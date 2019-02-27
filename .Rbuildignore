@@ -1,3 +1,4 @@
+^data-raw/*experiment\.R$
 ^LICENSE\.md$
 ^data-raw$
 ^docs$

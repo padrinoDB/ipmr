@@ -1,0 +1,40 @@
+# test add_kernel
+
+state_list <- list(c('dbh', 2, 20, 50), c('ht', 0.5, 30, 70))
+
+x <- init_ipm('simple_di_det') %>%
+  add_kernel("P",
+             formula = s * g,
+             family = "CC",
+             s = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
+             g = dnorm(dbh_2, mu_g, sd_g),
+             mu_g = g_int + g_slope * dbh_1,
+             data_list = list(s_int = 2.2,
+                              s_slope = 2.5,
+                              g_int = 0.2,
+                              g_slope = 1.02,
+                              sd_g = 3.9),
+             state_list = state_list,
+             int_rule = 'midpoint',
+             dom_start = 'dbh',
+             dom_end = 'dbh',
+             evict = TRUE,
+             evict_type = 'truncated_distributions') %>%
+  add_kernel('F',
+             formula = f_r * f_s * f_d,
+             family = 'CC',
+             f_r = 1/(1 + exp(-(f_r_int + f_r_slope * dbh_1))),
+             f_s = exp(f_s_int + f_s_slope * dhb_1),
+             f_d = dnorm(dbh_2, mu_fd, sd_fd),
+             data_list = list(f_r_int = 2,
+                              f_r_slope = 1.5,
+                              f_s_int = 1.3,
+                              f_s_slope = 2.2,
+                              mu_fd = 4,
+                              sd_fd = 2),
+             state_list = state_list,
+             int_rule = 'midpoint',
+             dom_start = 'dbh',
+             dom_end = 'dbh',
+             evict = TRUE,
+             evict_type = 'truncated_distributions')
