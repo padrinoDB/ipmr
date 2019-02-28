@@ -59,3 +59,64 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
   return(out)
 
 }
+
+#' @title Helpers for IPM construction
+#' @inheritParams add_kernel
+#' @param kernels The kernel names you that correspond to given population state vector.
+#' Suffix expansion is supported.
+#' @param ... Named expressions. See details for more information on their usage in
+#' each \code{define_*} function.
+#'
+#' @details
+#' These are helper functions to define certain types of IPM classes. It is recommended
+#' to use them within the IPM construction pipeline somewhere between \code{add_kernels}/
+#' \code{add_K} and \code{make_ipm}. The order in which they are called does not matter provided
+#' all values on the left hand side of the \code{...} appear in the right hand side
+#' of another expression used elsewhere. Expressions where the left hand side does
+#' not appear anywhere else will be ignored during construction, and so will not
+#' be present in the returned \code{ipm} object.
+#'
+#' Each \code{define_*} function takes dots in the same way: named expressions
+#' are captured and evaluated later in the appropriate contexts with their respective
+#' kernels. Suffix expansion is supported so that hierarchical models with
+#' year/plot/what-have-you effects do not need to  be rewritten 10s or 100s of times.
+#'
+#' @return All \code{define_*} functions return a proto_ipm.
+#'
+#' @rdname define_star
+#' @export
+
+define_pop_state <- function(proto_ipm, kernels, ...) {
+
+  # DEFINE ME
+}
+
+#' @rdname define_star
+#' @inheritParams define_pop_state
+#' @export
+
+define_state_vars <- function(proto_ipm, ...) {
+
+  # DEFINE ME
+}
+
+#' @inheritParams define_pop_state
+#' @param data_list A list of named values that correspond to constants in the formula.
+#' You do not need to specify vectors corresponding to the domains here.
+#' @rdname define_star
+#' @export
+
+define_environment <- function(proto_ipm, ..., data_list) {
+
+  # DEFINE ME
+}
+
+
+#' @rdname define_star
+#' @inheritParams define_pop_state
+#' @export
+
+define_hier_effs <- function(proto_ipm, ...) {
+
+  # DEFINE ME
+}

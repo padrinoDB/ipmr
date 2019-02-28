@@ -1,11 +1,62 @@
-
+#' @title Methods to implement an IPM
+#'
+#' @description The \code{make_ipm.*} methods convert a \code{proto_ipm} into a
+#' set of discretized kernels and population vectors. Methods have different
+#' requirements, so carefully read the parameter documentation and the
+#' \code{vignette("implementation", package = "ipmr")}.
+#'
+#' @param proto_ipm The proto_ipm object you wish to implement. This should be the
+#' output of \code{add_kernel}, \code{add_K}, or the \code{define_*} functions.
+#' @param ... Other arguments passed to methods
+#'
+#' @return The \code{make_ipm.*det} methods will always return a list of length 4
+#' containing the following components:
+#'
+#' \itemize{
+#'   \item{\strong{iterators}}{: iteration kernel(s) (if specified by \code{add_K}),
+#'                             otherwise contains \code{NA}.}
+#'   \item{\strong{sub_kernels}}{: the sub_kernels specified in \code{add_kernel}.}
+#'   \item{\strong{pop_state}}{: population vectors stored as an instance of the
+#'                              \code{pop_state} class.}
+#'   \item{\strong{proto_ipm}}{: the \code{proto_ipm} object used to implement
+#'                              the model.}
+#' }
+#'  The \code{make_ipm.*stoch} methods will always return a list of length 5
+#' containing the following components:
+#'
+#' \itemize{
+#'   \item{\strong{iterators}}{: iteration kernel(s) (if specified by \code{add_K}),
+#'                             otherwise contains \code{NA}.}
+#'   \item{\strong{sub_kernels}}{: the sub_kernels specified in \code{add_kernel}.}
+#'   \item{\strong{pop_state}}{: population vectors stored as an instance of the
+#'                              \code{pop_state} class.}
+#'   \item{\strong{env_state}}{: a matrix with dimension \code{n_iterations} X 1 of
+#'                              kernel indices indicating the order
+#'                              in which kernels are to be/were resampled OR
+#'                              a matrix with as many columns as stochastic parameters
+#'                              \code{n_iterations} rows.}
+#'   \item{\strong{proto_ipm}}{: the \code{proto_ipm} object used to implement
+#'                              the model.}
+#' }
+#'
+#'
+#'
+#'
+#'
+#' @author Sam Levin
+#'
+#' @export
 
 make_ipm <- function(proto_ipm, ...) {
   UseMethod('make_ipm')
 }
 
 
-make_ipm.general_di_det <- function(proto_ipm) {
+#' @inheritParams make_ipm
+#'
+#' @export
+
+make_ipm.simple_di_det <- function(proto_ipm) {
 
   # Split out K from others so it isn't evaluated until we're ready. If it
   # isn't there, then proceed as usual
@@ -56,6 +107,71 @@ make_ipm.general_di_det <- function(proto_ipm) {
     names(sub_kern_list)[i] <- others$kernel_id[i]
   }
 
+  if(length(K_row) > 0) {
+    K <- make_k(k_row, proto_ipm, sub_kern_list)
+  } else {
+    K <- NA_character_
+  }
 
+  out <- .generate_ipm_output(K, sub_kern_list, proto_ipm)
 
+  return(out)
+
+}
+
+make_ipm.simple_di_stoch_kern <- function(proto_ipm, ...) {
+
+  # DEFINE ME
+}
+
+make_ipm.simple_di_stoch_param <- function(proto_ipm, ...) {
+
+  # DEFINE ME
+}
+
+make_ipm.general_di_det <- function(proto_ipm, ...) {
+
+  # DEFINE ME
+}
+
+make_ipm.general_di_stoch_kern <- function(proto_ipm, ...) {
+
+  # DEFINE ME
+}
+
+make_ipm.general_di_stoch_param <- function(proto_ipm, ...) {
+
+  # DEFINE ME
+}
+
+# Density dependent methods----------
+
+make_ipm.simple_dd_det <- function(proto_ipm, ...) {
+
+  # DEFINE ME
+}
+
+make_ipm.simple_dd_stoch_kern <- function(proto_ipm, ...) {
+
+  # DEFINE ME
+}
+
+make_ipm.simple_dd_stoch_param <- function(proto_ipm, ...) {
+
+  # DEFINE ME
+}
+
+make_ipm.general_dd_det <- function(proto_ipm, ...) {
+
+  # DEFINE ME
+}
+
+make_ipm.general_dd_stoch_kern <- function(proto_ipm, ...) {
+
+  # DEFINE ME
+}
+
+make_ipm.general_dd_stoch_param <- function(proto_ipm, ...) {
+
+  # DEFINE ME
 }

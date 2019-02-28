@@ -33,6 +33,9 @@
 #' discrete to continuous should have a state variable entered here and an \code{NA}
 #' for \code{dom_start}. For kernels moving from continuous to discrete, vice versa.
 #' For discrete to discrete, both are \code{NA}.
+#' @param int_rule The integration rule to be used for the kernel. The default is
+#' "midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.
+#' If "g-l", additional arguments need to be supplied (\strong{Work on this later!!}).
 #' @param evict A logical indicating whether an eviction correction should be applied
 #' to the kernel. Default is \code{TRUE}.
 #' @param evict_type If \code{evict == TRUE}, then the type of eviction. Currently,
@@ -48,8 +51,9 @@
 
 add_kernel <- function(proto_ipm, name, formula, family,
                        ..., data_list, state_list,
-                       dom_start, dom_end, evict = TRUE,
-                       int_rule,
+                       dom_start, dom_end,
+                       int_rule = "midpoint",
+                       evict = TRUE,
                        evict_type = "truncated_distributions") {
 
   # Capture formulas and convert to text

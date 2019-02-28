@@ -5,7 +5,7 @@
 \title{Add a new kernel to the IPM}
 \usage{
 add_kernel(proto_ipm, name, formula, family, ..., data_list, state_list,
-  dom_start, dom_end, evict = TRUE, int_rule,
+  dom_start, dom_end, int_rule = "midpoint", evict = TRUE,
   evict_type = "truncated_distributions")
 }
 \arguments{
@@ -44,6 +44,10 @@ value here. For cases with a discrete stage, kernels moving individuals from
 discrete to continuous should have a state variable entered here and an \code{NA}
 for \code{dom_start}. For kernels moving from continuous to discrete, vice versa.
 For discrete to discrete, both are \code{NA}.}
+
+\item{int_rule}{The integration rule to be used for the kernel. The default is
+"midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.
+If "g-l", additional arguments need to be supplied (\strong{Work on this later!!}).}
 
 \item{evict}{A logical indicating whether an eviction correction should be applied
 to the kernel. Default is \code{TRUE}.}
