@@ -56,7 +56,10 @@ make_ipm <- function(proto_ipm, ...) {
 #'
 #' @export
 
-make_ipm.simple_di_det <- function(proto_ipm) {
+make_ipm.simple_di_det <- function(proto_ipm, domain_list = NULL) {
+
+  # Make sure we clean up the shimmed environment from the search path
+  on.exit(detach("domain_env", character.only = TRUE))
 
   # Split out K from others so it isn't evaluated until we're ready. If it
   # isn't there, then proceed as usual
@@ -81,9 +84,11 @@ make_ipm.simple_di_det <- function(proto_ipm) {
 
   # Initialize the domain_environment so these values can all be found at
   # evaluation time
-
-  domain_env <- .generate_domain_env(others$domain)
-
+  if(is.null(domain_list)){
+    domain_env <- .generate_domain_env(others$domain)
+  } else {
+    domain_env <- .generat_domain_env(domain_list)
+  }
   # Loop over the kernels for evaluation
   sub_kern_list <- list()
 
@@ -96,15 +101,24 @@ make_ipm.simple_di_det <- function(proto_ipm) {
 
     kern_env <- .generate_kernel_env(param_tree$params, domain_env)
 
-    kern_quos <- .parse_all_formulae(param_tree$formula, param_tree$vr_text)
+    kern_quos <- .parse_vr_formulae(param_tree$vr_text,
+                                    kern_env)
+    kern_form <- .parse_kern_formula(param_tree$formula,
+                                     kern_env)
 
     rlang::env_bind_lazy(kern_env,
                          !!! kern_quos,
                          .eval_env = kern_env)
 
+    if(others$evict[i]) {
+      rlang::env_bind_lazy(kern_env,
+                           !!! evict_type)
+    }
+
 
     sub_kern_list[[i]] <- rlang::env_get(kern_env, "formula")
     names(sub_kern_list)[i] <- others$kernel_id[i]
+    class(sub_kern_list[[i]]) <- others$params[[i]]$family
   }
 
   if(length(K_row) > 0) {
@@ -113,7 +127,10 @@ make_ipm.simple_di_det <- function(proto_ipm) {
     K <- NA_character_
   }
 
-  out <- .generate_ipm_output(K, sub_kern_list, proto_ipm)
+  out <- .generate_ipm_output(K,
+                              sub_kern_list,
+                              pop_state,
+                              proto_ipm)
 
   return(out)
 

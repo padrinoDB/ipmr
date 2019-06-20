@@ -20,15 +20,13 @@
 #' @param ... A set of named expressions that correspond to vital rates in \code{formula}.
 #' @param data_list A list of named values that correspond to constants in the formula.
 #' You do not need to specify vectors corresponding to the domains here.
-#' @param state_list A list, usually the output of \code{define_state_vars}. If specified
-#' manually, then each entry of the list should be a vector of length 4. The first is
-#' the name of the state variable (e.g. "dbh", "height", "weight", etc), the second
-#' is the lower boundary for that state variable (e.g. 2, 0.5, etc), the 3rd the upper
-#' bound, and the 4th the number of meshpoints for that particular state variable.
+#' @param state_list A list containing the names of each state variable used in
+#' the kernel.
 #' @param dom_start The name of the state variable for the kernel at time \emph{t}.
 #' @param dom_end The name of the state variable for the kernel at time \emph{t+1}.
 #' This is usually the same as \code{dom_start}, but general IPMs
-#' with discrete classes or IPMs that move from one state to another may have another
+#' with discrete classes or IPMs that move from one state to another (e.g. tree
+#' seedling going from a height domain to a DBH domain at T+1) may have another
 #' value here. For cases with a discrete stage, kernels moving individuals from
 #' discrete to continuous should have a state variable entered here and an \code{NA}
 #' for \code{dom_start}. For kernels moving from continuous to discrete, vice versa.
@@ -38,13 +36,15 @@
 #' If "g-l", additional arguments need to be supplied (\strong{Work on this later!!}).
 #' @param evict A logical indicating whether an eviction correction should be applied
 #' to the kernel. Default is \code{TRUE}.
-#' @param evict_type If \code{evict == TRUE}, then the type of eviction. Currently,
-#' \code{"truncated_distributions"} is the default (and the only option for now!).
+#' @param evict_fun If \code{evict == TRUE}, then a function that corrects for it.
+#' Currently, \code{truncated_distributions} and \code{rescale_kernel} are the
+#' only built-in functions, but user specified ones should work as well.
 #'
 #' @details \strong{BLAH BLAH BLAH}
 #'
-#' @importFrom purrr map_chr
-#' @importFrom rlang := list2
+#' @importFrom purrr map_chr map
+#' @importFrom rlang := list2 enquo enquos parse_expr parse_exprs quo_text
+#' quo_is_null
 #'
 #' @export
 
@@ -54,7 +54,7 @@ add_kernel <- function(proto_ipm, name, formula, family,
                        dom_start, dom_end,
                        int_rule = "midpoint",
                        evict = TRUE,
-                       evict_type = "truncated_distributions") {
+                       evict_fun = NULL) {
 
   # Capture formulas and convert to text
   formula <- rlang::enquo(formula)
@@ -63,14 +63,29 @@ add_kernel <- function(proto_ipm, name, formula, family,
                            .homonyms = "error",
                            .check_assign = TRUE)
 
+  evict_fun <- rlang::enquo(evict_fun)
   form_text <- rlang::quo_text(formula)
   vr_text <- lapply(vr_quos, rlang::quo_text)
+
+  # need to supply a function if you want to correct for eviction!
+  if(evict & rlang::quo_is_null(evict_fun)) {
+    stop('"evict" is TRUE but no evict_fun supplied!')
+
+  # if we have one, we need to get the name of the corrected object
+  } else if(!rlang::quo_is_null(evict_fun)) {
+    text <- rlang::quo_text(evict_fun)
+    nm <- strsplit(text, '\\(|\\)')[[1]][2]
+
+    evict_fun <- list(evict_fun)
+    names(evict_fun) <- nm
+  }
+
 
   # retain names
   names(vr_text) <- names(vr_quos)
 
   # convert state list into usable domain information
-  domain_info <- .get_domain_info(state_list, dom_start, dom_end)
+  domain_info <- .get_state_info(state_list, dom_start, dom_end)
 
   # Param_tree should always contain these four entries, regardless of class.
   # pop_states and env_states get defined separately.
@@ -83,14 +98,14 @@ add_kernel <- function(proto_ipm, name, formula, family,
   out <- data.frame(
     id = 'A1',
     kernel_id = name,
-    domain = I(rlang::list2(!!name := domain_info)),
-    state_var = I(rlang::list2(!!name := state_list)),
+    domain = I(rlang::list2(!! name := domain_info)),
+    state_var = I(rlang::list2(!! name := state_list)),
     int_rule = int_rule,
     evict = evict,
-    evict_type = evict_type,
-    pop_state = I(list("placeholder")),
-    env_state = I(list("placeholder")),
-    params = I(rlang::list2(!!name := param_tree))
+    evict_fun = I(list(evict_fun)),
+    pop_state = I(list(NA_character_)),
+    env_state = I(list(NA_character_)),
+    params = I(rlang::list2(!! name := param_tree))
   )
 
   rbind(proto_ipm, out)
@@ -98,27 +113,29 @@ add_kernel <- function(proto_ipm, name, formula, family,
 
 
 #' @noRd
-.get_domain_info <- function(state_list, dom_start, dom_end) {
+.get_state_info <- function(state_list, dom_start, dom_end) {
 
   # match names, then get info. Otherwise, generate an NA. the domain name
   # will always be first entry.
 
   if(!is.na(dom_start)) {
     state_ind <- which(grepl(dom_start, purrr::map_chr(state_list, ~.x[1])))
-    start_state_info <- as.numeric(state_list[[state_ind]][2:4])
+    start_state_info <- rep(NA_real_, 3)
 
     dom_start <- paste(dom_start, "_1", sep = "")
   } else {
     start_state_info <- NA_real_
+    dom_start <- 'start_not_applicable'
   }
 
   if(!is.na(dom_end)) {
     state_ind <- which(grepl(dom_end, purrr::map_chr(state_list, ~.x[1])))
-    end_state_info <- as.numeric(state_list[[state_ind]][2:4])
+    end_state_info <- rep(NA_real_, 3)
 
     dom_end <- paste(dom_end, "_2", sep = "")
   } else {
     end_state_info <- NA_real_
+    dom_end <- 'end_not_applicable'
   }
 
   out <- rlang::list2(!!dom_start := start_state_info,

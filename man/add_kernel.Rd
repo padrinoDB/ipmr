@@ -5,8 +5,7 @@
 \title{Add a new kernel to the IPM}
 \usage{
 add_kernel(proto_ipm, name, formula, family, ..., data_list, state_list,
-  dom_start, dom_end, int_rule = "midpoint", evict = TRUE,
-  evict_type = "truncated_distributions")
+  dom_start, dom_end, int_rule = "midpoint", evict = TRUE, evict_fun)
 }
 \arguments{
 \item{proto_ipm}{The name of object you wish to append the new kernel to.}
@@ -29,17 +28,15 @@ discrete to discrete (e.g. stasis in a seedbank).}
 \item{data_list}{A list of named values that correspond to constants in the formula.
 You do not need to specify vectors corresponding to the domains here.}
 
-\item{state_list}{A list, usually the output of \code{define_state_vars}. If specified
-manually, then each entry of the list should be a vector of length 4. The first is
-the name of the state variable (e.g. "dbh", "height", "weight", etc), the second
-is the lower boundary for that state variable (e.g. 2, 0.5, etc), the 3rd the upper
-bound, and the 4th the number of meshpoints for that particular state variable.}
+\item{state_list}{A list containing the names of each state variable used in
+the kernel.}
 
 \item{dom_start}{The name of the state variable for the kernel at time \emph{t}.}
 
 \item{dom_end}{The name of the state variable for the kernel at time \emph{t+1}.
 This is usually the same as \code{dom_start}, but general IPMs
-with discrete classes or IPMs that move from one state to another may have another
+with discrete classes or IPMs that move from one state to another (e.g. tree
+seedling going from a height domain to a DBH domain at T+1) may have another
 value here. For cases with a discrete stage, kernels moving individuals from
 discrete to continuous should have a state variable entered here and an \code{NA}
 for \code{dom_start}. For kernels moving from continuous to discrete, vice versa.
@@ -52,8 +49,9 @@ If "g-l", additional arguments need to be supplied (\strong{Work on this later!!
 \item{evict}{A logical indicating whether an eviction correction should be applied
 to the kernel. Default is \code{TRUE}.}
 
-\item{evict_type}{If \code{evict == TRUE}, then the type of eviction. Currently,
-\code{"truncated_distributions"} is the default (and the only option for now!).}
+\item{evict_fun}{If \code{evict == TRUE}, then a function that corrects for it.
+Currently, \code{truncated_distributions} and \code{rescale_kernel} are the
+only built-in functions, but user specified ones should work as well.}
 }
 \description{
 Adds a new kernel to the \code{proto_ipm} structure. Different

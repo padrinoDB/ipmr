@@ -27,7 +27,8 @@ Suggests:
     roxygen2
 VignetteBuilder: knitr
 Language: en-US
-Imports: 
-    rlang (>= 0.3.0),
-    magrittr
+Imports:
+    magrittr,
+    purrr (>= 0.3.0),
+    rlang (>= 0.3.0)
 RoxygenNote: 6.1.1

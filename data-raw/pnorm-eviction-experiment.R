@@ -4,6 +4,9 @@ g_int <- 0.5
 g_slope <- 1.02
 s <- 3.5
 
+dbh_1 <- dbh_2 <- seq(0, 15, length.out = 50)
+
+
 # Not automatically normalized
 grow <- function(dbh_2, dbh_1, g_int, g_slope, s, expre) {
   mu <- eval_bare(expre)
