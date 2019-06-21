@@ -44,18 +44,25 @@
 #'
 #' @importFrom purrr map_chr map
 #' @importFrom rlang := list2 enquo enquos parse_expr parse_exprs quo_text
-#' quo_is_null
+#' quo_is_null is_quosure
 #'
 #' @export
 
 
-add_kernel <- function(proto_ipm, name, formula, family,
-                       ..., data_list, state_list,
-                       dom_start, dom_end,
+add_kernel <- function(proto_ipm,
+                       name,
+                       formula,
+                       family,
+                       ...,
+                       data_list = list(),
+                       state_list,
+                       dom_start,
+                       dom_end,
                        int_rule = "midpoint",
                        evict = TRUE,
                        evict_fun = NULL) {
 
+  cls <- class(proto_ipm)
   # Capture formulas and convert to text
   formula <- rlang::enquo(formula)
   vr_quos <- rlang::enquos(...,
@@ -63,23 +70,13 @@ add_kernel <- function(proto_ipm, name, formula, family,
                            .homonyms = "error",
                            .check_assign = TRUE)
 
+  # make sure eviction function is correctly specified
   evict_fun <- rlang::enquo(evict_fun)
+  evict_fun <- .check_evict_fun(evict, evict_fun)
+
+  # protos store text rather than quos. They get converted back into quos later
   form_text <- rlang::quo_text(formula)
   vr_text <- lapply(vr_quos, rlang::quo_text)
-
-  # need to supply a function if you want to correct for eviction!
-  if(evict & rlang::quo_is_null(evict_fun)) {
-    stop('"evict" is TRUE but no evict_fun supplied!')
-
-  # if we have one, we need to get the name of the corrected object
-  } else if(!rlang::quo_is_null(evict_fun)) {
-    text <- rlang::quo_text(evict_fun)
-    nm <- strsplit(text, '\\(|\\)')[[1]][2]
-
-    evict_fun <- list(evict_fun)
-    names(evict_fun) <- nm
-  }
-
 
   # retain names
   names(vr_text) <- names(vr_quos)
@@ -95,7 +92,7 @@ add_kernel <- function(proto_ipm, name, formula, family,
                      vr_text = vr_text,
                      params = data_list)
 
-  out <- data.frame(
+  temp <- data.frame(
     id = 'A1',
     kernel_id = name,
     domain = I(rlang::list2(!! name := domain_info)),
@@ -105,10 +102,16 @@ add_kernel <- function(proto_ipm, name, formula, family,
     evict_fun = I(list(evict_fun)),
     pop_state = I(list(NA_character_)),
     env_state = I(list(NA_character_)),
-    params = I(rlang::list2(!! name := param_tree))
+    params = I(rlang::list2(!! name := param_tree)),
+    stringsAsFactors = FALSE
   )
 
-  rbind(proto_ipm, out)
+  out <- rbind(proto_ipm,
+               temp,
+               stringsAsFactors = FALSE)
+
+  class(out) <- cls
+  return(out)
 }
 
 
@@ -119,23 +122,27 @@ add_kernel <- function(proto_ipm, name, formula, family,
   # will always be first entry.
 
   if(!is.na(dom_start)) {
-    state_ind <- which(grepl(dom_start, purrr::map_chr(state_list, ~.x[1])))
-    start_state_info <- rep(NA_real_, 3)
 
+    start_state_info <- rep(NA_real_, 3)
     dom_start <- paste(dom_start, "_1", sep = "")
+
   } else {
+
     start_state_info <- NA_real_
     dom_start <- 'start_not_applicable'
+
   }
 
   if(!is.na(dom_end)) {
-    state_ind <- which(grepl(dom_end, purrr::map_chr(state_list, ~.x[1])))
-    end_state_info <- rep(NA_real_, 3)
 
+    end_state_info <- rep(NA_real_, 3)
     dom_end <- paste(dom_end, "_2", sep = "")
+
   } else {
+
     end_state_info <- NA_real_
     dom_end <- 'end_not_applicable'
+
   }
 
   out <- rlang::list2(!!dom_start := start_state_info,
@@ -143,3 +150,25 @@ add_kernel <- function(proto_ipm, name, formula, family,
   return(out)
 }
 
+.check_evict_fun <- function(evict, fun) {
+
+  # need to supply a function if you want to correct for eviction!
+  if(evict & rlang::quo_is_null(fun)) {
+    stop('"evict" is TRUE but no fun supplied!')
+
+    # if we have one, we need to get the name of the corrected object
+
+  } else if(!rlang::quo_is_null(fun)) {
+
+    text <- rlang::quo_text(fun)
+    nm <- strsplit(text, '\\(|\\)')[[1]][2]
+
+    fun <- list(fun)
+    names(fun) <- nm
+
+  } else if(rlang::quo_is_null(fun)) {
+    fun <- NA_character_
+  }
+
+  return(fun)
+}

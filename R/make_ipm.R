@@ -47,7 +47,7 @@
 #'
 #' @export
 
-make_ipm <- function(proto_ipm, ...) {
+make_ipm <- function(proto_ipm, return_all = FALSE, ...) {
   UseMethod('make_ipm')
 }
 
@@ -56,41 +56,41 @@ make_ipm <- function(proto_ipm, ...) {
 #'
 #' @export
 
-make_ipm.simple_di_det <- function(proto_ipm, domain_list = NULL) {
-
-  # Make sure we clean up the shimmed environment from the search path
-  on.exit(detach("domain_env", character.only = TRUE))
+make_ipm.simple_di_det <- function(proto_ipm,
+                                   return_all = FALSE,
+                                   domain_list = NULL) {
 
   # Split out K from others so it isn't evaluated until we're ready. If it
   # isn't there, then proceed as usual
 
   K_row <- which(grepl("K", proto_ipm$kernel_id))
 
-  if(length(k_row) > 0) {
+  if(length(K_row) > 0) {
     k_row <- proto_ipm[K_row, ]
-    sub_kernels <- proto_ipm[-c(K_row), ]
+    others <- proto_ipm[-c(K_row), ]
   } else {
-    sub_kernels <- proto_ipm
+    others <- proto_ipm
   }
 
   # If vital rates are fit with a hierarchical model of any kind,
   # then split those out into their respective years/plots/what-have-you
-  # BE SURE TO WRITE VIGNETTE ON THIS SYNTAX
+  # BE SURE TO WRITE VIGNETTE ON THIS SYNTAX  ONCE IMPLEMENTED
 
-  if(.has_hier_effs(others) | .has_hier_effs(k_row)) {
-    others <- .split_hier_effs(others)
-    k_row <- .split_hier_effs(k_row)
-  }
+  # if(.has_hier_effs(others) | .has_hier_effs(k_row)) {
+  #   others <- .split_hier_effs(others)
+  #   k_row  <- .split_hier_effs(k_row)
+  # }
 
   # Initialize the domain_environment so these values can all be found at
   # evaluation time
   if(is.null(domain_list)){
     domain_env <- .generate_domain_env(others$domain)
   } else {
-    domain_env <- .generat_domain_env(domain_list)
+    domain_env <- .generate_domain_env(domain_list)
   }
   # Loop over the kernels for evaluation
   sub_kern_list <- list()
+  env_list <- list(dom_env = domain_env)
 
   for(i in seq_len(dim(others)[1])) {
 
@@ -103,34 +103,52 @@ make_ipm.simple_di_det <- function(proto_ipm, domain_list = NULL) {
 
     kern_quos <- .parse_vr_formulae(param_tree$vr_text,
                                     kern_env)
-    kern_form <- .parse_kern_formula(param_tree$formula,
+    kern_form <- .parse_vr_formulae(param_tree$formula,
                                      kern_env)
+    names(kern_form) <- others$kernel_id[i]
 
+    # Bind the vital rate expressions so the initial discretization can take
+    # place
     rlang::env_bind_lazy(kern_env,
                          !!! kern_quos,
                          .eval_env = kern_env)
 
-    if(others$evict[i]) {
-      rlang::env_bind_lazy(kern_env,
-                           !!! evict_type)
+
+    if(others$evict[i] &
+       rlang::is_quosure(others$evict_fun[[i]][[1]])) {
+
+      evict_correction <- rlang::quo_set_env(others$evict_fun[[i]][[1]],
+                                             kern_env)
+      nm <- strsplit(rlang::quo_text(evict_correction), '\\(|,|\\)')[[1]][2]
+
+      assign(nm, rlang::eval_tidy(evict_correction), envir = kern_env)
     }
 
+    rlang::env_bind_lazy(kern_env,
+                         !!! kern_form,
+                         .eval_env = kern_env)
 
-    sub_kern_list[[i]] <- rlang::env_get(kern_env, "formula")
+    sub_kern_list[[i]] <- rlang::env_get(kern_env, others$kernel_id[i])
     names(sub_kern_list)[i] <- others$kernel_id[i]
     class(sub_kern_list[[i]]) <- others$params[[i]]$family
+
+    if(return_all) {
+      env_list[[i + 1]] <- kern_env
+      names(env_list)[i + 1] <- others$kernel_id[i]
+    }
   }
 
   if(length(K_row) > 0) {
-    K <- make_k(k_row, proto_ipm, sub_kern_list)
+    iterators <- .make_k_simple(k_row, proto_ipm, sub_kern_list, domain_env)
   } else {
-    K <- NA_character_
+    iterators <- NA_character_
   }
 
-  out <- .generate_ipm_output(K,
-                              sub_kern_list,
-                              pop_state,
-                              proto_ipm)
+  out <- list(iterators = iterators,
+              sub_kernels = sub_kern_list,
+              data_envs = ifelse(return_all, env_list, NA),
+              pop_state = ifelse(hasArg(pop_state), pop_state, NA),
+              proto_ipm = proto_ipm)
 
   return(out)
 

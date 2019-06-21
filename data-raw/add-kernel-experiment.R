@@ -7,7 +7,7 @@ x <- init_ipm('simple_di_det') %>%
              formula = t(s * t(g)),
              family = "CC",
              s = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
-             g = dnorm(dbh_2, mu_g, sd_g),
+             g = cell_size_dbh * dnorm(dbh_2, mu_g, sd_g),
              mu_g = g_int + g_slope * dbh_1,
              data_list = list(s_int = 2.2,
                               s_slope = 0.25,
@@ -19,14 +19,15 @@ x <- init_ipm('simple_di_det') %>%
              dom_start = 'dbh',
              dom_end = 'dbh',
              evict = TRUE,
-             evict_fun = truncated_distributions(g)) %>%
+             evict_fun = truncated_distributions(g,
+                                                 n_mesh_p = 100)) %>%
   add_kernel('F',
              formula = f_r * f_s * f_d,
              family = 'CC',
              f_r = 1/(1 + exp(-(f_r_int + f_r_slope * dbh_1))),
-             f_s = exp(f_s_int + f_s_slope * dhb_1),
-             f_d = dnorm(dbh_2, mu_fd, sd_fd),
-             data_list = list(f_r_int = 0.2,
+             f_s = exp(f_s_int + f_s_slope * dbh_1),
+             f_d = cell_size_dbh * dnorm(dbh_2, mu_fd, sd_fd),
+             data_list = list(f_r_int = 0.03,
                               f_r_slope = 0.015,
                               f_s_int = 1.3,
                               f_s_slope = 0.075,
@@ -36,8 +37,9 @@ x <- init_ipm('simple_di_det') %>%
              int_rule = 'midpoint',
              dom_start = 'dbh',
              dom_end = 'dbh',
-             evict = TRUE,
-             evict_fun = truncated_distributions(f_d)) %>%
+             evict = FALSE) %>%#,
+             # evict_fun = truncated_distributions(f_d,
+             #                                     n_mesh_p = 100)) %>%
   add_kernel('K',
              formula = P + F,
              family = 'IPM',
@@ -47,7 +49,5 @@ x <- init_ipm('simple_di_det') %>%
              dom_start = 'dbh',
              dom_end = 'dbh',
              evict = FALSE) %>%
-  define_domains(dbh = c(0, 50, 100))
-
-    #%>%
-#  make_ipm()
+  define_domains(dbh = c(0, 50, 100)) %>%
+  make_ipm(return_all = TRUE)

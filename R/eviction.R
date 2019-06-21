@@ -4,7 +4,7 @@
 #' @description Various helpers to correct for unintentional eviction (Williams
 #' et al. 2012).
 #'
-#' @param discretized_mat The kernel or function that needs correcting.
+#' @param discretized_kernel The kernel or function that needs correcting.
 #'
 #' @return A matrix of the same dimension as the input.
 #'
@@ -14,28 +14,40 @@
 #'
 #' @export
 
-truncated_distributions <- function(discretized_kernel) {
+truncated_distributions <- function(discretized_kernel,
+                                    n_mesh_p) {
 
-  dim_in <- dim(discretized_kernel)
+  if(is.matrix(discretized_kernel)){
+    dim_in <- dim(discretized_kernel)
+  } else {
 
-  out <- discretized_mat / matrix(
-                             as.vector(
-                               apply(
-                                 discretized_kernel,
-                                 2,
-                                 sum
-                               )
-                             ),
-                             nrow = dim_in[1],
-                             ncol = dim_in[2],
-                             byrow = TRUE
-                           )
+    discretized_kernel <- matrix(discretized_kernel,
+                                 nrow = n_mesh_p,
+                                 ncol = n_mesh_p)
+    dim_in <- c(n_mesh_p, n_mesh_p)
+
+  }
+
+  out <- discretized_kernel /
+    matrix(
+      as.vector(
+        apply(
+          discretized_kernel,
+          2,
+          sum
+        )
+      ),
+      nrow = dim_in[1],
+      ncol = dim_in[2],
+      byrow = TRUE
+    )
   return(out)
 
 }
 
-rescale_kernel <- function(discretized_kernel) {
+rescale_kernel <- function(discretized_kernel, n_mesh_p) {
   return(
-    truncated_distributions(discretized_kernel = discretized_kernel)
+    truncated_distributions(discretized_kernel = discretized_kernel,
+                            n_mesh_p = n_mesh_p)
   )
 }
