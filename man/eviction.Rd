@@ -4,10 +4,10 @@
 \alias{truncated_distributions}
 \title{Eviction correction}
 \usage{
-truncated_distributions(discretized_kernel)
+truncated_distributions(discretized_kernel, n_mesh_p)
 }
 \arguments{
-\item{discretized_mat}{The kernel or function that needs correcting.}
+\item{discretized_kernel}{The kernel or function that needs correcting.}
 }
 \value{
 A matrix of the same dimension as the input.

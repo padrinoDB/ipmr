@@ -2,9 +2,18 @@
 % Please edit documentation in R/make_ipm.R
 \name{make_ipm}
 \alias{make_ipm}
+\alias{make_ipm.simple_di_det}
+\alias{make_ipm.simple_di_stoch_kern}
 \title{Methods to implement an IPM}
 \usage{
-make_ipm(proto_ipm, ...)
+make_ipm(proto_ipm, return_all = FALSE, ...)
+
+\method{make_ipm}{simple_di_det}(proto_ipm, return_all = FALSE,
+  domain_list = NULL, usr_funs = list(), ...)
+
+\method{make_ipm}{simple_di_stoch_kern}(proto_ipm, domain_list = NULL,
+  return_all = FALSE, iterate = FALSE, iterations = 50,
+  k_seq = NULL, usr_funs = list(), ...)
 }
 \arguments{
 \item{proto_ipm}{The proto_ipm object you wish to implement. This should be the

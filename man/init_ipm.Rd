@@ -4,12 +4,10 @@
 \alias{init_ipm}
 \title{Initialize an IPM}
 \usage{
-init_ipm(class, ...)
+init_ipm(model_class)
 }
 \arguments{
-\item{class}{The type of IPM. See \code{Details} for more information on classes}
-
-\item{...}{Additional arguments passed to methods (???)}
+\item{model_class}{The type of IPM. See \code{Details} for more information on classes}
 }
 \value{
 An object of classes \code{proto_ipm} and \code{class}

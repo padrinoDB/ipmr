@@ -16,8 +16,6 @@ define_environment(proto_ipm, ..., data_list)
 define_hier_effs(proto_ipm, ...)
 }
 \arguments{
-\item{proto_ipm}{The name of object you wish to append the new kernel to.}
-
 \item{kernels}{The kernel names you that correspond to given population state vector.
 Suffix expansion is supported.}
 
@@ -35,8 +33,8 @@ Helpers for IPM construction
 }
 \details{
 These are helper functions to define certain types of IPM classes. It is recommended
-to use them within the IPM construction pipeline somewhere between \code{add_kernels}/
-\code{add_K} and \code{make_ipm}. The order in which they are called does not matter provided
+to use them within the IPM construction pipeline somewhere between \code{add_kernels}
+and \code{make_ipm}. The order in which they are called does not matter provided
 all values on the left hand side of the \code{...} appear in the right hand side
 of another expression used elsewhere. Expressions where the left hand side does
 not appear anywhere else will be ignored during construction, and so will not

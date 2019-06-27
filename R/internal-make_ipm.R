@@ -1,41 +1,29 @@
 # make_ipm internal helpers
 
-#'@noRd
-.make_k_simple <- function(k_row, proto_ipm, sub_kern_list, domain_env) {
-  params <- k_row$params[[1]]
-  formula <- params$formula
-
-  # set up the environment and bind the subkernels to it
-  k_env <- rlang::child_env(.parent = domain_env,
-                            !!! sub_kern_list)
-
-  k_form <- ipmr:::.parse_vr_formulae(formula,
-                                      k_env)
-  names(k_form) <- k_row$kernel_id
-
-  rlang::env_bind_lazy(k_env,
-                       !!! k_form,
-                       .eval_env = k_env)
-
-  out <- rlang::env_get_list(k_env, nms = k_row$kernel_id)
-
-  return(out)
-
-}
-
 #' @noRd
-.generate_kernel_env <- function(parameters, domain_env) {
+.generate_kernel_env <- function(parameters,
+                                 domain_env,
+                                 param_tree) {
 
   kernel_env <- rlang::child_env(.parent = domain_env)
 
   rlang::env_bind(kernel_env,
                   !!! parameters)
 
-  return(kernel_env)
+  kern_quos <- .parse_vr_formulae(param_tree$vr_text,
+                                  kernel_env)
+
+  # Bind the vital rate expressions so the initial discretization can take
+  # place
+  rlang::env_bind_lazy(kernel_env,
+                       !!! kern_quos,
+                       .eval_env = kernel_env)
+
+  invisible(kernel_env)
 }
 
 #' @noRd
-.parse_vr_formulae <- function(text, kern_env) {
+.parse_vr_formulae <- function(text, kernel_env) {
 
   # parse the text expressions and then convert to list of depth 1.
   # This is critical as otherwise, env_bind_lazy bind a list containing the
@@ -49,15 +37,15 @@
     temp <- rlang::enquo(x)
     rlang::quo_set_env(temp, to_set)
   },
-  to_set = kern_env)
+  to_set = kernel_env)
 
   return(out)
 }
 
 
 #' @noRd
-#' @importFrom purrr flatten
-.generate_domain_env <- function(domain_list) {
+#' @importFrom purrr flatten map_dbl
+.generate_domain_env <- function(domain_list, usr_funs) {
 
   # Inherits from whatever is 2nd on search path. all loaded functions/packges
   # should still be findable, but objects in the global environment should not
@@ -69,7 +57,14 @@
 
   domain_list <- domain_list[!duplicated(names(domain_list))]
 
-  bounds <- purrr::map(domain_list, function(x) ipmr:::.make_domain_seqs(x))
+  bounds <- purrr::map(domain_list, function(x) .make_domain_seqs(x))
+
+  n_mesh_p <- purrr::map_dbl(domain_list, ~.x[3])
+
+  names(n_mesh_p) <- paste('n_', names(domain_list), sep = "")
+
+  rlang::env_bind(dom_env,
+                  !!! n_mesh_p)
 
   mids <- purrr::map(bounds, .f = function(x) {
     l <- length(x) - 1
@@ -98,8 +93,24 @@
 
   }
 
+  rlang::env_bind(dom_env,
+                  !!! usr_funs)
+
 
   invisible(dom_env)
+}
+
+.extract_kernel_from_eval_env <- function(kernel_env,
+                                          kernel_id,
+                                          sub_kernel_list,
+                                          family,
+                                          pos) {
+
+  sub_kernel_list[[pos]] <- rlang::env_get(kernel_env, kernel_id)
+  names(sub_kernel_list)[pos] <- kernel_id
+  class(sub_kernel_list[[pos]]) <- family
+
+  return(sub_kernel_list)
 }
 
 .make_domain_seqs <- function(dom_vec) {
@@ -111,6 +122,63 @@
   }
 
 
+}
+
+.make_kern_seq <- function(proto, kernels, iterations, env_seq) {
+
+  if(is.null(env_seq)) {
+    seq_type <- 'int_generated'
+  } else {
+
+    test <- is.matrix(env_seq)
+
+    if(test) {
+      seq_type <- 'mc_mat'
+
+    } else {
+      seq_type <- 'usr_specified'
+    }
+  }
+
+  out <- switch(seq_type,
+                'int_generated' = .make_internal_seq(kernels, iterations),
+                'mc_mat' = .make_markov_seq(proto, kernels, env_seq, iterations),
+                'usr_specified' = .make_usr_seq(proto, kernels, env_seq, iterations))
+
+  return(out)
+
+}
+
+.make_internal_seq <- function(kernels, iterations) {
+
+  n_kerns <- length(kernels)
+
+  out <- round(runif(iterations, min = 1, max = n_kerns))
+
+  return(out)
+
+}
+
+.make_usr_seq <- function(kernels, env_seq, iterations) {
+
+  int_test <- vapply(env_seq, function(x) is.integer(x), logical(1))
+
+  if(!all(int_test)) {
+    stop("All values in 'env_seq' must be integers.")
+  }
+
+  max_test <- max(env_seq)
+
+  if(max_test > length(kernels)) {
+    stop('Maximum value of env_seq cannot exceed the number of kernels.')
+  }
+
+  if(length(env_seq) > iterations) {
+    warning("'length(env_seq)' is greater than requested 'iterations'.",
+            " Simulation will only run for as many 'iterations'.")
+  }
+
+  return(env_seq)
 }
 
 #' @noRd

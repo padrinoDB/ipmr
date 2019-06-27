@@ -1,4 +1,6 @@
 # simple-ndd-det IPM test
+library(ipmr)
+
 data_list = list(s_int = 2.2,
                  s_slope = 0.25,
                  g_int = 0.2,
@@ -62,59 +64,68 @@ lambda <- Re(eigen(K)$values[1])
 w <- Re(eigen(K)$vectors[ , 1])
 
 
+inv_logit <- function(int, slope, sv) {
+  return(1/(1 + exp(-(int + slope * sv))))
+}
+
 state_list <- list(c('dbh'))
 
 x <- init_ipm('simple_di_det') %>%
-  add_kernel("P",
-             formula = t(s * t(g)),
-             family = "CC",
-             s = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
-             g = cell_size_dbh * dnorm(dbh_2, mu_g, sd_g),
-             mu_g = g_int + g_slope * dbh_1,
-             data_list = list(s_int = 2.2,
-                              s_slope = 0.25,
-                              g_int = 0.2,
-                              g_slope = 1.02,
-                              sd_g = 0.7),
-             state_list = state_list,
-             int_rule = 'midpoint',
-             dom_start = 'dbh',
-             dom_end = 'dbh',
-             evict = TRUE,
-             evict_fun = truncated_distributions(g,
-                                                 n_mesh_p = 100)) %>%
-  add_kernel('F',
-             formula = f_r * f_s * f_d,
-             family = 'CC',
-             f_r = 1/(1 + exp(-(f_r_int + f_r_slope * dbh_1))),
-             f_s = exp(f_s_int + f_s_slope * dbh_1),
-             f_d = cell_size_dbh * dnorm(dbh_2, mu_fd, sd_fd),
-             data_list = list(f_r_int = 0.03,
-                              f_r_slope = 0.015,
-                              f_s_int = 1.3,
-                              f_s_slope = 0.075,
-                              mu_fd = 0.5,
-                              sd_fd = 0.2),
-             state_list = state_list,
-             int_rule = 'midpoint',
-             dom_start = 'dbh',
-             dom_end = 'dbh',
-             evict = FALSE) %>%#,
+  define_kernel("P",
+                formula = t(s * t(g)), # make helper for double transposes
+                family = "CC",
+                s = inv_logit(s_int, s_slope, dbh_1),
+                g = cell_size_dbh * dnorm(dbh_2, mu_g, sd_g),
+                mu_g = g_int + g_slope * dbh_1,
+                data_list = list(s_int = 2.2,
+                                 s_slope = 0.25,
+                                 g_int = 0.2,
+                                 g_slope = 1.02,
+                                 sd_g = 0.7),
+
+                # split out implementation details into a separate
+                # function - named lists??
+                state_list = state_list,
+                int_rule = 'midpoint',
+                dom_start = 'dbh',
+                dom_end = 'dbh',
+                evict = TRUE,
+                evict_fun = truncated_distributions(g,
+                                                    n_mesh_p = 100)) %>%
+  define_kernel('F',
+                formula = f_r * f_s * f_d,
+                family = 'CC',
+                f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
+                f_s = exp(f_s_int + f_s_slope * dbh_1),
+                f_d = cell_size_dbh * dnorm(dbh_2, mu_fd, sd_fd),
+                data_list = list(f_r_int = 0.03,
+                                 f_r_slope = 0.015,
+                                 f_s_int = 1.3,
+                                 f_s_slope = 0.075,
+                                 mu_fd = 0.5,
+                                 sd_fd = 0.2),
+                state_list = state_list,
+                int_rule = 'midpoint',
+                dom_start = 'dbh',
+                dom_end = 'dbh',
+                evict = FALSE) %>%#,
   # evict_fun = truncated_distributions(f_d,
   #                                     n_mesh_p = 100)) %>%
-  add_kernel('K',
-             formula = P + F,
-             family = 'IPM',
-             data_list = list(),
-             state_list = state_list,
-             int_rule = 'midpoint',
-             dom_start = 'dbh',
-             dom_end = 'dbh',
-             evict = FALSE) %>%
+  define_kernel('K',
+                formula = P + F,
+                family = 'IPM',
+                data_list = list(),
+                state_list = state_list,
+                int_rule = 'midpoint',
+                dom_start = 'dbh',
+                dom_end = 'dbh',
+                evict = FALSE) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
-  make_ipm()
+  make_ipm(usr_funs = list(inv_logit = inv_logit))
 
 lambda_ipmr <- Re(eigen(x$iterators$K)$values[1])
+w_ipmr <- Re(eigen(x$iterators$K)$vectors[ , 1])
 
 lambda - lambda_ipmr
+
 

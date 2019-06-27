@@ -4,8 +4,7 @@
 #' All you need for this is to know what type of IPM you want to construct - the rest comes later
 #' with \code{add_kernel()}, \code{add_K}, \code{make_ipm}, and associated helper functions.
 #'
-#' @param class The type of IPM. See \code{Details} for more information on classes
-#' @param ... Additional arguments passed to methods (???)
+#' @param model_class The type of IPM. See \code{Details} for more information on classes
 #'
 #' @return An object of classes \code{proto_ipm} and \code{class}
 #'
@@ -58,7 +57,7 @@
 #'
 #' @export
 
-init_ipm <- function(class, ...) {
+init_ipm <- function(model_class) {
 
   out <- data.frame(
     id = character(0L),
@@ -70,10 +69,13 @@ init_ipm <- function(class, ...) {
     evict_type = character(0L),
     pop_state =  character(0L),
     env_state =  character(0L),
+    hier_effs = logical(0L),
+    levels_hier_effs = character(0L),
     params =  character(0L)
   )
 
-  class(out) <- c(class, 'proto_ipm', class(out))
+
+  class(out) <- c(model_class, 'proto_ipm', class(out))
 
   return(out)
 }

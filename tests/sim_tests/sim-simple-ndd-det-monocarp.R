@@ -70,37 +70,37 @@ lambda <- Re(eigen(K)$values[1])
 state_list <- list(c('surf_area'))
 
 monocarp_sys <- init_ipm('simple_di_det') %>%
-  add_kernel("P",
-             formula = t(s * t(g)),
-             family = 'CC',
-             s = 1/(1 + exp(-(s_int + s_slope * surf_area_1))) *
-               (1 - (1/(1 + exp(-(f_r_int + f_r_slope * surf_area_1))))),
-             g = cell_size_surf_area * dnorm(surf_area_2, mu_g, sd_g),
-             mu_g = g_int + g_slope * surf_area_1,
-             data_list = list(
-                    s_int = 1.03,
-                    s_slope = 0.19,
-                    g_int = 8,
-                    g_slope = 0.92,
-                    sd_g = 0.9,
-                    f_r_int = 0.09,
-                    f_r_slope = 0.05
+  define_kernel("P",
+                formula = t(s * t(g)),
+                family = 'CC',
+                s = 1/(1 + exp(-(s_int + s_slope * surf_area_1))) *
+                  (1 - (1/(1 + exp(-(f_r_int + f_r_slope * surf_area_1))))),
+                g = cell_size_surf_area * dnorm(surf_area_2, mu_g, sd_g),
+                mu_g = g_int + g_slope * surf_area_1,
+                data_list = list(
+                  s_int = 1.03,
+                  s_slope = 0.19,
+                  g_int = 8,
+                  g_slope = 0.92,
+                  sd_g = 0.9,
+                  f_r_int = 0.09,
+                  f_r_slope = 0.05
                 ),
-             state_list = state_list,
-             int_rule = 'midpoint',
-             dom_start = 'surf_area',
-             dom_end = 'surf_area',
-             evict = TRUE,
-             evict_fun = truncated_distributions(g,
-                                                 n_mesh_p = 500)
-             ) %>%
-  add_kernel("F",
-             formula = f_r * f_s * f_d,
-             family = 'CC',
-             f_r = 1/(1 + exp(-(f_r_int + f_r_slope * surf_area_1))),
-             f_s = exp(f_s_int + f_s_slope * surf_area_1),
-             f_d = cell_size_surf_area * dnorm(surf_area_2, mu_fd, sd_fd),
-             data_list = list(
+                state_list = state_list,
+                int_rule = 'midpoint',
+                dom_start = 'surf_area',
+                dom_end = 'surf_area',
+                evict = TRUE,
+                evict_fun = truncated_distributions(g,
+                                                    n_mesh_p = 500)
+  ) %>%
+  define_kernel("F",
+                formula = f_r * f_s * f_d,
+                family = 'CC',
+                f_r = 1/(1 + exp(-(f_r_int + f_r_slope * surf_area_1))),
+                f_s = exp(f_s_int + f_s_slope * surf_area_1),
+                f_d = cell_size_surf_area * dnorm(surf_area_2, mu_fd, sd_fd),
+                data_list = list(
                   f_r_int = 0.09,
                   f_r_slope = 0.05,
                   f_s_int = 0.01,
@@ -108,23 +108,23 @@ monocarp_sys <- init_ipm('simple_di_det') %>%
                   mu_fd = 3,
                   sd_fd = 0.7
                 ),
-             state_list = state_list,
-             int_rule = 'midpoint',
-             dom_start = 'surf_area',
-             dom_end = 'surf_area',
-             evict = FALSE
-             ) %>%
-  add_kernel("K",
-             formula = P + F,
-             family = "IPM",
-             data_list = list(),
-             state_list = state_list,
-             int_rule = 'midpoint',
-             dom_start = 'surf_area',
-             dom_end = 'surf_area',
-             evict = FALSE) %>%
+                state_list = state_list,
+                int_rule = 'midpoint',
+                dom_start = 'surf_area',
+                dom_end = 'surf_area',
+                evict = FALSE
+  ) %>%
+  define_kernel("K",
+                formula = P + F,
+                family = "IPM",
+                data_list = list(),
+                state_list = state_list,
+                int_rule = 'midpoint',
+                dom_start = 'surf_area',
+                dom_end = 'surf_area',
+                evict = FALSE) %>%
   define_domains(surf_area = c(0.3, 200, 500)) %>%
-  make_ipm()
+  make_ipm(return_all = TRUE)
 
 K_ipmr <- monocarp_sys$iterators$K
 

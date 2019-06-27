@@ -69,8 +69,8 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
 #'
 #' @details
 #' These are helper functions to define certain types of IPM classes. It is recommended
-#' to use them within the IPM construction pipeline somewhere between \code{add_kernels}/
-#' \code{add_K} and \code{make_ipm}. The order in which they are called does not matter provided
+#' to use them within the IPM construction pipeline somewhere between \code{add_kernels}
+#' and \code{make_ipm}. The order in which they are called does not matter provided
 #' all values on the left hand side of the \code{...} appear in the right hand side
 #' of another expression used elsewhere. Expressions where the left hand side does
 #' not appear anywhere else will be ignored during construction, and so will not

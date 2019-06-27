@@ -51,3 +51,23 @@ rescale_kernel <- function(discretized_kernel, n_mesh_p) {
                             n_mesh_p = n_mesh_p)
   )
 }
+
+
+# Internal helpers for make_ipm() methods
+
+#' @noRd
+.correct_eviction <- function(evict_fun, kernel_env) {
+
+  # Set the quosure environment for eval_tidy and get the name of the symbol
+  # being modified
+  evict_correction <- rlang::quo_set_env(evict_fun,
+                                         kernel_env)
+  nm <- strsplit(rlang::quo_text(evict_correction), '\\(|,|\\)')[[1]][2]
+
+  # Need to evaluate before bindidng as the symbols are no longer uniquely named
+  assign(nm,
+         rlang::eval_tidy(evict_correction),
+         envir = kernel_env)
+
+  invisible(kernel_env)
+}
