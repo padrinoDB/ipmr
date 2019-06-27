@@ -153,8 +153,8 @@ make_ipm.simple_di_det <- function(proto_ipm,
 #'
 #' @export
 make_ipm.simple_di_stoch_kern <- function(proto_ipm,
-                                          domain_list = NULL,
                                           return_all = FALSE,
+                                          domain_list = NULL,
                                           iterate = FALSE,
                                           iterations = 50,
                                           k_seq = NULL,

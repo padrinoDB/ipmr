@@ -12,14 +12,7 @@
 #'
 #' @return The \code{proto_ipm} with the domain information added.
 #'
-#' @examples
-#'
-#'
-#' domains <- define_domains(dbh = c(0, 10, 50), ht = c(0, 20, 80))
-#'
-#' my_ipm <- make_ipm(pre_defined_proto, domain_list = domains)
-#'
-#'@export
+#' @export
 
 define_domains <- function(proto_ipm, ...) {
 

@@ -6,7 +6,6 @@
                                  param_tree) {
 
   kernel_env <- rlang::child_env(.parent = domain_env)
-
   rlang::env_bind(kernel_env,
                   !!! parameters)
 
@@ -143,7 +142,7 @@
   out <- switch(seq_type,
                 'int_generated' = .make_internal_seq(kernels, iterations),
                 'mc_mat' = .make_markov_seq(proto, kernels, env_seq, iterations),
-                'usr_specified' = .make_usr_seq(proto, kernels, env_seq, iterations))
+                'usr_specified' = .make_usr_seq(kernels, env_seq, iterations))
 
   return(out)
 

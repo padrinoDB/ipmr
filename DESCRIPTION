@@ -29,6 +29,8 @@ VignetteBuilder: knitr
 Language: en-US
 Imports:
     magrittr,
+    methods,
     purrr (>= 0.3.0),
-    rlang (>= 0.3.0)
+    rlang (>= 0.3.0),
+    stats
 RoxygenNote: 6.1.1

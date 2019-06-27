@@ -11,8 +11,8 @@ make_ipm(proto_ipm, return_all = FALSE, ...)
 \method{make_ipm}{simple_di_det}(proto_ipm, return_all = FALSE,
   domain_list = NULL, usr_funs = list(), ...)
 
-\method{make_ipm}{simple_di_stoch_kern}(proto_ipm, domain_list = NULL,
-  return_all = FALSE, iterate = FALSE, iterations = 50,
+\method{make_ipm}{simple_di_stoch_kern}(proto_ipm, return_all = FALSE,
+  domain_list = NULL, iterate = FALSE, iterations = 50,
   k_seq = NULL, usr_funs = list(), ...)
 }
 \arguments{
