@@ -34,6 +34,13 @@
 #' @param int_rule The integration rule to be used for the kernel. The default is
 #' "midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.
 #' If "g-l", additional arguments need to be supplied (\strong{Work on this later!!}).
+#' @param has_hier_effs A logical indicating whether or not the kernel and/or its
+#' underlying vital rates are structured with hierarchical effects. If so and you
+#' specify either the functional forms or the exact parameter values you want to use,
+#' the kernels will be automatically split according to the notation in the vital
+#' rates and kernel formulae and multiple kernels will be built. See the vignette
+#' on the syntax for this feature for more details (\code{vignettes(
+#' 'hierarchical-notation', package = 'ipmr')}).
 #' @param evict A logical indicating whether an eviction correction should be applied
 #' to the kernel. Default is \code{TRUE}.
 #' @param evict_fun If \code{evict == TRUE}, then a function that corrects for it.
@@ -49,7 +56,7 @@
 #' @export
 
 
-add_kernel <- function(proto_ipm,
+define_kernel <- function(proto_ipm,
                        name,
                        formula,
                        family,
@@ -59,6 +66,8 @@ add_kernel <- function(proto_ipm,
                        dom_start,
                        dom_end,
                        int_rule = "midpoint",
+                       has_hier_effs = FALSE,
+                       levels_hier_effs = list(),
                        evict = TRUE,
                        evict_fun = NULL) {
 
@@ -92,6 +101,8 @@ add_kernel <- function(proto_ipm,
                      vr_text = vr_text,
                      params = data_list)
 
+  if(!methods::hasArg(levels_hier_effs)) levels_hier_effs <- list(levels = NA)
+
   temp <- data.frame(
     id = 'A1',
     kernel_id = name,
@@ -102,6 +113,8 @@ add_kernel <- function(proto_ipm,
     evict_fun = I(list(evict_fun)),
     pop_state = I(list(NA_character_)),
     env_state = I(list(NA_character_)),
+    has_hier_effs = has_hier_effs,
+    levels_hier_effs = I(rlang::list2(levels_hier_effs)),
     params = I(rlang::list2(!! name := param_tree)),
     stringsAsFactors = FALSE
   )
@@ -161,7 +174,7 @@ add_kernel <- function(proto_ipm,
   } else if(!rlang::quo_is_null(fun)) {
 
     text <- rlang::quo_text(fun)
-    nm <- strsplit(text, '\\(|\\)')[[1]][2]
+    nm <- strsplit(text, '\\(|,|\\)')[[1]][2]
 
     fun <- list(fun)
     names(fun) <- nm
