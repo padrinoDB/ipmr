@@ -5,9 +5,8 @@
 \title{Add a new kernel to the IPM}
 \usage{
 define_kernel(proto_ipm, name, formula, family, ..., data_list = list(),
-  state_list, dom_start, dom_end, int_rule = "midpoint",
-  has_hier_effs = FALSE, levels_hier_effs = list(), evict = TRUE,
-  evict_fun = NULL)
+  state_list, has_hier_effs = FALSE, levels_hier_effs = list(),
+  evict = TRUE, evict_fun = NULL)
 }
 \arguments{
 \item{proto_ipm}{The name of object you wish to append the new kernel to.}
@@ -33,21 +32,6 @@ You do not need to specify vectors corresponding to the domains here.}
 \item{state_list}{A list containing the names of each state variable used in
 the kernel.}
 
-\item{dom_start}{The name of the state variable for the kernel at time \emph{t}.}
-
-\item{dom_end}{The name of the state variable for the kernel at time \emph{t+1}.
-This is usually the same as \code{dom_start}, but general IPMs
-with discrete classes or IPMs that move from one state to another (e.g. tree
-seedling going from a height domain to a DBH domain at T+1) may have another
-value here. For cases with a discrete stage, kernels moving individuals from
-discrete to continuous should have a state variable entered here and an \code{NA}
-for \code{dom_start}. For kernels moving from continuous to discrete, vice versa.
-For discrete to discrete, both are \code{NA}.}
-
-\item{int_rule}{The integration rule to be used for the kernel. The default is
-"midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.
-If "g-l", additional arguments need to be supplied (\strong{Work on this later!!}).}
-
 \item{has_hier_effs}{A logical indicating whether or not the kernel and/or its
 underlying vital rates are structured with hierarchical effects. If so and you
 specify either the functional forms or the exact parameter values you want to use,
@@ -55,6 +39,10 @@ the kernels will be automatically split according to the notation in the vital
 rates and kernel formulae and multiple kernels will be built. See the vignette
 on the syntax for this feature for more details (\code{vignettes(
 'hierarchical-notation', package = 'ipmr')}).}
+
+\item{levels_hier_effs}{A named list with vectors corresponding the various levels
+the hierarchical variable can take. This should be a single vector, usually
+character or integer.}
 
 \item{evict}{A logical indicating whether an eviction correction should be applied
 to the kernel. Default is \code{TRUE}.}

@@ -1,205 +1,6 @@
-
-[![Travis build
-status](https://travis-ci.org/levisc8/ipmr.svg?branch=master)](https://travis-ci.org/levisc8/ipmr)
-
-# ipmr
-
-Simple, density-independent, deterministic and kernel-resampled
-stochastic models (`simple_di_det`, `simple_di_stoch_kern`) are now
-functional. However, expect changes as more complicated methods are
-implemented\! See below for an example of how to implement an IPM in
-this framework.
-
-Next on the implementation to-do list are simple, stochastic IPMs using
-parameter
-resampling.
-
-``` r
-# Example of the setup for a simple IPM without density dependence or environmental
-# stochasticity
-
-library(ipmr)
-
-data_list = list(s_int = 2.2,
-                 s_slope = 0.25,
-                 g_int = 0.2,
-                 g_slope = 1.02,
-                 sd_g = 0.7,
-                 f_r_int = 0.03,
-                 f_r_slope = 0.015,
-                 f_s_int = 1.3,
-                 f_s_slope = 0.075,
-                 mu_fd = 0.5,
-                 sd_fd = 0.2)
-
-s <- function(sv1, params) {
-  1/(1 + exp(-(params[1] + params[2] * sv1)))
-}
-
-
-g <- function(sv1, sv2, params) {
-  mu <- params[1] + params[2] * sv1
-  dnorm(sv2, mean = mu, sd = params[3])
-}
-
-f_r <- function(sv1, params) {
-  1/(1 + exp(-(params[1] + params[2] * sv1)))
-}
-
-f_s <- function(sv1, params) {
-  exp(params[1] + params[2] * sv1)
-}
-
-f_d <- function(sv2, params) {
-  dnorm(sv2, mean = params[1], sd = params[2])
-}
-
-fec <- function(sv1, sv2, params) {
-  f_r(sv1, params[1:2]) * f_s(sv1, params[3:4]) * f_d(sv2, params[5:6])
-}
-
-b <- seq(0, 50, length.out = 101)
-d1 <- d2 <- (b[2:101] + b[1:100]) * 0.5
-h <- d1[3] - d1[2]
-
-
-G <- h * outer(d1, d2, FUN = g, params = c(data_list$g_int,
-                                           data_list$g_slope,
-                                           data_list$sd_g))
-G2 <- G/matrix(as.vector(apply(G, 2, sum)),
-               nrow = length(d1),
-               ncol = length(d1),
-               byrow = TRUE)
-
-S <- s(d1, c(data_list$s_int, data_list$s_slope))
-
-P <- t(S * t(G2))
-
-Fm <- h * outer(d1, d2, FUN = fec, params = unlist(data_list[6:11]))
-
-K <- P + Fm
-
-lambda_usr <- Re(eigen(K)$values[1])
-w_usr <- Re(eigen(K)$vectors[ , 1])
-
-
-# User specified functions can be passed to make_ipm(usr_funs = list(my_fun = my_fun)).
-# inv_logit is a simple example, but more complicated ones can be specified as well. 
-
-inv_logit <- function(int, slope, sv) {
-  return(1/(1 + exp(-(int + slope * sv))))
-}
-
-state_list <- list(c('dbh'))
-
-x <- init_ipm('simple_di_det') %>%
-  define_kernel(
-    # Name of the kernel
-    name = "P",
-    # The type of transition it describes (e.g. continuous - continuous, discrete - continuous)
-    family = "CC",
-    # The formula for the kernel. don't forget to transpose the growth matrix when multiplying survival!
-    formula = t(s * t(g)),
-    # A named set of expressions for the vital rates it includes. ipmr automatically
-    # computes the bin width creates a variable called "cell_size_stateVariable"
-    # for usage in expressions that require integrating a density function. NOTE - the
-    # cell_size_variable will not be required much longer as ipmr should be able
-    # to detect when it is needed and insert it automatically!
-    
-    s = inv_logit(s_int, s_slope, dbh_1), # note the use of user-specified function here
-    g = cell_size_dbh * dnorm(dbh_2, mu_g, sd_g),
-    mu_g = g_int + g_slope * dbh_1,
-    data_list = list(s_int = 2.2,
-                     s_slope = 0.25,
-                     g_int = 0.2,
-                     g_slope = 1.02,
-                     sd_g = 0.7),
-    # The implementation details will soon be split out into another function
-    # that matches integration rules and domains to kernels
-    state_list = state_list,
-    has_hier_effs = FALSE,
-    # The evict_fun argument can take any function. ipmr provides built in
-    # truncated density functions, but a user specified one will work as well, 
-    # provided all parameters are provided in the data_list argument.
-    evict = TRUE,
-    evict_fun = truncated_distributions(g,
-                                        n_mesh_p = 100)) %>%
-  
-  # Define the fecundity kernel
-  define_kernel(
-    name = 'F',
-    formula = f_r * f_s * f_d,
-    family = 'CC',
-    f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
-    f_s = exp(f_s_int + f_s_slope * dbh_1),
-    f_d = cell_size_dbh * dnorm(dbh_2, mu_fd, sd_fd),
-    data_list = list(f_r_int = 0.03,
-                     f_r_slope = 0.015,
-                     f_s_int = 1.3,
-                     f_s_slope = 0.075,
-                     mu_fd = 0.5,
-                     sd_fd = 0.2),
-    state_list = state_list,
-    evict = FALSE
-  ) %>%
-  
-  # K kernels will likely get their own define_k() function, so don't expect
-  # this interface to remain consistent
-  define_kernel(
-    name = "K",
-    formula = P + F,
-    family = "IPM",
-    state_list = state_list,
-    evict = FALSE # this is dealt with in the sub-kernels, so no need to do so again.
-  ) %>%
-  define_impl(
-    kernel_impl_list =  make_impl_args_list(
-      kernel_names = c("K", "P", "F"),
-      int_rule = rep('midpoint', 3),
-      dom_start = rep('dbh', 3),
-      dom_end = rep('dbh', 3)
-    )
-  ) %>% 
-  define_domains(
-    dbh = c(0, # the first entry is the lower bound of the domain.
-            50, # the second entry is the upper bound of the domain.
-            100 # third entry is the number of meshpoints for the domain.
-    )
-  ) %>%
-  make_ipm(usr_funs = list(inv_logit = inv_logit))
-
-lambda_ipmr <- Re(eigen(x$iterators$K)$values[1])
-w_ipmr <- Re(eigen(x$iterators$K)$vectors[ , 1])
-
-lambda_ipmr - lambda_usr
-```
-
-## Simple, density independent, stochastic kernel resampling models
-
-These models are typically the result of vital rate models that are fit
-in a mixed effects framework (e.g. multiple sites or multiple years of
-data). They have a special syntax that mirrors the mathematical notation
-of these models (and has the side effect of saving you a considerable
-amount of copying/pasting/typing in general).
-
-The syntax uses a `name_hierarchicalVariable` notation. These names are
-automatically expanded to include the multiple levels of the
-hierarchical variable. For example, the P kernel for a model with 5
-years of data could be `name`’d `P_yr`, and the underlying vital rates
-would be denoted `vitalRate_yr`. The parameter values in the `data_list`
-are the exception to this - they must be labeled with the actual values
-that the hierarchical variable takes. See the example
-below.
-
-``` r
-# rlang is a useful shortcut for splicing named values into lists. purrr is used to manipulate said lists.
-# This is intended to simulate a monocarpic perennial life history where flowering is always fatal.
-# Note that this means the survival function also includes the probability of reproduction function.
-
+context('test simple_di_stoch_kern')
 library(rlang)
-library(ipmr)
 library(purrr)
-
 # define functions for target ipm
 
 # Survival - logistic regression
@@ -263,7 +64,7 @@ names(s_r_int) <- paste('s_', nms, sep = "")
 names(f_s_r_int) <- paste('f_s_', nms, sep = "")
 
 # The !!! operator used inside of list2 from rlang takes the named vector
-# and converts it to a named list. This can be spliced into the data list 
+# and converts it to a named list. This can be spliced into the data list
 # to rapidly make a parameter set suitable for usage in the data_list argument
 # of define_kernel
 
@@ -349,17 +150,16 @@ F_5 <- h * outer(sv1, sv2, FUN = fec,
                  r_effect = params$f_s_r_5)
 
 
-K_1 <- P_1 + F_1
-K_2 <- P_2 + F_2
-K_3 <- P_3 + F_3
-K_4 <- P_4 + F_4
-K_5 <- P_5 + F_5
+ipms <- list(K_1 = P_1 + F_1,
+             K_2 = P_2 + F_2,
+             K_3 = P_3 + F_3,
+             K_4 = P_4 + F_4,
+             K_5 = P_5 + F_5)
 
-lambdas <- c(Re(eigen(K_1)$values[1]),
-             Re(eigen(K_2)$values[1]),
-             Re(eigen(K_3)$values[1]),
-             Re(eigen(K_4)$values[1]),
-             Re(eigen(K_5)$values[1]))
+eigen_sys <- lapply(ipms, function(x) eigen(x))
+
+lambdas <- vapply(eigen_sys, function(x) Re(x$values[1]), numeric(1))
+ws      <- vapply(eigen_sys, function(x) Re(x$vectors[ ,1]), numeric(500))
 
 
 ## ipmr version
@@ -395,14 +195,14 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     # The yr suffix is appended to the kernel name and the parameter names
     # within each vital rate expression. ipmr substitutes in the hier_levels
     # for each suffix occurrence, thus changing P_yr in P_1, P_2, P_3, P_4, P_5,
-    # s_yr in s_1, s_2, s_3, s_4, and s_5. s_r_yr is converted to s_r_1, s_r_2, 
+    # s_yr in s_1, s_2, s_3, s_4, and s_5. s_r_yr is converted to s_r_1, s_r_2,
     # etc. In the case of s_r_yr, provided that the names in the data_list match
     # the expanded names, all will go well!
-    
+
     name = 'P_yr',
     formula = t(s_yr * t(g_yr)) ,
     family = "CC",
-    s_yr = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) * 
+    s_yr = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
       (1 - inv_logit(ht_1, f_r_int, f_r_slope)),
     g_yr = dnorm(ht_2, mean = mu_g_yr, sd = sd_g) * cell_size_ht,
     mu_g_yr = g_int + g_slope * ht_1 + g_r_yr,
@@ -452,7 +252,19 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
 
 
 ks <- monocarp_sys$iterators
-l_bc <- vapply(ks, function(x) Re(eigen(x)$values[1]), numeric(1))
 
-l_bc - lambdas
-```
+eigen_sys <- lapply(ks, function(x) eigen(x))
+
+lambdas_ipmr <- vapply(eigen_sys, function(x) Re(x$values[1]), numeric(1))
+ws_ipmr      <- vapply(eigen_sys, function(x) Re(x$vectors[ ,1]), numeric(500))
+
+test_that('eigenvectors and values are correct', {
+
+  expect_equal(lambdas_ipmr, lambdas, tolerance = 1e-10)
+  expect_equal(ws_ipmr[ ,1], ws[ ,1], tolerance = 1e-15)
+  expect_equal(ws_ipmr[ ,2], ws[ ,2], tolerance = 1e-15)
+  expect_equal(ws_ipmr[ ,3], ws[ ,3], tolerance = 1e-15)
+  expect_equal(ws_ipmr[ ,4], ws[ ,4], tolerance = 1e-15)
+  expect_equal(ws_ipmr[ ,5], ws[ ,5], tolerance = 1e-15)
+
+})

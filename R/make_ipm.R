@@ -9,6 +9,24 @@
 #' @param proto_ipm The proto_ipm object you wish to implement. This should be the
 #' output of \code{add_kernel}, \code{add_K}, or the \code{define_*} functions.
 #' @param ... Other arguments passed to methods
+#' @param return_all A logical indicating whether to return the environments that
+#' the kernel expressions are evaluated in. This is useful for developer debugging and not
+#' much else.
+#' @param domain_list An optional list of new domain information to implement
+#' the IPM with.
+#' @param usr_funs An optional list of user-specified functions that are passed
+#' on to the evaluation environments. This can help make vital rate expressions
+#' more concise and expressive. Names in this list should exactly match the names
+#' of the function calls in the \code{...} or \code{formula}.
+#' @param iterate A logical indicating whether or not iterate the model during or just
+#' return the iteration kernels.
+#' @param iterations If \code{iterate} is \code{TRUE}, then the number of iterations
+#' to simulate.
+#' @param k_seq The sequence of kernels to use during the iterations. This can either
+#' be a vector of integers corresponding to kernel indices, a character vector corresponding
+#' to kernel names, a Markov chain matrix with transition probabilities between
+#' given states (NOT YET IMPLEMENTED), or empty. If empty, a random sequence will
+#' be generated internally from a uniform distribution.
 #'
 #' @return The \code{make_ipm.*det} methods will always return a list of length 4
 #' containing the following components:

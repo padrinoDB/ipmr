@@ -16,6 +16,8 @@ define_environment(proto_ipm, ..., data_list)
 define_hier_effs(proto_ipm, ...)
 }
 \arguments{
+\item{proto_ipm}{The name of object you wish to append the new kernel to.}
+
 \item{kernels}{The kernel names you that correspond to given population state vector.
 Suffix expansion is supported.}
 

@@ -61,7 +61,7 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
 }
 
 #' @title Helpers for IPM construction
-#' @inheritParams add_kernel
+#' @inheritParams define_kernel
 #' @param kernels The kernel names you that correspond to given population state vector.
 #' Suffix expansion is supported.
 #' @param ... Named expressions. See details for more information on their usage in

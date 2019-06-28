@@ -113,9 +113,6 @@ x <- init_ipm('simple_di_det') %>%
     # The implementation details will soon be split out into another function
     # that matches integration rules and domains to kernels
     state_list = state_list,
-    int_rule = 'midpoint',
-    dom_start = 'dbh',
-    dom_end = 'dbh',
     has_hier_effs = FALSE,
     # The evict_fun argument can take any function. ipmr provides built in
     # truncated density functions, but a user specified one will work as well, 
@@ -139,9 +136,6 @@ x <- init_ipm('simple_di_det') %>%
                      mu_fd = 0.5,
                      sd_fd = 0.2),
     state_list = state_list,
-    int_rule = 'midpoint',
-    dom_start = 'dbh',
-    dom_end = 'dbh',
     evict = FALSE
   ) %>%
   
@@ -152,10 +146,16 @@ x <- init_ipm('simple_di_det') %>%
     formula = P + F,
     family = "IPM",
     state_list = state_list,
-    dom_start = 'dbh',
-    dom_end = 'dbh',
     evict = FALSE # this is dealt with in the sub-kernels, so no need to do so again.
   ) %>%
+  define_impl(
+    kernel_impl_list =  make_impl_args_list(
+      kernel_names = c("K", "P", "F"),
+      int_rule = rep('midpoint', 3),
+      dom_start = rep('dbh', 3),
+      dom_end = rep('dbh', 3)
+    )
+  ) %>% 
   define_domains(
     dbh = c(0, # the first entry is the lower bound of the domain.
             50, # the second entry is the upper bound of the domain.
@@ -396,9 +396,6 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     mu_g_yr = g_int + g_slope * ht_1 + g_r_yr,
     data_list = params,
     state_list = list(c('ht')),
-    dom_start = 'ht',
-    dom_end = 'ht',
-    int_rule = 'midpoint',
     has_hier_effs = TRUE,
     levels_hier_effs = hier_levels,
     evict = TRUE,
@@ -415,9 +412,6 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     f_d = dnorm(ht_2, mean = mu_fd, sd = sd_fd) * cell_size_ht,
     data_list = params,
     state_list = list(c('ht')),
-    dom_start = 'ht',
-    dom_end = 'ht',
-    int_rule = 'midpoint',
     has_hier_effs = TRUE,
     levels_hier_effs = hier_levels,
     evict = FALSE) %>%
@@ -427,12 +421,17 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     family = "IPM",
     data_list = params,
     state_list = list(c("ht")),
-    dom_start = 'ht',
-    dom_end = 'ht',
-    int_rule = 'midpoint',
     has_hier_effs = TRUE,
     levels_hier_effs = hier_levels,
     evict = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("K_yr", "P_yr", "F_yr"),
+      int_rule = rep("midpoint", 3),
+      dom_start = rep("ht", 3),
+      dom_end = rep("ht", 3)
+    )
   ) %>%
   define_domains(ht = c(0.2, 400, 500)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit,

@@ -148,11 +148,14 @@
 
 }
 
+#' @importFrom stats runif
 .make_internal_seq <- function(kernels, iterations) {
 
   n_kerns <- length(kernels)
 
-  out <- round(runif(iterations, min = 1, max = n_kerns))
+  out <- round(
+    stats::runif(iterations, min = 1, max = n_kerns)
+  )
 
   return(out)
 

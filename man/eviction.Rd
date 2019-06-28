@@ -8,6 +8,8 @@ truncated_distributions(discretized_kernel, n_mesh_p)
 }
 \arguments{
 \item{discretized_kernel}{The kernel or function that needs correcting.}
+
+\item{n_mesh_p}{The number of meshpoints for the kernel being corrected.}
 }
 \value{
 A matrix of the same dimension as the input.

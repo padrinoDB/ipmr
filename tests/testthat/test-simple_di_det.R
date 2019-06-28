@@ -71,6 +71,11 @@ inv_logit <- function(int, slope, sv) {
 
 state_list <- list(c('dbh'))
 
+impl_args <- make_impl_args_list(c('P', 'F', 'K'),
+                                 int_rule = rep('midpoint', 3),
+                                 dom_start = rep('dbh', 3),
+                                 dom_end = rep('dbh', 3))
+
 x <- init_ipm('simple_di_det') %>%
   define_kernel("P",
                 formula = t(s * t(g)), # make helper for double transposes
@@ -83,13 +88,7 @@ x <- init_ipm('simple_di_det') %>%
                                  g_int = 0.2,
                                  g_slope = 1.02,
                                  sd_g = 0.7),
-
-                # split out implementation details into a separate
-                # function - named lists??
                 state_list = state_list,
-                int_rule = 'midpoint',
-                dom_start = 'dbh',
-                dom_end = 'dbh',
                 evict = TRUE,
                 evict_fun = truncated_distributions(g,
                                                     n_mesh_p = 100)) %>%
@@ -106,9 +105,6 @@ x <- init_ipm('simple_di_det') %>%
                                  mu_fd = 0.5,
                                  sd_fd = 0.2),
                 state_list = state_list,
-                int_rule = 'midpoint',
-                dom_start = 'dbh',
-                dom_end = 'dbh',
                 evict = FALSE) %>%#,
   # evict_fun = truncated_distributions(f_d,
   #                                     n_mesh_p = 100)) %>%
@@ -117,10 +113,8 @@ x <- init_ipm('simple_di_det') %>%
                 family = 'IPM',
                 data_list = list(),
                 state_list = state_list,
-                int_rule = 'midpoint',
-                dom_start = 'dbh',
-                dom_end = 'dbh',
                 evict = FALSE) %>%
+  define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit))
 

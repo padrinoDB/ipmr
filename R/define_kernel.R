@@ -22,18 +22,6 @@
 #' You do not need to specify vectors corresponding to the domains here.
 #' @param state_list A list containing the names of each state variable used in
 #' the kernel.
-#' @param dom_start The name of the state variable for the kernel at time \emph{t}.
-#' @param dom_end The name of the state variable for the kernel at time \emph{t+1}.
-#' This is usually the same as \code{dom_start}, but general IPMs
-#' with discrete classes or IPMs that move from one state to another (e.g. tree
-#' seedling going from a height domain to a DBH domain at T+1) may have another
-#' value here. For cases with a discrete stage, kernels moving individuals from
-#' discrete to continuous should have a state variable entered here and an \code{NA}
-#' for \code{dom_start}. For kernels moving from continuous to discrete, vice versa.
-#' For discrete to discrete, both are \code{NA}.
-#' @param int_rule The integration rule to be used for the kernel. The default is
-#' "midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.
-#' If "g-l", additional arguments need to be supplied (\strong{Work on this later!!}).
 #' @param has_hier_effs A logical indicating whether or not the kernel and/or its
 #' underlying vital rates are structured with hierarchical effects. If so and you
 #' specify either the functional forms or the exact parameter values you want to use,
@@ -41,6 +29,9 @@
 #' rates and kernel formulae and multiple kernels will be built. See the vignette
 #' on the syntax for this feature for more details (\code{vignettes(
 #' 'hierarchical-notation', package = 'ipmr')}).
+#' @param levels_hier_effs A named list with vectors corresponding the various levels
+#' the hierarchical variable can take. This should be a single vector, usually
+#' character or integer.
 #' @param evict A logical indicating whether an eviction correction should be applied
 #' to the kernel. Default is \code{TRUE}.
 #' @param evict_fun If \code{evict == TRUE}, then a function that corrects for it.
@@ -57,19 +48,16 @@
 
 
 define_kernel <- function(proto_ipm,
-                       name,
-                       formula,
-                       family,
-                       ...,
-                       data_list = list(),
-                       state_list,
-                       dom_start,
-                       dom_end,
-                       int_rule = "midpoint",
-                       has_hier_effs = FALSE,
-                       levels_hier_effs = list(),
-                       evict = TRUE,
-                       evict_fun = NULL) {
+                          name,
+                          formula,
+                          family,
+                          ...,
+                          data_list = list(),
+                          state_list,
+                          has_hier_effs = FALSE,
+                          levels_hier_effs = list(),
+                          evict = TRUE,
+                          evict_fun = NULL) {
 
   cls <- class(proto_ipm)
   # Capture formulas and convert to text
@@ -90,9 +78,6 @@ define_kernel <- function(proto_ipm,
   # retain names
   names(vr_text) <- names(vr_quos)
 
-  # convert state list into usable domain information
-  domain_info <- .get_state_info(state_list, dom_start, dom_end)
-
   # Param_tree should always contain these four entries, regardless of class.
   # pop_states and env_states get defined separately.
 
@@ -106,9 +91,9 @@ define_kernel <- function(proto_ipm,
   temp <- data.frame(
     id = 'A1',
     kernel_id = name,
-    domain = I(rlang::list2(!! name := domain_info)),
+    domain = I(list(NA_character_)),
     state_var = I(rlang::list2(!! name := state_list)),
-    int_rule = int_rule,
+    int_rule = NA_character_,
     evict = evict,
     evict_fun = I(list(evict_fun)),
     pop_state = I(list(NA_character_)),
@@ -129,7 +114,7 @@ define_kernel <- function(proto_ipm,
 
 
 #' @noRd
-.get_state_info <- function(state_list, dom_start, dom_end) {
+.get_state_info <- function(dom_start, dom_end) {
 
   # match names, then get info. Otherwise, generate an NA. the domain name
   # will always be first entry.

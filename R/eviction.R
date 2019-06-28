@@ -5,6 +5,7 @@
 #' et al. 2012).
 #'
 #' @param discretized_kernel The kernel or function that needs correcting.
+#' @param n_mesh_p The number of meshpoints for the kernel being corrected.
 #'
 #' @return A matrix of the same dimension as the input.
 #'
