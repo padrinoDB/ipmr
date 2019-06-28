@@ -1,4 +1,7 @@
 
+[![Travis build
+status](https://travis-ci.org/levisc8/ipmr.svg?branch=master)](https://travis-ci.org/levisc8/ipmr)
+
 # ipmr
 
 Simple, density-independent, deterministic and kernel-resampled

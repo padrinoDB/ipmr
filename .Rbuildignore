@@ -6,3 +6,4 @@
 ^README\.Rmd$
 ^ipmr\.Rproj$
 ^\.Rproj\.user$
+^\.travis\.yml$
