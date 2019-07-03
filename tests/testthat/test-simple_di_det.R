@@ -69,12 +69,12 @@ inv_logit <- function(int, slope, sv) {
   return(1/(1 + exp(-(int + slope * sv))))
 }
 
-state_list <- list(c('dbh'))
-
 impl_args <- make_impl_args_list(c('P', 'F', 'K'),
                                  int_rule = rep('midpoint', 3),
                                  dom_start = rep('dbh', 3),
                                  dom_end = rep('dbh', 3))
+
+states <- c('dbh', 'dbh')
 
 x <- init_ipm('simple_di_det') %>%
   define_kernel("P",
@@ -88,7 +88,7 @@ x <- init_ipm('simple_di_det') %>%
                                  g_int = 0.2,
                                  g_slope = 1.02,
                                  sd_g = 0.7),
-                state_list = state_list,
+                states = states,
                 evict = TRUE,
                 evict_fun = truncated_distributions(g,
                                                     n_mesh_p = 100)) %>%
@@ -104,7 +104,7 @@ x <- init_ipm('simple_di_det') %>%
                                  f_s_slope = 0.075,
                                  mu_fd = 0.5,
                                  sd_fd = 0.2),
-                state_list = state_list,
+                states = states,
                 evict = FALSE) %>%#,
   # evict_fun = truncated_distributions(f_d,
   #                                     n_mesh_p = 100)) %>%
@@ -112,7 +112,7 @@ x <- init_ipm('simple_di_det') %>%
                 formula = P + F,
                 family = 'IPM',
                 data_list = list(),
-                state_list = state_list,
+                states = states,
                 evict = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%

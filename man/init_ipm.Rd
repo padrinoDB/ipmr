@@ -15,7 +15,7 @@ An object of classes \code{proto_ipm} and \code{class}
 \description{
 This is always the first step in constructing an IPM with \code{ipmr}.
 All you need for this is to know what type of IPM you want to construct - the rest comes later
-with \code{add_kernel()}, \code{add_K}, \code{make_ipm}, and associated helper functions.
+with \code{define_kernel}, \code{define_k}, \code{make_ipm}, and associated helper functions.
 }
 \details{
 Combinations of \code{simple} or \code{general}, \code{dd} or \code{di},
@@ -31,33 +31,42 @@ use kernel resampling vs those that use parameter resampling (\emph{sensu} Metca
 in the \code{vignettes("classes", package = 'ipmr')}.
 
 \itemize{
-  \item{\code{simple}}{: an IPM with a single continuous state variable that does not include
-  any discrete stages. Simple IPMs can still be stochastic and/or density dependent.}
-  \item{\code{general}}{: an IPM with more than one continuous state variable
-  and/or a model that includes discrete stages.}
 
-  \item{\code{dd}}{: used to denote a density dependent IPM.}
-  \item{\code{di}}{: used to denote a density independent IPM.}
-
-  \item{\code{det}}{: used to denote a deterministic IPM. Use this when you are
-  building a single iteration kernel.}
-  \item{\code{stoch}}{: used to denote a stochastic IPM. Stochasticity can be implemented
-  in two ways in \code{ipmr}: \code{"kern"} resampling, and \code{"param"} resampling.}
-
-  \item{\code{kern}}{: used to denote an IPM that uses kernel resampling. Briefly,
-  these models build all of the iteration kernels ahead of time and then choose one
-  at random or in a user-specified order as they move from iteration to iteration. The
-  user-specified population vector is multiplied by the chosen kernel and the result
-  is multiplied by the next kernel for the desired number of iterations or until
-  convergence is reached (depending on what you request following \code{make_ipm()}.}
-  \item{\code{param}}{: used to denote parameter resampling. This generates distributions
-  for each parameter based on user-specified functions supplied to \code{define_stoch_params()},
-  and then resamples those distributions at each iteration. This will be a bit slower than
-  \code{"kern"} resampling because iteration matrices need to be reconstructed
-  from new parameters at every time step. The \code{vignette("classes", package = "ipmr")}
-  contains more details and a number of suggestions for further reading on how to avoid this
-  slow down.}
-
+  \item{One of}
+  \itemize{
+    \item{\code{simple}}{: an IPM with a single continuous state variable that does not include
+    any discrete stages. Simple IPMs can still be stochastic and/or density dependent.}
+    \item{\code{general}}{: an IPM with more than one continuous state variable
+    and/or a model that includes discrete stages.}
+ }
+ \item{and one of}
+ \itemize{
+    \item{\code{dd}}{: used to denote a density dependent IPM.}
+    \item{\code{di}}{: used to denote a density independent IPM.}
+ }
+ \item{and one of}
+ \itemize{
+    \item{\code{det}}{: used to denote a deterministic IPM. Use this when you are
+    building a single iteration kernel.}
+    \item{\code{stoch}}{: used to denote a stochastic IPM. Stochasticity can be implemented
+    in two ways in \code{ipmr}: \code{"kern"} resampling, and \code{"param"} resampling.}
+ }
+ \item{If using \code{det}, this should be omitted. If using \code{stoch}, then one of the following: }
+ \itemize{
+    \item{\code{kern}}{: used to denote an IPM that uses kernel resampling. Briefly,
+    these models build all of the iteration kernels ahead of time and then choose one
+    at random or in a user-specified order as they move from iteration to iteration. The
+    user-specified population vector is multiplied by the chosen kernel and the result
+    is multiplied by the next kernel for the desired number of iterations or until
+    convergence is reached (depending on what you request following \code{make_ipm()}.}
+    \item{\code{param}}{: used to denote parameter resampling. This generates distributions
+    for each parameter based on user-specified functions supplied to \code{define_env()},
+    and then resamples those distributions at each iteration. This will be a bit slower than
+    \code{"kern"} resampling because iteration matrices need to be reconstructed
+    from new parameters at every time step. The \code{vignette("classes", package = "ipmr")}
+    contains more details and a number of suggestions for further reading on how to avoid this
+    slow down.}
+}
 }
 }
 \references{

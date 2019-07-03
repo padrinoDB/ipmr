@@ -2,9 +2,14 @@
 % Please edit documentation in R/define_kernel.R
 \name{define_kernel}
 \alias{define_kernel}
-\title{Add a new kernel to the IPM}
+\alias{define_k}
+\title{Functions to initialize and define IPM kernels}
 \usage{
 define_kernel(proto_ipm, name, formula, family, ..., data_list = list(),
+  state_list, has_hier_effs = FALSE, levels_hier_effs = list(),
+  evict = TRUE, evict_fun = NULL)
+
+define_k(proto_ipm, name, formula, family, ..., data_list = list(),
   state_list, has_hier_effs = FALSE, levels_hier_effs = list(),
   evict = TRUE, evict_fun = NULL)
 }
@@ -50,6 +55,9 @@ to the kernel. Default is \code{TRUE}.}
 \item{evict_fun}{If \code{evict == TRUE}, then a function that corrects for it.
 Currently, \code{truncated_distributions} and \code{rescale_kernel} are the
 only built-in functions, but user specified ones should work as well.}
+}
+\value{
+All functions described here return a \code{proto_ipm}.
 }
 \description{
 Adds a new kernel to the \code{proto_ipm} structure. Different

@@ -1,4 +1,5 @@
-#' @title Add a new kernel to the IPM
+#' @title Functions to initialize and define IPM kernels
+#' @rdname kernel-definitions
 #'
 #' @description Adds a new kernel to the \code{proto_ipm} structure. Different
 #' classes of IPMs may have many or only a few kernels. Each one requires its
@@ -20,7 +21,7 @@
 #' @param ... A set of named expressions that correspond to vital rates in \code{formula}.
 #' @param data_list A list of named values that correspond to constants in the formula.
 #' You do not need to specify vectors corresponding to the domains here.
-#' @param state_list A list containing the names of each state variable used in
+#' @param states A character vector containing the names of each state variable used in
 #' the kernel.
 #' @param has_hier_effs A logical indicating whether or not the kernel and/or its
 #' underlying vital rates are structured with hierarchical effects. If so and you
@@ -40,6 +41,8 @@
 #'
 #' @details \strong{BLAH BLAH BLAH}
 #'
+#' @return All functions described here return a \code{proto_ipm}.
+#'
 #' @importFrom purrr map_chr map
 #' @importFrom rlang := list2 enquo enquos parse_expr parse_exprs quo_text
 #' quo_is_null is_quosure
@@ -53,7 +56,7 @@ define_kernel <- function(proto_ipm,
                           family,
                           ...,
                           data_list = list(),
-                          state_list,
+                          states,
                           has_hier_effs = FALSE,
                           levels_hier_effs = list(),
                           evict = TRUE,
@@ -92,7 +95,7 @@ define_kernel <- function(proto_ipm,
     id = 'A1',
     kernel_id = name,
     domain = I(list(NA_character_)),
-    state_var = I(rlang::list2(!! name := state_list)),
+    state_var = I(rlang::list2(!!name := states)),
     int_rule = NA_character_,
     evict = evict,
     evict_fun = I(list(evict_fun)),
@@ -113,8 +116,71 @@ define_kernel <- function(proto_ipm,
 }
 
 
+#' @rdname kernel-definitions
+#'
+#' @inheritParams define_kernel
+#'
+#' @export
+
+define_k <- function(proto_ipm,
+                     name,
+                     formula,
+                     family,
+                     ...,
+                     data_list = list(),
+                     states,
+                     has_hier_effs = FALSE,
+                     levels_hier_effs = list(),
+                     evict = TRUE,
+                     evict_fun = NULL) {
+
+  formula <- rlang::enquo(formula)
+  form_expr <- rlang::quo_text(formula) %>%
+    rlang::parse_expr()
+
+  .check_k_def(proto_ipm,
+               name = name,
+               family = family)
+
+  out <- define_kernel(
+    proto_ipm = proto_ipm,
+    name = name,
+    formula = !! form_expr,
+    family = family,
+    ...,
+    data_list = data_list,
+    states = states,
+    has_hier_effs = has_hier_effs,
+    levels_hier_effs = levels_hier_effs,
+    evict = evict,
+    evict_fun = evict_fun
+  )
+
+  return(out)
+}
+
+
+.check_k_def <- function(proto_ipm, name, family) {
+
+  if(!grepl('K|k', name)) {
+    stop("'name' passed to define_k must be of the form K, k, K_effects, or k_effects.")
+  }
+
+  # Possible family types. These need to be updated eventually, this is mostly
+  # a placeholder
+  families <- c('IPM')
+
+  if(!family %in% families) {
+    stop("'family' should be one of the following options: ", families)
+  }
+
+  invisible(proto_ipm)
+
+}
+
+
 #' @noRd
-.get_state_info <- function(dom_start, dom_end) {
+.state_to_domain_info <- function(dom_start, dom_end) {
 
   # match names, then get info. Otherwise, generate an NA. the domain name
   # will always be first entry.

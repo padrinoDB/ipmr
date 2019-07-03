@@ -145,7 +145,7 @@ x <- init_ipm('simple_di_det') %>%
   
   # K kernels will likely get their own define_k() function, so don't expect
   # this interface to remain consistent
-  define_kernel(
+  define_k(
     name = "K",
     formula = P + F,
     family = "IPM",
@@ -427,7 +427,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     has_hier_effs = TRUE,
     levels_hier_effs = hier_levels,
     evict = FALSE) %>%
-  define_kernel(
+  define_k(
     'K_yr',
     formula = P_yr + F_yr,
     family = "IPM",

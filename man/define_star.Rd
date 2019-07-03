@@ -3,7 +3,7 @@
 \name{define_pop_state}
 \alias{define_pop_state}
 \alias{define_state_vars}
-\alias{define_environment}
+\alias{define_env_state}
 \alias{define_hier_effs}
 \title{Helpers for IPM construction}
 \usage{
@@ -11,7 +11,7 @@ define_pop_state(proto_ipm, kernels, ...)
 
 define_state_vars(proto_ipm, ...)
 
-define_environment(proto_ipm, ..., data_list)
+define_env_state(proto_ipm, ..., data_list)
 
 define_hier_effs(proto_ipm, ...)
 }

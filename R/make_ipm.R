@@ -274,9 +274,35 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
   return(out)
 }
 
-make_ipm.simple_di_stoch_param <- function(proto_ipm, ...) {
+make_ipm.simple_di_stoch_param <- function(proto_ipm,
+                                           return_all = FALSE,
+                                           domain_list = NULL,
+                                           iterate = FALSE,
+                                           iterations = 50,
+                                           usr_funs = list(),
+                                           ...) {
 
-  # DEFINE ME
+  # Split out K from others so it isn't evaluated until we're ready. If it
+  # isn't there, then proceed as usual
+
+  K_row <- which(grepl("K", proto_ipm$kernel_id))
+
+  if(length(K_row) > 0) {
+    k_row  <- proto_ipm[K_row, ]
+    others <- proto_ipm[-c(K_row), ]
+  } else {
+    others <- proto_ipm
+  }
+
+  # If vital rates are fit with a hierarchical model of any kind,
+  # then split those out into their respective years/plots/what-have-you
+  # BE SURE TO WRITE VIGNETTE ON THIS SYNTAX  ONCE IMPLEMENTED
+
+  if(any(others$has_hier_effs) | any(k_row$has_hier_effs)) {
+    others <- .split_hier_effs(others)
+    k_row  <- .split_hier_effs(k_row)
+  }
+
 }
 
 make_ipm.general_di_det <- function(proto_ipm, ...) {

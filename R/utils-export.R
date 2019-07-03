@@ -86,9 +86,9 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
 #' @rdname define_star
 #' @export
 
-define_pop_state <- function(proto_ipm, kernels, ...) {
+define_pop_state <- function(proto_ipm, ...) {
 
-  # DEFINE ME
+
 }
 
 #' @rdname define_star
@@ -106,7 +106,7 @@ define_state_vars <- function(proto_ipm, ...) {
 #' @rdname define_star
 #' @export
 
-define_environment <- function(proto_ipm, ..., data_list) {
+define_env_state <- function(proto_ipm, ..., data_list) {
 
   # DEFINE ME
 }

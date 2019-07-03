@@ -49,10 +49,14 @@ define_impl <- function(proto_ipm,
     proto_ind <- which(kernels[i] == proto_ipm$kernel_id)
 
     proto_ipm$int_rule[proto_ind] <- kernel_impl_list[[i]]$int_rule
-    domain_info <- .get_state_info(kernel_impl_list[[i]]$dom_start,
-                                   kernel_impl_list[[i]]$dom_end)
+    domain_info <- .state_to_domain_info(kernel_impl_list[[i]]$dom_start,
+                                         kernel_impl_list[[i]]$dom_end)
 
     proto_ipm$domain[proto_ind] <- list(domain_info)
+
+    pop_info <- .state_to_pop_info(proto_ipm$state_var[[i]][1])
+
+    proto_ipm$pop_state[proto_ind] <- list(pop_info)
 
   }
 
