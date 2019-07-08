@@ -2,12 +2,12 @@
 
 
 #'@noRd
-.make_k_simple <- function(k_rows, proto_ipm, sub_kern_list, domain_env) {
+.make_k_simple <- function(k_rows, proto_ipm, sub_kern_list, master_env) {
   params <- k_rows$params[[1]]
   formula <- params$formula
 
   # set up the environment and bind the subkernels to it
-  k_env <- rlang::child_env(.parent = domain_env,
+  k_env <- rlang::child_env(.parent = master_env,
                             !!! sub_kern_list)
 
   k_form <- .parse_vr_formulae(formula,
@@ -24,7 +24,7 @@
 
 }
 
-.make_k_kern_samp <- function(k_rows, proto_ipm, sub_kernel_list, domain_env) {
+.make_k_kern_samp <- function(k_rows, proto_ipm, sub_kernel_list, master_env) {
 
   # result storage
   k_list <- list()
@@ -40,7 +40,7 @@
     # Part one of .generate_kernel env, but we don't want to bind kern_quos
     # because they do not exist yet!
 
-    kern_env <- rlang::child_env(.parent = domain_env,
+    kern_env <- rlang::child_env(.parent = master_env,
                                  !!! param_tree$parameters)
 
     rlang::env_bind_lazy(kern_env,

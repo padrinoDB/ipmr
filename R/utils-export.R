@@ -88,6 +88,11 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
 
 define_pop_state <- function(proto_ipm, ...) {
 
+  pop_quos <- rlang::enquos(...)
+
+  proto_ipm$pop_state <- list(pop_quos)
+
+  return(proto_ipm)
 
 }
 
@@ -108,7 +113,14 @@ define_state_vars <- function(proto_ipm, ...) {
 
 define_env_state <- function(proto_ipm, ..., data_list) {
 
-  # DEFINE ME
+  env_quos <- rlang::enquos(...)
+
+  out <- list(env_exprs = env_quos,
+              constants = data_list)
+
+  proto_ipm$env_state <- list(out)
+
+  return(out)
 }
 
 

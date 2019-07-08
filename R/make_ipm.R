@@ -1,5 +1,5 @@
-#' @rdname make_ipm
 #' @title Methods to implement an IPM
+#' @rdname make_ipm
 #'
 #' @description The \code{make_ipm.*} methods convert a \code{proto_ipm} into a
 #' set of discretized kernels and population vectors. Methods have different
@@ -10,23 +10,26 @@
 #' output of \code{add_kernel}, \code{add_K}, or the \code{define_*} functions.
 #' @param ... Other arguments passed to methods
 #' @param return_all A logical indicating whether to return the environments that
-#' the kernel expressions are evaluated in. This is useful for developer debugging and not
-#' much else.
+#' the kernel expressions are evaluated in. This is useful for developer
+#' debugging and not much else.
 #' @param domain_list An optional list of new domain information to implement
 #' the IPM with.
 #' @param usr_funs An optional list of user-specified functions that are passed
 #' on to the evaluation environments. This can help make vital rate expressions
 #' more concise and expressive. Names in this list should exactly match the names
 #' of the function calls in the \code{...} or \code{formula}.
-#' @param iterate A logical indicating whether or not iterate the model during or just
-#' return the iteration kernels.
+#' @param iterate A logical indicating whether or not iterate the model during
+#' or just return the iteration kernels. For density dependent (\code{dd}) and/or
+#' stochastic parameter resampled models (\code{stoch_param}), this should always
+#' be \code{TRUE}.
 #' @param iterations If \code{iterate} is \code{TRUE}, then the number of iterations
 #' to simulate.
-#' @param k_seq The sequence of kernels to use during the iterations. This can either
-#' be a vector of integers corresponding to kernel indices, a character vector corresponding
-#' to kernel names, a Markov chain matrix with transition probabilities between
-#' given states (NOT YET IMPLEMENTED), or empty. If empty, a random sequence will
-#' be generated internally from a uniform distribution.
+#' @param kernel_seq The sequence of kernels to use during the iterations.
+#' This can either be a vector of integers corresponding to kernel indices,
+#' a character vector corresponding to kernel names, a Markov chain matrix with
+#' transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
+#' If empty, a random sequence will be generated internally from a uniform
+#' distribution.
 #'
 #' @return The \code{make_ipm.*det} methods will always return a list of length 4
 #' containing the following components:
@@ -81,7 +84,10 @@ make_ipm.simple_di_det <- function(proto_ipm,
                                    return_all = FALSE,
                                    domain_list = NULL,
                                    usr_funs = list(),
+                                   iterate = FALSE,
                                    ...) {
+  # checks pop_state, env_state, domain_definitions
+  .check_ipm_definition(proto_ipm, iterate)
 
   # Split out K from others so it isn't evaluated until we're ready. If it
   # isn't there, then proceed as usual
@@ -95,60 +101,26 @@ make_ipm.simple_di_det <- function(proto_ipm,
     others <- proto_ipm
   }
 
-  # Initialize the domain_environment so these values can all be found at
+  # Initialize the master_environment so these values can all be found at
   # evaluation time
   if(is.null(domain_list)){
-    domain_env <- .generate_domain_env(others$domain, usr_funs)
+    master_env <- .generate_master_env(others$domain, usr_funs)
   } else {
-    domain_env <- .generate_domain_env(domain_list, usr_funs)
+    master_env <- .generate_master_env(domain_list, usr_funs)
   }
-  # Loop over the kernels for evaluation
-  sub_kern_list <- list()
-  env_list <- list(dom_env = domain_env)
 
-  for(i in seq_len(dim(others)[1])) {
+  # construct the kernels from their function defintions
+  env_list <- list(master_env = master_env)
 
-    param_tree <- others$params[[i]]
+  all_sub_kerns <- .make_sub_kernel(others,
+                                    env_list,
+                                    return_envs = return_all)
 
-    # kern_env inherits from domain_env so that those variables are
-    # findable at evaluation time
+  sub_kern_list <- all_sub_kerns$sub_kernels
 
-    kern_env <- .generate_kernel_env(param_tree$params,
-                                     domain_env,
-                                     param_tree)
-
-    kern_form <- .parse_vr_formulae(param_tree$formula,
-                                    kern_env)
-    names(kern_form) <- others$kernel_id[i]
-
-
-    if(others$evict[i] &
-       rlang::is_quosure(others$evict_fun[[i]][[1]])) {
-
-      # modifies the kernel
-      kern_env <- .correct_eviction(others$evict_fun[[i]][[1]],
-                                    kern_env)
-    }
-
-    rlang::env_bind_lazy(kern_env,
-                         !!! kern_form,
-                         .eval_env = kern_env)
-
-    sub_kern_list <- .extract_kernel_from_eval_env(kern_env,
-                                                   others$kernel_id[i],
-                                                   sub_kern_list,
-                                                   others$params[[i]]$family,
-                                                   pos = i)
-
-    if(return_all) {
-      env_list <- purrr::splice(env_list, list(kern_env))
-      names(env_list)[(i + 1)] <- others$kernel_id[i]
-    }
-
-  } # End sub-kernel construction
 
   if(length(K_row) > 0) {
-    iterators <- .make_k_simple(k_row, proto_ipm, sub_kern_list, domain_env)
+    iterators <- .make_k_simple(k_row, proto_ipm, sub_kern_list, master_env)
   } else {
     iterators <- NA_real_
   }
@@ -175,9 +147,13 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
                                           domain_list = NULL,
                                           iterate = FALSE,
                                           iterations = 50,
-                                          k_seq = NULL,
-                                          usr_funs = list(),
+                                          kernel_seq = NULL,
+                                          usr_funs = list,
                                           ...) {
+
+
+  # checks pop_state, env_state, domain_definitions
+  .check_ipm_definition(proto_ipm, iterate)
 
   # Split out K from others so it isn't evaluated until we're ready. If it
   # isn't there, then proceed as usual
@@ -200,58 +176,33 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
     k_row  <- .split_hier_effs(k_row)
   }
 
-  # Initialize the domain_environment so these values can all be found at
+  # Initialize the master_environment so these values can all be found at
   # evaluation time
   if(is.null(domain_list)){
-    domain_env <- .generate_domain_env(others$domain, usr_funs)
+    master_env <- .generate_master_env(others$domain, usr_funs)
   } else {
-    domain_env <- .generate_domain_env(domain_list, usr_funs)
-  }
-  # Loop over the kernels for evaluation
-  sub_kern_list <- list()
-  env_list <- list(dom_env = domain_env)
-
-  for(i in seq_len(dim(others)[1])) {
-
-    param_tree <- others$params[[i]]
-
-    # kern_env inherits from domain_env so that those variables are
-    # findable at evaluation time
-
-    kern_env <- .generate_kernel_env(param_tree$params,
-                                     domain_env,
-                                     param_tree)
-
-    kern_form <- .parse_vr_formulae(param_tree$formula,
-                                    kern_env)
-    names(kern_form) <- others$kernel_id[i]
-
-    if(others$evict[i] &
-       rlang::is_quosure(others$evict_fun[[i]])) {
-
-      # modifies the kernel
-      kern_env <- .correct_eviction(others$evict_fun[[i]],
-                                    kern_env)
-    }
-
-    rlang::env_bind_lazy(kern_env,
-                         !!! kern_form,
-                         .eval_env = kern_env)
-
-    sub_kern_list <- .extract_kernel_from_eval_env(kern_env,
-                                                   others$kernel_id[i],
-                                                   sub_kern_list,
-                                                   others$params[[i]]$family,
-                                                   pos = i)
-    if(return_all) {
-      env_list[[i + 1]] <- kern_env
-      names(env_list)[i + 1] <- others$kernel_id[i]
-    }
+    master_env <- .generate_master_env(domain_list, usr_funs)
   }
 
-  iterators <- .make_k_kern_samp(k_row, proto_ipm, sub_kern_list, domain_env)
+  # construct the kernels from their function defintions
+  env_list <- list(master_env = master_env)
 
-  kern_seq <- .make_kern_seq(proto_ipm, iterators, iterations, k_seq)
+  all_sub_kerns <- .make_sub_kernel(others,
+                                    env_list,
+                                    return_envs = return_all)
+
+  sub_kern_list <- all_sub_kerns$sub_kernels
+
+  # build up the iteration kernels from their sub-kernels
+  iterators     <- .make_k_kern_samp(k_row,
+                                     proto_ipm,
+                                     sub_kern_list,
+                                     master_env)
+
+  kern_seq      <-  .make_kern_seq(proto_ipm,
+                                   iterators,
+                                   iterations,
+                                   kernel_seq)
 
   if(iterate) {
 
@@ -274,6 +225,10 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
   return(out)
 }
 
+#' @inheritParams make_ipm
+#' @rdname make_ipm
+#'
+#' @export
 make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                            return_all = FALSE,
                                            domain_list = NULL,
@@ -281,6 +236,11 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                            iterations = 50,
                                            usr_funs = list(),
                                            ...) {
+
+
+  # checks pop_state, env_state, domain definitions
+  .check_ipm_definition(proto_ipm, iterate)
+
 
   # Split out K from others so it isn't evaluated until we're ready. If it
   # isn't there, then proceed as usual
@@ -302,6 +262,49 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
     others <- .split_hier_effs(others)
     k_row  <- .split_hier_effs(k_row)
   }
+
+  # Initialize the master_environment so these values can all be found at
+  # evaluation time
+  if(is.null(domain_list)){
+    master_env <- .generate_master_env(others$domain, usr_funs)
+  } else {
+    master_env <- .generate_master_env(domain_list, usr_funs)
+  }
+
+  # Bind env_exprs, constants, and pop_vectors to master_env so that
+  # we can always find them and avoid that miserable repitition
+
+  master_env <- .bind_all_exprs(others$pop_state,
+                                others$env_state,
+                                env_to_bind = master_env)
+
+  env_list <- list(master_env = master_env)
+
+  out <- .prep_param_resamp_output(others, k_row)
+
+  for(i in seq_len(iterations)) {
+
+    # Lazy variant makes sure that whatever functions that generate parameter
+    # values stochastically are only evaluated 1 time per iteration! This is so
+    # multiple parameters meant to come from a joint distribution really come from
+    # the joint distribution!
+
+    sys <- .make_sub_kernel_lazy(others,
+                                 master_env,
+                                 return_envs = return_all)
+
+    sub_kernels <- sys$ipm_system$sub_kernels
+
+    # Resume here 7/8/19 --------------
+    k_i <- .make_k_param_samp(sub_kernels, k_row, master_env)
+
+
+    out <- .update_param_resamp_output(sub_kernels, k_i, master_env, out)
+
+  }
+
+
+
 
 }
 

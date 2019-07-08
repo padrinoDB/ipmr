@@ -178,42 +178,6 @@ define_k <- function(proto_ipm,
 
 }
 
-
-#' @noRd
-.state_to_domain_info <- function(dom_start, dom_end) {
-
-  # match names, then get info. Otherwise, generate an NA. the domain name
-  # will always be first entry.
-
-  if(!is.na(dom_start)) {
-
-    start_state_info <- rep(NA_real_, 3)
-    dom_start <- paste(dom_start, "_1", sep = "")
-
-  } else {
-
-    start_state_info <- NA_real_
-    dom_start <- 'start_not_applicable'
-
-  }
-
-  if(!is.na(dom_end)) {
-
-    end_state_info <- rep(NA_real_, 3)
-    dom_end <- paste(dom_end, "_2", sep = "")
-
-  } else {
-
-    end_state_info <- NA_real_
-    dom_end <- 'end_not_applicable'
-
-  }
-
-  out <- rlang::list2(!!dom_start := start_state_info,
-                      !!dom_end := end_state_info)
-  return(out)
-}
-
 .check_evict_fun <- function(evict, fun) {
 
   # need to supply a function if you want to correct for eviction!

@@ -1,11 +1,171 @@
 # make_ipm internal helpers
 
+.make_sub_kernel <- function(proto, env_list, return_envs = FALSE) {
+  out <- list()
+  master_env <- env_list$master_env
+
+  for(i in seq_len(dim(proto)[1])) {
+    param_tree <- proto$params[[i]]
+
+    kern_env <- .generate_kernel_env(param_tree$params,
+                                     master_env,
+                                     param_tree)
+
+    kern_form <- .parse_vr_formulae(param_tree$formula,
+                                    kern_env)
+
+    names(kern_form) <- proto$kernel_id[i]
+
+    if(proto$evict[i]) {
+      kern_env <- .correct_eviction(proto$evict_fun[[i]],
+                                    kern_env)
+    }
+
+    rlang::env_bind_lazy(kern_env,
+                         !!! kern_form,
+                         .eval_env = kern_env)
+
+    out <- .extract_kernel_from_eval_env(kern_env,
+                                         proto$kernel_id[i],
+                                         out,
+                                         proto$params[[i]]$family,
+                                         pos = i)
+
+    if(return_envs) {
+      env_list <- purrr::splice(env_list, list(kern_env))
+      names(env_list)[(i + 1)] <- proto$kernel_id[i]
+    }
+
+  } # end sub-kernel construction
+
+  res <- list(sub_kernels = out, env_list = env_list)
+
+  return(res)
+
+}
+
 #' @noRd
+# makes sub-kernels, but ensures that stochastic parameters are sampled from
+# their respective distributions one time for each iteration. One of many reasons
+# kernel resampling is preferred when a viable alternative (at least within
+# the context of ipmr).
+
+.make_sub_kernel_lazy <- function(proto, master_env, return_envs = FALSE) {
+
+  env_state_funs <- lapply(
+    proto$env_state,
+    function(x, master_env) {
+      temp <- x$env_quos
+      out <- lapply(temp,
+                    function(x, master_env) {
+                      rlang::quo_set_env(x,
+                                         master_env)
+                    },
+                    master_env = master_env)
+      return(out)
+    },
+    master_env = master_env)
+
+  env_state_funs <- env_state_funs[!duplicated(names(env_state_funs))]
+
+  master_env <- .eval_env_exprs(master_env, env_state_funs)
+
+  sys <- .make_sub_kernel(proto, master_env, return_envs = return_envs)
+
+  out <- list(ipm_system = sys,
+              master_env = master_env)
+  return(out)
+}
+
+#' @noRd
+# makes sure the expressions for each stochastic parameter are evaluated
+# only one time per iteration of the whole model
+
+.eval_env_exprs <- function(master_env, env_funs) {
+
+  nms <- names(env_funs)
+
+  for(i in unique(nms)) {
+
+    assign(i, rlang::eval_tidy(env_funs[[i]]), envir = master_env)
+
+  }
+
+  return(master_env)
+
+}
+
+#'
+.prep_param_resamp_output <- function(others, k_row, proto_ipm) {
+
+  out <- list(iterators = list(),
+              sub_kernels = list(),
+              env_list = list(),
+              env_seq = NA_character_, # placeholder
+              pop_state = proto$pop_state[[1]], # placeholder,
+              proto_ipm = proto_ipm)
+
+  env_vars <- lapply(proto_ipm$env_state, function(x) x$env_quos)
+
+  env_var_nms <- lapply(env_vars, names) %>%
+    unlist() %>%
+    unique()
+
+  n_env_vars <- length(env_var_nms)
+
+  env_holder <- matrix(0,
+                       nrow = 1,
+                       ncol = n_env_vars,
+                       dimnames = list(c(NA),
+                                       c(env_var_names)))
+
+  out$env_seq <- env_holder
+
+  return(out)
+}
+
+#' @noRd
+
+.update_param_resamp_output <- function(sub_kernels,
+                                        iterator,
+                                        master_env,
+                                        output) {
+
+  pop_state_nms <- names(output$pop_state)
+
+  pop_state_temp <- rlang::env_get_list(master_env,
+                                        pop_state_nms,
+                                        default = NA_real_)
+
+  env_vars <- dimnames(output$env_seq)[[2]]
+
+  env_temp <- rlang::env_get_list(master_env,
+                                  env_vars,
+                                  default = NA_real_) %>%
+    unlist()
+
+  output$env_seq <- rbind(output$env_seq, env_temp)
+
+  output$sub_kernels <- purrr::splice(output$sub_kernels, sub_kernels)
+  output$iterators <- purrr::splice(output$iterators, iterator)
+
+  # This MUST BE GENERALIZED for multiple state variables!!!!!!!!!!!!!!!!!
+  output$pop_state <- cbind(output$pop_state, pop_state_temp)
+
+  return(output)
+
+}
+
+#' @noRd
+# Generates evaluation environment for a sub-kernel. Assumes that all parameters
+# name/value pairs have been generated. Inherits from master_env so that it can
+# access domains, stochastic parameters, and population states.
+
 .generate_kernel_env <- function(parameters,
-                                 domain_env,
+                                 master_env,
                                  param_tree) {
 
-  kernel_env <- rlang::child_env(.parent = domain_env)
+  kernel_env <- rlang::child_env(.parent = master_env)
   rlang::env_bind(kernel_env,
                   !!! parameters)
 
@@ -44,13 +204,17 @@
 
 #' @noRd
 #' @importFrom purrr flatten map_dbl
-.generate_domain_env <- function(domain_list, usr_funs) {
+#'
+# Rename to master_env or something like that - this doesn't strictly hold
+# domain information anymore
+
+.generate_master_env <- function(domain_list, usr_funs) {
 
   # Inherits from whatever is 2nd on search path. all loaded functions/packges
   # should still be findable, but objects in the global environment should not
   # be to prevent overscoping!
 
-  dom_env <- new.env(parent = as.environment(search()[2]))
+  master_env <- new.env(parent = as.environment(search()[2]))
 
   domain_list <- purrr::flatten(domain_list)
 
@@ -62,7 +226,7 @@
 
   names(n_mesh_p) <- paste('n_', names(domain_list), sep = "")
 
-  rlang::env_bind(dom_env,
+  rlang::env_bind(master_env,
                   !!! n_mesh_p)
 
   mids <- purrr::map(bounds, .f = function(x) {
@@ -79,7 +243,7 @@
 
     names(domain_grid) <- c(names(mids)[i], names(mids)[i + 1])
 
-    rlang::env_bind(dom_env,
+    rlang::env_bind(master_env,
                     !!! domain_grid)
 
     sv <- strsplit(names(domain_list)[i], '_[0-9]')[[1]][1]
@@ -88,16 +252,37 @@
 
     h <- domain_grid[2, 1] - domain_grid[1, 1]
 
-    assign(nm, h, envir = dom_env)
+    assign(nm, h, envir = master_env)
 
   }
 
-  rlang::env_bind(dom_env,
+  rlang::env_bind(master_env,
                   !!! usr_funs)
 
 
-  invisible(dom_env)
+  invisible(master_env)
 }
+
+#' @noRd
+# Generates sequences for the domain of midpoint rule integration (and midpoint
+# rule only!!!!!!!!!). This must be generalized for handling trapezoid, g-l, etc.
+
+.make_domain_seqs <- function(dom_vec) {
+  if(all(!is.na(dom_vec))) {
+    out <- seq(dom_vec[1], dom_vec[2], length.out = dom_vec[3] + 1)
+    return(out)
+  } else {
+    return(NULL)
+  }
+
+
+}
+
+
+
+#' @noRd
+# Pulls out the evaluated sub-kernels from their evaluation environment
+# and splices them into a list to hold them.
 
 .extract_kernel_from_eval_env <- function(kernel_env,
                                           kernel_id,
@@ -112,37 +297,41 @@
   return(sub_kernel_list)
 }
 
-.make_domain_seqs <- function(dom_vec) {
-  if(all(!is.na(dom_vec))) {
-    out <- seq(dom_vec[1], dom_vec[2], length.out = dom_vec[3] + 1)
-    return(out)
-  } else {
-    return(NULL)
-  }
+#' @noRd
+# Generates a sequence of indices to sample kernels during stochastic
+# kernel resampling procedures.
+
+.make_kern_seq <- function(proto, kernels, iterations, kernel_seq) {
 
 
-}
+  if(is.null(kernel_seq)) {
 
-.make_kern_seq <- function(proto, kernels, iterations, env_seq) {
+    seq_type   <- 'internal_generated'
 
-  if(is.null(env_seq)) {
-    seq_type <- 'int_generated'
   } else {
 
-    test <- is.matrix(env_seq)
+    test       <- is.matrix(kernel_seq)
 
     if(test) {
-      seq_type <- 'mc_mat'
+
+      seq_type <- 'markov_chain_mat'
 
     } else {
+
       seq_type <- 'usr_specified'
     }
   }
 
   out <- switch(seq_type,
-                'int_generated' = .make_internal_seq(kernels, iterations),
-                'mc_mat' = .make_markov_seq(proto, kernels, env_seq, iterations),
-                'usr_specified' = .make_usr_seq(kernels, env_seq, iterations))
+                'internal_generated' = .make_internal_seq(kernels,
+                                                          iterations),
+                'markov_chain_mat'   = .make_markov_seq(proto,
+                                                        kernels,
+                                                        kernel_seq,
+                                                        iterations),
+                'usr_specified'      = .make_usr_seq(kernels,
+                                                     kernel_seq,
+                                                     iterations))
 
   return(out)
 
@@ -153,46 +342,116 @@
 
   n_kerns <- length(kernels)
 
-  out <- round(
-    stats::runif(iterations, min = 1, max = n_kerns)
-  )
+  out     <- sample.int(seq(1, n_kerns, by =  1),
+                        size = iterations,
+                        replace = TRUE)
 
   return(out)
 
 }
 
-.make_usr_seq <- function(kernels, env_seq, iterations) {
+.make_usr_seq <- function(kernels, kernel_seq, iterations) {
 
-  int_test <- vapply(env_seq, function(x) is.integer(x), logical(1))
+  int_test <- vapply(kernel_seq, function(x) is.integer(x), logical(1))
 
   if(!all(int_test)) {
-    stop("All values in 'env_seq' must be integers.")
+    stop("All values in 'kernel_seq' must be integers.")
   }
 
-  max_test <- max(env_seq)
+  max_test <- max(kernel_seq)
 
   if(max_test > length(kernels)) {
-    stop('Maximum value of env_seq cannot exceed the number of kernels.')
+    stop("Maximum value of 'kernel_seq' cannot exceed the number of kernels.")
   }
 
-  if(length(env_seq) > iterations) {
-    warning("'length(env_seq)' is greater than requested 'iterations'.",
+  if(length(kernel_seq) > iterations) {
+    warning("'length(kernel_seq)' is greater than requested 'iterations'.",
             " Simulation will only run for as many 'iterations'.")
   }
 
-  return(env_seq)
+  return(kernel_seq)
+}
+
+#' @noRd
+.check_ipm_definition <- function(proto_ipm ,iterate) {
+
+  .check_pop_state(proto_ipm)
+  .check_env_state(proto_ipm)
+
+  ipm_type <- class(proto_ipm)[1]
+
+  if(grepl('_param|dd', ipm_type) & !iterate) {
+    stop("Stochastic, parameter resampled and density dependent models must be\n",
+         "iterated! Set 'iterate' to 'TRUE' and re-run.")
+  }
+
+  # probably want to add more here -------
+
+
+  invisible(TRUE)
+
 }
 
 #' @noRd
 .check_pop_state <- function(proto_ipm) {
 
-  #DEFINE ME
+  # ipm type is always first in class(proto)
+  ipm_type <- class(proto_ipm)[1]
+
+  pop_state <- unlist(proto_ipm$pop_state) %>%
+    unique()
+
+  state_vars <- unlist(proto_ipm$state_var) %>%
+    unique()
+
+  if(!all(names(pop_state) %in% names(state_vars))) {
+    stop("Names of state variables do not match names of 'pop_state'!")
+  }
+
+  # density dependent IPMs must have pop_state defined!
+  if(grepl('_dd_', ipm_type)) {
+    if(all(is.na(pop_state))) {
+      stop("Density dependent IPMs must have 'pop_state' defined!\n",
+           "See '?define_pop_state()' for more details.")
+    }
+  }
+
+  invisible(TRUE)
 }
 
 #' @noRd
-.check_env_params <- function(proto_ipm) {
+.check_env_state <- function(proto_ipm) {
 
-  #DEFINE ME
+  # ipm type is always first in class(proto)
+  ipm_type <- class(proto_ipm)[1]
+
+  env_state <- unlist(proto_ipm$env_state, recursive = FALSE)
+
+  if(grepl('_param', ipm_type)) {
+    if(all(is.na(env_state))) {
+      stop("Stochastic parameter-resampled IPMs must have 'env_state' defined!\n",
+           "See '?define_env_state()' for more details.")
+    }
+
+  }
+
+  invisible(TRUE)
+
 }
 
-#' @noRd
+.bind_all_exprs <- function(..., env_to_bind) {
+
+  to_bind <- unlist(..., recursive = TRUE) %>%
+    unique()
+
+  rlang::env_bind_lazy(env_to_bind,
+                       !!! to_bind,
+                       .eval_env = env_to_bind)
+
+
+  return(env_to_bind)
+
+}
+
+
+

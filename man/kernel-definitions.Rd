@@ -6,11 +6,11 @@
 \title{Functions to initialize and define IPM kernels}
 \usage{
 define_kernel(proto_ipm, name, formula, family, ..., data_list = list(),
-  state_list, has_hier_effs = FALSE, levels_hier_effs = list(),
+  states, has_hier_effs = FALSE, levels_hier_effs = list(),
   evict = TRUE, evict_fun = NULL)
 
 define_k(proto_ipm, name, formula, family, ..., data_list = list(),
-  state_list, has_hier_effs = FALSE, levels_hier_effs = list(),
+  states, has_hier_effs = FALSE, levels_hier_effs = list(),
   evict = TRUE, evict_fun = NULL)
 }
 \arguments{
@@ -34,7 +34,7 @@ discrete to discrete (e.g. stasis in a seedbank).}
 \item{data_list}{A list of named values that correspond to constants in the formula.
 You do not need to specify vectors corresponding to the domains here.}
 
-\item{state_list}{A list containing the names of each state variable used in
+\item{states}{A character vector containing the names of each state variable used in
 the kernel.}
 
 \item{has_hier_effs}{A logical indicating whether or not the kernel and/or its

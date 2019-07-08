@@ -59,6 +59,8 @@ rescale_kernel <- function(discretized_kernel, n_mesh_p) {
 #' @noRd
 .correct_eviction <- function(evict_fun, kernel_env) {
 
+  if(is.list(evict_fun)) evict_fun <- unlist(evict_fun)[[1]]
+
   # Set the quosure environment for eval_tidy and get the name of the symbol
   # being modified
   evict_correction <- rlang::quo_set_env(evict_fun,

@@ -7,7 +7,7 @@
 \alias{define_hier_effs}
 \title{Helpers for IPM construction}
 \usage{
-define_pop_state(proto_ipm, kernels, ...)
+define_pop_state(proto_ipm, ...)
 
 define_state_vars(proto_ipm, ...)
 
@@ -18,14 +18,14 @@ define_hier_effs(proto_ipm, ...)
 \arguments{
 \item{proto_ipm}{The name of object you wish to append the new kernel to.}
 
-\item{kernels}{The kernel names you that correspond to given population state vector.
-Suffix expansion is supported.}
-
 \item{...}{Named expressions. See details for more information on their usage in
 each \code{define_*} function.}
 
 \item{data_list}{A list of named values that correspond to constants in the formula.
 You do not need to specify vectors corresponding to the domains here.}
+
+\item{kernels}{The kernel names you that correspond to given population state vector.
+Suffix expansion is supported.}
 }
 \value{
 All \code{define_*} functions return a proto_ipm.

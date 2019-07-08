@@ -54,12 +54,14 @@ define_impl <- function(proto_ipm,
 
     proto_ipm$domain[proto_ind] <- list(domain_info)
 
-    pop_info <- .state_to_pop_info(proto_ipm$state_var[[i]][1])
+    # Name of the pop vector should correspond to the beginning domain, as that
+    # is the one that the kernel will be multiplied by during iteration
+
+    pop_info <- .state_to_pop_info(kernel_impl_list[[i]]$dom_start)
 
     proto_ipm$pop_state[proto_ind] <- list(pop_info)
 
   }
-
 
   class(proto_ipm) <- cls
 
@@ -123,3 +125,45 @@ make_impl_args_list <- function(kernel_names,
 
 }
 
+
+#' @noRd
+.state_to_domain_info <- function(dom_start, dom_end) {
+
+  # match names, then get info. Otherwise, generate an NA. the domain name
+  # will always be first entry.
+
+  if(!is.na(dom_start)) {
+
+    start_state_info <- rep(NA_real_, 3)
+    dom_start <- paste(dom_start, "_1", sep = "")
+
+  } else {
+
+    start_state_info <- NA_real_
+    dom_start <- 'start_not_applicable'
+
+  }
+
+  if(!is.na(dom_end)) {
+
+    end_state_info <- rep(NA_real_, 3)
+    dom_end <- paste(dom_end, "_2", sep = "")
+
+  } else {
+
+    end_state_info <- NA_real_
+    dom_end <- 'end_not_applicable'
+
+  }
+
+  out <- rlang::list2(!!dom_start := start_state_info,
+                      !!dom_end := end_state_info)
+  return(out)
+}
+
+
+.state_to_pop_info <- function(start_state) {
+
+  rlang::list2(!!start_state := NA_real_)
+
+}

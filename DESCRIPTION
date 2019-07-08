@@ -24,7 +24,8 @@ Suggests:
     rmarkdown,
     testthat,
     spelling,
-    roxygen2
+    roxygen2,
+    mvtnorm
 VignetteBuilder: knitr
 Language: en-US
 Imports:

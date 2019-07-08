@@ -192,13 +192,6 @@ pois_r <- function(sv, int, slope, r_eff) {
 
 monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
   define_kernel(
-    # The yr suffix is appended to the kernel name and the parameter names
-    # within each vital rate expression. ipmr substitutes in the hier_levels
-    # for each suffix occurrence, thus changing P_yr in P_1, P_2, P_3, P_4, P_5,
-    # s_yr in s_1, s_2, s_3, s_4, and s_5. s_r_yr is converted to s_r_1, s_r_2,
-    # etc. In the case of s_r_yr, provided that the names in the data_list match
-    # the expanded names, all will go well!
-
     name = 'P_yr',
     formula = t(s_yr * t(g_yr)) ,
     family = "CC",
@@ -207,7 +200,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     g_yr = dnorm(ht_2, mean = mu_g_yr, sd = sd_g) * cell_size_ht,
     mu_g_yr = g_int + g_slope * ht_1 + g_r_yr,
     data_list = params,
-    state_list = list(c('ht')),
+    states = list(c('ht')),
     has_hier_effs = TRUE,
     levels_hier_effs = hier_levels,
     evict = TRUE,
@@ -223,7 +216,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     f_s_yr = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr),
     f_d = dnorm(ht_2, mean = mu_fd, sd = sd_fd) * cell_size_ht,
     data_list = params,
-    state_list = list(c('ht')),
+    states = list(c('ht')),
     has_hier_effs = TRUE,
     levels_hier_effs = hier_levels,
     evict = FALSE) %>%
@@ -232,7 +225,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     formula = P_yr + F_yr,
     family = "IPM",
     data_list = params,
-    state_list = list(c("ht")),
+    states = list(c("ht")),
     has_hier_effs = TRUE,
     levels_hier_effs = hier_levels,
     evict = FALSE
