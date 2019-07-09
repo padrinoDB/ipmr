@@ -193,7 +193,7 @@ pois_r <- function(sv, int, slope, r_eff) {
 monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
   define_kernel(
     name = 'P_yr',
-    formula = t(s_yr * t(g_yr)) ,
+    formula = s_g_mult(s_yr, g_yr),
     family = "CC",
     s_yr = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
       (1 - inv_logit(ht_1, f_r_int, f_r_slope)),

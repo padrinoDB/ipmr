@@ -78,7 +78,7 @@ states <- c('dbh', 'dbh')
 
 x <- init_ipm('simple_di_det') %>%
   define_kernel("P",
-                formula = t(s * t(g)), # make helper for double transposes
+                formula = s_g_mult(s, g),
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = cell_size_dbh * dnorm(dbh_2, mu_g, sd_g),

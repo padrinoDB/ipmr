@@ -17,7 +17,7 @@ make_ipm(proto_ipm, return_all = FALSE, ...)
   kernel_seq = NULL, usr_funs = list, ...)
 
 \method{make_ipm}{simple_di_stoch_param}(proto_ipm, return_all = FALSE,
-  domain_list = NULL, iterate = FALSE, iterations = 50,
+  domain_list = NULL, iterate = TRUE, iterations = 50,
   usr_funs = list(), ...)
 }
 \arguments{

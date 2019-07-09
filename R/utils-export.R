@@ -84,13 +84,20 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
 #' @return All \code{define_*} functions return a proto_ipm.
 #'
 #' @rdname define_star
+#' @importFrom rlang is_empty
 #' @export
 
-define_pop_state <- function(proto_ipm, ...) {
+define_pop_state <- function(proto_ipm, ..., pop_vectors = list()) {
 
   pop_quos <- rlang::enquos(...)
 
-  proto_ipm$pop_state <- list(pop_quos)
+  temp <- rlang::list2(pop_quos, !!! pop_vectors)
+
+  out <- Filter(Negate(rlang::is_empty), temp)
+
+  names(out) <- gsub('n_', 'pop_state_', names(out))
+
+  proto_ipm$pop_state <- list(out)
 
   return(proto_ipm)
 
@@ -115,12 +122,12 @@ define_env_state <- function(proto_ipm, ..., data_list) {
 
   env_quos <- rlang::enquos(...)
 
-  out <- list(env_exprs = env_quos,
+  out <- list(env_exprs = unlist(env_quos),
               constants = data_list)
 
   proto_ipm$env_state <- list(out)
 
-  return(out)
+  return(proto_ipm)
 }
 
 
@@ -131,4 +138,52 @@ define_env_state <- function(proto_ipm, ..., data_list) {
 define_hier_effs <- function(proto_ipm, ...) {
 
   # DEFINE ME
+}
+
+
+#' @rdname fun-mult-helpers
+#'
+#' @param ... Symbols representing functions - usually things that appear on the
+#' left hand side of \code{formula} and/or \code{...} in \code{define_kernel} and
+#' \code{define_k}.
+#'
+#' @export
+right_mult <- function(...) {
+
+  to_mult <- list(...)
+  dims <- vapply(to_mult, dim, integer(2))
+
+  id_dim <- max(dims)
+
+  init <- diag(id_dim) # Identity matrix as initial starting point
+
+  Reduce('%*%', to_mult, init = init)
+}
+
+# #' @rdname fun-mult-helpers
+# #' @inheritParams left_mult
+# #' @export
+#
+# left_mult <- function(...) {
+#   to_mult <- rev(list(...))
+#   init <- diag(dim(to_mult[[length(to_mult)]])[1]) # Identity matrix as initial starting point
+#
+#   Reduce('%*%', to_mult, init = init)
+#
+# }
+
+#' @title Function multiplication helpers
+#' @rdname fun-mult-helpers
+#'
+#' @description Helpers for multiplying functions - follows the terminology from
+#' Ellner, Rees & Childs (2016), Table 3.1. \code{s_g_mult} is a special function
+#' that correctly multiplies survival and growth
+#'
+#' @param s A vector of survival probabilities
+#' @param g A discretized growth kernel
+#'
+#' @export
+
+s_g_mult <- function(s, g) {
+  return(t(s * t(g)))
 }

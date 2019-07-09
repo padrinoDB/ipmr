@@ -124,19 +124,20 @@ inv_logit <- function(int, slope, sv1) {
 }
 
 mvt_wrapper <- function(r_means, r_sigma, nms) {
-  out <- mvtnorm(1, r_means, r_sigma) %>%
-    as.vector()
+  out <- rmvnorm(1, r_means, r_sigma) %>%
+    as.list()
 
   names(out) <- nms
+  return(out)
 }
 
-init_ipm('simple_di_stoch_param') %>%
+test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
   define_kernel(
     'P',
-    formula = t(s * t(g)),
+    formula = s_g_mult(s, g),
     family = 'CC',
-    g_mu = g_int_yr + g_slope * surf_area_1,
-    s = inv_logit(s_int_yr, s_slope, surf_area_1),
+    g_mu = env_params$g_int_yr + g_slope * surf_area_1,
+    s = inv_logit(env_params$s_int_yr, s_slope, surf_area_1),
     g = cell_size_surf_area * dnorm(surf_area_2, g_mu, g_sd),
     data_list = data_list,
     states = list(c('surf_area')),
@@ -149,16 +150,17 @@ init_ipm('simple_di_stoch_param') %>%
     'F',
     formula = f_r * f_s * f_d,
     family = 'CC',
-    f_r = inv_logit(f_r_int_yr, f_r_slope, surf_area_1),
-    f_s = exp(f_s_int_yr + f_s_slope * surf_area_1),
+    f_r = inv_logit(env_params$f_r_int_yr, f_r_slope, surf_area_1),
+    f_s = exp(env_params$f_s_int_yr + f_s_slope * surf_area_1),
     f_d = cell_size_surf_area * dnorm(surf_area_2, f_d_mu, f_d_sd),
+    data_list = data_list,
     states = list(c('surf_area')),
     has_hier_effs = FALSE,
     evict = FALSE
   ) %>%
   define_k(
     'K',
-    n_surf_area_t_1 = (P + F) * n_surf_area_t,
+    n_surf_area_t_1 = right_mult((P+F), n_surf_area_t),
     family = 'IPM',
     data_list = data_list,
     states = list(c('surf_area')),
@@ -175,10 +177,10 @@ init_ipm('simple_di_stoch_param') %>%
   ) %>%
   define_domains(surf_area = c(0, 10, 100)) %>%
   define_env_state(
-    mvt_wrapper(r_means, r_sigma, nms = c('s_int_yr',
-                                          'g_int_yr',
-                                          'f_r_int_yr',
-                                          'f_s_int_yr')),
+    env_params = mvt_wrapper(r_means, r_sigma, nms = c('s_int_yr',
+                                                       'g_int_yr',
+                                                       'f_r_int_yr',
+                                                       'f_s_int_yr')),
     data_list = list(
       r_means = r_means,
       r_sigma = r_sigma
@@ -186,6 +188,10 @@ init_ipm('simple_di_stoch_param') %>%
   ) %>%
   define_pop_state(
     pop_vectors = list(n_surf_area_t = init_pop_vec),
-  )
+  ) %>%
+  make_ipm(usr_funs = list(inv_logit = inv_logit,
+                           mvt_wrapper = mvt_wrapper),
+           iterate = TRUE,
+           iterations = 10)
 
 

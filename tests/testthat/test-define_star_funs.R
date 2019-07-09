@@ -10,7 +10,7 @@ impl_args_single <- make_impl_args_list(c('P', 'F', 'K'),
 
 single_state <- init_ipm('simple_di_det') %>%
   define_kernel("P",
-                formula = t(s * t(g)), # make helper for double transposes
+                formula = s_g_mult(s, g),
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = cell_size_dbh * dnorm(dbh_2, mu_g, sd_g),
@@ -60,7 +60,7 @@ impl_args_2 <- make_impl_args_list(c('P_1',"P_2", 'F', 'K'),
 
 two_state <- init_ipm('simple_di_det') %>%
   define_kernel("P_1",
-                formula = t(s * t(g)), # make helper for double transposes
+                formula = s_g_mult(s, g), # make helper for double transposes
                 family = "CC",
                 s = inv_logit(s_int, s_slope, ht_1),
                 g = cell_size_ht * dnorm(dbh_2, mu_g, sd_g),
@@ -75,7 +75,7 @@ two_state <- init_ipm('simple_di_det') %>%
                 evict_fun = truncated_distributions(g,
                                                     n_mesh_p = 100)) %>%
   define_kernel("P_2",
-                formula = t(s * t(g)), # make helper for double transposes
+                formula = s_g_mult(s, g), # make helper for double transposes
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = cell_size_dbh * dnorm(dbh_2, mu_g, sd_g),
@@ -125,11 +125,11 @@ test_that('define_pop_state produces expected outputs', {
 
   expect_true(is.list(pop_state))
 
-  classes <- vapply(pop_state, function(x) inherits(x, 'quosures'), logical(1L))
+  classes <- vapply(pop_state, function(x) inherits(x[[1]], 'quosures'), logical(1L))
 
   expect_true((all(classes)))
 
-  nms <- vapply(pop_state, names, character(2L)) %>%
+  nms <- vapply(pop_state, function(x) names(x[[1]]), character(2L)) %>%
     as.vector() %>%
     unique()
 
