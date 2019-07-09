@@ -75,8 +75,8 @@ f_s_params <- list2(!!! f_s_r_int)
 params <- splice(data_list, g_params, s_params, f_s_params)
 
 
-b <- seq(0.2, 400, length.out = 501)
-sv1 <- sv2 <- (b[2:501] + b[1:500]) * 0.5
+b <- seq(0.2, 40, length.out = 101)
+sv1 <- sv2 <- (b[2:101] + b[1:100]) * 0.5
 h <- sv1[2] - sv1[1]
 
 # repetitive to demonstrate the typical kernel construction process.
@@ -105,11 +105,11 @@ g_5 <- h * outer(sv1, sv2, FUN = g, params = c(params$g_int,
                                                params$sd_g),
                  r_effect = params$g_r_5)
 
-g_1 <- truncated_distributions(g_1, n_mesh_p = 500)
-g_2 <- truncated_distributions(g_2, n_mesh_p = 500)
-g_3 <- truncated_distributions(g_3, n_mesh_p = 500)
-g_4 <- truncated_distributions(g_4, n_mesh_p = 500)
-g_5 <- truncated_distributions(g_5, n_mesh_p = 500)
+g_1 <- truncated_distributions(g_1, n_mesh_p = 100)
+g_2 <- truncated_distributions(g_2, n_mesh_p = 100)
+g_3 <- truncated_distributions(g_3, n_mesh_p = 100)
+g_4 <- truncated_distributions(g_4, n_mesh_p = 100)
+g_5 <- truncated_distributions(g_5, n_mesh_p = 100)
 
 s_1 <- s(sv1, c(params$s_int, params$s_slope,
                 params$f_r_int, params$f_r_slope), params$s_r_1)
@@ -159,7 +159,7 @@ ipms <- list(K_1 = P_1 + F_1,
 eigen_sys <- lapply(ipms, function(x) eigen(x))
 
 lambdas <- vapply(eigen_sys, function(x) Re(x$values[1]), numeric(1))
-ws      <- vapply(eigen_sys, function(x) Re(x$vectors[ ,1]), numeric(500))
+ws      <- vapply(eigen_sys, function(x) Re(x$vectors[ ,1]), numeric(100))
 
 
 ## ipmr version
@@ -206,7 +206,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     evict = TRUE,
     # Note that the suffix is appended here since the growth kernel also has a random intercept.
     evict_fun = truncated_distributions(g_yr,
-                                        n_mesh_p = 500)
+                                        n_mesh_p = 100)
   ) %>%
   define_kernel(
     "F_yr",
@@ -238,7 +238,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
       dom_end = rep("ht", 3)
     )
   ) %>%
-  define_domains(ht = c(0.2, 400, 500)) %>%
+  define_domains(ht = c(0.2, 40, 100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit,
                            inv_logit_r = inv_logit_r,
                            pois_r = pois_r))
@@ -249,15 +249,15 @@ ks <- monocarp_sys$iterators
 eigen_sys <- lapply(ks, function(x) eigen(x))
 
 lambdas_ipmr <- vapply(eigen_sys, function(x) Re(x$values[1]), numeric(1))
-ws_ipmr      <- vapply(eigen_sys, function(x) Re(x$vectors[ ,1]), numeric(500))
+ws_ipmr      <- vapply(eigen_sys, function(x) Re(x$vectors[ ,1]), numeric(100))
 
 test_that('eigenvectors and values are correct', {
 
   expect_equal(lambdas_ipmr, lambdas, tolerance = 1e-10)
-  expect_equal(ws_ipmr[ ,1], ws[ ,1], tolerance = 1e-15)
-  expect_equal(ws_ipmr[ ,2], ws[ ,2], tolerance = 1e-15)
-  expect_equal(ws_ipmr[ ,3], ws[ ,3], tolerance = 1e-15)
-  expect_equal(ws_ipmr[ ,4], ws[ ,4], tolerance = 1e-15)
-  expect_equal(ws_ipmr[ ,5], ws[ ,5], tolerance = 1e-15)
+  expect_equal(ws_ipmr[ ,1], ws[ ,1], tolerance = 1e-13)
+  expect_equal(ws_ipmr[ ,2], ws[ ,2], tolerance = 1e-13)
+  expect_equal(ws_ipmr[ ,3], ws[ ,3], tolerance = 1e-13)
+  expect_equal(ws_ipmr[ ,4], ws[ ,4], tolerance = 1e-13)
+  expect_equal(ws_ipmr[ ,5], ws[ ,5], tolerance = 1e-13)
 
 })
