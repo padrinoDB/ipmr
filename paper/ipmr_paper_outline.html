@@ -384,33 +384,46 @@ $(document).ready(function () {
 <div id="intro" class="section level2">
 <h2>Intro</h2>
 <ol style="list-style-type: decimal">
-<li>IPMs have become one of the tools of choice for discrete time demographers studying structured populations. <em>Point about flexibility, lead to figure 1</em></li>
+<li>Integral projection models (IPMs) have become one of the tools of choice for discrete time demographers studying structured populations. Since Easterling, Ellner &amp; Dixon’s (2000) seminal paper, there have been XXX publications using IPMs. Their main power lies in the fact that they allow for continuously distributed state variables to describe vital rates, as opposed to historically favored methods that relied on sometimes arbitrary delineation of classes.</li>
 </ol>
+<p><em>Point about flexibility, lead to figure 1</em></p>
 <pre class="r"><code># Figure 1 - N_publications ~ Year + (Year|model_type)</code></pre>
 <ol start="2" style="list-style-type: decimal">
-<li><p>IPMpack is great! Highlight usage in teaching and power of its diagnostic tools (which we will likely unashamedly re-purpose in this package). BUT:</p>
+<li><p>To date, there has been only one serious effort to implement an R package to assist with integral projection modeling (Metcalf et al. XXXX). IPMpack was a major leap forward in allowing users to go from raw data to set of iteration kernels in a matter of a few lines of code. Indeed, a number of authors of <code>ipmr</code> have used to it to great effect on their own data, as well as in teaching how to fit IPMs to students and mentees. BUT:</p>
 <ul>
 <li><p>Clunky interface for general IPMs, age x size IPMs</p></li>
-<li><p>Continuous environments cannot be modeled</p></li>
+<li><p>Continuous environments can only sort of be modeled</p></li>
 <li><p>Restricted integration types</p></li>
 <li><p>Generally too high a level of abstraction to fully harness the power of IPMs</p>
 <ul>
-<li><p>S4 is (non-biodegradable) trash and obfuscates too much of what is going on (perhaps a sub-point of ^^)</p></li>
-<li><p>Less flexible vital rate models (e.g. cannot fit a GAM)</p></li>
+<li><p>S4 obfuscates too much of what is going on</p></li>
+<li><p>Less flexible vital rate models without an exceptional understanding of S4 OOP</p></li>
+<li><p>Above points can actually hinder learning the methods in the long run, as they don’t require a user to understand the fundamentals of what is going on with an IPM</p></li>
 </ul></li>
 </ul></li>
 </ol>
-<p>Table 1 (comparative checklist of available tools) to compare <code>IPMpack</code>, <code>ipmr</code>, and base R implementations.</p>
 </div>
 <div id="what-makes-us-different" class="section level2">
 <h2>What makes us different??</h2>
 <ol start="3" style="list-style-type: decimal">
-<li><code>ipmr</code> is a lower-level framework that uses mathematical expressions, rather than model objects, to generate iteration kernels. <em>Tidy Eval Blah Blah Blah - lead to Figure 2</em>. Make no emphasis on speed… yet!</li>
+<li><code>ipmr</code> is a lower-level framework that uses mathematical expressions, rather than model objects, to generate iteration kernels. It also does not try to abstract away the actual vital rate model fitting process - we feel that is a substantially different question (e.g. how to model vital rates is a statistical question, not a model implementation one) that is best left to the user. This also means that users are free to specify vital rate models of <em>any</em> form.</li>
 </ol>
+<p><code>ipmr</code> is largely powered by <code>rlang</code> (Henry &amp; Wickham 2019) and works by building up expressions that reference each other at higher and higher levels in the model hierarchy. <code>ipmr</code> is relatively dependency-free, requiring only <code>purrr</code> and <code>magrittr</code> (in addition to the packages included in the base R distribution. It may also not even require <code>purrr</code> in a technical sense - I’ve just been lazy about using <code>lapply/vapply</code>) to work as advertized.</p>
+<p>The package itself can handle any set of valid R code that is presented to it, so user-specified functions, in addition to ones available from other packages, can all be included in the expressions that the user passes to <code>ipmr</code> functions. Figure 2 shows a generic IPM workflow from collecting the raw data to biological inference, highlighting the stages at which <code>ipmr</code> is useful.</p>
 <pre class="r"><code># Figure 2 - Work flow from raw data to IPM construction</code></pre>
+<p>Table 1 (comparative checklist of available tools) to compare <code>IPMpack</code>, <code>ipmr</code>, and base R implementations.</p>
+<p>At the core of <code>ipmr</code> is the <code>proto_ipm</code> data structure. It is a data frame containing all the information necessary to implement each sub-kernel, as well as the information needed to</p>
 <p>Introduce the <code>proto_ipm</code> data structure - becomes a key point in the discussion and sets up the idea of the common link between user- and database-specified IPMs.</p>
 <ol start="4" style="list-style-type: decimal">
-<li>Highlight flexibility - Table 2 w/ classes and descriptions.</li>
+<li><p>Highlight flexibility - Table 2 w/ classes, descriptions RESERVED WORDS!!!!!!!.</p>
+<ul>
+<li><p>Reserved words</p>
+<ul>
+<li><p><code>pop_state</code></p></li>
+<li><p><code>K</code></p></li>
+<li></li>
+</ul></li>
+</ul></li>
 </ol>
 </div>
 <div id="examples" class="section level2">
@@ -423,11 +436,138 @@ $(document).ready(function () {
 </ul></li>
 </ol>
 <pre class="r"><code># Figure 3 - diagnostic plots and general output from plot.* methods in ipmr</code></pre>
+<pre class="r"><code>library(ipmr)
+library(rlang)
+library(purrr)
+
+# NOTE SCL 7/9/19 - Should create some function that takes a set of desired names,
+# a set of random effect estimates, and a list of fixed effect parameter estimates
+# and generates a parameter list (or something like that - this shit below looks 
+# weird to non-rlang users)
+
+# Define some fixed parameters
+data_list = list(s_int = 1.03,
+                 s_slope = 2.2,
+                 g_int = 8,
+                 g_slope = 0.92,
+                 sd_g = 0.9,
+                 f_r_int = 0.09,
+                 f_r_slope = 0.05,
+                 f_s_int = 0.1,
+                 f_s_slope = 0.005,
+                 mu_fd = 9,
+                 sd_fd = 2)
+
+# Now, simulate some random intercepts for growth, survival, and offspring production
+g_r_int &lt;- rnorm(5, 0, 0.3)
+s_r_int &lt;- rnorm(5, 0, 0.7)
+f_s_r_int &lt;- rnorm(5, 0, 0.2)
+
+nms &lt;- paste(&quot;r_&quot;, 1:5, sep = &quot;&quot;)
+
+names(g_r_int) &lt;- paste(&#39;g_&#39;, nms, sep = &quot;&quot;)
+names(s_r_int) &lt;- paste(&#39;s_&#39;, nms, sep = &quot;&quot;)
+names(f_s_r_int) &lt;- paste(&#39;f_s_&#39;, nms, sep = &quot;&quot;)
+
+# The !!! operator used inside of list2 from rlang takes the named vector
+# and converts it to a named list. This can be spliced into the data list
+# to rapidly make a parameter set suitable for usage in the data_list argument
+# of define_kernel
+
+g_params &lt;- list2(!!! g_r_int)
+s_params &lt;- list2(!!! s_r_int)
+f_s_params &lt;- list2(!!! f_s_r_int)
+
+params &lt;- splice(data_list, g_params, s_params, f_s_params)
+
+# define the levels of the hierarchical variable and save them in a named
+# list that corresponds to the suffix in the kernel notation
+hier_levels &lt;- list(yr = 1:5)
+
+# additional usr_funs to be passed into make_ipm()
+inv_logit &lt;- function(sv, int, slope) {
+  return(
+    1/(1 + exp(-(int + slope * sv)))
+  )
+}
+
+inv_logit_r &lt;- function(sv, int, slope, r_eff) {
+  return(
+    1/(1 + exp(-(int + slope * sv + r_eff)))
+  )
+}
+
+pois_r &lt;- function(sv, int, slope, r_eff) {
+  return(
+    exp(
+      int + slope * sv + r_eff
+    )
+  )
+}
+
+
+monocarp_sys &lt;- init_ipm(&#39;simple_di_stoch_kern&#39;) %&gt;%
+  define_kernel(
+    name = &#39;P_yr&#39;,
+    formula = s_g_mult(s_yr, g_yr),
+    family = &quot;CC&quot;,
+    s_yr = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
+      (1 - inv_logit(ht_1, f_r_int, f_r_slope)),
+    g_yr = dnorm(ht_2, mean = mu_g_yr, sd = sd_g) * cell_size_ht,
+    mu_g_yr = g_int + g_slope * ht_1 + g_r_yr,
+    data_list = params,
+    states = list(c(&#39;ht&#39;)),
+    has_hier_effs = TRUE,
+    levels_hier_effs = hier_levels,
+    evict = TRUE,
+    # Note that the suffix is appended here since the growth kernel also has a random intercept.
+    evict_fun = truncated_distributions(g_yr,
+                                        n_mesh_p = 100)
+  ) %&gt;%
+  define_kernel(
+    &quot;F_yr&quot;,
+    formula = f_r * f_s_yr * f_d,
+    family = &quot;CC&quot;,
+    f_r = inv_logit(ht_1, f_r_int, f_r_slope),
+    f_s_yr = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr),
+    f_d = dnorm(ht_2, mean = mu_fd, sd = sd_fd) * cell_size_ht,
+    data_list = params,
+    states = list(c(&#39;ht&#39;)),
+    has_hier_effs = TRUE,
+    levels_hier_effs = hier_levels,
+    evict = FALSE) %&gt;%
+  define_k(
+    &#39;K_yr&#39;,
+    K_yr = P_yr + F_yr,
+    family = &quot;IPM&quot;,
+    data_list = params,
+    states = list(c(&quot;ht&quot;)),
+    has_hier_effs = TRUE,
+    levels_hier_effs = hier_levels,
+    evict = FALSE
+  ) %&gt;%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c(&quot;K_yr&quot;, &quot;P_yr&quot;, &quot;F_yr&quot;),
+      int_rule = rep(&quot;midpoint&quot;, 3),
+      dom_start = rep(&quot;ht&quot;, 3),
+      dom_end = rep(&quot;ht&quot;, 3)
+    )
+  ) %&gt;%
+  define_domains(ht = c(0.2, 40, 100)) %&gt;%
+  make_ipm(usr_funs = list(inv_logit = inv_logit,
+                           inv_logit_r = inv_logit_r,
+                           pois_r = pois_r))</code></pre>
 </div>
 <div id="discusion-of-additional-applications" class="section level2">
 <h2>Discusion of additional applications</h2>
 <ol start="6" style="list-style-type: decimal">
+<li><p>bullets for now</p>
+<ul>
+<li><p>the <code>proto_ipm</code> provides a natural intermediate data structure for user- and database-specified IPMs</p></li>
+<li><p>viable mechanism for reproducing published IPMs without relying on raw data and associated code</p></li>
 <li></li>
+</ul></li>
 </ol>
 </div>
 

@@ -14,18 +14,19 @@ Authors@R: c(
 Description: Flexibly implements IPMs using an expression based framework. This
   will not abstract away the model selection process, but it will make sure you
   get everything after that correct. It handles density dependence and environmental
-  stochasticity, with a couple options for implementing the latter. Additionally,
-  provides model diagnostic tools, plotting functionality, and analysis tools.
+  stochasticity, with a couple of options for implementing the latter. Additionally,
+  provides model diagnostic tools, plotting functionality, stochastic/deterministic
+  simulations, and analysis tools.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: 
     knitr,
+    mvtnorm,
     rmarkdown,
-    testthat,
-    spelling,
     roxygen2,
-    mvtnorm
+    spelling,
+    testthat
 VignetteBuilder: knitr
 Language: en-US
 Imports:

@@ -8,7 +8,9 @@ output: html_document
 
 ## Intro
 
-1. IPMs have become one of the tools of choice for discrete time demographers studying structured populations. *Point about flexibility, lead to figure 1*
+1. Integral projection models (IPMs) have become one of the tools of choice for discrete time demographers studying structured populations. Since Easterling, Ellner & Dixon's (2000) seminal paper, there have been XXX publications using IPMs. Their main power lies in the fact that they allow for continuously distributed state variables to describe vital rates, as opposed to historically favored methods that relied on sometimes arbitrary delineation of classes.
+
+*Point about flexibility, lead to figure 1*
 
 ```{r figure 1, eval = FALSE}
 
@@ -17,26 +19,31 @@ output: html_document
 ```
 
 
-2. IPMpack is great! Highlight usage in teaching and power of its diagnostic tools (which we will likely unashamedly re-purpose in this package). BUT:
+2. To date, there has been only one serious effort to implement an R package to assist with integral projection modeling (Metcalf et al. XXXX). IPMpack was a major leap forward in allowing users to go from raw data to set of iteration kernels in a matter of a few lines of code. Indeed, a number of authors of `ipmr` have used to it to great effect on their own data, as well as in teaching how to fit IPMs to students and mentees. BUT:
     
     + Clunky interface for general IPMs, age x size IPMs
     
-    + Continuous environments cannot be modeled
+    + Continuous environments can only sort of be modeled
     
     + Restricted integration types
     
     + Generally too high a level of abstraction to fully harness the power of IPMs
     
-        + S4 is (non-biodegradable) trash and obfuscates too much of what is going on (perhaps a sub-point of ^^)
+        + S4  obfuscates too much of what is going on 
         
-        + Less flexible vital rate models (e.g. cannot fit a GAM)
+        + Less flexible vital rate models without an exceptional understanding of S4 OOP
 
+        + Above points can actually hinder learning the methods in the long run, as they don't require a user to understand the fundamentals of what is going on with an IPM
     
-Table 1 (comparative checklist of available tools) to compare `IPMpack`, `ipmr`, and base R implementations. 
 
 ## What makes us different??
 
-3. `ipmr` is a lower-level framework that uses mathematical expressions, rather than model objects, to generate iteration kernels. *Tidy Eval Blah Blah Blah - lead to Figure 2*. Make no emphasis on speed... yet!
+3. `ipmr` is a lower-level framework that uses mathematical expressions, rather than model objects, to generate iteration kernels. It also does not try to abstract away the actual vital rate model fitting process - we feel that is a substantially different question (e.g. how to model vital rates is a statistical question, not a model implementation one) that is best left to the user. This also means that users are free to specify vital rate models of *any* form. 
+
+`ipmr` is largely powered by `rlang` (Henry & Wickham 2019) and works by building up expressions that reference each other at higher and higher levels in the model hierarchy. `ipmr` is relatively dependency-free, requiring only `purrr` and `magrittr` (in addition to the packages included in the base R distribution. It may also not even require `purrr` in a technical sense - I've just been lazy about using `lapply/vapply`) to work as advertized. 
+
+The package itself can handle any set of valid R code that is presented to it, so user-specified functions, in addition to ones available from other packages, can all be included in the expressions that the user passes to `ipmr` functions. Figure 2 shows a generic IPM workflow from collecting the raw data to biological inference, highlighting the stages at which `ipmr` is useful.
+
 
 ```{r figure 2, eval = FALSE}
 
@@ -44,10 +51,21 @@ Table 1 (comparative checklist of available tools) to compare `IPMpack`, `ipmr`,
 
 ```
 
+Table 1 (comparative checklist of available tools) to compare `IPMpack`, `ipmr`, and base R implementations.
+
+At the core of `ipmr` is the `proto_ipm` data structure. It is a data frame containing all the information necessary to implement each sub-kernel, as well as the information needed to 
 
 Introduce the `proto_ipm` data structure - becomes a key point in the discussion and sets up the idea of the common link between user- and database-specified IPMs.
 
-4. Highlight flexibility - Table 2 w/ classes and descriptions. 
+4. Highlight flexibility - Table 2 w/ classes, descriptions RESERVED WORDS!!!!!!!.
+
+    + Reserved words
+        
+        + `pop_state`
+        
+        + `K`
+        
+        + 
 
 ## Examples 
 
@@ -63,9 +81,143 @@ Introduce the `proto_ipm` data structure - becomes a key point in the discussion
 
 ```
     
+    
+```{r Case Studies, eval = FALSE}
+library(ipmr)
+library(rlang)
+library(purrr)
+
+# NOTE SCL 7/9/19 - Should create some function that takes a set of desired names,
+# a set of random effect estimates, and a list of fixed effect parameter estimates
+# and generates a parameter list (or something like that - this shit below looks 
+# weird to non-rlang users)
+
+# Define some fixed parameters
+data_list = list(s_int = 1.03,
+                 s_slope = 2.2,
+                 g_int = 8,
+                 g_slope = 0.92,
+                 sd_g = 0.9,
+                 f_r_int = 0.09,
+                 f_r_slope = 0.05,
+                 f_s_int = 0.1,
+                 f_s_slope = 0.005,
+                 mu_fd = 9,
+                 sd_fd = 2)
+
+# Now, simulate some random intercepts for growth, survival, and offspring production
+g_r_int <- rnorm(5, 0, 0.3)
+s_r_int <- rnorm(5, 0, 0.7)
+f_s_r_int <- rnorm(5, 0, 0.2)
+
+nms <- paste("r_", 1:5, sep = "")
+
+names(g_r_int) <- paste('g_', nms, sep = "")
+names(s_r_int) <- paste('s_', nms, sep = "")
+names(f_s_r_int) <- paste('f_s_', nms, sep = "")
+
+# The !!! operator used inside of list2 from rlang takes the named vector
+# and converts it to a named list. This can be spliced into the data list
+# to rapidly make a parameter set suitable for usage in the data_list argument
+# of define_kernel
+
+g_params <- list2(!!! g_r_int)
+s_params <- list2(!!! s_r_int)
+f_s_params <- list2(!!! f_s_r_int)
+
+params <- splice(data_list, g_params, s_params, f_s_params)
+
+# define the levels of the hierarchical variable and save them in a named
+# list that corresponds to the suffix in the kernel notation
+hier_levels <- list(yr = 1:5)
+
+# additional usr_funs to be passed into make_ipm()
+inv_logit <- function(sv, int, slope) {
+  return(
+    1/(1 + exp(-(int + slope * sv)))
+  )
+}
+
+inv_logit_r <- function(sv, int, slope, r_eff) {
+  return(
+    1/(1 + exp(-(int + slope * sv + r_eff)))
+  )
+}
+
+pois_r <- function(sv, int, slope, r_eff) {
+  return(
+    exp(
+      int + slope * sv + r_eff
+    )
+  )
+}
+
+
+monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
+  define_kernel(
+    name = 'P_yr',
+    formula = s_g_mult(s_yr, g_yr),
+    family = "CC",
+    s_yr = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
+      (1 - inv_logit(ht_1, f_r_int, f_r_slope)),
+    g_yr = dnorm(ht_2, mean = mu_g_yr, sd = sd_g) * cell_size_ht,
+    mu_g_yr = g_int + g_slope * ht_1 + g_r_yr,
+    data_list = params,
+    states = list(c('ht')),
+    has_hier_effs = TRUE,
+    levels_hier_effs = hier_levels,
+    evict = TRUE,
+    # Note that the suffix is appended here since the growth kernel also has a random intercept.
+    evict_fun = truncated_distributions(g_yr,
+                                        n_mesh_p = 100)
+  ) %>%
+  define_kernel(
+    "F_yr",
+    formula = f_r * f_s_yr * f_d,
+    family = "CC",
+    f_r = inv_logit(ht_1, f_r_int, f_r_slope),
+    f_s_yr = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr),
+    f_d = dnorm(ht_2, mean = mu_fd, sd = sd_fd) * cell_size_ht,
+    data_list = params,
+    states = list(c('ht')),
+    has_hier_effs = TRUE,
+    levels_hier_effs = hier_levels,
+    evict = FALSE) %>%
+  define_k(
+    'K_yr',
+    K_yr = P_yr + F_yr,
+    family = "IPM",
+    data_list = params,
+    states = list(c("ht")),
+    has_hier_effs = TRUE,
+    levels_hier_effs = hier_levels,
+    evict = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("K_yr", "P_yr", "F_yr"),
+      int_rule = rep("midpoint", 3),
+      dom_start = rep("ht", 3),
+      dom_end = rep("ht", 3)
+    )
+  ) %>%
+  define_domains(ht = c(0.2, 40, 100)) %>%
+  make_ipm(usr_funs = list(inv_logit = inv_logit,
+                           inv_logit_r = inv_logit_r,
+                           pois_r = pois_r))
+
+
+```
+    
 ## Discusion of additional applications
 
-6. 
+6. bullets for now
+
+    + the `proto_ipm` provides a natural intermediate data structure for user- and database-specified IPMs
+    
+    + viable mechanism for reproducing published IPMs without relying on raw data and associated code
+    
+    + 
     
 
 
