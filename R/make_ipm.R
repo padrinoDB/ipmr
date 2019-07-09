@@ -232,7 +232,7 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                            return_all = FALSE,
                                            domain_list = NULL,
-                                           iterate = FALSE,
+                                           iterate = TRUE,
                                            iterations = 50,
                                            usr_funs = list(),
                                            ...) {
@@ -256,7 +256,6 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
   # If vital rates are fit with a hierarchical model of any kind,
   # then split those out into their respective years/plots/what-have-you
-  # BE SURE TO WRITE VIGNETTE ON THIS SYNTAX  ONCE IMPLEMENTED
 
   if(any(others$has_hier_effs) | any(k_row$has_hier_effs)) {
     others <- .split_hier_effs(others)
@@ -274,13 +273,13 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
   # Bind env_exprs, constants, and pop_vectors to master_env so that
   # we can always find them and avoid that miserable repitition
 
-  master_env <- .bind_all_exprs(others$pop_state,
-                                others$env_state,
+  master_env <- .bind_all_exprs(pop_state = others$pop_state[[1]],
+                                env_state = others$env_state[[1]],
                                 env_to_bind = master_env)
 
   env_list <- list(master_env = master_env)
 
-  out <- .prep_param_resamp_output(others, k_row)
+  out <- .prep_param_resamp_output(others, k_row, proto_ipm)
 
   for(i in seq_len(iterations)) {
 
@@ -295,15 +294,24 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
     sub_kernels <- sys$ipm_system$sub_kernels
 
-    # Resume here 7/8/19 --------------
-    k_i <- .make_k_param_samp(sub_kernels, k_row, master_env)
+    sys_i <- .make_k_param_samp(sub_kernels, k_row, master_env)
 
 
-    out <- .update_param_resamp_output(sub_kernels, k_i, master_env, out)
+    out <- .update_param_resamp_output(sub_kernels,
+                                       sys_i$iterator,
+                                       sys_i$pop_vec,
+                                       ifelse(return_all,
+                                              sys$data_envs,
+                                              NA_character_),
+                                       master_env,
+                                       out)
+
+    master_env <- .update_master_env(sys$pop_vec, master_env)
 
   }
 
 
+  return(out)
 
 
 }

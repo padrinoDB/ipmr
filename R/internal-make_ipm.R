@@ -70,7 +70,9 @@
 
   master_env <- .eval_env_exprs(master_env, env_state_funs)
 
-  sys <- .make_sub_kernel(proto, master_env, return_envs = return_envs)
+  env_list <- list(master_env = master_env)
+
+  sys <- .make_sub_kernel(proto, env_list, return_envs = return_envs)
 
   out <- list(ipm_system = sys,
               master_env = master_env)
@@ -102,7 +104,7 @@
               sub_kernels = list(),
               env_list = list(),
               env_seq = NA_character_, # placeholder
-              pop_state = proto$pop_state[[1]], # placeholder,
+              pop_state = others$pop_state[[1]], # placeholder,
               proto_ipm = proto_ipm)
 
   env_vars <- lapply(proto_ipm$env_state, function(x) x$env_quos)
@@ -117,7 +119,7 @@
                        nrow = 1,
                        ncol = n_env_vars,
                        dimnames = list(c(NA),
-                                       c(env_var_names)))
+                                       c(env_var_nms)))
 
   out$env_seq <- env_holder
 
@@ -128,6 +130,8 @@
 
 .update_param_resamp_output <- function(sub_kernels,
                                         iterator,
+                                        pop_vec,
+                                        data_envs = NA_character_,
                                         master_env,
                                         output) {
 
@@ -143,6 +147,10 @@
                                   env_vars,
                                   default = NA_real_) %>%
     unlist()
+
+  if(!is.na(data_envs)) {
+    out$sub_kernel_envs <- purrr::splice(out$sub_kernel_envs, data_envs)
+  }
 
   output$env_seq <- rbind(output$env_seq, env_temp)
 
@@ -201,6 +209,27 @@
   return(out)
 }
 
+parse_k_formulae <- function(text, kernel_env) {
+
+  text <- lapply(text, function(x)
+    gsub('n_', 'pop_state_', x)
+  )
+
+  text <- lapply(text, function(x) {
+    temp <- strsplit(x, split = '[=]')
+
+    if(length(temp[[1]]) == 1) { # defined by iteration matrix only
+      out <- temp[[1]][1]
+    } else {                     # defined by iteration matrix and pop_vector
+      out <- temp[[1]][2]
+    }
+    return(out)
+  })
+
+  out <- ipmr:::.parse_vr_formulae(text, kernel_env)
+
+  return(out)
+}
 
 #' @noRd
 #' @importFrom purrr flatten map_dbl
@@ -439,10 +468,25 @@
 
 }
 
-.bind_all_exprs <- function(..., env_to_bind) {
+.bind_all_exprs <- function(pop_state = NA_real_,
+                            env_state = NA_real_,
+                            env_to_bind) {
 
-  to_bind <- unlist(..., recursive = TRUE) %>%
-    unique()
+  if(!all(is.na(pop_state))) {
+    if(rlang::is_list(pop_state)) {
+      pop_state <- .flatten_to_depth(pop_state, 1)
+    }
+  }
+
+  if(!all(is.na(env_state))) {
+    if(rlang::is_list(env_state)) {
+      env_state <- .flatten_to_depth(env_state, 1)
+    }
+  }
+
+  temp <- purrr::splice(pop_state, env_state)
+
+  to_bind <- .drop_duplicated_names_and_splice(temp)
 
   rlang::env_bind_lazy(env_to_bind,
                        !!! to_bind,
@@ -452,6 +496,8 @@
   return(env_to_bind)
 
 }
+
+
 
 
 

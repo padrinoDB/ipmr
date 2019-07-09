@@ -74,6 +74,20 @@
 
 }
 
+.make_k_param_samp <- function(sub_kernels, k_rows, master_env) {
+
+  ks <- list()
+
+  for(i in seq_len(dim(k_rows)[1])) {
+
+
+
+  }
+
+
+
+}
+
 
 .get_sub_kernels_for_k <- function(k_id, sub_kernel_list) {
 

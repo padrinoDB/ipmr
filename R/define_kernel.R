@@ -170,7 +170,13 @@ define_k <- function(proto_ipm,
   evict_fun <- .check_evict_fun(evict, evict_fun)
 
   # protos store text rather than quos. They get converted back into quos later
-  forms_text <- lapply(forms, rlang::quo_text)
+  forms_text <- lapply(forms, function(x) {
+    temp <- rlang::quo_text(x)
+    out <- gsub('n_t$', 'pop_state_t', temp)
+    return(out)
+  })
+
+  names(forms_text) <- gsub('^n_', 'pop_state_', names(forms_text))
 
   # retain names
   names(forms_text) <- names(forms)
