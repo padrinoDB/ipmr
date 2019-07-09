@@ -7,3 +7,4 @@
 ^ipmr\.Rproj$
 ^\.Rproj\.user$
 ^\.travis\.yml$
+^paper/*$

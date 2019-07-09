@@ -1,0 +1,71 @@
+---
+title: "ipmr Paper"
+author: "Sam Levin"
+date: "7/9/2019"
+output: html_document
+---
+
+
+## Intro
+
+1. IPMs have become one of the tools of choice for discrete time demographers studying structured populations. *Point about flexibility, lead to figure 1*
+
+```{r figure 1, eval = FALSE}
+
+# Figure 1 - N_publications ~ Year + (Year|model_type)
+
+```
+
+
+2. IPMpack is great! Highlight usage in teaching and power of its diagnostic tools (which we will likely unashamedly re-purpose in this package). BUT:
+    
+    + Clunky interface for general IPMs, age x size IPMs
+    
+    + Continuous environments cannot be modeled
+    
+    + Restricted integration types
+    
+    + Generally too high a level of abstraction to fully harness the power of IPMs
+    
+        + S4 is (non-biodegradable) trash and obfuscates too much of what is going on (perhaps a sub-point of ^^)
+        
+        + Less flexible vital rate models (e.g. cannot fit a GAM)
+
+    
+Table 1 (comparative checklist of available tools) to compare `IPMpack`, `ipmr`, and base R implementations. 
+
+## What makes us different??
+
+3. `ipmr` is a lower-level framework that uses mathematical expressions, rather than model objects, to generate iteration kernels. *Tidy Eval Blah Blah Blah - lead to Figure 2*. Make no emphasis on speed... yet!
+
+```{r figure 2, eval = FALSE}
+
+# Figure 2 - Work flow from raw data to IPM construction
+
+```
+
+
+Introduce the `proto_ipm` data structure - becomes a key point in the discussion and sets up the idea of the common link between user- and database-specified IPMs.
+
+4. Highlight flexibility - Table 2 w/ classes and descriptions. 
+
+## Examples 
+
+5. Case study - implement a `simple_di_det` and `general_dd_stoch_kern` to illustrate the different ways that it can be used to implement IPMs
+
+    + Focus here on commonality of code structure - the general example *shouldn't* include much more than the simple one.
+    
+    + make sure to demonstrate as many of the ancillary functions as possible (e.g. `define_*`) and key differences between `define_kernel` and `define_k`
+    
+```{r Figure 3, eval = FALSE}
+
+# Figure 3 - diagnostic plots and general output from plot.* methods in ipmr
+
+```
+    
+## Discusion of additional applications
+
+6. 
+    
+
+
