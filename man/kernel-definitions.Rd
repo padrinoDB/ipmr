@@ -9,9 +9,9 @@ define_kernel(proto_ipm, name, formula, family, ..., data_list = list(),
   states, has_hier_effs = FALSE, levels_hier_effs = list(),
   evict = TRUE, evict_fun = NULL)
 
-define_k(proto_ipm, name, formula, family, ..., data_list = list(),
-  states, has_hier_effs = FALSE, levels_hier_effs = list(),
-  evict = TRUE, evict_fun = NULL)
+define_k(proto_ipm, name, family, ..., data_list = list(), states,
+  has_hier_effs = FALSE, levels_hier_effs = list(), evict = TRUE,
+  evict_fun = NULL)
 }
 \arguments{
 \item{proto_ipm}{The name of object you wish to append the new kernel to.}
@@ -29,7 +29,14 @@ transitions, \code{"DC"} for discrete to continuous (e.g. emergence from a seedb
 \code{"CD"} for continuous to discrete (e.g. entering a seedbank), and \code{"DD"} for
 discrete to discrete (e.g. stasis in a seedbank).}
 
-\item{...}{A set of named expressions that correspond to vital rates in \code{formula}.}
+\item{...}{For \code{define_kernel}, set of named expressions that correspond
+to vital rates in \code{formula}. For \code{define_K}, a set of named expressions
+that relate the population state at T + 1 to the population state at T. Alternatively,
+can be an expression where the left hand side is the name of the kernel specified
+in \code{name} and the right hand side only describes the structure of the
+iteration kernel. In all cases, suffix expansion of hierarchical models is supported.
+Specific details for each case are in their respecitive function's sections
+below.}
 
 \item{data_list}{A list of named values that correspond to constants in the formula.
 You do not need to specify vectors corresponding to the domains here.}
@@ -46,15 +53,16 @@ on the syntax for this feature for more details (\code{vignettes(
 'hierarchical-notation', package = 'ipmr')}).}
 
 \item{levels_hier_effs}{A named list with vectors corresponding the various levels
-the hierarchical variable can take. This should be a single vector, usually
-character or integer.}
+the hierarchical variable can take. Entries in this list should be a single
+vector and should be character or integer typed.}
 
 \item{evict}{A logical indicating whether an eviction correction should be applied
 to the kernel. Default is \code{TRUE}.}
 
 \item{evict_fun}{If \code{evict == TRUE}, then a function that corrects for it.
 Currently, \code{truncated_distributions} and \code{rescale_kernel} are the
-only built-in functions, but user specified ones should work as well.}
+only built-in functions, but user specified ones should work as well provided
+they return a numeric matrix or vector.}
 }
 \value{
 All functions described here return a \code{proto_ipm}.
@@ -66,6 +74,23 @@ own call to this function, though there are some exceptions, namely for kernels
 derived from hierarchical models (e.g. vital rate models fit across plots and years).
 See Details for more info
 }
-\details{
-\strong{BLAH BLAH BLAH}
+\section{\code{define_k}}{
+
+
+The preferred method of defining a \code{K} kernel is to use the left
+hand side of the \code{...} to reference the population vectors that the right
+hand side creates (e.g. \code{n_T_1 = (P + F) * n_T}). This enables powerful
+iteration-based methods to work properly. On the other hand, these iteration
+based methods can be quite time consuming, and many applications only require
+an iteration matrix while not necessarily requiring the population vectors (e.g.
+calculations of deterministic population growth rate). In those cases, the
+\code{...} can contain something like \code{K = P + F}. In this case, the left
+hand side of the expression should match the \code{name} argument to \code{define_k}.
 }
+
+\section{\code{define_kernel}}{
+
+
+Describe vital rate expression syntax - include suffix expansion of hier_effs
+}
+

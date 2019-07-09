@@ -42,7 +42,7 @@ single_state <- init_ipm('simple_di_det') %>%
   #                                     n_mesh_p = 100)) %>%
   define_k(
     name = 'K',
-    formula = P + F,
+    K = P + F,
     family = 'IPM',
     data_list = list(),
     states = states_single,
@@ -107,7 +107,7 @@ two_state <- init_ipm('simple_di_det') %>%
   #                                     n_mesh_p = 100)) %>%
   define_k(
     name = 'K',
-    formula = P + F,
+    K = P + F,
     family = 'IPM',
     data_list = list(),
     states = states_2,

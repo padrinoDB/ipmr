@@ -108,12 +108,12 @@ x <- init_ipm('simple_di_det') %>%
                 evict = FALSE) %>%#,
   # evict_fun = truncated_distributions(f_d,
   #                                     n_mesh_p = 100)) %>%
-  define_kernel('K',
-                formula = P + F,
-                family = 'IPM',
-                data_list = list(),
-                states = states,
-                evict = FALSE) %>%
+  define_k('K',
+           K = P + F,
+           family = 'IPM',
+           data_list = list(),
+           states = states,
+           evict = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit))

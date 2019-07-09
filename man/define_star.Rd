@@ -7,7 +7,7 @@
 \alias{define_hier_effs}
 \title{Helpers for IPM construction}
 \usage{
-define_pop_state(proto_ipm, ...)
+define_pop_state(proto_ipm, ..., pop_vectors = list())
 
 define_state_vars(proto_ipm, ...)
 

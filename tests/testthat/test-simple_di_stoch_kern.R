@@ -220,9 +220,9 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     has_hier_effs = TRUE,
     levels_hier_effs = hier_levels,
     evict = FALSE) %>%
-  define_kernel(
+  define_k(
     'K_yr',
-    formula = P_yr + F_yr,
+    K_yr = P_yr + F_yr,
     family = "IPM",
     data_list = params,
     states = list(c("ht")),
