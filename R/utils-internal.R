@@ -48,5 +48,62 @@
 
   return(out)
 
+}
 
+#' @noRd
+# x = an pbject from make_ipm()
+
+.det_lambda <- function(x) {
+
+  vapply(x$iterators,
+         function(y) Re(eigen(y)$values[1]),
+         numeric(1))
+
+}
+
+#' @noRd
+# vec = numeric vector
+
+.geom_mean <- function(vec) {
+  n <- length(vec)
+
+  out <- prod(vec)
+
+  return(out ^ (1/n))
+}
+
+.stoch_lambda_pop_size <- function(x) {
+
+  pops <- x$pop_state
+  n_its <- dim(pops[[1]])[2]
+  temp <- numeric(n_its - 1)
+
+  for(i in seq(2, n_its, 1)) {
+    tot_pop_size_t <- lapply(pops, function(x, it) {
+      sum(x[ ,it])
+    },
+    it = (i - 1)) %>%
+      unlist() %>%
+      sum()
+
+    tot_pop_size_t_1 <- lapply(pops, function(x, it) {
+      sum(x[ ,it])
+    },
+    it = i) %>%
+      unlist() %>%
+      sum()
+
+    temp[(i - 1)] <- tot_pop_size_t_1/tot_pop_size_t
+
+  }
+
+  return(.geom_mean(temp))
+
+}
+
+.stoch_lambda_eigen <- function(x) {
+  eigs <- vapply(x$iterators,
+                 .det_lambdas,
+                 numeric(1))
+  return(.geom_mean(eigs))
 }

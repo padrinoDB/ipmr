@@ -30,6 +30,7 @@ f_d <- function(sv2, params) {
 fec <- function(sv1, sv2, params) {
   f_r(sv1, params[1:2]) * f_s(sv1, params[3:4]) * f_d(sv2, params[5:6])
 }
+
 update_r_effs <- function(to_add, r_eff_list) {
   purrr::map2(r_eff_list, to_add, .f = function(.x, .y) c(.y, .x))
 }
@@ -51,63 +52,17 @@ r_means <- c(s_int_yr = 0.8,
              f_r_int_yr = 0.3,
              f_s_int_yr = 0.004)
 
-set.seed(5000)
-
 # These are likely nonsense values - using for testing purposes only!
 r_sigma <- runif(16)
 r_sigma <- matrix(r_sigma, nrow = 4)
 
 r_sigma <- r_sigma %*% t(r_sigma) # make symmetrical
 
-iterations <- 50
-
-
-seeds <- sample(1:iterations, iterations, replace = TRUE)
+iterations <- 10
 
 pop_vec <- matrix(0, ncol = iterations + 1, nrow = length(d1))
 
 pop_vec[ ,1] <- init_pop_vec <- runif(length(d1), 0, 10)
-lambda <- vector('numeric', iterations)
-
-for(i in seq_len(iterations)) {
-
-  set.seed(seeds[i])
-
-  r_ests <- rmvnorm(1, mean = r_means, sigma = r_sigma) %>%
-    as.list() %>%
-    setNames(names(r_means))
-
-  temp <- purrr::splice(data_list,  r_ests)
-
-  g_mat <- h * outer(d1, d2, FUN = g,
-                    params = c(temp$g_int_yr,
-                               temp$g_slope,
-                               temp$g_sd))
-
-  s_vec <- s(d1, params = c(temp$s_int_yr,
-                            temp$s_slope))
-
-  g_mat <- truncated_distributions(g_mat, 100)
-  P <- t(s_vec * t(g_mat))
-
-  F_mat <- h * outer(d1, d2, FUN = fec,
-                     params = c(temp$f_r_int_yr,
-                                temp$f_r_slope,
-                                temp$f_s_int_yr,
-                                temp$f_s_slope,
-                                temp$f_d_mu,
-                                temp$f_d_sd))
-
-  K_temp <- P + F_mat
-
-  n_t_1 <- K_temp %*% pop_vec[ , i]
-
-  lambda[i] <- sum(n_t_1)/sum(pop_vec[ , i])
-
-  pop_vec[ , (i + 1)] <- n_t_1
-
-}
-
 
 ## IPMR Version
 
@@ -138,7 +93,7 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     family = 'CC',
     g_mu = env_params$g_int_yr + g_slope * surf_area_1,
     s = inv_logit(env_params$s_int_yr, s_slope, surf_area_1),
-    g = cell_size_surf_area * dnorm(surf_area_2, g_mu, g_sd),
+    g = dnorm(surf_area_2, g_mu, g_sd),
     data_list = data_list,
     states = list(c('surf_area')),
     has_hier_effs = FALSE,
@@ -152,7 +107,7 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     family = 'CC',
     f_r = inv_logit(env_params$f_r_int_yr, f_r_slope, surf_area_1),
     f_s = exp(env_params$f_s_int_yr + f_s_slope * surf_area_1),
-    f_d = cell_size_surf_area * dnorm(surf_area_2, f_d_mu, f_d_sd),
+    f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
     data_list = data_list,
     states = list(c('surf_area')),
     has_hier_effs = FALSE,
@@ -160,7 +115,8 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
   ) %>%
   define_k(
     'K',
-    n_surf_area_t_1 = right_mult((P+F), n_surf_area_t),
+    K = P + F,
+    n_surf_area_t_1 = right_mult(K, n_surf_area_t),
     family = 'IPM',
     data_list = data_list,
     states = list(c('surf_area')),
@@ -194,4 +150,88 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
            iterate = TRUE,
            iterations = 10)
 
+pop_state_ipmr <- test_stoch_param$pop_state$pop_state_surf_area
+lambda_ipmr <- numeric(iterations)
 
+for(i in seq(2, dim(pop_state_ipmr)[2], 1)) {
+  lambda_ipmr[(i - 1)] <- sum(pop_state_ipmr[ ,i]) / sum(pop_state_ipmr[ ,(i - 1)])
+}
+
+# Now, use the env_seq to plug into this loop for each iteration and see if
+# lambdas are identical. If not, then find a bridge and jump
+
+lambda <- vector('numeric', iterations)
+
+ks <- list()
+ps <- list()
+fs <- list()
+
+for(i in seq_len(iterations)) {
+
+  r_ests <- test_stoch_param$env_seq[i, ] %>%
+    as.list() %>%
+    setNames(names(r_means))
+
+  temp <- purrr::splice(data_list,  r_ests)
+
+  g_mat <- outer(d1, d2, FUN = g,
+                     params = c(temp$g_int_yr,
+                                temp$g_slope,
+                                temp$g_sd))
+
+  s_vec <- s(d1, params = c(temp$s_int_yr,
+                            temp$s_slope))
+
+  g_mat <- truncated_distributions(g_mat, 100)
+  P <- t(s_vec * t(g_mat)) * h
+
+  F_mat <- h * outer(d1, d2, FUN = fec,
+                     params = c(temp$f_r_int_yr,
+                                temp$f_r_slope,
+                                temp$f_s_int_yr,
+                                temp$f_s_slope,
+                                temp$f_d_mu,
+                                temp$f_d_sd))
+
+  K_temp <- P + F_mat
+
+  nm_k <- paste0('K_', i, sep = "")
+  nm_p <- paste0('P_', i, sep = "")
+  nm_f <- paste0('F_', i, sep = "")
+  ks[[i]] <- K_temp
+  ps[[i]] <- P
+  fs[[i]] <- F_mat
+  names(ks)[i] <- nm_k
+  names(ps)[i] <- nm_p
+  names(fs)[i] <- nm_f
+
+  n_t_1 <- K_temp %*% pop_vec[ , i]
+
+  lambda[i] <- sum(n_t_1)/sum(pop_vec[ , i])
+
+  pop_vec[ , (i + 1)] <- n_t_1
+
+}
+
+ws <- vapply(ks, function(x) Re(eigen(x)$vectors[ , 1]), numeric(100L))
+ws_ipmr <- vapply(test_stoch_param$iterators,
+                  function(x) Re(eigen(x)$vectors[ , 1]),
+                  numeric(100L))
+
+vs <- vapply(ks, function(x) Re(eigen(t(x))$vectors[ , 1]), numeric(100L))
+vs_ipmr <- vapply(test_stoch_param$iterators,
+                  function(x) Re(eigen(t(x))$vectors[ , 1]),
+                  numeric(100L))
+
+test_that('eigenvectors/values are all good', {
+
+  # Deterministic lambdas
+  expect_equal(lambda_ipmr, lambda, tolerance = 1e-10)
+
+  # Stable stage distributions
+  expect_equal(ws_ipmr[ ,1], ws[ ,1], tolerance = 1e-13)
+  expect_equal(ws_ipmr[ ,2], ws[ ,2], tolerance = 1e-13)
+  expect_equal(ws_ipmr[ ,3], ws[ ,3], tolerance = 1e-13)
+  expect_equal(ws_ipmr[ ,4], ws[ ,4], tolerance = 1e-13)
+  expect_equal(ws_ipmr[ ,5], ws[ ,5], tolerance = 1e-13)
+})

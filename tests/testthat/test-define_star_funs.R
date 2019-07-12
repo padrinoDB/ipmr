@@ -13,7 +13,7 @@ single_state <- init_ipm('simple_di_det') %>%
                 formula = s_g_mult(s, g),
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
-                g = cell_size_dbh * dnorm(dbh_2, mu_g, sd_g),
+                g = dnorm(dbh_2, mu_g, sd_g),
                 mu_g = g_int + g_slope * dbh_1,
                 data_list = list(s_int = 2.2,
                                  s_slope = 0.25,
@@ -29,7 +29,7 @@ single_state <- init_ipm('simple_di_det') %>%
                 family = 'CC',
                 f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
                 f_s = exp(f_s_int + f_s_slope * dbh_1),
-                f_d = cell_size_dbh * dnorm(dbh_2, mu_fd, sd_fd),
+                f_d = dnorm(dbh_2, mu_fd, sd_fd),
                 data_list = list(f_r_int = 0.03,
                                  f_r_slope = 0.015,
                                  f_s_int = 1.3,
@@ -48,7 +48,7 @@ single_state <- init_ipm('simple_di_det') %>%
     states = states_single,
     evict = FALSE) %>%
   define_impl(impl_args_single) %>%
-  #define_domains(dbh = c(0, 50, 100)) %>%
+  define_domains(dbh = c(0, 50, 100)) %>%
   define_pop_state(dbh = rep(1:50, 2))
 
 
@@ -63,7 +63,7 @@ two_state <- init_ipm('simple_di_det') %>%
                 formula = s_g_mult(s, g), # make helper for double transposes
                 family = "CC",
                 s = inv_logit(s_int, s_slope, ht_1),
-                g = cell_size_ht * dnorm(dbh_2, mu_g, sd_g),
+                g = dnorm(dbh_2, mu_g, sd_g),
                 mu_g = g_int + g_slope * ht_1,
                 data_list = list(s_int = 0.3,
                                  s_slope = 0.2,
@@ -78,7 +78,7 @@ two_state <- init_ipm('simple_di_det') %>%
                 formula = s_g_mult(s, g), # make helper for double transposes
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
-                g = cell_size_dbh * dnorm(dbh_2, mu_g, sd_g),
+                g = dnorm(dbh_2, mu_g, sd_g),
                 mu_g = g_int + g_slope * dbh_1,
                 data_list = list(s_int = 2.2,
                                  s_slope = 0.25,
@@ -94,7 +94,7 @@ two_state <- init_ipm('simple_di_det') %>%
                 family = 'CC',
                 f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
                 f_s = exp(f_s_int + f_s_slope * dbh_1),
-                f_d = cell_size_ht * dnorm(ht_2, mu_fd, sd_fd),
+                f_d = dnorm(ht_2, mu_fd, sd_fd),
                 data_list = list(f_r_int = 0.03,
                                  f_r_slope = 0.015,
                                  f_s_int = 1.3,
@@ -147,8 +147,3 @@ test_that('define_pop_state produces expected outputs', {
   # evaluation occurs - .check_pop_state needs separate unit tests
 })
 
-
-test_that('define_domains produces expected outputs', {
-
-
-})

@@ -45,7 +45,7 @@ d1 <- d2 <- (b[2:101] + b[1:100]) * 0.5
 h <- d1[3] - d1[2]
 
 
-G <- h * outer(d1, d2, FUN = g, params = c(data_list$g_int,
+G <- outer(d1, d2, FUN = g, params = c(data_list$g_int,
                                            data_list$g_slope,
                                            data_list$sd_g))
 G2 <- G/matrix(as.vector(apply(G, 2, sum)),
@@ -55,7 +55,7 @@ G2 <- G/matrix(as.vector(apply(G, 2, sum)),
 
 S <- s(d1, c(data_list$s_int, data_list$s_slope))
 
-P <- t(S * t(G2))
+P <- h * t(S * t(G2))
 
 Fm <- h * outer(d1, d2, FUN = fec, params = unlist(data_list[6:11]))
 
@@ -81,7 +81,7 @@ x <- init_ipm('simple_di_det') %>%
                 formula = s_g_mult(s, g),
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
-                g = cell_size_dbh * dnorm(dbh_2, mu_g, sd_g),
+                g = dnorm(dbh_2, mu_g, sd_g),
                 mu_g = g_int + g_slope * dbh_1,
                 data_list = list(s_int = 2.2,
                                  s_slope = 0.25,
@@ -97,7 +97,7 @@ x <- init_ipm('simple_di_det') %>%
                 family = 'CC',
                 f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
                 f_s = exp(f_s_int + f_s_slope * dbh_1),
-                f_d = cell_size_dbh * dnorm(dbh_2, mu_fd, sd_fd),
+                f_d = dnorm(dbh_2, mu_fd, sd_fd),
                 data_list = list(f_r_int = 0.03,
                                  f_r_slope = 0.015,
                                  f_s_int = 1.3,

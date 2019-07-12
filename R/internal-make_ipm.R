@@ -1,5 +1,7 @@
 # make_ipm internal helpers
 
+#' @noRd
+
 .make_sub_kernel <- function(proto, env_list, return_envs = FALSE) {
   out <- list()
   master_env <- env_list$master_env
@@ -11,7 +13,11 @@
                                      master_env,
                                      param_tree)
 
-    kern_form <- .parse_vr_formulae(param_tree$formula,
+    kern_text <- .append_dz_to_kern_form(param_tree$formula,
+                                         proto,
+                                         i)
+
+    kern_form <- .parse_vr_formulae(kern_text,
                                     kern_env)
 
     names(kern_form) <- proto$kernel_id[i]
@@ -45,6 +51,24 @@
 }
 
 #' @noRd
+
+.append_dz_to_kern_form <- function(kern_text, proto, id) {
+  sv <- names(proto$domain[[id]])
+  sv <- gsub('_[0-9]', "", sv)
+
+  if(all(!is.na(sv))){
+    use_var <- sv[1]
+  } else {
+    ind <- which(!is.na(sv))
+    use_var <- sv[ind]
+  }
+
+  out <- paste(kern_text, ' * cell_size_', use_var, sep = "")
+
+  return(out)
+}
+
+#' @noRd
 # makes sub-kernels, but ensures that stochastic parameters are sampled from
 # their respective distributions one time for each iteration. One of many reasons
 # kernel resampling is preferred when a viable alternative (at least within
@@ -56,26 +80,39 @@
     proto$env_state,
     function(x, master_env) {
       temp <- x$env_quos
-      out <- lapply(temp,
-                    function(x, master_env) {
-                      rlang::quo_set_env(x,
-                                         master_env)
-                    },
-                    master_env = master_env)
+
+      if(rlang::is_quosure(temp[[1]]) || rlang::is_quosure(temp[[1]])) {
+        out <- lapply(temp,
+                      function(x, master_env) {
+                        rlang::quo_set_env(x,
+                                           master_env)
+                      },
+                      master_env = master_env)
+      } else {
+        out <- NULL
+      }
+
       return(out)
     },
     master_env = master_env)
 
-  env_state_funs <- env_state_funs[!duplicated(names(env_state_funs))]
+  nms <- lapply(env_state_funs, names) %>% unlist()
 
-  master_env <- .eval_env_exprs(master_env, env_state_funs)
+  ind <- duplicated(nms)
 
-  env_list <- list(master_env = master_env)
+  env_state_funs <- env_state_funs[!ind]
 
-  sys <- .make_sub_kernel(proto, env_list, return_envs = return_envs)
+  master_env     <- .bind_env_exprs(master_env, env_state_funs)
 
-  out <- list(ipm_system = sys,
-              master_env = master_env)
+  env_list       <- list(master_env = master_env)
+
+  sys            <- .make_sub_kernel(proto,
+                                     env_list,
+                                     return_envs = return_envs)
+
+  out            <- list(ipm_system = sys,
+                         master_env = master_env)
+
   return(out)
 }
 
@@ -83,13 +120,15 @@
 # makes sure the expressions for each stochastic parameter are evaluated
 # only one time per iteration of the whole model
 
-.eval_env_exprs <- function(master_env, env_funs) {
+.bind_env_exprs <- function(master_env, env_funs) {
 
-  nms <- names(env_funs)
+  nms <- lapply(env_funs, names) %>% unlist()
 
-  for(i in unique(nms)) {
+  for(i in seq_len(length(nms))) {
 
-    assign(i, rlang::eval_tidy(env_funs[[i]]), envir = master_env)
+    ass_nm <- nms[i]
+
+    assign(ass_nm, rlang::eval_tidy(env_funs[[i]][[1]]), envir = master_env)
 
   }
 
@@ -97,31 +136,83 @@
 
 }
 
-#'
-.prep_param_resamp_output <- function(others, k_row, proto_ipm) {
+#' @noRd
+
+.prep_param_resamp_output <- function(others, k_row, proto_ipm, iterations) {
 
   out <- list(iterators = list(),
               sub_kernels = list(),
               env_list = list(),
-              env_seq = NA_character_, # placeholder
-              pop_state = others$pop_state[[1]], # placeholder,
+              env_seq = NA_real_, # placeholder
+              pop_state = NA_real_,
               proto_ipm = proto_ipm)
 
-  env_vars <- lapply(proto_ipm$env_state, function(x) x$env_quos)
 
-  env_var_nms <- lapply(env_vars, names) %>%
-    unlist() %>%
-    unique()
+  out$pop_state <- .init_pop_state_list(others, iterations)
 
-  n_env_vars <- length(env_var_nms)
+  return(out)
+}
 
-  env_holder <- matrix(0,
-                       nrow = 1,
-                       ncol = n_env_vars,
-                       dimnames = list(c(NA),
-                                       c(env_var_nms)))
+#' @noRd
 
-  out$env_seq <- env_holder
+.init_pop_state_list <- function(others,
+                                 iterations) {
+
+  pop_state <- others$pop_state[[1]]
+
+  out <- list()
+  # If pop_vec is specified, then initialize an array to hold the output
+  if(!rlang::is_empty(pop_state)){
+    if(rlang::is_list(pop_state)) {
+
+      # multiple states
+
+      for(i in seq_along(pop_state)) {
+
+        dim_pop_out <- ifelse(is.matrix(pop_state[[i]]),
+                              dim(pop_state[[i]]),
+                              length(pop_state[[i]]))
+
+        # Need to work out exactly how to know the indexing procedure here -
+        # higher dimensional kernels will have time as the 3rd, 4th, or 5th
+        # dimension (so trippy!) and normal bracket notation won't necessarily
+        # work without some awful if{...}else{} sequence. Right now, this will
+        # only work for single continuous state vars
+
+        pop_out            <- array(NA_real_, dim = c(dim_pop_out, iterations + 1))
+
+
+
+        pop_out[ , 1]      <- pop_state[[1]]
+
+        out[[i]]           <- pop_out
+      }
+
+      names(out)           <- gsub("_t", "", names(pop_state))
+
+    } else {
+
+      # single continuous state
+      dim_pop_out <- ifelse(is.matrix(pop_state),
+                            dim(pop_state),
+                            length(pop_state))
+
+      # Need to work out exactly how to know the indexing procedure here -
+      # higher dimensional kernels will have time as the 3rd, 4th, or 5th
+      # dimension (so trippy!) and normal bracket notation won't necessarily
+      # work without some awful if{...}else{} sequence. Right now, this will
+      # only work for single continuous state vars
+
+      pop_out            <- array(0, dim = c(dim_pop_out, iterations + 1))
+
+
+
+      pop_out[ , 1]      <- eval(others$pop_state[[1]])
+
+      out[[1]]           <- pop_out
+      names(out)         <- gsub('_t', '', names(pop_state))
+    }
+  }
 
   return(out)
 }
@@ -129,39 +220,112 @@
 #' @noRd
 
 .update_param_resamp_output <- function(sub_kernels,
-                                        iterator,
-                                        pop_vec,
+                                        ipm_system,
                                         data_envs = NA_character_,
                                         master_env,
-                                        output) {
+                                        output,
+                                        tot_iterations,
+                                        current_iteration) {
 
-  pop_state_nms <- names(output$pop_state)
+  # Determine if env_state is comprised of functions. If so, get whatever
+  # they returned for that iteration. If not, grab the constants (I think this
+  # is more useful for troubleshooting than anyone actually using it - if the
+  # environment isn't varying, then they shouldn't be using this method anyway).
+  if(!rlang::is_empty(names(output$proto_ipm$env_state[[1]]$env_quos))) {
 
-  pop_state_temp <- rlang::env_get_list(master_env,
-                                        pop_state_nms,
-                                        default = NA_real_)
+    env_vars <- names(output$proto_ipm$env_state[[1]]$env_quos)
 
-  env_vars <- dimnames(output$env_seq)[[2]]
+  } else {
 
-  env_temp <- rlang::env_get_list(master_env,
-                                  env_vars,
-                                  default = NA_real_) %>%
+    env_vars <- names(output$proto_ipm$env_state[[1]]$constants)
+  }
+
+  env_temp       <- rlang::env_get_list(master_env,
+                                        env_vars,
+                                        default = NA_real_,
+                                        inherit = FALSE) %>%
     unlist()
 
-  if(!is.na(data_envs)) {
+  if(current_iteration == 1) {
+
+    output$env_seq <- matrix(NA_real_,
+                             nrow = tot_iterations,
+                             ncol = length(env_temp),
+                             byrow = TRUE,
+                             dimnames = list(c(NULL),
+                                             c(names(env_temp))))
+
+  }
+
+  output$env_seq[current_iteration, ] <-  env_temp
+
+  # On to the rest of the output
+
+  if(!all(is.na(data_envs))) {
     out$sub_kernel_envs <- purrr::splice(out$sub_kernel_envs, data_envs)
   }
 
-  output$env_seq <- rbind(output$env_seq, env_temp)
+  # Determine who's a kernel and who's a pop_vector!
+  ipm_system <- .flatten_to_depth(ipm_system, 1)
+  kern_ind <- lapply(ipm_system, function(x) dim(x)[2] != 1) %>%
+    unlist()
+
+  iterator <- ipm_system[kern_ind]
+
+
+  # make names a bit prettier to help distinguish between iterations
+  names(sub_kernels) <- paste(names(sub_kernels),
+                               current_iteration,
+                               sep = "_")
+
+  names(iterator) <- paste(names(iterator), current_iteration, sep = "_")
 
   output$sub_kernels <- purrr::splice(output$sub_kernels, sub_kernels)
   output$iterators <- purrr::splice(output$iterators, iterator)
 
-  # This MUST BE GENERALIZED for multiple state variables!!!!!!!!!!!!!!!!!
-  output$pop_state <- cbind(output$pop_state, pop_state_temp)
+  ps_ind <- lapply(ipm_system, function(x) dim(x)[2] == 1) %>%
+    unlist()
+
+  if(sum(ps_ind) > 0){
+    output$pop_state <- .update_pop_state(output$pop_state,
+                                          ipm_system[ps_ind],
+                                          current_iteration)
+  }
+
 
   return(output)
 
+}
+
+#' @noRd
+
+.update_pop_state <- function(pop_history, pop_out_t_1, iteration) {
+  pop_out_t_1 <- unlist(pop_out_t_1)
+
+  if(is.list(pop_history)) {
+    for(i in seq_along(pop_history)) {
+      pop_history[[i]][ , (iteration + 1)] <- pop_out_t_1
+    }
+  } else if(is.matrix(pop_history)) {
+    pop_history[ , (iteration + 1)] <- pop_out_t_1
+  }
+
+  return(pop_history)
+
+}
+
+#' @noRd
+
+.update_master_env <- function(pop_state, master_env, iteration) {
+
+  for(i in seq_along(pop_state)) {
+    nm <- paste0(names(pop_state), '_t', sep = "")
+    nm <- gsub('n_', 'pop_state_', nm)
+
+    assign(nm, pop_state[[i]][, (iteration + 1)], master_env)
+  }
+
+  return(master_env)
 }
 
 #' @noRd
@@ -209,10 +373,11 @@
   return(out)
 }
 
-parse_k_formulae <- function(text, kernel_env) {
+.parse_k_formulae <- function(text, kernel_env) {
 
-  text <- lapply(text, function(x)
+  text <- lapply(text, function(x) {
     gsub('n_', 'pop_state_', x)
+    }
   )
 
   text <- lapply(text, function(x) {
@@ -226,7 +391,8 @@ parse_k_formulae <- function(text, kernel_env) {
     return(out)
   })
 
-  out <- ipmr:::.parse_vr_formulae(text, kernel_env)
+  names(text) <- gsub('n_', 'pop_state_', names(text))
+  out <- .parse_vr_formulae(text, kernel_env)
 
   return(out)
 }
@@ -367,17 +533,21 @@ parse_k_formulae <- function(text, kernel_env) {
 }
 
 #' @importFrom stats runif
+#' @noRd
+
 .make_internal_seq <- function(kernels, iterations) {
 
   n_kerns <- length(kernels)
 
-  out     <- sample.int(seq(1, n_kerns, by =  1),
+  out     <- sample.int(n = n_kerns,
                         size = iterations,
                         replace = TRUE)
 
   return(out)
 
 }
+
+#' @noRd
 
 .make_usr_seq <- function(kernels, kernel_seq, iterations) {
 
@@ -422,6 +592,7 @@ parse_k_formulae <- function(text, kernel_env) {
 }
 
 #' @noRd
+
 .check_pop_state <- function(proto_ipm) {
 
   # ipm type is always first in class(proto)
@@ -449,6 +620,7 @@ parse_k_formulae <- function(text, kernel_env) {
 }
 
 #' @noRd
+
 .check_env_state <- function(proto_ipm) {
 
   # ipm type is always first in class(proto)
@@ -468,9 +640,11 @@ parse_k_formulae <- function(text, kernel_env) {
 
 }
 
-.bind_all_exprs <- function(pop_state = NA_real_,
-                            env_state = NA_real_,
-                            env_to_bind) {
+#' @noRd
+
+.bind_all_constants <- function(pop_state = NA_real_,
+                                env_state = NA_real_,
+                                env_to_bind) {
 
   if(!all(is.na(pop_state))) {
     if(rlang::is_list(pop_state)) {
@@ -488,16 +662,55 @@ parse_k_formulae <- function(text, kernel_env) {
 
   to_bind <- .drop_duplicated_names_and_splice(temp)
 
-  rlang::env_bind_lazy(env_to_bind,
-                       !!! to_bind,
-                       .eval_env = env_to_bind)
+  rlang::env_bind(env_to_bind,
+                  !!! to_bind)
 
 
   return(env_to_bind)
 
 }
 
+#' @noRd
 
+.iterate_kerns_simple <- function(iterators, iterations, kern_seq, pop_state) {
 
+  if(rlang::is_quosure(pop_state)) {
+    pop_state <- rlang::eval_tidy(pop_state)
+  } else {
+    pop_state <- pop_state[[1]][ , 1]
+  }
+
+  pop_holder <- array(NA_real_, dim = c(length(pop_state), (iterations + 1)))
+
+  pop_holder[ , 1] <- n_t <-  pop_state
+
+  for(i in seq_len(iterations)) {
+
+    .check_n_t(n_t)
+
+    k_selector <- kern_seq[i]
+
+    n_t_1 <- right_mult(iterators[[k_selector]], n_t)
+
+    pop_holder[ , (i + 1)] <- n_t <- n_t_1
+
+  }
+
+  return(list(pop_state = pop_holder))
+}
+
+.check_n_t <- function(n_t) {
+
+  if(any(n_t < 0)) {
+    stop('some elements of the population vector are less than 0!')
+  }
+
+  if(!any(is.finite(n_t))) {
+    stop("some elements of the population vector have become infinite!")
+  }
+
+  invisible(TRUE)
+
+}
 
 

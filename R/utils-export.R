@@ -62,10 +62,11 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
 
 #' @title Helpers for IPM construction
 #' @inheritParams define_kernel
-#' @param kernels The kernel names you that correspond to given population state vector.
-#' Suffix expansion is supported.
 #' @param ... Named expressions. See details for more information on their usage in
 #' each \code{define_*} function.
+#' @param pop_vectors If the population vectors are already pre-defined (i.e. are
+#' not defined by a function passed to \code{...}), then they can
+#' be passed as a named list here.
 #'
 #' @details
 #' These are helper functions to define certain types of IPM classes. It is recommended
@@ -122,7 +123,7 @@ define_env_state <- function(proto_ipm, ..., data_list) {
 
   env_quos <- rlang::enquos(...)
 
-  out <- list(env_exprs = unlist(env_quos),
+  out <- list(env_quos = unlist(env_quos),
               constants = data_list)
 
   proto_ipm$env_state <- list(out)
@@ -151,9 +152,17 @@ define_hier_effs <- function(proto_ipm, ...) {
 right_mult <- function(...) {
 
   to_mult <- list(...)
-  dims <- vapply(to_mult, dim, integer(2))
+  dims <- vapply(to_mult,
+                 function(x) {
+                   if(is.matrix(x)) {
+                     dim(x)
+                   } else {
+                     c(NA_integer_, NA_integer_)
+                   }
+                 },
+                 integer(2))
 
-  id_dim <- max(dims)
+  id_dim <- max(dims, na.rm = TRUE)
 
   init <- diag(id_dim) # Identity matrix as initial starting point
 

@@ -81,26 +81,26 @@ h <- sv1[2] - sv1[1]
 
 # repetitive to demonstrate the typical kernel construction process.
 
-g_1 <- h * outer(sv1, sv2, FUN = g, params = c(params$g_int,
+g_1 <- outer(sv1, sv2, FUN = g, params = c(params$g_int,
                                                params$g_slope,
                                                params$sd_g),
                  r_effect = params$g_r_1)
 
-g_2 <- h * outer(sv1, sv2, FUN = g, params = c(params$g_int,
+g_2 <- outer(sv1, sv2, FUN = g, params = c(params$g_int,
                                                params$g_slope,
                                                params$sd_g),
                  r_effect = params$g_r_2)
-g_3 <- h * outer(sv1, sv2, FUN = g, params = c(params$g_int,
+g_3 <- outer(sv1, sv2, FUN = g, params = c(params$g_int,
                                                params$g_slope,
                                                params$sd_g),
                  r_effect = params$g_r_3)
 
-g_4 <- h * outer(sv1, sv2, FUN = g, params = c(params$g_int,
+g_4 <- outer(sv1, sv2, FUN = g, params = c(params$g_int,
                                                params$g_slope,
                                                params$sd_g),
                  r_effect = params$g_r_4)
 
-g_5 <- h * outer(sv1, sv2, FUN = g, params = c(params$g_int,
+g_5 <- outer(sv1, sv2, FUN = g, params = c(params$g_int,
                                                params$g_slope,
                                                params$sd_g),
                  r_effect = params$g_r_5)
@@ -122,11 +122,11 @@ s_4 <- s(sv1, c(params$s_int, params$s_slope,
 s_5 <- s(sv1, c(params$s_int, params$s_slope,
                 params$f_r_int, params$f_r_slope), params$s_r_5)
 
-P_1 <- t(s_1 * t(g_1))
-P_2 <- t(s_2 * t(g_2))
-P_3 <- t(s_3 * t(g_3))
-P_4 <- t(s_4 * t(g_4))
-P_5 <- t(s_5 * t(g_5))
+P_1 <- t(s_1 * t(g_1)) * h
+P_2 <- t(s_2 * t(g_2)) * h
+P_3 <- t(s_3 * t(g_3)) * h
+P_4 <- t(s_4 * t(g_4)) * h
+P_5 <- t(s_5 * t(g_5)) * h
 
 # These are not corrected for eviction, but they probably should be
 F_1 <- h * outer(sv1, sv2, FUN = fec,
@@ -197,7 +197,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     family = "CC",
     s_yr = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
       (1 - inv_logit(ht_1, f_r_int, f_r_slope)),
-    g_yr = dnorm(ht_2, mean = mu_g_yr, sd = sd_g) * cell_size_ht,
+    g_yr = dnorm(ht_2, mean = mu_g_yr, sd = sd_g),
     mu_g_yr = g_int + g_slope * ht_1 + g_r_yr,
     data_list = params,
     states = list(c('ht')),
@@ -214,7 +214,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     family = "CC",
     f_r = inv_logit(ht_1, f_r_int, f_r_slope),
     f_s_yr = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr),
-    f_d = dnorm(ht_2, mean = mu_fd, sd = sd_fd) * cell_size_ht,
+    f_d = dnorm(ht_2, mean = mu_fd, sd = sd_fd),
     data_list = params,
     states = list(c('ht')),
     has_hier_effs = TRUE,
@@ -260,4 +260,51 @@ test_that('eigenvectors and values are correct', {
   expect_equal(ws_ipmr[ ,4], ws[ ,4], tolerance = 1e-13)
   expect_equal(ws_ipmr[ ,5], ws[ ,5], tolerance = 1e-13)
 
+})
+
+
+# Test whether .iterate kerns does what it should
+kern_seq <- sample(1:5, 50, replace = TRUE)
+
+proto <- monocarp_sys$proto_ipm
+
+init_pop_vec <- runif(100)
+
+iterated_sys <- proto %>%
+  define_pop_state(
+    pop_vectors = list(ht = init_pop_vec)
+  ) %>%
+  make_ipm(usr_funs = list(inv_logit = inv_logit,
+                           inv_logit_r = inv_logit_r,
+                           pois_r = pois_r),
+           kernel_seq = kern_seq,
+           iterate = TRUE,
+           iterations = 50)
+
+ipmr_pop_state <- iterated_sys$pop_state$pop_state
+
+pop_holder <- array(NA_real_, dim = c(100, 51))
+
+pop_holder[ , 1] <- init_pop_vec
+
+pop_size_lambdas <- pop_size_lambdas_ipmr <- numeric(50L)
+
+for(i in seq_len(50)) {
+
+  k_selector <- kern_seq[i]
+  k_temp <- ipms[[k_selector]]
+
+  pop_holder[ , (i + 1)] <- k_temp %*% pop_holder[ , i]
+
+  pop_size_lambdas[i] <- sum(pop_holder[ , (i + 1)]) / sum(pop_holder[ , i])
+
+  pop_size_lambdas_ipmr[i] <- sum(ipmr_pop_state[ , (i + 1)]) / sum(ipmr_pop_state[ , i])
+}
+
+pop_sizes_ipmr <- colSums(ipmr_pop_state)
+pop_sizes_test <- colSums(pop_holder)
+
+test_that('.iterate_kerns is acting correctly', {
+  expect_equal(pop_size_lambdas, pop_size_lambdas_ipmr, tolerance = 1e-10)
+  expect_equal(pop_sizes_test, pop_sizes_ipmr, tolerance = 1e-10)
 })
