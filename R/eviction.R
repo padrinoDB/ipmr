@@ -2,7 +2,8 @@
 #' @rdname eviction
 #'
 #' @description Various helpers to correct for unintentional eviction (Williams
-#' et al. 2012).
+#' et al. 2012). \code{rescale_kernel} is an alias for
+#' \code{truncated_distributions}.
 #'
 #' @param discretized_kernel The kernel or function that needs correcting.
 #' @param n_mesh_p The number of meshpoints for the kernel being corrected.
@@ -18,14 +19,17 @@
 truncated_distributions <- function(discretized_kernel,
                                     n_mesh_p) {
 
-  if(is.matrix(discretized_kernel)){
-    dim_in <- dim(discretized_kernel)
+  if(is.matrix(discretized_kernel)) {
+
+    dim_in             <- dim(discretized_kernel)
+
   } else {
 
     discretized_kernel <- matrix(discretized_kernel,
                                  nrow = n_mesh_p,
                                  ncol = n_mesh_p)
-    dim_in <- c(n_mesh_p, n_mesh_p)
+
+    dim_in             <- c(n_mesh_p, n_mesh_p)
 
   }
 
@@ -45,6 +49,10 @@ truncated_distributions <- function(discretized_kernel,
   return(out)
 
 }
+
+#' @rdname eviction
+#' @inheritParams truncated_distributions
+#' @export
 
 rescale_kernel <- function(discretized_kernel, n_mesh_p) {
   return(

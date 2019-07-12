@@ -98,13 +98,17 @@ make_ipm.simple_di_det <- function(proto_ipm,
   # Split out K from others so it isn't evaluated until we're ready. If it
   # isn't there, then proceed as usual
 
-  K_row <- which(grepl("K", proto_ipm$kernel_id))
+  K_row    <- which(grepl("K", proto_ipm$kernel_id))
 
   if(length(K_row) > 0) {
-    k_row <- proto_ipm[K_row, ]
+
+    k_row  <- proto_ipm[K_row, ]
     others <- proto_ipm[-c(K_row), ]
+
   } else {
+
     others <- proto_ipm
+
   }
 
   # Initialize the master_environment so these values can all be found at
@@ -133,7 +137,7 @@ make_ipm.simple_di_det <- function(proto_ipm,
 
   if(iterate) {
 
-    kern_seq <- rep(1, iterations)
+    kern_seq  <- rep(1, iterations)
 
     pop_state <- .iterate_kerns_simple(iterators,
                                        iterations,
@@ -141,14 +145,15 @@ make_ipm.simple_di_det <- function(proto_ipm,
                                        pop_state)
   }
 
-  out <- list(iterators = iterators,
+  out <- list(iterators   = iterators,
               sub_kernels = sub_kern_list,
-              env_list = ifelse(return_all, env_list, NA),
-              env_seq = ifelse(iterate, kern_seq, NA_integer_),
-              pop_state = ifelse(all(is.na(unlist(proto_ipm$pop_state))),
-                                 NA,
-                                 pop_state),
-              proto_ipm = proto_ipm)
+              env_list    = ifelse(return_all, env_list, NA),
+              env_seq     = ifelse(iterate, kern_seq, NA_integer_),
+              pop_state   = ifelse(all(is.na(unlist(proto_ipm$pop_state))),
+                                   NA,
+                                   pop_state),
+              proto_ipm   = proto_ipm)
+
   class(out) <- c('simple_di_det_ipm', 'list')
 
   return(out)
@@ -169,6 +174,7 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 
 
   # checks pop_state, env_state, domain_definitions
+
   .check_ipm_definition(proto_ipm, iterate)
 
   # Split out K from others so it isn't evaluated until we're ready. If it
@@ -177,15 +183,16 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
   K_row <- which(grepl("K", proto_ipm$kernel_id))
 
   if(length(K_row) > 0) {
+
     k_row  <- proto_ipm[K_row, ]
     others <- proto_ipm[-c(K_row), ]
+
   } else {
     others <- proto_ipm
   }
 
   # If vital rates are fit with a hierarchical model of any kind,
   # then split those out into their respective years/plots/what-have-you
-  # BE SURE TO WRITE VIGNETTE ON THIS SYNTAX  ONCE IMPLEMENTED
 
   if(any(others$has_hier_effs) | any(k_row$has_hier_effs)) {
     others <- .split_hier_effs(others)
@@ -194,6 +201,7 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 
   # Initialize the master_environment so these values can all be found at
   # evaluation time
+
   if(is.null(domain_list)){
     master_env <- .generate_master_env(others$domain, usr_funs)
   } else {
@@ -201,7 +209,8 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
   }
 
   # construct the kernels from their function defintions
-  env_list <- list(master_env = master_env)
+
+  env_list      <- list(master_env = master_env)
 
   all_sub_kerns <- .make_sub_kernel(others,
                                     env_list,
@@ -210,6 +219,7 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
   sub_kern_list <- all_sub_kerns$sub_kernels
 
   # build up the iteration kernels from their sub-kernels
+
   iterators     <- .make_k_kern_samp(k_row,
                                      proto_ipm,
                                      sub_kern_list,
@@ -224,22 +234,24 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 
     init_pop_state <- .init_pop_state_list(others, iterations)
 
-    pop_state <- .iterate_kerns_simple(iterators,
-                                       iterations,
-                                       kern_seq,
-                                       init_pop_state)
+    pop_state      <- .iterate_kerns_simple(iterators,
+                                            iterations,
+                                            kern_seq,
+                                            init_pop_state)
 
   } else {
+
     pop_state <- NA_real_
+
   }
 
 
-  out <- list(iterators = iterators,
+  out <- list(iterators   = iterators,
               sub_kernels = sub_kern_list,
-              env_list = ifelse(return_all, env_list, NA),
-              env_seq = kern_seq,
-              pop_state = pop_state,
-              proto_ipm = proto_ipm)
+              env_list    = ifelse(return_all, env_list, NA),
+              env_seq     = kern_seq,
+              pop_state   = pop_state,
+              proto_ipm   = proto_ipm)
 
 
   class(out) <- c('simple_di_stoch_kern_ipm', 'list')
@@ -267,26 +279,33 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
   # Split out K from others so it isn't evaluated until we're ready. If it
   # isn't there, then proceed as usual
 
-  K_row <- which(grepl("K", proto_ipm$kernel_id))
+  K_row    <- which(grepl("K", proto_ipm$kernel_id))
 
   if(length(K_row) > 0) {
+
     k_row  <- proto_ipm[K_row, ]
     others <- proto_ipm[-c(K_row), ]
+
   } else {
+
     others <- proto_ipm
+
   }
 
   # If vital rates are fit with a hierarchical model of any kind,
   # then split those out into their respective years/plots/what-have-you
 
   if(any(others$has_hier_effs) | any(k_row$has_hier_effs)) {
+
     others <- .split_hier_effs(others)
     k_row  <- .split_hier_effs(k_row)
+
   }
 
   # Initialize the master_environment so these values can all be found at
   # evaluation time
-  if(is.null(domain_list)){
+
+  if(is.null(domain_list)) {
     master_env <- .generate_master_env(others$domain, usr_funs)
   } else {
     master_env <- .generate_master_env(domain_list, usr_funs)
@@ -295,11 +314,11 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
   # Bind env_exprs, constants, and pop_vectors to master_env so that
   # we can always find them and avoid that miserable repitition
 
-  master_env <- .bind_all_constants(pop_state = others$pop_state[[1]],
-                                   env_state = others$env_state[[1]]$constants,
-                                   env_to_bind = master_env)
+  master_env <- .bind_all_constants(pop_state   = others$pop_state[[1]],
+                                    env_state   = others$env_state[[1]]$constants,
+                                    env_to_bind = master_env)
 
-  out <- .prep_param_resamp_output(others, k_row, proto_ipm, iterations)
+  out        <- .prep_param_resamp_output(others, k_row, proto_ipm, iterations)
 
   # initialize the pop_state vectors in master_env so they can be found
   # at evaluation time
@@ -308,6 +327,7 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                              master_env)
 
   # list to hold the possibly returned evaluation environments
+
   env_list <- list(master_env = master_env)
 
   for(i in seq_len(iterations)) {

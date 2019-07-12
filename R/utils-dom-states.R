@@ -20,7 +20,9 @@ define_domains <- function(proto_ipm, ...) {
     lapply(eval)
 
   .check_domain_inputs(doms)
+
   proto <- .match_domains_to_kernels(proto_ipm, doms)
+
   return(proto)
 
 }
@@ -30,7 +32,9 @@ define_domains <- function(proto_ipm, ...) {
 .check_domain_inputs <- function(doms) {
 
   lns <- vapply(doms, length, integer(1))
+
   if(any(lns != 3)) {
+
     ind <- which(lns != 3)
 
     msg <- paste('The following entry or entries are not the right length: ',
@@ -59,9 +63,9 @@ define_domains <- function(proto_ipm, ...) {
 
     temp <- purrr::map(res,
                        function(.x) {
-                         X <- .x
-                         nms <- names(X)
-                         ind <- grepl(nm, nms)
+                         X      <- .x
+                         nms    <- names(X)
+                         ind    <- grepl(nm, nms)
                          X[ind] <- domain_list[i]
                          return(X)
                        })
@@ -69,8 +73,8 @@ define_domains <- function(proto_ipm, ...) {
     res <- temp
   }
 
-
   proto_ipm$domain <- res
+
   return(proto_ipm)
 
 }

@@ -8,17 +8,21 @@
 
 print.proto_ipm <- function(x, ...) {
 
-  n_kerns <- dim(x)[1]
+  n_kerns      <- dim(x)[1]
 
-  cls_switch <- class(x)[1]
+  cls_switch   <- class(x)[1]
 
   pretty_class <- .pretty_class(cls_switch)
 
-  msg <- paste("A", pretty_class, "proto_ipm with", n_kerns, "kernels defined:\n")
+  msg          <- paste("A",
+                        pretty_class,
+                        "proto_ipm with",
+                        n_kerns,
+                        "kernels defined:\n")
 
-  msg <- c(msg, paste(x$kernel_id, collapse = ', '))
+  msg          <- c(msg, paste(x$kernel_id, collapse = ', '))
 
-  msg <- c(msg, '\n')
+  msg          <- c(msg, '\n')
 
   # Add more later -----------
   cat(msg)
@@ -78,14 +82,14 @@ print.simple_di_det_ipm <- function(x, compute_lambda = TRUE,
                 ' sub-kernel(s) defined.', sep = "")
 
   if(compute_lambda) {
-    nm_ks <- names(x$iterators)
 
-    lambda <- vapply(x$iterators, function(y) Re(eigen(y)$values[1])%>%
-                       round(digits = sig_digits), numeric(1))
+    nm_ks  <- names(x$iterators)
 
-    l_msg <- paste0('\nDeterministic lambda for ', nm_ks,' = ', lambda, sep = "" )
+    lambda <- .det_lambda(x)
 
-    msg <- c(msg, l_msg)
+    l_msg  <- paste0('\nDeterministic lambda for ', nm_ks,' = ', lambda, sep = "" )
+
+    msg    <- c(msg, l_msg)
 
   }
 
@@ -109,7 +113,6 @@ print.simple_di_det_ipm <- function(x, compute_lambda = TRUE,
 #' vectors, \code{"pop_size"} will likely be substantially faster. Note that
 #' option \code{"pop_size"} is only possible if an initial population vector was
 #' supplied when constructing the IPM.
-#'
 #'  @export
 print.simple_di_stoch_kern_ipm <- function(x,
                                            compute_lambda = TRUE,
@@ -118,6 +121,7 @@ print.simple_di_stoch_kern_ipm <- function(x,
                                            compute_type = c('pop_size',
                                                             'eigen'),
                                            sig_digits = 3, ...) {
+
   msg <- paste0('A simple, density independent, deterministic IPM with ',
                 length(x$iterators),
                 ' iteration kernel(s) and ',
@@ -125,15 +129,19 @@ print.simple_di_stoch_kern_ipm <- function(x,
                 ' sub-kernel(s) defined.', sep = "")
 
   if(compute_lambda){
-    nm_ks <- names(x$iterators)
+    nm_ks  <- names(x$iterators)
     lambda <- switch(lambda_type,
-                     'stochastic' = switch(compute_type,
-                                           'pop_size' = .stoch_lambda_pop_size(x),
-                                           'eigen' = .stoch_lambda_eigen(x)),
+                     'stochastic'    = switch(compute_type,
+                                              'pop_size' = .stoch_lambda_pop_size(x),
+                                              'eigen'    = .stoch_lambda_eigen(x)),
                      'deterministic' = .det_lambda(x))
 
 
-    l_msg <- paste0('\nDeterministic lambda for ', nm_ks,' = ', lambda, sep = "" )
+    l_msg  <- paste0('\nDeterministic lambda for ',
+                     nm_ks,
+                     ' = ',
+                     lambda,
+                     sep = "" )
 
     msg <- c(msg, l_msg)
   }

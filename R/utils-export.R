@@ -49,11 +49,15 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
   }
 
   if(square) {
+
     mat_dim <- sqrt(length(mat))
 
-    out <- matrix(mat, nrow = mat_dim, ncol = mat_dim)
+    out     <- matrix(mat, nrow = mat_dim, ncol = mat_dim)
+
   } else {
-    out <- matrix(mat, nrow = nrow, ncol = ncol)
+
+    out     <- matrix(mat, nrow = nrow, ncol = ncol)
+
   }
 
   return(out)
@@ -90,13 +94,13 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
 
 define_pop_state <- function(proto_ipm, ..., pop_vectors = list()) {
 
-  pop_quos <- rlang::enquos(...)
+  pop_quos            <- rlang::enquos(...)
 
-  temp <- rlang::list2(pop_quos, !!! pop_vectors)
+  temp                <- rlang::list2(pop_quos, !!! pop_vectors)
 
-  out <- Filter(Negate(rlang::is_empty), temp)
+  out                 <- Filter(Negate(rlang::is_empty), temp)
 
-  names(out) <- gsub('n_', 'pop_state_', names(out))
+  names(out)          <- gsub('n_', 'pop_state_', names(out))
 
   proto_ipm$pop_state <- list(out)
 
@@ -121,10 +125,10 @@ define_state_vars <- function(proto_ipm, ...) {
 
 define_env_state <- function(proto_ipm, ..., data_list) {
 
-  env_quos <- rlang::enquos(...)
+  env_quos            <- rlang::enquos(...)
 
-  out <- list(env_quos = unlist(env_quos),
-              constants = data_list)
+  out                 <- list(env_quos = unlist(env_quos),
+                              constants = data_list)
 
   proto_ipm$env_state <- list(out)
 
@@ -164,7 +168,7 @@ right_mult <- function(...) {
 
   id_dim <- max(dims, na.rm = TRUE)
 
-  init <- diag(id_dim) # Identity matrix as initial starting point
+  init   <- diag(id_dim) # Identity matrix as initial starting point
 
   Reduce('%*%', to_mult, init = init)
 }
@@ -194,5 +198,7 @@ right_mult <- function(...) {
 #' @export
 
 s_g_mult <- function(s, g) {
+
   return(t(s * t(g)))
+
 }

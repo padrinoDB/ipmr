@@ -32,18 +32,22 @@
 
   temp   <- to_drop[rlang::have_name(temp)]
   temp_2 <- temp[!duplicated(names(temp))]
-  ind <- vapply(temp_2, is.list) %>%
+
+  ind    <- vapply(temp_2, is.list) %>%
     which()
 
   if(length(ind) > 0) {
-    out <- temp_2[-ind]
+
+    out         <- temp_2[-ind]
 
     for(i in ind) {
       to_splice <- temp_2[[i]]
-      out <- purrr::splice(out, to_splice)
+      out       <- purrr::splice(out, to_splice)
     }
+
   } else {
-    out <- temp_2
+
+    out         <- temp_2
   }
 
   return(out)
@@ -65,7 +69,7 @@
 # vec = numeric vector
 
 .geom_mean <- function(vec) {
-  n <- length(vec)
+  n   <- length(vec)
 
   out <- prod(vec)
 
@@ -74,11 +78,12 @@
 
 .stoch_lambda_pop_size <- function(x) {
 
-  pops <- x$pop_state
+  pops  <- x$pop_state
   n_its <- dim(pops[[1]])[2]
-  temp <- numeric(n_its - 1)
+  temp  <- numeric(n_its - 1)
 
   for(i in seq(2, n_its, 1)) {
+
     tot_pop_size_t <- lapply(pops, function(x, it) {
       sum(x[ ,it])
     },
@@ -93,7 +98,7 @@
       unlist() %>%
       sum()
 
-    temp[(i - 1)] <- tot_pop_size_t_1/tot_pop_size_t
+    temp[(i - 1)] <- tot_pop_size_t_1 / tot_pop_size_t
 
   }
 

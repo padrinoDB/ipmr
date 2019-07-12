@@ -41,23 +41,24 @@
 define_impl <- function(proto_ipm,
                         kernel_impl_list) {
 
-  cls <- class(proto_ipm)
+  cls     <- class(proto_ipm)
   kernels <- names(kernel_impl_list)
 
   for(i in seq_along(kernel_impl_list)) {
 
-    proto_ind <- which(kernels[i] == proto_ipm$kernel_id)
+    proto_ind                     <- which(kernels[i] == proto_ipm$kernel_id)
 
     proto_ipm$int_rule[proto_ind] <- kernel_impl_list[[i]]$int_rule
-    domain_info <- .state_to_domain_info(kernel_impl_list[[i]]$dom_start,
-                                         kernel_impl_list[[i]]$dom_end)
 
-    proto_ipm$domain[proto_ind] <- list(domain_info)
+    domain_info                   <- .state_to_domain_info(kernel_impl_list[[i]]$dom_start,
+                                                           kernel_impl_list[[i]]$dom_end)
+
+    proto_ipm$domain[proto_ind]   <- list(domain_info)
 
     # Name of the pop vector should correspond to the beginning domain, as that
     # is the one that the kernel will be multiplied by during iteration
 
-    pop_info <- .state_to_pop_info(kernel_impl_list[[i]]$dom_start)
+    pop_info                       <- .state_to_pop_info(kernel_impl_list[[i]]$dom_start)
 
     proto_ipm$pop_state[proto_ind] <- list(pop_info)
 
@@ -85,8 +86,9 @@ make_impl_args_list <- function(kernel_names,
     warning("Assuming that all kernels are implemented with the same",
             " 'int_rule'.")
 
-    i_rule <- replicate(ln, int_rule, simplify = FALSE) %>%
+    i_rule   <- replicate(ln, int_rule, simplify = FALSE) %>%
       unlist()
+
     int_rule <- i_rule[seq_len(ln)]
   }
   if(ln != length(dom_start)) {
@@ -94,9 +96,10 @@ make_impl_args_list <- function(kernel_names,
     warning("Assuming that all kernels are implemented with the same",
             " 'dom_start'.")
 
-    i_rule <- replicate(ln, dom_start, simplify = FALSE) %>%
+    ds_rule   <- replicate(ln, dom_start, simplify = FALSE) %>%
       unlist()
-    dom_start <- i_rule[seq_len(ln)]
+
+    dom_start <- ds_rule[seq_len(ln)]
   }
 
   if(ln != length(dom_end)) {
@@ -104,17 +107,18 @@ make_impl_args_list <- function(kernel_names,
     warning("Assuming that all kernels are implemented with the same",
             " 'dom_end'.")
 
-    i_rule <- replicate(ln, dom_end, simplify = FALSE) %>%
+    de_rule <- replicate(ln, dom_end, simplify = FALSE) %>%
       unlist()
-    dom_end <- i_rule[seq_len(ln)]
+
+    dom_end <- de_rule[seq_len(ln)]
   }
 
   out <- vector('list', length = ln)
 
   for(i in seq_along(kernel_names)) {
-    out[[i]]$int_rule <- int_rule[i]
+    out[[i]]$int_rule  <- int_rule[i]
     out[[i]]$dom_start <- dom_start[i]
-    out[[i]]$dom_end <- dom_end[i]
+    out[[i]]$dom_end   <- dom_end[i]
   }
 
   names(out) <- kernel_names
@@ -135,29 +139,29 @@ make_impl_args_list <- function(kernel_names,
   if(!is.na(dom_start)) {
 
     start_state_info <- rep(NA_real_, 3)
-    dom_start <- paste(dom_start, "_1", sep = "")
+    dom_start        <- paste(dom_start, "_1", sep = "")
 
   } else {
 
     start_state_info <- NA_real_
-    dom_start <- 'start_not_applicable'
+    dom_start        <- 'start_not_applicable'
 
   }
 
   if(!is.na(dom_end)) {
 
     end_state_info <- rep(NA_real_, 3)
-    dom_end <- paste(dom_end, "_2", sep = "")
+    dom_end        <- paste(dom_end, "_2", sep = "")
 
   } else {
 
     end_state_info <- NA_real_
-    dom_end <- 'end_not_applicable'
+    dom_end        <- 'end_not_applicable'
 
   }
 
   out <- rlang::list2(!!dom_start := start_state_info,
-                      !!dom_end := end_state_info)
+                      !!dom_end   := end_state_info)
   return(out)
 }
 

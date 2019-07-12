@@ -69,18 +69,18 @@
 init_ipm <- function(model_class) {
 
   out <- data.frame(
-    id = character(0L),
-    kernel_id = character(0L),
-    domain = character(0L),
-    state_var =  character(0L),
-    int_rule = character(0L),
-    evict = logical(0L),
-    evict_type = character(0L),
-    pop_state =  character(0L),
-    env_state =  character(0L),
-    hier_effs = logical(0L),
+    id               = character(0L),
+    kernel_id        = character(0L),
+    domain           = character(0L),
+    state_var        =  character(0L),
+    int_rule         = character(0L),
+    evict            = logical(0L),
+    evict_type       = character(0L),
+    pop_state        =  character(0L),
+    env_state        =  character(0L),
+    hier_effs        = logical(0L),
     levels_hier_effs = character(0L),
-    params =  character(0L)
+    params           =  character(0L)
   )
 
 

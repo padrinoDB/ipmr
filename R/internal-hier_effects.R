@@ -9,23 +9,27 @@
   # Create a place to hold the output - either kernels with no hierarchical effects
   # or a new proto
   if(length(kerns) != dim(proto_ipm)[1]) {
+
     out <- proto_ipm[-kerns, ]
+
   } else {
+
     out <- init_ipm(class(proto_ipm)[1])
+
   }
 
   hier_rows <- proto_ipm[kerns, ]
 
   for(i in seq_len(dim(hier_rows)[1])) {
 
-    levs <- hier_rows$levels_hier_effs[[i]]
+    levs   <- hier_rows$levels_hier_effs[[i]]
 
     levels <- lapply(levs, eval) %>%
       expand.grid(stringsAsFactors = FALSE)
 
-    temp <- .expand_hier_effs(hier_rows[i, ], levels)
+    temp   <- .expand_hier_effs(hier_rows[i, ], levels)
 
-    out <- rbind(out, temp)
+    out    <- rbind(out, temp)
 
   }
 
@@ -42,12 +46,14 @@
 
     # Unadulterated garbage, but it works. Creates a row for every level/comibnation
     # of levels, next we substitute in everything
-    temp <- .expand_proto(rows, levels, i)
 
-    for_bind <- .sub_levels(temp, levels)
+    temp      <- .expand_proto(rows, levels, i)
+
+    for_bind  <- .sub_levels(temp, levels)
 
     new_proto <- rbind(new_proto, for_bind)
   }
+
   return(new_proto)
 }
 
@@ -64,16 +70,20 @@
       # the kernel_id, kernel formula, and vital rate exprs. I fear I will
       # come to regret this comment
 
-      proto[it, 'kernel_id'] <- gsub(nm, levels[k, j], proto[it, 'kernel_id'])
+      proto[it, 'kernel_id']            <- gsub(nm,
+                                                levels[k, j],
+                                                proto[it, 'kernel_id'])
 
-      proto$params[[it]]$formula <- gsub(nm, levels[k, j], proto$params[[it]]$formula)
+      proto$params[[it]]$formula        <- gsub(nm,
+                                                levels[k, j],
+                                                proto$params[[it]]$formula)
 
-      proto$params[[it]]$vr_text <- purrr::map(proto$params[[it]]$vr_text,
-                                               .f = function(x, level, nm) {
-                                                 gsub(nm, level, x)
-                                               },
-                                               level = levels[k,j],
-                                               nm = nm)
+      proto$params[[it]]$vr_text        <- purrr::map(proto$params[[it]]$vr_text,
+                                                      .f = function(x, level, nm) {
+                                                        gsub(nm, level, x)
+                                                      },
+                                                      level = levels[k,j],
+                                                      nm = nm)
 
       names(proto$params[[it]]$vr_text) <- purrr::map_chr(names(proto$params[[it]]$vr_text),
                                                           .f = function(x, level, nm) {
@@ -88,7 +98,7 @@
         rlang::parse_expr()
 
 
-      proto$evict_fun[[it]] <-  rlang::enquo(temp)
+      proto$evict_fun[[it]]   <-  rlang::enquo(temp)
 
       names(proto$params)[it] <- gsub(nm,
                                       levels[k, j],
@@ -109,8 +119,10 @@
 
 
 .expand_proto <- function(rows, levels, i) {
+
   do.call("rbind",
           replicate(dim(levels)[1],
                     rows[i, ],
                     simplify = FALSE))
+
 }

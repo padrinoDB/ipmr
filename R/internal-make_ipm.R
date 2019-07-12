@@ -9,22 +9,22 @@
   for(i in seq_len(dim(proto)[1])) {
     param_tree <- proto$params[[i]]
 
-    kern_env <- .generate_kernel_env(param_tree$params,
-                                     master_env,
-                                     param_tree)
+    kern_env         <- .generate_kernel_env(param_tree$params,
+                                             master_env,
+                                             param_tree)
 
-    kern_text <- .append_dz_to_kern_form(param_tree$formula,
-                                         proto,
-                                         i)
+    kern_text        <- .append_dz_to_kern_form(param_tree$formula,
+                                                proto,
+                                                i)
 
-    kern_form <- .parse_vr_formulae(kern_text,
-                                    kern_env)
+    kern_form        <- .parse_vr_formulae(kern_text,
+                                           kern_env)
 
     names(kern_form) <- proto$kernel_id[i]
 
     if(proto$evict[i]) {
-      kern_env <- .correct_eviction(proto$evict_fun[[i]],
-                                    kern_env)
+      kern_env       <- .correct_eviction(proto$evict_fun[[i]],
+                                          kern_env)
     }
 
     rlang::env_bind_lazy(kern_env,
@@ -38,7 +38,7 @@
                                          pos = i)
 
     if(return_envs) {
-      env_list <- purrr::splice(env_list, list(kern_env))
+      env_list                 <- purrr::splice(env_list, list(kern_env))
       names(env_list)[(i + 1)] <- proto$kernel_id[i]
     }
 
@@ -53,6 +53,7 @@
 #' @noRd
 
 .append_dz_to_kern_form <- function(kern_text, proto, id) {
+
   sv <- names(proto$domain[[id]])
   sv <- gsub('_[0-9]', "", sv)
 
@@ -79,9 +80,10 @@
   env_state_funs <- lapply(
     proto$env_state,
     function(x, master_env) {
+
       temp <- x$env_quos
 
-      if(rlang::is_quosure(temp[[1]]) || rlang::is_quosure(temp[[1]])) {
+      if(rlang::is_quosure(temp[[1]]) || rlang::is_quosures(temp[[1]])) {
         out <- lapply(temp,
                       function(x, master_env) {
                         rlang::quo_set_env(x,
@@ -140,12 +142,12 @@
 
 .prep_param_resamp_output <- function(others, k_row, proto_ipm, iterations) {
 
-  out <- list(iterators = list(),
+  out <- list(iterators   = list(),
               sub_kernels = list(),
-              env_list = list(),
-              env_seq = NA_real_, # placeholder
-              pop_state = NA_real_,
-              proto_ipm = proto_ipm)
+              env_list    = list(),
+              env_seq     = NA_real_, # placeholder
+              pop_state   = NA_real_,
+              proto_ipm   = proto_ipm)
 
 
   out$pop_state <- .init_pop_state_list(others, iterations)
@@ -240,10 +242,10 @@
     env_vars <- names(output$proto_ipm$env_state[[1]]$constants)
   }
 
-  env_temp       <- rlang::env_get_list(master_env,
-                                        env_vars,
-                                        default = NA_real_,
-                                        inherit = FALSE) %>%
+  env_temp   <- rlang::env_get_list(master_env,
+                                    env_vars,
+                                    default = NA_real_,
+                                    inherit = FALSE) %>%
     unlist()
 
   if(current_iteration == 1) {
@@ -267,10 +269,11 @@
 
   # Determine who's a kernel and who's a pop_vector!
   ipm_system <- .flatten_to_depth(ipm_system, 1)
-  kern_ind <- lapply(ipm_system, function(x) dim(x)[2] != 1) %>%
+
+  kern_ind   <- lapply(ipm_system, function(x) dim(x)[2] != 1) %>%
     unlist()
 
-  iterator <- ipm_system[kern_ind]
+  iterator   <- ipm_system[kern_ind]
 
 
   # make names a bit prettier to help distinguish between iterations
@@ -278,12 +281,12 @@
                                current_iteration,
                                sep = "_")
 
-  names(iterator) <- paste(names(iterator), current_iteration, sep = "_")
+  names(iterator)    <- paste(names(iterator), current_iteration, sep = "_")
 
   output$sub_kernels <- purrr::splice(output$sub_kernels, sub_kernels)
-  output$iterators <- purrr::splice(output$iterators, iterator)
+  output$iterators   <- purrr::splice(output$iterators, iterator)
 
-  ps_ind <- lapply(ipm_system, function(x) dim(x)[2] == 1) %>%
+  ps_ind             <- lapply(ipm_system, function(x) dim(x)[2] == 1) %>%
     unlist()
 
   if(sum(ps_ind) > 0){
@@ -300,14 +303,17 @@
 #' @noRd
 
 .update_pop_state <- function(pop_history, pop_out_t_1, iteration) {
+
   pop_out_t_1 <- unlist(pop_out_t_1)
 
   if(is.list(pop_history)) {
     for(i in seq_along(pop_history)) {
+
       pop_history[[i]][ , (iteration + 1)] <- pop_out_t_1
     }
   } else if(is.matrix(pop_history)) {
-    pop_history[ , (iteration + 1)] <- pop_out_t_1
+
+    pop_history[ , (iteration + 1)]        <- pop_out_t_1
   }
 
   return(pop_history)
@@ -341,8 +347,8 @@
   rlang::env_bind(kernel_env,
                   !!! parameters)
 
-  kern_quos <- .parse_vr_formulae(param_tree$vr_text,
-                                  kernel_env)
+  kern_quos  <- .parse_vr_formulae(param_tree$vr_text,
+                                   kernel_env)
 
   # Bind the vital rate expressions so the initial discretization can take
   # place
@@ -364,8 +370,11 @@
     purrr::flatten()
 
   # convert to quosures and set the environment for evaluation
-  out <-  lapply(vr_forms, function(x, to_set){
-    temp <- rlang::enquo(x)
+
+  out      <-  lapply(vr_forms, function(x, to_set) {
+
+    temp   <- rlang::enquo(x)
+
     rlang::quo_set_env(temp, to_set)
   },
   to_set = kernel_env)
@@ -380,19 +389,25 @@
     }
   )
 
-  text <- lapply(text, function(x) {
+  text   <- lapply(text, function(x) {
+
     temp <- strsplit(x, split = '[=]')
 
     if(length(temp[[1]]) == 1) { # defined by iteration matrix only
+
       out <- temp[[1]][1]
+
     } else {                     # defined by iteration matrix and pop_vector
+
       out <- temp[[1]][2]
+
     }
+
     return(out)
   })
 
   names(text) <- gsub('n_', 'pop_state_', names(text))
-  out <- .parse_vr_formulae(text, kernel_env)
+  out         <- .parse_vr_formulae(text, kernel_env)
 
   return(out)
 }
@@ -405,19 +420,19 @@
 
 .generate_master_env <- function(domain_list, usr_funs) {
 
-  # Inherits from whatever is 2nd on search path. all loaded functions/packges
+  # Parent is whatever is 2nd on search path. all loaded functions/packges
   # should still be findable, but objects in the global environment should not
   # be to prevent overscoping!
 
-  master_env <- new.env(parent = as.environment(search()[2]))
+  master_env      <- new.env(parent = as.environment(search()[2]))
 
-  domain_list <- purrr::flatten(domain_list)
+  domain_list     <- purrr::flatten(domain_list)
 
-  domain_list <- domain_list[!duplicated(names(domain_list))]
+  domain_list     <- domain_list[!duplicated(names(domain_list))]
 
-  bounds <- purrr::map(domain_list, function(x) .make_domain_seqs(x))
+  bounds          <- purrr::map(domain_list, function(x) .make_domain_seqs(x))
 
-  n_mesh_p <- purrr::map_dbl(domain_list, ~.x[3])
+  n_mesh_p        <- purrr::map_dbl(domain_list, ~.x[3])
 
   names(n_mesh_p) <- paste('n_', names(domain_list), sep = "")
 
@@ -433,8 +448,8 @@
 
   for(i in seq(1, length(mids), by = 2)){
 
-    domain_grid <- expand.grid(mids[[i]],
-                               mids[[i + 1]])
+    domain_grid        <- expand.grid(mids[[i]],
+                                      mids[[i + 1]])
 
     names(domain_grid) <- c(names(mids)[i], names(mids)[i + 1])
 
@@ -445,7 +460,7 @@
 
     nm <- paste0('cell_size_', sv, sep = "")
 
-    h <- domain_grid[2, 1] - domain_grid[1, 1]
+    h  <- domain_grid[2, 1] - domain_grid[1, 1]
 
     assign(nm, h, envir = master_env)
 
@@ -453,7 +468,6 @@
 
   rlang::env_bind(master_env,
                   !!! usr_funs)
-
 
   invisible(master_env)
 }
@@ -464,13 +478,14 @@
 
 .make_domain_seqs <- function(dom_vec) {
   if(all(!is.na(dom_vec))) {
+
     out <- seq(dom_vec[1], dom_vec[2], length.out = dom_vec[3] + 1)
+
     return(out)
+
   } else {
     return(NULL)
   }
-
-
 }
 
 
@@ -485,8 +500,8 @@
                                           family,
                                           pos) {
 
-  sub_kernel_list[[pos]] <- rlang::env_get(kernel_env, kernel_id)
-  names(sub_kernel_list)[pos] <- kernel_id
+  sub_kernel_list[[pos]]        <- rlang::env_get(kernel_env, kernel_id)
+  names(sub_kernel_list)[pos]   <- kernel_id
   class(sub_kernel_list[[pos]]) <- family
 
   return(sub_kernel_list)
@@ -596,21 +611,23 @@
 .check_pop_state <- function(proto_ipm) {
 
   # ipm type is always first in class(proto)
-  ipm_type <- class(proto_ipm)[1]
+  ipm_type   <- class(proto_ipm)[1]
 
-  pop_state <- unlist(proto_ipm$pop_state) %>%
+  pop_state  <- unlist(proto_ipm$pop_state) %>%
     unique()
 
   state_vars <- unlist(proto_ipm$state_var) %>%
     unique()
 
   if(!all(names(pop_state) %in% names(state_vars))) {
+
     stop("Names of state variables do not match names of 'pop_state'!")
   }
 
   # density dependent IPMs must have pop_state defined!
   if(grepl('_dd_', ipm_type)) {
     if(all(is.na(pop_state))) {
+
       stop("Density dependent IPMs must have 'pop_state' defined!\n",
            "See '?define_pop_state()' for more details.")
     }
@@ -624,7 +641,7 @@
 .check_env_state <- function(proto_ipm) {
 
   # ipm type is always first in class(proto)
-  ipm_type <- class(proto_ipm)[1]
+  ipm_type  <- class(proto_ipm)[1]
 
   env_state <- unlist(proto_ipm$env_state, recursive = FALSE)
 
@@ -658,7 +675,7 @@
     }
   }
 
-  temp <- purrr::splice(pop_state, env_state)
+  temp    <- purrr::splice(pop_state, env_state)
 
   to_bind <- .drop_duplicated_names_and_splice(temp)
 
@@ -680,7 +697,7 @@
     pop_state <- pop_state[[1]][ , 1]
   }
 
-  pop_holder <- array(NA_real_, dim = c(length(pop_state), (iterations + 1)))
+  pop_holder  <- array(NA_real_, dim = c(length(pop_state), (iterations + 1)))
 
   pop_holder[ , 1] <- n_t <-  pop_state
 
@@ -690,7 +707,7 @@
 
     k_selector <- kern_seq[i]
 
-    n_t_1 <- right_mult(iterators[[k_selector]], n_t)
+    n_t_1      <- right_mult(iterators[[k_selector]], n_t)
 
     pop_holder[ , (i + 1)] <- n_t <- n_t_1
 
