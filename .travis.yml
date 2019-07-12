@@ -18,5 +18,13 @@ sudo: false
 dist: trusty
 cache: packages
 
+# Apparently R-devel for OSX is a pain on most CI platforms, so I'm excluding
+# it from our builds. See below for more details on the problem
+# https://community.rstudio.com/t/r-devel-error-on-travis-ci-and-appveyor/2708
+matrix:
+  exclude:
+  - os: osx
+    r: devel
+
 after_success:
   - Rscript -e 'covr::codecov()'
