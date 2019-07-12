@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tidy eval helpers — tidyeval • ipmr</title>
+<title>Define implementation parameters — define_impl • ipmr</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,29 +30,9 @@
 
 
 
-<meta property="og:title" content="Tidy eval helpers — tidyeval" />
+<meta property="og:title" content="Define implementation parameters — define_impl" />
 
-<meta property="og:description" content="
-sym() creates a symbol from a string and
-syms() creates a list of symbols from a
-character vector.
-expr() and quo() quote
-one expression. quo() wraps the quoted expression in a quosure.
-The plural variants rlang::exprs() and
-quos() return a list of quoted expressions or
-quosures.
-enexpr() and enquo()
-capture the expression supplied as argument by the user of the
-current function (enquo() wraps this expression in a quosure).
-enexprs() and enquos()
-capture multiple expressions supplied as arguments, including
-....
-" />
-
-<meta property="og:description" content="exprs() is not exported to avoid conflicts with Biobase::exprs(),
-therefore one should always use rlang::exprs().
-To learn more about tidy eval and how to use these tools, visit
-http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
+<meta property="og:description" content="Define implementation parameters" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -132,44 +112,96 @@ http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Tidy eval helpers</h1>
+    <h1>Define implementation parameters</h1>
     
-    <div class="hidden name"><code>tidyeval.Rd</code></div>
+    <div class="hidden name"><code>impl-args.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <ul>
-<li><p><code><a href='https://rlang.r-lib.org/reference/sym.html'>sym</a>()</code> creates a symbol from a string and
-<code><a href='https://rlang.r-lib.org/reference/sym.html'>syms</a>()</code> creates a list of symbols from a
-character vector.</p></li>
-<li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>expr</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>quo</a>()</code> quote
-one expression. <code>quo()</code> wraps the quoted expression in a quosure.</p>
-<p>The plural variants <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code> and
-<code><a href='https://rlang.r-lib.org/reference/quotation.html'>quos</a>()</code> return a list of quoted expressions or
-quosures.</p></li>
-<li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>enexpr</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>enquo</a>()</code>
-capture the expression supplied as argument by the user of the
-current function (<code>enquo()</code> wraps this expression in a quosure).</p>
-<p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>enexprs</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>enquos</a>()</code>
-capture multiple expressions supplied as arguments, including
-<code>...</code>.</p></li>
-</ul>
-
-    <p><code>exprs()</code> is not exported to avoid conflicts with <code><a href='https://www.rdocumentation.org/packages/Biobase/topics/exprs'>Biobase::exprs()</a></code>,
-therefore one should always use <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code>.</p>
-<p>To learn more about tidy eval and how to use these tools, visit
-<a href='http://rlang.r-lib.org'>http://rlang.r-lib.org</a> and the <a href='https://adv-r.hadley.nz/meta.html'>Metaprogramming section</a> of <a href='https://adv-r.hadley.nz'>Advanced R</a>.</p>
+    <p>Define implementation parameters</p>
     
     </div>
 
-        
+    <pre class="usage"><span class='fu'>define_impl</span>(<span class='no'>proto_ipm</span>, <span class='no'>kernel_impl_list</span>)
+
+<span class='fu'>make_impl_args_list</span>(<span class='no'>kernel_names</span>, <span class='no'>int_rule</span>, <span class='no'>dom_start</span>, <span class='no'>dom_end</span>, <span class='no'>...</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>proto_ipm</th>
+      <td><p>The name of object you wish to append the new kernel to.</p></td>
+    </tr>
+    <tr>
+      <th>kernel_impl_list</th>
+      <td><p>A named list. Names correspond to kernel names. Each
+kernel should have 3 slots defined - the <code>int_rule</code> (integration rule),
+the <code>dom_start</code> (the domain the kernel begins on), and the <code>dom_end</code>
+(the domain the kernel ends on). It is safest to use <code>make_impl_args_list</code>
+to generate this.</p></td>
+    </tr>
+    <tr>
+      <th>kernel_names</th>
+      <td><p>A character vector with the names of the kernels
+that parameters are being defined for.</p></td>
+    </tr>
+    <tr>
+      <th>int_rule</th>
+      <td><p>The integration rule to be used for the kernel. The default is
+"midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.
+If "g-l", additional arguments need to be supplied (<strong>Work on this later!!</strong>).</p></td>
+    </tr>
+    <tr>
+      <th>dom_start</th>
+      <td><p>The name of the state variable for the kernel at time <em>t</em>.</p></td>
+    </tr>
+    <tr>
+      <th>dom_end</th>
+      <td><p>The name of the state variable for the kernel at time <em>t+1</em>.
+This is usually the same as <code>dom_start</code>, but general IPMs
+with discrete classes or IPMs that move from one state to another (e.g. tree
+seedling going from a height domain to a DBH domain at T+1) may have another
+value here. For cases with a discrete stage, kernels moving individuals from
+discrete to continuous should have a state variable entered here and an <code>NA</code>
+for <code>dom_start</code>. For kernels moving from continuous to discrete, vice versa.
+For discrete to discrete, both are <code>NA</code>.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Additional arguments required for <code>int_rule = 'g-l'</code>.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A <code>proto_ipm</code> with the implementation details stored.</p>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>define_impl</code> is meant to help distinguish the process of
+generating the kernels' mathematical form from their implementation details.
+It takes a <code>proto_ipm</code> object and returns a modified one containing the
+implementation information.</p>
+<p><code>make_impl_args_list</code> helps generate that
+information in the correct format. It is usually easiest to call <code>make_impl_args_list</code>
+before calling <code>init_ipm</code> and then substituting that variable into
+the call to <code>define_impl</code>. Alternatively, one can do something like
+<code>define_impl(kernel_impl_list = make_impl_arg_list(...))</code> within the course
+of the model definitition pipeline.</p>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-                </ul>
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+
+      <li><a href="#details">Details</a></li>
+          </ul>
 
   </div>
 </div>

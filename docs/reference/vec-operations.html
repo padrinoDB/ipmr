@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tidy eval helpers — tidyeval • ipmr</title>
+<title>Perform the <em>vec</em> operation and it's inverse — vec • ipmr</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,29 +30,10 @@
 
 
 
-<meta property="og:title" content="Tidy eval helpers — tidyeval" />
+<meta property="og:title" content="Perform the <em>vec</em> operation and it's inverse — vec" />
 
-<meta property="og:description" content="
-sym() creates a symbol from a string and
-syms() creates a list of symbols from a
-character vector.
-expr() and quo() quote
-one expression. quo() wraps the quoted expression in a quosure.
-The plural variants rlang::exprs() and
-quos() return a list of quoted expressions or
-quosures.
-enexpr() and enquo()
-capture the expression supplied as argument by the user of the
-current function (enquo() wraps this expression in a quosure).
-enexprs() and enquos()
-capture multiple expressions supplied as arguments, including
-....
-" />
-
-<meta property="og:description" content="exprs() is not exported to avoid conflicts with Biobase::exprs(),
-therefore one should always use rlang::exprs().
-To learn more about tidy eval and how to use these tools, visit
-http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
+<meta property="og:description" content="Unstacks a matrix into a single column vector. Each successive
+column is appended to the bottom of the vector" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -132,44 +113,96 @@ http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Tidy eval helpers</h1>
+    <h1>Perform the <em>vec</em> operation and it's inverse</h1>
     
-    <div class="hidden name"><code>tidyeval.Rd</code></div>
+    <div class="hidden name"><code>vec-operations.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <ul>
-<li><p><code><a href='https://rlang.r-lib.org/reference/sym.html'>sym</a>()</code> creates a symbol from a string and
-<code><a href='https://rlang.r-lib.org/reference/sym.html'>syms</a>()</code> creates a list of symbols from a
-character vector.</p></li>
-<li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>expr</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>quo</a>()</code> quote
-one expression. <code>quo()</code> wraps the quoted expression in a quosure.</p>
-<p>The plural variants <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code> and
-<code><a href='https://rlang.r-lib.org/reference/quotation.html'>quos</a>()</code> return a list of quoted expressions or
-quosures.</p></li>
-<li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>enexpr</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>enquo</a>()</code>
-capture the expression supplied as argument by the user of the
-current function (<code>enquo()</code> wraps this expression in a quosure).</p>
-<p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>enexprs</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>enquos</a>()</code>
-capture multiple expressions supplied as arguments, including
-<code>...</code>.</p></li>
-</ul>
-
-    <p><code>exprs()</code> is not exported to avoid conflicts with <code><a href='https://www.rdocumentation.org/packages/Biobase/topics/exprs'>Biobase::exprs()</a></code>,
-therefore one should always use <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code>.</p>
-<p>To learn more about tidy eval and how to use these tools, visit
-<a href='http://rlang.r-lib.org'>http://rlang.r-lib.org</a> and the <a href='https://adv-r.hadley.nz/meta.html'>Metaprogramming section</a> of <a href='https://adv-r.hadley.nz'>Advanced R</a>.</p>
+    <p>Unstacks a matrix into a single column vector. Each successive
+column is appended to the bottom of the vector</p>
     
     </div>
 
-        
+    <pre class="usage"><span class='fu'>vec</span>(<span class='no'>mat</span>)
 
+<span class='fu'>inv_vec</span>(<span class='no'>mat</span>, <span class='kw'>square</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>mat</th>
+      <td><p>The matrix</p></td>
+    </tr>
+    <tr>
+      <th>square</th>
+      <td><p>A logical indicating whether to return a square matrix. For IPMs,
+this should usually be <code>TRUE</code>. If set to <code>FALSE</code>, <code>nrow</code> and <code>ncol</code>
+must be specified</p></td>
+    </tr>
+    <tr>
+      <th>nrow</th>
+      <td><p>The number of rows for the new matrix</p></td>
+    </tr>
+    <tr>
+      <th>ncol</th>
+      <td><p>The number of columns for the new matrix</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p><code>vec</code>: A matrix with dimensions nrow(mat) * ncol(mat) X 1</p>
+<p><code>inv_vec</code>: A matrix with dimensions <code><a href='https://www.rdocumentation.org/packages/base/topics/MathFun'>sqrt(length(mat))</a></code> X <code><a href='https://www.rdocumentation.org/packages/base/topics/MathFun'>sqrt(length(mat))</a></code> or
+dimensions specified by <code>nrow</code> and <code>ncol</code></p>
+    
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>
+<span class='no'>mat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/matrix'>matrix</a></span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>5</span>)
+
+<span class='no'>v</span> <span class='kw'>&lt;-</span> <span class='fu'>vec</span>(<span class='no'>mat</span>)
+
+<span class='no'>v</span></div><div class='output co'>#&gt;       [,1]
+#&gt;  [1,]    1
+#&gt;  [2,]    2
+#&gt;  [3,]    3
+#&gt;  [4,]    4
+#&gt;  [5,]    5
+#&gt;  [6,]    6
+#&gt;  [7,]    7
+#&gt;  [8,]    8
+#&gt;  [9,]    9
+#&gt; [10,]   10
+#&gt; [11,]   11
+#&gt; [12,]   12
+#&gt; [13,]   13
+#&gt; [14,]   14
+#&gt; [15,]   15
+#&gt; [16,]   16
+#&gt; [17,]   17
+#&gt; [18,]   18
+#&gt; [19,]   19
+#&gt; [20,]   20</div><div class='input'>
+<span class='fu'>inv_vec</span>(<span class='no'>v</span>)</div><div class='output co'>#&gt;      [,1] [,2] [,3] [,4]
+#&gt; [1,]    1    5    9   13
+#&gt; [2,]    2    6   10   14
+#&gt; [3,]    3    7   11   15
+#&gt; [4,]    4    8   12   16</div><div class='input'>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-                </ul>
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

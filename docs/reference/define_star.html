@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tidy eval helpers — tidyeval • ipmr</title>
+<title>Helpers for IPM construction — define_pop_state • ipmr</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,29 +30,9 @@
 
 
 
-<meta property="og:title" content="Tidy eval helpers — tidyeval" />
+<meta property="og:title" content="Helpers for IPM construction — define_pop_state" />
 
-<meta property="og:description" content="
-sym() creates a symbol from a string and
-syms() creates a list of symbols from a
-character vector.
-expr() and quo() quote
-one expression. quo() wraps the quoted expression in a quosure.
-The plural variants rlang::exprs() and
-quos() return a list of quoted expressions or
-quosures.
-enexpr() and enquo()
-capture the expression supplied as argument by the user of the
-current function (enquo() wraps this expression in a quosure).
-enexprs() and enquos()
-capture multiple expressions supplied as arguments, including
-....
-" />
-
-<meta property="og:description" content="exprs() is not exported to avoid conflicts with Biobase::exprs(),
-therefore one should always use rlang::exprs().
-To learn more about tidy eval and how to use these tools, visit
-http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
+<meta property="og:description" content="Helpers for IPM construction" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -132,44 +112,79 @@ http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Tidy eval helpers</h1>
+    <h1>Helpers for IPM construction</h1>
     
-    <div class="hidden name"><code>tidyeval.Rd</code></div>
+    <div class="hidden name"><code>define_star.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <ul>
-<li><p><code><a href='https://rlang.r-lib.org/reference/sym.html'>sym</a>()</code> creates a symbol from a string and
-<code><a href='https://rlang.r-lib.org/reference/sym.html'>syms</a>()</code> creates a list of symbols from a
-character vector.</p></li>
-<li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>expr</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>quo</a>()</code> quote
-one expression. <code>quo()</code> wraps the quoted expression in a quosure.</p>
-<p>The plural variants <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code> and
-<code><a href='https://rlang.r-lib.org/reference/quotation.html'>quos</a>()</code> return a list of quoted expressions or
-quosures.</p></li>
-<li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>enexpr</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>enquo</a>()</code>
-capture the expression supplied as argument by the user of the
-current function (<code>enquo()</code> wraps this expression in a quosure).</p>
-<p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>enexprs</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>enquos</a>()</code>
-capture multiple expressions supplied as arguments, including
-<code>...</code>.</p></li>
-</ul>
-
-    <p><code>exprs()</code> is not exported to avoid conflicts with <code><a href='https://www.rdocumentation.org/packages/Biobase/topics/exprs'>Biobase::exprs()</a></code>,
-therefore one should always use <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code>.</p>
-<p>To learn more about tidy eval and how to use these tools, visit
-<a href='http://rlang.r-lib.org'>http://rlang.r-lib.org</a> and the <a href='https://adv-r.hadley.nz/meta.html'>Metaprogramming section</a> of <a href='https://adv-r.hadley.nz'>Advanced R</a>.</p>
+    <p>Helpers for IPM construction</p>
     
     </div>
 
-        
+    <pre class="usage"><span class='fu'>define_pop_state</span>(<span class='no'>proto_ipm</span>, <span class='no'>...</span>, <span class='kw'>pop_vectors</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>())
+
+<span class='fu'>define_state_vars</span>(<span class='no'>proto_ipm</span>, <span class='no'>...</span>)
+
+<span class='fu'>define_env_state</span>(<span class='no'>proto_ipm</span>, <span class='no'>...</span>, <span class='no'>data_list</span>)
+
+<span class='fu'>define_hier_effs</span>(<span class='no'>proto_ipm</span>, <span class='no'>...</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>proto_ipm</th>
+      <td><p>The name of object you wish to append the new kernel to.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Named expressions. See details for more information on their usage in
+each <code>define_*</code> function.</p></td>
+    </tr>
+    <tr>
+      <th>pop_vectors</th>
+      <td><p>If the population vectors are already pre-defined (i.e. are
+not defined by a function passed to <code>...</code>), then they can
+be passed as a named list here.</p></td>
+    </tr>
+    <tr>
+      <th>data_list</th>
+      <td><p>A list of named values that correspond to constants in the formula.
+You do not need to specify vectors corresponding to the domains here.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>All <code>define_*</code> functions return a proto_ipm.</p>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>These are helper functions to define certain types of IPM classes. It is recommended
+to use them within the IPM construction pipeline somewhere between <code>add_kernels</code>
+and <code>make_ipm</code>. The order in which they are called does not matter provided
+all values on the left hand side of the <code>...</code> appear in the right hand side
+of another expression used elsewhere. Expressions where the left hand side does
+not appear anywhere else will be ignored during construction, and so will not
+be present in the returned <code>ipm</code> object.</p>
+<p>Each <code>define_*</code> function takes dots in the same way: named expressions
+are captured and evaluated later in the appropriate contexts with their respective
+kernels. Suffix expansion is supported so that hierarchical models with
+year/plot/what-have-you effects do not need to  be rewritten 10s or 100s of times.</p>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-                </ul>
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+
+      <li><a href="#details">Details</a></li>
+          </ul>
 
   </div>
 </div>

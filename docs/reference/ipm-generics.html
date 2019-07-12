@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tidy eval helpers — tidyeval • ipmr</title>
+<title>Generics for IPM classes — print.simple_di_det_ipm • ipmr</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,29 +30,9 @@
 
 
 
-<meta property="og:title" content="Tidy eval helpers — tidyeval" />
+<meta property="og:title" content="Generics for IPM classes — print.simple_di_det_ipm" />
 
-<meta property="og:description" content="
-sym() creates a symbol from a string and
-syms() creates a list of symbols from a
-character vector.
-expr() and quo() quote
-one expression. quo() wraps the quoted expression in a quosure.
-The plural variants rlang::exprs() and
-quos() return a list of quoted expressions or
-quosures.
-enexpr() and enquo()
-capture the expression supplied as argument by the user of the
-current function (enquo() wraps this expression in a quosure).
-enexprs() and enquos()
-capture multiple expressions supplied as arguments, including
-....
-" />
-
-<meta property="og:description" content="exprs() is not exported to avoid conflicts with Biobase::exprs(),
-therefore one should always use rlang::exprs().
-To learn more about tidy eval and how to use these tools, visit
-http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
+<meta property="og:description" content="Generics for IPM classes" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -132,44 +112,85 @@ http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Tidy eval helpers</h1>
+    <h1>Generics for IPM classes</h1>
     
-    <div class="hidden name"><code>tidyeval.Rd</code></div>
+    <div class="hidden name"><code>ipm-generics.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <ul>
-<li><p><code><a href='https://rlang.r-lib.org/reference/sym.html'>sym</a>()</code> creates a symbol from a string and
-<code><a href='https://rlang.r-lib.org/reference/sym.html'>syms</a>()</code> creates a list of symbols from a
-character vector.</p></li>
-<li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>expr</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>quo</a>()</code> quote
-one expression. <code>quo()</code> wraps the quoted expression in a quosure.</p>
-<p>The plural variants <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code> and
-<code><a href='https://rlang.r-lib.org/reference/quotation.html'>quos</a>()</code> return a list of quoted expressions or
-quosures.</p></li>
-<li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>enexpr</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>enquo</a>()</code>
-capture the expression supplied as argument by the user of the
-current function (<code>enquo()</code> wraps this expression in a quosure).</p>
-<p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>enexprs</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>enquos</a>()</code>
-capture multiple expressions supplied as arguments, including
-<code>...</code>.</p></li>
-</ul>
-
-    <p><code>exprs()</code> is not exported to avoid conflicts with <code><a href='https://www.rdocumentation.org/packages/Biobase/topics/exprs'>Biobase::exprs()</a></code>,
-therefore one should always use <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code>.</p>
-<p>To learn more about tidy eval and how to use these tools, visit
-<a href='http://rlang.r-lib.org'>http://rlang.r-lib.org</a> and the <a href='https://adv-r.hadley.nz/meta.html'>Metaprogramming section</a> of <a href='https://adv-r.hadley.nz'>Advanced R</a>.</p>
+    <p>Generics for IPM classes</p>
     
     </div>
 
-        
+    <pre class="usage"><span class='co'># S3 method for simple_di_det_ipm</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>x</span>, <span class='kw'>compute_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for simple_di_stoch_kern_ipm</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>x</span>, <span class='kw'>compute_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>lambda_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"stochastic"</span>, <span class='st'>"deterministic"</span>),
+  <span class='kw'>compute_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"pop_size"</span>, <span class='st'>"eigen"</span>), <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for simple_di_stoch_param_ipm</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>x</span>, <span class='kw'>compute_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>lambda_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"stochastic"</span>, <span class='st'>"deterministic"</span>),
+  <span class='kw'>compute_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"pop_size"</span>, <span class='st'>"eigen"</span>), <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='no'>...</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p>An object produced by <code>make_ipm</code>.</p></td>
+    </tr>
+    <tr>
+      <th>compute_lambda</th>
+      <td><p>A logical indicating whether or not to calculate lambdas
+for the iteration kernels and display them</p></td>
+    </tr>
+    <tr>
+      <th>sig_digits</th>
+      <td><p>The number of significant digits to round to if <code>
+comput_lambda = TRUE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Ignored</p></td>
+    </tr>
+    <tr>
+      <th>lambda_type</th>
+      <td><p>If <code>compute_lambda</code> is <code>TRUE</code>, then either
+<code>"stochastic"</code> or <code>"deterministic"</code>. <code>"deterministic"</code> will return
+the dominant eigenvalue of the iteration kernel from each iteration. <code>
+"stochastic"</code> depends on <code>compute_type</code>.</p></td>
+    </tr>
+    <tr>
+      <th>compute_type</th>
+      <td><p>Either <code>"pop_size"</code> or <code>"eigen"</code>. <code>"pop_size"</code>
+computes lambda as the ratio of population sizes between successive time steps
+and then takes the geometric mean. <code>"eigen"</code> computes the dominant eigenvalue
+of each iteration kernel and then takes the geometric mean. For large population
+vectors, <code>"pop_size"</code> will likely be substantially faster. Note that
+option <code>"pop_size"</code> is only possible if an initial population vector was
+supplied when constructing the IPM.</p>
+<p>@export</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p><code>x</code> invisibly.</p>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-                </ul>
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+          </ul>
 
   </div>
 </div>
