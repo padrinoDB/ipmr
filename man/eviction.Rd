@@ -2,9 +2,12 @@
 % Please edit documentation in R/eviction.R
 \name{truncated_distributions}
 \alias{truncated_distributions}
+\alias{rescale_kernel}
 \title{Eviction correction}
 \usage{
 truncated_distributions(discretized_kernel, n_mesh_p)
+
+rescale_kernel(discretized_kernel, n_mesh_p)
 }
 \arguments{
 \item{discretized_kernel}{The kernel or function that needs correcting.}
@@ -16,7 +19,8 @@ A matrix of the same dimension as the input.
 }
 \description{
 Various helpers to correct for unintentional eviction (Williams
-et al. 2012).
+et al. 2012). \code{rescale_kernel} is an alias for
+\code{truncated_distributions}.
 }
 \references{
 Williams JL, Miller TEX & Ellner SP, (2012). Avoiding unintentional eviction

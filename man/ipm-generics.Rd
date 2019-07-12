@@ -40,7 +40,6 @@ of each iteration kernel and then takes the geometric mean. For large population
 vectors, \code{"pop_size"} will likely be substantially faster. Note that
 option \code{"pop_size"} is only possible if an initial population vector was
 supplied when constructing the IPM.
-
  @export}
 }
 \value{
