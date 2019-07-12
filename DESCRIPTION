@@ -26,7 +26,8 @@ Suggests:
     rmarkdown,
     roxygen2,
     spelling,
-    testthat
+    testthat,
+    covr
 VignetteBuilder: knitr
 Language: en-US
 Imports:

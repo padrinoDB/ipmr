@@ -8,3 +8,5 @@
 ^\.Rproj\.user$
 ^\.travis\.yml$
 ^paper/*$
+^experimental_funs/*$
+^codecov\.yml$
