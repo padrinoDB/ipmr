@@ -10,7 +10,8 @@
 make_ipm(proto_ipm, return_all = FALSE, ...)
 
 \method{make_ipm}{simple_di_det}(proto_ipm, return_all = FALSE,
-  domain_list = NULL, usr_funs = list(), iterate = FALSE, ...)
+  domain_list = NULL, usr_funs = list(), iterate = FALSE,
+  iterations = 50, ...)
 
 \method{make_ipm}{simple_di_stoch_kern}(proto_ipm, return_all = FALSE,
   domain_list = NULL, iterate = FALSE, iterations = 50,
@@ -38,7 +39,7 @@ on to the evaluation environments. This can help make vital rate expressions
 more concise and expressive. Names in this list should exactly match the names
 of the function calls in the \code{...} or \code{formula}.}
 
-\item{iterate}{A logical indicating whether or not iterate the model during
+\item{iterate}{A logical indicating whether or not iterate the model before exiting
 or just return the iteration kernels. For density dependent (\code{dd}) and/or
 stochastic parameter resampled models (\code{stoch_param}), this should always
 be \code{TRUE}.}
@@ -61,8 +62,9 @@ containing the following components:
   \item{\strong{iterators}}{: iteration kernel(s) (if specified by \code{add_K}),
                             otherwise contains \code{NA}.}
   \item{\strong{sub_kernels}}{: the sub_kernels specified in \code{add_kernel}.}
-  \item{\strong{pop_state}}{: population vectors stored as an instance of the
-                             \code{pop_state} class.}
+  \item{\strong{pop_state}}{: population vectors stored in a list of arrays.
+  Dimension one corresponds the continuous state, and dimension 2 is time (
+  requires generalization for higher dimensional kernels!!!).}
   \item{\strong{proto_ipm}}{: the \code{proto_ipm} object used to implement
                              the model.}
 }
@@ -73,13 +75,17 @@ containing the following components:
   \item{\strong{iterators}}{: iteration kernel(s) (if specified by \code{add_K}),
                             otherwise contains \code{NA}.}
   \item{\strong{sub_kernels}}{: the sub_kernels specified in \code{add_kernel}.}
-  \item{\strong{pop_state}}{: population vectors stored as an instance of the
-                             \code{pop_state} class.}
-  \item{\strong{env_state}}{: a matrix with dimension \code{n_iterations} X 1 of
+  \item{\strong{env_list}}{: a list containing the evaluation environments of
+                           kernel. This will always be empty unless \code{
+                           return_all} is \code{TRUE}. Mostly here for developer
+                           debugging.}
+  \item{\strong{env_seq}}{: a matrix with dimension \code{n_iterations} X 1 of
                              kernel indices indicating the order
                              in which kernels are to be/were resampled OR
                              a matrix with as many columns as stochastic parameters
                              \code{n_iterations} rows.}
+  \item{\strong{pop_state}}{: population vectors stored as an instance of the
+                             \code{pop_state} class.}
   \item{\strong{proto_ipm}}{: the \code{proto_ipm} object used to implement
                              the model.}
 }
@@ -87,8 +93,8 @@ containing the following components:
 \description{
 The \code{make_ipm.*} methods convert a \code{proto_ipm} into a
 set of discretized kernels and population vectors. Methods have different
-requirements, so carefully read the parameter documentation and the
-\code{vignette("implementation", package = "ipmr")}.
+requirements, so be sure to read the parameter documentation. \code{
+vignettes('Introduction to ipmr', 'ipmr')} also contains helpful information.
 }
 \author{
 Sam Levin

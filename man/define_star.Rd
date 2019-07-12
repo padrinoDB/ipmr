@@ -21,11 +21,12 @@ define_hier_effs(proto_ipm, ...)
 \item{...}{Named expressions. See details for more information on their usage in
 each \code{define_*} function.}
 
+\item{pop_vectors}{If the population vectors are already pre-defined (i.e. are
+not defined by a function passed to \code{...}), then they can
+be passed as a named list here.}
+
 \item{data_list}{A list of named values that correspond to constants in the formula.
 You do not need to specify vectors corresponding to the domains here.}
-
-\item{kernels}{The kernel names you that correspond to given population state vector.
-Suffix expansion is supported.}
 }
 \value{
 All \code{define_*} functions return a proto_ipm.

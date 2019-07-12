@@ -1,0 +1,12 @@
+---
+title: "Hierarchical Notation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Hierarchical Notation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette describes how to write formulas using `ipmr`'s notation for hierarchical models. This can potentially save you loads of time and typing, especially when combined with the power of `rlang` and `purrr`.
+
+## Need to write this

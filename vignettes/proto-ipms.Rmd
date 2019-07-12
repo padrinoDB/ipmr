@@ -1,0 +1,10 @@
+---
+title: "proto_ipm data structure"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{proto_ipm Data Structure}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+NEED TO WRITE THIS
