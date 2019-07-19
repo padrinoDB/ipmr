@@ -10,3 +10,4 @@
 ^paper/*$
 ^experimental_funs/*$
 ^codecov\.yml$
+^README\.html$

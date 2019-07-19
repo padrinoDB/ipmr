@@ -50,25 +50,26 @@ The next step is to define the actual kernels comprising the IPM. These are defi
 
 my_ipm <- init_ipm('simple_di_det') %>%
   define_kernel(
-    name = "P",
-    formula = s_g_mult(s, g),
-    family = "CC",
-    s = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
-    g = dnorm(dbh_2, g_mu, g_sd),
-    g_mu = g_int + g_slope * dbh_1,
+    name      = "P",
+    formula   = s_g_mult(s, g),
+    family    = "CC",
+    s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
+    g         = dnorm(dbh_2, g_mu, g_sd),
+    g_mu      = g_int + g_slope * dbh_1,
+    
     data_list = list(
-      s_int = 0.2,
-      s_slope = 0.5,
-      g_int = 0.1,
-      g_slope = 1.033,
-      g_sd = 2.2
+      s_int     = 0.2,
+      s_slope   = 0.5,
+      g_int     = 0.1,
+      g_slope   = 1.033,
+      g_sd      = 2.2
     ),
-    states = list(c('dbh')),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = TRUE,
-    evict_fun = truncated_distributions(g,
-                                        100)
-  )
+    evict         = TRUE,
+    evict_fun     = truncated_distributions(g,
+                                            n_mesh_p = 200)
+  ) 
 
 ```
 
@@ -100,45 +101,46 @@ Finally, `ipmr` is meant to be pipe-friendly, so all functions associated with c
 
 my_ipm <- init_ipm('simple_di_det') %>%
   define_kernel(
-    name = "P",
-    formula = s_g_mult(s, g),
-    family = "CC",
-    s = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
-    g = dnorm(dbh_2, g_mu, g_sd),
-    g_mu = g_int + g_slope * dbh_1,
+    name      = "P",
+    formula   = s_g_mult(s, g),
+    family    = "CC",
+    s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
+    g         = dnorm(dbh_2, g_mu, g_sd),
+    g_mu      = g_int + g_slope * dbh_1,
+    
     data_list = list(
-      s_int = 0.2,
-      s_slope = 0.5,
-      g_int = 0.1,
-      g_slope = 1.033,
-      g_sd = 2.2
+      s_int     = 0.2,
+      s_slope   = 0.5,
+      g_int     = 0.1,
+      g_slope   = 1.033,
+      g_sd      = 2.2
     ),
-    states = list(c('dbh')),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = TRUE,
-    evict_fun = truncated_distributions(g,
-                                        n_mesh_p = 100)
+    evict         = TRUE,
+    evict_fun     = truncated_distributions(g,
+                                            n_mesh_p = 200)
   ) %>% 
   define_kernel(
-    name = "F",
-    formula = f_r * f_s * f_d,
-    family = "CC",
-    f_r = 1/(1 + exp(-(f_r_int + f_r_slope * dbh_1))),
-    f_s = exp(f_s_int + f_s_slope * dbh_1),
-    f_d = dnorm(dbh_2, f_d_mu, f_d_sd),
+    name      = "F",
+    formula   = f_r * f_s * f_d,
+    family    = "CC",
+    f_r       = 1/(1 + exp(-(f_r_int + f_r_slope * dbh_1))),
+    f_s       = exp(f_s_int + f_s_slope * dbh_1),
+    f_d       = dnorm(dbh_2, f_d_mu, f_d_sd),
     data_list = list(
-      f_r_int = 0.5,
+      f_r_int   = 0.5,
       f_r_slope = 0.1,
-      f_s_int = 1.2,
+      f_s_int   = 1.2,
       f_s_slope = 0.03,
-      f_d_mu = 1.2,
-      f_d_sd = 0.7
+      f_d_mu    = 1.2,
+      f_d_sd    = 0.7
     ),
-    states = list(c('dbh')),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = TRUE,
-    evict_fun = truncated_distributions(f_d,
-                                        n_mesh_p = 100)
+    evict         = TRUE,
+    evict_fun     = truncated_distributions(f_d,
+                                            n_mesh_p = 200)
   )
 
 ```
@@ -154,55 +156,57 @@ These kernels are treated slightly differently in `ipmr`. They are defined with 
 
 my_ipm <- init_ipm('simple_di_det') %>%
   define_kernel(
-    name = "P",
-    formula = s_g_mult(s, g),
-    family = "CC",
-    s = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
-    g = dnorm(dbh_2, g_mu, g_sd),
-    g_mu = g_int + g_slope * dbh_1,
+    name      = "P",
+    formula   = s_g_mult(s, g),
+    family    = "CC",
+    s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
+    g         = dnorm(dbh_2, g_mu, g_sd),
+    g_mu      = g_int + g_slope * dbh_1,
+    
     data_list = list(
-      s_int = 0.2,
-      s_slope = 0.5,
-      g_int = 0.1,
-      g_slope = 1.033,
-      g_sd = 2.2
+      s_int     = 0.2,
+      s_slope   = 0.5,
+      g_int     = 0.1,
+      g_slope   = 1.033,
+      g_sd      = 2.2
     ),
-    states = list(c('dbh')),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = TRUE,
-    evict_fun = truncated_distributions(g,
-                                        n_mesh_p = 100)
+    evict         = TRUE,
+    evict_fun     = truncated_distributions(g,
+                                            n_mesh_p = 200)
   ) %>% 
   define_kernel(
-    name = "F",
-    formula = f_r * f_s * f_d,
-    family = "CC",
-    f_r = 1/(1 + exp(-(f_r_int + f_r_slope * dbh_1))),
-    f_s = exp(f_s_int + f_s_slope * dbh_1),
-    f_d = dnorm(dbh_2, f_d_mu, f_d_sd),
+    name      = "F",
+    formula   = f_r * f_s * f_d,
+    family    = "CC",
+    f_r       = 1/(1 + exp(-(f_r_int + f_r_slope * dbh_1))),
+    f_s       = exp(f_s_int + f_s_slope * dbh_1),
+    f_d       = dnorm(dbh_2, f_d_mu, f_d_sd),
     data_list = list(
-      f_r_int = 0.5,
+      f_r_int   = 0.5,
       f_r_slope = 0.1,
-      f_s_int = 1.2,
+      f_s_int   = 1.2,
       f_s_slope = 0.03,
-      f_d_mu = 1.2,
-      f_d_sd = 0.7
+      f_d_mu    = 1.2,
+      f_d_sd    = 0.7
     ),
-    states = list(c('dbh')),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = TRUE,
-    evict_fun = truncated_distributions(f_d,
-                                        n_mesh_p = 100)
+    evict         = TRUE,
+    evict_fun     = truncated_distributions(f_d,
+                                            n_mesh_p = 200)
   ) %>%
   define_k(
-    name = "K",
-    family = "IPM",
-    K = P + F,
-    data_list = list(),
-    states = list(c('dbh')),
+    name          = "K",
+    family        = "IPM",
+    K             = P + F,
+    data_list     = list(),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = FALSE
-  )
+    evict         = FALSE
+  ) 
+
 ```
 
 Here, the `...` take over the role that `formula` took in the previous kernels. This is to facilitate passing multiple expressions for the iteration kernel when defining more complex models (e.g. an age x size model). In this example, the left hand side of the expression should match the name because we aren't actually iterating this kernel with a population vector (see below for examples of that!). Note that there are no additional parameters that need to be passed to complete the construction of the kernel, so `data_list` can be empty. It never hurts to pass the same `data_list` containing all of the parameters to each call to `define_*` though - if the parameter names aren't in a given kernels definition, they are simply ignored. Finally, we specify `evict = FALSE` in the `K` because we've already corrected for it in the previous kernel defintions.
@@ -225,71 +229,73 @@ It is important to note that `make_impl_args_list` *does not return a `proto_ipm
 
 impl_args <- make_impl_args_list(
   kernel_names = c("K", "P", "F"),
-  int_rule = rep("midpoint", 3),
-  dom_start = rep("dbh", 3),
-  dom_end = rep("dbh", 3)
+  int_rule     = rep("midpoint", 3),
+  dom_start    = rep("dbh", 3),
+  dom_end      = rep("dbh", 3)
 )
 
 my_ipm <- init_ipm('simple_di_det') %>%
   define_kernel(
-    name = "P",
-    formula = s_g_mult(s, g),
-    family = "CC",
-    s = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
-    g = dnorm(dbh_2, g_mu, g_sd),
-    g_mu = g_int + g_slope * dbh_1,
+    name      = "P",
+    formula   = s_g_mult(s, g),
+    family    = "CC",
+    s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
+    g         = dnorm(dbh_2, g_mu, g_sd),
+    g_mu      = g_int + g_slope * dbh_1,
+    
     data_list = list(
-      s_int = 0.2,
-      s_slope = 0.5,
-      g_int = 0.1,
-      g_slope = 1.033,
-      g_sd = 2.2
+      s_int     = 0.2,
+      s_slope   = 0.5,
+      g_int     = 0.1,
+      g_slope   = 1.033,
+      g_sd      = 2.2
     ),
-    states = list(c('dbh')),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = TRUE,
-    evict_fun = truncated_distributions(g,
-                                        n_mesh_p = 100)
+    evict         = TRUE,
+    evict_fun     = truncated_distributions(g,
+                                            n_mesh_p = 200)
   ) %>% 
   define_kernel(
-    name = "F",
-    formula = f_r * f_s * f_d,
-    family = "CC",
-    f_r = 1/(1 + exp(-(f_r_int + f_r_slope * dbh_1))),
-    f_s = exp(f_s_int + f_s_slope * dbh_1),
-    f_d = dnorm(dbh_2, f_d_mu, f_d_sd),
+    name      = "F",
+    formula   = f_r * f_s * f_d,
+    family    = "CC",
+    f_r       = 1/(1 + exp(-(f_r_int + f_r_slope * dbh_1))),
+    f_s       = exp(f_s_int + f_s_slope * dbh_1),
+    f_d       = dnorm(dbh_2, f_d_mu, f_d_sd),
     data_list = list(
-      f_r_int = 0.5,
+      f_r_int   = 0.5,
       f_r_slope = 0.1,
-      f_s_int = 1.2,
+      f_s_int   = 1.2,
       f_s_slope = 0.03,
-      f_d_mu = 1.2,
-      f_d_sd = 0.7
+      f_d_mu    = 1.2,
+      f_d_sd    = 0.7
     ),
-    states = list(c('dbh')),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = TRUE,
-    evict_fun = truncated_distributions(f_d,
-                                        n_mesh_p = 100)
+    evict         = TRUE,
+    evict_fun     = truncated_distributions(f_d,
+                                            n_mesh_p = 200)
   ) %>%
   define_k(
-    name = "K",
-    family = "IPM",
-    K = P + F,
-    data_list = list(),
-    states = list(c('dbh')),
+    name          = "K",
+    family        = "IPM",
+    K             = P + F,
+    data_list     = list(),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = FALSE
+    evict         = FALSE
   )  %>%
   # Alternative 2, put the call to make_impl_args_list() inside of define_impl(). 
   define_impl(
     make_impl_args_list(
       kernel_names = c("K", "P", "F"),
-      int_rule = rep("midpoint", 3),
-      dom_start = rep("dbh", 3),
-      dom_end = rep("dbh",3)
+      int_rule     = rep("midpoint", 3),
+      dom_start    = rep("dbh", 3),
+      dom_end      = rep("dbh",3)
     )
-  ) 
+  )
+
 ```
 
 ### Defining domains for state variables
@@ -304,69 +310,70 @@ Note that for other `int_rule`s, the vectors associated with each domain will lo
 
 impl_args <- make_impl_args_list(
   kernel_names = c("K", "P", "F"),
-  int_rule = rep("midpoint", 3),
-  dom_start = rep("dbh", 3),
-  dom_end = rep("dbh", 3)
+  int_rule     = rep("midpoint", 3),
+  dom_start    = rep("dbh", 3),
+  dom_end      = rep("dbh", 3)
 )
 
 my_ipm <- init_ipm('simple_di_det') %>%
   define_kernel(
-    name = "P",
-    formula = s_g_mult(s, g),
-    family = "CC",
-    s = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
-    g = dnorm(dbh_2, g_mu, g_sd),
-    g_mu = g_int + g_slope * dbh_1,
+    name      = "P",
+    formula   = s_g_mult(s, g),
+    family    = "CC",
+    s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
+    g         = dnorm(dbh_2, g_mu, g_sd),
+    g_mu      = g_int + g_slope * dbh_1,
+    
     data_list = list(
-      s_int = 0.2,
-      s_slope = 0.5,
-      g_int = 0.1,
-      g_slope = 1.033,
-      g_sd = 2.2
+      s_int     = 0.2,
+      s_slope   = 0.5,
+      g_int     = 0.1,
+      g_slope   = 1.033,
+      g_sd      = 2.2
     ),
-    states = list(c('dbh')),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = TRUE,
-    evict_fun = truncated_distributions(g,
-                                        n_mesh_p = 100)
+    evict         = TRUE,
+    evict_fun     = truncated_distributions(g,
+                                            n_mesh_p = 200)
   ) %>% 
   define_kernel(
-    name = "F",
-    formula = f_r * f_s * f_d,
-    family = "CC",
-    f_r = 1/(1 + exp(-(f_r_int + f_r_slope * dbh_1))),
-    f_s = exp(f_s_int + f_s_slope * dbh_1),
-    f_d = dnorm(dbh_2, f_d_mu, f_d_sd),
+    name      = "F",
+    formula   = f_r * f_s * f_d,
+    family    = "CC",
+    f_r       = 1/(1 + exp(-(f_r_int + f_r_slope * dbh_1))),
+    f_s       = exp(f_s_int + f_s_slope * dbh_1),
+    f_d       = dnorm(dbh_2, f_d_mu, f_d_sd),
     data_list = list(
-      f_r_int = 0.5,
+      f_r_int   = 0.5,
       f_r_slope = 0.1,
-      f_s_int = 1.2,
+      f_s_int   = 1.2,
       f_s_slope = 0.03,
-      f_d_mu = 1.2,
-      f_d_sd = 0.7
+      f_d_mu    = 1.2,
+      f_d_sd    = 0.7
     ),
-    states = list(c('dbh')),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = TRUE,
-    evict_fun = truncated_distributions(f_d,
-                                        n_mesh_p = 100)
+    evict         = TRUE,
+    evict_fun     = truncated_distributions(f_d,
+                                            n_mesh_p = 200)
   ) %>%
   define_k(
-    name = "K",
-    family = "IPM",
-    K = P + F,
-    data_list = list(),
-    states = list(c('dbh')),
+    name          = "K",
+    family        = "IPM",
+    K             = P + F,
+    data_list     = list(),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = FALSE
+    evict         = FALSE
   )  %>%
   # Alternative 2, put the call to make_impl_args_list() inside of define_impl(). 
   define_impl(
     make_impl_args_list(
       kernel_names = c("K", "P", "F"),
-      int_rule = rep("midpoint", 3),
-      dom_start = rep("dbh", 3),
-      dom_end = rep("dbh",3)
+      int_rule     = rep("midpoint", 3),
+      dom_start    = rep("dbh", 3),
+      dom_end      = rep("dbh",3)
     )
   ) %>%
   define_domains(
@@ -383,62 +390,63 @@ The minimal set of information to generate a single deterministic kernel is now 
 
 my_ipm <- init_ipm('simple_di_det') %>%
   define_kernel(
-    name = "P",
-    formula = s_g_mult(s, g),
-    family = "CC",
-    s = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
-    g = dnorm(dbh_2, g_mu, g_sd),
-    g_mu = g_int + g_slope * dbh_1,
+    name      = "P",
+    formula   = s_g_mult(s, g),
+    family    = "CC",
+    s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
+    g         = dnorm(dbh_2, g_mu, g_sd),
+    g_mu      = g_int + g_slope * dbh_1,
+    
     data_list = list(
-      s_int = 0.2,
-      s_slope = 0.5,
-      g_int = 0.1,
-      g_slope = 1.033,
-      g_sd = 2.2
+      s_int     = 0.2,
+      s_slope   = 0.5,
+      g_int     = 0.1,
+      g_slope   = 1.033,
+      g_sd      = 2.2
     ),
-    states = list(c('dbh')),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = TRUE,
-    evict_fun = truncated_distributions(g,
-                                        n_mesh_p = 200)
+    evict         = TRUE,
+    evict_fun     = truncated_distributions(g,
+                                            n_mesh_p = 200)
   ) %>% 
   define_kernel(
-    name = "F",
-    formula = f_r * f_s * f_d,
-    family = "CC",
-    f_r = 1/(1 + exp(-(f_r_int + f_r_slope * dbh_1))),
-    f_s = exp(f_s_int + f_s_slope * dbh_1),
-    f_d = dnorm(dbh_2, f_d_mu, f_d_sd),
+    name      = "F",
+    formula   = f_r * f_s * f_d,
+    family    = "CC",
+    f_r       = 1/(1 + exp(-(f_r_int + f_r_slope * dbh_1))),
+    f_s       = exp(f_s_int + f_s_slope * dbh_1),
+    f_d       = dnorm(dbh_2, f_d_mu, f_d_sd),
     data_list = list(
-      f_r_int = 0.5,
+      f_r_int   = 0.5,
       f_r_slope = 0.1,
-      f_s_int = 1.2,
+      f_s_int   = 1.2,
       f_s_slope = 0.03,
-      f_d_mu = 1.2,
-      f_d_sd = 0.7
+      f_d_mu    = 1.2,
+      f_d_sd    = 0.7
     ),
-    states = list(c('dbh')),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = TRUE,
-    evict_fun = truncated_distributions(f_d,
-                                        n_mesh_p = 200)
+    evict         = TRUE,
+    evict_fun     = truncated_distributions(f_d,
+                                            n_mesh_p = 200)
   ) %>%
   define_k(
-    name = "K",
-    family = "IPM",
-    K = P + F,
-    data_list = list(),
-    states = list(c('dbh')),
+    name          = "K",
+    family        = "IPM",
+    K             = P + F,
+    data_list     = list(),
+    states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict = FALSE
+    evict         = FALSE
   )  %>%
   # Alternative 2, put the call to make_impl_args_list() inside of define_impl(). 
   define_impl(
     make_impl_args_list(
       kernel_names = c("K", "P", "F"),
-      int_rule = rep("midpoint", 3),
-      dom_start = rep("dbh", 3),
-      dom_end = rep("dbh",3)
+      int_rule     = rep("midpoint", 3),
+      dom_start    = rep("dbh", 3),
+      dom_end      = rep("dbh",3)
     )
   ) %>%
   define_domains(
@@ -477,17 +485,19 @@ library(rlang)
 library(purrr)
 
 # Define some fixed parameters
-data_list <- list(s_int = 1.03,
-                  s_slope = 2.2,
-                  g_int = 8,
-                  g_slope = 0.92,
-                  sd_g = 0.9,
-                  f_r_int = 0.09,
-                  f_r_slope = 0.05,
-                  f_s_int = 0.1,
-                  f_s_slope = 0.005,
-                  mu_fd = 9,
-                  sd_fd = 2)
+data_list <- list(
+  s_int     = 1.03,
+  s_slope   = 2.2,
+  g_int     = 3.7,
+  g_slope   = 0.92,
+  sd_g      = 0.9,
+  f_r_int   = 0.09,
+  f_r_slope = 0.05,
+  f_s_int   = 0.1,
+  f_s_slope = 0.005,
+  mu_fd     = 9,
+  sd_fd     = 2
+)
 
 # Now, simulate some random intercepts for growth (g_), survival (s_), and offspring production (f_s_)
 g_r_int   <- rnorm(5, 0, 0.3)
@@ -558,53 +568,54 @@ hier_levels <- list(yr = 1:5)
 
 my_ipm <- init_ipm('simple_di_stoch_kern') %>%
   define_kernel(
-    name = 'P_yr', # P because P_yr
-    formula = s_g_mult(s_yr, g_yr), # g and s become g_yr and s_yr, respectively
-    family = "CC",
-    s_yr = inv_logit_r(ht_1, s_int, s_slope, s_r_yr), 
-    g_yr = dnorm(ht_2, mean = mu_g_yr, sd = sd_g),
-    mu_g_yr = g_int + g_slope * ht_1 + g_r_yr,
-    data_list = params,
-    states = list(c('ht')),
-    has_hier_effs = TRUE,
+    name             = 'P_yr', # P because P_yr
+    formula          = s_g_mult(s_yr, g_yr), # g and s become g_yr and s_yr, respectively
+    family           = "CC",
+    s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr), 
+    g_yr             = dnorm(ht_2, mean = mu_g_yr, sd = sd_g),
+    mu_g_yr          = g_int + g_slope * ht_1 + g_r_yr,
+    data_list        = params,
+    states           = list(c('ht')),
+    has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict = TRUE,
-    evict_fun = truncated_distributions(g_yr,
-                                        n_mesh_p = 100)
+    evict            = TRUE,
+    evict_fun        = truncated_distributions(g_yr,
+                                               n_mesh_p = 100)
   ) %>%
   define_kernel(
-    "F_yr",
-    formula = f_r * f_s_yr * f_d,
-    family = "CC",
-    f_r = inv_logit(ht_1, f_r_int, f_r_slope),
-    f_s_yr = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr),
-    f_d = dnorm(ht_2, mean = mu_fd, sd = sd_fd),
-    data_list = params,
-    states = list(c('ht')),
-    has_hier_effs = TRUE,
+    name             = "F_yr",
+    formula          = f_r * f_s_yr * f_d,
+    family           = "CC",
+    f_r              = inv_logit(ht_1, f_r_int, f_r_slope),
+    f_s_yr           = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr),
+    f_d              = dnorm(ht_2, mean = mu_fd, sd = sd_fd),
+    data_list        = params,
+    states           = list(c('ht')),
+    has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict = FALSE) %>%
+    evict            = FALSE
+  ) %>%
   define_k(
-    'K_yr',
-    K_yr = P_yr + F_yr,
-    family = "IPM",
-    data_list = params,
-    states = list(c("ht")),
-    has_hier_effs = TRUE,
+    name             = 'K_yr',
+    K_yr             = P_yr + F_yr,
+    family           = "IPM",
+    data_list        = params,
+    states           = list(c("ht")),
+    has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict = FALSE
+    evict            = FALSE
   ) %>%
   define_impl(
     make_impl_args_list(
       kernel_names = c("K_yr", "P_yr", "F_yr"),
-      int_rule = rep("midpoint", 3),
-      dom_start = rep("ht", 3),
-      dom_end = rep("ht", 3)
+      int_rule     = rep("midpoint", 3),
+      dom_start    = rep("ht", 3),
+      dom_end      = rep("ht", 3)
     )
   ) %>%
   define_domains(ht = c(0.2, 40, 100)) %>%
   make_ipm(usr_funs = my_funs,
-           iterate = FALSE)
+           iterate  = FALSE)
 
 ```
 
@@ -616,5 +627,147 @@ Syntax aside, the only real difference between the first example and this one is
 ## Working with parameter distributions 
 
 In some cases, it is not desirable to work with point estimates of a random variable, and we prefer to work with entire distribution it comes from. Quantifying uncertainty is a critical part of demography, and methods for propagating uncertainty in parameter estimates throughout a model are well established. Unfortunately, this also means that we can't obtain a set of kernels without iterating the model at least once. This is where the `*_stoch_param` methods come in handy.
+
+`*_stoch_param` methods are, on the surface, slightly less computationally efficient than their `*_stoch_kern*` counterparts because they must rebuild the iteration kernel for every single iteration. However, they are fantastic tools for propagating uncertainty in parameter estimates throughout the model. In fact, the time they save on boot-strapping and re-building the vital rate models can make them even more efficient than their kernel-resampled counterparts. Below is an example that uses a multivariate normal distribution to re-generate parameter estimates for each iteration of the model. `ipmr` is careful to only evaluate each function only once per iteration, so you can use multivariate distributions without worrying about accidentally drawing too many times.
+
+The example uses the `mvtnorm` library to access the `rmvnorm` function for generating parameter estimates from a multivariate normal distribution during each model iteration.
+
+```{r eval = FALSE}
+
+library(ipmr)
+library(mvtnorm)
+
+# Define the fixed parameters in a list
+
+data_list <- list(s_slope   = 0.3,
+                  g_slope   = 0.99,
+                  g_sd      = 0.2,
+                  f_r_slope = 0.03,
+                  f_s_slope = 0.001,
+                  f_d_mu    = 1.1,
+                  f_d_sd    = 0.1)
+
+# Simulate some random parameters to define the multivariate distribution
+# to sample from. In user-specified models, these will likely come from mixed
+# effects models fit to real data.
+
+r_means <- c(s_int_yr   = 0.8,
+             g_int_yr   = 0.1,
+             f_r_int_yr = 0.3,
+             f_s_int_yr = 0.4)
+
+r_sigma <- runif(16)
+r_sigma <- matrix(r_sigma, nrow = 4)
+
+r_sigma <- r_sigma %*% t(r_sigma) # make symmetrical - most users can/should skip this step.
+
+iterations <- 10
+
+# Specify an initial population vector. This can also be done in the call to
+# define_pop_state
+
+init_pop_vec <- runif(100)
+
+# Again, we can define our own functions and pass them into calls to make_ipm. This
+# isn't strictly necessary, but makes the model code more readable.
+
+inv_logit <- function(int, slope, sv1) {
+  1/(1 + exp(-(int + slope * sv1)))
+}
+
+# In this case, we also define a wrapper function around rmvnorm to make sure
+# that the names of the returned values match those in the vital rate
+# expressions.
+
+mvt_wrapper <- function(r_means, r_sigma, nms) {
+  out <- mvtnorm::rmvnorm(1, r_means, r_sigma) %>%
+    as.list()
+  
+  names(out) <- nms
+  return(out)
+}
+
+param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
+  define_kernel(
+    name    = 'P',
+    formula = s_g_mult(s, g),
+    family  = 'CC',
+    
+    # Note here that the growth and survival intercepts are prefaced with env_params$...
+    # This is because the mvt_wrapper function is named env_params in the call
+    # to define_env_state(). env_params is not a reserved word, so you can call
+    # it whatever you like.
+    
+    g_mu      = env_params$g_int_yr + g_slope * surf_area_1,
+    s         = inv_logit(env_params$s_int_yr, s_slope, surf_area_1),
+    g         = dnorm(surf_area_2, g_mu, g_sd),
+    data_list = data_list,
+    states    = list(c('surf_area')),
+    
+    # In this case, we do not specify hier_effs as the kernels don't vary discretely,
+    # but in a continuous manner.
+    
+    has_hier_effs = FALSE,
+    evict         = TRUE,
+    evict_fun     = truncated_distributions(g,
+                                            100)
+  ) %>%
+  define_kernel(
+    name          = 'F',
+    formula       = f_r * f_s * f_d,
+    family        = 'CC',
+    f_r           = inv_logit(env_params$f_r_int_yr, f_r_slope, surf_area_1),
+    f_s           = exp(env_params$f_s_int_yr + f_s_slope * surf_area_1),
+    f_d           = dnorm(surf_area_2, f_d_mu, f_d_sd),
+    data_list     = data_list,
+    states        = list(c('surf_area')),
+    has_hier_effs = FALSE,
+    evict         = FALSE
+  ) %>%
+  define_k(
+    name = 'K',
+    
+    # Note that here, we specify both the form of the iteration kernel and
+    # the iteration procedure. right_mult() is a helper function to make sure
+    # population states are multiplied by the kernels correctly.
+    
+    K               = P + F,
+    n_surf_area_t_1 = right_mult(K, n_surf_area_t),
+    family          = 'IPM',
+    data_list       = data_list,
+    states          = list(c('surf_area')),
+    has_hier_effs   = FALSE,
+    evict           = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P", "F", "K"),
+      int_rule     = rep('midpoint', 3),
+      dom_start    = rep('surf_area',3),
+      dom_end      = rep('surf_area', 3)
+    )
+  ) %>%
+  define_domains(surf_area = c(0, 10, 100)) %>%
+  define_env_state(
+    env_params = mvt_wrapper(r_means, r_sigma, nms = c('s_int_yr',
+                                                       'g_int_yr',
+                                                       'f_r_int_yr',
+                                                       'f_s_int_yr')),
+    data_list = list(
+      r_means = r_means,
+      r_sigma = r_sigma
+    )
+  ) %>%
+  define_pop_state(
+    pop_vectors = list(
+      n_surf_area_t = init_pop_vec
+    ),
+  ) %>%
+  make_ipm(usr_funs   = list(inv_logit   = inv_logit,
+                             mvt_wrapper = mvt_wrapper),
+           iterate    = TRUE,
+           iterations = 10)
+
+```
 
 

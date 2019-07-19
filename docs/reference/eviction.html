@@ -33,7 +33,8 @@
 <meta property="og:title" content="Eviction correction — truncated_distributions" />
 
 <meta property="og:description" content="Various helpers to correct for unintentional eviction (Williams
-et al. 2012)." />
+et al. 2012). rescale_kernel is an alias for
+truncated_distributions." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -121,11 +122,14 @@ et al. 2012)." />
     <div class="ref-description">
     
     <p>Various helpers to correct for unintentional eviction (Williams
-et al. 2012).</p>
+et al. 2012). <code>rescale_kernel</code> is an alias for
+<code>truncated_distributions</code>.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>truncated_distributions</span>(<span class='no'>discretized_kernel</span>, <span class='no'>n_mesh_p</span>)</pre>
+    <pre class="usage"><span class='fu'>truncated_distributions</span>(<span class='no'>discretized_kernel</span>, <span class='no'>n_mesh_p</span>)
+
+<span class='fu'>rescale_kernel</span>(<span class='no'>discretized_kernel</span>, <span class='no'>n_mesh_p</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
