@@ -74,8 +74,13 @@
 #'
 #' @export
 
-make_ipm <- function(proto_ipm, return_all = FALSE, ...) {
+make_ipm <- function(proto_ipm,
+                     return_all = FALSE,
+                     usr_funs = list(),
+                     ...) {
+
   UseMethod('make_ipm')
+
 }
 
 
@@ -319,9 +324,25 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
 }
 
-make_ipm.general_di_det <- function(proto_ipm, ...) {
 
-  # DEFINE ME
+#' @inheritParams make_ipm
+#' @rdname make_ipm
+#'
+#' @export
+
+make_ipm.general_di_det <- function(proto_ipm,
+                                    return_all = FALSE,
+                                    domain_list = NULL,
+                                    iterate = TRUE,
+                                    iterations = 50,
+                                    usr_funs = list(),
+                                    ...) {
+
+  # initialize others + k_row
+
+  proto_list <- .initialize_others_and_k(proto_ipm, iterate)
+
+
 }
 
 make_ipm.general_di_stoch_kern <- function(proto_ipm, ...) {

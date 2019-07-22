@@ -5,9 +5,10 @@
 \alias{make_ipm.simple_di_det}
 \alias{make_ipm.simple_di_stoch_kern}
 \alias{make_ipm.simple_di_stoch_param}
+\alias{make_ipm.general_di_det}
 \title{Methods to implement an IPM}
 \usage{
-make_ipm(proto_ipm, return_all = FALSE, ...)
+make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
 
 \method{make_ipm}{simple_di_det}(proto_ipm, return_all = FALSE,
   domain_list = NULL, usr_funs = list(), iterate = FALSE,
@@ -20,6 +21,10 @@ make_ipm(proto_ipm, return_all = FALSE, ...)
 \method{make_ipm}{simple_di_stoch_param}(proto_ipm, return_all = FALSE,
   domain_list = NULL, iterate = TRUE, iterations = 50,
   usr_funs = list(), ...)
+
+\method{make_ipm}{general_di_det}(proto_ipm, return_all = FALSE,
+  domain_list = NULL, iterate = TRUE, iterations = 50,
+  usr_funs = list(), ...)
 }
 \arguments{
 \item{proto_ipm}{The proto_ipm object you wish to implement. This should be the
@@ -29,15 +34,15 @@ output of \code{add_kernel}, \code{add_K}, or the \code{define_*} functions.}
 the kernel expressions are evaluated in. This is useful for developer
 debugging and not much else.}
 
-\item{...}{Other arguments passed to methods}
-
-\item{domain_list}{An optional list of new domain information to implement
-the IPM with.}
-
 \item{usr_funs}{An optional list of user-specified functions that are passed
 on to the evaluation environments. This can help make vital rate expressions
 more concise and expressive. Names in this list should exactly match the names
 of the function calls in the \code{...} or \code{formula}.}
+
+\item{...}{Other arguments passed to methods}
+
+\item{domain_list}{An optional list of new domain information to implement
+the IPM with.}
 
 \item{iterate}{A logical indicating whether or not iterate the model before exiting
 or just return the iteration kernels. For density dependent (\code{dd}) and/or
