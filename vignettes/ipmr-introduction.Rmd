@@ -2,7 +2,10 @@
 title: "Introduction to ipmr"
 author: "Sam Levin"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette: 
+    toc: yes
+    toc_depth: 3
 vignette: >
   %\VignetteIndexEntry{Introduction}
   %\VignetteEngine{knitr::rmarkdown}
@@ -25,7 +28,7 @@ Implementing an IPM with `ipmr` almost always begins with a call to `init_ipm()`
 df <- data.frame(Entry = c("simple", "general", "di", "dd", "det", "stoch", "param", "kern"),
 Explanation = c("An IPM that has a single continuous state variable and no discrete stages",
 "An IPM that has more than 1 continuous state variable and/or discrete stages", 
-"A density independent IPM", "A density dependent IPM", "A deterministic IPM", "A stochastic IPM", "If stochastic, this indicates that parameters are resampled in each iteration and kernels are reconstructed with the new parameters", "If stochastic, this indicates that kernels constructed from parameters ahead of time and then re-sampled at each iteration"))
+"A density independent IPM", "A density dependent IPM", "A deterministic IPM", "A stochastic IPM", "If `stoch`, this indicates that parameters are resampled in each iteration and kernels are reconstructed with the new parameters", "If `stoch`, this indicates that kernels constructed from parameters ahead of time and then re-sampled at each iteration"))
 
 knitr::kable(df[1:2, ], format = 'markdown', 
 caption = "One of", row.names = FALSE)
@@ -38,7 +41,7 @@ caption = "and possibly one of", row.names = FALSE)
 
 ```
 
-## Implementing a simple deterministic IPM without density dependence
+## Specifying a simple deterministic IPM without density dependence
 
 This is the simplest model that `ipmr` works with. it is an IPM with a single continuous state variable, no density dependent functions, and parameters that define a single iteration kernel (as opposed to many iteration kernels). This will walk through the steps required to implement such an IPM.
 
@@ -209,11 +212,11 @@ my_ipm <- init_ipm('simple_di_det') %>%
 
 ```
 
-Here, the `...` take over the role that `formula` took in the previous kernels. This is to facilitate passing multiple expressions for the iteration kernel when defining more complex models (e.g. an age x size model). In this example, the left hand side of the expression should match the name because we aren't actually iterating this kernel with a population vector (see below for examples of that!). Note that there are no additional parameters that need to be passed to complete the construction of the kernel, so `data_list` can be empty. It never hurts to pass the same `data_list` containing all of the parameters to each call to `define_*` though - if the parameter names aren't in a given kernels definition, they are simply ignored. Finally, we specify `evict = FALSE` in the `K` because we've already corrected for it in the previous kernel defintions.
+Here, the `...` take over the role that `formula` took in the previous kernels. This is to facilitate passing multiple expressions for the iteration kernel when defining more complex models (e.g. an age x size model). In this example, the left hand side of the expression should match the `name` because we aren't actually iterating this kernel with a population vector (see below for examples of that!). Note that there are no additional parameters that need to be passed to complete the construction of the kernel, so `data_list` can be empty. It never hurts to pass the same `data_list` containing all of the parameters to each call to `define_k()`/`define_kernel() though - if the parameter names aren't in a given kernels definition, they are simply ignored. Finally, we specify `evict = FALSE` in the `K` because we've already corrected for it in the previous kernel defintions.
 
 ### Defining the implementation arguments (`impl_args`)
 
-Next, we need to define how the kernels are to be implemented. This is where we define the integration rule `int_rule`, the domain the kernel begins on `dom_start`, and the domain that it finishes on `dom_end`. This is done wiht the `define_impl()` function. It takes a named list where names correspond to the kernels, and each entry is itself a list of length 3 containing slots `int_rule`, `dom_start`, and `dom_end`. Because this is a bit specific, there is a helper function that can be called within `define_impl` or called before initializing the IPM to make sure everything is formatted correctly - `make_ipml_args_list()`.
+Next, we need to define how the kernels are to be implemented. This is where we define the integration rule `int_rule`, the domain the kernels begin on `dom_start`, and the domain that they finish on `dom_end`. This is done wiht the `define_impl()` function. It takes a named list where names correspond to the kernels, and each entry is itself a list of length 3 containing slots `int_rule`, `dom_start`, and `dom_end`. Because this is a bit specific, there is a helper function that can be called within `define_impl` or called before initializing the IPM to make sure everything is formatted correctly - `make_ipml_args_list()`.
 
 The first argument to the `make_ipml_args_list()` function is `kernel_names`. This is a character vector with kernel names for which the implementation arguments are being supplied. 
 
@@ -221,7 +224,7 @@ Next, `int_rule` is a character vector, and currently `'midpoint'` is the only o
 
 `dom_start` and `dom_end` are always the same in `simple_*` IPMs. In `general_*` ones, they may be different, or, if describing a transition involving a discrete state, they may be `NA`. For all non-`NA` `dom_*`'s, they are one of the variables in the `states` list. `dom_start`'s have `_1` and `dom_end`'s have `_2`  appended to them internally, so they may be referenced by vital rate functions without explicitly creating a variable for them.
 
-It is important to note that `make_impl_args_list` *does not return a `proto_ipm`*. Thus, it must either be called before starting, or inside of `define_impl`! 
+It is important to note that `make_impl_args_list` *does not return a `proto_ipm`*. Thus, it must either be called before beginning the model definition, or inside of `define_impl`! 
 
 ```{r eval = FALSE}
 
@@ -556,11 +559,11 @@ my_funs <- list(inv_logit   = inv_logit,
                 pois_r      = pois_r)
 ```
 
-The only requirement for these functions is that they contain valid R code, and their return types are sensible for the expression they're being passed to.
+The only requirement for these functions is that they contain valid R code, and their return types are numeric.
 
 ### Initializing the IPM
 
-With the functions and parameter values in hand, we are now ready to begin composing the model. Each expression's syntax will look a little different from before, because we are appending suffix corresponding to the hierarchical component of the model to each parameter/vital rate/kernel that is affected by it. In this case, we're using it as a year effect, denoted `_yr`, but any suffix will work. The first line creates a list with the suffix as the name and a vector corresponding to the levels it takes on. This can be a character or integer vector, and the list can have as many entries as required by the model (e.g. `yr` for years *and* `pl` for plots, etc.). The calls to `define_kernel` and `define_k` now have `has_hier_effs = TRUE`, and `levels_hier_effs = hier_levels`. Otherwise, the code should look quite familiar.
+With the functions and parameter values in hand, we are now ready to begin composing the model. Each expression's syntax will look a little different from before, because we are appending a suffix corresponding to the hierarchical component of the model to each parameter/vital rate/kernel that is affected by it. In this case, we're using it as a year effect, denoted `_yr`, but any suffix will work. The first line creates a list with the suffix as the name and a vector corresponding to the levels it takes on. This can be a character or integer vector, and the list can have as many entries as required by the model (e.g. `yr` for years *and* `pl` for plots, etc.). The calls to `define_kernel` and `define_k` now have `has_hier_effs = TRUE`, and `levels_hier_effs = hier_levels`. Otherwise, the code should look quite familiar.
 
 ```{r eval = FALSE}
 
@@ -568,7 +571,7 @@ hier_levels <- list(yr = 1:5)
 
 my_ipm <- init_ipm('simple_di_stoch_kern') %>%
   define_kernel(
-    name             = 'P_yr', # P because P_yr
+    name             = 'P_yr',               # P because P_yr
     formula          = s_g_mult(s_yr, g_yr), # g and s become g_yr and s_yr, respectively
     family           = "CC",
     s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr), 
@@ -579,7 +582,10 @@ my_ipm <- init_ipm('simple_di_stoch_kern') %>%
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
     evict            = TRUE,
-    evict_fun        = truncated_distributions(g_yr,
+    
+    # reference to g_yr in evict_fun is also updated
+    
+    evict_fun        = truncated_distributions(g_yr, 
                                                n_mesh_p = 100)
   ) %>%
   define_kernel(
@@ -630,7 +636,20 @@ In some cases, it is not desirable to work with point estimates of a random vari
 
 `*_stoch_param` methods are, on the surface, slightly less computationally efficient than their `*_stoch_kern*` counterparts because they must rebuild the iteration kernel for every single iteration. However, they are fantastic tools for propagating uncertainty in parameter estimates throughout the model. In fact, the time they save on boot-strapping and re-building the vital rate models can make them even more efficient than their kernel-resampled counterparts. Below is an example that uses a multivariate normal distribution to re-generate parameter estimates for each iteration of the model. `ipmr` is careful to only evaluate each function only once per iteration, so you can use multivariate distributions without worrying about accidentally drawing too many times.
 
-The example uses the `mvtnorm` library to access the `rmvnorm` function for generating parameter estimates from a multivariate normal distribution during each model iteration.
+### Defining initial conditions
+
+Stochastic simulations require specification of the initial conditions. `ipmr` aims to make this straightforward for you by providing two helpers - `define_pop_state()` and `define_env_state()`. Both are flexible in their syntax, though each does have a learning curve if you are not used to writing your own functions. The example below will use both when defining the model.
+
+### `define_pop_state()`
+
+`define_pop_state()` takes either a named set of expressions that, when evaluated, generate a population vector, or a named list of pre-generated population vectors in the `pop_vectors` argument. One important thing to note about working with population vectors in `ipmr` is that they should take the form `n_statevariable_t` and `n_statevariable_t_1`. `ipmr` uses these key words to make sure that population states are matched to the kernels that use them, and so the strict syntax in this area is needed to ensure accuracy in more complicated models. 
+
+
+### `define_env_state()`
+
+`define_env_state()` takes a named set of expressions in the `...` and then a data list, much like how `define_kernel()`/`define_k()` take them. The key difference here is that you will need to use the name on the left hand side of the `...` to access the values on the right hand side. In the example below, the function passed to `define_env_state()` returns a named list of length 4. However, we only want to access a single parameter in each vital rate expression. Since the list is named `env_params` and the variables we really want are named `s_int_yr`, `g_int_yr`, `f_r_int_yr`, `f_s_int_yr`, we access them using standard `$` syntax (e.g. `env_params$s_int_yr`) in each of the vital rate expressions.
+
+Finally, this example uses the `mvtnorm` library to access the `rmvnorm` function for generating parameter estimates from a multivariate normal distribution during each model iteration.
 
 ```{r eval = FALSE}
 
@@ -668,14 +687,7 @@ iterations <- 10
 
 init_pop_vec <- runif(100)
 
-# Again, we can define our own functions and pass them into calls to make_ipm. This
-# isn't strictly necessary, but makes the model code more readable.
-
-inv_logit <- function(int, slope, sv1) {
-  1/(1 + exp(-(int + slope * sv1)))
-}
-
-# In this case, we also define a wrapper function around rmvnorm to make sure
+# We define a wrapper function around rmvnorm to make sure
 # that the names of the returned values match those in the vital rate
 # expressions.
 
@@ -685,6 +697,14 @@ mvt_wrapper <- function(r_means, r_sigma, nms) {
   
   names(out) <- nms
   return(out)
+}
+
+
+# Again, we can define our own functions and pass them into calls to make_ipm. This
+# isn't strictly necessary, but makes the model code more readable.
+
+inv_logit <- function(int, slope, sv1) {
+  1/(1 + exp(-(int + slope * sv1)))
 }
 
 param_resamp_model <- init_ipm('simple_di_stoch_param') %>%

@@ -1,2 +1,9 @@
 development:
-  mode: release
+  mode: unreleased
+url: https://levisc8.github.io/ipmr
+authors:
+  Sam Levin:
+    href: https://github.com/levisc8
+template:
+  params:
+    bootswatch: yeti

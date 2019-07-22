@@ -5,4 +5,7 @@ articles:
   hierarchical-notation: hierarchical-notation.html
   ipmr-introduction: ipmr-introduction.html
   proto-ipms: proto-ipms.html
+urls:
+  reference: https://levisc8.github.io/ipmr/reference
+  article: https://levisc8.github.io/ipmr/articles
 

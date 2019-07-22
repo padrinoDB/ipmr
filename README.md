@@ -1,10 +1,10 @@
-
 [![Travis build
 status](https://travis-ci.org/levisc8/ipmr.svg?branch=master)](https://travis-ci.org/levisc8/ipmr)
 [![Codecov test
 coverage](https://codecov.io/gh/levisc8/ipmr/branch/master/graph/badge.svg)](https://codecov.io/gh/levisc8/ipmr?branch=master)
 
-# ipmr
+ipmr
+====
 
 `ipmr` is a package for implementing Integral Projection Models (IPMs)
 in *R*. It relies heavily on the mathematical syntax of the models, and
@@ -16,14 +16,19 @@ brief overview of how `ipmr` classifies different model types followed
 by examples of how to implement those types in this framework.
 
 Note that this package **will not** help with the process of fitting
-vital rate models at all\! That is a sufficiently different (and vast)
+vital rate models at all! That is a sufficiently different (and vast)
 question that we decided it was not within the scope of this project.
 This will only help you turn those regression models into an IPM without
 shooting yourself in the foot. Thus, everything that follows assumes you
 have parameterized those vital rate models and are now ready to begin
 implementing your model.
 
-## Model classes
+Below is a brief overview of the package and some examples of how to
+implement models with it. A more thorough introduction is available
+[here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
+
+Model classes
+-------------
 
 The first step of defining a model in `ipmr` (assuming all parameters
 have already been estimated) is to initialize the model using
@@ -35,36 +40,36 @@ character string with at least 3 (but possibly 4) entries separated by
 underscores (`_`). Below, the are the possible entries for each
 position.
 
-  - Position 1: `"simple"`/`"general"`
-    
-      - 1.  **simple**: This describes an IPM with a single continuous
+-   Position 1: `"simple"`/`"general"`
+
+    -   1.  **simple**: This describes an IPM with a single continuous
             state variable and no discrete stages.
-    
-      - 2.  **general**: This describes and IPM with either more than
+
+    -   1.  **general**: This describes and IPM with either more than
             one continuous state variable, one or more discrete stages,
             or both of the above. Basically, anything other than an IPM
             with a single continuous state variable.
 
-  - Position 2: `"di"`/`"dd"`
-    
-      - A. **di**: This is used to denote a density-independent IPM.
-    
-      - B. **dd**: This is used to denote a density-dependent IPM.
+-   Position 2: `"di"`/`"dd"`
 
-  - Position 3: `"det"`/`"stoch"`
-    
-      - A. **det**: This is used to denote a deterministic IPM. If this
+    -   A. **di**: This is used to denote a density-independent IPM.
+
+    -   B. **dd**: This is used to denote a density-dependent IPM.
+
+-   Position 3: `"det"`/`"stoch"`
+
+    -   A. **det**: This is used to denote a deterministic IPM. If this
         is used in the third position of `model_class`, there should not
         be a fourth entry.
-    
-      - B. **stoch**: This is used to denote a stochastic IPM. If this
+
+    -   B. **stoch**: This is used to denote a stochastic IPM. If this
         is used in the third position of `model_class`, there should
         always be a fourth entry. The two possibilities for the fourth
         are described next.
 
-  - Position 4: `"kern"`/`"param"`
-    
-      - A. **kern**: This describes an IPM with discretely varying
+-   Position 4: `"kern"`/`"param"`
+
+    -   A. **kern**: This describes an IPM with discretely varying
         parameters such that there values are known before the model is
         specified. This is usually the case with models that estimate
         random year/site effects and for which defining a multivariate
@@ -73,8 +78,8 @@ position.
         efficient than the `param` alternative because all kernels can
         be constructed before the iteration procedure begins, as opposed
         to requiring reconstruction for every single iteration.
-    
-      - B. **param**: This describes an IPM with parameters that are
+
+    -   B. **param**: This describes an IPM with parameters that are
         re-sampled from some distribution at each iteration of the model
         (usually a multivariate joint distribution). This can be a
         multivariate normal defined by covarying slopes and intercepts,
@@ -87,56 +92,56 @@ position.
         writing those.
 
 With the type of model selected, the `model_class` becomes a string and
-the call to `init_ipm` is composed like so: `init_ipm(model_class =
-"position1_position_2_position3_position4")`.
+the call to `init_ipm` is composed like so:
+`init_ipm(model_class = "position1_position_2_position3_position4")`.
 
 The following possibilities are currently or will become available in
 `ipmr` (bold text denotes development progress):
 
-  - Simple, density independent models: **Completed and ready**
-    
+-   Simple, density independent models: **Completed and ready**
+
     1.  `"simple_di_det"`
-    
+
     2.  `"simple_di_stoch_kern"`
-    
+
     3.  `"simple_di_stoch_param"`
 
-  - Simple, density dependent models: **Please be patient**
-    
-    4.  `"simple_dd_det"`
-    
-    5.  `"simple_dd_stoch_kern"`
-    
-    6.  `"simple_dd_stoch_param"`
+-   Simple, density dependent models: **Please be patient**
 
-  - General, density independent models: **Currently in progress**
-    
-    7.  `"general_di_det"`
-    
-    8.  `"general_di_stoch_kern"`
-    
-    9.  `"general_di_stoch_param"`
+    1.  `"simple_dd_det"`
 
-  - General, density dependent models: **Please be patient**
-    
-    10. `"general_dd_det"`
-    
-    11. `"general_dd_stoch_kern"`
-    
-    12. `"general_dd_stoch_param"`
+    2.  `"simple_dd_stoch_kern"`
 
-## Examples for implemented IPM types
+    3.  `"simple_dd_stoch_param"`
+
+-   General, density independent models: **Currently in progress**
+
+    1.  `"general_di_det"`
+
+    2.  `"general_di_stoch_kern"`
+
+    3.  `"general_di_stoch_param"`
+
+-   General, density dependent models: **Please be patient**
+
+    1.  `"general_dd_det"`
+
+    2.  `"general_dd_stoch_kern"`
+
+    3.  `"general_dd_stoch_param"`
+
+Examples for implemented IPM types
+----------------------------------
 
 Simple density-independent deterministic, simple kernel-resampled
 stochastic, and simple parameter resampled stochastic models
 (`simple_di_det`, `simple_di_stoch_kern`, `simple_di_stoch_param`) are
 now functional. However, expect changes as more complicated methods are
-implemented\! See below for an example of how to implement an IPM in
-this framework.
+implemented! See below for an example of how to implement an IPM in this
+framework.
 
 Next on the implementation to-do list are the general versions of these
-(still density
-independent).
+(still density independent).
 
 ``` r
 # Example of the setup for a simple IPM without density dependence or environmental
@@ -309,7 +314,8 @@ w_ipmr      <- Re(eigen(x$iterators$K)$vectors[ , 1])
 lambda_ipmr - lambda_usr
 ```
 
-## Simple, density independent, stochastic kernel resampled models
+Simple, density independent, stochastic kernel resampled models
+---------------------------------------------------------------
 
 These models are typically the result of vital rate models that are fit
 in a mixed effects framework (e.g. multiple sites or multiple years of
@@ -328,8 +334,7 @@ that the hierarchical variable takes.
 The example below simulates a lifecycle where reproduction is always
 fatal. Thus, the survival term also includes the probability of
 reproducing. This is meant to (hopefully) demonstrate the flexibility of
-the
-framework.
+the framework.
 
 ``` r
 # rlang is a useful shortcut for splicing named values into lists. purrr is used to manipulate said lists.
@@ -610,7 +615,8 @@ lambda_ipmr <- vapply(ks, function(x) Re(eigen(x)$values[1]), numeric(1))
 lambda_ipmr - lambdas
 ```
 
-## Simple, density independet, parameter resampled models
+Simple, density independet, parameter resampled models
+------------------------------------------------------
 
 These models are stochastic, but rather than building the iteration
 kernels first and then iterating them - distributions for varying
