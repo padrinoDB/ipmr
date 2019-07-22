@@ -92,27 +92,17 @@ make_ipm.simple_di_det <- function(proto_ipm,
                                    iterate = FALSE,
                                    iterations = 50,
                                    ...) {
+
   # checks pop_state, env_state, domain_definitions
-  .check_ipm_definition(proto_ipm, iterate)
 
-  # Split out K from others so it isn't evaluated until we're ready. If it
-  # isn't there, then proceed as usual
+  proto_list <- .initialize_others_and_k(proto_ipm, iterate)
 
-  K_row    <- which(grepl("K", proto_ipm$kernel_id))
-
-  if(length(K_row) > 0) {
-
-    k_row  <- proto_ipm[K_row, ]
-    others <- proto_ipm[-c(K_row), ]
-
-  } else {
-
-    others <- proto_ipm
-
-  }
+  others <- proto_list$others
+  k_row  <- proto_list$k_row   # k_row is either an NA or a proto_ipm object
 
   # Initialize the master_environment so these values can all be found at
   # evaluation time
+
   if(is.null(domain_list)){
     master_env <- .generate_master_env(others$domain, usr_funs)
   } else {
@@ -128,8 +118,7 @@ make_ipm.simple_di_det <- function(proto_ipm,
 
   sub_kern_list <- all_sub_kerns$sub_kernels
 
-
-  if(length(K_row) > 0) {
+  if(!is.na(k_row)[1]) {
     iterators <- .make_k_simple(k_row, proto_ipm, sub_kern_list, master_env)
   } else {
     iterators <- NA_real_
@@ -175,29 +164,10 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 
   # checks pop_state, env_state, domain_definitions
 
-  .check_ipm_definition(proto_ipm, iterate)
+  proto_list <- .initialize_others_and_k(proto_ipm, iterate)
 
-  # Split out K from others so it isn't evaluated until we're ready. If it
-  # isn't there, then proceed as usual
-
-  K_row <- which(grepl("K", proto_ipm$kernel_id))
-
-  if(length(K_row) > 0) {
-
-    k_row  <- proto_ipm[K_row, ]
-    others <- proto_ipm[-c(K_row), ]
-
-  } else {
-    others <- proto_ipm
-  }
-
-  # If vital rates are fit with a hierarchical model of any kind,
-  # then split those out into their respective years/plots/what-have-you
-
-  if(any(others$has_hier_effs) | any(k_row$has_hier_effs)) {
-    others <- .split_hier_effs(others)
-    k_row  <- .split_hier_effs(k_row)
-  }
+  others <- proto_list$others
+  k_row  <- proto_list$k_row
 
   # Initialize the master_environment so these values can all be found at
   # evaluation time
@@ -271,36 +241,10 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                            usr_funs = list(),
                                            ...) {
 
+  proto_list <- .initialize_others_and_k(proto_ipm, iterate)
 
-  # checks pop_state, env_state, domain definitions
-  .check_ipm_definition(proto_ipm, iterate)
-
-
-  # Split out K from others so it isn't evaluated until we're ready. If it
-  # isn't there, then proceed as usual
-
-  K_row    <- which(grepl("K", proto_ipm$kernel_id))
-
-  if(length(K_row) > 0) {
-
-    k_row  <- proto_ipm[K_row, ]
-    others <- proto_ipm[-c(K_row), ]
-
-  } else {
-
-    others <- proto_ipm
-
-  }
-
-  # If vital rates are fit with a hierarchical model of any kind,
-  # then split those out into their respective years/plots/what-have-you
-
-  if(any(others$has_hier_effs) | any(k_row$has_hier_effs)) {
-
-    others <- .split_hier_effs(others)
-    k_row  <- .split_hier_effs(k_row)
-
-  }
+  others <- proto_list$others
+  k_row  <- proto_list$k_row
 
   # Initialize the master_environment so these values can all be found at
   # evaluation time

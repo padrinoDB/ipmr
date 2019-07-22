@@ -716,6 +716,8 @@
   return(list(pop_state = pop_holder))
 }
 
+#' @noRd
+
 .check_n_t <- function(n_t) {
 
   if(any(n_t < 0)) {
@@ -730,4 +732,46 @@
 
 }
 
+#' @noRd
+# Returns a list with entries others and k_row with hier_effs split out
+# Checks ipm definition
+.initialize_others_and_k <- function(proto_ipm, iterate) {
+
+  # checks pop_state, env_state, domain definitions
+  .check_ipm_definition(proto_ipm, iterate)
+
+
+  # Split out K from others so it isn't evaluated until we're ready. If it
+  # isn't there, then proceed as usual
+
+  K_row    <- which(grepl("K", proto_ipm$kernel_id))
+
+  if(length(K_row) > 0) {
+
+    k_row  <- proto_ipm[K_row, ]
+    others <- proto_ipm[-c(K_row), ]
+
+  } else {
+
+    others <- proto_ipm
+    k_row <- NA_character_
+
+  }
+
+  # If vital rates are fit with a hierarchical model of any kind,
+  # then split those out into their respective years/plots/what-have-you
+
+  if(any(others$has_hier_effs) | any(k_row$has_hier_effs)) {
+
+    others <- .split_hier_effs(others)
+    k_row  <- .split_hier_effs(k_row)
+
+  }
+
+  out <- list(others = others,
+              k_row  = k_row)
+
+  return(out)
+
+}
 
