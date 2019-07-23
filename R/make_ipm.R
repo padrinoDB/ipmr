@@ -100,7 +100,7 @@ make_ipm.simple_di_det <- function(proto_ipm,
 
   # checks pop_state, env_state, domain_definitions
 
-  proto_list <- .initialize_others_and_k(proto_ipm, iterate)
+  proto_list <- .initialize_kernels(proto_ipm, iterate)
 
   others <- proto_list$others
   k_row  <- proto_list$k_row   # k_row is either an NA or a proto_ipm object
@@ -109,9 +109,9 @@ make_ipm.simple_di_det <- function(proto_ipm,
   # evaluation time
 
   if(is.null(domain_list)){
-    master_env <- .generate_master_env(others$domain, usr_funs)
+    master_env <- .make_master_env(others$domain, usr_funs)
   } else {
-    master_env <- .generate_master_env(domain_list, usr_funs)
+    master_env <- .make_master_env(domain_list, usr_funs)
   }
 
   # construct the kernels from their function defintions
@@ -169,7 +169,7 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 
   # checks pop_state, env_state, domain_definitions
 
-  proto_list <- .initialize_others_and_k(proto_ipm, iterate)
+  proto_list <- .initialize_kernels(proto_ipm, iterate)
 
   others <- proto_list$others
   k_row  <- proto_list$k_row
@@ -178,9 +178,9 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
   # evaluation time
 
   if(is.null(domain_list)){
-    master_env <- .generate_master_env(others$domain, usr_funs)
+    master_env <- .make_master_env(others$domain, usr_funs)
   } else {
-    master_env <- .generate_master_env(domain_list, usr_funs)
+    master_env <- .make_master_env(domain_list, usr_funs)
   }
 
   # construct the kernels from their function defintions
@@ -246,7 +246,7 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                            usr_funs = list(),
                                            ...) {
 
-  proto_list <- .initialize_others_and_k(proto_ipm, iterate)
+  proto_list <- .initialize_kernels(proto_ipm, iterate)
 
   others <- proto_list$others
   k_row  <- proto_list$k_row
@@ -255,9 +255,9 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
   # evaluation time
 
   if(is.null(domain_list)) {
-    master_env <- .generate_master_env(others$domain, usr_funs)
+    master_env <- .make_master_env(others$domain, usr_funs)
   } else {
-    master_env <- .generate_master_env(domain_list, usr_funs)
+    master_env <- .make_master_env(domain_list, usr_funs)
   }
 
   # Bind env_exprs, constants, and pop_vectors to master_env so that
@@ -267,7 +267,7 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                     env_state   = others$env_state[[1]]$constants,
                                     env_to_bind = master_env)
 
-  out        <- .prep_param_resamp_output(others, k_row, proto_ipm, iterations)
+  out        <- .prep_di_output(others, k_row, proto_ipm, iterations)
 
   # initialize the pop_state vectors in master_env so they can be found
   # at evaluation time
@@ -340,7 +340,53 @@ make_ipm.general_di_det <- function(proto_ipm,
 
   # initialize others + k_row
 
-  proto_list <- .initialize_others_and_k(proto_ipm, iterate)
+  proto_list <- .initialize_kernels(proto_ipm, iterate)
+
+  others <- proto_list$others
+  k_row  <- proto_list$k_row
+
+  if(is.null(domain_list)) {
+    master_env <- .make_master_env(others$domain, usr_funs)
+  } else {
+    master_env <- .make_master_env(domain_list, usr_funs)
+  }
+
+  # Bind env_exprs, constants, and pop_vectors to master_env so that
+  # we can always find them and avoid that miserable repitition
+
+  master_env <- .bind_all_constants(pop_state   = others$pop_state[[1]],
+                                    env_state   = others$env_state[[1]]$constants,
+                                    env_to_bind = master_env)
+
+
+  out        <- .prep_di_output(others, k_row, proto_ipm, iterations)
+
+  # Thus far, I think general_* methods will have to use iteration for lambdas
+  # as I'm not sure I want to work out the correct cbind(rbind(...)) rules for
+  # creating a mega-matrix. So throw an error if pop_state isn't defined
+  if(is.na(proto_ipm$pop_state[[1]])) {
+
+    stop("All general_* IPMs must have a 'pop_state' defined.",
+         "See ?define_pop_state() for more details." )
+
+  } else {
+
+    master_env <- .add_pop_state_to_master_env(out$pop_state, master_env)
+
+  }
+  all_sub_kerns <- .make_sub_kernel(others,
+                                    env_list,
+                                    return_envs = return_all)
+
+  sub_kern_list <- all_sub_kerns$sub_kernels
+
+  # build up the iteration kernels from their sub-kernels
+
+  iterators     <- .make_k_general_det(k_row,
+                                       proto_ipm,
+                                       sub_kern_list,
+                                       master_env)
+
 
 
 }

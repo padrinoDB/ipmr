@@ -141,6 +141,24 @@
 
 }
 
+.make_k_general_det <- function(k_row,
+                                proto_ipm,
+                                sub_kern_list,
+                                master_env) {
+
+  k_list <- list()
+
+
+  n_ks <- sum(.flatten_to_depth(k_row$params, 1) %>%
+                grepl("formula", names(.)))
+
+  for(i in seq_len) {
+
+    # FILL ME !
+  }
+
+}
+
 #' @noRd
 
 .add_pop_state_to_master_env <- function(pop_state, master_env) {
