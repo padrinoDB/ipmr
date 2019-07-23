@@ -123,8 +123,6 @@ make_impl_args_list <- function(kernel_names,
 
   names(out) <- kernel_names
 
-  out <- purrr::map(out, .f = function(x) x[!is.na(x)])
-
   return(out)
 
 }

@@ -140,7 +140,7 @@
 
 #' @noRd
 
-.prep_param_resamp_output <- function(others, k_row, proto_ipm, iterations) {
+.prep_di_output <- function(others, k_row, proto_ipm, iterations) {
 
   out <- list(iterators   = list(),
               sub_kernels = list(),
@@ -179,7 +179,7 @@
         # higher dimensional kernels will have time as the 3rd, 4th, or 5th
         # dimension (so trippy!) and normal bracket notation won't necessarily
         # work without some awful if{...}else{} sequence. Right now, this will
-        # only work for single continuous state vars
+        # only work for distinct continuous state vars
 
         pop_out            <- array(NA_real_, dim = c(dim_pop_out, iterations + 1))
 
@@ -418,7 +418,7 @@
 # Rename to master_env or something like that - this doesn't strictly hold
 # domain information anymore
 
-.generate_master_env <- function(domain_list, usr_funs) {
+.make_master_env <- function(domain_list, usr_funs) {
 
   # Parent is whatever is 2nd on search path. all loaded functions/packges
   # should still be findable, but objects in the global environment should not
@@ -735,7 +735,7 @@
 #' @noRd
 # Returns a list with entries others and k_row with hier_effs split out
 # Checks ipm definition
-.initialize_others_and_k <- function(proto_ipm, iterate) {
+.initialize_kernels <- function(proto_ipm, iterate) {
 
   # checks pop_state, env_state, domain definitions
   .check_ipm_definition(proto_ipm, iterate)
@@ -744,7 +744,7 @@
   # Split out K from others so it isn't evaluated until we're ready. If it
   # isn't there, then proceed as usual
 
-  K_row    <- which(grepl("K", proto_ipm$kernel_id))
+  K_row    <- which(grepl("K|^n_.*?_t", proto_ipm$kernel_id))
 
   if(length(K_row) > 0) {
 

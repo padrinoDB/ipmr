@@ -230,7 +230,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
     family        = 'CD',
     f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
     f_s           = exp(f_s_int + f_s_slope * ht_1),
-    data_list     = data_list,
+    data_list     = data_list_cr,
     states        = states,
     has_hier_effs = FALSE,
     evict         = FALSE
@@ -239,13 +239,14 @@ ipmr_cr <- init_ipm("general_di_det") %>%
     name    = 'stay_discrete',
     formula = 0,
     family  = "DD",
-    states  = states
+    states  = states,
+    evict = FALSE
   ) %>%
   define_kernel(
     name          = 'leave_discrete',
     formula       = e_p * dnorm(ht_2, f_d_mu, f_d_sd),
     family        = 'DC',
-    data_list     = data_list,
+    data_list     = data_list_cr,
     states        = states,
     has_hier_effs = FALSE,
     evict         = FALSE,
@@ -259,7 +260,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
     n_ht_t_1 = right_mult(leave_discrete, n_b_t) + right_mult(P, n_ht_t),
 
 
-    data_list     = data_list,
+    data_list     = data_list_cr,
     states        = states,
     has_hier_effs = FALSE,
     evict         = FALSE
@@ -269,7 +270,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
       kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
       int_rule     = c(rep("midpoint", 5)),
       dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
-      dom_end      = c('ht', NA_character_, NA_character, 'ht', 'ht')
+      dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
     )
   ) %>%
   define_domains(
@@ -280,7 +281,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
       n_ht = init_pop_vec,
       n_b  = init_b
     )
-  ) %>%
+  ) #%>%
   make_ipm(iterations = 100,
            usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_2 = inv_logit_2))

@@ -65,6 +65,8 @@
 
 }
 
+
+# Lambda helpers----------
 #' @noRd
 # vec = numeric vector
 

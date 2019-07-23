@@ -85,7 +85,7 @@ x <- init_ipm('simple_di_det') %>%
 
                 # split out implementation details into a separate
                 # function - named lists??
-                state_list = state_list,
+                states = state_list,
                 int_rule = 'midpoint',
                 dom_start = 'dbh',
                 dom_end = 'dbh',
@@ -104,7 +104,7 @@ x <- init_ipm('simple_di_det') %>%
                                  f_s_slope = 0.075,
                                  mu_fd = 0.5,
                                  sd_fd = 0.2),
-                state_list = state_list,
+                states = state_list,
                 int_rule = 'midpoint',
                 dom_start = 'dbh',
                 dom_end = 'dbh',
@@ -115,7 +115,7 @@ x <- init_ipm('simple_di_det') %>%
                 formula = P + F,
                 family = 'IPM',
                 data_list = list(),
-                state_list = state_list,
+                states = state_list,
                 int_rule = 'midpoint',
                 dom_start = 'dbh',
                 dom_end = 'dbh',
