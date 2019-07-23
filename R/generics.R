@@ -1,3 +1,5 @@
+# Print----------------
+
 #' Methods for proto_ipms
 #' @rdname proto_generics
 #'
@@ -164,3 +166,117 @@ print.simple_di_stoch_param_ipm <- function(x,
   cat('not yet implemented')
   invisible(x)
 }
+
+
+# Lambda------------
+#' @title Compute the per-capita growth rate for an IPM object
+#' @rdname lambda
+#'
+#' @param ipm An object returned by \code{make_ipm()}.
+#' @param ... other arguments passed to methods.
+#'
+#' @return A single numeric value.
+#'
+#'
+#' @details Determinstic lambda is computed as the dominant eigenvalue of the
+#' iteration kernel(s) where possible. For \code{simple_*_stoch_kern_ipm} models,
+#' a vector containing the dominant eigenvalue of each entry in
+#' \code{ipm$iterators}. For \code{simple_*_det_ipm} models, a single value.
+#'
+#'  NOTE ^^^^ Needs clarification for simple_dd_det models - that can either be
+#'  pop_size or eigen. implement the make_ipm methods before returning!
+#'
+#' Because \code{ipmr} doesn't construct the iteration
+#' kernel for \code{general_*} IPMs the way that they are typically implemented in
+#' interactive sessions (e.g. by r/cbind()ing discrete and continuous stages together),
+#' lambda must be computed by dividing successive population sizes
+#' by their prior sizes and taking the geometric mean of those ratios. Thus, only
+#' \code{type = 'stochastic'} and \code{comp_method = "pop_size"} are available
+#' for these models.
+#'
+#' @export
+
+lambda <- function(ipm, ...) {
+  UseMethod('lambda')
+}
+
+#' @rdname lambda
+#' @inheritParams lambda
+#' @param type Either \code{"stochastic"} or \code{"deterministic"}.
+#' \code{"stochastic"} also has two types - \code{"eigen"} and \code{"pop_size"}.
+#' See details for more information.
+#'
+#' @export
+
+lambda.simple_di_det_ipm <- function(ipm, type = "deterministic", ...) {
+
+  .det_lambda(ipm)
+
+}
+
+#' @rdname lambda
+#' @inheritParams lambda
+#' @param comp_method Either \code{"eigen"} or \code{"pop_size"}. \code{"eigen"}
+#' is not possible except for \code{"simple_*_stoch_kern"} and \code{"simple_*_det"}
+#'
+#' @export
+
+lambda.simple_di_stoch_kern_ipm <- function(ipm,
+                                            type = "stochastic",
+                                            comp_method = c("eigen", "pop_size"),
+                                            ...) {
+
+  switch(comp_method,
+         'eigen'    = .stoch_lambda_eigen(ipm),
+         'pop_size' = .stoch_lambda_pop_size(ipm))
+}
+
+#' @rdname lambda
+#' @inheritParams lambda
+#'
+#' @export
+
+lambda.simple_di_stoch_param_ipm <- function(ipm, ...) {
+
+  .stoch_lambda_pop_size(ipm)
+
+}
+
+#' @rdname lambda
+#' @inheritParams lambda
+#' @export
+#'
+lambda.general_di_det_ipm <- function(ipm, type, ...) {
+  .stoch_lambda_pop_size(ipm)
+}
+
+#' @rdname lambda
+#' @inheritParams lambda.simple_di_stoch_kern_ipm
+#'
+#' @export
+#'
+lambda.general_di_stoch_param_ipm <- function(ipm, ...) {
+
+  .stoch_lambda_pop_size(ipm)
+
+}
+
+
+
+
+# Plot ---------------
+
+
+# `[` ----------------
+# ^^ I think these will exist... but hold on
+
+# Sensitivitiy ---------------
+
+
+# Elastictiy   ---------------
+
+
+# diagnose_ipm ---------------
+
+
+
