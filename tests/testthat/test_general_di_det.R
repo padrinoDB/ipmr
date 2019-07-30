@@ -282,7 +282,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
       n_b  = init_b
     )
   ) #%>%
-  make_ipm(iterations = 100,
-           usr_funs = list(inv_logit   = inv_logit,
-                           inv_logit_2 = inv_logit_2))
+  # make_ipm(iterations = 100,
+           # usr_funs = list(inv_logit   = inv_logit,
+           #                 inv_logit_2 = inv_logit_2))
 
