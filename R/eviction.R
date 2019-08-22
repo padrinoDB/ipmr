@@ -113,7 +113,7 @@ truncated_distributions <- function(fun,
 
 .get_param_form <- function(param, proto) {
 
-  all_params <- ipmr:::.flatten_to_depth(proto$params, 1)
+  all_params <- .flatten_to_depth(proto$params, 1)
 
   ind <- which(names(all_params) == param)
 

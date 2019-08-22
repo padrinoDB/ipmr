@@ -354,9 +354,9 @@ plot.matrix <- function(x = NULL, y = NULL,
 
 #' @rdname plot-methods
 #' @inheritParams plot.matrix
-#' @param sub_kernels A logical - also plot the sub-kernels?
+#' @param sub_kernels A logical - also plot the sub-kernels? NOT YET IMPLEMENTED
 #' @export
-#'
+
 plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
                                    ipm,
                                    sub_kernels = FALSE,
@@ -371,12 +371,9 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
 
   dots <- list(...)
 
-  if(sub_kernels) {
-    plot_list <- purrr::splice(ipm$iterators, ipm$sub_kernels)
+  if(sub_kernels) { # Not yet implemented
 
-    if(any(ipm$proto$has_hier_effs)) {
-      # group_hier_effs
-    }
+    plot_list <- purrr::splice(ipm$iterators, ipm$sub_kernels)
 
   } else {
 
@@ -395,6 +392,47 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
 
   invisible(ipm)
 }
+
+#' @rdname plot-methods
+#' @inheritParams plot.simple_di_det_ipm
+#' @export
+
+plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
+                                   ipm,
+                                   sub_kernels = FALSE,
+                                   col = rainbow(100, start=0.67, end=0),
+                                   bw = FALSE,
+                                   do_contour = FALSE,
+                                   do_legend = FALSE,
+                                   ...) {
+
+  old_par <- par('mar')
+  on.exit(par(old_par))
+
+  dots <- list(...)
+
+  if(sub_kernels) { # Not yet implemented
+
+    plot_list <- purrr::splice(ipm$iterators, ipm$sub_kernels)
+
+  } else {
+
+    plot_list <- ipm$iterators
+
+  }
+
+  lapply(plot_list, function(ipm) plot.matrix(x = x,
+                                              y = y,
+                                              A = ipm,
+                                              col = col,
+                                              bw = bw,
+                                              do_contour = do_contour,
+                                              do_legend = do_legend,
+                                              dots))
+
+  invisible(ipm)
+}
+
 
 # `[` ----------------
 # ^^ I think these will exist... but hold on

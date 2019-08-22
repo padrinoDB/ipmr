@@ -92,11 +92,12 @@ make_ipm <- function(proto_ipm,
 
 make_ipm.simple_di_det <- function(proto_ipm,
                                    return_all = FALSE,
-                                   domain_list = NULL,
                                    usr_funs = list(),
+                                   ...,
+                                   domain_list = NULL,
                                    iterate = FALSE,
-                                   iterations = 50,
-                                   ...) {
+                                   iterations = 50
+                                   ) {
 
   # checks pop_state, env_state, domain_definitions
 
@@ -159,12 +160,12 @@ make_ipm.simple_di_det <- function(proto_ipm,
 #' @export
 make_ipm.simple_di_stoch_kern <- function(proto_ipm,
                                           return_all = FALSE,
+                                          usr_funs = list(),
+                                          ...,
                                           domain_list = NULL,
                                           iterate = FALSE,
                                           iterations = 50,
-                                          kernel_seq = NULL,
-                                          usr_funs = list,
-                                          ...) {
+                                          kernel_seq = NULL) {
 
 
   # checks pop_state, env_state, domain_definitions
@@ -240,11 +241,11 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 #' @export
 make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                            return_all = FALSE,
+                                           usr_funs = list(),
+                                           ...,
                                            domain_list = NULL,
                                            iterate = TRUE,
-                                           iterations = 50,
-                                           usr_funs = list(),
-                                           ...) {
+                                           iterations = 50) {
 
   proto_list <- .initialize_kernels(proto_ipm, iterate)
 
@@ -331,11 +332,11 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
 make_ipm.general_di_det <- function(proto_ipm,
                                     return_all = FALSE,
+                                    usr_funs = list(),
+                                    ...,
                                     domain_list = NULL,
                                     iterate = TRUE,
-                                    iterations = 50,
-                                    usr_funs = list(),
-                                    ...) {
+                                    iterations = 50) {
 
   # initialize others + k_row
 
@@ -373,6 +374,9 @@ make_ipm.general_di_det <- function(proto_ipm,
     master_env <- .add_pop_state_to_master_env(out$pop_state, master_env)
 
   }
+
+  env_list <- list(master_env)
+
   all_sub_kerns <- .make_sub_kernel(others,
                                     env_list,
                                     return_envs = return_all)
@@ -390,44 +394,68 @@ make_ipm.general_di_det <- function(proto_ipm,
 
 }
 
-make_ipm.general_di_stoch_kern <- function(proto_ipm, ...) {
+make_ipm.general_di_stoch_kern <- function(proto_ipm,
+                                           return_all = FALSE,
+                                           usr_funs = list(),
+                                           ...) {
 
   # DEFINE ME
 }
 
-make_ipm.general_di_stoch_param <- function(proto_ipm, ...) {
+make_ipm.general_di_stoch_param <- function(proto_ipm,
+                                            return_all = FALSE,
+                                            usr_funs = list(),
+                                            ...) {
 
   # DEFINE ME
 }
 
 # Density dependent methods----------
 
-make_ipm.simple_dd_det <- function(proto_ipm, ...) {
+make_ipm.simple_dd_det <- function(proto_ipm,
+                                   return_all = FALSE,
+                                   usr_funs = list(),
+                                   ...) {
 
   # DEFINE ME
 }
 
-make_ipm.simple_dd_stoch_kern <- function(proto_ipm, ...) {
+make_ipm.simple_dd_stoch_kern <- function(proto_ipm,
+                                          return_all = FALSE,
+                                          usr_funs = list(),
+                                          ...) {
 
   # DEFINE ME
 }
 
-make_ipm.simple_dd_stoch_param <- function(proto_ipm, ...) {
+make_ipm.simple_dd_stoch_param <- function(proto_ipm,
+                                           return_all = FALSE,
+                                           usr_funs = list(),
+                                           ...) {
 
   # DEFINE ME
 }
 
-make_ipm.general_dd_det <- function(proto_ipm, ...) {
+make_ipm.general_dd_det <- function(proto_ipm,
+                                    return_all = FALSE,
+                                    usr_funs = list(),
+                                    ...) {
 
   # DEFINE ME
 }
 
-make_ipm.general_dd_stoch_kern <- function(proto_ipm, ...) {
+make_ipm.general_dd_stoch_kern <- function(proto_ipm,
+                                           return_all = FALSE,
+                                           usr_funs = list(),
+                                           ...) {
 
   # DEFINE ME
 }
 
-make_ipm.general_dd_stoch_param <- function(proto_ipm, ...) {
+make_ipm.general_dd_stoch_param <- function(proto_ipm,
+                                            return_all = FALSE,
+                                            usr_funs = list(),
+                                            ...) {
 
   # DEFINE ME
 }
