@@ -265,7 +265,136 @@ lambda.general_di_stoch_param_ipm <- function(ipm, ...) {
 
 
 # Plot ---------------
+# Authors - whoever wrote the code from the IPM book
 
+#' @title Plot a matrix or an *_ipm object
+#' @rdname plot-methods
+#'
+#' @param x,y Either the values of the meshpoints or \code{NULL}. If \code{NULL},
+#' then a sequence is generated so that meshpoints are given sequential bin numbers.
+#' @param A,ipm A matrix or a result from \code{make_ipm}
+#' @param col A vector of colors to use for plotting
+#' @param bw A logical indicating whether to use a greyscale palette for plotting
+#' @param do_contour A logical indicating whether or not draw contour lines
+#' on the plot
+#' @param do_legend A logical indicating whether to draw a legend for the plot
+#' @param ... further arguments passed to legend
+#'
+#' @return \code{A} or \code{ipm} invisibly
+#'
+#' @export
+
+
+plot.matrix <- function(x = NULL, y = NULL,
+                        A,
+                        col = rainbow(100, start=0.67, end=0),
+                        bw = FALSE,
+                        do_contour = FALSE,
+                        do_legend = FALSE,
+                        ...) {
+
+  old_par <- par()
+  on.exit(par(old_par))
+
+  if(do_legend) layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
+
+  par(mar = c(6, 5, 3, 2))
+
+  if(is.null(x)) x = seq_len(ncol(A))
+  if(is.null(y)) y = seq_len(nrow(A))
+
+  nx = length(x)
+  ny = length(y)
+  x1 = c(1.5 * x[1] - 0.5 * x[2], 1.5 * x[nx] - 0.5 * x[nx - 1])
+  y1 = c(1.5 * y[1] - 0.5 * y[2], 1.5 * y[ny] - 0.5 * y[ny - 1])
+
+  if(bw) col = grey( (200:50) / 200 )
+
+  image(list(x = x,
+             y = y,
+             z = t(A)),
+        xlim     = x1,
+        ylim     = rev(y1),
+        col      = col,
+        cex.axis = 1.5,
+        cex.lab  = 1.5,
+        bty      = "u",
+        xlab     = 'T',
+        ylab     = 'T + 1',
+        ...)
+
+  abline(v = range(x1))
+  abline(h = range(y1))
+
+  if(do_contour) contour(x,
+                         y,
+                         t(A),
+                         nlevels = 5,
+                         labcex  = 1.2,
+                         add     = TRUE)
+
+  if(do_legend) {
+    l.y = seq(min(A), max(A),length = 100)
+    par(mar = c(6, 2, 3, 1))
+    image(list(x = 1:2,
+               y = l.y,
+               z = rbind(l.y, l.y)),
+          col  = col,
+          bty  = "o",
+          xaxt = "n",
+          yaxt = "n")
+    axis(side     = 2,
+         cex.axis = 1.5,
+         at       = pretty(seq(min(A), max(A), length=10)))
+  }
+
+  invisible(A)
+}
+
+
+#' @rdname plot-methods
+#' @inheritParams plot.matrix
+#' @param sub_kernels A logical - also plot the sub-kernels?
+#' @export
+#'
+plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
+                                   ipm,
+                                   sub_kernels = FALSE,
+                                   col = rainbow(100, start=0.67, end=0),
+                                   bw = FALSE,
+                                   do_contour = FALSE,
+                                   do_legend = FALSE,
+                                   ...) {
+
+  old_par <- par()
+  on.exit(par(old_par))
+
+  dots <- list(...)
+
+  if(sub_kernels) {
+    plot_list <- purrr::splice(ipm$iterators, ipm$sub_kernels)
+
+    if(any(ipm$proto$has_hier_effs)) {
+      # group_hier_effs
+    }
+
+  } else {
+
+    plot_list <- ipm$iterators
+
+  }
+
+  lapply(plot_list, function(ipm) plot.matrix(x = x,
+                                              y = y,
+                                              A = ipm,
+                                              col = col,
+                                              bw = bw,
+                                              do_contour = do_contour,
+                                              do_legend = do_legend,
+                                              dots))
+
+  invisible(ipm)
+}
 
 # `[` ----------------
 # ^^ I think these will exist... but hold on
