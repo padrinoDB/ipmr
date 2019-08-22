@@ -109,8 +109,9 @@
 }
 
 .stoch_lambda_eigen <- function(x) {
-  eigs <- vapply(x$iterators,
-                 .det_lambdas,
-                 numeric(1))
+
+  eigs <- .det_lambda(x)
+
   return(.geom_mean(eigs))
+
 }

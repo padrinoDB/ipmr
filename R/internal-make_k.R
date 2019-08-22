@@ -57,12 +57,6 @@
 
     names(kern_form) <- k_id
 
-    # does anyone ever correct for eviction at the k stage? not even sure one could...
-    if(k_rows$evict[i] & rlang::is_quosure(k_rows$evict_fun[[i]])) {
-
-      kern_env <- .correct_eviction(k_rows$evict_fun[[i]][[1]],
-                                    kern_env)
-    }
 
     rlang::env_bind_lazy(kern_env,
                          !!! kern_form,
@@ -84,7 +78,6 @@
 #' @noRd
 
 .make_k_param_samp <- function(k_rows,
-                               proto_ipm,
                                sub_kernel_list,
                                master_env) {
 
@@ -115,14 +108,6 @@
     # Gets both the iteration kernel and the population state vector (if applicable)
 
     pull_name <- ifelse(names(kern_form) == k_id, k_id, names(kern_form))
-
-
-    # does anyone ever correct for eviction at the k stage? not even sure one could...
-    if(k_rows$evict[i] & rlang::is_quosure(k_rows$evict_fun[[i]])) {
-
-      kern_env <- .correct_eviction(k_rows$evict_fun[[i]][[1]],
-                                    kern_env)
-    }
 
     rlang::env_bind_lazy(kern_env,
                          !!! kern_form,

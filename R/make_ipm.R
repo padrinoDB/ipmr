@@ -293,7 +293,6 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
     sub_kernels <- sys$ipm_system$sub_kernels
 
     sys_i       <- .make_k_param_samp(k_row,
-                                      proto_ipm,
                                       sub_kernels,
                                       master_env)
 

@@ -1,6 +1,7 @@
 context('general density independent deterministic models')
 
 
+set.seed(2312)
 init_pop_vec <- runif(500)
 init_b <- 20
 
@@ -49,9 +50,10 @@ f_r_x <- function(int, slope1,  sv1) {
 }
 
 
-g_x <- function(sv2, sv1, int, slope, gsd) {
+g_x <- function(sv2, sv1, int, slope, gsd, L, U) {
   mu <- int + slope * sv1
-  out <- dnorm(sv2, mean = mu, sd = gsd)
+  ev <- pnorm(U, mu, gsd) - pnorm(L, mu, gsd)
+  out <- dnorm(sv2, mean = mu, sd = gsd) / ev
 
   return(out)
 }
@@ -65,30 +67,38 @@ b        <- seq(L, U, length.out = n + 1)
 d1 <- d2 <- (b[2:(n + 1)] + b[1:n]) * 0.5
 h        <- d1[3] - d1[2]
 
-G <- h * outer(d1, d2, FUN = g_x,
-               int   = data_list_control$g_int,
-               slope = data_list_control$g_slope,
-               gsd   = data_list_control$g_sd)
+domains <- expand.grid(list(d2 = d1, d1 = d1))
+G <- h * g_x(domains$d1, domains$d2,
+             int   = data_list_control$g_int,
+             slope = data_list_control$g_slope,
+             gsd   = data_list_control$g_sd,
+             L = L,
+             U = U) %>%
+  matrix(nrow = n, ncol = n, byrow = TRUE)
 
 s <- s_x(data_list_control$s_int,
          data_list_control$s_slope,
          data_list_control$s_slope_2,
          d1)
 
-G <- truncated_distributions(G,
-                             n)
+
 
 P <- s_g_mult(s, G)
 
 cd_co <- f_r_x(data_list_control$f_r_int,
-            data_list_control$f_r_slope,
-            d1) *
+               data_list_control$f_r_slope,
+               d1) *
   exp(data_list_control$f_s_int + data_list_control$f_s_slope * d1) *
   data_list_control$g_i %>%
   matrix(ncol = n,
          nrow = 1)
 
-dc_co <- dnorm(d2, mean = data_list_control$f_d_mu, sd = data_list_control$f_d_sd) *
+dc_co <- (dnorm(d2, mean = data_list_control$f_d_mu, sd = data_list_control$f_d_sd) /
+            (pnorm(U,
+                   data_list_control$f_d_mu,
+                   data_list_control$f_d_sd) - pnorm(L,
+                                                     data_list_control$f_d_mu,
+                                                     data_list_control$f_d_sd))) *
   data_list_control$e_p *
   h %>%
   matrix(nrow = n, ncol = 1)
@@ -105,18 +115,19 @@ actual_co <- Re(eigen(K_co)$values[1])
 
 # Repeat, but with CRs
 
-G <- h * outer(d1, d2, FUN = g_x,
-               int   = data_list_cr$g_int,
-               slope = data_list_cr$g_slope,
-               gsd   = data_list_cr$g_sd)
+G <- h * g_x(domains$d1, domains$d2,
+             int   = data_list_cr$g_int,
+             slope = data_list_cr$g_slope,
+             gsd   = data_list_cr$g_sd,
+             L = L, U = U) %>%
+  matrix(nrow = n, ncol = n, byrow = TRUE)
 
 s <- s_x(data_list_cr$s_int,
          data_list_cr$s_slope,
          data_list_cr$s_slope_2,
          d1)
 
-G <- truncated_distributions(G,
-                             n)
+
 
 P <- s_g_mult(s, G)
 
@@ -128,7 +139,12 @@ cd_cr <- f_r_x(data_list_cr$f_r_int,
   matrix(ncol = n,
          nrow = 1)
 
-dc_cr <- dnorm(d2, mean = data_list_cr$f_d_mu, sd = data_list_cr$f_d_sd) *
+dc_cr <- (dnorm(d2, mean = data_list_cr$f_d_mu, sd = data_list_cr$f_d_sd) /
+            (pnorm(U,
+                   data_list_cr$f_d_mu,
+                   data_list_cr$f_d_sd) - pnorm(L,
+                                                data_list_cr$f_d_mu,
+                                                data_list_cr$f_d_sd))) *
   data_list_cr$e_p *
   h %>%
   matrix(nrow = n, ncol = 1)
@@ -143,15 +159,15 @@ K_cr <- rbind(
 
 actual_cr <- Re(eigen(K_cr)$values[1])
 
-target_cr <- 1.2578
-target_co <- 1.2208
+target_cr <- 1.26
+target_co <- 1.22
 
 
 # Verify test implementation actually does the published one
 
 test_that('test implementation matches published quantities', {
-  expect_equal(target_cr, actual_cr, tolerance = 1e-3)
-  expect_equal(target_co, actual_co, tolerance = 1e-3)
+  expect_equal(target_cr, actual_cr, tolerance = 1e-2)
+  expect_equal(target_co, actual_co, tolerance = 1e-2)
 })
 
 # Now, set up simulation to compare w/ ipmr
@@ -219,10 +235,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
     g_mu          = g_int + g_slope * ht_1,
     s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
     states        = states,
-    has_hier_effs = FALSE,
-    evict         = TRUE,
-    evict_fun     = truncated_distributions(g,
-                                            500)
+    has_hier_effs = FALSE
   ) %>%
   define_kernel(
     name          = "go_discrete",
@@ -232,8 +245,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
     f_s           = exp(f_s_int + f_s_slope * ht_1),
     data_list     = data_list_cr,
     states        = states,
-    has_hier_effs = FALSE,
-    evict         = FALSE
+    has_hier_effs = FALSE
   ) %>%
   define_kernel(
     name    = 'stay_discrete',
@@ -248,8 +260,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
     family        = 'DC',
     data_list     = data_list_cr,
     states        = states,
-    has_hier_effs = FALSE,
-    evict         = FALSE,
+    has_hier_effs = FALSE
   ) %>%
   define_k(
     name     = "K",
@@ -262,8 +273,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
 
     data_list     = data_list_cr,
     states        = states,
-    has_hier_effs = FALSE,
-    evict         = FALSE
+    has_hier_effs = FALSE
   ) %>%
   define_impl(
     make_impl_args_list(
@@ -282,7 +292,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
       n_b  = init_b
     )
   ) #%>%
-  # make_ipm(iterations = 100,
-           # usr_funs = list(inv_logit   = inv_logit,
-           #                 inv_logit_2 = inv_logit_2))
+# make_ipm(iterations = 100,
+# usr_funs = list(inv_logit   = inv_logit,
+#                 inv_logit_2 = inv_logit_2))
 

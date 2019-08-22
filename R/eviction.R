@@ -5,8 +5,17 @@
 #' et al. 2012). \code{rescale_kernel} is an alias for
 #' \code{truncated_distributions}.
 #'
-#' @param discretized_kernel The kernel or function that needs correcting.
-#' @param n_mesh_p The number of meshpoints for the kernel being corrected.
+#' @param fun The cumulative density function to use. For example, could be
+#' \code{"norm"} to correct a Gaussian density function, or \code{"lnorm"} to
+#' correct a log-normal density function.
+#' @param param The parameter/vital rate being modified
+#' @param L Optionally, the name of the lower bound of the domain. Otherwise,
+#' the function will try to find the \code{param} inside of the \code{proto_ipm}
+#' object under construction and use that to infer the domain of the function.
+#' @param U Optionally, the name of the upper bound of the domain. Otherwise,
+#' the function will try to find the \code{param} inside of the \code{proto_ipm}
+#' object under construction and use that to infer the domain of the function.
+#' @param ... Only used for internal modification - do not use!
 #'
 #' @return A matrix of the same dimension as the input.
 #'
@@ -14,71 +23,123 @@
 #' Williams JL, Miller TEX & Ellner SP, (2012). Avoiding unintentional eviction
 #' from integral projection models.Ecology 93(9): 2008-2014.
 #'
+#' @importFrom rlang caller_env
 #' @export
 
-truncated_distributions <- function(discretized_kernel,
-                                    n_mesh_p) {
+truncated_distributions <- function(fun,
+                                    param,
+                                    L = NA,
+                                    U = NA,
+                                    ...) {
 
-  if(is.matrix(discretized_kernel)) {
+  proto <- ..1
 
-    dim_in             <- dim(discretized_kernel)
+  if(is.na(L) || is.na(U)) {
 
-  } else {
-
-    discretized_kernel <- matrix(discretized_kernel,
-                                 nrow = n_mesh_p,
-                                 ncol = n_mesh_p)
-
-    dim_in             <- c(n_mesh_p, n_mesh_p)
+    LU <- .get_bounds_from_proto(param, proto)
+    L <- LU[1]
+    U <- LU[2]
 
   }
 
-  out <- discretized_kernel /
-    matrix(
-      as.vector(
-        apply(
-          discretized_kernel,
-          2,
-          sum
-        )
-      ),
-      nrow = dim_in[1],
-      ncol = dim_in[2],
-      byrow = TRUE
-    )
+  proto <- .sub_new_param_call(fun, param, L, U, proto)
+
+  return(proto)
+}
+
+# Internal helpers for eviction correction functions
+
+#' @noRd
+
+.sub_new_param_call <- function(fun, param, L, U, proto) {
+
+  fun <- paste('p', fun, sep = "")
+  param_form   <- .get_param_form(param, proto)
+  fixed_params <- rlang::call_args(rlang::parse_expr(param_form))[-1] %>%
+    unlist() %>%
+    as.character() %>%
+    paste(collapse = ', ')
+
+  denom_1 <- paste(fun, '(', U, ', ', fixed_params, ')', sep = "")
+  denom_2 <- paste(fun, '(', L, ', ', fixed_params, ')', sep = "")
+
+  final_form <- paste(param_form,
+                      ' / ',
+                      '(',
+                      denom_1,
+                      ' - ',
+                      denom_2,
+                      ')',
+                      sep = "")
+
+  out <- .insert_final_form(param, final_form, proto)
+
   return(out)
 
 }
 
-#' @rdname eviction
-#' @inheritParams truncated_distributions
-#' @export
+.insert_final_form <- function(param, final_form, proto) {
 
-rescale_kernel <- function(discretized_kernel, n_mesh_p) {
-  return(
-    truncated_distributions(discretized_kernel = discretized_kernel,
-                            n_mesh_p = n_mesh_p)
-  )
+  ind <- which(names(proto$params[[1]]$vr_text) == param)
+  proto$params[[1]]$vr_text[ind] <- final_form
+
+  return(proto)
 }
 
+#' @noRd
 
-# Internal helpers for make_ipm() methods
+.get_bounds_from_proto <- function(param, proto) {
+
+  # Get parameter function form
+  param_form <- .get_param_form(param, proto)
+
+  # Next, infer the state variable and construct the L, U
+
+  svs <- unique(unlist(proto$state_var))
+
+  sv_ind <- vapply(svs,
+                   FUN = function(x) grepl(x, param_form),
+                   logical(1))
+
+  sv <- svs[sv_ind]
+
+  out <- paste(c("L", "U"), sv, '2', sep = "_")
+
+  return(out)
+
+}
 
 #' @noRd
-.correct_eviction <- function(evict_fun, kernel_env) {
 
-  if(is.list(evict_fun)) evict_fun <- unlist(evict_fun)[[1]]
+.get_param_form <- function(param, proto) {
 
-  # Set the quosure environment for eval_tidy and get the name of the symbol
-  # being modified
-  evict_correction <- rlang::quo_set_env(evict_fun,
-                                         kernel_env)
-  nm <- strsplit(rlang::quo_text(evict_correction), '\\(|,|\\)')[[1]][2]
+  all_params <- ipmr:::.flatten_to_depth(proto$params, 1)
 
-  # Need to evaluate before bindidng as the symbols are no longer uniquely named
-  assign(nm,
-         rlang::eval_tidy(evict_correction),
-         envir = kernel_env)
+  ind <- which(names(all_params) == param)
 
-  invisible(kernel_env)
+  param_form <- all_params[[ind]]
+
+  return(param_form)
+}
+
+#' @noRd
+
+.correct_eviction <- function(proto) {
+
+  if(is.list(proto$evict_fun)) evict_fun <- unlist(proto$evict_fun)[[1]]
+
+  if(grepl('truncated_distributions', rlang::quo_text(evict_fun))) {
+
+    text <- gsub(')', ', proto = proto[i, ])', rlang::quo_text(evict_fun))
+    rep_expr <- rlang::parse_expr(text)
+    evict_fun <- rlang::quo_set_expr(evict_fun, rep_expr)
+
+  }
+
+  evict_fun <- rlang::quo_set_env(evict_fun, rlang::caller_env())
+
+  out <- rlang::eval_tidy(evict_fun)
+
+  return(out)
+
 }

@@ -41,11 +41,15 @@
 #' the hierarchical variable can take. Entries in this list should be a single
 #' vector and should be character or integer typed.
 #' @param evict A logical indicating whether an eviction correction should be applied
-#' to the kernel. Default is \code{TRUE}.
+#' to the kernel. It is generally recommended to use a function in the vital rate
+#' definition as opposed to using this option Default is \code{FALSE}.
 #' @param evict_fun If \code{evict == TRUE}, then a function that corrects for it.
-#' Currently, \code{truncated_distributions} and \code{rescale_kernel} are the
-#' only built-in functions, but user specified ones should work as well provided
-#' they return a numeric matrix or vector.
+#' Currently, the only implemented function is \code{truncated_distributions}.
+#' This works by modifying the functional form of the vital rate expressions
+#' \code{...}, and so supplying your own function in this slot will be difficult.
+#' One can also specify \code{usr_funs} function that performs the correction
+#' during the numerical implementation of the model itself. In that case,
+#' set \code{evict} to \code{FALSE}.
 #'
 #' @section \code{define_k}:
 #'
@@ -81,7 +85,7 @@ define_kernel <- function(proto_ipm,
                           states,
                           has_hier_effs = FALSE,
                           levels_hier_effs = list(),
-                          evict = TRUE,
+                          evict = FALSE,
                           evict_fun = NULL) {
 
   cls <- class(proto_ipm)
@@ -152,7 +156,7 @@ define_k <- function(proto_ipm,
                      states,
                      has_hier_effs = FALSE,
                      levels_hier_effs = list(),
-                     evict = TRUE,
+                     evict = FALSE,
                      evict_fun = NULL) {
 
   cls <- class(proto_ipm)

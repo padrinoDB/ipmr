@@ -293,7 +293,7 @@ plot.matrix <- function(x = NULL, y = NULL,
                         do_legend = FALSE,
                         ...) {
 
-  old_par <- par()
+  old_par <- par('mar')
   on.exit(par(old_par))
 
   if(do_legend) layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
@@ -366,7 +366,7 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
                                    do_legend = FALSE,
                                    ...) {
 
-  old_par <- par()
+  old_par <- par('mar')
   on.exit(par(old_par))
 
   dots <- list(...)

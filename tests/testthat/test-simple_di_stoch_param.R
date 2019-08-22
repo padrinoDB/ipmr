@@ -5,14 +5,17 @@ library(ipmr)
 
 context('Simple density independent stochastic parameter resampled models')
 
+set.seed(25129)
+
 s <- function(sv1, params) {
   1/(1 + exp(-(params[1] + params[2] * sv1)))
 }
 
 
-g <- function(sv1, sv2, params) {
+g <- function(sv1, sv2, params, L, U) {
   mu <- params[1] + params[2] * sv1
-  dnorm(sv2, mean = mu, sd = params[3])
+  ev <- pnorm(U, mu, params[3]) - pnorm(L, mu, params[3])
+  dnorm(sv2, mean = mu, sd = params[3]) / ev
 }
 
 f_r <- function(sv1, params) {
@@ -27,8 +30,9 @@ f_d <- function(sv2, params) {
   dnorm(sv2, mean = params[1], sd = params[2])
 }
 
-fec <- function(sv1, sv2, params) {
-  f_r(sv1, params[1:2]) * f_s(sv1, params[3:4]) * f_d(sv2, params[5:6])
+fec <- function(sv1, sv2, params, L, U) {
+  ev <- pnorm(U, params[5], params[6]) - pnorm(L, params[5], params[6])
+  f_r(sv1, params[1:2]) * f_s(sv1, params[3:4]) * (f_d(sv2, params[5:6]) / ev)
 }
 
 update_r_effs <- function(to_add, r_eff_list) {
@@ -39,9 +43,9 @@ data_list <- list(s_slope = 0.2,
                   g_slope = 0.99,
                   g_sd = 0.2,
                   f_r_slope = 0.003,
-                  f_s_slope = 0.0001,
-                  f_d_mu = 0.09,
-                  f_d_sd = 0.01)
+                  f_s_slope = 0.01,
+                  f_d_mu = 2,
+                  f_d_sd = 0.75)
 
 b <- seq(0, 10, length.out = 101)
 d1 <- d2 <- (b[2:101] + b[1:100]) * 0.5
@@ -50,7 +54,7 @@ h <- d1[3] - d1[2]
 r_means <- c(s_int_yr = 0.8,
              g_int_yr = 0.1,
              f_r_int_yr = 0.3,
-             f_s_int_yr = 0.004)
+             f_s_int_yr = 0.01)
 
 # These are likely nonsense values - using for testing purposes only!
 r_sigma <- runif(16)
@@ -70,9 +74,9 @@ data_list <- list(s_slope = 0.2,
                   g_slope = 0.99,
                   g_sd = 0.2,
                   f_r_slope = 0.003,
-                  f_s_slope = 0.0001,
-                  f_d_mu = 0.09,
-                  f_d_sd = 0.01)
+                  f_s_slope = 0.01,
+                  f_d_mu = 2,
+                  f_d_sd = 0.75)
 
 inv_logit <- function(int, slope, sv1) {
   1/(1 + exp(-(int + slope * sv1)))
@@ -98,8 +102,7 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     states = list(c('surf_area')),
     has_hier_effs = FALSE,
     evict = TRUE,
-    evict_fun = truncated_distributions(g,
-                                        100)
+    evict_fun = truncated_distributions('norm', 'g')
   ) %>%
   define_kernel(
     'F',
@@ -111,7 +114,8 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     data_list = data_list,
     states = list(c('surf_area')),
     has_hier_effs = FALSE,
-    evict = FALSE
+    evict = TRUE,
+    evict_fun = truncated_distributions('norm', 'f_d')
   ) %>%
   define_k(
     'K',
@@ -166,6 +170,8 @@ ks <- list()
 ps <- list()
 fs <- list()
 
+domains <- expand.grid(list(d2 = d1, d1 = d1))
+
 for(i in seq_len(iterations)) {
 
   r_ests <- test_stoch_param$env_seq[i, ] %>%
@@ -174,24 +180,29 @@ for(i in seq_len(iterations)) {
 
   temp <- purrr::splice(data_list,  r_ests)
 
-  g_mat <- outer(d1, d2, FUN = g,
-                     params = c(temp$g_int_yr,
-                                temp$g_slope,
-                                temp$g_sd))
+  g_mat <- g(domains$d2, domains$d1,
+             params = c(temp$g_int_yr,
+                        temp$g_slope,
+                        temp$g_sd),
+             L = 0,
+             U = 10)
 
   s_vec <- s(d1, params = c(temp$s_int_yr,
                             temp$s_slope))
 
-  g_mat <- truncated_distributions(g_mat, 100)
-  P <- t(s_vec * t(g_mat)) * h
+  P <- (t(s_vec * t(g_mat)) * h) %>%
+    matrix(nrow = 100, ncol = 100, byrow = TRUE)
 
-  F_mat <- h * outer(d1, d2, FUN = fec,
-                     params = c(temp$f_r_int_yr,
-                                temp$f_r_slope,
-                                temp$f_s_int_yr,
-                                temp$f_s_slope,
-                                temp$f_d_mu,
-                                temp$f_d_sd))
+  F_mat <- h * fec(domains$d2, domains$d1,
+                   params = c(temp$f_r_int_yr,
+                              temp$f_r_slope,
+                              temp$f_s_int_yr,
+                              temp$f_s_slope,
+                              temp$f_d_mu,
+                              temp$f_d_sd),
+                   L = 0,
+                   U = 10) %>%
+    matrix(nrow = 100, ncol = 100, byrow = TRUE)
 
   K_temp <- P + F_mat
 

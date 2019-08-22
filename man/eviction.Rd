@@ -2,17 +2,26 @@
 % Please edit documentation in R/eviction.R
 \name{truncated_distributions}
 \alias{truncated_distributions}
-\alias{rescale_kernel}
 \title{Eviction correction}
 \usage{
-truncated_distributions(discretized_kernel, n_mesh_p)
-
-rescale_kernel(discretized_kernel, n_mesh_p)
+truncated_distributions(fun, param, L = NA, U = NA, ...)
 }
 \arguments{
-\item{discretized_kernel}{The kernel or function that needs correcting.}
+\item{fun}{The cumulative density function to use. For example, could be
+\code{"norm"} to correct a Gaussian density function, or \code{"lnorm"} to
+correct a log-normal density function.}
 
-\item{n_mesh_p}{The number of meshpoints for the kernel being corrected.}
+\item{param}{The parameter/vital rate being modified}
+
+\item{L}{Optionally, the name of the lower bound of the domain. Otherwise,
+the function will try to find the \code{param} inside of the \code{proto_ipm}
+object under construction and use that to infer the domain of the function.}
+
+\item{U}{Optionally, the name of the upper bound of the domain. Otherwise,
+the function will try to find the \code{param} inside of the \code{proto_ipm}
+object under construction and use that to infer the domain of the function.}
+
+\item{...}{Only used for internal modification - do not use!}
 }
 \value{
 A matrix of the same dimension as the input.

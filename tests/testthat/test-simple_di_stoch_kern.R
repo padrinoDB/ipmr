@@ -1,6 +1,8 @@
 context('test simple_di_stoch_kern')
 library(rlang)
+library(ipmr)
 library(purrr)
+
 # define functions for target ipm
 
 # Survival - logistic regression
@@ -10,9 +12,10 @@ s <- function(sv1, params, r_effect) {
 }
 
 # Growth
-g <- function(sv1, sv2, params, r_effect) {
+g <- function(sv1, sv2, params, r_effect, L, U) {
   mu <- params[1] + params[2] * sv1 + r_effect
-  dnorm(sv2, mean = mu, sd = params[3])
+  ev <- pnorm(U, mu, params[3]) - pnorm(L, mu, params[3])
+  dnorm(sv2, mean = mu, sd = params[3]) / ev
 }
 
 # probability of reproducing
@@ -26,13 +29,14 @@ f_s <- function(sv1, params, r_effect) {
 }
 
 # offspring size distribution
-f_d <- function(sv2, params) {
-  dnorm(sv2, mean = params[1], sd = params[2])
+f_d <- function(sv2, params, L, U) {
+  ev <- pnorm(U, params[1], params[2]) - pnorm(L, params[1], params[2])
+  dnorm(sv2, mean = params[1], sd = params[2]) / ev
 }
 
 # constructor function for the F kernel
-fec <- function(sv1, sv2, params, r_effect) {
-  f_r(sv1, params[1:2]) * f_s(sv1, params[3:4], r_effect) * f_d(sv2, params[5:6])
+fec <- function(sv1, sv2, params, r_effect, L, U) {
+  f_r(sv1, params[1:2]) * f_s(sv1, params[3:4], r_effect) * f_d(sv2, params[5:6], L, U)
 }
 
 
@@ -40,27 +44,30 @@ set.seed(50127)
 
 
 # Define some fixed parameters
-data_list = list(s_int = 1.03,
-                 s_slope = 2.2,
-                 g_int = 8,
-                 g_slope = 0.92,
-                 sd_g = 0.9,
-                 f_r_int = 0.09,
-                 f_r_slope = 0.05,
-                 f_s_int = 0.1,
-                 f_s_slope = 0.005,
-                 mu_fd = 9,
-                 sd_fd = 2)
+data_list = list(
+  s_int     = 1.03,
+  s_slope   = 2.2,
+  g_int     = 8,
+  g_slope   = 0.92,
+  sd_g      = 0.9,
+  f_r_int   = 0.09,
+  f_r_slope = 0.05,
+  f_s_int   = 0.1,
+  f_s_slope = 0.005,
+  mu_fd     = 9,
+  sd_fd     = 2
+)
 
 # Now, simulate some random intercepts for growth, survival, and offspring production
-g_r_int <- rnorm(5, 0, 0.3)
-s_r_int <- rnorm(5, 0, 0.7)
+
+g_r_int   <- rnorm(5, 0, 0.3)
+s_r_int   <- rnorm(5, 0, 0.7)
 f_s_r_int <- rnorm(5, 0, 0.2)
 
 nms <- paste("r_", 1:5, sep = "")
 
-names(g_r_int) <- paste('g_', nms, sep = "")
-names(s_r_int) <- paste('s_', nms, sep = "")
+names(g_r_int)   <- paste('g_', nms, sep = "")
+names(s_r_int)   <- paste('s_', nms, sep = "")
 names(f_s_r_int) <- paste('f_s_', nms, sep = "")
 
 # The !!! operator used inside of list2 from rlang takes the named vector
@@ -68,48 +75,63 @@ names(f_s_r_int) <- paste('f_s_', nms, sep = "")
 # to rapidly make a parameter set suitable for usage in the data_list argument
 # of define_kernel
 
-g_params <- list2(!!! g_r_int)
-s_params <- list2(!!! s_r_int)
+g_params   <- list2(!!! g_r_int)
+s_params   <- list2(!!! s_r_int)
 f_s_params <- list2(!!! f_s_r_int)
 
-params <- splice(data_list, g_params, s_params, f_s_params)
+params     <- splice(data_list, g_params, s_params, f_s_params)
 
 
-b <- seq(0.2, 40, length.out = 101)
-sv1 <- sv2 <- (b[2:101] + b[1:100]) * 0.5
-h <- sv1[2] - sv1[1]
+b   <- seq(0.2, 40, length.out = 101)
+
+sv1 <- (b[2:101] + b[1:100]) * 0.5
+
+domains <- expand.grid(list(d2 = sv1, d1 = sv1))
+
+h   <- sv1[2] - sv1[1]
 
 # repetitive to demonstrate the typical kernel construction process.
 
-g_1 <- outer(sv1, sv2, FUN = g, params = c(params$g_int,
-                                               params$g_slope,
-                                               params$sd_g),
-                 r_effect = params$g_r_1)
+g_1 <- g(domains$d2, domains$d1,
+         params = c(params$g_int,
+                    params$g_slope,
+                    params$sd_g),
+         r_effect = params$g_r_1,
+         L = 0.2,
+         U = 40)
 
-g_2 <- outer(sv1, sv2, FUN = g, params = c(params$g_int,
-                                               params$g_slope,
-                                               params$sd_g),
-                 r_effect = params$g_r_2)
-g_3 <- outer(sv1, sv2, FUN = g, params = c(params$g_int,
-                                               params$g_slope,
-                                               params$sd_g),
-                 r_effect = params$g_r_3)
+g_2 <- g(domains$d2, domains$d1,
+         params = c(params$g_int,
+                    params$g_slope,
+                    params$sd_g),
+         r_effect = params$g_r_2,
+         L = 0.2,
+         U = 40)
 
-g_4 <- outer(sv1, sv2, FUN = g, params = c(params$g_int,
-                                               params$g_slope,
-                                               params$sd_g),
-                 r_effect = params$g_r_4)
+g_3 <- g(domains$d2, domains$d1,
+         params = c(params$g_int,
+                    params$g_slope,
+                    params$sd_g),
+         r_effect = params$g_r_3,
+         L = 0.2,
+         U = 40)
 
-g_5 <- outer(sv1, sv2, FUN = g, params = c(params$g_int,
-                                               params$g_slope,
-                                               params$sd_g),
-                 r_effect = params$g_r_5)
 
-g_1 <- truncated_distributions(g_1, n_mesh_p = 100)
-g_2 <- truncated_distributions(g_2, n_mesh_p = 100)
-g_3 <- truncated_distributions(g_3, n_mesh_p = 100)
-g_4 <- truncated_distributions(g_4, n_mesh_p = 100)
-g_5 <- truncated_distributions(g_5, n_mesh_p = 100)
+g_4 <- g(domains$d2, domains$d1,
+         params = c(params$g_int,
+                    params$g_slope,
+                    params$sd_g),
+         r_effect = params$g_r_4,
+         L = 0.2,
+         U = 40)
+
+g_5 <-g(domains$d2, domains$d1,
+        params = c(params$g_int,
+                   params$g_slope,
+                   params$sd_g),
+        r_effect = params$g_r_5,
+        L = 0.2,
+        U = 40)
 
 s_1 <- s(sv1, c(params$s_int, params$s_slope,
                 params$f_r_int, params$f_r_slope), params$s_r_1)
@@ -129,46 +151,66 @@ P_4 <- t(s_4 * t(g_4)) * h
 P_5 <- t(s_5 * t(g_5)) * h
 
 # These are not corrected for eviction, but they probably should be
-F_1 <- h * outer(sv1, sv2, FUN = fec,
-                 params = unlist(params[6:11]),
-                 r_effect = params$f_s_r_1)
 
-F_2 <- h * outer(sv1, sv2, FUN = fec,
-                 params = unlist(params[6:11]),
-                 r_effect = params$f_s_r_2)
+F_1 <- h * fec(domains$d2, domains$d1,
+               params = unlist(params[6:11]),
+               r_effect = params$f_s_r_1,
+               L = 0.2,
+               U = 40)
 
-F_3 <- h * outer(sv1, sv2, FUN = fec,
-                 params = unlist(params[6:11]),
-                 r_effect = params$f_s_r_3)
+F_2 <- h * fec(domains$d2, domains$d1,
+               params = unlist(params[6:11]),
+               r_effect = params$f_s_r_2,
+               L = 0.2,
+               U = 40)
 
-F_4 <- h * outer(sv1, sv2, FUN = fec,
-                 params = unlist(params[6:11]),
-                 r_effect = params$f_s_r_4)
+F_3 <- h * fec(domains$d2, domains$d1,
+               params = unlist(params[6:11]),
+               r_effect = params$f_s_r_3,
+               L = 0.2,
+               U = 40)
+F_4 <- h * fec(domains$d2, domains$d1,
+               params = unlist(params[6:11]),
+               r_effect = params$f_s_r_4,
+               L = 0.2,
+               U = 40)
+F_5 <- h * fec(domains$d2, domains$d1,
+               params = unlist(params[6:11]),
+               r_effect = params$f_s_r_5,
+               L = 0.2,
+               U = 40)
 
-F_5 <- h * outer(sv1, sv2, FUN = fec,
-                 params = unlist(params[6:11]),
-                 r_effect = params$f_s_r_5)
+K_1 <- (P_1 + F_1) %>%
+  matrix(nrow = 100, ncol = 100, byrow = TRUE)
+K_2 <- (P_2 + F_2) %>%
+  matrix(nrow = 100, ncol = 100, byrow = TRUE)
+K_3 <- (P_3 + F_3) %>%
+  matrix(nrow = 100, ncol = 100, byrow = TRUE)
+K_4 <- (P_4 + F_4) %>%
+  matrix(nrow = 100, ncol = 100, byrow = TRUE)
+K_5 <- (P_5 + F_5) %>%
+  matrix(nrow = 100, ncol = 100, byrow = TRUE)
 
+sys <- list(K_1 = K_1,
+            K_2 = K_2,
+            K_3 = K_3,
+            K_4 = K_4,
+            K_5 = K_5)
 
-ipms <- list(K_1 = P_1 + F_1,
-             K_2 = P_2 + F_2,
-             K_3 = P_3 + F_3,
-             K_4 = P_4 + F_4,
-             K_5 = P_5 + F_5)
-
-eigen_sys <- lapply(ipms, function(x) eigen(x))
+eigen_sys <- lapply(sys, eigen)
 
 lambdas <- vapply(eigen_sys, function(x) Re(x$values[1]), numeric(1))
-ws      <- vapply(eigen_sys, function(x) Re(x$vectors[ ,1]), numeric(100))
-
+ws      <- vapply(eigen_sys, function(x) Re(x$vectors[ , 1]), numeric(100))
 
 ## ipmr version
 
 # define the levels of the hierarchical variable and save them in a named
 # list that corresponds to the suffix in the kernel notation
+
 hier_levels <- list(yr = 1:5)
 
 # additional usr_funs to be passed into make_ipm()
+
 inv_logit <- function(sv, int, slope) {
   return(
     1/(1 + exp(-(int + slope * sv)))
@@ -189,67 +231,77 @@ pois_r <- function(sv, int, slope, r_eff) {
   )
 }
 
+# The "model_class" argument is now changed to reflect a different model type
 
 monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
   define_kernel(
-    name = 'P_yr',
-    formula = s_g_mult(s_yr, g_yr),
-    family = "CC",
-    s_yr = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
+
+    # The yr suffix is appended to the kernel name and the parameter names
+    # within each vital rate expression. ipmr substitutes in the hier_levels
+    # for each suffix occurrence, thus changing P_yr in P_1, P_2, P_3, P_4, P_5,
+    # s_yr in s_1, s_2, s_3, s_4, and s_5. s_r_yr is converted to s_r_1, s_r_2,
+    # etc. In the case of s_r_yr, provided that the names in the data_list match
+    # the expanded names, all will go well!
+
+    name             = 'P_yr',
+    formula          = s_g_mult(s_yr, g_yr) ,
+    family           = "CC",
+    s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
       (1 - inv_logit(ht_1, f_r_int, f_r_slope)),
-    g_yr = dnorm(ht_2, mean = mu_g_yr, sd = sd_g),
-    mu_g_yr = g_int + g_slope * ht_1 + g_r_yr,
-    data_list = params,
-    states = list(c('ht')),
-    has_hier_effs = TRUE,
+    g_yr             = dnorm(ht_2, mu_g_yr, sd_g),
+    mu_g_yr          = g_int + g_slope * ht_1 + g_r_yr,
+    data_list        = params,
+    states           = list(c('ht')),
+    has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
     evict = TRUE,
-    # Note that the suffix is appended here since the growth kernel also has a random intercept.
-    evict_fun = truncated_distributions(g_yr,
-                                        n_mesh_p = 100)
+    evict_fun        = truncated_distributions('norm', 'g_yr')
   ) %>%
   define_kernel(
-    "F_yr",
-    formula = f_r * f_s_yr * f_d,
-    family = "CC",
-    f_r = inv_logit(ht_1, f_r_int, f_r_slope),
-    f_s_yr = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr),
-    f_d = dnorm(ht_2, mean = mu_fd, sd = sd_fd),
-    data_list = params,
-    states = list(c('ht')),
-    has_hier_effs = TRUE,
+    name             = "F_yr",
+    formula          = f_r * f_s_yr * f_d,
+    family           = "CC",
+    f_r              = inv_logit(ht_1, f_r_int, f_r_slope),
+    f_s_yr           = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr),
+    f_d              = dnorm(ht_2, mu_fd, sd_fd),
+    data_list        = params,
+    states           = list(c('ht')),
+    has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict = FALSE) %>%
+    evict            = TRUE,
+    evict_fun        = truncated_distributions('norm', 'f_d')
+  ) %>%
   define_k(
-    'K_yr',
-    K_yr = P_yr + F_yr,
-    family = "IPM",
-    data_list = params,
-    states = list(c("ht")),
-    has_hier_effs = TRUE,
-    levels_hier_effs = hier_levels,
-    evict = FALSE
+    name             = 'K_yr',
+    K_yr             = P_yr + F_yr,
+    family           = "IPM",
+    data_list        = params,
+    states           = list(c("ht")),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = hier_levels
   ) %>%
   define_impl(
     make_impl_args_list(
       kernel_names = c("K_yr", "P_yr", "F_yr"),
-      int_rule = rep("midpoint", 3),
-      dom_start = rep("ht", 3),
-      dom_end = rep("ht", 3)
+      int_rule     = rep("midpoint", 3),
+      dom_start    = rep("ht", 3),
+      dom_end      = rep("ht", 3)
     )
   ) %>%
   define_domains(ht = c(0.2, 40, 100)) %>%
-  make_ipm(usr_funs = list(inv_logit = inv_logit,
+  make_ipm(usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_r = inv_logit_r,
-                           pois_r = pois_r))
+                           pois_r      = pois_r))
 
 
-ks <- monocarp_sys$iterators
 
-eigen_sys <- lapply(ks, function(x) eigen(x))
+lambdas_ipmr <- vapply(monocarp_sys$iterators,
+                       function(x) Re(eigen(x)$values[1]),
+                       numeric(1))
+ws_ipmr <- vapply(monocarp_sys$iterators,
+                  function(x) Re(eigen(x)$vectors[ , 1]),
+                  numeric(100L))
 
-lambdas_ipmr <- vapply(eigen_sys, function(x) Re(x$values[1]), numeric(1))
-ws_ipmr      <- vapply(eigen_sys, function(x) Re(x$vectors[ ,1]), numeric(100))
 
 test_that('eigenvectors and values are correct', {
 
@@ -292,7 +344,7 @@ pop_size_lambdas <- pop_size_lambdas_ipmr <- numeric(50L)
 for(i in seq_len(50)) {
 
   k_selector <- kern_seq[i]
-  k_temp <- ipms[[k_selector]]
+  k_temp <- sys[[k_selector]]
 
   pop_holder[ , (i + 1)] <- k_temp %*% pop_holder[ , i]
 
@@ -304,7 +356,17 @@ for(i in seq_len(50)) {
 pop_sizes_ipmr <- colSums(ipmr_pop_state)
 pop_sizes_test <- colSums(pop_holder)
 
+lambda_generic_lambdas <- lambda(iterated_sys, comp_method = 'pop_size')
+
 test_that('.iterate_kerns is acting correctly', {
   expect_equal(pop_size_lambdas, pop_size_lambdas_ipmr, tolerance = 1e-10)
   expect_equal(pop_sizes_test, pop_sizes_ipmr, tolerance = 1e-10)
+
 })
+
+# test_that('lambda "pop_size" works as expected', {
+#
+#   expect_equal(pop_size_lambdas,      lambda_generic_lambdas, tolerance = 1e-10)
+#   expect_equal(pop_size_lambdas_ipmr, lambda_generic_lambdas, tolerance = 1e-10)
+#
+# })

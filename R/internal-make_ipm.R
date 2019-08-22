@@ -3,10 +3,16 @@
 #' @noRd
 
 .make_sub_kernel <- function(proto, env_list, return_envs = FALSE) {
+
   out <- list()
   master_env <- env_list$master_env
 
   for(i in seq_len(dim(proto)[1])) {
+
+    if(proto$evict[i]) {
+      proto[i, ] <- .correct_eviction(proto[i, ])
+    }
+
     param_tree <- proto$params[[i]]
 
     kern_env         <- .generate_kernel_env(param_tree$params,
@@ -22,20 +28,22 @@
 
     names(kern_form) <- proto$kernel_id[i]
 
-    if(proto$evict[i]) {
-      kern_env       <- .correct_eviction(proto$evict_fun[[i]],
-                                          kern_env)
-    }
-
     rlang::env_bind_lazy(kern_env,
                          !!! kern_form,
                          .eval_env = kern_env)
 
-    out <- .extract_kernel_from_eval_env(kern_env,
-                                         proto$kernel_id[i],
-                                         out,
-                                         proto$params[[i]]$family,
-                                         pos = i)
+    temp     <- .extract_kernel_from_eval_env(kern_env,
+                                              proto$kernel_id[i],
+                                              out,
+                                              proto$params[[i]]$family,
+                                              pos = i)
+
+    out[[i]] <- .fun_to_iteration_mat(temp[[i]],
+                                      state_var_start = names(proto$domain[[i]])[1],
+                                      state_var_end   = names(proto$domain[[i]])[2],
+                                      master_env      = master_env)
+
+    names(out)[i] <- proto$kernel_id[i]
 
     if(return_envs) {
       env_list                 <- purrr::splice(env_list, list(kern_env))
@@ -275,7 +283,6 @@
 
   iterator   <- ipm_system[kern_ind]
 
-
   # make names a bit prettier to help distinguish between iterations
   names(sub_kernels) <- paste(names(sub_kernels),
                                current_iteration,
@@ -432,12 +439,22 @@
 
   bounds          <- purrr::map(domain_list, function(x) .make_domain_seqs(x))
 
+  # Create helper vars for user-facing formula writing
+  Ls              <- purrr::map_dbl(domain_list, ~.x[1])
+  Us              <- purrr::map_dbl(domain_list, ~.x[2])
   n_mesh_p        <- purrr::map_dbl(domain_list, ~.x[3])
 
+  # Generate unique names
+
+  names(Ls)       <- paste('L_', names(domain_list), sep = "")
+  names(Us)       <- paste('U_', names(domain_list), sep = "")
   names(n_mesh_p) <- paste('n_', names(domain_list), sep = "")
 
   rlang::env_bind(master_env,
+                  !!! Ls,
+                  !!! Us,
                   !!! n_mesh_p)
+
 
   mids <- purrr::map(bounds, .f = function(x) {
     l <- length(x) - 1
@@ -741,7 +758,7 @@
   .check_ipm_definition(proto_ipm, iterate)
 
 
-  # Split out K from others so it isn't evaluated until we're ready. If it
+  # Split out K from Fothers so it isn't evaluated until we're ready. If it
   # isn't there, then proceed as usual
 
   K_row    <- which(grepl("K|^n_.*?_t", proto_ipm$kernel_id))
@@ -775,3 +792,44 @@
 
 }
 
+.fun_to_iteration_mat <- function(fun,
+                                  state_var_start,
+                                  state_var_end,
+                                  master_env) {
+
+  # If there is no starting domain, its a discrete to continuous, and will
+  # produce a column vector (or scalar for DD). Otherwise, get number of
+  # meshpoints
+
+  if(is.na(state_var_start) || is.null(state_var_start)) {
+
+    n_mesh_p_start <- 1
+
+  } else {
+
+    mesh_p_start_text <- paste('n_', state_var_start, sep = "")
+    n_mesh_p_start    <- master_env[[mesh_p_start_text]]
+
+  }
+
+  # Same as above but for domain end and it makes a row vector (or scalar)
+
+  if(is.na(state_var_end) || is.null(state_var_end)) {
+
+    n_mesh_p_end <- 1
+
+  } else {
+
+    mesh_p_end_text   <- paste('n_', state_var_end, sep = "")
+
+    n_mesh_p_end      <- master_env[[mesh_p_end_text]]
+
+  }
+
+  out <- matrix(fun, nrow = n_mesh_p_end, ncol = n_mesh_p_start, byrow = TRUE)
+
+  class(out) <- c(class(fun[[1]]), class(out))
+
+  return(out)
+
+}
