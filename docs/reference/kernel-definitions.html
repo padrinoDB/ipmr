@@ -133,10 +133,10 @@ See Details for more info</p>
 
     <pre class="usage"><span class='fu'>define_kernel</span>(<span class='no'>proto_ipm</span>, <span class='no'>name</span>, <span class='no'>formula</span>, <span class='no'>family</span>, <span class='no'>...</span>, <span class='kw'>data_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(),
   <span class='no'>states</span>, <span class='kw'>has_hier_effs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(),
-  <span class='kw'>evict</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+  <span class='kw'>evict</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='fu'>define_k</span>(<span class='no'>proto_ipm</span>, <span class='no'>name</span>, <span class='no'>family</span>, <span class='no'>...</span>, <span class='kw'>data_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='no'>states</span>,
-  <span class='kw'>has_hier_effs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>evict</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>has_hier_effs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>evict</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -205,14 +205,18 @@ vector and should be character or integer typed.</p></td>
     <tr>
       <th>evict</th>
       <td><p>A logical indicating whether an eviction correction should be applied
-to the kernel. Default is <code>TRUE</code>.</p></td>
+to the kernel. It is generally recommended to use a function in the vital rate
+definition as opposed to using this option Default is <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>evict_fun</th>
       <td><p>If <code>evict == TRUE</code>, then a function that corrects for it.
-Currently, <code>truncated_distributions</code> and <code>rescale_kernel</code> are the
-only built-in functions, but user specified ones should work as well provided
-they return a numeric matrix or vector.</p></td>
+Currently, the only implemented function is <code>truncated_distributions</code>.
+This works by modifying the functional form of the vital rate expressions
+<code>...</code>, and so supplying your own function in this slot will be difficult.
+One can also specify <code>usr_funs</code> function that performs the correction
+during the numerical implementation of the model itself. In that case,
+set <code>evict</code> to <code>FALSE</code>.</p></td>
     </tr>
     </table>
     

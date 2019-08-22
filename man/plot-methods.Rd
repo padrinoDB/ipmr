@@ -3,6 +3,7 @@
 \name{plot.matrix}
 \alias{plot.matrix}
 \alias{plot.simple_di_det_ipm}
+\alias{plot.simple_di_stoch_param_ipm}
 \title{Plot a matrix or an *_ipm object}
 \usage{
 \method{plot}{matrix}(x = NULL, y = NULL, A, col = rainbow(100, start
@@ -10,6 +11,10 @@
   do_legend = FALSE, ...)
 
 \method{plot}{simple_di_det_ipm}(x = NULL, y = NULL, ipm,
+  sub_kernels = FALSE, col = rainbow(100, start = 0.67, end = 0),
+  bw = FALSE, do_contour = FALSE, do_legend = FALSE, ...)
+
+\method{plot}{simple_di_stoch_param_ipm}(x = NULL, y = NULL, ipm,
   sub_kernels = FALSE, col = rainbow(100, start = 0.67, end = 0),
   bw = FALSE, do_contour = FALSE, do_legend = FALSE, ...)
 }
@@ -30,7 +35,7 @@ on the plot}
 
 \item{...}{further arguments passed to legend}
 
-\item{sub_kernels}{A logical - also plot the sub-kernels?}
+\item{sub_kernels}{A logical - also plot the sub-kernels? NOT YET IMPLEMENTED}
 }
 \value{
 \code{A} or \code{ipm} invisibly

@@ -127,20 +127,36 @@ et al. 2012). <code>rescale_kernel</code> is an alias for
     
     </div>
 
-    <pre class="usage"><span class='fu'>truncated_distributions</span>(<span class='no'>discretized_kernel</span>, <span class='no'>n_mesh_p</span>)
-
-<span class='fu'>rescale_kernel</span>(<span class='no'>discretized_kernel</span>, <span class='no'>n_mesh_p</span>)</pre>
+    <pre class="usage"><span class='fu'>truncated_distributions</span>(<span class='no'>fun</span>, <span class='no'>param</span>, <span class='kw'>L</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>U</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>discretized_kernel</th>
-      <td><p>The kernel or function that needs correcting.</p></td>
+      <th>fun</th>
+      <td><p>The cumulative density function to use. For example, could be
+<code>"norm"</code> to correct a Gaussian density function, or <code>"lnorm"</code> to
+correct a log-normal density function.</p></td>
     </tr>
     <tr>
-      <th>n_mesh_p</th>
-      <td><p>The number of meshpoints for the kernel being corrected.</p></td>
+      <th>param</th>
+      <td><p>The parameter/vital rate being modified</p></td>
+    </tr>
+    <tr>
+      <th>L</th>
+      <td><p>Optionally, the name of the lower bound of the domain. Otherwise,
+the function will try to find the <code>param</code> inside of the <code>proto_ipm</code>
+object under construction and use that to infer the domain of the function.</p></td>
+    </tr>
+    <tr>
+      <th>U</th>
+      <td><p>Optionally, the name of the upper bound of the domain. Otherwise,
+the function will try to find the <code>param</code> inside of the <code>proto_ipm</code>
+object under construction and use that to infer the domain of the function.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Only used for internal modification - do not use!</p></td>
     </tr>
     </table>
     

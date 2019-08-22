@@ -129,22 +129,27 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
     
     </div>
 
-    <pre class="usage"><span class='fu'>make_ipm</span>(<span class='no'>proto_ipm</span>, <span class='kw'>return_all</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>make_ipm</span>(<span class='no'>proto_ipm</span>, <span class='kw'>return_all</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='no'>...</span>)
 
 <span class='co'># S3 method for simple_di_det</span>
 <span class='fu'>make_ipm</span>(<span class='no'>proto_ipm</span>, <span class='kw'>return_all</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='no'>...</span>)
+  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='no'>...</span>, <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>)
 
 <span class='co'># S3 method for simple_di_stoch_kern</span>
 <span class='fu'>make_ipm</span>(<span class='no'>proto_ipm</span>, <span class='kw'>return_all</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='no'>list</span>, <span class='no'>...</span>)
+  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='no'>...</span>, <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S3 method for simple_di_stoch_param</span>
 <span class='fu'>make_ipm</span>(<span class='no'>proto_ipm</span>, <span class='kw'>return_all</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='no'>...</span>)</pre>
+  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='no'>...</span>, <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>)
+
+<span class='co'># S3 method for general_di_det</span>
+<span class='fu'>make_ipm</span>(<span class='no'>proto_ipm</span>, <span class='kw'>return_all</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='no'>...</span>, <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -161,6 +166,13 @@ the kernel expressions are evaluated in. This is useful for developer
 debugging and not much else.</p></td>
     </tr>
     <tr>
+      <th>usr_funs</th>
+      <td><p>An optional list of user-specified functions that are passed
+on to the evaluation environments. This can help make vital rate expressions
+more concise and expressive. Names in this list should exactly match the names
+of the function calls in the <code>...</code> or <code>formula</code>.</p></td>
+    </tr>
+    <tr>
       <th>...</th>
       <td><p>Other arguments passed to methods</p></td>
     </tr>
@@ -168,13 +180,6 @@ debugging and not much else.</p></td>
       <th>domain_list</th>
       <td><p>An optional list of new domain information to implement
 the IPM with.</p></td>
-    </tr>
-    <tr>
-      <th>usr_funs</th>
-      <td><p>An optional list of user-specified functions that are passed
-on to the evaluation environments. This can help make vital rate expressions
-more concise and expressive. Names in this list should exactly match the names
-of the function calls in the <code>...</code> or <code>formula</code>.</p></td>
     </tr>
     <tr>
       <th>iterate</th>

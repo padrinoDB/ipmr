@@ -7,16 +7,10 @@
     <loc>https://levisc8.github.io/ipmr/reference/define_star.html</loc>
   </url>
   <url>
-    <loc>https://levisc8.github.io/ipmr/reference/doms-n-states.html</loc>
-  </url>
-  <url>
     <loc>https://levisc8.github.io/ipmr/reference/eviction.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/fun-mult-helpers.html</loc>
-  </url>
-  <url>
-    <loc>https://levisc8.github.io/ipmr/reference/impl-args.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/init_ipm.html</loc>
@@ -28,10 +22,16 @@
     <loc>https://levisc8.github.io/ipmr/reference/kernel-definitions.html</loc>
   </url>
   <url>
+    <loc>https://levisc8.github.io/ipmr/reference/lambda.html</loc>
+  </url>
+  <url>
     <loc>https://levisc8.github.io/ipmr/reference/make_ipm.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/pipe.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/reference/plot-methods.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/proto_generics.html</loc>

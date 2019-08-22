@@ -68,6 +68,7 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
 #' @inheritParams define_kernel
 #' @param ... Named expressions. See details for more information on their usage in
 #' each \code{define_*} function.
+#'
 #' @param pop_vectors If the population vectors are already pre-defined (i.e. are
 #' not defined by a function passed to \code{...}), then they can
 #' be passed as a named list here.
@@ -81,12 +82,32 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
 #' not appear anywhere else will be ignored during construction, and so will not
 #' be present in the returned \code{ipm} object.
 #'
-#' Each \code{define_*} function takes dots in the same way: named expressions
+#' Most \code{define_*} functions takes dots in the same way: named expressions
 #' are captured and evaluated later in the appropriate contexts with their respective
 #' kernels. Suffix expansion is supported so that hierarchical models with
 #' year/plot/what-have-you effects do not need to  be rewritten 10s or 100s of times.
 #'
-#' @return All \code{define_*} functions return a proto_ipm.
+#' The one exception to this is \code{define_domains}. It takes named numeric
+#' vectors of length 3 where the name corresponds to the
+#' state variable, the first entry is the lower bound of the domain, the second
+#' is the upper bound of the domain, and the third entry is the number of
+#' meshpoints.
+#'
+#' \code{define_impl} is meant to help distinguish the process of
+#' generating the kernels' mathematical form from their implementation details.
+#' It takes a \code{proto_ipm} object and returns a modified one containing the
+#' implementation information.
+#'
+#' \code{make_impl_args_list} helps generate that
+#' information in the correct format. It is usually easiest to call \code{make_impl_args_list}
+#' before calling \code{init_ipm} and then substituting that variable into
+#' the call to \code{define_impl}. Alternatively, one can do something like
+#' \code{define_impl(kernel_impl_list = make_impl_arg_list(...))} within the course
+#' of the model definitition pipeline.
+#'
+#' @return All \code{define_*} functions return a proto_ipm. \code{make_impl_args_list}
+#' returns a list, and so must be used within a call to \code{define_impl} or
+#' before initiating the piped model creation procedure.
 #'
 #' @rdname define_star
 #' @importFrom rlang is_empty

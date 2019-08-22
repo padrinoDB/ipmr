@@ -11,20 +11,20 @@
 make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
 
 \method{make_ipm}{simple_di_det}(proto_ipm, return_all = FALSE,
-  domain_list = NULL, usr_funs = list(), iterate = FALSE,
-  iterations = 50, ...)
+  usr_funs = list(), ..., domain_list = NULL, iterate = FALSE,
+  iterations = 50)
 
 \method{make_ipm}{simple_di_stoch_kern}(proto_ipm, return_all = FALSE,
-  domain_list = NULL, iterate = FALSE, iterations = 50,
-  kernel_seq = NULL, usr_funs = list, ...)
+  usr_funs = list(), ..., domain_list = NULL, iterate = FALSE,
+  iterations = 50, kernel_seq = NULL)
 
 \method{make_ipm}{simple_di_stoch_param}(proto_ipm, return_all = FALSE,
-  domain_list = NULL, iterate = TRUE, iterations = 50,
-  usr_funs = list(), ...)
+  usr_funs = list(), ..., domain_list = NULL, iterate = TRUE,
+  iterations = 50)
 
 \method{make_ipm}{general_di_det}(proto_ipm, return_all = FALSE,
-  domain_list = NULL, iterate = TRUE, iterations = 50,
-  usr_funs = list(), ...)
+  usr_funs = list(), ..., domain_list = NULL, iterate = TRUE,
+  iterations = 50)
 }
 \arguments{
 \item{proto_ipm}{The proto_ipm object you wish to implement. This should be the

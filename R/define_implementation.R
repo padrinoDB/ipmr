@@ -1,5 +1,4 @@
-#' @title Define implementation parameters
-#' @rdname impl-args
+#' @rdname define_star
 #'
 #' @inheritParams define_kernel
 #' @param kernel_names A character vector with the names of the kernels
@@ -20,21 +19,7 @@
 #' For discrete to discrete, both are \code{NA}.
 #' @param int_rule The integration rule to be used for the kernel. The default is
 #' "midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.
-#' If "g-l", additional arguments need to be supplied (\strong{Work on this later!!}).
-#'
-#' @return A \code{proto_ipm} with the implementation details stored.
-#'
-#' @details \code{define_impl} is meant to help distinguish the process of
-#' generating the kernels' mathematical form from their implementation details.
-#' It takes a \code{proto_ipm} object and returns a modified one containing the
-#' implementation information.
-#'
-#' \code{make_impl_args_list} helps generate that
-#' information in the correct format. It is usually easiest to call \code{make_impl_args_list}
-#' before calling \code{init_ipm} and then substituting that variable into
-#' the call to \code{define_impl}. Alternatively, one can do something like
-#' \code{define_impl(kernel_impl_list = make_impl_arg_list(...))} within the course
-#' of the model definitition pipeline.
+#'  If "g-l", additional arguments need to be supplied (\strong{Work on this later!!}).
 #'
 #' @export
 
@@ -69,8 +54,7 @@ define_impl <- function(proto_ipm,
   return(proto_ipm)
 }
 
-#' @rdname impl-args
-#' @param ... Additional arguments required for \code{int_rule = 'g-l'}.
+#' @rdname define_star
 #' @export
 
 make_impl_args_list <- function(kernel_names,

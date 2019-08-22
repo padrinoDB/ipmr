@@ -70,8 +70,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
     evict         = TRUE,
-    evict_fun     = truncated_distributions(g,
-                                            n_mesh_p = 200)
+    evict_fun     = truncated_distributions("norm", "g")
   ) 
 
 ```
@@ -121,8 +120,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
     evict         = TRUE,
-    evict_fun     = truncated_distributions(g,
-                                            n_mesh_p = 200)
+    evict_fun     = truncated_distributions("norm", "g")
   ) %>% 
   define_kernel(
     name      = "F",
@@ -142,8 +140,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
     evict         = TRUE,
-    evict_fun     = truncated_distributions(f_d,
-                                            n_mesh_p = 200)
+    evict_fun     = truncated_distributions("norm", "f_d")
   )
 
 ```
@@ -176,8 +173,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
     evict         = TRUE,
-    evict_fun     = truncated_distributions(g,
-                                            n_mesh_p = 200)
+    evict_fun     = truncated_distributions("norm", "g")
   ) %>% 
   define_kernel(
     name      = "F",
@@ -197,8 +193,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
     evict         = TRUE,
-    evict_fun     = truncated_distributions(f_d,
-                                            n_mesh_p = 200)
+    evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
     name          = "K",
@@ -256,8 +251,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
     evict         = TRUE,
-    evict_fun     = truncated_distributions(g,
-                                            n_mesh_p = 200)
+    evict_fun     = truncated_distributions("norm", "g")
   ) %>% 
   define_kernel(
     name      = "F",
@@ -277,8 +271,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
     evict         = TRUE,
-    evict_fun     = truncated_distributions(f_d,
-                                            n_mesh_p = 200)
+    evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
     name          = "K",
@@ -337,8 +330,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
     evict         = TRUE,
-    evict_fun     = truncated_distributions(g,
-                                            n_mesh_p = 200)
+    evict_fun     = truncated_distributions("norm", "g")
   ) %>% 
   define_kernel(
     name      = "F",
@@ -358,8 +350,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
     evict         = TRUE,
-    evict_fun     = truncated_distributions(f_d,
-                                            n_mesh_p = 200)
+    evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
     name          = "K",
@@ -410,8 +401,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
     evict         = TRUE,
-    evict_fun     = truncated_distributions(g,
-                                            n_mesh_p = 200)
+    evict_fun     = truncated_distributions("norm", "g")
   ) %>% 
   define_kernel(
     name      = "F",
@@ -431,8 +421,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
     evict         = TRUE,
-    evict_fun     = truncated_distributions(f_d,
-                                            n_mesh_p = 200)
+    evict_fun     = truncated_distributions("norm", "g")
   ) %>%
   define_k(
     name          = "K",
@@ -585,8 +574,7 @@ my_ipm <- init_ipm('simple_di_stoch_kern') %>%
     
     # reference to g_yr in evict_fun is also updated
     
-    evict_fun        = truncated_distributions(g_yr, 
-                                               n_mesh_p = 100)
+    evict_fun        = truncated_distributions("norm", "g_yr")
   ) %>%
   define_kernel(
     name             = "F_yr",
@@ -609,7 +597,8 @@ my_ipm <- init_ipm('simple_di_stoch_kern') %>%
     states           = list(c("ht")),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict            = FALSE
+    evict            = TRUE,
+    evict_fun        = truncated_distributions("norm", "f_d")
   ) %>%
   define_impl(
     make_impl_args_list(
@@ -729,8 +718,7 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
     
     has_hier_effs = FALSE,
     evict         = TRUE,
-    evict_fun     = truncated_distributions(g,
-                                            100)
+    evict_fun     = truncated_distributions("norm", "g")
   ) %>%
   define_kernel(
     name          = 'F',
@@ -742,7 +730,8 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
     data_list     = data_list,
     states        = list(c('surf_area')),
     has_hier_effs = FALSE,
-    evict         = FALSE
+    evict         = TRUE,
+    evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
     name = 'K',

@@ -1,16 +1,5 @@
-#' @title Domains and State Variables
-#' @rdname doms-n-states
+#' @rdname define_star
 #'
-#' @description Functions to assist with constructing and manipulating
-#' the domains of state variables in \code{ipmr}.
-#'
-#' @param proto_ipm The model to add the domain information to.
-#' @param ... Numeric vectors of length 3 where the name corresponds to the
-#' state variable, the first entry is the lower bound of the domain, the second
-#' is the upper bound of the domain, and the third entry is the number of
-#' meshpoints.
-#'
-#' @return The \code{proto_ipm} with the domain information added.
 #'
 #' @export
 

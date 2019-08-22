@@ -96,9 +96,7 @@
 <a href="#model-classes" class="anchor"></a>Model classes</h2>
 <p>The first step of defining a model in <code>ipmr</code> (assuming all parameters have already been estimated) is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function takes a single argument: <code>model_class</code>. The <code>model_class</code> defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. <code>model_class</code> should be a character string with at least 3 (but possibly 4) entries separated by underscores (<code>_</code>). Below, the are the possible entries for each position.</p>
 <ul>
-<li>
-<p>Position 1: <code>"simple"</code>/<code>"general"</code></p>
-<ul>
+<li><p>Position 1: <code>"simple"</code>/<code>"general"</code></p></li>
 <li><ol style="list-style-type: upper-alpha">
 <li>
 <strong>simple</strong>: This describes an IPM with a single continuous state variable and no discrete stages.</li>
@@ -107,66 +105,54 @@
 <li>
 <strong>general</strong>: This describes and IPM with either more than one continuous state variable, one or more discrete stages, or both of the above. Basically, anything other than an IPM with a single continuous state variable.</li>
 </ol></li>
-</ul>
-</li>
-<li>
-<p>Position 2: <code>"di"</code>/<code>"dd"</code></p>
-<ul>
+<li><p>Position 2: <code>"di"</code>/<code>"dd"</code></p></li>
 <li><p>A. <strong>di</strong>: This is used to denote a density-independent IPM.</p></li>
 <li><p>B. <strong>dd</strong>: This is used to denote a density-dependent IPM.</p></li>
-</ul>
-</li>
-<li>
-<p>Position 3: <code>"det"</code>/<code>"stoch"</code></p>
-<ul>
+<li><p>Position 3: <code>"det"</code>/<code>"stoch"</code></p></li>
 <li><p>A. <strong>det</strong>: This is used to denote a deterministic IPM. If this is used in the third position of <code>model_class</code>, there should not be a fourth entry.</p></li>
 <li><p>B. <strong>stoch</strong>: This is used to denote a stochastic IPM. If this is used in the third position of <code>model_class</code>, there should always be a fourth entry. The two possibilities for the fourth are described next.</p></li>
-</ul>
-</li>
-<li>
-<p>Position 4: <code>"kern"</code>/<code>"param"</code></p>
-<ul>
+<li><p>Position 4: <code>"kern"</code>/<code>"param"</code></p></li>
 <li><p>A. <strong>kern</strong>: This describes an IPM with discretely varying parameters such that there values are known before the model is specified. This is usually the case with models that estimate random year/site effects and for which defining a multivariate joint distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the <code>param</code> alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration.</p></li>
 <li><p>B. <strong>param</strong>: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model (usually a multivariate joint distribution). This can be a multivariate normal defined by covarying slopes and intercepts, or posterior distribution from a Bayesian model. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the <code>"simple_di_stoch_param"</code> example for some inspiration in writing those.</p></li>
-</ul>
-</li>
 </ul>
 <p>With the type of model selected, the <code>model_class</code> becomes a string and the call to <code>init_ipm</code> is composed like so: <code><a href="reference/init_ipm.html">init_ipm(model_class = "position1_position_2_position3_position4")</a></code>.</p>
 <p>The following possibilities are currently or will become available in <code>ipmr</code> (bold text denotes development progress):</p>
 <ul>
-<li>
-<p>Simple, density independent models: <strong>Completed and ready</strong></p>
+<li>Simple, density independent models: <strong>Completed and ready</strong>
+</li>
+</ul>
 <ol style="list-style-type: decimal">
 <li><p><code>"simple_di_det"</code></p></li>
 <li><p><code>"simple_di_stoch_kern"</code></p></li>
 <li><p><code>"simple_di_stoch_param"</code></p></li>
 </ol>
+<ul>
+<li>Simple, density dependent models: <strong>Please be patient</strong>
 </li>
-<li>
-<p>Simple, density dependent models: <strong>Please be patient</strong></p>
+</ul>
 <ol start="4" style="list-style-type: decimal">
 <li><p><code>"simple_dd_det"</code></p></li>
 <li><p><code>"simple_dd_stoch_kern"</code></p></li>
 <li><p><code>"simple_dd_stoch_param"</code></p></li>
 </ol>
+<ul>
+<li>General, density independent models: <strong>Currently in progress</strong>
 </li>
-<li>
-<p>General, density independent models: <strong>Currently in progress</strong></p>
+</ul>
 <ol start="7" style="list-style-type: decimal">
 <li><p><code>"general_di_det"</code></p></li>
 <li><p><code>"general_di_stoch_kern"</code></p></li>
 <li><p><code>"general_di_stoch_param"</code></p></li>
 </ol>
+<ul>
+<li>General, density dependent models: <strong>Please be patient</strong>
 </li>
-<li>
-<p>General, density dependent models: <strong>Please be patient</strong></p>
+</ul>
 <ol start="10" style="list-style-type: decimal">
 <li><p><code>"general_dd_det"</code></p></li>
 <li><p><code>"general_dd_stoch_kern"</code></p></li>
 <li><p><code>"general_dd_stoch_param"</code></p></li>
 </ol>
-</li>
-</ul>
 </div>
 <div id="examples-for-implemented-ipm-types" class="section level2">
 <h2 class="hasAnchor">
@@ -178,169 +164,167 @@
 <a class="sourceLine" id="cb1-3" title="3"></a>
 <a class="sourceLine" id="cb1-4" title="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ipmr)</a>
 <a class="sourceLine" id="cb1-5" title="5"></a>
-<a class="sourceLine" id="cb1-6" title="6">data_list &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb1-7" title="7">  <span class="dt">s_int     =</span> <span class="fl">2.2</span>,</a>
-<a class="sourceLine" id="cb1-8" title="8">  <span class="dt">s_slope   =</span> <span class="fl">0.25</span>,</a>
-<a class="sourceLine" id="cb1-9" title="9">  <span class="dt">g_int     =</span> <span class="fl">0.2</span>,</a>
-<a class="sourceLine" id="cb1-10" title="10">  <span class="dt">g_slope   =</span> <span class="fl">1.02</span>,</a>
-<a class="sourceLine" id="cb1-11" title="11">  <span class="dt">sd_g      =</span> <span class="fl">0.7</span>,</a>
-<a class="sourceLine" id="cb1-12" title="12">  <span class="dt">f_r_int   =</span> <span class="fl">0.03</span>,</a>
-<a class="sourceLine" id="cb1-13" title="13">  <span class="dt">f_r_slope =</span> <span class="fl">0.015</span>,</a>
-<a class="sourceLine" id="cb1-14" title="14">  <span class="dt">f_s_int   =</span> <span class="fl">1.3</span>,</a>
-<a class="sourceLine" id="cb1-15" title="15">  <span class="dt">f_s_slope =</span> <span class="fl">0.075</span>,</a>
-<a class="sourceLine" id="cb1-16" title="16">  <span class="dt">mu_fd     =</span> <span class="fl">0.5</span>,</a>
-<a class="sourceLine" id="cb1-17" title="17">  <span class="dt">sd_fd     =</span> <span class="fl">0.2</span></a>
-<a class="sourceLine" id="cb1-18" title="18">)</a>
-<a class="sourceLine" id="cb1-19" title="19"></a>
-<a class="sourceLine" id="cb1-20" title="20">s &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params) {</a>
-<a class="sourceLine" id="cb1-21" title="21">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)))</a>
-<a class="sourceLine" id="cb1-22" title="22">}</a>
-<a class="sourceLine" id="cb1-23" title="23"></a>
-<a class="sourceLine" id="cb1-24" title="24"></a>
-<a class="sourceLine" id="cb1-25" title="25">g &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, sv2, params) {</a>
-<a class="sourceLine" id="cb1-26" title="26">  mu &lt;-<span class="st"> </span>params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1</a>
-<a class="sourceLine" id="cb1-27" title="27">  <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(sv2, <span class="dt">mean =</span> mu, <span class="dt">sd =</span> params[<span class="dv">3</span>])</a>
-<a class="sourceLine" id="cb1-28" title="28">}</a>
-<a class="sourceLine" id="cb1-29" title="29"></a>
-<a class="sourceLine" id="cb1-30" title="30">f_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params) {</a>
-<a class="sourceLine" id="cb1-31" title="31">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)))</a>
-<a class="sourceLine" id="cb1-32" title="32">}</a>
-<a class="sourceLine" id="cb1-33" title="33"></a>
-<a class="sourceLine" id="cb1-34" title="34">f_s &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params) {</a>
-<a class="sourceLine" id="cb1-35" title="35">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)</a>
-<a class="sourceLine" id="cb1-36" title="36">}</a>
-<a class="sourceLine" id="cb1-37" title="37"></a>
-<a class="sourceLine" id="cb1-38" title="38">f_d &lt;-<span class="st"> </span><span class="cf">function</span>(sv2, params) {</a>
-<a class="sourceLine" id="cb1-39" title="39">  <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(sv2, <span class="dt">mean =</span> params[<span class="dv">1</span>], <span class="dt">sd =</span> params[<span class="dv">2</span>])</a>
-<a class="sourceLine" id="cb1-40" title="40">}</a>
-<a class="sourceLine" id="cb1-41" title="41"></a>
-<a class="sourceLine" id="cb1-42" title="42">fec &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, sv2, params) {</a>
-<a class="sourceLine" id="cb1-43" title="43">  <span class="kw">f_r</span>(sv1, params[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]) <span class="op">*</span><span class="st"> </span><span class="kw">f_s</span>(sv1, params[<span class="dv">3</span><span class="op">:</span><span class="dv">4</span>]) <span class="op">*</span><span class="st"> </span><span class="kw">f_d</span>(sv2, params[<span class="dv">5</span><span class="op">:</span><span class="dv">6</span>])</a>
+<a class="sourceLine" id="cb1-6" title="6">data_list =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">s_int     =</span> <span class="fl">2.2</span>,</a>
+<a class="sourceLine" id="cb1-7" title="7">                 <span class="dt">s_slope   =</span> <span class="fl">0.25</span>,</a>
+<a class="sourceLine" id="cb1-8" title="8">                 <span class="dt">g_int     =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb1-9" title="9">                 <span class="dt">g_slope   =</span> <span class="fl">1.02</span>,</a>
+<a class="sourceLine" id="cb1-10" title="10">                 <span class="dt">sd_g      =</span> <span class="fl">0.7</span>,</a>
+<a class="sourceLine" id="cb1-11" title="11">                 <span class="dt">f_r_int   =</span> <span class="fl">0.003</span>,</a>
+<a class="sourceLine" id="cb1-12" title="12">                 <span class="dt">f_r_slope =</span> <span class="fl">0.015</span>,</a>
+<a class="sourceLine" id="cb1-13" title="13">                 <span class="dt">f_s_int   =</span> <span class="fl">1.3</span>,</a>
+<a class="sourceLine" id="cb1-14" title="14">                 <span class="dt">f_s_slope =</span> <span class="fl">0.075</span>,</a>
+<a class="sourceLine" id="cb1-15" title="15">                 <span class="dt">mu_fd     =</span> <span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb1-16" title="16">                 <span class="dt">sd_fd     =</span> <span class="fl">0.3</span>)</a>
+<a class="sourceLine" id="cb1-17" title="17"></a>
+<a class="sourceLine" id="cb1-18" title="18">s &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params) {</a>
+<a class="sourceLine" id="cb1-19" title="19">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)))</a>
+<a class="sourceLine" id="cb1-20" title="20">}</a>
+<a class="sourceLine" id="cb1-21" title="21"></a>
+<a class="sourceLine" id="cb1-22" title="22"></a>
+<a class="sourceLine" id="cb1-23" title="23">g &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, sv2, params, L, U) {</a>
+<a class="sourceLine" id="cb1-24" title="24">  mu &lt;-<span class="st"> </span>params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1</a>
+<a class="sourceLine" id="cb1-25" title="25">  ev &lt;-<span class="st"> </span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(U, mu, params[<span class="dv">3</span>]) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(L, mu, params[<span class="dv">3</span>]))</a>
+<a class="sourceLine" id="cb1-26" title="26">  <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(sv2, <span class="dt">mean =</span> mu, <span class="dt">sd =</span> params[<span class="dv">3</span>]) <span class="op">/</span><span class="st"> </span>ev</a>
+<a class="sourceLine" id="cb1-27" title="27">}</a>
+<a class="sourceLine" id="cb1-28" title="28"></a>
+<a class="sourceLine" id="cb1-29" title="29">f_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params) {</a>
+<a class="sourceLine" id="cb1-30" title="30">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)))</a>
+<a class="sourceLine" id="cb1-31" title="31">}</a>
+<a class="sourceLine" id="cb1-32" title="32"></a>
+<a class="sourceLine" id="cb1-33" title="33">f_s &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params) {</a>
+<a class="sourceLine" id="cb1-34" title="34">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)</a>
+<a class="sourceLine" id="cb1-35" title="35">}</a>
+<a class="sourceLine" id="cb1-36" title="36"></a>
+<a class="sourceLine" id="cb1-37" title="37">f_d &lt;-<span class="st"> </span><span class="cf">function</span>(sv2, params) {</a>
+<a class="sourceLine" id="cb1-38" title="38">  <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(sv2, <span class="dt">mean =</span> params[<span class="dv">1</span>], <span class="dt">sd =</span> params[<span class="dv">2</span>])</a>
+<a class="sourceLine" id="cb1-39" title="39">}</a>
+<a class="sourceLine" id="cb1-40" title="40"></a>
+<a class="sourceLine" id="cb1-41" title="41">fec &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, sv2, params, L, U) {</a>
+<a class="sourceLine" id="cb1-42" title="42">  ev &lt;-<span class="st"> </span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(U, params[<span class="dv">5</span>], params[<span class="dv">6</span>]) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(L, params[<span class="dv">5</span>], params[<span class="dv">6</span>]))</a>
+<a class="sourceLine" id="cb1-43" title="43">  <span class="kw">f_r</span>(sv1, params[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]) <span class="op">*</span><span class="st"> </span><span class="kw">f_s</span>(sv1, params[<span class="dv">3</span><span class="op">:</span><span class="dv">4</span>]) <span class="op">*</span><span class="st"> </span>(<span class="kw">f_d</span>(sv2, params[<span class="dv">5</span><span class="op">:</span><span class="dv">6</span>] <span class="op">/</span><span class="st"> </span>ev))</a>
 <a class="sourceLine" id="cb1-44" title="44">}</a>
 <a class="sourceLine" id="cb1-45" title="45"></a>
-<a class="sourceLine" id="cb1-46" title="46">b  &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">0</span>, <span class="dv">50</span>, <span class="dt">length.out =</span> <span class="dv">101</span>)</a>
-<a class="sourceLine" id="cb1-47" title="47">d1 &lt;-<span class="st"> </span>d2 &lt;-<span class="st"> </span>(b[<span class="dv">2</span><span class="op">:</span><span class="dv">101</span>] <span class="op">+</span><span class="st"> </span>b[<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>]) <span class="op">*</span><span class="st"> </span><span class="fl">0.5</span></a>
-<a class="sourceLine" id="cb1-48" title="48">h  &lt;-<span class="st"> </span>d1[<span class="dv">3</span>] <span class="op">-</span><span class="st"> </span>d1[<span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb1-46" title="46">b &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">0</span>, <span class="dv">50</span>, <span class="dt">length.out =</span> <span class="dv">101</span>)</a>
+<a class="sourceLine" id="cb1-47" title="47">d1 &lt;-<span class="st"> </span>(b[<span class="dv">2</span><span class="op">:</span><span class="dv">101</span>] <span class="op">+</span><span class="st"> </span>b[<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>]) <span class="op">*</span><span class="st"> </span><span class="fl">0.5</span></a>
+<a class="sourceLine" id="cb1-48" title="48">h &lt;-<span class="st"> </span>d1[<span class="dv">3</span>] <span class="op">-</span><span class="st"> </span>d1[<span class="dv">2</span>]</a>
 <a class="sourceLine" id="cb1-49" title="49"></a>
-<a class="sourceLine" id="cb1-50" title="50"></a>
-<a class="sourceLine" id="cb1-51" title="51">G  &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/outer">outer</a></span>(d1, d2, <span class="dt">FUN =</span> g, <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(data_list<span class="op">$</span>g_int,</a>
-<a class="sourceLine" id="cb1-52" title="52">                                        data_list<span class="op">$</span>g_slope,</a>
-<a class="sourceLine" id="cb1-53" title="53">                                        data_list<span class="op">$</span>sd_g))</a>
-<a class="sourceLine" id="cb1-54" title="54">G2 &lt;-<span class="st"> </span>G<span class="op">/</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/vector">as.vector</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(G, <span class="dv">2</span>, sum)),</a>
-<a class="sourceLine" id="cb1-55" title="55">               <span class="dt">nrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(d1),</a>
-<a class="sourceLine" id="cb1-56" title="56">               <span class="dt">ncol =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(d1),</a>
-<a class="sourceLine" id="cb1-57" title="57">               <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb1-58" title="58"></a>
-<a class="sourceLine" id="cb1-59" title="59">S  &lt;-<span class="st"> </span><span class="kw">s</span>(d1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(data_list<span class="op">$</span>s_int, data_list<span class="op">$</span>s_slope))</a>
+<a class="sourceLine" id="cb1-50" title="50">domains &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/expand.grid">expand.grid</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">d2 =</span> d1, <span class="dt">d1 =</span> d1))</a>
+<a class="sourceLine" id="cb1-51" title="51"></a>
+<a class="sourceLine" id="cb1-52" title="52">G &lt;-<span class="st"> </span><span class="kw">g</span>(domains<span class="op">$</span>d2,</a>
+<a class="sourceLine" id="cb1-53" title="53">       domains<span class="op">$</span>d1,</a>
+<a class="sourceLine" id="cb1-54" title="54">       <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(data_list<span class="op">$</span>g_int,</a>
+<a class="sourceLine" id="cb1-55" title="55">                  data_list<span class="op">$</span>g_slope,</a>
+<a class="sourceLine" id="cb1-56" title="56">                  data_list<span class="op">$</span>sd_g),</a>
+<a class="sourceLine" id="cb1-57" title="57">       <span class="dt">L =</span> <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb1-58" title="58">       <span class="dt">U =</span> <span class="dv">50</span>)</a>
+<a class="sourceLine" id="cb1-59" title="59"></a>
 <a class="sourceLine" id="cb1-60" title="60"></a>
-<a class="sourceLine" id="cb1-61" title="61">P  &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(S <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(G2))</a>
-<a class="sourceLine" id="cb1-62" title="62"></a>
-<a class="sourceLine" id="cb1-63" title="63">Fm &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/outer">outer</a></span>(d1, d2, <span class="dt">FUN =</span> fec, <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(data_list[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]))</a>
-<a class="sourceLine" id="cb1-64" title="64"></a>
-<a class="sourceLine" id="cb1-65" title="65">K  &lt;-<span class="st"> </span>P <span class="op">+</span><span class="st"> </span>Fm</a>
-<a class="sourceLine" id="cb1-66" title="66"></a>
-<a class="sourceLine" id="cb1-67" title="67">lambda_usr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(K)<span class="op">$</span>values[<span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb1-68" title="68">w_usr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(K)<span class="op">$</span>vectors[ , <span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb1-69" title="69"></a>
+<a class="sourceLine" id="cb1-61" title="61"></a>
+<a class="sourceLine" id="cb1-62" title="62">S &lt;-<span class="st"> </span><span class="kw">s</span>(d1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(data_list<span class="op">$</span>s_int, data_list<span class="op">$</span>s_slope))</a>
+<a class="sourceLine" id="cb1-63" title="63"></a>
+<a class="sourceLine" id="cb1-64" title="64">P &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(S <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(G))</a>
+<a class="sourceLine" id="cb1-65" title="65"></a>
+<a class="sourceLine" id="cb1-66" title="66">Fm &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw">fec</span>(domains<span class="op">$</span>d2,</a>
+<a class="sourceLine" id="cb1-67" title="67">              domains<span class="op">$</span>d1,</a>
+<a class="sourceLine" id="cb1-68" title="68">              <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(data_list[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
+<a class="sourceLine" id="cb1-69" title="69">              <span class="dt">L =</span> <span class="dv">0</span>, <span class="dt">U =</span> <span class="dv">50</span>)</a>
 <a class="sourceLine" id="cb1-70" title="70"></a>
-<a class="sourceLine" id="cb1-71" title="71"><span class="co"># User specified functions can be passed to make_ipm(usr_funs = list(my_fun = my_fun)).</span></a>
-<a class="sourceLine" id="cb1-72" title="72"><span class="co"># inv_logit is a simple example, but more complicated ones can be specified as well. </span></a>
-<a class="sourceLine" id="cb1-73" title="73"></a>
-<a class="sourceLine" id="cb1-74" title="74">inv_logit &lt;-<span class="st"> </span><span class="cf">function</span>(int, slope, sv) {</a>
-<a class="sourceLine" id="cb1-75" title="75">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(<span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv))))</a>
-<a class="sourceLine" id="cb1-76" title="76">}</a>
-<a class="sourceLine" id="cb1-77" title="77"></a>
-<a class="sourceLine" id="cb1-78" title="78">state_list &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'dbh'</span>))</a>
+<a class="sourceLine" id="cb1-71" title="71">K &lt;-<span class="st"> </span>P <span class="op">+</span><span class="st"> </span>Fm</a>
+<a class="sourceLine" id="cb1-72" title="72"></a>
+<a class="sourceLine" id="cb1-73" title="73">K &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(K, <span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb1-74" title="74"></a>
+<a class="sourceLine" id="cb1-75" title="75"></a>
+<a class="sourceLine" id="cb1-76" title="76">lambda_usr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(K)<span class="op">$</span>values[<span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb1-77" title="77">w &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(K)<span class="op">$</span>vectors[ , <span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb1-78" title="78"></a>
 <a class="sourceLine" id="cb1-79" title="79"></a>
-<a class="sourceLine" id="cb1-80" title="80">x &lt;-<span class="st"> </span><span class="kw"><a href="reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_det'</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb1-81" title="81"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb1-82" title="82">    </a>
-<a class="sourceLine" id="cb1-83" title="83">    <span class="co"># Name of the kernel</span></a>
-<a class="sourceLine" id="cb1-84" title="84">    </a>
-<a class="sourceLine" id="cb1-85" title="85">    <span class="dt">name      =</span> <span class="st">"P"</span>,</a>
-<a class="sourceLine" id="cb1-86" title="86">    </a>
-<a class="sourceLine" id="cb1-87" title="87">    <span class="co"># The type of transition it describes (e.g. continuous - continuous, discrete - continuous)</span></a>
-<a class="sourceLine" id="cb1-88" title="88">    </a>
-<a class="sourceLine" id="cb1-89" title="89">    <span class="dt">family    =</span> <span class="st">"CC"</span>,</a>
-<a class="sourceLine" id="cb1-90" title="90">    </a>
-<a class="sourceLine" id="cb1-91" title="91">    <span class="co"># The formula for the kernel. s_g_mult() is a helper function to make sure the</span></a>
-<a class="sourceLine" id="cb1-92" title="92">    <span class="co"># survival vector is correctly aligned with the kernel.</span></a>
-<a class="sourceLine" id="cb1-93" title="93">    </a>
-<a class="sourceLine" id="cb1-94" title="94">    <span class="dt">formula   =</span> <span class="kw"><a href="reference/fun-mult-helpers.html">s_g_mult</a></span>(s, g),</a>
-<a class="sourceLine" id="cb1-95" title="95">    </a>
-<a class="sourceLine" id="cb1-96" title="96">    <span class="co"># A named set of expressions for the vital rates it includes. </span></a>
-<a class="sourceLine" id="cb1-97" title="97">    </a>
-<a class="sourceLine" id="cb1-98" title="98">    <span class="dt">s         =</span> <span class="kw">inv_logit</span>(s_int, s_slope, dbh_<span class="dv">1</span>), <span class="co"># note the use of user-specified function here</span></a>
-<a class="sourceLine" id="cb1-99" title="99">    <span class="dt">g         =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(dbh_<span class="dv">2</span>, mu_g, sd_g),</a>
-<a class="sourceLine" id="cb1-100" title="100">    <span class="dt">mu_g      =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb1-101" title="101">    <span class="dt">data_list =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb1-102" title="102">      <span class="dt">s_int     =</span> <span class="fl">2.2</span>,</a>
-<a class="sourceLine" id="cb1-103" title="103">      <span class="dt">s_slope   =</span> <span class="fl">0.25</span>,</a>
-<a class="sourceLine" id="cb1-104" title="104">      <span class="dt">g_int     =</span> <span class="fl">0.2</span>,</a>
-<a class="sourceLine" id="cb1-105" title="105">      <span class="dt">g_slope   =</span> <span class="fl">1.02</span>,</a>
-<a class="sourceLine" id="cb1-106" title="106">      <span class="dt">sd_g      =</span> <span class="fl">0.7</span></a>
-<a class="sourceLine" id="cb1-107" title="107">    ),</a>
-<a class="sourceLine" id="cb1-108" title="108">    <span class="dt">states        =</span> state_list,</a>
-<a class="sourceLine" id="cb1-109" title="109">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb1-110" title="110">    </a>
-<a class="sourceLine" id="cb1-111" title="111">    <span class="co"># The evict_fun argument can take any function. ipmr provides built in</span></a>
-<a class="sourceLine" id="cb1-112" title="112">    <span class="co"># truncated density functions, but a user specified one will work as well, </span></a>
-<a class="sourceLine" id="cb1-113" title="113">    <span class="co"># provided all parameters are provided in the data_list argument.</span></a>
-<a class="sourceLine" id="cb1-114" title="114">    </a>
-<a class="sourceLine" id="cb1-115" title="115">    <span class="dt">evict     =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb1-116" title="116">    <span class="dt">evict_fun =</span> <span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(g,</a>
-<a class="sourceLine" id="cb1-117" title="117">                                        <span class="dt">n_mesh_p =</span> <span class="dv">100</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb1-118" title="118"><span class="st">  </span></a>
-<a class="sourceLine" id="cb1-119" title="119"><span class="st">  </span><span class="co"># Define the fecundity kernel</span></a>
-<a class="sourceLine" id="cb1-120" title="120"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb1-121" title="121">    <span class="dt">name      =</span> <span class="st">'F'</span>,</a>
-<a class="sourceLine" id="cb1-122" title="122">    <span class="dt">formula   =</span> f_r <span class="op">*</span><span class="st"> </span>f_s <span class="op">*</span><span class="st"> </span>f_d,</a>
-<a class="sourceLine" id="cb1-123" title="123">    <span class="dt">family    =</span> <span class="st">'CC'</span>,</a>
-<a class="sourceLine" id="cb1-124" title="124">    <span class="dt">f_r       =</span> <span class="kw">inv_logit</span>(f_r_int, f_r_slope, dbh_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb1-125" title="125">    <span class="dt">f_s       =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(f_s_int <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb1-126" title="126">    <span class="dt">f_d       =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(dbh_<span class="dv">2</span>, mu_fd, sd_fd),</a>
-<a class="sourceLine" id="cb1-127" title="127">    <span class="dt">data_list =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb1-128" title="128">      <span class="dt">f_r_int   =</span> <span class="fl">0.03</span>,</a>
-<a class="sourceLine" id="cb1-129" title="129">      <span class="dt">f_r_slope =</span> <span class="fl">0.015</span>,</a>
-<a class="sourceLine" id="cb1-130" title="130">      <span class="dt">f_s_int   =</span> <span class="fl">1.3</span>,</a>
-<a class="sourceLine" id="cb1-131" title="131">      <span class="dt">f_s_slope =</span> <span class="fl">0.075</span>,</a>
-<a class="sourceLine" id="cb1-132" title="132">      <span class="dt">mu_fd     =</span> <span class="fl">0.5</span>,</a>
-<a class="sourceLine" id="cb1-133" title="133">      <span class="dt">sd_fd     =</span> <span class="fl">0.2</span></a>
-<a class="sourceLine" id="cb1-134" title="134">    ),</a>
-<a class="sourceLine" id="cb1-135" title="135">    <span class="dt">states    =</span> state_list,</a>
-<a class="sourceLine" id="cb1-136" title="136">    <span class="dt">evict     =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb1-137" title="137">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb1-138" title="138"><span class="st">  </span><span class="co"># K kernels get their own special define_k function. Rather than use the formula</span></a>
-<a class="sourceLine" id="cb1-139" title="139"><span class="st">  </span><span class="co"># parameter, it simply takes ..., allowing you to specify the form of the iteration</span></a>
-<a class="sourceLine" id="cb1-140" title="140"><span class="st">  </span><span class="co"># kernel and the population vector at T + 1 simulataneously. This is likely to</span></a>
-<a class="sourceLine" id="cb1-141" title="141"><span class="st">  </span><span class="co"># be more useful for stochastic simulation models than deterministic models</span></a>
-<a class="sourceLine" id="cb1-142" title="142"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_k</a></span>(</a>
-<a class="sourceLine" id="cb1-143" title="143">    <span class="dt">name   =</span> <span class="st">"K"</span>,</a>
-<a class="sourceLine" id="cb1-144" title="144">    <span class="dt">K      =</span> P <span class="op">+</span><span class="st"> </span>F,</a>
-<a class="sourceLine" id="cb1-145" title="145">    <span class="dt">family =</span> <span class="st">"IPM"</span>,</a>
-<a class="sourceLine" id="cb1-146" title="146">    <span class="dt">states =</span> state_list,</a>
-<a class="sourceLine" id="cb1-147" title="147">    <span class="dt">evict  =</span> <span class="ot">FALSE</span> <span class="co"># this is dealt with in the sub-kernels, so no need to do so again.</span></a>
-<a class="sourceLine" id="cb1-148" title="148">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb1-149" title="149"><span class="st">  </span><span class="kw"><a href="reference/impl-args.html">define_impl</a></span>(</a>
-<a class="sourceLine" id="cb1-150" title="150">    <span class="dt">kernel_impl_list =</span>  <span class="kw"><a href="reference/impl-args.html">make_impl_args_list</a></span>(</a>
-<a class="sourceLine" id="cb1-151" title="151">      <span class="dt">kernel_names   =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"K"</span>, <span class="st">"P"</span>, <span class="st">"F"</span>),</a>
-<a class="sourceLine" id="cb1-152" title="152">      <span class="dt">int_rule       =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">'midpoint'</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb1-153" title="153">      <span class="dt">dom_start      =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">'dbh'</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb1-154" title="154">      <span class="dt">dom_end        =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">'dbh'</span>, <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb1-155" title="155">    )</a>
-<a class="sourceLine" id="cb1-156" title="156">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb1-157" title="157"><span class="st">  </span><span class="kw"><a href="reference/doms-n-states.html">define_domains</a></span>(</a>
-<a class="sourceLine" id="cb1-158" title="158">    <span class="dt">dbh =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="co"># the first entry is the lower bound of the domain.</span></a>
-<a class="sourceLine" id="cb1-159" title="159">            <span class="dv">50</span>, <span class="co"># the second entry is the upper bound of the domain.</span></a>
-<a class="sourceLine" id="cb1-160" title="160">            <span class="dv">100</span> <span class="co"># third entry is the number of meshpoints for the domain.</span></a>
-<a class="sourceLine" id="cb1-161" title="161">    )</a>
-<a class="sourceLine" id="cb1-162" title="162">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb1-163" title="163"><span class="st">  </span><span class="kw"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">inv_logit =</span> inv_logit))</a>
+<a class="sourceLine" id="cb1-80" title="80"><span class="co"># User specified functions can be passed to make_ipm(usr_funs = list(my_fun = my_fun)).</span></a>
+<a class="sourceLine" id="cb1-81" title="81"><span class="co"># inv_logit is a simple example, but more complicated ones can be specified as well. </span></a>
+<a class="sourceLine" id="cb1-82" title="82"></a>
+<a class="sourceLine" id="cb1-83" title="83">inv_logit &lt;-<span class="st"> </span><span class="cf">function</span>(int, slope, sv) {</a>
+<a class="sourceLine" id="cb1-84" title="84">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(<span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv))))</a>
+<a class="sourceLine" id="cb1-85" title="85">}</a>
+<a class="sourceLine" id="cb1-86" title="86"></a>
+<a class="sourceLine" id="cb1-87" title="87"></a>
+<a class="sourceLine" id="cb1-88" title="88">impl_args &lt;-<span class="st"> </span><span class="kw"><a href="reference/define_star.html">make_impl_args_list</a></span>(</a>
+<a class="sourceLine" id="cb1-89" title="89">  <span class="dt">kernel_names =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"K"</span>, <span class="st">"P"</span>, <span class="st">"F"</span>),</a>
+<a class="sourceLine" id="cb1-90" title="90">  <span class="dt">int_rule     =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"midpoint"</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb1-91" title="91">  <span class="dt">dom_start    =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"dbh"</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb1-92" title="92">  <span class="dt">dom_end      =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"dbh"</span>, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb1-93" title="93">)</a>
+<a class="sourceLine" id="cb1-94" title="94">states &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'dbh'</span>))</a>
+<a class="sourceLine" id="cb1-95" title="95"></a>
+<a class="sourceLine" id="cb1-96" title="96">x &lt;-<span class="st"> </span><span class="kw"><a href="reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_det'</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb1-97" title="97"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb1-98" title="98">    </a>
+<a class="sourceLine" id="cb1-99" title="99">    <span class="co"># Name of the kernel</span></a>
+<a class="sourceLine" id="cb1-100" title="100">    </a>
+<a class="sourceLine" id="cb1-101" title="101">    <span class="dt">name      =</span> <span class="st">"P"</span>,</a>
+<a class="sourceLine" id="cb1-102" title="102">    </a>
+<a class="sourceLine" id="cb1-103" title="103">    <span class="co"># The type of transition it describes (e.g. continuous - continuous, discrete - continuous)</span></a>
+<a class="sourceLine" id="cb1-104" title="104">    </a>
+<a class="sourceLine" id="cb1-105" title="105">    <span class="dt">family    =</span> <span class="st">"CC"</span>,</a>
+<a class="sourceLine" id="cb1-106" title="106">    </a>
+<a class="sourceLine" id="cb1-107" title="107">    <span class="co"># The formula for the kernel. s_g_mult() is a helper function to make sure the</span></a>
+<a class="sourceLine" id="cb1-108" title="108">    <span class="co"># survival vector is correctly aligned with the kernel.</span></a>
+<a class="sourceLine" id="cb1-109" title="109">    </a>
+<a class="sourceLine" id="cb1-110" title="110">    <span class="dt">formula   =</span> <span class="kw"><a href="reference/fun-mult-helpers.html">s_g_mult</a></span>(s, g),</a>
+<a class="sourceLine" id="cb1-111" title="111">    </a>
+<a class="sourceLine" id="cb1-112" title="112">    <span class="co"># A named set of expressions for the vital rates it includes. </span></a>
+<a class="sourceLine" id="cb1-113" title="113">    <span class="co"># note the use of user-specified functions here. Additionally, each </span></a>
+<a class="sourceLine" id="cb1-114" title="114">    <span class="co"># state variable has an L_StateVariable and U_StateVariable_ internally defined</span></a>
+<a class="sourceLine" id="cb1-115" title="115">    <span class="co"># for the domain associated with it, so you can reference those when </span></a>
+<a class="sourceLine" id="cb1-116" title="116">    <span class="co"># when specifying your own functions. </span></a>
+<a class="sourceLine" id="cb1-117" title="117">    </a>
+<a class="sourceLine" id="cb1-118" title="118">    <span class="dt">s         =</span> <span class="kw">inv_logit</span>(s_int, s_slope, dbh_<span class="dv">1</span>), </a>
+<a class="sourceLine" id="cb1-119" title="119">    <span class="dt">g         =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(dbh_<span class="dv">2</span>, mu_g, sd_g),</a>
+<a class="sourceLine" id="cb1-120" title="120">    <span class="dt">mu_g      =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb1-121" title="121"></a>
+<a class="sourceLine" id="cb1-122" title="122">    <span class="dt">data_list =</span> data_list,</a>
+<a class="sourceLine" id="cb1-123" title="123">    <span class="dt">states    =</span> states,</a>
+<a class="sourceLine" id="cb1-124" title="124">    <span class="dt">evict     =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb1-125" title="125">    <span class="dt">evict_fun =</span> <span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(<span class="st">'norm'</span>,</a>
+<a class="sourceLine" id="cb1-126" title="126">                                        <span class="st">'g'</span>)</a>
+<a class="sourceLine" id="cb1-127" title="127">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb1-128" title="128"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_kernel</a></span>(<span class="st">'F'</span>,</a>
+<a class="sourceLine" id="cb1-129" title="129">                <span class="dt">formula   =</span> f_r <span class="op">*</span><span class="st"> </span>f_s <span class="op">*</span><span class="st"> </span>f_d,</a>
+<a class="sourceLine" id="cb1-130" title="130">                <span class="dt">family    =</span> <span class="st">'CC'</span>,</a>
+<a class="sourceLine" id="cb1-131" title="131">                <span class="dt">f_r       =</span> <span class="kw">inv_logit</span>(f_r_int, f_r_slope, dbh_<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb1-132" title="132">                <span class="dt">f_s       =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(f_s_int <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb1-133" title="133">                <span class="dt">f_d       =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(dbh_<span class="dv">2</span>, mu_fd, sd_fd),</a>
+<a class="sourceLine" id="cb1-134" title="134">                <span class="dt">data_list =</span> data_list,</a>
+<a class="sourceLine" id="cb1-135" title="135">                <span class="dt">states    =</span> states,</a>
+<a class="sourceLine" id="cb1-136" title="136">                <span class="dt">evict     =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb1-137" title="137">                <span class="dt">evict_fun =</span> <span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(<span class="st">'norm'</span>,</a>
+<a class="sourceLine" id="cb1-138" title="138">                                                    <span class="st">'f_d'</span>)</a>
+<a class="sourceLine" id="cb1-139" title="139">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb1-140" title="140"><span class="st">  </span></a>
+<a class="sourceLine" id="cb1-141" title="141"><span class="st">  </span><span class="co"># K kernels get their own special define_k function. Rather than use the formula</span></a>
+<a class="sourceLine" id="cb1-142" title="142"><span class="st">  </span><span class="co"># parameter, it simply takes ..., allowing you to specify the form of the iteration</span></a>
+<a class="sourceLine" id="cb1-143" title="143"><span class="st">  </span><span class="co"># kernel and the population vector at T + 1 simulataneously. This is likely to</span></a>
+<a class="sourceLine" id="cb1-144" title="144"><span class="st">  </span><span class="co"># be more useful for stochastic simulation models than deterministic models</span></a>
+<a class="sourceLine" id="cb1-145" title="145"><span class="st">  </span></a>
+<a class="sourceLine" id="cb1-146" title="146"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_k</a></span>(<span class="st">'K'</span>,</a>
+<a class="sourceLine" id="cb1-147" title="147">           <span class="dt">K         =</span> P <span class="op">+</span><span class="st"> </span>F,</a>
+<a class="sourceLine" id="cb1-148" title="148">           <span class="dt">family    =</span> <span class="st">'IPM'</span>,</a>
+<a class="sourceLine" id="cb1-149" title="149">           <span class="dt">data_list =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(),</a>
+<a class="sourceLine" id="cb1-150" title="150">           <span class="dt">states    =</span> states,</a>
+<a class="sourceLine" id="cb1-151" title="151">           <span class="dt">evict     =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb1-152" title="152"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_impl</a></span>(impl_args) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb1-153" title="153"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_domains</a></span>(</a>
+<a class="sourceLine" id="cb1-154" title="154">    <span class="dt">dbh =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="co"># the first entry is the lower bound of the domain.</span></a>
+<a class="sourceLine" id="cb1-155" title="155">            <span class="dv">50</span>, <span class="co"># the second entry is the upper bound of the domain.</span></a>
+<a class="sourceLine" id="cb1-156" title="156">            <span class="dv">100</span> <span class="co"># third entry is the number of meshpoints for the domain.</span></a>
+<a class="sourceLine" id="cb1-157" title="157">    ) </a>
+<a class="sourceLine" id="cb1-158" title="158">  )  <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb1-159" title="159"><span class="st">  </span><span class="kw"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">inv_logit =</span> inv_logit))</a>
+<a class="sourceLine" id="cb1-160" title="160"></a>
+<a class="sourceLine" id="cb1-161" title="161"></a>
+<a class="sourceLine" id="cb1-162" title="162">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(x<span class="op">$</span>iterators<span class="op">$</span>K)<span class="op">$</span>values[<span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb1-163" title="163">w_ipmr      &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(x<span class="op">$</span>iterators<span class="op">$</span>K)<span class="op">$</span>vectors[ , <span class="dv">1</span>])</a>
 <a class="sourceLine" id="cb1-164" title="164"></a>
-<a class="sourceLine" id="cb1-165" title="165">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(x<span class="op">$</span>iterators<span class="op">$</span>K)<span class="op">$</span>values[<span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb1-166" title="166">w_ipmr      &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(x<span class="op">$</span>iterators<span class="op">$</span>K)<span class="op">$</span>vectors[ , <span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb1-167" title="167"></a>
-<a class="sourceLine" id="cb1-168" title="168">lambda_ipmr <span class="op">-</span><span class="st"> </span>lambda_usr</a></code></pre></div>
+<a class="sourceLine" id="cb1-165" title="165"></a>
+<a class="sourceLine" id="cb1-166" title="166">lambda_ipmr <span class="op">-</span><span class="st"> </span>lambda_usr</a></code></pre></div>
 </div>
 <div id="simple-density-independent-stochastic-kernel-resampled-models" class="section level2">
 <h2 class="hasAnchor">
@@ -358,272 +342,304 @@
 <a class="sourceLine" id="cb2-8" title="8"></a>
 <a class="sourceLine" id="cb2-9" title="9"><span class="co"># define functions for target ipm</span></a>
 <a class="sourceLine" id="cb2-10" title="10"></a>
-<a class="sourceLine" id="cb2-11" title="11"><span class="co"># Survival - logistic regression</span></a>
-<a class="sourceLine" id="cb2-12" title="12">s &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params, r_effect) {</a>
-<a class="sourceLine" id="cb2-13" title="13">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1 <span class="op">+</span><span class="st"> </span>r_effect))) <span class="op">*</span></a>
-<a class="sourceLine" id="cb2-14" title="14"><span class="st">    </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">f_r</span>(sv1, params[<span class="dv">3</span><span class="op">:</span><span class="dv">4</span>]))</a>
-<a class="sourceLine" id="cb2-15" title="15">}</a>
-<a class="sourceLine" id="cb2-16" title="16"></a>
-<a class="sourceLine" id="cb2-17" title="17"><span class="co"># Growth</span></a>
-<a class="sourceLine" id="cb2-18" title="18">g &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, sv2, params, r_effect) {</a>
-<a class="sourceLine" id="cb2-19" title="19">  mu &lt;-<span class="st"> </span>params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1 <span class="op">+</span><span class="st"> </span>r_effect</a>
-<a class="sourceLine" id="cb2-20" title="20">  <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(sv2, <span class="dt">mean =</span> mu, <span class="dt">sd =</span> params[<span class="dv">3</span>])</a>
-<a class="sourceLine" id="cb2-21" title="21">}</a>
-<a class="sourceLine" id="cb2-22" title="22"></a>
-<a class="sourceLine" id="cb2-23" title="23"><span class="co"># probability of reproducing</span></a>
-<a class="sourceLine" id="cb2-24" title="24">f_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params) {</a>
-<a class="sourceLine" id="cb2-25" title="25">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)))</a>
-<a class="sourceLine" id="cb2-26" title="26">}</a>
-<a class="sourceLine" id="cb2-27" title="27"></a>
-<a class="sourceLine" id="cb2-28" title="28"><span class="co"># offspring production</span></a>
-<a class="sourceLine" id="cb2-29" title="29">f_s &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params, r_effect) {</a>
-<a class="sourceLine" id="cb2-30" title="30">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1 <span class="op">+</span><span class="st"> </span>r_effect)</a>
-<a class="sourceLine" id="cb2-31" title="31">}</a>
-<a class="sourceLine" id="cb2-32" title="32"></a>
-<a class="sourceLine" id="cb2-33" title="33"><span class="co"># offspring size distribution</span></a>
-<a class="sourceLine" id="cb2-34" title="34">f_d &lt;-<span class="st"> </span><span class="cf">function</span>(sv2, params) {</a>
-<a class="sourceLine" id="cb2-35" title="35">  <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(sv2, <span class="dt">mean =</span> params[<span class="dv">1</span>], <span class="dt">sd =</span> params[<span class="dv">2</span>])</a>
-<a class="sourceLine" id="cb2-36" title="36">}</a>
-<a class="sourceLine" id="cb2-37" title="37"></a>
-<a class="sourceLine" id="cb2-38" title="38"><span class="co"># constructor function for the F kernel</span></a>
-<a class="sourceLine" id="cb2-39" title="39">fec &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, sv2, params, r_effect) {</a>
-<a class="sourceLine" id="cb2-40" title="40">  <span class="kw">f_r</span>(sv1, params[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]) <span class="op">*</span><span class="st"> </span><span class="kw">f_s</span>(sv1, params[<span class="dv">3</span><span class="op">:</span><span class="dv">4</span>], r_effect) <span class="op">*</span><span class="st"> </span><span class="kw">f_d</span>(sv2, params[<span class="dv">5</span><span class="op">:</span><span class="dv">6</span>])</a>
-<a class="sourceLine" id="cb2-41" title="41">}</a>
-<a class="sourceLine" id="cb2-42" title="42"></a>
-<a class="sourceLine" id="cb2-43" title="43"></a>
-<a class="sourceLine" id="cb2-44" title="44"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">50127</span>)</a>
+<a class="sourceLine" id="cb2-11" title="11"></a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="co"># Survival - logistic regression</span></a>
+<a class="sourceLine" id="cb2-13" title="13">s &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params, r_effect) {</a>
+<a class="sourceLine" id="cb2-14" title="14">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1 <span class="op">+</span><span class="st"> </span>r_effect))) <span class="op">*</span></a>
+<a class="sourceLine" id="cb2-15" title="15"><span class="st">    </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">f_r</span>(sv1, params[<span class="dv">3</span><span class="op">:</span><span class="dv">4</span>]))</a>
+<a class="sourceLine" id="cb2-16" title="16">}</a>
+<a class="sourceLine" id="cb2-17" title="17"></a>
+<a class="sourceLine" id="cb2-18" title="18"><span class="co"># Growth</span></a>
+<a class="sourceLine" id="cb2-19" title="19">g &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, sv2, params, r_effect, L, U) {</a>
+<a class="sourceLine" id="cb2-20" title="20">  mu &lt;-<span class="st"> </span>params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1 <span class="op">+</span><span class="st"> </span>r_effect</a>
+<a class="sourceLine" id="cb2-21" title="21">  ev &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(U, mu, params[<span class="dv">3</span>]) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(L, mu, params[<span class="dv">3</span>])</a>
+<a class="sourceLine" id="cb2-22" title="22">  <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(sv2, <span class="dt">mean =</span> mu, <span class="dt">sd =</span> params[<span class="dv">3</span>]) <span class="op">/</span><span class="st"> </span>ev</a>
+<a class="sourceLine" id="cb2-23" title="23">}</a>
+<a class="sourceLine" id="cb2-24" title="24"></a>
+<a class="sourceLine" id="cb2-25" title="25"><span class="co"># probability of reproducing</span></a>
+<a class="sourceLine" id="cb2-26" title="26">f_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params) {</a>
+<a class="sourceLine" id="cb2-27" title="27">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)))</a>
+<a class="sourceLine" id="cb2-28" title="28">}</a>
+<a class="sourceLine" id="cb2-29" title="29"></a>
+<a class="sourceLine" id="cb2-30" title="30"><span class="co"># offspring production</span></a>
+<a class="sourceLine" id="cb2-31" title="31">f_s &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params, r_effect) {</a>
+<a class="sourceLine" id="cb2-32" title="32">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1 <span class="op">+</span><span class="st"> </span>r_effect)</a>
+<a class="sourceLine" id="cb2-33" title="33">}</a>
+<a class="sourceLine" id="cb2-34" title="34"></a>
+<a class="sourceLine" id="cb2-35" title="35"><span class="co"># offspring size distribution</span></a>
+<a class="sourceLine" id="cb2-36" title="36">f_d &lt;-<span class="st"> </span><span class="cf">function</span>(sv2, params, L, U) {</a>
+<a class="sourceLine" id="cb2-37" title="37">  ev &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(U, params[<span class="dv">1</span>], params[<span class="dv">2</span>]) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(L, params[<span class="dv">1</span>], params[<span class="dv">2</span>])</a>
+<a class="sourceLine" id="cb2-38" title="38">  <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(sv2, <span class="dt">mean =</span> params[<span class="dv">1</span>], <span class="dt">sd =</span> params[<span class="dv">2</span>]) <span class="op">/</span><span class="st"> </span>ev</a>
+<a class="sourceLine" id="cb2-39" title="39">}</a>
+<a class="sourceLine" id="cb2-40" title="40"></a>
+<a class="sourceLine" id="cb2-41" title="41"><span class="co"># constructor function for the F kernel</span></a>
+<a class="sourceLine" id="cb2-42" title="42">fec &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, sv2, params, r_effect, L, U) {</a>
+<a class="sourceLine" id="cb2-43" title="43">  <span class="kw">f_r</span>(sv1, params[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]) <span class="op">*</span><span class="st"> </span><span class="kw">f_s</span>(sv1, params[<span class="dv">3</span><span class="op">:</span><span class="dv">4</span>], r_effect) <span class="op">*</span><span class="st"> </span><span class="kw">f_d</span>(sv2, params[<span class="dv">5</span><span class="op">:</span><span class="dv">6</span>], L, U)</a>
+<a class="sourceLine" id="cb2-44" title="44">}</a>
 <a class="sourceLine" id="cb2-45" title="45"></a>
 <a class="sourceLine" id="cb2-46" title="46"></a>
-<a class="sourceLine" id="cb2-47" title="47"><span class="co"># Define some fixed parameters</span></a>
-<a class="sourceLine" id="cb2-48" title="48">data_list =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb2-49" title="49">  <span class="dt">s_int     =</span> <span class="fl">1.03</span>,</a>
-<a class="sourceLine" id="cb2-50" title="50">  <span class="dt">s_slope   =</span> <span class="fl">2.2</span>,</a>
-<a class="sourceLine" id="cb2-51" title="51">  <span class="dt">g_int     =</span> <span class="dv">8</span>,</a>
-<a class="sourceLine" id="cb2-52" title="52">  <span class="dt">g_slope   =</span> <span class="fl">0.92</span>,</a>
-<a class="sourceLine" id="cb2-53" title="53">  <span class="dt">sd_g      =</span> <span class="fl">0.9</span>,</a>
-<a class="sourceLine" id="cb2-54" title="54">  <span class="dt">f_r_int   =</span> <span class="fl">0.09</span>,</a>
-<a class="sourceLine" id="cb2-55" title="55">  <span class="dt">f_r_slope =</span> <span class="fl">0.05</span>,</a>
-<a class="sourceLine" id="cb2-56" title="56">  <span class="dt">f_s_int   =</span> <span class="fl">0.1</span>,</a>
-<a class="sourceLine" id="cb2-57" title="57">  <span class="dt">f_s_slope =</span> <span class="fl">0.005</span>,</a>
-<a class="sourceLine" id="cb2-58" title="58">  <span class="dt">mu_fd     =</span> <span class="dv">9</span>,</a>
-<a class="sourceLine" id="cb2-59" title="59">  <span class="dt">sd_fd     =</span> <span class="dv">2</span></a>
-<a class="sourceLine" id="cb2-60" title="60">)</a>
-<a class="sourceLine" id="cb2-61" title="61"></a>
-<a class="sourceLine" id="cb2-62" title="62"><span class="co"># Now, simulate some random intercepts for growth, survival, and offspring production</span></a>
-<a class="sourceLine" id="cb2-63" title="63"></a>
-<a class="sourceLine" id="cb2-64" title="64">g_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.3</span>)</a>
-<a class="sourceLine" id="cb2-65" title="65">s_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.7</span>)</a>
-<a class="sourceLine" id="cb2-66" title="66">f_s_r_int &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.2</span>)</a>
-<a class="sourceLine" id="cb2-67" title="67"></a>
-<a class="sourceLine" id="cb2-68" title="68">nms &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">"r_"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dt">sep =</span> <span class="st">""</span>)</a>
-<a class="sourceLine" id="cb2-69" title="69"></a>
-<a class="sourceLine" id="cb2-70" title="70"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(g_r_int)   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">'g_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
-<a class="sourceLine" id="cb2-71" title="71"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(s_r_int)   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">'s_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
-<a class="sourceLine" id="cb2-72" title="72"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(f_s_r_int) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">'f_s_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
-<a class="sourceLine" id="cb2-73" title="73"></a>
-<a class="sourceLine" id="cb2-74" title="74"><span class="co"># The !!! operator used inside of list2 from rlang takes the named vector</span></a>
-<a class="sourceLine" id="cb2-75" title="75"><span class="co"># and converts it to a named list. This can be spliced into the data list </span></a>
-<a class="sourceLine" id="cb2-76" title="76"><span class="co"># to rapidly make a parameter set suitable for usage in the data_list argument</span></a>
-<a class="sourceLine" id="cb2-77" title="77"><span class="co"># of define_kernel</span></a>
-<a class="sourceLine" id="cb2-78" title="78"></a>
-<a class="sourceLine" id="cb2-79" title="79">g_params   &lt;-<span class="st"> </span><span class="kw">list2</span>(<span class="op">!!!</span><span class="st"> </span>g_r_int)</a>
-<a class="sourceLine" id="cb2-80" title="80">s_params   &lt;-<span class="st"> </span><span class="kw">list2</span>(<span class="op">!!!</span><span class="st"> </span>s_r_int)</a>
-<a class="sourceLine" id="cb2-81" title="81">f_s_params &lt;-<span class="st"> </span><span class="kw">list2</span>(<span class="op">!!!</span><span class="st"> </span>f_s_r_int)</a>
-<a class="sourceLine" id="cb2-82" title="82"></a>
-<a class="sourceLine" id="cb2-83" title="83">params     &lt;-<span class="st"> </span><span class="kw">splice</span>(data_list, g_params, s_params, f_s_params)</a>
-<a class="sourceLine" id="cb2-84" title="84"></a>
+<a class="sourceLine" id="cb2-47" title="47"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">50127</span>)</a>
+<a class="sourceLine" id="cb2-48" title="48"></a>
+<a class="sourceLine" id="cb2-49" title="49"></a>
+<a class="sourceLine" id="cb2-50" title="50"><span class="co"># Define some fixed parameters</span></a>
+<a class="sourceLine" id="cb2-51" title="51">data_list =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
+<a class="sourceLine" id="cb2-52" title="52">  <span class="dt">s_int     =</span> <span class="fl">1.03</span>,</a>
+<a class="sourceLine" id="cb2-53" title="53">  <span class="dt">s_slope   =</span> <span class="fl">2.2</span>,</a>
+<a class="sourceLine" id="cb2-54" title="54">  <span class="dt">g_int     =</span> <span class="dv">8</span>,</a>
+<a class="sourceLine" id="cb2-55" title="55">  <span class="dt">g_slope   =</span> <span class="fl">0.92</span>,</a>
+<a class="sourceLine" id="cb2-56" title="56">  <span class="dt">sd_g      =</span> <span class="fl">0.9</span>,</a>
+<a class="sourceLine" id="cb2-57" title="57">  <span class="dt">f_r_int   =</span> <span class="fl">0.09</span>,</a>
+<a class="sourceLine" id="cb2-58" title="58">  <span class="dt">f_r_slope =</span> <span class="fl">0.05</span>,</a>
+<a class="sourceLine" id="cb2-59" title="59">  <span class="dt">f_s_int   =</span> <span class="fl">0.1</span>,</a>
+<a class="sourceLine" id="cb2-60" title="60">  <span class="dt">f_s_slope =</span> <span class="fl">0.005</span>,</a>
+<a class="sourceLine" id="cb2-61" title="61">  <span class="dt">mu_fd     =</span> <span class="dv">9</span>,</a>
+<a class="sourceLine" id="cb2-62" title="62">  <span class="dt">sd_fd     =</span> <span class="dv">2</span></a>
+<a class="sourceLine" id="cb2-63" title="63">)</a>
+<a class="sourceLine" id="cb2-64" title="64"></a>
+<a class="sourceLine" id="cb2-65" title="65"><span class="co"># Now, simulate some random intercepts for growth, survival, and offspring production</span></a>
+<a class="sourceLine" id="cb2-66" title="66"></a>
+<a class="sourceLine" id="cb2-67" title="67">g_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.3</span>)</a>
+<a class="sourceLine" id="cb2-68" title="68">s_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.7</span>)</a>
+<a class="sourceLine" id="cb2-69" title="69">f_s_r_int &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.2</span>)</a>
+<a class="sourceLine" id="cb2-70" title="70"></a>
+<a class="sourceLine" id="cb2-71" title="71">nms &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">"r_"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dt">sep =</span> <span class="st">""</span>)</a>
+<a class="sourceLine" id="cb2-72" title="72"></a>
+<a class="sourceLine" id="cb2-73" title="73"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(g_r_int)   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">'g_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
+<a class="sourceLine" id="cb2-74" title="74"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(s_r_int)   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">'s_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
+<a class="sourceLine" id="cb2-75" title="75"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(f_s_r_int) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">'f_s_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
+<a class="sourceLine" id="cb2-76" title="76"></a>
+<a class="sourceLine" id="cb2-77" title="77"><span class="co"># The !!! operator used inside of list2 from rlang takes the named vector</span></a>
+<a class="sourceLine" id="cb2-78" title="78"><span class="co"># and converts it to a named list. This can be spliced into the data list</span></a>
+<a class="sourceLine" id="cb2-79" title="79"><span class="co"># to rapidly make a parameter set suitable for usage in the data_list argument</span></a>
+<a class="sourceLine" id="cb2-80" title="80"><span class="co"># of define_kernel</span></a>
+<a class="sourceLine" id="cb2-81" title="81"></a>
+<a class="sourceLine" id="cb2-82" title="82">g_params   &lt;-<span class="st"> </span><span class="kw">list2</span>(<span class="op">!!!</span><span class="st"> </span>g_r_int)</a>
+<a class="sourceLine" id="cb2-83" title="83">s_params   &lt;-<span class="st"> </span><span class="kw">list2</span>(<span class="op">!!!</span><span class="st"> </span>s_r_int)</a>
+<a class="sourceLine" id="cb2-84" title="84">f_s_params &lt;-<span class="st"> </span><span class="kw">list2</span>(<span class="op">!!!</span><span class="st"> </span>f_s_r_int)</a>
 <a class="sourceLine" id="cb2-85" title="85"></a>
-<a class="sourceLine" id="cb2-86" title="86">b   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="fl">0.2</span>, <span class="dv">40</span>, <span class="dt">length.out =</span> <span class="dv">101</span>)</a>
+<a class="sourceLine" id="cb2-86" title="86">params     &lt;-<span class="st"> </span><span class="kw">splice</span>(data_list, g_params, s_params, f_s_params)</a>
 <a class="sourceLine" id="cb2-87" title="87"></a>
-<a class="sourceLine" id="cb2-88" title="88">sv1 &lt;-<span class="st"> </span>sv2 &lt;-<span class="st"> </span>(b[<span class="dv">2</span><span class="op">:</span><span class="dv">101</span>] <span class="op">+</span><span class="st"> </span>b[<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>]) <span class="op">*</span><span class="st"> </span><span class="fl">0.5</span></a>
-<a class="sourceLine" id="cb2-89" title="89"></a>
-<a class="sourceLine" id="cb2-90" title="90">h   &lt;-<span class="st"> </span>sv1[<span class="dv">2</span>] <span class="op">-</span><span class="st"> </span>sv1[<span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb2-91" title="91"></a>
-<a class="sourceLine" id="cb2-92" title="92"><span class="co"># repetitive to demonstrate the typical kernel construction process.</span></a>
-<a class="sourceLine" id="cb2-93" title="93"></a>
-<a class="sourceLine" id="cb2-94" title="94">g_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/outer">outer</a></span>(sv1, sv2, <span class="dt">FUN =</span> g, <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
-<a class="sourceLine" id="cb2-95" title="95">                                               params<span class="op">$</span>g_slope,</a>
-<a class="sourceLine" id="cb2-96" title="96">                                               params<span class="op">$</span>sd_g),</a>
-<a class="sourceLine" id="cb2-97" title="97">                 <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb2-88" title="88"></a>
+<a class="sourceLine" id="cb2-89" title="89">b   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="fl">0.2</span>, <span class="dv">40</span>, <span class="dt">length.out =</span> <span class="dv">101</span>)</a>
+<a class="sourceLine" id="cb2-90" title="90"></a>
+<a class="sourceLine" id="cb2-91" title="91">sv1 &lt;-<span class="st"> </span>(b[<span class="dv">2</span><span class="op">:</span><span class="dv">101</span>] <span class="op">+</span><span class="st"> </span>b[<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>]) <span class="op">*</span><span class="st"> </span><span class="fl">0.5</span></a>
+<a class="sourceLine" id="cb2-92" title="92"></a>
+<a class="sourceLine" id="cb2-93" title="93">domains &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/expand.grid">expand.grid</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">d2 =</span> sv1, <span class="dt">d1 =</span> sv1))</a>
+<a class="sourceLine" id="cb2-94" title="94"></a>
+<a class="sourceLine" id="cb2-95" title="95">h   &lt;-<span class="st"> </span>sv1[<span class="dv">2</span>] <span class="op">-</span><span class="st"> </span>sv1[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb2-96" title="96"></a>
+<a class="sourceLine" id="cb2-97" title="97"><span class="co"># repetitive to demonstrate the typical kernel construction process.</span></a>
 <a class="sourceLine" id="cb2-98" title="98"></a>
-<a class="sourceLine" id="cb2-99" title="99">g_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/outer">outer</a></span>(sv1, sv2, <span class="dt">FUN =</span> g, <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
-<a class="sourceLine" id="cb2-100" title="100">                                               params<span class="op">$</span>g_slope,</a>
-<a class="sourceLine" id="cb2-101" title="101">                                               params<span class="op">$</span>sd_g),</a>
-<a class="sourceLine" id="cb2-102" title="102">                 <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb2-103" title="103">g_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/outer">outer</a></span>(sv1, sv2, <span class="dt">FUN =</span> g, <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
-<a class="sourceLine" id="cb2-104" title="104">                                               params<span class="op">$</span>g_slope,</a>
-<a class="sourceLine" id="cb2-105" title="105">                                               params<span class="op">$</span>sd_g),</a>
-<a class="sourceLine" id="cb2-106" title="106">                 <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb2-107" title="107"></a>
-<a class="sourceLine" id="cb2-108" title="108">g_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/outer">outer</a></span>(sv1, sv2, <span class="dt">FUN =</span> g, <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
-<a class="sourceLine" id="cb2-109" title="109">                                               params<span class="op">$</span>g_slope,</a>
-<a class="sourceLine" id="cb2-110" title="110">                                               params<span class="op">$</span>sd_g),</a>
-<a class="sourceLine" id="cb2-111" title="111">                 <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb2-112" title="112"></a>
-<a class="sourceLine" id="cb2-113" title="113">g_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/outer">outer</a></span>(sv1, sv2, <span class="dt">FUN =</span> g, <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
-<a class="sourceLine" id="cb2-114" title="114">                                               params<span class="op">$</span>g_slope,</a>
-<a class="sourceLine" id="cb2-115" title="115">                                               params<span class="op">$</span>sd_g),</a>
-<a class="sourceLine" id="cb2-116" title="116">                 <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb2-117" title="117"></a>
-<a class="sourceLine" id="cb2-118" title="118">g_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(g_<span class="dv">1</span>, <span class="dt">n_mesh_p =</span> <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb2-119" title="119">g_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(g_<span class="dv">2</span>, <span class="dt">n_mesh_p =</span> <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb2-120" title="120">g_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(g_<span class="dv">3</span>, <span class="dt">n_mesh_p =</span> <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb2-121" title="121">g_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(g_<span class="dv">4</span>, <span class="dt">n_mesh_p =</span> <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb2-122" title="122">g_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(g_<span class="dv">5</span>, <span class="dt">n_mesh_p =</span> <span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb2-99" title="99">g_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">g</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
+<a class="sourceLine" id="cb2-100" title="100">         <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
+<a class="sourceLine" id="cb2-101" title="101">                    params<span class="op">$</span>g_slope,</a>
+<a class="sourceLine" id="cb2-102" title="102">                    params<span class="op">$</span>sd_g),</a>
+<a class="sourceLine" id="cb2-103" title="103">         <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb2-104" title="104">         <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb2-105" title="105">         <span class="dt">U =</span> <span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb2-106" title="106"></a>
+<a class="sourceLine" id="cb2-107" title="107">g_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">g</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
+<a class="sourceLine" id="cb2-108" title="108">         <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
+<a class="sourceLine" id="cb2-109" title="109">                    params<span class="op">$</span>g_slope,</a>
+<a class="sourceLine" id="cb2-110" title="110">                    params<span class="op">$</span>sd_g),</a>
+<a class="sourceLine" id="cb2-111" title="111">         <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb2-112" title="112">         <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb2-113" title="113">         <span class="dt">U =</span> <span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb2-114" title="114"></a>
+<a class="sourceLine" id="cb2-115" title="115">g_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">g</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
+<a class="sourceLine" id="cb2-116" title="116">         <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
+<a class="sourceLine" id="cb2-117" title="117">                    params<span class="op">$</span>g_slope,</a>
+<a class="sourceLine" id="cb2-118" title="118">                    params<span class="op">$</span>sd_g),</a>
+<a class="sourceLine" id="cb2-119" title="119">         <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">3</span>,</a>
+<a class="sourceLine" id="cb2-120" title="120">         <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb2-121" title="121">         <span class="dt">U =</span> <span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb2-122" title="122"></a>
 <a class="sourceLine" id="cb2-123" title="123"></a>
-<a class="sourceLine" id="cb2-124" title="124">s_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
-<a class="sourceLine" id="cb2-125" title="125">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb2-126" title="126">s_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
-<a class="sourceLine" id="cb2-127" title="127">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb2-128" title="128">s_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
-<a class="sourceLine" id="cb2-129" title="129">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb2-130" title="130">s_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
-<a class="sourceLine" id="cb2-131" title="131">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb2-132" title="132">s_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
-<a class="sourceLine" id="cb2-133" title="133">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb2-134" title="134"></a>
-<a class="sourceLine" id="cb2-135" title="135">P_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">1</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">1</span>)) <span class="op">*</span><span class="st"> </span>h</a>
-<a class="sourceLine" id="cb2-136" title="136">P_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>h</a>
-<a class="sourceLine" id="cb2-137" title="137">P_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">3</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>h</a>
-<a class="sourceLine" id="cb2-138" title="138">P_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">4</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">4</span>)) <span class="op">*</span><span class="st"> </span>h</a>
-<a class="sourceLine" id="cb2-139" title="139">P_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">5</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">5</span>)) <span class="op">*</span><span class="st"> </span>h</a>
-<a class="sourceLine" id="cb2-140" title="140"></a>
-<a class="sourceLine" id="cb2-141" title="141"><span class="co"># These are not corrected for eviction, but they probably should be</span></a>
-<a class="sourceLine" id="cb2-142" title="142"></a>
-<a class="sourceLine" id="cb2-143" title="143">F_<span class="dv">1</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/outer">outer</a></span>(sv1, sv2, <span class="dt">FUN =</span> fec,</a>
-<a class="sourceLine" id="cb2-144" title="144">                 <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
-<a class="sourceLine" id="cb2-145" title="145">                 <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb2-146" title="146"></a>
-<a class="sourceLine" id="cb2-147" title="147">F_<span class="dv">2</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/outer">outer</a></span>(sv1, sv2, <span class="dt">FUN =</span> fec,</a>
-<a class="sourceLine" id="cb2-148" title="148">                 <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
-<a class="sourceLine" id="cb2-149" title="149">                 <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb2-124" title="124">g_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">g</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
+<a class="sourceLine" id="cb2-125" title="125">         <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
+<a class="sourceLine" id="cb2-126" title="126">                    params<span class="op">$</span>g_slope,</a>
+<a class="sourceLine" id="cb2-127" title="127">                    params<span class="op">$</span>sd_g),</a>
+<a class="sourceLine" id="cb2-128" title="128">         <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">4</span>,</a>
+<a class="sourceLine" id="cb2-129" title="129">         <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb2-130" title="130">         <span class="dt">U =</span> <span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb2-131" title="131"></a>
+<a class="sourceLine" id="cb2-132" title="132">g_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw">g</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
+<a class="sourceLine" id="cb2-133" title="133">         <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
+<a class="sourceLine" id="cb2-134" title="134">                    params<span class="op">$</span>g_slope,</a>
+<a class="sourceLine" id="cb2-135" title="135">                    params<span class="op">$</span>sd_g),</a>
+<a class="sourceLine" id="cb2-136" title="136">         <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb2-137" title="137">         <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb2-138" title="138">         <span class="dt">U =</span> <span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb2-139" title="139"></a>
+<a class="sourceLine" id="cb2-140" title="140">s_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
+<a class="sourceLine" id="cb2-141" title="141">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb2-142" title="142">s_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
+<a class="sourceLine" id="cb2-143" title="143">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb2-144" title="144">s_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
+<a class="sourceLine" id="cb2-145" title="145">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb2-146" title="146">s_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
+<a class="sourceLine" id="cb2-147" title="147">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb2-148" title="148">s_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
+<a class="sourceLine" id="cb2-149" title="149">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">5</span>)</a>
 <a class="sourceLine" id="cb2-150" title="150"></a>
-<a class="sourceLine" id="cb2-151" title="151">F_<span class="dv">3</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/outer">outer</a></span>(sv1, sv2, <span class="dt">FUN =</span> fec,</a>
-<a class="sourceLine" id="cb2-152" title="152">                 <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
-<a class="sourceLine" id="cb2-153" title="153">                 <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb2-154" title="154"></a>
-<a class="sourceLine" id="cb2-155" title="155">F_<span class="dv">4</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/outer">outer</a></span>(sv1, sv2, <span class="dt">FUN =</span> fec,</a>
-<a class="sourceLine" id="cb2-156" title="156">                 <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
-<a class="sourceLine" id="cb2-157" title="157">                 <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb2-151" title="151">P_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">1</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">1</span>)) <span class="op">*</span><span class="st"> </span>h</a>
+<a class="sourceLine" id="cb2-152" title="152">P_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>h</a>
+<a class="sourceLine" id="cb2-153" title="153">P_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">3</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>h</a>
+<a class="sourceLine" id="cb2-154" title="154">P_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">4</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">4</span>)) <span class="op">*</span><span class="st"> </span>h</a>
+<a class="sourceLine" id="cb2-155" title="155">P_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">5</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">5</span>)) <span class="op">*</span><span class="st"> </span>h</a>
+<a class="sourceLine" id="cb2-156" title="156"></a>
+<a class="sourceLine" id="cb2-157" title="157"><span class="co"># These are not corrected for eviction, but they probably should be</span></a>
 <a class="sourceLine" id="cb2-158" title="158"></a>
-<a class="sourceLine" id="cb2-159" title="159">F_<span class="dv">5</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/outer">outer</a></span>(sv1, sv2, <span class="dt">FUN =</span> fec,</a>
-<a class="sourceLine" id="cb2-160" title="160">                 <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
-<a class="sourceLine" id="cb2-161" title="161">                 <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb2-162" title="162"></a>
-<a class="sourceLine" id="cb2-163" title="163"></a>
-<a class="sourceLine" id="cb2-164" title="164">K_<span class="dv">1</span> &lt;-<span class="st"> </span>P_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">1</span></a>
-<a class="sourceLine" id="cb2-165" title="165">K_<span class="dv">2</span> &lt;-<span class="st"> </span>P_<span class="dv">2</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">2</span></a>
-<a class="sourceLine" id="cb2-166" title="166">K_<span class="dv">3</span> &lt;-<span class="st"> </span>P_<span class="dv">3</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">3</span></a>
-<a class="sourceLine" id="cb2-167" title="167">K_<span class="dv">4</span> &lt;-<span class="st"> </span>P_<span class="dv">4</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">4</span></a>
-<a class="sourceLine" id="cb2-168" title="168">K_<span class="dv">5</span> &lt;-<span class="st"> </span>P_<span class="dv">5</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">5</span></a>
-<a class="sourceLine" id="cb2-169" title="169"></a>
-<a class="sourceLine" id="cb2-170" title="170">lambdas &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(K_<span class="dv">1</span>)<span class="op">$</span>values[<span class="dv">1</span>]),</a>
-<a class="sourceLine" id="cb2-171" title="171">             <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(K_<span class="dv">2</span>)<span class="op">$</span>values[<span class="dv">1</span>]),</a>
-<a class="sourceLine" id="cb2-172" title="172">             <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(K_<span class="dv">3</span>)<span class="op">$</span>values[<span class="dv">1</span>]),</a>
-<a class="sourceLine" id="cb2-173" title="173">             <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(K_<span class="dv">4</span>)<span class="op">$</span>values[<span class="dv">1</span>]),</a>
-<a class="sourceLine" id="cb2-174" title="174">             <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(K_<span class="dv">5</span>)<span class="op">$</span>values[<span class="dv">1</span>]))</a>
-<a class="sourceLine" id="cb2-175" title="175"></a>
-<a class="sourceLine" id="cb2-176" title="176"></a>
-<a class="sourceLine" id="cb2-177" title="177"><span class="co">## ipmr version</span></a>
-<a class="sourceLine" id="cb2-178" title="178"></a>
-<a class="sourceLine" id="cb2-179" title="179"><span class="co"># define the levels of the hierarchical variable and save them in a named</span></a>
-<a class="sourceLine" id="cb2-180" title="180"><span class="co"># list that corresponds to the suffix in the kernel notation</span></a>
-<a class="sourceLine" id="cb2-181" title="181"></a>
-<a class="sourceLine" id="cb2-182" title="182">hier_levels &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">yr =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb2-183" title="183"></a>
-<a class="sourceLine" id="cb2-184" title="184"><span class="co"># additional usr_funs to be passed into make_ipm()</span></a>
-<a class="sourceLine" id="cb2-185" title="185"></a>
-<a class="sourceLine" id="cb2-186" title="186">inv_logit &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope) {</a>
-<a class="sourceLine" id="cb2-187" title="187">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(</a>
-<a class="sourceLine" id="cb2-188" title="188">    <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv)))</a>
-<a class="sourceLine" id="cb2-189" title="189">  )</a>
-<a class="sourceLine" id="cb2-190" title="190">}</a>
-<a class="sourceLine" id="cb2-191" title="191"></a>
-<a class="sourceLine" id="cb2-192" title="192">inv_logit_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope, r_eff) {</a>
-<a class="sourceLine" id="cb2-193" title="193">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(</a>
-<a class="sourceLine" id="cb2-194" title="194">    <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv <span class="op">+</span><span class="st"> </span>r_eff)))</a>
-<a class="sourceLine" id="cb2-195" title="195">  )</a>
-<a class="sourceLine" id="cb2-196" title="196">}</a>
+<a class="sourceLine" id="cb2-159" title="159">F_<span class="dv">1</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw">fec</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
+<a class="sourceLine" id="cb2-160" title="160">               <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
+<a class="sourceLine" id="cb2-161" title="161">               <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb2-162" title="162">               <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb2-163" title="163">               <span class="dt">U =</span> <span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb2-164" title="164"></a>
+<a class="sourceLine" id="cb2-165" title="165">F_<span class="dv">2</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw">fec</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
+<a class="sourceLine" id="cb2-166" title="166">               <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
+<a class="sourceLine" id="cb2-167" title="167">               <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb2-168" title="168">               <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb2-169" title="169">               <span class="dt">U =</span> <span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb2-170" title="170"></a>
+<a class="sourceLine" id="cb2-171" title="171">F_<span class="dv">3</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw">fec</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
+<a class="sourceLine" id="cb2-172" title="172">               <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
+<a class="sourceLine" id="cb2-173" title="173">               <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">3</span>,</a>
+<a class="sourceLine" id="cb2-174" title="174">               <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb2-175" title="175">               <span class="dt">U =</span> <span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb2-176" title="176">F_<span class="dv">4</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw">fec</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
+<a class="sourceLine" id="cb2-177" title="177">               <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
+<a class="sourceLine" id="cb2-178" title="178">               <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">4</span>,</a>
+<a class="sourceLine" id="cb2-179" title="179">               <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb2-180" title="180">               <span class="dt">U =</span> <span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb2-181" title="181">F_<span class="dv">5</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw">fec</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
+<a class="sourceLine" id="cb2-182" title="182">               <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
+<a class="sourceLine" id="cb2-183" title="183">               <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb2-184" title="184">               <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb2-185" title="185">               <span class="dt">U =</span> <span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb2-186" title="186"></a>
+<a class="sourceLine" id="cb2-187" title="187">K_<span class="dv">1</span> &lt;-<span class="st"> </span>(P_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">1</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-188" title="188"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-189" title="189">K_<span class="dv">2</span> &lt;-<span class="st"> </span>(P_<span class="dv">2</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">2</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-190" title="190"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-191" title="191">K_<span class="dv">3</span> &lt;-<span class="st"> </span>(P_<span class="dv">3</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">3</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-192" title="192"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-193" title="193">K_<span class="dv">4</span> &lt;-<span class="st"> </span>(P_<span class="dv">4</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">4</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-194" title="194"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-195" title="195">K_<span class="dv">5</span> &lt;-<span class="st"> </span>(P_<span class="dv">5</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">5</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-196" title="196"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb2-197" title="197"></a>
-<a class="sourceLine" id="cb2-198" title="198">pois_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope, r_eff) {</a>
-<a class="sourceLine" id="cb2-199" title="199">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(</a>
-<a class="sourceLine" id="cb2-200" title="200">    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(</a>
-<a class="sourceLine" id="cb2-201" title="201">      int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv <span class="op">+</span><span class="st"> </span>r_eff</a>
-<a class="sourceLine" id="cb2-202" title="202">    )</a>
-<a class="sourceLine" id="cb2-203" title="203">  )</a>
-<a class="sourceLine" id="cb2-204" title="204">}</a>
+<a class="sourceLine" id="cb2-198" title="198">sys &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">K_1 =</span> K_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb2-199" title="199">            <span class="dt">K_2 =</span> K_<span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb2-200" title="200">            <span class="dt">K_3 =</span> K_<span class="dv">3</span>,</a>
+<a class="sourceLine" id="cb2-201" title="201">            <span class="dt">K_4 =</span> K_<span class="dv">4</span>,</a>
+<a class="sourceLine" id="cb2-202" title="202">            <span class="dt">K_5 =</span> K_<span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb2-203" title="203"></a>
+<a class="sourceLine" id="cb2-204" title="204">eigen_sys &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(sys, eigen)</a>
 <a class="sourceLine" id="cb2-205" title="205"></a>
-<a class="sourceLine" id="cb2-206" title="206"><span class="co"># The "model_class" argument is now changed to reflect a different model type</span></a>
-<a class="sourceLine" id="cb2-207" title="207"></a>
-<a class="sourceLine" id="cb2-208" title="208">monocarp_sys &lt;-<span class="st"> </span><span class="kw"><a href="reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_stoch_kern'</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-209" title="209"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb2-210" title="210">    </a>
-<a class="sourceLine" id="cb2-211" title="211">    <span class="co"># The yr suffix is appended to the kernel name and the parameter names</span></a>
-<a class="sourceLine" id="cb2-212" title="212">    <span class="co"># within each vital rate expression. ipmr substitutes in the hier_levels</span></a>
-<a class="sourceLine" id="cb2-213" title="213">    <span class="co"># for each suffix occurrence, thus changing P_yr in P_1, P_2, P_3, P_4, P_5,</span></a>
-<a class="sourceLine" id="cb2-214" title="214">    <span class="co"># s_yr in s_1, s_2, s_3, s_4, and s_5. s_r_yr is converted to s_r_1, s_r_2, </span></a>
-<a class="sourceLine" id="cb2-215" title="215">    <span class="co"># etc. In the case of s_r_yr, provided that the names in the data_list match</span></a>
-<a class="sourceLine" id="cb2-216" title="216">    <span class="co"># the expanded names, all will go well!</span></a>
-<a class="sourceLine" id="cb2-217" title="217">    </a>
-<a class="sourceLine" id="cb2-218" title="218">    <span class="dt">name             =</span> <span class="st">'P_yr'</span>,</a>
-<a class="sourceLine" id="cb2-219" title="219">    <span class="dt">formula          =</span> <span class="kw"><a href="reference/fun-mult-helpers.html">s_g_mult</a></span>(s_yr, g_yr) ,</a>
-<a class="sourceLine" id="cb2-220" title="220">    <span class="dt">family           =</span> <span class="st">"CC"</span>,</a>
-<a class="sourceLine" id="cb2-221" title="221">    <span class="dt">s_yr             =</span> <span class="kw">inv_logit_r</span>(ht_<span class="dv">1</span>, s_int, s_slope, s_r_yr) <span class="op">*</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-222" title="222"><span class="st">                        </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">inv_logit</span>(ht_<span class="dv">1</span>, f_r_int, f_r_slope)),</a>
-<a class="sourceLine" id="cb2-223" title="223">    <span class="dt">g_yr             =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(ht_<span class="dv">2</span>, <span class="dt">mean =</span> mu_g_yr, <span class="dt">sd =</span> sd_g),</a>
-<a class="sourceLine" id="cb2-224" title="224">    <span class="dt">mu_g_yr          =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>ht_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>g_r_yr,</a>
-<a class="sourceLine" id="cb2-225" title="225">    <span class="dt">data_list        =</span> params,</a>
-<a class="sourceLine" id="cb2-226" title="226">    <span class="dt">states           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'ht'</span>)),</a>
-<a class="sourceLine" id="cb2-227" title="227">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb2-228" title="228">    <span class="dt">levels_hier_effs =</span> hier_levels,</a>
-<a class="sourceLine" id="cb2-229" title="229">    <span class="dt">evict            =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb2-230" title="230">    </a>
-<a class="sourceLine" id="cb2-231" title="231">    <span class="co"># Note that the suffix is appended here since the growth kernel also has a random intercept.</span></a>
-<a class="sourceLine" id="cb2-232" title="232">    </a>
-<a class="sourceLine" id="cb2-233" title="233">    <span class="dt">evict_fun =</span> <span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(g_yr,</a>
-<a class="sourceLine" id="cb2-234" title="234">                                        <span class="dt">n_mesh_p =</span> <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb2-235" title="235">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-236" title="236"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb2-237" title="237">    <span class="dt">name             =</span> <span class="st">"F_yr"</span>,</a>
-<a class="sourceLine" id="cb2-238" title="238">    <span class="dt">formula          =</span> f_r <span class="op">*</span><span class="st"> </span>f_s_yr <span class="op">*</span><span class="st"> </span>f_d,</a>
-<a class="sourceLine" id="cb2-239" title="239">    <span class="dt">family           =</span> <span class="st">"CC"</span>,</a>
-<a class="sourceLine" id="cb2-240" title="240">    <span class="dt">f_r              =</span> <span class="kw">inv_logit</span>(ht_<span class="dv">1</span>, f_r_int, f_r_slope),</a>
-<a class="sourceLine" id="cb2-241" title="241">    <span class="dt">f_s_yr           =</span> <span class="kw">pois_r</span>(ht_<span class="dv">1</span>, f_s_int, f_s_slope, f_s_r_yr),</a>
-<a class="sourceLine" id="cb2-242" title="242">    <span class="dt">f_d              =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(ht_<span class="dv">2</span>, <span class="dt">mean =</span> mu_fd, <span class="dt">sd =</span> sd_fd),</a>
-<a class="sourceLine" id="cb2-243" title="243">    <span class="dt">data_list        =</span> params,</a>
-<a class="sourceLine" id="cb2-244" title="244">    <span class="dt">states           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'ht'</span>)),</a>
-<a class="sourceLine" id="cb2-245" title="245">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb2-246" title="246">    <span class="dt">levels_hier_effs =</span> hier_levels,</a>
-<a class="sourceLine" id="cb2-247" title="247">    <span class="dt">evict            =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb2-248" title="248">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-249" title="249"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_k</a></span>(</a>
-<a class="sourceLine" id="cb2-250" title="250">    <span class="dt">name             =</span> <span class="st">'K_yr'</span>,</a>
-<a class="sourceLine" id="cb2-251" title="251">    <span class="dt">K_yr             =</span> P_yr <span class="op">+</span><span class="st"> </span>F_yr,</a>
-<a class="sourceLine" id="cb2-252" title="252">    <span class="dt">family           =</span> <span class="st">"IPM"</span>,</a>
-<a class="sourceLine" id="cb2-253" title="253">    <span class="dt">data_list        =</span> params,</a>
-<a class="sourceLine" id="cb2-254" title="254">    <span class="dt">states           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"ht"</span>)),</a>
-<a class="sourceLine" id="cb2-255" title="255">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb2-256" title="256">    <span class="dt">levels_hier_effs =</span> hier_levels,</a>
-<a class="sourceLine" id="cb2-257" title="257">    <span class="dt">evict            =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb2-258" title="258">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-259" title="259"><span class="st">  </span><span class="kw"><a href="reference/impl-args.html">define_impl</a></span>(</a>
-<a class="sourceLine" id="cb2-260" title="260">    <span class="kw"><a href="reference/impl-args.html">make_impl_args_list</a></span>(</a>
-<a class="sourceLine" id="cb2-261" title="261">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"K_yr"</span>, <span class="st">"P_yr"</span>, <span class="st">"F_yr"</span>),</a>
-<a class="sourceLine" id="cb2-262" title="262">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"midpoint"</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb2-263" title="263">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"ht"</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb2-264" title="264">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"ht"</span>, <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb2-265" title="265">    )</a>
-<a class="sourceLine" id="cb2-266" title="266">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-267" title="267"><span class="st">  </span><span class="kw"><a href="reference/doms-n-states.html">define_domains</a></span>(<span class="dt">ht =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="fl">0.2</span>, <span class="dv">40</span>, <span class="dv">100</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-268" title="268"><span class="st">  </span><span class="kw"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">inv_logit =</span> inv_logit,</a>
-<a class="sourceLine" id="cb2-269" title="269">                           <span class="dt">inv_logit_r =</span> inv_logit_r,</a>
-<a class="sourceLine" id="cb2-270" title="270">                           <span class="dt">pois_r =</span> pois_r))</a>
-<a class="sourceLine" id="cb2-271" title="271"></a>
-<a class="sourceLine" id="cb2-272" title="272"></a>
-<a class="sourceLine" id="cb2-273" title="273">ks          &lt;-<span class="st"> </span>monocarp_sys<span class="op">$</span>iterators</a>
-<a class="sourceLine" id="cb2-274" title="274">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">vapply</a></span>(ks, <span class="cf">function</span>(x) <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(x)<span class="op">$</span>values[<span class="dv">1</span>]), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">numeric</a></span>(<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb2-275" title="275"></a>
-<a class="sourceLine" id="cb2-276" title="276">lambda_ipmr <span class="op">-</span><span class="st"> </span>lambdas</a></code></pre></div>
+<a class="sourceLine" id="cb2-206" title="206">lambdas &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">vapply</a></span>(eigen_sys, <span class="cf">function</span>(x) <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(x<span class="op">$</span>values[<span class="dv">1</span>]), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">numeric</a></span>(<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb2-207" title="207">ws      &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">vapply</a></span>(eigen_sys, <span class="cf">function</span>(x) <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(x<span class="op">$</span>vectors[ , <span class="dv">1</span>]), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">numeric</a></span>(<span class="dv">100</span>))</a>
+<a class="sourceLine" id="cb2-208" title="208"></a>
+<a class="sourceLine" id="cb2-209" title="209"></a>
+<a class="sourceLine" id="cb2-210" title="210"></a>
+<a class="sourceLine" id="cb2-211" title="211"><span class="co">## ipmr version</span></a>
+<a class="sourceLine" id="cb2-212" title="212"></a>
+<a class="sourceLine" id="cb2-213" title="213"><span class="co"># define the levels of the hierarchical variable and save them in a named</span></a>
+<a class="sourceLine" id="cb2-214" title="214"><span class="co"># list that corresponds to the suffix in the kernel notation</span></a>
+<a class="sourceLine" id="cb2-215" title="215"></a>
+<a class="sourceLine" id="cb2-216" title="216">hier_levels &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">yr =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb2-217" title="217"></a>
+<a class="sourceLine" id="cb2-218" title="218"><span class="co"># additional usr_funs to be passed into make_ipm()</span></a>
+<a class="sourceLine" id="cb2-219" title="219"></a>
+<a class="sourceLine" id="cb2-220" title="220">inv_logit &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope) {</a>
+<a class="sourceLine" id="cb2-221" title="221">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(</a>
+<a class="sourceLine" id="cb2-222" title="222">    <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv)))</a>
+<a class="sourceLine" id="cb2-223" title="223">  )</a>
+<a class="sourceLine" id="cb2-224" title="224">}</a>
+<a class="sourceLine" id="cb2-225" title="225"></a>
+<a class="sourceLine" id="cb2-226" title="226">inv_logit_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope, r_eff) {</a>
+<a class="sourceLine" id="cb2-227" title="227">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(</a>
+<a class="sourceLine" id="cb2-228" title="228">    <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv <span class="op">+</span><span class="st"> </span>r_eff)))</a>
+<a class="sourceLine" id="cb2-229" title="229">  )</a>
+<a class="sourceLine" id="cb2-230" title="230">}</a>
+<a class="sourceLine" id="cb2-231" title="231"></a>
+<a class="sourceLine" id="cb2-232" title="232">pois_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope, r_eff) {</a>
+<a class="sourceLine" id="cb2-233" title="233">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(</a>
+<a class="sourceLine" id="cb2-234" title="234">    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(</a>
+<a class="sourceLine" id="cb2-235" title="235">      int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv <span class="op">+</span><span class="st"> </span>r_eff</a>
+<a class="sourceLine" id="cb2-236" title="236">    )</a>
+<a class="sourceLine" id="cb2-237" title="237">  )</a>
+<a class="sourceLine" id="cb2-238" title="238">}</a>
+<a class="sourceLine" id="cb2-239" title="239"></a>
+<a class="sourceLine" id="cb2-240" title="240"><span class="co"># The "model_class" argument is now changed to reflect a different model type</span></a>
+<a class="sourceLine" id="cb2-241" title="241"></a>
+<a class="sourceLine" id="cb2-242" title="242">monocarp_sys &lt;-<span class="st"> </span><span class="kw"><a href="reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_stoch_kern'</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-243" title="243"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb2-244" title="244">    </a>
+<a class="sourceLine" id="cb2-245" title="245">    <span class="co"># The yr suffix is appended to the kernel name and the parameter names</span></a>
+<a class="sourceLine" id="cb2-246" title="246">    <span class="co"># within each vital rate expression. ipmr substitutes in the hier_levels</span></a>
+<a class="sourceLine" id="cb2-247" title="247">    <span class="co"># for each suffix occurrence, thus changing P_yr in P_1, P_2, P_3, P_4, P_5,</span></a>
+<a class="sourceLine" id="cb2-248" title="248">    <span class="co"># s_yr in s_1, s_2, s_3, s_4, and s_5. s_r_yr is converted to s_r_1, s_r_2, </span></a>
+<a class="sourceLine" id="cb2-249" title="249">    <span class="co"># etc. In the case of s_r_yr, provided that the names in the data_list match</span></a>
+<a class="sourceLine" id="cb2-250" title="250">    <span class="co"># the expanded names, all will go well!</span></a>
+<a class="sourceLine" id="cb2-251" title="251">    </a>
+<a class="sourceLine" id="cb2-252" title="252">    <span class="dt">name             =</span> <span class="st">'P_yr'</span>,</a>
+<a class="sourceLine" id="cb2-253" title="253">    <span class="dt">formula          =</span> <span class="kw"><a href="reference/fun-mult-helpers.html">s_g_mult</a></span>(s_yr, g_yr) ,</a>
+<a class="sourceLine" id="cb2-254" title="254">    <span class="dt">family           =</span> <span class="st">"CC"</span>,</a>
+<a class="sourceLine" id="cb2-255" title="255">    <span class="dt">s_yr             =</span> <span class="kw">inv_logit_r</span>(ht_<span class="dv">1</span>, s_int, s_slope, s_r_yr) <span class="op">*</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-256" title="256"><span class="st">      </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">inv_logit</span>(ht_<span class="dv">1</span>, f_r_int, f_r_slope)),</a>
+<a class="sourceLine" id="cb2-257" title="257">    <span class="dt">g_yr             =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(ht_<span class="dv">2</span>, mu_g_yr, sd_g),</a>
+<a class="sourceLine" id="cb2-258" title="258">    <span class="dt">mu_g_yr          =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>ht_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>g_r_yr,</a>
+<a class="sourceLine" id="cb2-259" title="259">    <span class="dt">data_list        =</span> params,</a>
+<a class="sourceLine" id="cb2-260" title="260">    <span class="dt">states           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'ht'</span>)),</a>
+<a class="sourceLine" id="cb2-261" title="261">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb2-262" title="262">    <span class="dt">levels_hier_effs =</span> hier_levels,</a>
+<a class="sourceLine" id="cb2-263" title="263">    <span class="dt">evict            =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb2-264" title="264">    <span class="dt">evict_fun        =</span> <span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g_yr"</span>)</a>
+<a class="sourceLine" id="cb2-265" title="265">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-266" title="266"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb2-267" title="267">    <span class="dt">name             =</span> <span class="st">"F_yr"</span>,</a>
+<a class="sourceLine" id="cb2-268" title="268">    <span class="dt">formula          =</span> f_r <span class="op">*</span><span class="st"> </span>f_s_yr <span class="op">*</span><span class="st"> </span>f_d,</a>
+<a class="sourceLine" id="cb2-269" title="269">    <span class="dt">family           =</span> <span class="st">"CC"</span>,</a>
+<a class="sourceLine" id="cb2-270" title="270">    <span class="dt">f_r              =</span> <span class="kw">inv_logit</span>(ht_<span class="dv">1</span>, f_r_int, f_r_slope),</a>
+<a class="sourceLine" id="cb2-271" title="271">    <span class="dt">f_s_yr           =</span> <span class="kw">pois_r</span>(ht_<span class="dv">1</span>, f_s_int, f_s_slope, f_s_r_yr),</a>
+<a class="sourceLine" id="cb2-272" title="272">    <span class="dt">f_d              =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(ht_<span class="dv">2</span>, mu_fd, sd_fd),</a>
+<a class="sourceLine" id="cb2-273" title="273">    <span class="dt">data_list        =</span> params,</a>
+<a class="sourceLine" id="cb2-274" title="274">    <span class="dt">states           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'ht'</span>)),</a>
+<a class="sourceLine" id="cb2-275" title="275">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb2-276" title="276">    <span class="dt">levels_hier_effs =</span> hier_levels,</a>
+<a class="sourceLine" id="cb2-277" title="277">    <span class="dt">evict            =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb2-278" title="278">    <span class="dt">evict_fun        =</span> <span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
+<a class="sourceLine" id="cb2-279" title="279">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-280" title="280"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_k</a></span>(</a>
+<a class="sourceLine" id="cb2-281" title="281">    <span class="dt">name             =</span> <span class="st">'K_yr'</span>,</a>
+<a class="sourceLine" id="cb2-282" title="282">    <span class="dt">K_yr             =</span> P_yr <span class="op">+</span><span class="st"> </span>F_yr,</a>
+<a class="sourceLine" id="cb2-283" title="283">    <span class="dt">family           =</span> <span class="st">"IPM"</span>,</a>
+<a class="sourceLine" id="cb2-284" title="284">    <span class="dt">data_list        =</span> params,</a>
+<a class="sourceLine" id="cb2-285" title="285">    <span class="dt">states           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"ht"</span>)),</a>
+<a class="sourceLine" id="cb2-286" title="286">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb2-287" title="287">    <span class="dt">levels_hier_effs =</span> hier_levels</a>
+<a class="sourceLine" id="cb2-288" title="288">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-289" title="289"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_impl</a></span>(</a>
+<a class="sourceLine" id="cb2-290" title="290">    <span class="kw"><a href="reference/define_star.html">make_impl_args_list</a></span>(</a>
+<a class="sourceLine" id="cb2-291" title="291">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"K_yr"</span>, <span class="st">"P_yr"</span>, <span class="st">"F_yr"</span>),</a>
+<a class="sourceLine" id="cb2-292" title="292">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"midpoint"</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb2-293" title="293">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"ht"</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb2-294" title="294">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"ht"</span>, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb2-295" title="295">    )</a>
+<a class="sourceLine" id="cb2-296" title="296">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-297" title="297"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_domains</a></span>(<span class="dt">ht =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="fl">0.2</span>, <span class="dv">40</span>, <span class="dv">100</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-298" title="298"><span class="st">  </span><span class="kw"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">inv_logit   =</span> inv_logit,</a>
+<a class="sourceLine" id="cb2-299" title="299">                           <span class="dt">inv_logit_r =</span> inv_logit_r,</a>
+<a class="sourceLine" id="cb2-300" title="300">                           <span class="dt">pois_r      =</span> pois_r))</a>
+<a class="sourceLine" id="cb2-301" title="301"></a>
+<a class="sourceLine" id="cb2-302" title="302"></a>
+<a class="sourceLine" id="cb2-303" title="303"></a>
+<a class="sourceLine" id="cb2-304" title="304">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">vapply</a></span>(monocarp_sys<span class="op">$</span>iterators, </a>
+<a class="sourceLine" id="cb2-305" title="305">                      <span class="cf">function</span>(x) <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(x)<span class="op">$</span>values[<span class="dv">1</span>]), </a>
+<a class="sourceLine" id="cb2-306" title="306">                      <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">numeric</a></span>(<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb2-307" title="307"></a>
+<a class="sourceLine" id="cb2-308" title="308">lambda_ipmr <span class="op">-</span><span class="st"> </span>lambdas</a></code></pre></div>
 </div>
 <div id="simple-density-independet-parameter-resampled-models" class="section level2">
 <h2 class="hasAnchor">
@@ -640,141 +656,143 @@
 <a class="sourceLine" id="cb3-3" title="3"></a>
 <a class="sourceLine" id="cb3-4" title="4"><span class="co"># Define the fixed parameters in a list</span></a>
 <a class="sourceLine" id="cb3-5" title="5"></a>
-<a class="sourceLine" id="cb3-6" title="6">data_list &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">s_slope   =</span> <span class="fl">0.3</span>,</a>
-<a class="sourceLine" id="cb3-7" title="7">                  <span class="dt">g_slope   =</span> <span class="fl">0.99</span>,</a>
-<a class="sourceLine" id="cb3-8" title="8">                  <span class="dt">g_sd      =</span> <span class="fl">0.2</span>,</a>
-<a class="sourceLine" id="cb3-9" title="9">                  <span class="dt">f_r_slope =</span> <span class="fl">0.03</span>,</a>
-<a class="sourceLine" id="cb3-10" title="10">                  <span class="dt">f_s_slope =</span> <span class="fl">0.001</span>,</a>
-<a class="sourceLine" id="cb3-11" title="11">                  <span class="dt">f_d_mu    =</span> <span class="fl">1.1</span>,</a>
-<a class="sourceLine" id="cb3-12" title="12">                  <span class="dt">f_d_sd    =</span> <span class="fl">0.1</span>)</a>
-<a class="sourceLine" id="cb3-13" title="13"></a>
-<a class="sourceLine" id="cb3-14" title="14"><span class="co"># Simulate some random parameters to define the multivariate distribution</span></a>
-<a class="sourceLine" id="cb3-15" title="15"><span class="co"># to sample from. In user-specified models, these will likely come from mixed</span></a>
-<a class="sourceLine" id="cb3-16" title="16"><span class="co"># effects models fit to real data.</span></a>
-<a class="sourceLine" id="cb3-17" title="17">r_means &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dt">s_int_yr   =</span> <span class="fl">0.8</span>,</a>
-<a class="sourceLine" id="cb3-18" title="18">             <span class="dt">g_int_yr   =</span> <span class="fl">0.1</span>,</a>
-<a class="sourceLine" id="cb3-19" title="19">             <span class="dt">f_r_int_yr =</span> <span class="fl">0.3</span>,</a>
-<a class="sourceLine" id="cb3-20" title="20">             <span class="dt">f_s_int_yr =</span> <span class="fl">0.4</span>)</a>
-<a class="sourceLine" id="cb3-21" title="21"></a>
-<a class="sourceLine" id="cb3-22" title="22">r_sigma &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Uniform">runif</a></span>(<span class="dv">16</span>)</a>
-<a class="sourceLine" id="cb3-23" title="23">r_sigma &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(r_sigma, <span class="dt">nrow =</span> <span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb3-24" title="24"></a>
-<a class="sourceLine" id="cb3-25" title="25">r_sigma &lt;-<span class="st"> </span>r_sigma <span class="op">%*%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(r_sigma) <span class="co"># make symmetrical - most users should skip this step.</span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">2123008</span>)</a>
+<a class="sourceLine" id="cb3-7" title="7"></a>
+<a class="sourceLine" id="cb3-8" title="8">data_list &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">s_slope   =</span> <span class="fl">0.3</span>,</a>
+<a class="sourceLine" id="cb3-9" title="9">                  <span class="dt">g_slope   =</span> <span class="fl">0.99</span>,</a>
+<a class="sourceLine" id="cb3-10" title="10">                  <span class="dt">g_sd      =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb3-11" title="11">                  <span class="dt">f_r_slope =</span> <span class="fl">0.03</span>,</a>
+<a class="sourceLine" id="cb3-12" title="12">                  <span class="dt">f_s_slope =</span> <span class="fl">0.001</span>,</a>
+<a class="sourceLine" id="cb3-13" title="13">                  <span class="dt">f_d_mu    =</span> <span class="fl">1.1</span>,</a>
+<a class="sourceLine" id="cb3-14" title="14">                  <span class="dt">f_d_sd    =</span> <span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb3-15" title="15"></a>
+<a class="sourceLine" id="cb3-16" title="16"><span class="co"># Simulate some random parameters to define the multivariate distribution</span></a>
+<a class="sourceLine" id="cb3-17" title="17"><span class="co"># to sample from. In user-specified models, these will likely come from mixed</span></a>
+<a class="sourceLine" id="cb3-18" title="18"><span class="co"># effects models fit to real data.</span></a>
+<a class="sourceLine" id="cb3-19" title="19">r_means &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dt">s_int_yr   =</span> <span class="fl">0.8</span>,</a>
+<a class="sourceLine" id="cb3-20" title="20">             <span class="dt">g_int_yr   =</span> <span class="fl">0.1</span>,</a>
+<a class="sourceLine" id="cb3-21" title="21">             <span class="dt">f_r_int_yr =</span> <span class="fl">0.3</span>,</a>
+<a class="sourceLine" id="cb3-22" title="22">             <span class="dt">f_s_int_yr =</span> <span class="fl">0.4</span>)</a>
+<a class="sourceLine" id="cb3-23" title="23"></a>
+<a class="sourceLine" id="cb3-24" title="24">r_sigma &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Uniform">runif</a></span>(<span class="dv">16</span>)</a>
+<a class="sourceLine" id="cb3-25" title="25">r_sigma &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(r_sigma, <span class="dt">nrow =</span> <span class="dv">4</span>)</a>
 <a class="sourceLine" id="cb3-26" title="26"></a>
-<a class="sourceLine" id="cb3-27" title="27">iterations &lt;-<span class="st"> </span><span class="dv">10</span></a>
+<a class="sourceLine" id="cb3-27" title="27">r_sigma &lt;-<span class="st"> </span>r_sigma <span class="op">%*%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(r_sigma) <span class="co"># make symmetrical - most users should skip this step.</span></a>
 <a class="sourceLine" id="cb3-28" title="28"></a>
-<a class="sourceLine" id="cb3-29" title="29"><span class="co"># Specify an initial population vector. This can also be done in the call to</span></a>
-<a class="sourceLine" id="cb3-30" title="30"><span class="co"># define_pop_state</span></a>
-<a class="sourceLine" id="cb3-31" title="31"></a>
-<a class="sourceLine" id="cb3-32" title="32">init_pop_vec &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Uniform">runif</a></span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb3-29" title="29">iterations &lt;-<span class="st"> </span><span class="dv">10</span></a>
+<a class="sourceLine" id="cb3-30" title="30"></a>
+<a class="sourceLine" id="cb3-31" title="31"><span class="co"># Specify an initial population vector. This can also be done in the call to</span></a>
+<a class="sourceLine" id="cb3-32" title="32"><span class="co"># define_pop_state</span></a>
 <a class="sourceLine" id="cb3-33" title="33"></a>
-<a class="sourceLine" id="cb3-34" title="34"><span class="co"># Again, we can define our own functions and pass them into calls to make_ipm</span></a>
-<a class="sourceLine" id="cb3-35" title="35">inv_logit &lt;-<span class="st"> </span><span class="cf">function</span>(int, slope, sv1) {</a>
-<a class="sourceLine" id="cb3-36" title="36">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv1)))</a>
-<a class="sourceLine" id="cb3-37" title="37">}</a>
-<a class="sourceLine" id="cb3-38" title="38"></a>
-<a class="sourceLine" id="cb3-39" title="39"><span class="co"># In this case, we define a wrapper function around rmvnorm to make sure</span></a>
-<a class="sourceLine" id="cb3-40" title="40"><span class="co"># that the names of the returned values match those in the vital rate</span></a>
-<a class="sourceLine" id="cb3-41" title="41"><span class="co"># expressions.</span></a>
-<a class="sourceLine" id="cb3-42" title="42"></a>
-<a class="sourceLine" id="cb3-43" title="43">mvt_wrapper &lt;-<span class="st"> </span><span class="cf">function</span>(r_means, r_sigma, nms) {</a>
-<a class="sourceLine" id="cb3-44" title="44">  out &lt;-<span class="st"> </span>mvtnorm<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/mvtnorm/topics/Mvnorm">rmvnorm</a></span>(<span class="dv">1</span>, r_means, r_sigma) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-45" title="45"><span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">as.list</a></span>()</a>
-<a class="sourceLine" id="cb3-46" title="46">  </a>
-<a class="sourceLine" id="cb3-47" title="47">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(out) &lt;-<span class="st"> </span>nms</a>
-<a class="sourceLine" id="cb3-48" title="48">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(out)</a>
-<a class="sourceLine" id="cb3-49" title="49">}</a>
-<a class="sourceLine" id="cb3-50" title="50"></a>
-<a class="sourceLine" id="cb3-51" title="51">param_resamp_model &lt;-<span class="st"> </span><span class="kw"><a href="reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_stoch_param'</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-52" title="52"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb3-53" title="53">    <span class="dt">name    =</span> <span class="st">'P'</span>,</a>
-<a class="sourceLine" id="cb3-54" title="54">    <span class="dt">formula =</span> <span class="kw"><a href="reference/fun-mult-helpers.html">s_g_mult</a></span>(s, g),</a>
-<a class="sourceLine" id="cb3-55" title="55">    <span class="dt">family  =</span> <span class="st">'CC'</span>,</a>
-<a class="sourceLine" id="cb3-56" title="56">    </a>
-<a class="sourceLine" id="cb3-57" title="57">    <span class="co"># Note here that the growth and survival intercepts are prefaced with env_params$...</span></a>
-<a class="sourceLine" id="cb3-58" title="58">    <span class="co"># This is because the mvt_wrapper function is named env_params in the call</span></a>
-<a class="sourceLine" id="cb3-59" title="59">    <span class="co"># to define_env_state(). env_params is not a reserved word, so you can call</span></a>
-<a class="sourceLine" id="cb3-60" title="60">    <span class="co"># it whatever you like.</span></a>
-<a class="sourceLine" id="cb3-61" title="61">    </a>
-<a class="sourceLine" id="cb3-62" title="62">    <span class="dt">g_mu          =</span> env_params<span class="op">$</span>g_int_yr <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>surf_area_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb3-63" title="63">    <span class="dt">s             =</span> <span class="kw">inv_logit</span>(env_params<span class="op">$</span>s_int_yr, s_slope, surf_area_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb3-64" title="64">    <span class="dt">g             =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(surf_area_<span class="dv">2</span>, g_mu, g_sd),</a>
-<a class="sourceLine" id="cb3-65" title="65">    <span class="dt">data_list     =</span> data_list,</a>
-<a class="sourceLine" id="cb3-66" title="66">    <span class="dt">states        =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'surf_area'</span>)),</a>
-<a class="sourceLine" id="cb3-67" title="67">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb3-68" title="68">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb3-69" title="69">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(g,</a>
-<a class="sourceLine" id="cb3-70" title="70">                                            <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb3-71" title="71">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-72" title="72"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb3-73" title="73">    <span class="dt">name          =</span> <span class="st">'F'</span>,</a>
-<a class="sourceLine" id="cb3-74" title="74">    <span class="dt">formula       =</span> f_r <span class="op">*</span><span class="st"> </span>f_s <span class="op">*</span><span class="st"> </span>f_d,</a>
-<a class="sourceLine" id="cb3-75" title="75">    <span class="dt">family        =</span> <span class="st">'CC'</span>,</a>
-<a class="sourceLine" id="cb3-76" title="76">    </a>
-<a class="sourceLine" id="cb3-77" title="77">    <span class="co"># Note the insertion of env_params$param_name here as well</span></a>
-<a class="sourceLine" id="cb3-78" title="78">    </a>
-<a class="sourceLine" id="cb3-79" title="79">    <span class="dt">f_r           =</span> <span class="kw">inv_logit</span>(env_params<span class="op">$</span>f_r_int_yr, f_r_slope, surf_area_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb3-80" title="80">    <span class="dt">f_s           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(env_params<span class="op">$</span>f_s_int_yr <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>surf_area_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb3-81" title="81">    <span class="dt">f_d           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(surf_area_<span class="dv">2</span>, f_d_mu, f_d_sd),</a>
-<a class="sourceLine" id="cb3-82" title="82">    </a>
-<a class="sourceLine" id="cb3-83" title="83">    <span class="dt">data_list     =</span> data_list,</a>
-<a class="sourceLine" id="cb3-84" title="84">    <span class="dt">states        =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'surf_area'</span>)),</a>
-<a class="sourceLine" id="cb3-85" title="85">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb3-86" title="86">    <span class="dt">evict         =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb3-87" title="87">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-88" title="88"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_k</a></span>(</a>
-<a class="sourceLine" id="cb3-89" title="89">    <span class="dt">name =</span> <span class="st">'K'</span>,</a>
-<a class="sourceLine" id="cb3-90" title="90">    </a>
-<a class="sourceLine" id="cb3-91" title="91">    <span class="co"># Note that here, we specify both the form of the iteration kernel and</span></a>
-<a class="sourceLine" id="cb3-92" title="92">    <span class="co"># the iteration procedure. right_mult() is a helper function to make sure</span></a>
-<a class="sourceLine" id="cb3-93" title="93">    <span class="co"># population states are multiplied by the kernels correctly.</span></a>
-<a class="sourceLine" id="cb3-94" title="94">   </a>
-<a class="sourceLine" id="cb3-95" title="95">    <span class="dt">K               =</span> P <span class="op">+</span><span class="st"> </span>F,</a>
-<a class="sourceLine" id="cb3-96" title="96">    <span class="dt">n_surf_area_t_1 =</span> <span class="kw"><a href="reference/fun-mult-helpers.html">right_mult</a></span>(K, n_surf_area_t),</a>
-<a class="sourceLine" id="cb3-97" title="97">    </a>
-<a class="sourceLine" id="cb3-98" title="98">    <span class="dt">family          =</span> <span class="st">'IPM'</span>,</a>
-<a class="sourceLine" id="cb3-99" title="99">    <span class="dt">data_list       =</span> data_list,</a>
-<a class="sourceLine" id="cb3-100" title="100">    <span class="dt">states          =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'surf_area'</span>)),</a>
-<a class="sourceLine" id="cb3-101" title="101">    <span class="dt">has_hier_effs   =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb3-102" title="102">    <span class="dt">evict           =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb3-103" title="103">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-104" title="104"><span class="st">  </span><span class="kw"><a href="reference/impl-args.html">define_impl</a></span>(</a>
-<a class="sourceLine" id="cb3-105" title="105">    <span class="kw"><a href="reference/impl-args.html">make_impl_args_list</a></span>(</a>
-<a class="sourceLine" id="cb3-106" title="106">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'P'</span>, <span class="st">"F"</span>, <span class="st">"K"</span>),</a>
-<a class="sourceLine" id="cb3-107" title="107">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">'midpoint'</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb3-108" title="108">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">'surf_area'</span>,<span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb3-109" title="109">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">'surf_area'</span>, <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb3-110" title="110">    )</a>
-<a class="sourceLine" id="cb3-111" title="111">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-112" title="112"><span class="st">  </span><span class="kw"><a href="reference/doms-n-states.html">define_domains</a></span>(<span class="dt">surf_area =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">100</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-113" title="113"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_env_state</a></span>(</a>
-<a class="sourceLine" id="cb3-114" title="114">    <span class="dt">env_params =</span> <span class="kw">mvt_wrapper</span>(r_means, r_sigma, <span class="dt">nms =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'s_int_yr'</span>,</a>
-<a class="sourceLine" id="cb3-115" title="115">                                                       <span class="st">'g_int_yr'</span>,</a>
-<a class="sourceLine" id="cb3-116" title="116">                                                       <span class="st">'f_r_int_yr'</span>,</a>
-<a class="sourceLine" id="cb3-117" title="117">                                                       <span class="st">'f_s_int_yr'</span>)),</a>
-<a class="sourceLine" id="cb3-118" title="118">    <span class="dt">data_list =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb3-119" title="119">      <span class="dt">r_means =</span> r_means,</a>
-<a class="sourceLine" id="cb3-120" title="120">      <span class="dt">r_sigma =</span> r_sigma</a>
-<a class="sourceLine" id="cb3-121" title="121">    )</a>
-<a class="sourceLine" id="cb3-122" title="122">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-123" title="123"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_pop_state</a></span>(</a>
-<a class="sourceLine" id="cb3-124" title="124">    <span class="dt">pop_vectors =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">n_surf_area_t =</span> init_pop_vec),</a>
-<a class="sourceLine" id="cb3-125" title="125">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-126" title="126"><span class="st">  </span><span class="kw"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs   =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">inv_logit =</span> inv_logit,</a>
-<a class="sourceLine" id="cb3-127" title="127">                             <span class="dt">mvt_wrapper =</span> mvt_wrapper),</a>
-<a class="sourceLine" id="cb3-128" title="128">           <span class="dt">iterate    =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb3-129" title="129">           <span class="dt">iterations =</span> <span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb3-130" title="130"></a>
-<a class="sourceLine" id="cb3-131" title="131">pop_state_ipmr &lt;-<span class="st"> </span>param_resamp_model<span class="op">$</span>pop_state<span class="op">$</span>pop_state_surf_area</a>
-<a class="sourceLine" id="cb3-132" title="132">lambda_ipmr    &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">numeric</a></span>(iterations)</a>
-<a class="sourceLine" id="cb3-133" title="133"></a>
-<a class="sourceLine" id="cb3-134" title="134"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">2</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/dim">dim</a></span>(pop_state_ipmr)[<span class="dv">2</span>], <span class="dv">1</span>)) {</a>
-<a class="sourceLine" id="cb3-135" title="135">  </a>
-<a class="sourceLine" id="cb3-136" title="136">  lambda_ipmr[(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(pop_state_ipmr[ ,i]) <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(pop_state_ipmr[ ,(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)])</a>
+<a class="sourceLine" id="cb3-34" title="34">init_pop_vec &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Uniform">runif</a></span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb3-35" title="35"></a>
+<a class="sourceLine" id="cb3-36" title="36"><span class="co"># Again, we can define our own functions and pass them into calls to make_ipm</span></a>
+<a class="sourceLine" id="cb3-37" title="37">inv_logit &lt;-<span class="st"> </span><span class="cf">function</span>(int, slope, sv1) {</a>
+<a class="sourceLine" id="cb3-38" title="38">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv1)))</a>
+<a class="sourceLine" id="cb3-39" title="39">}</a>
+<a class="sourceLine" id="cb3-40" title="40"></a>
+<a class="sourceLine" id="cb3-41" title="41"><span class="co"># In this case, we define a wrapper function around rmvnorm to make sure</span></a>
+<a class="sourceLine" id="cb3-42" title="42"><span class="co"># that the names of the returned values match those in the vital rate</span></a>
+<a class="sourceLine" id="cb3-43" title="43"><span class="co"># expressions.</span></a>
+<a class="sourceLine" id="cb3-44" title="44"></a>
+<a class="sourceLine" id="cb3-45" title="45">mvt_wrapper &lt;-<span class="st"> </span><span class="cf">function</span>(r_means, r_sigma, nms) {</a>
+<a class="sourceLine" id="cb3-46" title="46">  out &lt;-<span class="st"> </span>mvtnorm<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/mvtnorm/topics/Mvnorm">rmvnorm</a></span>(<span class="dv">1</span>, r_means, r_sigma) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-47" title="47"><span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">as.list</a></span>()</a>
+<a class="sourceLine" id="cb3-48" title="48">  </a>
+<a class="sourceLine" id="cb3-49" title="49">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(out) &lt;-<span class="st"> </span>nms</a>
+<a class="sourceLine" id="cb3-50" title="50">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(out)</a>
+<a class="sourceLine" id="cb3-51" title="51">}</a>
+<a class="sourceLine" id="cb3-52" title="52"></a>
+<a class="sourceLine" id="cb3-53" title="53">param_resamp_model &lt;-<span class="st"> </span><span class="kw"><a href="reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_stoch_param'</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-54" title="54"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb3-55" title="55">    <span class="dt">name    =</span> <span class="st">'P'</span>,</a>
+<a class="sourceLine" id="cb3-56" title="56">    <span class="dt">formula =</span> <span class="kw"><a href="reference/fun-mult-helpers.html">s_g_mult</a></span>(s, g),</a>
+<a class="sourceLine" id="cb3-57" title="57">    <span class="dt">family  =</span> <span class="st">'CC'</span>,</a>
+<a class="sourceLine" id="cb3-58" title="58">    </a>
+<a class="sourceLine" id="cb3-59" title="59">    <span class="co"># Note here that the growth and survival intercepts are prefaced with env_params$...</span></a>
+<a class="sourceLine" id="cb3-60" title="60">    <span class="co"># This is because the mvt_wrapper function is named env_params in the call</span></a>
+<a class="sourceLine" id="cb3-61" title="61">    <span class="co"># to define_env_state(). env_params is not a reserved word, so you can call</span></a>
+<a class="sourceLine" id="cb3-62" title="62">    <span class="co"># it whatever you like.</span></a>
+<a class="sourceLine" id="cb3-63" title="63">    </a>
+<a class="sourceLine" id="cb3-64" title="64">    <span class="dt">g_mu          =</span> env_params<span class="op">$</span>g_int_yr <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>surf_area_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb3-65" title="65">    <span class="dt">s             =</span> <span class="kw">inv_logit</span>(env_params<span class="op">$</span>s_int_yr, s_slope, surf_area_<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb3-66" title="66">    <span class="dt">g             =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(surf_area_<span class="dv">2</span>, g_mu, g_sd),</a>
+<a class="sourceLine" id="cb3-67" title="67">    <span class="dt">data_list     =</span> data_list,</a>
+<a class="sourceLine" id="cb3-68" title="68">    <span class="dt">states        =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'surf_area'</span>)),</a>
+<a class="sourceLine" id="cb3-69" title="69">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb3-70" title="70">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb3-71" title="71">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
+<a class="sourceLine" id="cb3-72" title="72">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-73" title="73"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb3-74" title="74">    <span class="dt">name          =</span> <span class="st">'F'</span>,</a>
+<a class="sourceLine" id="cb3-75" title="75">    <span class="dt">formula       =</span> f_r <span class="op">*</span><span class="st"> </span>f_s <span class="op">*</span><span class="st"> </span>f_d,</a>
+<a class="sourceLine" id="cb3-76" title="76">    <span class="dt">family        =</span> <span class="st">'CC'</span>,</a>
+<a class="sourceLine" id="cb3-77" title="77">    </a>
+<a class="sourceLine" id="cb3-78" title="78">    <span class="co"># Note the insertion of env_params$param_name here as well</span></a>
+<a class="sourceLine" id="cb3-79" title="79">    </a>
+<a class="sourceLine" id="cb3-80" title="80">    <span class="dt">f_r           =</span> <span class="kw">inv_logit</span>(env_params<span class="op">$</span>f_r_int_yr, f_r_slope, surf_area_<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb3-81" title="81">    <span class="dt">f_s           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(env_params<span class="op">$</span>f_s_int_yr <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>surf_area_<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb3-82" title="82">    <span class="dt">f_d           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(surf_area_<span class="dv">2</span>, f_d_mu, f_d_sd),</a>
+<a class="sourceLine" id="cb3-83" title="83">    </a>
+<a class="sourceLine" id="cb3-84" title="84">    <span class="dt">data_list     =</span> data_list,</a>
+<a class="sourceLine" id="cb3-85" title="85">    <span class="dt">states        =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'surf_area'</span>)),</a>
+<a class="sourceLine" id="cb3-86" title="86">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb3-87" title="87">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb3-88" title="88">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
+<a class="sourceLine" id="cb3-89" title="89">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-90" title="90"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_k</a></span>(</a>
+<a class="sourceLine" id="cb3-91" title="91">    <span class="dt">name =</span> <span class="st">'K'</span>,</a>
+<a class="sourceLine" id="cb3-92" title="92">    </a>
+<a class="sourceLine" id="cb3-93" title="93">    <span class="co"># Note that here, we specify both the form of the iteration kernel and</span></a>
+<a class="sourceLine" id="cb3-94" title="94">    <span class="co"># the iteration procedure. right_mult() is a helper function to make sure</span></a>
+<a class="sourceLine" id="cb3-95" title="95">    <span class="co"># population states are multiplied by the kernels correctly.</span></a>
+<a class="sourceLine" id="cb3-96" title="96">    </a>
+<a class="sourceLine" id="cb3-97" title="97">    <span class="dt">K               =</span> P <span class="op">+</span><span class="st"> </span>F,</a>
+<a class="sourceLine" id="cb3-98" title="98">    <span class="dt">n_surf_area_t_1 =</span> <span class="kw"><a href="reference/fun-mult-helpers.html">right_mult</a></span>(K, n_surf_area_t),</a>
+<a class="sourceLine" id="cb3-99" title="99">    </a>
+<a class="sourceLine" id="cb3-100" title="100">    <span class="dt">family          =</span> <span class="st">'IPM'</span>,</a>
+<a class="sourceLine" id="cb3-101" title="101">    <span class="dt">data_list       =</span> data_list,</a>
+<a class="sourceLine" id="cb3-102" title="102">    <span class="dt">states          =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'surf_area'</span>)),</a>
+<a class="sourceLine" id="cb3-103" title="103">    <span class="dt">has_hier_effs   =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb3-104" title="104">    <span class="dt">evict           =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb3-105" title="105">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-106" title="106"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_impl</a></span>(</a>
+<a class="sourceLine" id="cb3-107" title="107">    <span class="kw"><a href="reference/define_star.html">make_impl_args_list</a></span>(</a>
+<a class="sourceLine" id="cb3-108" title="108">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'P'</span>, <span class="st">"F"</span>, <span class="st">"K"</span>),</a>
+<a class="sourceLine" id="cb3-109" title="109">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">'midpoint'</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb3-110" title="110">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">'surf_area'</span>,<span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb3-111" title="111">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">'surf_area'</span>, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb3-112" title="112">    )</a>
+<a class="sourceLine" id="cb3-113" title="113">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-114" title="114"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_domains</a></span>(<span class="dt">surf_area =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">100</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-115" title="115"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_env_state</a></span>(</a>
+<a class="sourceLine" id="cb3-116" title="116">    <span class="dt">env_params =</span> <span class="kw">mvt_wrapper</span>(r_means, r_sigma, <span class="dt">nms =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'s_int_yr'</span>,</a>
+<a class="sourceLine" id="cb3-117" title="117">                                                       <span class="st">'g_int_yr'</span>,</a>
+<a class="sourceLine" id="cb3-118" title="118">                                                       <span class="st">'f_r_int_yr'</span>,</a>
+<a class="sourceLine" id="cb3-119" title="119">                                                       <span class="st">'f_s_int_yr'</span>)),</a>
+<a class="sourceLine" id="cb3-120" title="120">    <span class="dt">data_list =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
+<a class="sourceLine" id="cb3-121" title="121">      <span class="dt">r_means =</span> r_means,</a>
+<a class="sourceLine" id="cb3-122" title="122">      <span class="dt">r_sigma =</span> r_sigma</a>
+<a class="sourceLine" id="cb3-123" title="123">    )</a>
+<a class="sourceLine" id="cb3-124" title="124">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-125" title="125"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_pop_state</a></span>(</a>
+<a class="sourceLine" id="cb3-126" title="126">    <span class="dt">pop_vectors =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">n_surf_area_t =</span> init_pop_vec),</a>
+<a class="sourceLine" id="cb3-127" title="127">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-128" title="128"><span class="st">  </span><span class="kw"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs   =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">inv_logit =</span> inv_logit,</a>
+<a class="sourceLine" id="cb3-129" title="129">                             <span class="dt">mvt_wrapper =</span> mvt_wrapper),</a>
+<a class="sourceLine" id="cb3-130" title="130">           <span class="dt">iterate    =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb3-131" title="131">           <span class="dt">iterations =</span> <span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb3-132" title="132"></a>
+<a class="sourceLine" id="cb3-133" title="133">pop_state_ipmr &lt;-<span class="st"> </span>param_resamp_model<span class="op">$</span>pop_state<span class="op">$</span>pop_state_surf_area</a>
+<a class="sourceLine" id="cb3-134" title="134">lambda_ipmr    &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">numeric</a></span>(iterations)</a>
+<a class="sourceLine" id="cb3-135" title="135"></a>
+<a class="sourceLine" id="cb3-136" title="136"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">2</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/dim">dim</a></span>(pop_state_ipmr)[<span class="dv">2</span>], <span class="dv">1</span>)) {</a>
 <a class="sourceLine" id="cb3-137" title="137">  </a>
-<a class="sourceLine" id="cb3-138" title="138">}</a>
-<a class="sourceLine" id="cb3-139" title="139"></a>
-<a class="sourceLine" id="cb3-140" title="140">lambda_ipmr</a></code></pre></div>
+<a class="sourceLine" id="cb3-138" title="138">  lambda_ipmr[(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(pop_state_ipmr[ ,i]) <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(pop_state_ipmr[ ,(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)])</a>
+<a class="sourceLine" id="cb3-139" title="139">  </a>
+<a class="sourceLine" id="cb3-140" title="140">}</a>
+<a class="sourceLine" id="cb3-141" title="141"></a>
+<a class="sourceLine" id="cb3-142" title="142">lambda_ipmr</a></code></pre></div>
 </div>
 </div>
   </div>
@@ -799,6 +817,8 @@
 <h2>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://travis-ci.org/levisc8/ipmr"><img src="https://travis-ci.org/levisc8/ipmr.svg?branch=master" alt="Travis build status"></a></li>
+<li><a href="https://www.tidyverse.org/lifecycle/#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://cran.r-project.org/package=ipmr"><img src="https://www.r-pkg.org/badges/version/ipmr" alt="CRAN status"></a></li>
 <li><a href="https://codecov.io/gh/levisc8/ipmr?branch=master"><img src="https://codecov.io/gh/levisc8/ipmr/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
 </ul>
 </div>
