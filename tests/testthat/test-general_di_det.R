@@ -234,6 +234,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
     g             = dnorm(ht_2, g_mu, g_sd),
     g_mu          = g_int + g_slope * ht_1,
     s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
+    data_list     = data_list_cr,
     states        = states,
     has_hier_effs = FALSE
   ) %>%
@@ -291,8 +292,8 @@ ipmr_cr <- init_ipm("general_di_det") %>%
       n_ht = init_pop_vec,
       n_b  = init_b
     )
-  ) #%>%
-# make_ipm(iterations = 100,
-# usr_funs = list(inv_logit   = inv_logit,
-#                 inv_logit_2 = inv_logit_2))
+  ) %>%
+make_ipm(iterations = 100,
+         usr_funs = list(inv_logit   = inv_logit,
+                         inv_logit_2 = inv_logit_2))
 

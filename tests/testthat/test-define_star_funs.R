@@ -8,6 +8,10 @@ impl_args_single <- make_impl_args_list(c('P', 'F', 'K'),
                                         dom_start = rep('dbh', 3),
                                         dom_end = rep('dbh', 3))
 
+L <- 100
+U <- 500
+n_mesh_p <- 1000
+
 single_state <- init_ipm('simple_di_det') %>%
   define_kernel("P",
                 formula = s_g_mult(s, g),
@@ -147,3 +151,13 @@ test_that('define_pop_state produces expected outputs', {
   # evaluation occurs - .check_pop_state needs separate unit tests
 })
 
+test_that('define_domains can use global variables', {
+
+
+  two_state <- define_domains(two_state,
+                               dbh = c(L, U, n_mesh_p))
+
+  new_dom <- two_state$domain[[1]]$dbh_2
+
+  expect_equal(new_dom, c(L, U, n_mesh_p))
+})
