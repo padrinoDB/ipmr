@@ -16,12 +16,10 @@ define_k(proto_ipm, name, family, ..., data_list = list(), states,
 \arguments{
 \item{proto_ipm}{The name of object you wish to append the new kernel to.}
 
-\item{name}{The name of the new kernel. Survival and growth kernels should be
-named \code{"P"} for now. Fecundity should be named \code{"F"}, and clonal
-kernels should be named \code{"C"} (again, just for now. \strong{ need to work on
-generalizing that).}}
+\item{name}{The name of the new kernel - can be anything as long as it is
+unique to the model.}
 
-\item{formula}{An bare expression specifying the form of the kernel. See below
+\item{formula}{A bare expression specifying the form of the kernel. See below
 for examples}
 
 \item{family}{The type of kernel. Options are \code{"CC"} for continuous to continuous

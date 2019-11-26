@@ -8,11 +8,9 @@
 #' See Details for more info
 #'
 #' @param proto_ipm The name of object you wish to append the new kernel to.
-#' @param name The name of the new kernel. Survival and growth kernels should be
-#' named \code{"P"} for now. Fecundity should be named \code{"F"}, and clonal
-#' kernels should be named \code{"C"} (again, just for now. \strong{ need to work on
-#' generalizing that).}
-#' @param formula An bare expression specifying the form of the kernel. See below
+#' @param name The name of the new kernel - can be anything as long as it is
+#' unique to the model.
+#' @param formula A bare expression specifying the form of the kernel. See below
 #' for examples
 #' @param family The type of kernel. Options are \code{"CC"} for continuous to continuous
 #' transitions, \code{"DC"} for discrete to continuous (e.g. emergence from a seedbank),
