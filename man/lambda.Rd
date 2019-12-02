@@ -13,9 +13,15 @@ lambda(ipm, ...)
 
 \method{lambda}{simple_di_det_ipm}(ipm, type = "deterministic", ...)
 
-\method{lambda}{simple_di_stoch_kern_ipm}(ipm, type = "stochastic", comp_method = c("eigen", "pop_size"), ...)
+\method{lambda}{simple_di_stoch_kern_ipm}(
+  ipm,
+  type = "stochastic",
+  comp_method = c("eigen", "pop_size"),
+  all_lambdas = TRUE,
+  ...
+)
 
-\method{lambda}{simple_di_stoch_param_ipm}(ipm, ...)
+\method{lambda}{simple_di_stoch_param_ipm}(ipm, ...., all_lambdas = TRUE)
 
 \method{lambda}{general_di_det_ipm}(ipm, type, ...)
 
@@ -34,7 +40,7 @@ See details for more information.}
 is not possible except for \code{"simple_*_stoch_kern"} and \code{"simple_*_det"}}
 }
 \value{
-A single numeric value.
+A single numeric vector or single value.
 }
 \description{
 Compute the per-capita growth rate for an IPM object
@@ -52,7 +58,7 @@ Because \code{ipmr} doesn't construct the iteration
 kernel for \code{general_*} IPMs the way that they are typically implemented in
 interactive sessions (e.g. by r/cbind()ing discrete and continuous stages together),
 lambda must be computed by dividing successive population sizes
-by their prior sizes and taking the geometric mean of those ratios. Thus, only
+by their prior sizes. Thus, only
 \code{type = 'stochastic'} and \code{comp_method = "pop_size"} are available
 for these models.
 }

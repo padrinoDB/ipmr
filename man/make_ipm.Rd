@@ -53,7 +53,7 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
 }
 \arguments{
 \item{proto_ipm}{The proto_ipm object you wish to implement. This should be the
-output of \code{add_kernel}, \code{define_k}, or the \code{define_*} functions.}
+output of \code{define_kernel}, \code{define_k}, or the \code{define_*} functions.}
 
 \item{return_all}{A logical indicating whether to return the environments that
 the kernel expressions are evaluated in. This is useful for developer
@@ -89,9 +89,9 @@ The \code{make_ipm.*} methods will always return a list of length 6
 containing the following components:
 
 \itemize{
-  \item{\strong{iterators}}{: iteration kernel(s) (if specified by \code{add_K}),
+  \item{\strong{iterators}}{: iteration kernel(s) (if specified by \code{define_k}),
                             otherwise contains \code{NA}.}
-  \item{\strong{sub_kernels}}{: the sub_kernels specified in \code{add_kernel}.}
+  \item{\strong{sub_kernels}}{: the sub_kernels specified in \code{define_kernel}.}
   \item{\strong{env_list}}{: a list containing the evaluation environments of
                            kernel. This will always be empty unless \code{
                            return_all} is \code{TRUE}. Mostly here for developer

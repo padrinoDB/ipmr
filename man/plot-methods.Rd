@@ -4,6 +4,7 @@
 \alias{plot.ipmr_matrix}
 \alias{plot.simple_di_det_ipm}
 \alias{plot.simple_di_stoch_param_ipm}
+\alias{plot.simple_di_stoch_kern_ipm}
 \title{Plot a matrix or an *_ipm object}
 \usage{
 \method{plot}{ipmr_matrix}(
@@ -20,24 +21,39 @@
 \method{plot}{simple_di_det_ipm}(
   x = NULL,
   y = NULL,
-  ipm,
+  ipm = NULL,
   sub_kernels = FALSE,
   col = rainbow(100, start = 0.67, end = 0),
   bw = FALSE,
   do_contour = FALSE,
   do_legend = FALSE,
+  exponent = 1,
   ...
 )
 
 \method{plot}{simple_di_stoch_param_ipm}(
   x = NULL,
   y = NULL,
-  ipm,
+  ipm = NULL,
   sub_kernels = FALSE,
   col = rainbow(100, start = 0.67, end = 0),
   bw = FALSE,
   do_contour = FALSE,
   do_legend = FALSE,
+  exponent = 1,
+  ...
+)
+
+\method{plot}{simple_di_stoch_kern_ipm}(
+  x = NULL,
+  y = NULL,
+  ipm = NULL,
+  sub_kernels = FALSE,
+  col = rainbow(100, start = 0.67, end = 0),
+  bw = FALSE,
+  do_contour = FALSE,
+  do_legend = FALSE,
+  exponent = 1,
   ...
 )
 }
@@ -45,7 +61,8 @@
 \item{x, y}{Either the values of the meshpoints or \code{NULL}. If \code{NULL},
 then a sequence is generated so that meshpoints are given sequential bin numbers.}
 
-\item{A, ipm}{A matrix or a result from \code{make_ipm}}
+\item{A, ipm}{A matrix or a result from \code{make_ipm}, or \code{NULL} if \code{x}
+is specified as the matrix or IPM object.}
 
 \item{col}{A vector of colors to use for plotting}
 
@@ -65,4 +82,11 @@ on the plot}
 }
 \description{
 Plot a matrix or an *_ipm object
+}
+\details{
+\code{plot.ipmr_matrix} is intended for internal use only, and it
+is usually safer to use \code{plot.*_ipm} methods for visualizing kernels.
+If a K kernel is overwhelmed by information in say, a fecundity sub-kernel,
+use the \code{exponent} argument in \code{plot.*_ipm} to make it more visually
+appealing.
 }

@@ -186,7 +186,7 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
     <tr>
       <th>proto_ipm</th>
       <td><p>The proto_ipm object you wish to implement. This should be the
-output of <code>add_kernel</code>, <code>define_k</code>, or the <code>define_*</code> functions.</p></td>
+output of <code>define_kernel</code>, <code>define_k</code>, or the <code>define_*</code> functions.</p></td>
     </tr>
     <tr>
       <th>return_all</th>
@@ -238,9 +238,9 @@ distribution.</p></td>
     <p>The <code>make_ipm.*</code> methods will always return a list of length 6
 containing the following components:</p>
 <ul>
-<li><p><strong>iterators</strong>: iteration kernel(s) (if specified by <code>add_K</code>),
+<li><p><strong>iterators</strong>: iteration kernel(s) (if specified by <code>define_k</code>),
                             otherwise contains <code>NA</code>.</p></li>
-<li><p><strong>sub_kernels</strong>: the sub_kernels specified in <code>add_kernel</code>.</p></li>
+<li><p><strong>sub_kernels</strong>: the sub_kernels specified in <code>define_kernel</code>.</p></li>
 <li><p><strong>env_list</strong>: a list containing the evaluation environments of
                            kernel. This will always be empty unless <code>
                            return_all</code> is <code>TRUE</code>. Mostly here for developer
