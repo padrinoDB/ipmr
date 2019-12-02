@@ -26,8 +26,15 @@
 }
 
 .drop_duplicated_names_and_splice <- function(to_drop) {
+
   if(!any(duplicated(names(to_drop)))) {
-    return(to_drop)
+    test <- vapply(to_drop, function(x) all(is.na(x)), logical(1))
+    if(!any(test)) {
+      return(to_drop)
+    } else {
+      to_drop <- to_drop[!test]
+      return(to_drop)
+    }
   }
 
   temp   <- to_drop[rlang::have_name(temp)]
@@ -104,7 +111,7 @@
 
   }
 
-  return(.geom_mean(temp))
+  return(temp[length(temp)])
 
 }
 

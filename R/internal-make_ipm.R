@@ -1,8 +1,65 @@
 # make_ipm internal helpers
 
+
 #' @noRd
 
-.make_sub_kernel <- function(proto, env_list, return_envs = FALSE) {
+.make_sub_kernel_general <- function(proto, env_list, return_envs = FALSE) {
+
+  # browser()
+  out <- list()
+  master_env <- env_list$master_env
+
+  for(i in seq_len(dim(proto)[1])) {
+
+    if(proto$evict[i]) {
+      proto[i, ] <- .correct_eviction(proto[i, ])
+    }
+
+    param_tree <- proto$params[[i]]
+
+    kern_env         <- .generate_kernel_env(param_tree$params,
+                                             master_env,
+                                             param_tree)
+
+    kern_text        <- param_tree$formula
+
+    kern_form        <- .parse_vr_formulae(kern_text,
+                                           kern_env)
+
+    names(kern_form) <- proto$kernel_id[i]
+
+    rlang::env_bind_lazy(kern_env,
+                         !!! kern_form,
+                         .eval_env = kern_env)
+
+    temp     <- .extract_kernel_from_eval_env(kern_env,
+                                              proto$kernel_id[i],
+                                              out,
+                                              proto$params[[i]]$family,
+                                              pos = i)
+
+    out[[i]] <- .fun_to_iteration_mat(temp[[i]],
+                                      state_var_start = names(proto$domain[[i]])[1],
+                                      state_var_end   = names(proto$domain[[i]])[2],
+                                      master_env      = master_env)
+
+    names(out)[i] <- proto$kernel_id[i]
+
+    if(return_envs) {
+      env_list                 <- purrr::splice(env_list, list(kern_env))
+      names(env_list)[(i + 1)] <- proto$kernel_id[i]
+    }
+
+  } # end sub-kernel construction
+
+  res <- list(sub_kernels = out, env_list = env_list)
+
+  return(res)
+}
+
+#' @noRd
+
+.make_sub_kernel_simple <- function(proto, env_list, return_envs = FALSE) {
 
   out <- list()
   master_env <- env_list$master_env
@@ -62,17 +119,22 @@
 
 .append_dz_to_kern_form <- function(kern_text, proto, id) {
 
+
   sv <- names(proto$domain[[id]])
+  if(grepl('_not_applicable', sv[1])) {
+    return(kern_text)
+  }
+
   sv <- gsub('_[0-9]', "", sv)
 
-  if(all(!is.na(sv))){
+  if(all(!is.na(sv))) {
     use_var <- sv[1]
   } else {
     ind <- which(!is.na(sv))
     use_var <- sv[ind]
   }
 
-  out <- paste(kern_text, ' * cell_size_', use_var, sep = "")
+  out <- paste(kern_text, ' * d_', use_var, sep = "")
 
   return(out)
 }
@@ -116,9 +178,9 @@
 
   env_list       <- list(master_env = master_env)
 
-  sys            <- .make_sub_kernel(proto,
-                                     env_list,
-                                     return_envs = return_envs)
+  sys            <- .make_sub_kernel_simple(proto,
+                                            env_list,
+                                            return_envs = return_envs)
 
   out            <- list(ipm_system = sys,
                          master_env = master_env)
@@ -193,7 +255,7 @@
 
 
 
-        pop_out[ , 1]      <- pop_state[[1]]
+        pop_out[ , 1]      <- pop_state[[i]]
 
         out[[i]]           <- pop_out
       }
@@ -285,8 +347,8 @@
 
   # make names a bit prettier to help distinguish between iterations
   names(sub_kernels) <- paste(names(sub_kernels),
-                               current_iteration,
-                               sep = "_")
+                              current_iteration,
+                              sep = "_")
 
   names(iterator)    <- paste(names(iterator), current_iteration, sep = "_")
 
@@ -317,10 +379,13 @@
     for(i in seq_along(pop_history)) {
 
       pop_history[[i]][ , (iteration + 1)] <- pop_out_t_1
+
     }
+
   } else if(is.matrix(pop_history)) {
 
     pop_history[ , (iteration + 1)]        <- pop_out_t_1
+
   }
 
   return(pop_history)
@@ -393,7 +458,7 @@
 
   text <- lapply(text, function(x) {
     gsub('n_', 'pop_state_', x)
-    }
+  }
   )
 
   text   <- lapply(text, function(x) {
@@ -455,13 +520,46 @@
                   !!! Us,
                   !!! n_mesh_p)
 
+  # Generate midpoints for integration mesh
 
   mids <- purrr::map(bounds, .f = function(x) {
+
     l <- length(x) - 1
     out_domain <- 0.5 * (x[1:l] + x[2:(l + 1)])
     return(out_domain)
 
   })
+
+  # For general IPMs, we also need indices to extract the correct vectors
+  # from the evaluated kernels. For CC and DD, these are just empty vectors because
+  # we want the complete result. However, DC and CD will still generate vectors the
+  # same length as CC, even though we only want the first row for CD and first column
+  # for DC. CD is easy, it's just a sequence 1:n_mesh_p. DC is (0:n_mesh_p * n_mesh_p) + 1
+  # to get the first value in each row (e.g. the first column of the iteration matrix).
+  # Append names of the state variable to each so that we can access them later.
+
+  dc_cd_nms <- names(domain_list)[!grepl('_not_applicable', names(domain_list))]
+
+  for(i in seq_along(dc_cd_nms)) {
+
+    cd_nm <- paste('cd_ind_', dc_cd_nms[i], sep = "")
+    dc_nm <- paste('dc_ind_', dc_cd_nms[i], sep = "")
+
+    to_bind <- rlang::list2(!! cd_nm := seq(1,
+                                            n_mesh_p[[i]],
+                                            by = 1),
+                            !! dc_nm := (seq(0,
+                                             n_mesh_p[[i]] - 1,
+                                             by = 1) * n_mesh_p[[i]]) + 1)
+
+    rlang::env_bind(master_env,
+                    !!! to_bind)
+
+  }
+
+  # Loop over the different domains. Each continuous variable will have two,
+  # hence the "by = 2". This only applies for midpoint rule IPMs, others will need
+  # different weights, etc.
 
   for(i in seq(1, length(mids), by = 2)){
 
@@ -475,13 +573,16 @@
 
     sv <- strsplit(names(domain_list)[i], '_[0-9]')[[1]][1]
 
-    nm <- paste0('cell_size_', sv, sep = "")
+    nm <- paste0('d_', sv, sep = "")
 
     h  <- domain_grid[2, 1] - domain_grid[1, 1]
 
     assign(nm, h, envir = master_env)
 
   }
+
+  # Add in user specified functions. These need to be in the master_env
+  # so all kernels can access them during evaluation
 
   rlang::env_bind(master_env,
                   !!! usr_funs)
@@ -562,6 +663,15 @@
 
   return(out)
 
+}
+
+.make_markov_seq <- function(proto,
+                             kernels,
+                             kernel_seq,
+                             iterations) {
+
+  stop('markov chain environmental sequences not yet supported',
+       call. = FALSE)
 }
 
 #' @importFrom stats runif
@@ -684,6 +794,26 @@
     if(rlang::is_list(pop_state)) {
       pop_state <- .flatten_to_depth(pop_state, 1)
     }
+
+    # Turn pop_states for continuous vars into column vectors
+
+    cls_test <- lapply(pop_state,
+                       function(x) inherits(x, 'matrix'))
+
+
+    for(i in seq_along(pop_state)) {
+
+      if(length(pop_state[[i]]) > 1 && ! cls_test[[i]]) {
+
+        # Will not work for rectangular continuous state spaces!
+        # Need to work out the right procedure for that, but I think
+        # that's a challenge for a later date
+
+        pop_state[[i]] <- matrix(pop_state[[i]],
+                                 nrow = length(pop_state[[i]]),
+                                 ncol = 1)
+      }
+    }
   }
 
   if(!all(is.na(env_state))) {
@@ -731,6 +861,68 @@
   }
 
   return(list(pop_state = pop_holder))
+}
+
+#' @noRd
+#' @importFrom purrr map2
+.iterate_kerns_general <- function(k_row,
+                                   proto_ipm,
+                                   sub_kern_list,
+                                   iterations,
+                                   kern_seq,
+                                   pop_state,
+                                   master_env) {
+
+  # If it's an expression, make sure it's evaluated.
+  # It can only be an expression or a numeric vector/matrix, otherwise
+  # we get an error earlier on, so there shouldn't be an "else". This should
+  # almost never be triggered though, as .init_pop_state_list *should* be
+  # generating matrices/vectors before hand.
+
+  if(rlang::is_quosures(pop_state) || rlang::is_quosure(pop_state)) {
+    pop_state <- lapply(pop_state, rlang::eval_tidy)
+  }
+
+  for(i in seq_len(iterations)) {
+
+    pop_list_t_1 <- .eval_general_det(k_row         = k_row,
+                                      proto_ipm     = proto_ipm,
+                                      sub_kern_list = sub_kern_list,
+                                      pop_state     = pop_state,
+                                      master_env    = master_env)
+
+
+    # make names match pop_state and then reorder the list for easy
+    # insertion
+    names(pop_list_t_1) <- gsub('_t_1', '', names(pop_list_t_1))
+
+    pop_list_t_1        <- pop_list_t_1[names(pop_state)]
+
+    pop_state           <- purrr::map2(.x        = pop_state,
+                                       .y        = pop_list_t_1,
+                                       .f        = function(.x, .y, iteration) {
+
+                                         .x[ , (iteration + 1)] <- .y
+
+                                         return(.x)
+                                       },
+                                       iteration = i
+    )
+
+    # Now, update the names so that we can bind the new n_*_t to
+    # master_env so that the next iteration is evaluated correctly
+
+    names(pop_list_t_1) <- names(pop_list_t_1) %>%
+      paste(., '_t', sep = "")
+
+
+    rlang::env_bind(.env = master_env,
+                    !!! pop_list_t_1)
+
+  }
+
+  return(pop_state)
+
 }
 
 #' @noRd
@@ -797,13 +989,24 @@
                                   state_var_end,
                                   master_env) {
 
+  test_vec <- c(state_var_start, state_var_end)
+
+  ind_lgl  <- vapply(test_vec,
+                     function(x) grepl('_not_applicable', x),
+                     logical(1))
+
   # If there is no starting domain, its a discrete to continuous, and will
   # produce a column vector (or scalar for DD). Otherwise, get number of
   # meshpoints
 
-  if(is.na(state_var_start) || is.null(state_var_start)) {
+  if(state_var_start == 'start_not_applicable' ||
+     is.null(state_var_start) ||
+     is.na(state_var_start)) {
 
     n_mesh_p_start <- 1
+
+    ind <- paste('master_env$dc_ind_', state_var_end, sep = "")
+    ind <- rlang::parse_expr(ind)
 
   } else {
 
@@ -814,9 +1017,14 @@
 
   # Same as above but for domain end and it makes a row vector (or scalar)
 
-  if(is.na(state_var_end) || is.null(state_var_end)) {
+  if(state_var_end == 'end_not_applicable' ||
+     is.na(state_var_end) ||
+     is.null(state_var_end)) {
 
     n_mesh_p_end <- 1
+
+    ind <- paste('master_env$cd_ind_', state_var_start, sep = "")
+    ind <- rlang::parse_expr(ind)
 
   } else {
 
@@ -826,9 +1034,50 @@
 
   }
 
+  # ind_lgl will be all false for CC and all true for DD, so if either is not true
+  # then we need to use ind to subset the values contained in fun. Then, we can
+  # actually make an iteration matrix
+
+  if(!all(ind_lgl) && !all(!ind_lgl)) {
+    fun <- fun[eval(ind)]
+  }
+
   out <- matrix(fun, nrow = n_mesh_p_end, ncol = n_mesh_p_start, byrow = TRUE)
 
   class(out) <- c(class(fun[[1]]), class(out))
+
+  return(out)
+
+}
+
+#' @noRd
+# Helper to ensure returned objects have the right ipmr classes associated with
+# them.
+
+set_ipmr_classes <- function(to_set, cls = NULL) {
+
+  # Sets ipmr_matrix as default. Used to make sure lightweight S3 system for plotting
+  # works correctly!
+  if(! is.null(cls)) {
+
+    set_as <- paste('ipmr_', cls, sep = "")
+
+  } else {
+
+    set_as <- 'ipmr_matrix'
+
+  }
+
+  out <- lapply(
+    to_set,
+    function(x, set_as) {
+
+      class(x) <- c(set_as, class(x))
+
+      return(x)
+    },
+    set_as = set_as
+  )
 
   return(out)
 

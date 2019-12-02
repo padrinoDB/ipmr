@@ -126,22 +126,58 @@
 
 }
 
-.make_k_general_det <- function(k_row,
-                                proto_ipm,
-                                sub_kern_list,
-                                master_env) {
+#' @noRd
+# Evaluates the K exprs with their population vectors. Not prefaced with .make_*
+# because for general IPMs, we don't really "make" a K, just iterate it with
+# the sub kernels and use the population vectors. I think it may simplify the API
+# eventually to revert this back to make_* naming though
 
-  k_list <- list()
+.eval_general_det <- function(k_row,
+                              proto_ipm,
+                              sub_kern_list,
+                              pop_state,
+                              master_env) {
 
+  pop_list <- list()
 
-  n_ks <- sum(.flatten_to_depth(k_row$params, 1) %>%
-                grepl("formula", names(.)))
+  n_ks <- dim(k_row)[1]
 
-  for(i in seq_len) {
+  for(i in seq_len(n_ks)) {
 
-    # FILL ME !
+    id         <- k_row$kernel_id[i]
+
+    to_bind    <- .get_sub_kernels_for_k(id, sub_kern_list)
+
+    param_tree <- k_row$params[[i]]
+
+    # Part one of .generate_kernel env, but we don't want to bind kern_quos
+    # because they do not exist yet!
+
+    kern_env <- rlang::child_env(.parent = master_env,
+                                 !!! param_tree$params)
+
+    rlang::env_bind_lazy(kern_env,
+                         !!! to_bind,
+                         .eval_env = kern_env)
+
+    kern_form <- .parse_k_formulae(param_tree$formula,
+                                   kern_env)
+
+    pull_name <- ifelse(names(kern_form) == id, id, names(kern_form))
+
+    rlang::env_bind_lazy(kern_env,
+                         !!! kern_form,
+                         .eval_env = kern_env)
+
+    pop_list[[i]]        <- rlang::env_get_list(kern_env, nms = pull_name)
+
+    names(pop_list[[i]]) <- pull_name
+
   }
 
+  pop_list <- .flatten_to_depth(pop_list, 1)
+
+  return(pop_list)
 }
 
 #' @noRd

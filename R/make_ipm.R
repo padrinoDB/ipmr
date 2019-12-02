@@ -7,7 +7,7 @@
 #' vignettes('Introduction to ipmr', 'ipmr')} also contains helpful information.
 #'
 #' @param proto_ipm The proto_ipm object you wish to implement. This should be the
-#' output of \code{add_kernel}, \code{add_K}, or the \code{define_*} functions.
+#' output of \code{define_kernel}, \code{define_k}, or the \code{define_*} functions.
 #' @param ... Other arguments passed to methods
 #' @param return_all A logical indicating whether to return the environments that
 #' the kernel expressions are evaluated in. This is useful for developer
@@ -31,26 +31,14 @@
 #' If empty, a random sequence will be generated internally from a uniform
 #' distribution.
 #'
-#' @return The \code{make_ipm.*det} methods will always return a list of length 4
+#' @return
+#'  The \code{make_ipm.*} methods will always return a list of length 6
 #' containing the following components:
 #'
 #' \itemize{
-#'   \item{\strong{iterators}}{: iteration kernel(s) (if specified by \code{add_K}),
+#'   \item{\strong{iterators}}{: iteration kernel(s) (if specified by \code{define_k}),
 #'                             otherwise contains \code{NA}.}
-#'   \item{\strong{sub_kernels}}{: the sub_kernels specified in \code{add_kernel}.}
-#'   \item{\strong{pop_state}}{: population vectors stored in a list of arrays.
-#'   Dimension one corresponds the continuous state, and dimension 2 is time (
-#'   requires generalization for higher dimensional kernels!!!).}
-#'   \item{\strong{proto_ipm}}{: the \code{proto_ipm} object used to implement
-#'                              the model.}
-#' }
-#'  The \code{make_ipm.*stoch} methods will always return a list of length 5
-#' containing the following components:
-#'
-#' \itemize{
-#'   \item{\strong{iterators}}{: iteration kernel(s) (if specified by \code{add_K}),
-#'                             otherwise contains \code{NA}.}
-#'   \item{\strong{sub_kernels}}{: the sub_kernels specified in \code{add_kernel}.}
+#'   \item{\strong{sub_kernels}}{: the sub_kernels specified in \code{define_kernel}.}
 #'   \item{\strong{env_list}}{: a list containing the evaluation environments of
 #'                            kernel. This will always be empty unless \code{
 #'                            return_all} is \code{TRUE}. Mostly here for developer
@@ -61,12 +49,19 @@
 #'                              a matrix with as many columns as stochastic parameters
 #'                              \code{n_iterations} rows.}
 #'   \item{\strong{pop_state}}{: population vectors stored as an instance of the
-#'                              \code{pop_state} class.}
+#'                              stored as a list of arrays. The first dimension
+#'                              of each array corresponds to the state variable,
+#'                              and the second dimsension corresponds to time
+#'                              steps.}
 #'   \item{\strong{proto_ipm}}{: the \code{proto_ipm} object used to implement
 #'                              the model.}
 #' }
 #'
-#'
+#' In addition to the list class, each object will have the class from
+#' \code{model_class} defined in \code{init_ipm} plus \code{'_ipm'}. This is to
+#' facilitate \code{print}, \code{plot}, and \code{lambda} methods. For example,
+#' a \code{'simple_di_stoch_kern'} model will have the class \code{'simple_di_stoch_kern_ipm'}
+#' once it has been implemented using \code{make_ipm}.
 #'
 #'
 #'
@@ -85,7 +80,6 @@ make_ipm <- function(proto_ipm,
 
 
 #' @rdname make_ipm
-#' @inheritParams make_ipm
 #'
 #' @importFrom methods hasArg
 #' @export
@@ -97,7 +91,7 @@ make_ipm.simple_di_det <- function(proto_ipm,
                                    domain_list = NULL,
                                    iterate = FALSE,
                                    iterations = 50
-                                   ) {
+) {
 
   # checks pop_state, env_state, domain_definitions
 
@@ -116,18 +110,22 @@ make_ipm.simple_di_det <- function(proto_ipm,
   }
 
   # construct the kernels from their function defintions
-  env_list <- list(master_env = master_env)
+  env_list      <- list(master_env = master_env)
 
-  all_sub_kerns <- .make_sub_kernel(others,
-                                    env_list,
-                                    return_envs = return_all)
+  all_sub_kerns <- .make_sub_kernel_simple(others,
+                                           env_list,
+                                           return_envs = return_all)
 
   sub_kern_list <- all_sub_kerns$sub_kernels
 
   if(!is.na(k_row)[1]) {
+
     iterators <- .make_k_simple(k_row, proto_ipm, sub_kern_list, master_env)
+
   } else {
+
     iterators <- NA_real_
+
   }
 
   if(iterate) {
@@ -140,13 +138,32 @@ make_ipm.simple_di_det <- function(proto_ipm,
                                        pop_state)
   }
 
+  if(return_all) {
+    out_ret <- all_sub_kerns$env_list
+  } else {
+    out_ret <- NA_character_
+  }
+
+  if(iterate) {
+    out_seq <- kern_seq
+  } else {
+    out_seq <- NA_integer_
+  }
+
+  if(!all(is.na(unlist(proto_ipm$pop_state)))) {
+    out_pop <- pop_state
+  } else {
+    out_pop <- NA_real_
+  }
+
+  iterators     <- set_ipmr_classes(iterators)
+  sub_kern_list <- set_ipmr_classes(sub_kern_list)
+
   out <- list(iterators   = iterators,
               sub_kernels = sub_kern_list,
-              env_list    = ifelse(return_all, env_list, NA),
-              env_seq     = ifelse(iterate, kern_seq, NA_integer_),
-              pop_state   = ifelse(all(is.na(unlist(proto_ipm$pop_state))),
-                                   NA,
-                                   pop_state),
+              env_list    = out_ret,
+              env_seq     = out_seq,
+              pop_state   = out_pop,
               proto_ipm   = proto_ipm)
 
   class(out) <- c('simple_di_det_ipm', 'list')
@@ -159,13 +176,13 @@ make_ipm.simple_di_det <- function(proto_ipm,
 #'
 #' @export
 make_ipm.simple_di_stoch_kern <- function(proto_ipm,
-                                          return_all = FALSE,
-                                          usr_funs = list(),
+                                          return_all  = FALSE,
+                                          usr_funs    = list(),
                                           ...,
                                           domain_list = NULL,
-                                          iterate = FALSE,
-                                          iterations = 50,
-                                          kernel_seq = NULL) {
+                                          iterate     = FALSE,
+                                          iterations  = 50,
+                                          kernel_seq  = NULL) {
 
 
   # checks pop_state, env_state, domain_definitions
@@ -188,11 +205,12 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 
   env_list      <- list(master_env = master_env)
 
-  all_sub_kerns <- .make_sub_kernel(others,
-                                    env_list,
-                                    return_envs = return_all)
+  all_sub_kerns <- .make_sub_kernel_simple(others,
+                                           env_list,
+                                           return_envs = return_all)
 
   sub_kern_list <- all_sub_kerns$sub_kernels
+  env_list      <- all_sub_kerns$env_list
 
   # build up the iteration kernels from their sub-kernels
 
@@ -221,10 +239,18 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 
   }
 
+  if(return_all) {
+    out_ret <- env_list
+  } else {
+    out_ret <- NA_character_
+  }
+
+  iterators     <- set_ipmr_classes(iterators)
+  sub_kern_list <- set_ipmr_classes(sub_kern_list)
 
   out <- list(iterators   = iterators,
               sub_kernels = sub_kern_list,
-              env_list    = ifelse(return_all, env_list, NA),
+              env_list    = out_ret,
               env_seq     = kern_seq,
               pop_state   = pop_state,
               proto_ipm   = proto_ipm)
@@ -235,17 +261,16 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
   return(out)
 }
 
-#' @inheritParams make_ipm
 #' @rdname make_ipm
 #'
 #' @export
 make_ipm.simple_di_stoch_param <- function(proto_ipm,
-                                           return_all = FALSE,
-                                           usr_funs = list(),
+                                           return_all  = FALSE,
+                                           usr_funs    = list(),
                                            ...,
                                            domain_list = NULL,
-                                           iterate = TRUE,
-                                           iterations = 50) {
+                                           iterate     = TRUE,
+                                           iterations  = 50) {
 
   proto_list <- .initialize_kernels(proto_ipm, iterate)
 
@@ -316,27 +341,30 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
   }
 
+  out$iterators   <- set_ipmr_classes(out$iterators)
+  out$sub_kernels <- set_ipmr_classes(out$sub_kernels)
+
   if(return_all) out$data_envs <- purrr::splice(out$data_envs, env_list)
 
   class(out) <- c('simple_di_stoch_param_ipm', 'list')
+
   return(out)
 
 
 }
 
 
-#' @inheritParams make_ipm
 #' @rdname make_ipm
 #'
 #' @export
 
 make_ipm.general_di_det <- function(proto_ipm,
-                                    return_all = FALSE,
-                                    usr_funs = list(),
+                                    return_all  = FALSE,
+                                    usr_funs    = list(),
                                     ...,
                                     domain_list = NULL,
-                                    iterate = TRUE,
-                                    iterations = 50) {
+                                    iterate     = TRUE,
+                                    iterations  = 50) {
 
   # initialize others + k_row
 
@@ -355,42 +383,83 @@ make_ipm.general_di_det <- function(proto_ipm,
   # we can always find them and avoid that miserable repitition
 
   master_env <- .bind_all_constants(pop_state   = others$pop_state[[1]],
-                                    env_state   = others$env_state[[1]]$constants,
+                                    env_state   = others$env_state[[1]],
                                     env_to_bind = master_env)
 
 
-  out        <- .prep_di_output(others, k_row, proto_ipm, iterations)
+  temp       <- .prep_di_output(others, k_row, proto_ipm, iterations)
 
   # Thus far, I think general_* methods will have to use iteration for lambdas
   # as I'm not sure I want to work out the correct cbind(rbind(...)) rules for
   # creating a mega-matrix. So throw an error if pop_state isn't defined
-  if(is.na(proto_ipm$pop_state[[1]])) {
+  if(all(is.na(proto_ipm$pop_state[[1]]))) {
 
     stop("All general_* IPMs must have a 'pop_state' defined.",
          "See ?define_pop_state() for more details." )
 
   } else {
 
-    master_env <- .add_pop_state_to_master_env(out$pop_state, master_env)
+    master_env  <- .add_pop_state_to_master_env(temp$pop_state, master_env)
 
   }
 
-  env_list <- list(master_env)
+  env_list      <- list(master_env = master_env)
 
-  all_sub_kerns <- .make_sub_kernel(others,
-                                    env_list,
-                                    return_envs = return_all)
+  all_sub_kerns <- .make_sub_kernel_general(others,
+                                            env_list,
+                                            return_envs = return_all)
 
   sub_kern_list <- all_sub_kerns$sub_kernels
+  env_list      <- all_sub_kerns$env_list
 
-  # build up the iteration kernels from their sub-kernels
+  # Things switch up here from the simple_* versions. Rather than construct a mega-K
+  # through rbind + cbinding, we just iterate the population vector with the
+  # sub kernels. This means I don't have to overload all of the arithmetic
+  # operators and keeps things simpler internally. It also means there's no
+  # need to implement sparse kernels/matrices for things like an age x size IPM.
 
-  iterators     <- .make_k_general_det(k_row,
-                                       proto_ipm,
-                                       sub_kern_list,
-                                       master_env)
+  if(iterate) {
+
+    kern_seq  <- rep(1, iterations)
+
+    pop_state <- .iterate_kerns_general(k_row,
+                                        proto_ipm,
+                                        sub_kern_list,
+                                        iterations,
+                                        kern_seq,
+                                        temp$pop_state,
+                                        master_env)
+  }
 
 
+  sub_kern_list <- set_ipmr_classes(sub_kern_list)
+
+  if(return_all) {
+    env_ret <- env_list
+  } else {
+    env_ret <- NA_character_
+  }
+
+  if(iterate) {
+    env_seq_ret <- kern_seq
+    pop_ret     <- pop_state
+  } else {
+    env_seq_ret <- NA_integer_
+    pop_ret     <- temp$pop_state
+  }
+
+  out <- list(
+    iterators   = NA_character_,
+    sub_kernels = sub_kern_list,
+    env_list    = env_ret,
+    env_seq     = env_seq_ret,
+    pop_state   = pop_ret,
+    proto_ipm   = proto_ipm
+  )
+
+  class(out) <- c('general_di_det_ipm', 'list')
+
+  return(out)
 
 }
 
