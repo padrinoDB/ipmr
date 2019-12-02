@@ -5,13 +5,32 @@
 \alias{define_k}
 \title{Functions to initialize and define IPM kernels}
 \usage{
-define_kernel(proto_ipm, name, formula, family, ..., data_list = list(),
-  states, has_hier_effs = FALSE, levels_hier_effs = list(),
-  evict = FALSE, evict_fun = NULL)
+define_kernel(
+  proto_ipm,
+  name,
+  formula,
+  family,
+  ...,
+  data_list = list(),
+  states,
+  has_hier_effs = FALSE,
+  levels_hier_effs = list(),
+  evict = FALSE,
+  evict_fun = NULL
+)
 
-define_k(proto_ipm, name, family, ..., data_list = list(), states,
-  has_hier_effs = FALSE, levels_hier_effs = list(), evict = FALSE,
-  evict_fun = NULL)
+define_k(
+  proto_ipm,
+  name,
+  family,
+  ...,
+  data_list = list(),
+  states,
+  has_hier_effs = FALSE,
+  levels_hier_effs = list(),
+  evict = FALSE,
+  evict_fun = NULL
+)
 }
 \arguments{
 \item{proto_ipm}{The name of object you wish to append the new kernel to.}

@@ -7,8 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fits IPMs using an expression based framework  • ipmr</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/yeti/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Fits IPMs using an expression based framework ">
 <meta property="og:description" content="Flexibly implements IPMs using an expression based framework. This
   will not abstract away the model selection process, but it will make sure you
@@ -23,7 +24,7 @@
 <![endif]-->
 </head>
 <body>
-    <div class="container template-article">
+    <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
@@ -43,7 +44,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -78,12 +79,10 @@
 <!--/.navbar -->
 
       
-      </header><div class="row">
-  <div class="col-md-9 contents">
-    
 
-    
-    
+      </header><div class="row">
+  <div class="contents col-md-9">
+
 
 <div id="ipmr" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
@@ -97,11 +96,11 @@
 <p>The first step of defining a model in <code>ipmr</code> (assuming all parameters have already been estimated) is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function takes a single argument: <code>model_class</code>. The <code>model_class</code> defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. <code>model_class</code> should be a character string with at least 3 (but possibly 4) entries separated by underscores (<code>_</code>). Below, the are the possible entries for each position.</p>
 <ul>
 <li><p>Position 1: <code>"simple"</code>/<code>"general"</code></p></li>
-<li><ol style="list-style-type: upper-alpha">
+<li><ol>
 <li>
 <strong>simple</strong>: This describes an IPM with a single continuous state variable and no discrete stages.</li>
 </ol></li>
-<li><ol start="2" style="list-style-type: upper-alpha">
+<li><ol>
 <li>
 <strong>general</strong>: This describes and IPM with either more than one continuous state variable, one or more discrete stages, or both of the above. Basically, anything other than an IPM with a single continuous state variable.</li>
 </ol></li>
@@ -121,7 +120,7 @@
 <li>Simple, density independent models: <strong>Completed and ready</strong>
 </li>
 </ul>
-<ol style="list-style-type: decimal">
+<ol>
 <li><p><code>"simple_di_det"</code></p></li>
 <li><p><code>"simple_di_stoch_kern"</code></p></li>
 <li><p><code>"simple_di_stoch_param"</code></p></li>
@@ -130,7 +129,7 @@
 <li>Simple, density dependent models: <strong>Please be patient</strong>
 </li>
 </ul>
-<ol start="4" style="list-style-type: decimal">
+<ol>
 <li><p><code>"simple_dd_det"</code></p></li>
 <li><p><code>"simple_dd_stoch_kern"</code></p></li>
 <li><p><code>"simple_dd_stoch_param"</code></p></li>
@@ -139,7 +138,7 @@
 <li>General, density independent models: <strong>Currently in progress</strong>
 </li>
 </ul>
-<ol start="7" style="list-style-type: decimal">
+<ol>
 <li><p><code>"general_di_det"</code></p></li>
 <li><p><code>"general_di_stoch_kern"</code></p></li>
 <li><p><code>"general_di_stoch_param"</code></p></li>
@@ -148,7 +147,7 @@
 <li>General, density dependent models: <strong>Please be patient</strong>
 </li>
 </ul>
-<ol start="10" style="list-style-type: decimal">
+<ol>
 <li><p><code>"general_dd_det"</code></p></li>
 <li><p><code>"general_dd_stoch_kern"</code></p></li>
 <li><p><code>"general_dd_stoch_param"</code></p></li>
@@ -162,9 +161,9 @@
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># Example of the setup for a simple IPM without density dependence or environmental</span></a>
 <a class="sourceLine" id="cb1-2" title="2"><span class="co"># stochasticity</span></a>
 <a class="sourceLine" id="cb1-3" title="3"></a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ipmr)</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ipmr)</a>
 <a class="sourceLine" id="cb1-5" title="5"></a>
-<a class="sourceLine" id="cb1-6" title="6">data_list =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">s_int     =</span> <span class="fl">2.2</span>,</a>
+<a class="sourceLine" id="cb1-6" title="6">data_list =<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">s_int     =</span> <span class="fl">2.2</span>,</a>
 <a class="sourceLine" id="cb1-7" title="7">                 <span class="dt">s_slope   =</span> <span class="fl">0.25</span>,</a>
 <a class="sourceLine" id="cb1-8" title="8">                 <span class="dt">g_int     =</span> <span class="fl">0.2</span>,</a>
 <a class="sourceLine" id="cb1-9" title="9">                 <span class="dt">g_slope   =</span> <span class="fl">1.02</span>,</a>
@@ -177,42 +176,42 @@
 <a class="sourceLine" id="cb1-16" title="16">                 <span class="dt">sd_fd     =</span> <span class="fl">0.3</span>)</a>
 <a class="sourceLine" id="cb1-17" title="17"></a>
 <a class="sourceLine" id="cb1-18" title="18">s &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params) {</a>
-<a class="sourceLine" id="cb1-19" title="19">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)))</a>
+<a class="sourceLine" id="cb1-19" title="19">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)))</a>
 <a class="sourceLine" id="cb1-20" title="20">}</a>
 <a class="sourceLine" id="cb1-21" title="21"></a>
 <a class="sourceLine" id="cb1-22" title="22"></a>
 <a class="sourceLine" id="cb1-23" title="23">g &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, sv2, params, L, U) {</a>
 <a class="sourceLine" id="cb1-24" title="24">  mu &lt;-<span class="st"> </span>params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1</a>
-<a class="sourceLine" id="cb1-25" title="25">  ev &lt;-<span class="st"> </span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(U, mu, params[<span class="dv">3</span>]) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(L, mu, params[<span class="dv">3</span>]))</a>
-<a class="sourceLine" id="cb1-26" title="26">  <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(sv2, <span class="dt">mean =</span> mu, <span class="dt">sd =</span> params[<span class="dv">3</span>]) <span class="op">/</span><span class="st"> </span>ev</a>
+<a class="sourceLine" id="cb1-25" title="25">  ev &lt;-<span class="st"> </span>(<span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(U, mu, params[<span class="dv">3</span>]) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(L, mu, params[<span class="dv">3</span>]))</a>
+<a class="sourceLine" id="cb1-26" title="26">  <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(sv2, <span class="dt">mean =</span> mu, <span class="dt">sd =</span> params[<span class="dv">3</span>]) <span class="op">/</span><span class="st"> </span>ev</a>
 <a class="sourceLine" id="cb1-27" title="27">}</a>
 <a class="sourceLine" id="cb1-28" title="28"></a>
 <a class="sourceLine" id="cb1-29" title="29">f_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params) {</a>
-<a class="sourceLine" id="cb1-30" title="30">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)))</a>
+<a class="sourceLine" id="cb1-30" title="30">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)))</a>
 <a class="sourceLine" id="cb1-31" title="31">}</a>
 <a class="sourceLine" id="cb1-32" title="32"></a>
 <a class="sourceLine" id="cb1-33" title="33">f_s &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params) {</a>
-<a class="sourceLine" id="cb1-34" title="34">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)</a>
+<a class="sourceLine" id="cb1-34" title="34">  <span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)</a>
 <a class="sourceLine" id="cb1-35" title="35">}</a>
 <a class="sourceLine" id="cb1-36" title="36"></a>
 <a class="sourceLine" id="cb1-37" title="37">f_d &lt;-<span class="st"> </span><span class="cf">function</span>(sv2, params) {</a>
-<a class="sourceLine" id="cb1-38" title="38">  <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(sv2, <span class="dt">mean =</span> params[<span class="dv">1</span>], <span class="dt">sd =</span> params[<span class="dv">2</span>])</a>
+<a class="sourceLine" id="cb1-38" title="38">  <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(sv2, <span class="dt">mean =</span> params[<span class="dv">1</span>], <span class="dt">sd =</span> params[<span class="dv">2</span>])</a>
 <a class="sourceLine" id="cb1-39" title="39">}</a>
 <a class="sourceLine" id="cb1-40" title="40"></a>
 <a class="sourceLine" id="cb1-41" title="41">fec &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, sv2, params, L, U) {</a>
-<a class="sourceLine" id="cb1-42" title="42">  ev &lt;-<span class="st"> </span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(U, params[<span class="dv">5</span>], params[<span class="dv">6</span>]) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(L, params[<span class="dv">5</span>], params[<span class="dv">6</span>]))</a>
+<a class="sourceLine" id="cb1-42" title="42">  ev &lt;-<span class="st"> </span>(<span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(U, params[<span class="dv">5</span>], params[<span class="dv">6</span>]) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(L, params[<span class="dv">5</span>], params[<span class="dv">6</span>]))</a>
 <a class="sourceLine" id="cb1-43" title="43">  <span class="kw">f_r</span>(sv1, params[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]) <span class="op">*</span><span class="st"> </span><span class="kw">f_s</span>(sv1, params[<span class="dv">3</span><span class="op">:</span><span class="dv">4</span>]) <span class="op">*</span><span class="st"> </span>(<span class="kw">f_d</span>(sv2, params[<span class="dv">5</span><span class="op">:</span><span class="dv">6</span>] <span class="op">/</span><span class="st"> </span>ev))</a>
 <a class="sourceLine" id="cb1-44" title="44">}</a>
 <a class="sourceLine" id="cb1-45" title="45"></a>
-<a class="sourceLine" id="cb1-46" title="46">b &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">0</span>, <span class="dv">50</span>, <span class="dt">length.out =</span> <span class="dv">101</span>)</a>
+<a class="sourceLine" id="cb1-46" title="46">b &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dv">0</span>, <span class="dv">50</span>, <span class="dt">length.out =</span> <span class="dv">101</span>)</a>
 <a class="sourceLine" id="cb1-47" title="47">d1 &lt;-<span class="st"> </span>(b[<span class="dv">2</span><span class="op">:</span><span class="dv">101</span>] <span class="op">+</span><span class="st"> </span>b[<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>]) <span class="op">*</span><span class="st"> </span><span class="fl">0.5</span></a>
 <a class="sourceLine" id="cb1-48" title="48">h &lt;-<span class="st"> </span>d1[<span class="dv">3</span>] <span class="op">-</span><span class="st"> </span>d1[<span class="dv">2</span>]</a>
 <a class="sourceLine" id="cb1-49" title="49"></a>
-<a class="sourceLine" id="cb1-50" title="50">domains &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/expand.grid">expand.grid</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">d2 =</span> d1, <span class="dt">d1 =</span> d1))</a>
+<a class="sourceLine" id="cb1-50" title="50">domains &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">d2 =</span> d1, <span class="dt">d1 =</span> d1))</a>
 <a class="sourceLine" id="cb1-51" title="51"></a>
 <a class="sourceLine" id="cb1-52" title="52">G &lt;-<span class="st"> </span><span class="kw">g</span>(domains<span class="op">$</span>d2,</a>
 <a class="sourceLine" id="cb1-53" title="53">       domains<span class="op">$</span>d1,</a>
-<a class="sourceLine" id="cb1-54" title="54">       <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(data_list<span class="op">$</span>g_int,</a>
+<a class="sourceLine" id="cb1-54" title="54">       <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(data_list<span class="op">$</span>g_int,</a>
 <a class="sourceLine" id="cb1-55" title="55">                  data_list<span class="op">$</span>g_slope,</a>
 <a class="sourceLine" id="cb1-56" title="56">                  data_list<span class="op">$</span>sd_g),</a>
 <a class="sourceLine" id="cb1-57" title="57">       <span class="dt">L =</span> <span class="dv">0</span>,</a>
@@ -220,39 +219,39 @@
 <a class="sourceLine" id="cb1-59" title="59"></a>
 <a class="sourceLine" id="cb1-60" title="60"></a>
 <a class="sourceLine" id="cb1-61" title="61"></a>
-<a class="sourceLine" id="cb1-62" title="62">S &lt;-<span class="st"> </span><span class="kw">s</span>(d1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(data_list<span class="op">$</span>s_int, data_list<span class="op">$</span>s_slope))</a>
+<a class="sourceLine" id="cb1-62" title="62">S &lt;-<span class="st"> </span><span class="kw">s</span>(d1, <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(data_list<span class="op">$</span>s_int, data_list<span class="op">$</span>s_slope))</a>
 <a class="sourceLine" id="cb1-63" title="63"></a>
-<a class="sourceLine" id="cb1-64" title="64">P &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(S <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(G))</a>
+<a class="sourceLine" id="cb1-64" title="64">P &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(S <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(G))</a>
 <a class="sourceLine" id="cb1-65" title="65"></a>
 <a class="sourceLine" id="cb1-66" title="66">Fm &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw">fec</span>(domains<span class="op">$</span>d2,</a>
 <a class="sourceLine" id="cb1-67" title="67">              domains<span class="op">$</span>d1,</a>
-<a class="sourceLine" id="cb1-68" title="68">              <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(data_list[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
+<a class="sourceLine" id="cb1-68" title="68">              <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(data_list[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
 <a class="sourceLine" id="cb1-69" title="69">              <span class="dt">L =</span> <span class="dv">0</span>, <span class="dt">U =</span> <span class="dv">50</span>)</a>
 <a class="sourceLine" id="cb1-70" title="70"></a>
 <a class="sourceLine" id="cb1-71" title="71">K &lt;-<span class="st"> </span>P <span class="op">+</span><span class="st"> </span>Fm</a>
 <a class="sourceLine" id="cb1-72" title="72"></a>
-<a class="sourceLine" id="cb1-73" title="73">K &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(K, <span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb1-73" title="73">K &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(K, <span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb1-74" title="74"></a>
 <a class="sourceLine" id="cb1-75" title="75"></a>
-<a class="sourceLine" id="cb1-76" title="76">lambda_usr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(K)<span class="op">$</span>values[<span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb1-77" title="77">w &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(K)<span class="op">$</span>vectors[ , <span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb1-76" title="76">lambda_usr &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span>(K)<span class="op">$</span>values[<span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb1-77" title="77">w &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span>(K)<span class="op">$</span>vectors[ , <span class="dv">1</span>])</a>
 <a class="sourceLine" id="cb1-78" title="78"></a>
 <a class="sourceLine" id="cb1-79" title="79"></a>
 <a class="sourceLine" id="cb1-80" title="80"><span class="co"># User specified functions can be passed to make_ipm(usr_funs = list(my_fun = my_fun)).</span></a>
 <a class="sourceLine" id="cb1-81" title="81"><span class="co"># inv_logit is a simple example, but more complicated ones can be specified as well. </span></a>
 <a class="sourceLine" id="cb1-82" title="82"></a>
 <a class="sourceLine" id="cb1-83" title="83">inv_logit &lt;-<span class="st"> </span><span class="cf">function</span>(int, slope, sv) {</a>
-<a class="sourceLine" id="cb1-84" title="84">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(<span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv))))</a>
+<a class="sourceLine" id="cb1-84" title="84">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv))))</a>
 <a class="sourceLine" id="cb1-85" title="85">}</a>
 <a class="sourceLine" id="cb1-86" title="86"></a>
 <a class="sourceLine" id="cb1-87" title="87"></a>
 <a class="sourceLine" id="cb1-88" title="88">impl_args &lt;-<span class="st"> </span><span class="kw"><a href="reference/define_star.html">make_impl_args_list</a></span>(</a>
-<a class="sourceLine" id="cb1-89" title="89">  <span class="dt">kernel_names =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"K"</span>, <span class="st">"P"</span>, <span class="st">"F"</span>),</a>
-<a class="sourceLine" id="cb1-90" title="90">  <span class="dt">int_rule     =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"midpoint"</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb1-91" title="91">  <span class="dt">dom_start    =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"dbh"</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb1-92" title="92">  <span class="dt">dom_end      =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"dbh"</span>, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb1-89" title="89">  <span class="dt">kernel_names =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"K"</span>, <span class="st">"P"</span>, <span class="st">"F"</span>),</a>
+<a class="sourceLine" id="cb1-90" title="90">  <span class="dt">int_rule     =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb1-91" title="91">  <span class="dt">dom_start    =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb1-92" title="92">  <span class="dt">dom_end      =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>, <span class="dv">3</span>)</a>
 <a class="sourceLine" id="cb1-93" title="93">)</a>
-<a class="sourceLine" id="cb1-94" title="94">states &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'dbh'</span>))</a>
+<a class="sourceLine" id="cb1-94" title="94">states &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>))</a>
 <a class="sourceLine" id="cb1-95" title="95"></a>
 <a class="sourceLine" id="cb1-96" title="96">x &lt;-<span class="st"> </span><span class="kw"><a href="reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_det'</span>) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb1-97" title="97"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_kernel</a></span>(</a>
@@ -277,7 +276,7 @@
 <a class="sourceLine" id="cb1-116" title="116">    <span class="co"># when specifying your own functions. </span></a>
 <a class="sourceLine" id="cb1-117" title="117">    </a>
 <a class="sourceLine" id="cb1-118" title="118">    <span class="dt">s         =</span> <span class="kw">inv_logit</span>(s_int, s_slope, dbh_<span class="dv">1</span>), </a>
-<a class="sourceLine" id="cb1-119" title="119">    <span class="dt">g         =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(dbh_<span class="dv">2</span>, mu_g, sd_g),</a>
+<a class="sourceLine" id="cb1-119" title="119">    <span class="dt">g         =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(dbh_<span class="dv">2</span>, mu_g, sd_g),</a>
 <a class="sourceLine" id="cb1-120" title="120">    <span class="dt">mu_g      =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb1-121" title="121"></a>
 <a class="sourceLine" id="cb1-122" title="122">    <span class="dt">data_list =</span> data_list,</a>
@@ -290,8 +289,8 @@
 <a class="sourceLine" id="cb1-129" title="129">                <span class="dt">formula   =</span> f_r <span class="op">*</span><span class="st"> </span>f_s <span class="op">*</span><span class="st"> </span>f_d,</a>
 <a class="sourceLine" id="cb1-130" title="130">                <span class="dt">family    =</span> <span class="st">'CC'</span>,</a>
 <a class="sourceLine" id="cb1-131" title="131">                <span class="dt">f_r       =</span> <span class="kw">inv_logit</span>(f_r_int, f_r_slope, dbh_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb1-132" title="132">                <span class="dt">f_s       =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(f_s_int <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb1-133" title="133">                <span class="dt">f_d       =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(dbh_<span class="dv">2</span>, mu_fd, sd_fd),</a>
+<a class="sourceLine" id="cb1-132" title="132">                <span class="dt">f_s       =</span> <span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(f_s_int <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb1-133" title="133">                <span class="dt">f_d       =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(dbh_<span class="dv">2</span>, mu_fd, sd_fd),</a>
 <a class="sourceLine" id="cb1-134" title="134">                <span class="dt">data_list =</span> data_list,</a>
 <a class="sourceLine" id="cb1-135" title="135">                <span class="dt">states    =</span> states,</a>
 <a class="sourceLine" id="cb1-136" title="136">                <span class="dt">evict     =</span> <span class="ot">TRUE</span>,</a>
@@ -307,21 +306,21 @@
 <a class="sourceLine" id="cb1-146" title="146"><span class="st">  </span><span class="kw"><a href="reference/kernel-definitions.html">define_k</a></span>(<span class="st">'K'</span>,</a>
 <a class="sourceLine" id="cb1-147" title="147">           <span class="dt">K         =</span> P <span class="op">+</span><span class="st"> </span>F,</a>
 <a class="sourceLine" id="cb1-148" title="148">           <span class="dt">family    =</span> <span class="st">'IPM'</span>,</a>
-<a class="sourceLine" id="cb1-149" title="149">           <span class="dt">data_list =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(),</a>
+<a class="sourceLine" id="cb1-149" title="149">           <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(),</a>
 <a class="sourceLine" id="cb1-150" title="150">           <span class="dt">states    =</span> states,</a>
 <a class="sourceLine" id="cb1-151" title="151">           <span class="dt">evict     =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb1-152" title="152"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_impl</a></span>(impl_args) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb1-153" title="153"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_domains</a></span>(</a>
-<a class="sourceLine" id="cb1-154" title="154">    <span class="dt">dbh =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="co"># the first entry is the lower bound of the domain.</span></a>
+<a class="sourceLine" id="cb1-154" title="154">    <span class="dt">dbh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>, <span class="co"># the first entry is the lower bound of the domain.</span></a>
 <a class="sourceLine" id="cb1-155" title="155">            <span class="dv">50</span>, <span class="co"># the second entry is the upper bound of the domain.</span></a>
 <a class="sourceLine" id="cb1-156" title="156">            <span class="dv">100</span> <span class="co"># third entry is the number of meshpoints for the domain.</span></a>
 <a class="sourceLine" id="cb1-157" title="157">    ) </a>
 <a class="sourceLine" id="cb1-158" title="158">  )  <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb1-159" title="159"><span class="st">  </span><span class="kw"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">inv_logit =</span> inv_logit))</a>
+<a class="sourceLine" id="cb1-159" title="159"><span class="st">  </span><span class="kw"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">inv_logit =</span> inv_logit))</a>
 <a class="sourceLine" id="cb1-160" title="160"></a>
 <a class="sourceLine" id="cb1-161" title="161"></a>
-<a class="sourceLine" id="cb1-162" title="162">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(x<span class="op">$</span>iterators<span class="op">$</span>K)<span class="op">$</span>values[<span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb1-163" title="163">w_ipmr      &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(x<span class="op">$</span>iterators<span class="op">$</span>K)<span class="op">$</span>vectors[ , <span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb1-162" title="162">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span>(x<span class="op">$</span>iterators<span class="op">$</span>K)<span class="op">$</span>values[<span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb1-163" title="163">w_ipmr      &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span>(x<span class="op">$</span>iterators<span class="op">$</span>K)<span class="op">$</span>vectors[ , <span class="dv">1</span>])</a>
 <a class="sourceLine" id="cb1-164" title="164"></a>
 <a class="sourceLine" id="cb1-165" title="165"></a>
 <a class="sourceLine" id="cb1-166" title="166">lambda_ipmr <span class="op">-</span><span class="st"> </span>lambda_usr</a></code></pre></div>
@@ -336,40 +335,40 @@
 <a class="sourceLine" id="cb2-2" title="2"><span class="co"># This is intended to simulate a monocarpic perennial life history where flowering is always fatal.</span></a>
 <a class="sourceLine" id="cb2-3" title="3"><span class="co"># Note that this means the survival function also includes the probability of reproduction function.</span></a>
 <a class="sourceLine" id="cb2-4" title="4"></a>
-<a class="sourceLine" id="cb2-5" title="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(rlang)</a>
-<a class="sourceLine" id="cb2-6" title="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ipmr)</a>
-<a class="sourceLine" id="cb2-7" title="7"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(purrr)</a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(rlang)</a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ipmr)</a>
+<a class="sourceLine" id="cb2-7" title="7"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(purrr)</a>
 <a class="sourceLine" id="cb2-8" title="8"></a>
 <a class="sourceLine" id="cb2-9" title="9"><span class="co"># define functions for target ipm</span></a>
 <a class="sourceLine" id="cb2-10" title="10"></a>
 <a class="sourceLine" id="cb2-11" title="11"></a>
 <a class="sourceLine" id="cb2-12" title="12"><span class="co"># Survival - logistic regression</span></a>
 <a class="sourceLine" id="cb2-13" title="13">s &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params, r_effect) {</a>
-<a class="sourceLine" id="cb2-14" title="14">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1 <span class="op">+</span><span class="st"> </span>r_effect))) <span class="op">*</span></a>
+<a class="sourceLine" id="cb2-14" title="14">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1 <span class="op">+</span><span class="st"> </span>r_effect))) <span class="op">*</span></a>
 <a class="sourceLine" id="cb2-15" title="15"><span class="st">    </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">f_r</span>(sv1, params[<span class="dv">3</span><span class="op">:</span><span class="dv">4</span>]))</a>
 <a class="sourceLine" id="cb2-16" title="16">}</a>
 <a class="sourceLine" id="cb2-17" title="17"></a>
 <a class="sourceLine" id="cb2-18" title="18"><span class="co"># Growth</span></a>
 <a class="sourceLine" id="cb2-19" title="19">g &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, sv2, params, r_effect, L, U) {</a>
 <a class="sourceLine" id="cb2-20" title="20">  mu &lt;-<span class="st"> </span>params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1 <span class="op">+</span><span class="st"> </span>r_effect</a>
-<a class="sourceLine" id="cb2-21" title="21">  ev &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(U, mu, params[<span class="dv">3</span>]) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(L, mu, params[<span class="dv">3</span>])</a>
-<a class="sourceLine" id="cb2-22" title="22">  <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(sv2, <span class="dt">mean =</span> mu, <span class="dt">sd =</span> params[<span class="dv">3</span>]) <span class="op">/</span><span class="st"> </span>ev</a>
+<a class="sourceLine" id="cb2-21" title="21">  ev &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(U, mu, params[<span class="dv">3</span>]) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(L, mu, params[<span class="dv">3</span>])</a>
+<a class="sourceLine" id="cb2-22" title="22">  <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(sv2, <span class="dt">mean =</span> mu, <span class="dt">sd =</span> params[<span class="dv">3</span>]) <span class="op">/</span><span class="st"> </span>ev</a>
 <a class="sourceLine" id="cb2-23" title="23">}</a>
 <a class="sourceLine" id="cb2-24" title="24"></a>
 <a class="sourceLine" id="cb2-25" title="25"><span class="co"># probability of reproducing</span></a>
 <a class="sourceLine" id="cb2-26" title="26">f_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params) {</a>
-<a class="sourceLine" id="cb2-27" title="27">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)))</a>
+<a class="sourceLine" id="cb2-27" title="27">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1)))</a>
 <a class="sourceLine" id="cb2-28" title="28">}</a>
 <a class="sourceLine" id="cb2-29" title="29"></a>
 <a class="sourceLine" id="cb2-30" title="30"><span class="co"># offspring production</span></a>
 <a class="sourceLine" id="cb2-31" title="31">f_s &lt;-<span class="st"> </span><span class="cf">function</span>(sv1, params, r_effect) {</a>
-<a class="sourceLine" id="cb2-32" title="32">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1 <span class="op">+</span><span class="st"> </span>r_effect)</a>
+<a class="sourceLine" id="cb2-32" title="32">  <span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(params[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>params[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>sv1 <span class="op">+</span><span class="st"> </span>r_effect)</a>
 <a class="sourceLine" id="cb2-33" title="33">}</a>
 <a class="sourceLine" id="cb2-34" title="34"></a>
 <a class="sourceLine" id="cb2-35" title="35"><span class="co"># offspring size distribution</span></a>
 <a class="sourceLine" id="cb2-36" title="36">f_d &lt;-<span class="st"> </span><span class="cf">function</span>(sv2, params, L, U) {</a>
-<a class="sourceLine" id="cb2-37" title="37">  ev &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(U, params[<span class="dv">1</span>], params[<span class="dv">2</span>]) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">pnorm</a></span>(L, params[<span class="dv">1</span>], params[<span class="dv">2</span>])</a>
-<a class="sourceLine" id="cb2-38" title="38">  <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(sv2, <span class="dt">mean =</span> params[<span class="dv">1</span>], <span class="dt">sd =</span> params[<span class="dv">2</span>]) <span class="op">/</span><span class="st"> </span>ev</a>
+<a class="sourceLine" id="cb2-37" title="37">  ev &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(U, params[<span class="dv">1</span>], params[<span class="dv">2</span>]) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(L, params[<span class="dv">1</span>], params[<span class="dv">2</span>])</a>
+<a class="sourceLine" id="cb2-38" title="38">  <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(sv2, <span class="dt">mean =</span> params[<span class="dv">1</span>], <span class="dt">sd =</span> params[<span class="dv">2</span>]) <span class="op">/</span><span class="st"> </span>ev</a>
 <a class="sourceLine" id="cb2-39" title="39">}</a>
 <a class="sourceLine" id="cb2-40" title="40"></a>
 <a class="sourceLine" id="cb2-41" title="41"><span class="co"># constructor function for the F kernel</span></a>
@@ -378,11 +377,11 @@
 <a class="sourceLine" id="cb2-44" title="44">}</a>
 <a class="sourceLine" id="cb2-45" title="45"></a>
 <a class="sourceLine" id="cb2-46" title="46"></a>
-<a class="sourceLine" id="cb2-47" title="47"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">50127</span>)</a>
+<a class="sourceLine" id="cb2-47" title="47"><span class="kw"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="dv">50127</span>)</a>
 <a class="sourceLine" id="cb2-48" title="48"></a>
 <a class="sourceLine" id="cb2-49" title="49"></a>
 <a class="sourceLine" id="cb2-50" title="50"><span class="co"># Define some fixed parameters</span></a>
-<a class="sourceLine" id="cb2-51" title="51">data_list =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
+<a class="sourceLine" id="cb2-51" title="51">data_list =<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
 <a class="sourceLine" id="cb2-52" title="52">  <span class="dt">s_int     =</span> <span class="fl">1.03</span>,</a>
 <a class="sourceLine" id="cb2-53" title="53">  <span class="dt">s_slope   =</span> <span class="fl">2.2</span>,</a>
 <a class="sourceLine" id="cb2-54" title="54">  <span class="dt">g_int     =</span> <span class="dv">8</span>,</a>
@@ -398,15 +397,15 @@
 <a class="sourceLine" id="cb2-64" title="64"></a>
 <a class="sourceLine" id="cb2-65" title="65"><span class="co"># Now, simulate some random intercepts for growth, survival, and offspring production</span></a>
 <a class="sourceLine" id="cb2-66" title="66"></a>
-<a class="sourceLine" id="cb2-67" title="67">g_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.3</span>)</a>
-<a class="sourceLine" id="cb2-68" title="68">s_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.7</span>)</a>
-<a class="sourceLine" id="cb2-69" title="69">f_s_r_int &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.2</span>)</a>
+<a class="sourceLine" id="cb2-67" title="67">g_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.3</span>)</a>
+<a class="sourceLine" id="cb2-68" title="68">s_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.7</span>)</a>
+<a class="sourceLine" id="cb2-69" title="69">f_s_r_int &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.2</span>)</a>
 <a class="sourceLine" id="cb2-70" title="70"></a>
-<a class="sourceLine" id="cb2-71" title="71">nms &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">"r_"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dt">sep =</span> <span class="st">""</span>)</a>
+<a class="sourceLine" id="cb2-71" title="71">nms &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"r_"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dt">sep =</span> <span class="st">""</span>)</a>
 <a class="sourceLine" id="cb2-72" title="72"></a>
-<a class="sourceLine" id="cb2-73" title="73"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(g_r_int)   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">'g_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
-<a class="sourceLine" id="cb2-74" title="74"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(s_r_int)   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">'s_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
-<a class="sourceLine" id="cb2-75" title="75"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(f_s_r_int) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">'f_s_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
+<a class="sourceLine" id="cb2-73" title="73"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(g_r_int)   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'g_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
+<a class="sourceLine" id="cb2-74" title="74"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(s_r_int)   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'s_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
+<a class="sourceLine" id="cb2-75" title="75"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(f_s_r_int) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'f_s_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
 <a class="sourceLine" id="cb2-76" title="76"></a>
 <a class="sourceLine" id="cb2-77" title="77"><span class="co"># The !!! operator used inside of list2 from rlang takes the named vector</span></a>
 <a class="sourceLine" id="cb2-78" title="78"><span class="co"># and converts it to a named list. This can be spliced into the data list</span></a>
@@ -420,18 +419,18 @@
 <a class="sourceLine" id="cb2-86" title="86">params     &lt;-<span class="st"> </span><span class="kw">splice</span>(data_list, g_params, s_params, f_s_params)</a>
 <a class="sourceLine" id="cb2-87" title="87"></a>
 <a class="sourceLine" id="cb2-88" title="88"></a>
-<a class="sourceLine" id="cb2-89" title="89">b   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="fl">0.2</span>, <span class="dv">40</span>, <span class="dt">length.out =</span> <span class="dv">101</span>)</a>
+<a class="sourceLine" id="cb2-89" title="89">b   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">0.2</span>, <span class="dv">40</span>, <span class="dt">length.out =</span> <span class="dv">101</span>)</a>
 <a class="sourceLine" id="cb2-90" title="90"></a>
 <a class="sourceLine" id="cb2-91" title="91">sv1 &lt;-<span class="st"> </span>(b[<span class="dv">2</span><span class="op">:</span><span class="dv">101</span>] <span class="op">+</span><span class="st"> </span>b[<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>]) <span class="op">*</span><span class="st"> </span><span class="fl">0.5</span></a>
 <a class="sourceLine" id="cb2-92" title="92"></a>
-<a class="sourceLine" id="cb2-93" title="93">domains &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/expand.grid">expand.grid</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">d2 =</span> sv1, <span class="dt">d1 =</span> sv1))</a>
+<a class="sourceLine" id="cb2-93" title="93">domains &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">d2 =</span> sv1, <span class="dt">d1 =</span> sv1))</a>
 <a class="sourceLine" id="cb2-94" title="94"></a>
 <a class="sourceLine" id="cb2-95" title="95">h   &lt;-<span class="st"> </span>sv1[<span class="dv">2</span>] <span class="op">-</span><span class="st"> </span>sv1[<span class="dv">1</span>]</a>
 <a class="sourceLine" id="cb2-96" title="96"></a>
 <a class="sourceLine" id="cb2-97" title="97"><span class="co"># repetitive to demonstrate the typical kernel construction process.</span></a>
 <a class="sourceLine" id="cb2-98" title="98"></a>
 <a class="sourceLine" id="cb2-99" title="99">g_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">g</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
-<a class="sourceLine" id="cb2-100" title="100">         <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
+<a class="sourceLine" id="cb2-100" title="100">         <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(params<span class="op">$</span>g_int,</a>
 <a class="sourceLine" id="cb2-101" title="101">                    params<span class="op">$</span>g_slope,</a>
 <a class="sourceLine" id="cb2-102" title="102">                    params<span class="op">$</span>sd_g),</a>
 <a class="sourceLine" id="cb2-103" title="103">         <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">1</span>,</a>
@@ -439,7 +438,7 @@
 <a class="sourceLine" id="cb2-105" title="105">         <span class="dt">U =</span> <span class="dv">40</span>)</a>
 <a class="sourceLine" id="cb2-106" title="106"></a>
 <a class="sourceLine" id="cb2-107" title="107">g_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">g</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
-<a class="sourceLine" id="cb2-108" title="108">         <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
+<a class="sourceLine" id="cb2-108" title="108">         <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(params<span class="op">$</span>g_int,</a>
 <a class="sourceLine" id="cb2-109" title="109">                    params<span class="op">$</span>g_slope,</a>
 <a class="sourceLine" id="cb2-110" title="110">                    params<span class="op">$</span>sd_g),</a>
 <a class="sourceLine" id="cb2-111" title="111">         <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">2</span>,</a>
@@ -447,7 +446,7 @@
 <a class="sourceLine" id="cb2-113" title="113">         <span class="dt">U =</span> <span class="dv">40</span>)</a>
 <a class="sourceLine" id="cb2-114" title="114"></a>
 <a class="sourceLine" id="cb2-115" title="115">g_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">g</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
-<a class="sourceLine" id="cb2-116" title="116">         <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
+<a class="sourceLine" id="cb2-116" title="116">         <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(params<span class="op">$</span>g_int,</a>
 <a class="sourceLine" id="cb2-117" title="117">                    params<span class="op">$</span>g_slope,</a>
 <a class="sourceLine" id="cb2-118" title="118">                    params<span class="op">$</span>sd_g),</a>
 <a class="sourceLine" id="cb2-119" title="119">         <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">3</span>,</a>
@@ -456,7 +455,7 @@
 <a class="sourceLine" id="cb2-122" title="122"></a>
 <a class="sourceLine" id="cb2-123" title="123"></a>
 <a class="sourceLine" id="cb2-124" title="124">g_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">g</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
-<a class="sourceLine" id="cb2-125" title="125">         <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
+<a class="sourceLine" id="cb2-125" title="125">         <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(params<span class="op">$</span>g_int,</a>
 <a class="sourceLine" id="cb2-126" title="126">                    params<span class="op">$</span>g_slope,</a>
 <a class="sourceLine" id="cb2-127" title="127">                    params<span class="op">$</span>sd_g),</a>
 <a class="sourceLine" id="cb2-128" title="128">         <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">4</span>,</a>
@@ -464,81 +463,81 @@
 <a class="sourceLine" id="cb2-130" title="130">         <span class="dt">U =</span> <span class="dv">40</span>)</a>
 <a class="sourceLine" id="cb2-131" title="131"></a>
 <a class="sourceLine" id="cb2-132" title="132">g_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw">g</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
-<a class="sourceLine" id="cb2-133" title="133">         <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>g_int,</a>
+<a class="sourceLine" id="cb2-133" title="133">         <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(params<span class="op">$</span>g_int,</a>
 <a class="sourceLine" id="cb2-134" title="134">                    params<span class="op">$</span>g_slope,</a>
 <a class="sourceLine" id="cb2-135" title="135">                    params<span class="op">$</span>sd_g),</a>
 <a class="sourceLine" id="cb2-136" title="136">         <span class="dt">r_effect =</span> params<span class="op">$</span>g_r_<span class="dv">5</span>,</a>
 <a class="sourceLine" id="cb2-137" title="137">         <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
 <a class="sourceLine" id="cb2-138" title="138">         <span class="dt">U =</span> <span class="dv">40</span>)</a>
 <a class="sourceLine" id="cb2-139" title="139"></a>
-<a class="sourceLine" id="cb2-140" title="140">s_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
+<a class="sourceLine" id="cb2-140" title="140">s_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
 <a class="sourceLine" id="cb2-141" title="141">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb2-142" title="142">s_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
+<a class="sourceLine" id="cb2-142" title="142">s_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
 <a class="sourceLine" id="cb2-143" title="143">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb2-144" title="144">s_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
+<a class="sourceLine" id="cb2-144" title="144">s_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
 <a class="sourceLine" id="cb2-145" title="145">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb2-146" title="146">s_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
+<a class="sourceLine" id="cb2-146" title="146">s_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
 <a class="sourceLine" id="cb2-147" title="147">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb2-148" title="148">s_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
+<a class="sourceLine" id="cb2-148" title="148">s_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw">s</span>(sv1, <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(params<span class="op">$</span>s_int, params<span class="op">$</span>s_slope,</a>
 <a class="sourceLine" id="cb2-149" title="149">                params<span class="op">$</span>f_r_int, params<span class="op">$</span>f_r_slope), params<span class="op">$</span>s_r_<span class="dv">5</span>)</a>
 <a class="sourceLine" id="cb2-150" title="150"></a>
-<a class="sourceLine" id="cb2-151" title="151">P_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">1</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">1</span>)) <span class="op">*</span><span class="st"> </span>h</a>
-<a class="sourceLine" id="cb2-152" title="152">P_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>h</a>
-<a class="sourceLine" id="cb2-153" title="153">P_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">3</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>h</a>
-<a class="sourceLine" id="cb2-154" title="154">P_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">4</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">4</span>)) <span class="op">*</span><span class="st"> </span>h</a>
-<a class="sourceLine" id="cb2-155" title="155">P_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(s_<span class="dv">5</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(g_<span class="dv">5</span>)) <span class="op">*</span><span class="st"> </span>h</a>
+<a class="sourceLine" id="cb2-151" title="151">P_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(s_<span class="dv">1</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(g_<span class="dv">1</span>)) <span class="op">*</span><span class="st"> </span>h</a>
+<a class="sourceLine" id="cb2-152" title="152">P_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(s_<span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(g_<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>h</a>
+<a class="sourceLine" id="cb2-153" title="153">P_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(s_<span class="dv">3</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(g_<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>h</a>
+<a class="sourceLine" id="cb2-154" title="154">P_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(s_<span class="dv">4</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(g_<span class="dv">4</span>)) <span class="op">*</span><span class="st"> </span>h</a>
+<a class="sourceLine" id="cb2-155" title="155">P_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(s_<span class="dv">5</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(g_<span class="dv">5</span>)) <span class="op">*</span><span class="st"> </span>h</a>
 <a class="sourceLine" id="cb2-156" title="156"></a>
 <a class="sourceLine" id="cb2-157" title="157"><span class="co"># These are not corrected for eviction, but they probably should be</span></a>
 <a class="sourceLine" id="cb2-158" title="158"></a>
 <a class="sourceLine" id="cb2-159" title="159">F_<span class="dv">1</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw">fec</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
-<a class="sourceLine" id="cb2-160" title="160">               <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
+<a class="sourceLine" id="cb2-160" title="160">               <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
 <a class="sourceLine" id="cb2-161" title="161">               <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb2-162" title="162">               <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
 <a class="sourceLine" id="cb2-163" title="163">               <span class="dt">U =</span> <span class="dv">40</span>)</a>
 <a class="sourceLine" id="cb2-164" title="164"></a>
 <a class="sourceLine" id="cb2-165" title="165">F_<span class="dv">2</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw">fec</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
-<a class="sourceLine" id="cb2-166" title="166">               <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
+<a class="sourceLine" id="cb2-166" title="166">               <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
 <a class="sourceLine" id="cb2-167" title="167">               <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">2</span>,</a>
 <a class="sourceLine" id="cb2-168" title="168">               <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
 <a class="sourceLine" id="cb2-169" title="169">               <span class="dt">U =</span> <span class="dv">40</span>)</a>
 <a class="sourceLine" id="cb2-170" title="170"></a>
 <a class="sourceLine" id="cb2-171" title="171">F_<span class="dv">3</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw">fec</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
-<a class="sourceLine" id="cb2-172" title="172">               <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
+<a class="sourceLine" id="cb2-172" title="172">               <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
 <a class="sourceLine" id="cb2-173" title="173">               <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">3</span>,</a>
 <a class="sourceLine" id="cb2-174" title="174">               <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
 <a class="sourceLine" id="cb2-175" title="175">               <span class="dt">U =</span> <span class="dv">40</span>)</a>
 <a class="sourceLine" id="cb2-176" title="176">F_<span class="dv">4</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw">fec</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
-<a class="sourceLine" id="cb2-177" title="177">               <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
+<a class="sourceLine" id="cb2-177" title="177">               <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
 <a class="sourceLine" id="cb2-178" title="178">               <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">4</span>,</a>
 <a class="sourceLine" id="cb2-179" title="179">               <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
 <a class="sourceLine" id="cb2-180" title="180">               <span class="dt">U =</span> <span class="dv">40</span>)</a>
 <a class="sourceLine" id="cb2-181" title="181">F_<span class="dv">5</span> &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span><span class="kw">fec</span>(domains<span class="op">$</span>d2, domains<span class="op">$</span>d1,</a>
-<a class="sourceLine" id="cb2-182" title="182">               <span class="dt">params =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unlist">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
+<a class="sourceLine" id="cb2-182" title="182">               <span class="dt">params =</span> <span class="kw"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(params[<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>]),</a>
 <a class="sourceLine" id="cb2-183" title="183">               <span class="dt">r_effect =</span> params<span class="op">$</span>f_s_r_<span class="dv">5</span>,</a>
 <a class="sourceLine" id="cb2-184" title="184">               <span class="dt">L =</span> <span class="fl">0.2</span>,</a>
 <a class="sourceLine" id="cb2-185" title="185">               <span class="dt">U =</span> <span class="dv">40</span>)</a>
 <a class="sourceLine" id="cb2-186" title="186"></a>
 <a class="sourceLine" id="cb2-187" title="187">K_<span class="dv">1</span> &lt;-<span class="st"> </span>(P_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">1</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-188" title="188"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-188" title="188"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb2-189" title="189">K_<span class="dv">2</span> &lt;-<span class="st"> </span>(P_<span class="dv">2</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">2</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-190" title="190"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-190" title="190"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb2-191" title="191">K_<span class="dv">3</span> &lt;-<span class="st"> </span>(P_<span class="dv">3</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">3</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-192" title="192"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-192" title="192"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb2-193" title="193">K_<span class="dv">4</span> &lt;-<span class="st"> </span>(P_<span class="dv">4</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">4</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-194" title="194"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-194" title="194"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb2-195" title="195">K_<span class="dv">5</span> &lt;-<span class="st"> </span>(P_<span class="dv">5</span> <span class="op">+</span><span class="st"> </span>F_<span class="dv">5</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-196" title="196"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-196" title="196"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="dt">nrow =</span> <span class="dv">100</span>, <span class="dt">ncol =</span> <span class="dv">100</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb2-197" title="197"></a>
-<a class="sourceLine" id="cb2-198" title="198">sys &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">K_1 =</span> K_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb2-198" title="198">sys &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">K_1 =</span> K_<span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb2-199" title="199">            <span class="dt">K_2 =</span> K_<span class="dv">2</span>,</a>
 <a class="sourceLine" id="cb2-200" title="200">            <span class="dt">K_3 =</span> K_<span class="dv">3</span>,</a>
 <a class="sourceLine" id="cb2-201" title="201">            <span class="dt">K_4 =</span> K_<span class="dv">4</span>,</a>
 <a class="sourceLine" id="cb2-202" title="202">            <span class="dt">K_5 =</span> K_<span class="dv">5</span>)</a>
 <a class="sourceLine" id="cb2-203" title="203"></a>
-<a class="sourceLine" id="cb2-204" title="204">eigen_sys &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">lapply</a></span>(sys, eigen)</a>
+<a class="sourceLine" id="cb2-204" title="204">eigen_sys &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(sys, eigen)</a>
 <a class="sourceLine" id="cb2-205" title="205"></a>
-<a class="sourceLine" id="cb2-206" title="206">lambdas &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">vapply</a></span>(eigen_sys, <span class="cf">function</span>(x) <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(x<span class="op">$</span>values[<span class="dv">1</span>]), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">numeric</a></span>(<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb2-207" title="207">ws      &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">vapply</a></span>(eigen_sys, <span class="cf">function</span>(x) <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(x<span class="op">$</span>vectors[ , <span class="dv">1</span>]), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">numeric</a></span>(<span class="dv">100</span>))</a>
+<a class="sourceLine" id="cb2-206" title="206">lambdas &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span>(eigen_sys, <span class="cf">function</span>(x) <span class="kw"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(x<span class="op">$</span>values[<span class="dv">1</span>]), <span class="kw"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb2-207" title="207">ws      &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span>(eigen_sys, <span class="cf">function</span>(x) <span class="kw"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(x<span class="op">$</span>vectors[ , <span class="dv">1</span>]), <span class="kw"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(<span class="dv">100</span>))</a>
 <a class="sourceLine" id="cb2-208" title="208"></a>
 <a class="sourceLine" id="cb2-209" title="209"></a>
 <a class="sourceLine" id="cb2-210" title="210"></a>
@@ -547,25 +546,25 @@
 <a class="sourceLine" id="cb2-213" title="213"><span class="co"># define the levels of the hierarchical variable and save them in a named</span></a>
 <a class="sourceLine" id="cb2-214" title="214"><span class="co"># list that corresponds to the suffix in the kernel notation</span></a>
 <a class="sourceLine" id="cb2-215" title="215"></a>
-<a class="sourceLine" id="cb2-216" title="216">hier_levels &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">yr =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb2-216" title="216">hier_levels &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">yr =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)</a>
 <a class="sourceLine" id="cb2-217" title="217"></a>
 <a class="sourceLine" id="cb2-218" title="218"><span class="co"># additional usr_funs to be passed into make_ipm()</span></a>
 <a class="sourceLine" id="cb2-219" title="219"></a>
 <a class="sourceLine" id="cb2-220" title="220">inv_logit &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope) {</a>
-<a class="sourceLine" id="cb2-221" title="221">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(</a>
-<a class="sourceLine" id="cb2-222" title="222">    <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv)))</a>
+<a class="sourceLine" id="cb2-221" title="221">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(</a>
+<a class="sourceLine" id="cb2-222" title="222">    <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv)))</a>
 <a class="sourceLine" id="cb2-223" title="223">  )</a>
 <a class="sourceLine" id="cb2-224" title="224">}</a>
 <a class="sourceLine" id="cb2-225" title="225"></a>
 <a class="sourceLine" id="cb2-226" title="226">inv_logit_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope, r_eff) {</a>
-<a class="sourceLine" id="cb2-227" title="227">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(</a>
-<a class="sourceLine" id="cb2-228" title="228">    <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv <span class="op">+</span><span class="st"> </span>r_eff)))</a>
+<a class="sourceLine" id="cb2-227" title="227">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(</a>
+<a class="sourceLine" id="cb2-228" title="228">    <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv <span class="op">+</span><span class="st"> </span>r_eff)))</a>
 <a class="sourceLine" id="cb2-229" title="229">  )</a>
 <a class="sourceLine" id="cb2-230" title="230">}</a>
 <a class="sourceLine" id="cb2-231" title="231"></a>
 <a class="sourceLine" id="cb2-232" title="232">pois_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope, r_eff) {</a>
-<a class="sourceLine" id="cb2-233" title="233">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(</a>
-<a class="sourceLine" id="cb2-234" title="234">    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(</a>
+<a class="sourceLine" id="cb2-233" title="233">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(</a>
+<a class="sourceLine" id="cb2-234" title="234">    <span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(</a>
 <a class="sourceLine" id="cb2-235" title="235">      int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv <span class="op">+</span><span class="st"> </span>r_eff</a>
 <a class="sourceLine" id="cb2-236" title="236">    )</a>
 <a class="sourceLine" id="cb2-237" title="237">  )</a>
@@ -588,10 +587,10 @@
 <a class="sourceLine" id="cb2-254" title="254">    <span class="dt">family           =</span> <span class="st">"CC"</span>,</a>
 <a class="sourceLine" id="cb2-255" title="255">    <span class="dt">s_yr             =</span> <span class="kw">inv_logit_r</span>(ht_<span class="dv">1</span>, s_int, s_slope, s_r_yr) <span class="op">*</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb2-256" title="256"><span class="st">      </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">inv_logit</span>(ht_<span class="dv">1</span>, f_r_int, f_r_slope)),</a>
-<a class="sourceLine" id="cb2-257" title="257">    <span class="dt">g_yr             =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(ht_<span class="dv">2</span>, mu_g_yr, sd_g),</a>
+<a class="sourceLine" id="cb2-257" title="257">    <span class="dt">g_yr             =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(ht_<span class="dv">2</span>, mu_g_yr, sd_g),</a>
 <a class="sourceLine" id="cb2-258" title="258">    <span class="dt">mu_g_yr          =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>ht_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>g_r_yr,</a>
 <a class="sourceLine" id="cb2-259" title="259">    <span class="dt">data_list        =</span> params,</a>
-<a class="sourceLine" id="cb2-260" title="260">    <span class="dt">states           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'ht'</span>)),</a>
+<a class="sourceLine" id="cb2-260" title="260">    <span class="dt">states           =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ht'</span>)),</a>
 <a class="sourceLine" id="cb2-261" title="261">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb2-262" title="262">    <span class="dt">levels_hier_effs =</span> hier_levels,</a>
 <a class="sourceLine" id="cb2-263" title="263">    <span class="dt">evict            =</span> <span class="ot">TRUE</span>,</a>
@@ -603,9 +602,9 @@
 <a class="sourceLine" id="cb2-269" title="269">    <span class="dt">family           =</span> <span class="st">"CC"</span>,</a>
 <a class="sourceLine" id="cb2-270" title="270">    <span class="dt">f_r              =</span> <span class="kw">inv_logit</span>(ht_<span class="dv">1</span>, f_r_int, f_r_slope),</a>
 <a class="sourceLine" id="cb2-271" title="271">    <span class="dt">f_s_yr           =</span> <span class="kw">pois_r</span>(ht_<span class="dv">1</span>, f_s_int, f_s_slope, f_s_r_yr),</a>
-<a class="sourceLine" id="cb2-272" title="272">    <span class="dt">f_d              =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(ht_<span class="dv">2</span>, mu_fd, sd_fd),</a>
+<a class="sourceLine" id="cb2-272" title="272">    <span class="dt">f_d              =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(ht_<span class="dv">2</span>, mu_fd, sd_fd),</a>
 <a class="sourceLine" id="cb2-273" title="273">    <span class="dt">data_list        =</span> params,</a>
-<a class="sourceLine" id="cb2-274" title="274">    <span class="dt">states           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'ht'</span>)),</a>
+<a class="sourceLine" id="cb2-274" title="274">    <span class="dt">states           =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ht'</span>)),</a>
 <a class="sourceLine" id="cb2-275" title="275">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb2-276" title="276">    <span class="dt">levels_hier_effs =</span> hier_levels,</a>
 <a class="sourceLine" id="cb2-277" title="277">    <span class="dt">evict            =</span> <span class="ot">TRUE</span>,</a>
@@ -616,28 +615,28 @@
 <a class="sourceLine" id="cb2-282" title="282">    <span class="dt">K_yr             =</span> P_yr <span class="op">+</span><span class="st"> </span>F_yr,</a>
 <a class="sourceLine" id="cb2-283" title="283">    <span class="dt">family           =</span> <span class="st">"IPM"</span>,</a>
 <a class="sourceLine" id="cb2-284" title="284">    <span class="dt">data_list        =</span> params,</a>
-<a class="sourceLine" id="cb2-285" title="285">    <span class="dt">states           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"ht"</span>)),</a>
+<a class="sourceLine" id="cb2-285" title="285">    <span class="dt">states           =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ht"</span>)),</a>
 <a class="sourceLine" id="cb2-286" title="286">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb2-287" title="287">    <span class="dt">levels_hier_effs =</span> hier_levels</a>
 <a class="sourceLine" id="cb2-288" title="288">  ) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb2-289" title="289"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_impl</a></span>(</a>
 <a class="sourceLine" id="cb2-290" title="290">    <span class="kw"><a href="reference/define_star.html">make_impl_args_list</a></span>(</a>
-<a class="sourceLine" id="cb2-291" title="291">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"K_yr"</span>, <span class="st">"P_yr"</span>, <span class="st">"F_yr"</span>),</a>
-<a class="sourceLine" id="cb2-292" title="292">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"midpoint"</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb2-293" title="293">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"ht"</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb2-294" title="294">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"ht"</span>, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb2-291" title="291">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"K_yr"</span>, <span class="st">"P_yr"</span>, <span class="st">"F_yr"</span>),</a>
+<a class="sourceLine" id="cb2-292" title="292">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb2-293" title="293">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"ht"</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb2-294" title="294">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"ht"</span>, <span class="dv">3</span>)</a>
 <a class="sourceLine" id="cb2-295" title="295">    )</a>
 <a class="sourceLine" id="cb2-296" title="296">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-297" title="297"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_domains</a></span>(<span class="dt">ht =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="fl">0.2</span>, <span class="dv">40</span>, <span class="dv">100</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-298" title="298"><span class="st">  </span><span class="kw"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">inv_logit   =</span> inv_logit,</a>
+<a class="sourceLine" id="cb2-297" title="297"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_domains</a></span>(<span class="dt">ht =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.2</span>, <span class="dv">40</span>, <span class="dv">100</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-298" title="298"><span class="st">  </span><span class="kw"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">inv_logit   =</span> inv_logit,</a>
 <a class="sourceLine" id="cb2-299" title="299">                           <span class="dt">inv_logit_r =</span> inv_logit_r,</a>
 <a class="sourceLine" id="cb2-300" title="300">                           <span class="dt">pois_r      =</span> pois_r))</a>
 <a class="sourceLine" id="cb2-301" title="301"></a>
 <a class="sourceLine" id="cb2-302" title="302"></a>
 <a class="sourceLine" id="cb2-303" title="303"></a>
-<a class="sourceLine" id="cb2-304" title="304">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">vapply</a></span>(monocarp_sys<span class="op">$</span>iterators, </a>
-<a class="sourceLine" id="cb2-305" title="305">                      <span class="cf">function</span>(x) <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/complex">Re</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/eigen">eigen</a></span>(x)<span class="op">$</span>values[<span class="dv">1</span>]), </a>
-<a class="sourceLine" id="cb2-306" title="306">                      <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">numeric</a></span>(<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb2-304" title="304">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span>(monocarp_sys<span class="op">$</span>iterators, </a>
+<a class="sourceLine" id="cb2-305" title="305">                      <span class="cf">function</span>(x) <span class="kw"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span>(x)<span class="op">$</span>values[<span class="dv">1</span>]), </a>
+<a class="sourceLine" id="cb2-306" title="306">                      <span class="kw"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(<span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb2-307" title="307"></a>
 <a class="sourceLine" id="cb2-308" title="308">lambda_ipmr <span class="op">-</span><span class="st"> </span>lambdas</a></code></pre></div>
 </div>
@@ -645,20 +644,20 @@
 <h2 class="hasAnchor">
 <a href="#simple-density-independet-parameter-resampled-models" class="anchor"></a>Simple, density independet, parameter resampled models</h2>
 <p>These models are stochastic, but rather than building the iteration kernels first and then iterating them - distributions for varying parameters are specified ahead of time and then resampled at each iteration. <code>ipmr</code> is careful to only evaluate each expression once per iteration, allowing you to specify parameters sampled from a joint distribution with a single expression. Their notation <em>usually</em> does not require suffix notation, though this example uses it to make clear which parameters are varying and which are fixed. All that’s required is that:</p>
-<ol style="list-style-type: decimal">
+<ol>
 <li><p>the function returns a named list of parameter values and</p></li>
 <li><p>the names of the list values and the names used in the vital rate/kernel expressions match.</p></li>
 </ol>
 <p>The user-specified function should go into <code><a href="reference/define_star.html">define_env_state()</a></code> call. The values can then be referenced using <code>list_name$parameter_name</code> notation in the vital rate expressions.</p>
 <p>This example uses the <code>rmvnorm</code> function from the <code>mvtnorm</code> package to demonstrate how one might sample from a joint distribution of parameters. One could also pass a function that samples from a posterior distribution of a Bayesian model, and pass the associated posterior to the <code>data_list</code> argument in <code>define_env_state</code> to propagate parameter uncertainty throughout the model.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ipmr)</a>
-<a class="sourceLine" id="cb3-2" title="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(mvtnorm)</a>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ipmr)</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(mvtnorm)</a>
 <a class="sourceLine" id="cb3-3" title="3"></a>
 <a class="sourceLine" id="cb3-4" title="4"><span class="co"># Define the fixed parameters in a list</span></a>
 <a class="sourceLine" id="cb3-5" title="5"></a>
-<a class="sourceLine" id="cb3-6" title="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">2123008</span>)</a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="kw"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="dv">2123008</span>)</a>
 <a class="sourceLine" id="cb3-7" title="7"></a>
-<a class="sourceLine" id="cb3-8" title="8">data_list &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">s_slope   =</span> <span class="fl">0.3</span>,</a>
+<a class="sourceLine" id="cb3-8" title="8">data_list &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">s_slope   =</span> <span class="fl">0.3</span>,</a>
 <a class="sourceLine" id="cb3-9" title="9">                  <span class="dt">g_slope   =</span> <span class="fl">0.99</span>,</a>
 <a class="sourceLine" id="cb3-10" title="10">                  <span class="dt">g_sd      =</span> <span class="fl">0.2</span>,</a>
 <a class="sourceLine" id="cb3-11" title="11">                  <span class="dt">f_r_slope =</span> <span class="fl">0.03</span>,</a>
@@ -669,26 +668,26 @@
 <a class="sourceLine" id="cb3-16" title="16"><span class="co"># Simulate some random parameters to define the multivariate distribution</span></a>
 <a class="sourceLine" id="cb3-17" title="17"><span class="co"># to sample from. In user-specified models, these will likely come from mixed</span></a>
 <a class="sourceLine" id="cb3-18" title="18"><span class="co"># effects models fit to real data.</span></a>
-<a class="sourceLine" id="cb3-19" title="19">r_means &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dt">s_int_yr   =</span> <span class="fl">0.8</span>,</a>
+<a class="sourceLine" id="cb3-19" title="19">r_means &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dt">s_int_yr   =</span> <span class="fl">0.8</span>,</a>
 <a class="sourceLine" id="cb3-20" title="20">             <span class="dt">g_int_yr   =</span> <span class="fl">0.1</span>,</a>
 <a class="sourceLine" id="cb3-21" title="21">             <span class="dt">f_r_int_yr =</span> <span class="fl">0.3</span>,</a>
 <a class="sourceLine" id="cb3-22" title="22">             <span class="dt">f_s_int_yr =</span> <span class="fl">0.4</span>)</a>
 <a class="sourceLine" id="cb3-23" title="23"></a>
-<a class="sourceLine" id="cb3-24" title="24">r_sigma &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Uniform">runif</a></span>(<span class="dv">16</span>)</a>
-<a class="sourceLine" id="cb3-25" title="25">r_sigma &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(r_sigma, <span class="dt">nrow =</span> <span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb3-24" title="24">r_sigma &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="dv">16</span>)</a>
+<a class="sourceLine" id="cb3-25" title="25">r_sigma &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(r_sigma, <span class="dt">nrow =</span> <span class="dv">4</span>)</a>
 <a class="sourceLine" id="cb3-26" title="26"></a>
-<a class="sourceLine" id="cb3-27" title="27">r_sigma &lt;-<span class="st"> </span>r_sigma <span class="op">%*%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(r_sigma) <span class="co"># make symmetrical - most users should skip this step.</span></a>
+<a class="sourceLine" id="cb3-27" title="27">r_sigma &lt;-<span class="st"> </span>r_sigma <span class="op">%*%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(r_sigma) <span class="co"># make symmetrical - most users should skip this step.</span></a>
 <a class="sourceLine" id="cb3-28" title="28"></a>
 <a class="sourceLine" id="cb3-29" title="29">iterations &lt;-<span class="st"> </span><span class="dv">10</span></a>
 <a class="sourceLine" id="cb3-30" title="30"></a>
 <a class="sourceLine" id="cb3-31" title="31"><span class="co"># Specify an initial population vector. This can also be done in the call to</span></a>
 <a class="sourceLine" id="cb3-32" title="32"><span class="co"># define_pop_state</span></a>
 <a class="sourceLine" id="cb3-33" title="33"></a>
-<a class="sourceLine" id="cb3-34" title="34">init_pop_vec &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Uniform">runif</a></span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb3-34" title="34">init_pop_vec &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="dv">100</span>)</a>
 <a class="sourceLine" id="cb3-35" title="35"></a>
 <a class="sourceLine" id="cb3-36" title="36"><span class="co"># Again, we can define our own functions and pass them into calls to make_ipm</span></a>
 <a class="sourceLine" id="cb3-37" title="37">inv_logit &lt;-<span class="st"> </span><span class="cf">function</span>(int, slope, sv1) {</a>
-<a class="sourceLine" id="cb3-38" title="38">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv1)))</a>
+<a class="sourceLine" id="cb3-38" title="38">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv1)))</a>
 <a class="sourceLine" id="cb3-39" title="39">}</a>
 <a class="sourceLine" id="cb3-40" title="40"></a>
 <a class="sourceLine" id="cb3-41" title="41"><span class="co"># In this case, we define a wrapper function around rmvnorm to make sure</span></a>
@@ -696,11 +695,11 @@
 <a class="sourceLine" id="cb3-43" title="43"><span class="co"># expressions.</span></a>
 <a class="sourceLine" id="cb3-44" title="44"></a>
 <a class="sourceLine" id="cb3-45" title="45">mvt_wrapper &lt;-<span class="st"> </span><span class="cf">function</span>(r_means, r_sigma, nms) {</a>
-<a class="sourceLine" id="cb3-46" title="46">  out &lt;-<span class="st"> </span>mvtnorm<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/mvtnorm/topics/Mvnorm">rmvnorm</a></span>(<span class="dv">1</span>, r_means, r_sigma) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-47" title="47"><span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">as.list</a></span>()</a>
+<a class="sourceLine" id="cb3-46" title="46">  out &lt;-<span class="st"> </span>mvtnorm<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html">rmvnorm</a></span>(<span class="dv">1</span>, r_means, r_sigma) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-47" title="47"><span class="st">    </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>()</a>
 <a class="sourceLine" id="cb3-48" title="48">  </a>
-<a class="sourceLine" id="cb3-49" title="49">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(out) &lt;-<span class="st"> </span>nms</a>
-<a class="sourceLine" id="cb3-50" title="50">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(out)</a>
+<a class="sourceLine" id="cb3-49" title="49">  <span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(out) &lt;-<span class="st"> </span>nms</a>
+<a class="sourceLine" id="cb3-50" title="50">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(out)</a>
 <a class="sourceLine" id="cb3-51" title="51">}</a>
 <a class="sourceLine" id="cb3-52" title="52"></a>
 <a class="sourceLine" id="cb3-53" title="53">param_resamp_model &lt;-<span class="st"> </span><span class="kw"><a href="reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_stoch_param'</span>) <span class="op">%&gt;%</span></a>
@@ -716,9 +715,9 @@
 <a class="sourceLine" id="cb3-63" title="63">    </a>
 <a class="sourceLine" id="cb3-64" title="64">    <span class="dt">g_mu          =</span> env_params<span class="op">$</span>g_int_yr <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>surf_area_<span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb3-65" title="65">    <span class="dt">s             =</span> <span class="kw">inv_logit</span>(env_params<span class="op">$</span>s_int_yr, s_slope, surf_area_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb3-66" title="66">    <span class="dt">g             =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(surf_area_<span class="dv">2</span>, g_mu, g_sd),</a>
+<a class="sourceLine" id="cb3-66" title="66">    <span class="dt">g             =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(surf_area_<span class="dv">2</span>, g_mu, g_sd),</a>
 <a class="sourceLine" id="cb3-67" title="67">    <span class="dt">data_list     =</span> data_list,</a>
-<a class="sourceLine" id="cb3-68" title="68">    <span class="dt">states        =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'surf_area'</span>)),</a>
+<a class="sourceLine" id="cb3-68" title="68">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'surf_area'</span>)),</a>
 <a class="sourceLine" id="cb3-69" title="69">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
 <a class="sourceLine" id="cb3-70" title="70">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb3-71" title="71">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
@@ -731,11 +730,11 @@
 <a class="sourceLine" id="cb3-78" title="78">    <span class="co"># Note the insertion of env_params$param_name here as well</span></a>
 <a class="sourceLine" id="cb3-79" title="79">    </a>
 <a class="sourceLine" id="cb3-80" title="80">    <span class="dt">f_r           =</span> <span class="kw">inv_logit</span>(env_params<span class="op">$</span>f_r_int_yr, f_r_slope, surf_area_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb3-81" title="81">    <span class="dt">f_s           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(env_params<span class="op">$</span>f_s_int_yr <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>surf_area_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb3-82" title="82">    <span class="dt">f_d           =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">dnorm</a></span>(surf_area_<span class="dv">2</span>, f_d_mu, f_d_sd),</a>
+<a class="sourceLine" id="cb3-81" title="81">    <span class="dt">f_s           =</span> <span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(env_params<span class="op">$</span>f_s_int_yr <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>surf_area_<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb3-82" title="82">    <span class="dt">f_d           =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(surf_area_<span class="dv">2</span>, f_d_mu, f_d_sd),</a>
 <a class="sourceLine" id="cb3-83" title="83">    </a>
 <a class="sourceLine" id="cb3-84" title="84">    <span class="dt">data_list     =</span> data_list,</a>
-<a class="sourceLine" id="cb3-85" title="85">    <span class="dt">states        =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'surf_area'</span>)),</a>
+<a class="sourceLine" id="cb3-85" title="85">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'surf_area'</span>)),</a>
 <a class="sourceLine" id="cb3-86" title="86">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
 <a class="sourceLine" id="cb3-87" title="87">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb3-88" title="88">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
@@ -752,49 +751,50 @@
 <a class="sourceLine" id="cb3-99" title="99">    </a>
 <a class="sourceLine" id="cb3-100" title="100">    <span class="dt">family          =</span> <span class="st">'IPM'</span>,</a>
 <a class="sourceLine" id="cb3-101" title="101">    <span class="dt">data_list       =</span> data_list,</a>
-<a class="sourceLine" id="cb3-102" title="102">    <span class="dt">states          =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'surf_area'</span>)),</a>
+<a class="sourceLine" id="cb3-102" title="102">    <span class="dt">states          =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'surf_area'</span>)),</a>
 <a class="sourceLine" id="cb3-103" title="103">    <span class="dt">has_hier_effs   =</span> <span class="ot">FALSE</span>,</a>
 <a class="sourceLine" id="cb3-104" title="104">    <span class="dt">evict           =</span> <span class="ot">FALSE</span></a>
 <a class="sourceLine" id="cb3-105" title="105">  ) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb3-106" title="106"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_impl</a></span>(</a>
 <a class="sourceLine" id="cb3-107" title="107">    <span class="kw"><a href="reference/define_star.html">make_impl_args_list</a></span>(</a>
-<a class="sourceLine" id="cb3-108" title="108">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'P'</span>, <span class="st">"F"</span>, <span class="st">"K"</span>),</a>
-<a class="sourceLine" id="cb3-109" title="109">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">'midpoint'</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb3-110" title="110">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">'surf_area'</span>,<span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb3-111" title="111">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">'surf_area'</span>, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb3-108" title="108">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'P'</span>, <span class="st">"F"</span>, <span class="st">"K"</span>),</a>
+<a class="sourceLine" id="cb3-109" title="109">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">'midpoint'</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb3-110" title="110">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">'surf_area'</span>,<span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb3-111" title="111">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">'surf_area'</span>, <span class="dv">3</span>)</a>
 <a class="sourceLine" id="cb3-112" title="112">    )</a>
 <a class="sourceLine" id="cb3-113" title="113">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-114" title="114"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_domains</a></span>(<span class="dt">surf_area =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">100</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-114" title="114"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_domains</a></span>(<span class="dt">surf_area =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">100</span>)) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb3-115" title="115"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_env_state</a></span>(</a>
-<a class="sourceLine" id="cb3-116" title="116">    <span class="dt">env_params =</span> <span class="kw">mvt_wrapper</span>(r_means, r_sigma, <span class="dt">nms =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'s_int_yr'</span>,</a>
+<a class="sourceLine" id="cb3-116" title="116">    <span class="dt">env_params =</span> <span class="kw">mvt_wrapper</span>(r_means, r_sigma, <span class="dt">nms =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'s_int_yr'</span>,</a>
 <a class="sourceLine" id="cb3-117" title="117">                                                       <span class="st">'g_int_yr'</span>,</a>
 <a class="sourceLine" id="cb3-118" title="118">                                                       <span class="st">'f_r_int_yr'</span>,</a>
 <a class="sourceLine" id="cb3-119" title="119">                                                       <span class="st">'f_s_int_yr'</span>)),</a>
-<a class="sourceLine" id="cb3-120" title="120">    <span class="dt">data_list =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
+<a class="sourceLine" id="cb3-120" title="120">    <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
 <a class="sourceLine" id="cb3-121" title="121">      <span class="dt">r_means =</span> r_means,</a>
 <a class="sourceLine" id="cb3-122" title="122">      <span class="dt">r_sigma =</span> r_sigma</a>
 <a class="sourceLine" id="cb3-123" title="123">    )</a>
 <a class="sourceLine" id="cb3-124" title="124">  ) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb3-125" title="125"><span class="st">  </span><span class="kw"><a href="reference/define_star.html">define_pop_state</a></span>(</a>
-<a class="sourceLine" id="cb3-126" title="126">    <span class="dt">pop_vectors =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">n_surf_area_t =</span> init_pop_vec),</a>
+<a class="sourceLine" id="cb3-126" title="126">    <span class="dt">pop_vectors =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">n_surf_area_t =</span> init_pop_vec),</a>
 <a class="sourceLine" id="cb3-127" title="127">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-128" title="128"><span class="st">  </span><span class="kw"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs   =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">inv_logit =</span> inv_logit,</a>
+<a class="sourceLine" id="cb3-128" title="128"><span class="st">  </span><span class="kw"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs   =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">inv_logit =</span> inv_logit,</a>
 <a class="sourceLine" id="cb3-129" title="129">                             <span class="dt">mvt_wrapper =</span> mvt_wrapper),</a>
 <a class="sourceLine" id="cb3-130" title="130">           <span class="dt">iterate    =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb3-131" title="131">           <span class="dt">iterations =</span> <span class="dv">10</span>)</a>
 <a class="sourceLine" id="cb3-132" title="132"></a>
 <a class="sourceLine" id="cb3-133" title="133">pop_state_ipmr &lt;-<span class="st"> </span>param_resamp_model<span class="op">$</span>pop_state<span class="op">$</span>pop_state_surf_area</a>
-<a class="sourceLine" id="cb3-134" title="134">lambda_ipmr    &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">numeric</a></span>(iterations)</a>
+<a class="sourceLine" id="cb3-134" title="134">lambda_ipmr    &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(iterations)</a>
 <a class="sourceLine" id="cb3-135" title="135"></a>
-<a class="sourceLine" id="cb3-136" title="136"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">2</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/dim">dim</a></span>(pop_state_ipmr)[<span class="dv">2</span>], <span class="dv">1</span>)) {</a>
+<a class="sourceLine" id="cb3-136" title="136"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dv">2</span>, <span class="kw"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(pop_state_ipmr)[<span class="dv">2</span>], <span class="dv">1</span>)) {</a>
 <a class="sourceLine" id="cb3-137" title="137">  </a>
-<a class="sourceLine" id="cb3-138" title="138">  lambda_ipmr[(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(pop_state_ipmr[ ,i]) <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(pop_state_ipmr[ ,(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)])</a>
+<a class="sourceLine" id="cb3-138" title="138">  lambda_ipmr[(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(pop_state_ipmr[ ,i]) <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(pop_state_ipmr[ ,(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)])</a>
 <a class="sourceLine" id="cb3-139" title="139">  </a>
 <a class="sourceLine" id="cb3-140" title="140">}</a>
 <a class="sourceLine" id="cb3-141" title="141"></a>
 <a class="sourceLine" id="cb3-142" title="142">lambda_ipmr</a></code></pre></div>
 </div>
 </div>
+
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -809,11 +809,11 @@
 <h2>Developers</h2>
 <ul class="list-unstyled">
 <li>
-<a href="https://github.com/levisc8">Sam Levin</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-3289-9925" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID" height="16"></a> </li>
+<a href="https://github.com/levisc8">Sam Levin</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-3289-9925" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID"></a> </li>
 </ul>
 </div>
 
-      <div class="dev-status">
+  <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://travis-ci.org/levisc8/ipmr"><img src="https://travis-ci.org/levisc8/ipmr.svg?branch=master" alt="Travis build status"></a></li>
@@ -823,7 +823,6 @@
 </ul>
 </div>
 </div>
-
 </div>
 
 
@@ -832,12 +831,14 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

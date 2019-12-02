@@ -13,8 +13,7 @@ lambda(ipm, ...)
 
 \method{lambda}{simple_di_det_ipm}(ipm, type = "deterministic", ...)
 
-\method{lambda}{simple_di_stoch_kern_ipm}(ipm, type = "stochastic",
-  comp_method = c("eigen", "pop_size"), ...)
+\method{lambda}{simple_di_stoch_kern_ipm}(ipm, type = "stochastic", comp_method = c("eigen", "pop_size"), ...)
 
 \method{lambda}{simple_di_stoch_param_ipm}(ipm, ...)
 

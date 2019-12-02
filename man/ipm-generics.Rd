@@ -6,16 +6,25 @@
 \alias{print.simple_di_stoch_param_ipm}
 \title{Generics for IPM classes}
 \usage{
-\method{print}{simple_di_det_ipm}(x, compute_lambda = TRUE,
-  sig_digits = 3, ...)
+\method{print}{simple_di_det_ipm}(x, compute_lambda = TRUE, sig_digits = 3, ...)
 
-\method{print}{simple_di_stoch_kern_ipm}(x, compute_lambda = TRUE,
+\method{print}{simple_di_stoch_kern_ipm}(
+  x,
+  compute_lambda = TRUE,
   lambda_type = c("stochastic", "deterministic"),
-  compute_type = c("pop_size", "eigen"), sig_digits = 3, ...)
+  compute_type = c("pop_size", "eigen"),
+  sig_digits = 3,
+  ...
+)
 
-\method{print}{simple_di_stoch_param_ipm}(x, compute_lambda = TRUE,
+\method{print}{simple_di_stoch_param_ipm}(
+  x,
+  compute_lambda = TRUE,
   lambda_type = c("stochastic", "deterministic"),
-  compute_type = c("pop_size", "eigen"), sig_digits = 3, ...)
+  compute_type = c("pop_size", "eigen"),
+  sig_digits = 3,
+  ...
+)
 }
 \arguments{
 \item{x}{An object produced by \code{make_ipm}.}

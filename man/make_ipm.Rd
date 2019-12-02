@@ -10,25 +10,50 @@
 \usage{
 make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
 
-\method{make_ipm}{simple_di_det}(proto_ipm, return_all = FALSE,
-  usr_funs = list(), ..., domain_list = NULL, iterate = FALSE,
-  iterations = 50)
+\method{make_ipm}{simple_di_det}(
+  proto_ipm,
+  return_all = FALSE,
+  usr_funs = list(),
+  ...,
+  domain_list = NULL,
+  iterate = FALSE,
+  iterations = 50
+)
 
-\method{make_ipm}{simple_di_stoch_kern}(proto_ipm, return_all = FALSE,
-  usr_funs = list(), ..., domain_list = NULL, iterate = FALSE,
-  iterations = 50, kernel_seq = NULL)
+\method{make_ipm}{simple_di_stoch_kern}(
+  proto_ipm,
+  return_all = FALSE,
+  usr_funs = list(),
+  ...,
+  domain_list = NULL,
+  iterate = FALSE,
+  iterations = 50,
+  kernel_seq = NULL
+)
 
-\method{make_ipm}{simple_di_stoch_param}(proto_ipm, return_all = FALSE,
-  usr_funs = list(), ..., domain_list = NULL, iterate = TRUE,
-  iterations = 50)
+\method{make_ipm}{simple_di_stoch_param}(
+  proto_ipm,
+  return_all = FALSE,
+  usr_funs = list(),
+  ...,
+  domain_list = NULL,
+  iterate = TRUE,
+  iterations = 50
+)
 
-\method{make_ipm}{general_di_det}(proto_ipm, return_all = FALSE,
-  usr_funs = list(), ..., domain_list = NULL, iterate = TRUE,
-  iterations = 50)
+\method{make_ipm}{general_di_det}(
+  proto_ipm,
+  return_all = FALSE,
+  usr_funs = list(),
+  ...,
+  domain_list = NULL,
+  iterate = TRUE,
+  iterations = 50
+)
 }
 \arguments{
 \item{proto_ipm}{The proto_ipm object you wish to implement. This should be the
-output of \code{add_kernel}, \code{add_K}, or the \code{define_*} functions.}
+output of \code{add_kernel}, \code{define_k}, or the \code{define_*} functions.}
 
 \item{return_all}{A logical indicating whether to return the environments that
 the kernel expressions are evaluated in. This is useful for developer
@@ -60,20 +85,7 @@ If empty, a random sequence will be generated internally from a uniform
 distribution.}
 }
 \value{
-The \code{make_ipm.*det} methods will always return a list of length 4
-containing the following components:
-
-\itemize{
-  \item{\strong{iterators}}{: iteration kernel(s) (if specified by \code{add_K}),
-                            otherwise contains \code{NA}.}
-  \item{\strong{sub_kernels}}{: the sub_kernels specified in \code{add_kernel}.}
-  \item{\strong{pop_state}}{: population vectors stored in a list of arrays.
-  Dimension one corresponds the continuous state, and dimension 2 is time (
-  requires generalization for higher dimensional kernels!!!).}
-  \item{\strong{proto_ipm}}{: the \code{proto_ipm} object used to implement
-                             the model.}
-}
- The \code{make_ipm.*stoch} methods will always return a list of length 5
+The \code{make_ipm.*} methods will always return a list of length 6
 containing the following components:
 
 \itemize{
@@ -90,10 +102,19 @@ containing the following components:
                              a matrix with as many columns as stochastic parameters
                              \code{n_iterations} rows.}
   \item{\strong{pop_state}}{: population vectors stored as an instance of the
-                             \code{pop_state} class.}
+                             stored as a list of arrays. The first dimension
+                             of each array corresponds to the state variable,
+                             and the second dimsension corresponds to time
+                             steps.}
   \item{\strong{proto_ipm}}{: the \code{proto_ipm} object used to implement
                              the model.}
 }
+
+In addition to the list class, each object will have the class from
+\code{model_class} defined in \code{init_ipm} plus \code{'_ipm'}. This is to
+facilitate \code{print}, \code{plot}, and \code{lambda} methods. For example,
+a \code{'simple_di_stoch_kern'} model will have the class \code{'simple_di_stoch_kern_ipm'}
+once it has been implemented using \code{make_ipm}.
 }
 \description{
 The \code{make_ipm.*} methods convert a \code{proto_ipm} into a

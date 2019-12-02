@@ -88,7 +88,8 @@ The one exception to this is \code{define_domains}. It takes named numeric
 vectors of length 3 where the name corresponds to the
 state variable, the first entry is the lower bound of the domain, the second
 is the upper bound of the domain, and the third entry is the number of
-meshpoints.
+meshpoints (applies to \code{int_rule = "midpoint"} only! Other rules are not
+implemented yet).
 
 \code{define_impl} is meant to help distinguish the process of
 generating the kernels' mathematical form from their implementation details.
