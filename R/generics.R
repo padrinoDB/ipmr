@@ -141,7 +141,7 @@ print.simple_di_stoch_kern_ipm <- function(x,
     l_msg  <- paste0('\nDeterministic lambda for ',
                      nm_ks,
                      ' = ',
-                     lambda,
+                     round(lambda, sig_digits),
                      sep = "" )
 
     msg <- c(msg, l_msg)
@@ -173,7 +173,7 @@ print.simple_di_stoch_param_ipm <- function(x,
 #' @param ipm An object returned by \code{make_ipm()}.
 #' @param ... other arguments passed to methods.
 #'
-#' @return A single numeric value.
+#' @return A single numeric vector or single value.
 #'
 #'
 #' @details Determinstic lambda is computed as the dominant eigenvalue of the
@@ -188,7 +188,7 @@ print.simple_di_stoch_param_ipm <- function(x,
 #' kernel for \code{general_*} IPMs the way that they are typically implemented in
 #' interactive sessions (e.g. by r/cbind()ing discrete and continuous stages together),
 #' lambda must be computed by dividing successive population sizes
-#' by their prior sizes and taking the geometric mean of those ratios. Thus, only
+#' by their prior sizes. Thus, only
 #' \code{type = 'stochastic'} and \code{comp_method = "pop_size"} are available
 #' for these models.
 #'
@@ -220,20 +220,21 @@ lambda.simple_di_det_ipm <- function(ipm, type = "deterministic", ...) {
 lambda.simple_di_stoch_kern_ipm <- function(ipm,
                                             type = "stochastic",
                                             comp_method = c("eigen", "pop_size"),
+                                            all_lambdas = TRUE,
                                             ...) {
 
   switch(comp_method,
-         'eigen'    = .stoch_lambda_eigen(ipm),
-         'pop_size' = .stoch_lambda_pop_size(ipm))
+         'eigen'    = .stoch_lambda_eigen(ipm, all_lambdas = all_lambdas),
+         'pop_size' = .stoch_lambda_pop_size(ipm, all_lambdas = all_lambdas))
 }
 
 #' @rdname lambda
 #'
 #' @export
 
-lambda.simple_di_stoch_param_ipm <- function(ipm, ...) {
+lambda.simple_di_stoch_param_ipm <- function(ipm, ...., all_lambdas = TRUE) {
 
-  .stoch_lambda_pop_size(ipm)
+  .stoch_lambda_pop_size(ipm, all_lambdas = all_lambdas)
 
 }
 
@@ -265,7 +266,8 @@ lambda.general_di_stoch_param_ipm <- function(ipm, ...) {
 #'
 #' @param x,y Either the values of the meshpoints or \code{NULL}. If \code{NULL},
 #' then a sequence is generated so that meshpoints are given sequential bin numbers.
-#' @param A,ipm A matrix or a result from \code{make_ipm}
+#' @param A,ipm A matrix or a result from \code{make_ipm}, or \code{NULL} if \code{x}
+#' is specified as the matrix or IPM object.
 #' @param col A vector of colors to use for plotting
 #' @param bw A logical indicating whether to use a greyscale palette for plotting
 #' @param do_contour A logical indicating whether or not draw contour lines
@@ -274,6 +276,12 @@ lambda.general_di_stoch_param_ipm <- function(ipm, ...) {
 #' @param ... further arguments passed to legend
 #'
 #' @return \code{A} or \code{ipm} invisibly
+#'
+#' @details \code{plot.ipmr_matrix} is intended for internal use only, and it
+#' is usually safer to use \code{plot.*_ipm} methods for visualizing kernels.
+#' If a K kernel is overwhelmed by information in say, a fecundity sub-kernel,
+#' use the \code{exponent} argument in \code{plot.*_ipm} to make it more visually
+#' appealing.
 #'
 #' @importFrom grDevices grey rainbow
 #' @importFrom graphics abline axis contour image layout par
@@ -352,20 +360,29 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
 #' @export
 
 plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
-                                   ipm,
+                                   ipm = NULL,
                                    sub_kernels = FALSE,
                                    col = rainbow(100, start=0.67, end=0),
                                    bw = FALSE,
                                    do_contour = FALSE,
                                    do_legend = FALSE,
+                                   exponent = 1,
                                    ...) {
+
+  # This is used so that users can just say plot(my_model) instead of
+  # plot(ipm = my_model). ipmr_matrix expects x and y to both be NULL
+
+  if(!is.null(x) && is.null(ipm)){
+    ipm <- x
+    x   <- NULL
+  }
 
   old_par <- par('mar')
   on.exit(par(old_par))
 
   dots <- list(...)
 
-  if(sub_kernels) { # Not yet implemented
+  if(sub_kernels) {
 
     plot_list <- purrr::splice(ipm$iterators, ipm$sub_kernels)
 
@@ -377,7 +394,7 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
 
   lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
                                                    y = y,
-                                                   A = ipm,
+                                                   A = ipm ^ exponent,
                                                    col = col,
                                                    bw = bw,
                                                    do_contour = do_contour,
@@ -391,20 +408,29 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
 #' @export
 
 plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
-                                           ipm,
+                                           ipm = NULL,
                                            sub_kernels = FALSE,
                                            col = rainbow(100, start=0.67, end=0),
                                            bw = FALSE,
                                            do_contour = FALSE,
                                            do_legend = FALSE,
+                                           exponent = 1,
                                            ...) {
+
+  # This is used so that users can just say plot(my_model) instead of
+  # plot(ipm = my_model). ipmr_matrix expects x and y to both be NULL
+
+  if(!is.null(x) && is.null(ipm)){
+    ipm <- x
+    x   <- NULL
+  }
 
   old_par <- par('mar')
   on.exit(par(old_par))
 
   dots <- list(...)
 
-  if(sub_kernels) { # Not yet implemented
+  if(sub_kernels) {
 
     plot_list <- purrr::splice(ipm$iterators, ipm$sub_kernels)
 
@@ -416,7 +442,55 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
 
   lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
                                                    y = y,
-                                                   A = ipm,
+                                                   A = ipm ^ exponent,
+                                                   col = col,
+                                                   bw = bw,
+                                                   do_contour = do_contour,
+                                                   do_legend = do_legend,
+                                                   dots))
+
+  invisible(ipm)
+}
+
+#' @rdname plot-methods
+#' @export
+
+plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
+                                           ipm = NULL,
+                                           sub_kernels = FALSE,
+                                           col = rainbow(100, start=0.67, end=0),
+                                           bw = FALSE,
+                                           do_contour = FALSE,
+                                           do_legend = FALSE,
+                                           exponent = 1,
+                                           ...) {
+
+  # This is used so that users can just say plot(my_model) instead of
+  # plot(ipm = my_model). ipmr_matrix expects x and y to both be NULL
+
+  if(!is.null(x) && is.null(ipm)){
+    ipm <- x
+    x   <- NULL
+  }
+
+  old_par <- par('mar')
+  on.exit(par(old_par))
+
+  dots <- list(...)
+
+  if(sub_kernels) {
+
+    plot_list <- purrr::splice(ipm$iterators, ipm$sub_kernels)
+
+  } else {
+
+    plot_list <- ipm$iterators
+
+  }
+
+  lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
+                                                   y = y,
+                                                   A = ipm ^ exponent,
                                                    col = col,
                                                    bw = bw,
                                                    do_contour = do_contour,

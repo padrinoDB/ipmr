@@ -85,7 +85,9 @@
   return(out ^ (1/n))
 }
 
-.stoch_lambda_pop_size <- function(x) {
+#' @noRd
+
+.stoch_lambda_pop_size <- function(x, all_lambdas = FALSE) {
 
   pops  <- x$pop_state
   n_its <- dim(pops[[1]])[2]
@@ -111,14 +113,22 @@
 
   }
 
-  return(temp[length(temp)])
+  if(!all_lambdas) {
+    return(temp[length(temp)])
+  } else {
+    return(temp)
+  }
 
 }
 
-.stoch_lambda_eigen <- function(x) {
+.stoch_lambda_eigen <- function(x, all_lambdas = FALSE) {
 
   eigs <- .det_lambda(x)
 
-  return(.geom_mean(eigs))
+  if(!all_lambdas) {
+    return(.geom_mean(eigs))
+  } else {
+    return(eigs)
+  }
 
 }
