@@ -1,7 +1,7 @@
 # test simple_di_stoch_param
 library(mvtnorm)
 library(rlang)
-library(ipmr)
+# library(ipmr)
 
 context('Simple density independent stochastic parameter resampled models')
 
@@ -245,4 +245,23 @@ test_that('eigenvectors/values are all good', {
   expect_equal(ws_ipmr[ ,3], ws[ ,3], tolerance = 1e-13)
   expect_equal(ws_ipmr[ ,4], ws[ ,4], tolerance = 1e-13)
   expect_equal(ws_ipmr[ ,5], ws[ ,5], tolerance = 1e-13)
+})
+
+
+test_that('classes are correctly set', {
+
+  k_cls <- vapply(test_stoch_param$sub_kernels,
+                  function(x) class(x)[1],
+                  character(1L))
+
+  expect_true(all(k_cls == 'ipmr_matrix'))
+
+  sub_cls <- vapply(test_stoch_param$sub_kernels,
+                    function(x) class(x)[1],
+                    character(1L))
+
+  expect_true(all(sub_cls == 'ipmr_matrix'))
+  expect_s3_class(test_stoch_param, 'simple_di_stoch_param_ipm')
+
+
 })

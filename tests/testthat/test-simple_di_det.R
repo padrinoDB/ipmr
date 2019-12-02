@@ -132,3 +132,12 @@ test_that('lambdas are equal', {
   expect_equal(w_ipmr, w, tolerance = 1e-6)
 })
 
+test_that('classes are correctly set', {
+
+  expect_s3_class(x$iterators$K, 'ipmr_matrix')
+  expect_s3_class(x$sub_kernels$P, 'ipmr_matrix')
+  expect_s3_class(x$sub_kernels$F, 'ipmr_matrix')
+  expect_s3_class(x, 'simple_di_det_ipm')
+
+})
+

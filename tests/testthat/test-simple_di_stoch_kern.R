@@ -364,9 +364,19 @@ test_that('.iterate_kerns is acting correctly', {
 
 })
 
-# test_that('lambda "pop_size" works as expected', {
-#
-#   expect_equal(pop_size_lambdas,      lambda_generic_lambdas, tolerance = 1e-10)
-#   expect_equal(pop_size_lambdas_ipmr, lambda_generic_lambdas, tolerance = 1e-10)
-#
-# })
+test_that('classes are correctly set', {
+
+  k_cls <- vapply(monocarp_sys$iterators,
+                  function(x) class(x)[1],
+                  character(1L))
+
+  expect_true(all(k_cls == 'ipmr_matrix'))
+
+  sub_cls <- vapply(monocarp_sys$sub_kernels,
+                  function(x) class(x)[1],
+                  character(1L))
+
+  expect_true(all(sub_cls == 'ipmr_matrix'))
+  expect_s3_class(monocarp_sys, 'simple_di_stoch_kern_ipm')
+
+})

@@ -223,20 +223,23 @@ inv_logit <- function(int, slope, sv) {
 }
 
 inv_logit_2 <- function(int, slope, slope_2, sv) {
-  1/(1 + exp(-(int + slope * sv + slope_2 * sv^2)))
+  1/(1 + exp(-(int + slope * sv + slope_2 * sv ^ 2)))
 }
 
 ipmr_cr <- init_ipm("general_di_det") %>%
   define_kernel(
     name          = "P",
-    formula       = s_g_mult(s, g),
+    formula       = s_g_mult(s, g) * d_ht,
     family        = "CC",
     g             = dnorm(ht_2, g_mu, g_sd),
     g_mu          = g_int + g_slope * ht_1,
     s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
     data_list     = data_list_cr,
     states        = states,
-    has_hier_effs = FALSE
+    has_hier_effs = FALSE,
+    evict         = TRUE,
+    evict_fun     = truncated_distributions('norm',
+                                            'g')
   ) %>%
   define_kernel(
     name          = "go_discrete",
@@ -257,21 +260,21 @@ ipmr_cr <- init_ipm("general_di_det") %>%
   ) %>%
   define_kernel(
     name          = 'leave_discrete',
-    formula       = e_p * dnorm(ht_2, f_d_mu, f_d_sd),
+    formula       = e_p * f_d * d_ht,
+    f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
     family        = 'DC',
     data_list     = data_list_cr,
     states        = states,
-    has_hier_effs = FALSE
+    has_hier_effs = FALSE,
+    evict         = TRUE,
+    evict_fun     = truncated_distributions('norm',
+                                            'f_d')
   ) %>%
   define_k(
     name     = "K",
     family   = "IPM",
-
-    n_b_t_1  = right_mult(stay_discrete, n_b_t)  + right_mult(go_discrete,
-                                                              n_ht_t),
-    n_ht_t_1 = right_mult(leave_discrete, n_b_t) + right_mult(P, n_ht_t),
-
-
+    n_b_t_1  = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
+    n_ht_t_1 = leave_discrete %*% n_b_t + P %*% n_ht_t,
     data_list     = data_list_cr,
     states        = states,
     has_hier_effs = FALSE
@@ -293,7 +296,40 @@ ipmr_cr <- init_ipm("general_di_det") %>%
       n_b  = init_b
     )
   ) %>%
-make_ipm(iterations = 100,
-         usr_funs = list(inv_logit   = inv_logit,
-                         inv_logit_2 = inv_logit_2))
+  make_ipm(iterations = 100,
+           usr_funs = list(inv_logit   = inv_logit,
+                           inv_logit_2 = inv_logit_2),
+           return_all = TRUE)
 
+
+ipmr_lam_cr <- ipmr:::.stoch_lambda_pop_size(ipmr_cr)
+
+
+test_that('ipmr version matches hand version', {
+
+  expect_equal(ipmr_lam_cr, lam_s_cr, tol = 1e-10)
+
+  # compare final population distributions
+  pop_size_final_cr   <- pop_size_cr$pop_state$ht_cr[ , 101]
+  pop_size_final_ipmr <- ipmr_cr$pop_state$pop_state_ht[ , 101]
+  bank_size_final_cr   <- pop_size_cr$pop_state$b_t_cr[ , 101]
+  bank_size_final_ipmr <- ipmr_cr$pop_state$pop_state_b[ , 101]
+
+  expect_equal(pop_size_final_cr,
+               pop_size_final_ipmr,
+               tol = 1e-7)
+  expect_equal(bank_size_final_cr,
+               bank_size_final_ipmr,
+               tol = 1e-7)
+
+})
+
+test_that('classes are correctly set', {
+
+  sub_cls <- vapply(ipmr_cr$sub_kernels,
+                    function(x) class(x)[1],
+                    character(1L))
+
+  expect_true(all(sub_cls == 'ipmr_matrix'))
+  expect_s3_class(ipmr_cr, 'general_di_det_ipm')
+})
