@@ -7,3 +7,4 @@ paper/ipmr_paper_outline.html
 experimental_funs
 *.html
 compadre*
+tests/testthat/Rplots.*
