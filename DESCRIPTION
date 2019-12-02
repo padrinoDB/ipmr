@@ -27,9 +27,12 @@ Suggests:
 VignetteBuilder: knitr
 Language: en-US
 Imports:
+    graphics,
+    grDevices,
     magrittr,
     methods,
     purrr (>= 0.3.0),
     rlang (>= 0.3.0),
-    stats
-RoxygenNote: 6.1.1
+    stats,
+    utils
+RoxygenNote: 7.0.0
