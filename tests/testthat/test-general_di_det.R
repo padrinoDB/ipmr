@@ -302,7 +302,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
            return_all = TRUE)
 
 
-ipmr_lam_cr <- ipmr:::.stoch_lambda_pop_size(ipmr_cr)
+ipmr_lam_cr <- lambda(ipmr_cr)
 
 
 test_that('ipmr version matches hand version', {
