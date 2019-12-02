@@ -5,8 +5,8 @@
 
 define_domains <- function(proto_ipm, ...) {
 
-  doms <- rlang::enexprs(...) %>%
-    lapply(eval)
+  doms <- rlang::enquos(...) %>%
+    lapply(FUN = function(x) rlang::eval_tidy(x))
 
   .check_domain_inputs(doms)
 
@@ -67,3 +67,7 @@ define_domains <- function(proto_ipm, ...) {
   return(proto_ipm)
 
 }
+
+#' @importFrom utils globalVariables
+
+utils::globalVariables(c('.'), add = FALSE)

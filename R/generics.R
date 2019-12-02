@@ -103,7 +103,6 @@ print.simple_di_det_ipm <- function(x, compute_lambda = TRUE,
 }
 
 #' @rdname ipm-generics
-#' @inheritParams print.simple_di_det
 #' @param lambda_type If \code{compute_lambda} is \code{TRUE}, then either
 #' \code{"stochastic"} or \code{"deterministic"}. \code{"deterministic"} will return
 #' the dominant eigenvalue of the iteration kernel from each iteration. \code{
@@ -153,7 +152,6 @@ print.simple_di_stoch_kern_ipm <- function(x,
 }
 
 #' @rdname ipm-generics
-#' @inheritParams print.simple_di_stoch_kern
 #' @export
 print.simple_di_stoch_param_ipm <- function(x,
                                             compute_lambda = TRUE,
@@ -201,7 +199,6 @@ lambda <- function(ipm, ...) {
 }
 
 #' @rdname lambda
-#' @inheritParams lambda
 #' @param type Either \code{"stochastic"} or \code{"deterministic"}.
 #' \code{"stochastic"} also has two types - \code{"eigen"} and \code{"pop_size"}.
 #' See details for more information.
@@ -215,7 +212,6 @@ lambda.simple_di_det_ipm <- function(ipm, type = "deterministic", ...) {
 }
 
 #' @rdname lambda
-#' @inheritParams lambda
 #' @param comp_method Either \code{"eigen"} or \code{"pop_size"}. \code{"eigen"}
 #' is not possible except for \code{"simple_*_stoch_kern"} and \code{"simple_*_det"}
 #'
@@ -232,7 +228,6 @@ lambda.simple_di_stoch_kern_ipm <- function(ipm,
 }
 
 #' @rdname lambda
-#' @inheritParams lambda
 #'
 #' @export
 
@@ -243,7 +238,6 @@ lambda.simple_di_stoch_param_ipm <- function(ipm, ...) {
 }
 
 #' @rdname lambda
-#' @inheritParams lambda
 #' @export
 #'
 lambda.general_di_det_ipm <- function(ipm, type, ...) {
@@ -251,7 +245,6 @@ lambda.general_di_det_ipm <- function(ipm, type, ...) {
 }
 
 #' @rdname lambda
-#' @inheritParams lambda.simple_di_stoch_kern_ipm
 #'
 #' @export
 #'
@@ -282,23 +275,25 @@ lambda.general_di_stoch_param_ipm <- function(ipm, ...) {
 #'
 #' @return \code{A} or \code{ipm} invisibly
 #'
+#' @importFrom grDevices grey rainbow
+#' @importFrom graphics abline axis contour image layout par
 #' @export
 
 
-plot.matrix <- function(x = NULL, y = NULL,
-                        A,
-                        col = rainbow(100, start=0.67, end=0),
-                        bw = FALSE,
-                        do_contour = FALSE,
-                        do_legend = FALSE,
-                        ...) {
+plot.ipmr_matrix <- function(x = NULL, y = NULL,
+                             A,
+                             col = grDevices::rainbow(100, start=0.67, end=0),
+                             bw = FALSE,
+                             do_contour = FALSE,
+                             do_legend = FALSE,
+                             ...) {
 
-  old_par <- par('mar')
+  old_par <- graphics::par('mar')
   on.exit(par(old_par))
 
-  if(do_legend) layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
+  if(do_legend) graphics::layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
 
-  par(mar = c(6, 5, 3, 2))
+  graphics::par(mar = c(6, 5, 3, 2))
 
   if(is.null(x)) x = seq_len(ncol(A))
   if(is.null(y)) y = seq_len(nrow(A))
@@ -308,44 +303,44 @@ plot.matrix <- function(x = NULL, y = NULL,
   x1 = c(1.5 * x[1] - 0.5 * x[2], 1.5 * x[nx] - 0.5 * x[nx - 1])
   y1 = c(1.5 * y[1] - 0.5 * y[2], 1.5 * y[ny] - 0.5 * y[ny - 1])
 
-  if(bw) col = grey( (200:50) / 200 )
+  if(bw) col = grDevices::grey( (200:50) / 200 )
 
-  image(list(x = x,
-             y = y,
-             z = t(A)),
-        xlim     = x1,
-        ylim     = rev(y1),
-        col      = col,
-        cex.axis = 1.5,
-        cex.lab  = 1.5,
-        bty      = "u",
-        xlab     = 'T',
-        ylab     = 'T + 1',
-        ...)
+  graphics::image(list(x = x,
+                       y = y,
+                       z = t(A)),
+                  xlim     = x1,
+                  ylim     = rev(y1),
+                  col      = col,
+                  cex.axis = 1.5,
+                  cex.lab  = 1.5,
+                  bty      = "u",
+                  xlab     = 'T',
+                  ylab     = 'T + 1',
+                  ...)
 
-  abline(v = range(x1))
-  abline(h = range(y1))
+  graphics::abline(v = range(x1))
+  graphics::abline(h = range(y1))
 
-  if(do_contour) contour(x,
-                         y,
-                         t(A),
-                         nlevels = 5,
-                         labcex  = 1.2,
-                         add     = TRUE)
+  if(do_contour) graphics::contour(x,
+                                   y,
+                                   t(A),
+                                   nlevels = 5,
+                                   labcex  = 1.2,
+                                   add     = TRUE)
 
   if(do_legend) {
     l.y = seq(min(A), max(A),length = 100)
     par(mar = c(6, 2, 3, 1))
-    image(list(x = 1:2,
-               y = l.y,
-               z = rbind(l.y, l.y)),
-          col  = col,
-          bty  = "o",
-          xaxt = "n",
-          yaxt = "n")
-    axis(side     = 2,
-         cex.axis = 1.5,
-         at       = pretty(seq(min(A), max(A), length=10)))
+    graphics::image(list(x = 1:2,
+                         y = l.y,
+                         z = rbind(l.y, l.y)),
+                    col  = col,
+                    bty  = "o",
+                    xaxt = "n",
+                    yaxt = "n")
+    graphics::axis(side     = 2,
+                   cex.axis = 1.5,
+                   at       = pretty(seq(min(A), max(A), length=10)))
   }
 
   invisible(A)
@@ -353,7 +348,6 @@ plot.matrix <- function(x = NULL, y = NULL,
 
 
 #' @rdname plot-methods
-#' @inheritParams plot.matrix
 #' @param sub_kernels A logical - also plot the sub-kernels? NOT YET IMPLEMENTED
 #' @export
 
@@ -381,30 +375,29 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
 
   }
 
-  lapply(plot_list, function(ipm) plot.matrix(x = x,
-                                              y = y,
-                                              A = ipm,
-                                              col = col,
-                                              bw = bw,
-                                              do_contour = do_contour,
-                                              do_legend = do_legend,
-                                              dots))
+  lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
+                                                   y = y,
+                                                   A = ipm,
+                                                   col = col,
+                                                   bw = bw,
+                                                   do_contour = do_contour,
+                                                   do_legend = do_legend,
+                                                   dots))
 
   invisible(ipm)
 }
 
 #' @rdname plot-methods
-#' @inheritParams plot.simple_di_det_ipm
 #' @export
 
 plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
-                                   ipm,
-                                   sub_kernels = FALSE,
-                                   col = rainbow(100, start=0.67, end=0),
-                                   bw = FALSE,
-                                   do_contour = FALSE,
-                                   do_legend = FALSE,
-                                   ...) {
+                                           ipm,
+                                           sub_kernels = FALSE,
+                                           col = rainbow(100, start=0.67, end=0),
+                                           bw = FALSE,
+                                           do_contour = FALSE,
+                                           do_legend = FALSE,
+                                           ...) {
 
   old_par <- par('mar')
   on.exit(par(old_par))
@@ -421,14 +414,14 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
 
   }
 
-  lapply(plot_list, function(ipm) plot.matrix(x = x,
-                                              y = y,
-                                              A = ipm,
-                                              col = col,
-                                              bw = bw,
-                                              do_contour = do_contour,
-                                              do_legend = do_legend,
-                                              dots))
+  lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
+                                                   y = y,
+                                                   A = ipm,
+                                                   col = col,
+                                                   bw = bw,
+                                                   do_contour = do_contour,
+                                                   do_legend = do_legend,
+                                                   dots))
 
   invisible(ipm)
 }

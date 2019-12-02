@@ -33,7 +33,6 @@ vec <- function(mat) {
 
 #' @rdname vec-operations
 #'
-#' @inheritParams vec
 #' @param square A logical indicating whether to return a square matrix. For IPMs,
 #' this should usually be \code{TRUE}. If set to \code{FALSE}, \code{nrow} and \code{ncol}
 #' must be specified
@@ -91,7 +90,8 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
 #' vectors of length 3 where the name corresponds to the
 #' state variable, the first entry is the lower bound of the domain, the second
 #' is the upper bound of the domain, and the third entry is the number of
-#' meshpoints.
+#' meshpoints (applies to \code{int_rule = "midpoint"} only! Other rules are not
+#' implemented yet).
 #'
 #' \code{define_impl} is meant to help distinguish the process of
 #' generating the kernels' mathematical form from their implementation details.
@@ -121,7 +121,7 @@ define_pop_state <- function(proto_ipm, ..., pop_vectors = list()) {
 
   out                 <- Filter(Negate(rlang::is_empty), temp)
 
-  names(out)          <- gsub('n_', 'pop_state_', names(out))
+  names(out)          <- gsub('^n_', 'pop_state_', names(out))
 
   proto_ipm$pop_state <- list(out)
 

@@ -142,7 +142,6 @@ define_kernel <- function(proto_ipm,
 
 #' @rdname kernel-definitions
 #'
-#' @inheritParams define_kernel
 #'
 #' @export
 
