@@ -21,7 +21,7 @@ lambda(ipm, ...)
   ...
 )
 
-\method{lambda}{simple_di_stoch_param_ipm}(ipm, ...., all_lambdas = TRUE)
+\method{lambda}{simple_di_stoch_param_ipm}(ipm, ..., all_lambdas = TRUE)
 
 \method{lambda}{general_di_det_ipm}(ipm, type, ...)
 
@@ -37,7 +37,16 @@ lambda(ipm, ...)
 See details for more information.}
 
 \item{comp_method}{Either \code{"eigen"} or \code{"pop_size"}. \code{"eigen"}
-is not possible except for \code{"simple_*_stoch_kern"} and \code{"simple_*_det"}}
+is not possible except for \code{"simple_*_stoch_kern"} and \code{"simple_*_det"}.}
+
+\item{all_lambdas}{A logical to return lamdas for each individual kernel, or a single
+number. For \code{comp_method = 'pop_size'} and \code{all_lambdas = FALSE},
+this will return the final value of computed lambdas (e.g. presumably when
+convergence has been reached). For \code{comp_method = 'eigen'} and
+\code{all_lambdas = FALSE}, it will return the geometric mean of the
+dominant eigenvalues for each projection matrix. For \code{all_lambdas = TRUE},
+it will always return a numeric vector of lambdas computed either from the ratio
+of population sizes or dominant eigenvalues of each kernel.}
 }
 \value{
 A single numeric vector or single value.

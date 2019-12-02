@@ -5,6 +5,6 @@ inst/doc
 .Ruserdata
 paper/ipmr_paper_outline.html
 experimental_funs
-*.html
+.html
 compadre*
 tests/testthat/Rplots.*

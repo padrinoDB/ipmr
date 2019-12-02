@@ -213,7 +213,16 @@ lambda.simple_di_det_ipm <- function(ipm, type = "deterministic", ...) {
 
 #' @rdname lambda
 #' @param comp_method Either \code{"eigen"} or \code{"pop_size"}. \code{"eigen"}
-#' is not possible except for \code{"simple_*_stoch_kern"} and \code{"simple_*_det"}
+#' is not possible except for \code{"simple_*_stoch_kern"} and \code{"simple_*_det"}.
+#' @param all_lambdas A logical to return lamdas for each individual kernel, or a single
+#' number. For \code{comp_method = 'pop_size'} and \code{all_lambdas = FALSE},
+#' this will return the final value of computed lambdas (e.g. presumably when
+#' convergence has been reached). For \code{comp_method = 'eigen'} and
+#' \code{all_lambdas = FALSE}, it will return the geometric mean of the
+#' dominant eigenvalues for each projection matrix. For \code{all_lambdas = TRUE},
+#' it will always return a numeric vector of lambdas computed either from the ratio
+#' of population sizes or dominant eigenvalues of each kernel.
+#'
 #'
 #' @export
 
@@ -232,7 +241,7 @@ lambda.simple_di_stoch_kern_ipm <- function(ipm,
 #'
 #' @export
 
-lambda.simple_di_stoch_param_ipm <- function(ipm, ...., all_lambdas = TRUE) {
+lambda.simple_di_stoch_param_ipm <- function(ipm, ..., all_lambdas = TRUE) {
 
   .stoch_lambda_pop_size(ipm, all_lambdas = all_lambdas)
 
@@ -356,7 +365,9 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
 
 
 #' @rdname plot-methods
-#' @param sub_kernels A logical - also plot the sub-kernels? NOT YET IMPLEMENTED
+#' @param sub_kernels A logical - also plot the sub-kernels?
+#' @param exponent The exponent to raise each kernel to. Setting this to a low
+#' number can help visualize kernels that are overwhelmed by a few very large numbers.
 #' @export
 
 plot.simple_di_det_ipm <- function(x = NULL, y = NULL,

@@ -75,7 +75,10 @@ on the plot}
 
 \item{...}{further arguments passed to legend}
 
-\item{sub_kernels}{A logical - also plot the sub-kernels? NOT YET IMPLEMENTED}
+\item{sub_kernels}{A logical - also plot the sub-kernels?}
+
+\item{exponent}{The exponent to raise each kernel to. Setting this to a low
+number can help visualize kernels that are overwhelmed by a few very large numbers.}
 }
 \value{
 \code{A} or \code{ipm} invisibly
