@@ -50,6 +50,7 @@ truncated_distributions <- function(fun,
 # Internal helpers for eviction correction functions
 
 #' @noRd
+#' @importFrom rlang call_args
 
 .sub_new_param_call <- function(fun, param, L, U, proto) {
 

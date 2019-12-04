@@ -8,3 +8,4 @@ experimental_funs
 .html
 compadre*
 tests/testthat/Rplots.*
+tests/sim_tests/*.PNG

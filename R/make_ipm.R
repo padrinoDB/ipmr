@@ -468,7 +468,74 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
                                            usr_funs = list(),
                                            ...) {
 
-  # DEFINE ME
+  # initialize others + k_row
+
+  proto_list <- .initialize_kernels(proto_ipm, iterate)
+
+  others <- proto_list$others
+  k_row  <- proto_list$k_row
+
+  if(is.null(domain_list)) {
+    master_env <- .make_master_env(others$domain, usr_funs)
+  } else {
+    master_env <- .make_master_env(domain_list, usr_funs)
+  }
+
+  # Bind env_exprs, constants, and pop_vectors to master_env so that
+  # we can always find them and avoid that miserable repitition
+
+  master_env <- .bind_all_constants(pop_state   = others$pop_state[[1]],
+                                    env_state   = others$env_state[[1]],
+                                    env_to_bind = master_env)
+
+
+  temp       <- .prep_di_output(others, k_row, proto_ipm, iterations)
+
+  # Thus far, I think general_* methods will have to use iteration for lambdas
+  # as I'm not sure I want to work out the correct cbind(rbind(...)) rules for
+  # creating a mega-matrix. So throw an error if pop_state isn't defined
+  if(all(is.na(proto_ipm$pop_state[[1]]))) {
+
+    stop("All general_* IPMs must have a 'pop_state' defined.",
+         "See ?define_pop_state() for more details." )
+
+  } else {
+
+    master_env  <- .add_pop_state_to_master_env(temp$pop_state, master_env)
+
+  }
+
+  env_list      <- list(master_env = master_env)
+
+  all_sub_kerns <- .make_sub_kernel_general(others,
+                                            env_list,
+                                            return_envs = return_all)
+
+  sub_kern_list <- all_sub_kerns$sub_kernels
+  env_list      <- all_sub_kerns$env_list
+
+  # Things switch up here from the simple_* versions. Rather than construct a mega-K
+  # through rbind + cbinding, we just iterate the population vector with the
+  # sub kernels. This means I don't have to overload all of the arithmetic
+  # operators and keeps things simpler internally. It also means there's no
+  # need to implement sparse kernels/matrices for things like an age x size IPM.
+
+  if(iterate) {
+
+    kern_seq  <- rep(1, iterations)
+
+    pop_state <- .iterate_kerns_general(k_row,
+                                        proto_ipm,
+                                        sub_kern_list,
+                                        iterations,
+                                        kern_seq,
+                                        temp$pop_state,
+                                        master_env)
+  }
+
+  # Temporary return to make sure things aren't all-a-cattywompus
+  return(pop_state)
+
 }
 
 make_ipm.general_di_stoch_param <- function(proto_ipm,
