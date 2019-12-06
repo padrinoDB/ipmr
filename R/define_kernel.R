@@ -95,6 +95,7 @@ define_kernel <- function(proto_ipm,
                            .check_assign = TRUE)
 
   # make sure eviction function is correctly specified
+
   evict_fun <- rlang::enquo(evict_fun)
   evict_fun <- .check_evict_fun(evict, evict_fun)
 
@@ -242,8 +243,11 @@ define_k <- function(proto_ipm,
 
 .check_evict_fun <- function(evict, fun) {
 
+
   # need to supply a function if you want to correct for eviction!
+
   if(evict & rlang::quo_is_null(fun)) {
+
     stop('"evict" is TRUE but no fun supplied!')
 
     # if we have one, we need to get the name of the corrected object
@@ -259,6 +263,8 @@ define_k <- function(proto_ipm,
   } else if(rlang::quo_is_null(fun)) {
     fun <- NA_character_
   }
+
+
 
   return(fun)
 }
