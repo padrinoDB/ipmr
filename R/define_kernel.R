@@ -178,7 +178,6 @@ define_k <- function(proto_ipm,
     return(out)
   })
 
-  names(forms_text) <- gsub('^n_', 'pop_state_', names(forms_text))
 
   # retain names
   names(forms_text) <- names(forms)
@@ -218,8 +217,6 @@ define_k <- function(proto_ipm,
   class(out) <- cls
   return(out)
 
-
-  return(out)
 }
 
 
