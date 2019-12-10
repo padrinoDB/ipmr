@@ -62,6 +62,7 @@
   it <- 1
 
   for(j in seq_len(dim(levels)[2])) { # variable names loop
+
     nm <- names(levels)[j]
 
     for(k in seq_len(dim(levels)[1])) { # variable values loop
@@ -74,23 +75,77 @@
                                                 levels[k, j],
                                                 proto[it, 'kernel_id'])
 
-      proto$params[[it]]$formula        <- gsub(nm,
-                                                levels[k, j],
-                                                proto$params[[it]]$formula)
+      # Kernels with multiple population vectors require a named list of
+      # `formula`, whereas single population vectors will just be a scalar
+      # that is then turned back into a later on
 
-      proto$params[[it]]$vr_text        <- purrr::map(proto$params[[it]]$vr_text,
-                                                      .f = function(x, level, nm) {
-                                                        gsub(nm, level, x)
-                                                      },
-                                                      level = levels[k,j],
-                                                      nm = nm)
+      if(is.list(proto$params[[it]]$formula)) {
+        proto$params[[it]]$formula <- purrr::map(
+          proto$params[[it]]$formula,
+          .f = function(x, level, nm) {
 
-      names(proto$params[[it]]$vr_text) <- purrr::map_chr(names(proto$params[[it]]$vr_text),
-                                                          .f = function(x, level, nm) {
-                                                            gsub(nm, level, x)
-                                                          },
-                                                          level = levels[k, j],
-                                                          nm = nm)
+            gsub(nm, level, x)
+
+          },
+          level = levels[k,j],
+          nm    = nm
+        )
+
+        names(proto$params[[it]]$formula) <- purrr::map_chr(
+          names(proto$params[[it]]$formula),
+                .f = function(x, level, nm) {
+
+                  gsub(nm, level, x)
+
+                },
+                level = levels[k,j],
+                nm = nm
+
+        )
+
+      } else {
+
+        proto$params[[it]]$formula        <- gsub(
+          nm,
+          levels[k, j],
+          proto$params[[it]]$formula
+        )
+
+      }
+
+      proto$params[[it]]$vr_text        <- purrr::map(
+        proto$params[[it]]$vr_text,
+        .f = function(x, level, nm) {
+
+          gsub(nm, level, x)
+
+        },
+        level = levels[k,j],
+        nm = nm
+      )
+
+
+      names(proto$pop_state[[it]])      <- purrr::map_chr(
+        names(proto$pop_state[[it]]),
+        .f = function(x, level, nm) {
+          gsub(nm, level, x)
+        },
+        level = levels[k, j],
+        nm = nm
+      )
+
+
+      # We want a character VECTOR of names, not a list. Hence the map_chr instead
+      # of standard purrr::map here
+
+      names(proto$params[[it]]$vr_text) <- purrr::map_chr(
+        names(proto$params[[it]]$vr_text),
+        .f = function(x, level, nm) {
+          gsub(nm, level, x)
+        },
+        level = levels[k, j],
+        nm = nm
+      )
 
 
       temp <- rlang::quo_text(proto$evict_fun[[it]][[1]]) %>%

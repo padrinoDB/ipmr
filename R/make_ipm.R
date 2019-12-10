@@ -289,8 +289,7 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
   # Bind env_exprs, constants, and pop_vectors to master_env so that
   # we can always find them and avoid that miserable repitition
 
-  master_env <- .bind_all_constants(pop_state   = others$pop_state[[1]],
-                                    env_state   = others$env_state[[1]]$constants,
+  master_env <- .bind_all_constants(env_state   = others$env_state[[1]]$constants,
                                     env_to_bind = master_env)
 
   out        <- .prep_di_output(others, k_row, proto_ipm, iterations)
@@ -382,8 +381,7 @@ make_ipm.general_di_det <- function(proto_ipm,
   # Bind env_exprs, constants, and pop_vectors to master_env so that
   # we can always find them and avoid that miserable repitition
 
-  master_env <- .bind_all_constants(pop_state   = others$pop_state[[1]],
-                                    env_state   = others$env_state[[1]],
+  master_env <- .bind_all_constants(env_state   = others$env_state[[1]],
                                     env_to_bind = master_env)
 
 
@@ -432,21 +430,22 @@ make_ipm.general_di_det <- function(proto_ipm,
   }
 
 
-  sub_kern_list <- set_ipmr_classes(sub_kern_list)
+  # Final bits of housekeeping post-iteration. .prep_other_output deals specifically
+  # with items that depend on `return_all` and `iterate` switches, but have
+  # length > 1 (ifelse() output always equals length(input))
 
-  if(return_all) {
-    env_ret <- env_list
-  } else {
-    env_ret <- NA_character_
-  }
+  sub_kern_list  <- set_ipmr_classes(sub_kern_list)
 
-  if(iterate) {
-    env_seq_ret <- kern_seq
-    pop_ret     <- pop_state
-  } else {
-    env_seq_ret <- NA_integer_
-    pop_ret     <- temp$pop_state
-  }
+
+  temp_other_out <- .prep_other_output(env_list,
+                                       kern_seq,
+                                       pop_state,
+                                       return_all,
+                                       iterate)
+
+  env_ret     <- temp_other_out$env_ret
+  env_seq_ret <- temp_other_out$env_seq_ret
+  pop_ret     <- temp_other_out$pop_ret
 
   out <- list(
     iterators   = NA_character_,
@@ -463,10 +462,18 @@ make_ipm.general_di_det <- function(proto_ipm,
 
 }
 
+#' @rdname make_ipm
+#'
+#' @export
+
 make_ipm.general_di_stoch_kern <- function(proto_ipm,
-                                           return_all = FALSE,
-                                           usr_funs = list(),
-                                           ...) {
+                                           return_all  = FALSE,
+                                           usr_funs    = list(),
+                                           ...,
+                                           domain_list = NULL,
+                                           iterate     = TRUE,
+                                           iterations  = 50,
+                                           kernel_seq  = NULL) {
 
   # initialize others + k_row
 
@@ -484,8 +491,7 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
   # Bind env_exprs, constants, and pop_vectors to master_env so that
   # we can always find them and avoid that miserable repitition
 
-  master_env <- .bind_all_constants(pop_state   = others$pop_state[[1]],
-                                    env_state   = others$env_state[[1]],
+  master_env <- .bind_all_constants(env_state   = others$env_state[[1]],
                                     env_to_bind = master_env)
 
 
@@ -522,7 +528,10 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
 
   if(iterate) {
 
-    kern_seq  <- rep(1, iterations)
+    kern_seq  <- .make_kern_seq(proto_ipm,
+                                sub_kern_list,
+                                iterations,
+                                kernel_seq)
 
     pop_state <- .iterate_kerns_general(k_row,
                                         proto_ipm,
@@ -533,10 +542,39 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
                                         master_env)
   }
 
-  # Temporary return to make sure things aren't all-a-cattywompus
-  return(pop_state)
+  # Final bits of housekeeping post-iteration. .prep_other_output deals specifically
+  # with items that depend on `return_all` and `iterate` switches, but have
+  # length > 1 (ifelse() output always equals length(input))
+
+  sub_kern_list  <- set_ipmr_classes(sub_kern_list)
+
+
+  temp_other_out <- .prep_other_output(env_list,
+                                       kern_seq,
+                                       pop_state,
+                                       return_all,
+                                       iterate)
+
+  env_ret     <- temp_other_out$env_ret
+  env_seq_ret <- temp_other_out$env_seq_ret
+  pop_ret     <- temp_other_out$pop_ret
+
+  out <- list(
+    iterators   = NA_character_,
+    sub_kernels = sub_kern_list,
+    env_list    = env_ret,
+    env_seq     = env_seq_ret,
+    pop_state   = pop_ret,
+    proto_ipm   = proto_ipm,
+    final_proto = rbind(others, k_row)
+  )
+
+  class(out) <- c('general_di_stoch_kern_ipm', 'list')
+
+  return(out)
 
 }
+
 
 make_ipm.general_di_stoch_param <- function(proto_ipm,
                                             return_all = FALSE,

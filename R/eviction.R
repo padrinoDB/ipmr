@@ -34,17 +34,31 @@ truncated_distributions <- function(fun,
 
   proto <- ..1
 
-  if(is.na(L) || is.na(U)) {
+  for(i in seq_along(param)) {
 
-    LU <- .get_bounds_from_proto(param, proto)
-    L <- LU[1]
-    U <- LU[2]
+    if(length(fun) != length(param)) {
+      warning("length of 'fun' in 'truncated_distributions()' is not equal to ",
+              "length of 'param. Recycling 'fun'.")
 
+      use_fun <- fun[1]
+    } else {
+      use_fun <- fun[i]
+    }
+
+
+    if(is.na(L) || is.na(U)) {
+
+      LU <- .get_bounds_from_proto(param[i], proto)
+      L <- LU[1]
+      U <- LU[2]
+
+    }
+
+    proto <- .sub_new_param_call(use_fun, param[i], L, U, proto)
   }
 
-  proto <- .sub_new_param_call(fun, param, L, U, proto)
-
   return(proto)
+
 }
 
 # Internal helpers for eviction correction functions
@@ -201,6 +215,3 @@ truncated_distributions <- function(fun,
 
 }
 
-.quo_has_list <- function(quo_)  {
-  grepl('list\\(', quo_)
-}
