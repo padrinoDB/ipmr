@@ -129,11 +129,11 @@ test_that('define_pop_state produces expected outputs', {
 
   expect_true(is.list(pop_state))
 
-  classes <- vapply(pop_state, function(x) inherits(x[[1]], 'quosures'), logical(1L))
+  classes <- vapply(pop_state, function(x) inherits(x[[1]], 'quosure'), logical(1L))
 
   expect_true((all(classes)))
 
-  nms <- vapply(pop_state, function(x) names(x[[1]]), character(2L)) %>%
+  nms <- vapply(pop_state, function(x) names(x), character(2L)) %>%
     as.vector() %>%
     unique()
 

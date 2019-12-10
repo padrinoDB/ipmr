@@ -1,10 +1,15 @@
 if(rlang::is_interactive()) {
   library(testthat)
 }
+
+# print(search())
 context('general density independent stochastic kernel models')
 
-# Test with Aikens & Roach 2014 Population dynamics in central and edge
-# populations of a narrowly endemic plant
+# Test with parameters from Aikens & Roach 2014 Population dynamics in central
+# and edge populations of a narrowly endemic plant. They only report
+# lambdas on a figure, and so I won't try to hit those perfectly.
+# Rather, just going to simulate a model using their parameters and then
+# try to recover it using ipmr.
 
 library(rlang)
 library(purrr)
@@ -12,7 +17,7 @@ library(purrr)
 flatten_to_depth <- ipmr:::.flatten_to_depth
 
 hier_effs <- list(
-  pop = c(
+  site = c(
     'whitetop',
     'mt_rogers',
     'roan',
@@ -237,11 +242,21 @@ gamma_nr <- function(x_2, z_1, params, L, U) {
 
 }
 
-gamma_nd <- function(x_2, params, L, U) {
+gamma_nd <- function(x_2, x_1, params, L, U) {
 
-  ev <- pnorm(U, x_2, params[[2]]) - pnorm(L, x_2, params[[2]])
+  params <- list(params[[1]], 0, params[[2]])
 
-  dnorm(x_2, params[[1]], params[[2]]) / ev
+  lin_prob(params[[1]], params[[2]], params[[3]], x_1, x_2, L, U)
+
+  # ev <- pnorm(U,
+  #             mean = x_2,
+  #             sd   = params[[2]]) - pnorm(L,
+  #                                         mean = x_2,
+  #                                         sd   = params[[2]])
+  #
+  # out <- dnorm(x_2, params[[1]], params[[2]]) / ev
+
+  # return(out)
 
 }
 
@@ -322,7 +337,7 @@ k_dx <- function(x_2, x_1, params) {
   L_x <- 0.234 # size bounds for eviction correction
   U_x <- 2.97
 
-  gamma_nd(x_2, params[24:25], L_x, U_x) * d_x
+  gamma_nd(x_2, x_1, params[24:25], L_x, U_x) * d_x
 
 }
 
@@ -375,14 +390,16 @@ k_zd <- function(z_1, params) {
 
 n_iterations   <- 100
 
-models         <- vector('list', length(hier_effs$pop))
-names(models)  <- hier_effs$pop
+models         <- vector('list', length(hier_effs$site))
+names(models)  <- hier_effs$site
 
-pop_holders        <- vector('list', length(hier_effs$pop))
-names(pop_holders) <- hier_effs$pop
+pop_holders        <- vector('list', length(hier_effs$site))
+names(pop_holders) <- hier_effs$site
 
 # All populations will get the same initial population vector, and it's
 # just a random set of numbers in their range of possible values
+
+# set.seed(214512)
 
 init_pop_vec      <- list(ln_leaf_l = runif(domains$sqrt_area[3]),
                           sqrt_area = runif(domains$sqrt_area[3]))
@@ -495,9 +512,12 @@ for(i in seq_along(models)) {
                    all_mesh_p$z_1,
                    site_params) %>%
       matrix(nrow = 50, ncol = 50, byrow = TRUE),
+
+    # This requires the subsetting because we only want a single
+    # column vector (e.g. the first entry of each row).
     kern_dx = k_dx(all_mesh_p$x_2,
                    all_mesh_p$x_1,
-                   site_params) %>%
+                   site_params)[seq(1, 2500, by = 50)] %>%
       matrix(nrow = 50, ncol = 1, byrow = TRUE),
     kern_xz = k_xz(all_mesh_p$x_2,
                    all_mesh_p$z_2,
@@ -505,11 +525,14 @@ for(i in seq_along(models)) {
                    all_mesh_p$z_1,
                    site_params) %>%
       matrix(nrow = 50, ncol = 50, byrow = TRUE),
+
+    # These are simpler to subset because we just want the first row of the
+    # matrix.
     kern_xd = k_xd(all_mesh_p$x_1,
-                   site_params) %>%
+                   site_params)[1:50] %>%
       matrix(nrow = 1, ncol = 50, byrow = TRUE),
     kern_zd = k_zd(all_mesh_p$z_1,
-                   site_params)  %>%
+                   site_params)[1:50]  %>%
       matrix(nrow = 1, ncol = 50, byrow = TRUE)
 
   )
@@ -549,11 +572,248 @@ actual_lambdas <- vapply(pop_holders,
                          function(x) ipmr:::.stoch_lambda_pop_size(x),
                          numeric(1L))
 
+# And now, for the ipmr version.
 
-test_that('simulation can somewhat recover the kernels', {
 
-  expect_equal(target_lambdas, actual_lambdas, tol = 3e-2)
+gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
+  define_kernel(
+    name             = 'k_xx_site',
+    family           = "CC",
+    formula          = sig_n_site          *
+      (1 - mu_n_site)   *
+      (1 - beta_n_site) *
+      gamma_nn_site     *
+      d_ln_leaf_l,
+
+    sig_n_site        = inv_logit(nr_s_z_int_site, nr_s_z_b_site, ln_leaf_l_1),
+    gamma_nn_site     = dnorm(ln_leaf_l_2, nr_nr_mu_site, nr_nr_sd_site),
+    nr_nr_mu_site     = nr_nr_int_site + nr_nr_b_site * ln_leaf_l_1,
+    mu_n_site         = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
+    beta_n_site       = inv_logit(nr_f_z_int_site, nr_f_z_b_site, ln_leaf_l_1),
+
+    data_list        = full_data_list,
+    states           = list(c('ln_leaf_l')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = hier_effs,
+    evict            =  TRUE,
+    evict_fun        = truncated_distributions('norm',
+                                               'gamma_nn_site')
+  ) %>%
+  define_kernel(
+    name             = 'k_zx_site',
+    family           = 'CC',
+
+    formula          = (
+      phi_site        *
+        nu_site         *
+        gamma_sr_site   +
+        sig_r_site      *
+        (1 - mu_r_site) *
+        gamma_nr_site
+    )                *
+      d_sqrt_area,
+
+    phi_site      = pois(f_s_int_site, f_s_slope_site, sqrt_area_1),
+    nu_site       = sdl_es_r_site,
+    gamma_sr_site = dnorm(ln_leaf_l_2, sdl_z_int_site, sdl_z_sd_site),
+    sig_r_site    = inv_logit(ra_s_z_int_site, ra_s_z_b_site, sqrt_area_1),
+    mu_r_site     = inv_logit(ra_d_z_int_site, ra_d_z_b_site, sqrt_area_1),
+    gamma_nr_site = dnorm(ln_leaf_l_2, mu_ra_nr_site, ra_n_z_sd_site),
+    mu_ra_nr_site = ra_n_z_int_site + ra_n_z_b_site * sqrt_area_1,
+
+    data_list    = full_data_list,
+    states       = list(c('sqrt_area', 'ln_leaf_l')),
+    has_hier_effs = TRUE,
+    levels_hier_effs = hier_effs,
+    evict = TRUE,
+    evict_fun = truncated_distributions(c('norm', 'norm'),
+                                        c('gamma_nr_site',
+                                          'gamma_sr_site'))
+  ) %>%
+  define_kernel(
+    name = 'k_dx_site',
+    family = 'DC',
+
+    formula = gamma_nd_site * d_ln_leaf_l,
+
+    gamma_nd_site = dnorm(ln_leaf_l_2, dc_nr_int_site, dc_nr_sd_site),
+
+    data_list = full_data_list,
+    states = list(c('ln_leaf_l')),
+    has_hier_effs = TRUE,
+    levels_hier_effs = hier_effs,
+    evict = TRUE,
+    evict_fun = truncated_distributions('norm',
+                                        'gamma_nd_site')
+  ) %>%
+  define_kernel(
+    name             = 'k_xz_site',
+    family           = 'CC',
+    formula          = sig_n_site         *
+      (1 - mu_n_site)    *
+      beta_n_site       *
+      gamma_rn_site     *
+      tau               *
+      d_ln_leaf_l,
+
+    sig_n_site        = inv_logit(nr_s_z_int_site, nr_s_z_b_site, ln_leaf_l_1),
+    mu_n_site         = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
+    beta_n_site       = inv_logit(nr_f_z_int_site, nr_f_z_b_site, ln_leaf_l_1),
+    gamma_rn_site     = dnorm(sqrt_area_2, mu_nr_ra_site, nr_ra_sd_site),
+    mu_nr_ra_site     = nr_ra_int_site + nr_ra_b_site * ln_leaf_l_1,
+    tau               = inv_logit(tau_int_site, tau_b_site, ln_leaf_l_1),
+
+    data_list        = full_data_list,
+    states           = list(c('sqrt_area', 'ln_leaf_l')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = hier_effs,
+    evict            = TRUE,
+    evict_fun        = truncated_distributions('norm',
+                                               'gamma_rn_site')
+
+  ) %>%
+  define_kernel(
+    name             = 'k_xd_site',
+    family           = 'CD',
+    formula          = sig_n_site * mu_n_site * d_ln_leaf_l,
+    sig_n_site       = inv_logit(nr_s_z_int_site, nr_s_z_b_site, ln_leaf_l_1),
+    mu_n_site        = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
+    data_list        = full_data_list,
+    states           = list(c('ln_leaf_l')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = hier_effs,
+    evict            = FALSE
+  ) %>%
+  define_kernel(
+    name             = 'k_zd_site',
+    family           = 'CD',
+    formula          = sig_r_site * mu_r_site * d_sqrt_area,
+    sig_r_site        = inv_logit(ra_s_z_int_site, ra_s_z_b_site, sqrt_area_1),
+    mu_r_site         = inv_logit(ra_d_z_int_site, ra_d_z_b_site, sqrt_area_1),
+    data_list        = full_data_list,
+    states           = list(c('sqrt_area')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = hier_effs,
+    evict            = FALSE
+  ) %>%
+  define_k(
+    name = 'K_site',
+    n_ln_leaf_l_site_t_1 = k_xx_site %*% n_ln_leaf_l_site_t +
+      k_zx_site %*% n_sqrt_area_site_t +
+      k_dx_site %*% n_d_site_t,
+    n_sqrt_area_site_t_1 = k_xz_site %*% n_ln_leaf_l_site_t,
+    n_d_site_t_1 =         k_xd_site %*% n_ln_leaf_l_site_t +
+      k_zd_site %*% n_sqrt_area_site_t,
+    family = 'IPM',
+    data_list = full_data_list,
+    states    = list(c('sqrt_area', 'ln_leaf_l')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = hier_effs
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c(paste('k_',
+                             c('xx',
+                               'zx', 'dx', 'xz', 'xd', 'zd'),
+                             '_site',
+                             sep = ""),
+                       'K_site'),
+      int_rule     = rep('midpoint', 7),
+      dom_start    = c('ln_leaf_l',
+                       'sqrt_area', NA_character_,
+                       'ln_leaf_l', 'ln_leaf_l', 'sqrt_area', NA_character_),
+      dom_end      = c('ln_leaf_l',
+                       'ln_leaf_l', 'ln_leaf_l',
+                       'sqrt_area', NA_character_, NA_character_, NA_character_)
+    )
+  ) %>%
+  define_domains(
+    sqrt_area = c(0.63 * 0.9, 3.87 * 1.1, 50),
+    ln_leaf_l = c(0.26 * 0.9, 2.70 * 1.1, 50)
+  ) %>%
+  define_pop_state(
+    pop_vectors = list(
+      n_ln_leaf_l_site = init_pop_vec$ln_leaf_l,
+      n_sqrt_area_site = init_pop_vec$sqrt_area,
+      n_d_site         = 10
+    )
+  ) %>%
+  make_ipm(
+    return_all = TRUE,
+    usr_funs   = list(
+      inv_logit = inv_logit,
+      pois      = pois
+    ),
+    iterations = 100
+  )
+
+# need to rethink how output is generated - no reason I shouldn't be able to
+# plug model object straight into lambda generic!
+
+ipmr_pop_sizes <- list(
+  whitetop  = list(pop_state = gen_di_stoch_kern$pop_state[1:3]),
+  mt_rogers = list(pop_state = gen_di_stoch_kern$pop_state[4:6]),
+  roan      = list(pop_state = gen_di_stoch_kern$pop_state[7:9]),
+  big_bald  = list(pop_state = gen_di_stoch_kern$pop_state[10:12]),
+  bob_bald  = list(pop_state = gen_di_stoch_kern$pop_state[13:15]),
+  oak_knob  = list(pop_state = gen_di_stoch_kern$pop_state[16:18])
+)
+
+ipmr_lambdas <- vapply(ipmr_pop_sizes,
+                       function(x) ipmr:::.stoch_lambda_pop_size(x),
+                       numeric(1L))
+
+test_that('ipmr version matches simulation', {
+
+  expect_equal(ipmr_lambdas, actual_lambdas, tol = 1e-10)
+
+  # Standardized right eigenvectors
+
+  ipmr_w <- ipmr_pop_sizes$whitetop$pop_state$pop_state_ln_leaf_l_whitetop[ , 101] /
+    sum(ipmr_pop_sizes$whitetop$pop_state$pop_state_ln_leaf_l_whitetop[ , 101])
+
+  hand_w <- pop_holders$whitetop$pop_state$n_ln_leaf_l[ , 101] /
+    sum(pop_holders$whitetop$pop_state$n_ln_leaf_l [ , 101])
+
+  expect_equal(ipmr_w, hand_w, tol = 1e-10)
+
+  kern_tests <- logical(length(gen_di_stoch_kern$sub_kernels))
+
+  kern_suffs <- c('xx', 'zx', 'xd', 'xz', 'dx', 'dz')
+
+  for(i in seq_along(hier_effs$site)) {
+
+    ind <- seq(i,
+               length(gen_di_stoch_kern$sub_kernels),
+               by = length(hier_effs$site))
+
+    kern_tests[ind] <- compare_kernels('gen_di_stoch_kern',
+                                       'models',
+                                       nms_ipmr = paste('k_',
+                                                        paste(kern_suffs,
+                                                              hier_effs$site[i],
+                                                              sep = "_"),
+                                                        sep = ""),
+                                       nms_hand = paste(hier_effs$site[i],
+                                                        '$kern_',
+                                                        kern_suffs,
+                                                        sep = ""))
+
+  }
+
+  if(any(! kern_tests)) warning('kernel indices: ', which(! kern_tests),
+                               ' are not identical')
+
+  expect_true(all(kern_tests))
 
 })
+
+# Next, we need to test the internal iteration machinery - particularly the
+# kern_seq properties. This tests whether or not we can recover stochastic simulations
+# given the same sequence of kernels (i.e. did I write the user-defined sequence
+# machinery correctly). Since we've already verified that the kernels are all identical,
+# there should never be any issues here.
+
+
 
 

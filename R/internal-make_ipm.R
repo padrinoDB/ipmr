@@ -230,7 +230,14 @@
 .init_pop_state_list <- function(others,
                                  iterations) {
 
-  pop_state <- others$pop_state[[1]]
+  # Flatten and drop duplicates. Duplication is likely to occur in simple_*
+  # ipms because every kernel will have the same population state associated
+  # with it. General IPMs with hierarchical effects, on the other hand, will need
+  # different population states for almost every kernel row.
+
+  pop_state <- .flatten_to_depth(others$pop_state, 1L)
+
+  pop_state <- pop_state[!duplicated(names(pop_state))]
 
   out <- list()
   # If pop_vec is specified, then initialize an array to hold the output
@@ -398,7 +405,7 @@
 
   for(i in seq_along(pop_state)) {
     nm <- paste0(names(pop_state), '_t', sep = "")
-    nm <- gsub('n_', 'pop_state_', nm)
+    nm <- gsub('^n_', 'pop_state_', nm)
 
     assign(nm, pop_state[[i]][, (iteration + 1)], master_env)
   }
@@ -456,8 +463,14 @@
 
 .parse_k_formulae <- function(text, kernel_env) {
 
+  # This is very shaky - requires code to have whitespace, and will fail
+  # when users don't put spaces between variables. I think that's bad practice
+  # in general, but I also think the whole n_ -> pop_state naming business
+  # needs a rethink. This is something that will happen once the rest of the
+  # di_* methods are written, so that tests can be re-written in bulk
+
   text <- lapply(text, function(x) {
-    gsub('n_', 'pop_state_', x)
+    gsub(' n_', ' pop_state_', x, perl = TRUE)
   }
   )
 
@@ -478,7 +491,7 @@
     return(out)
   })
 
-  names(text) <- gsub('n_', 'pop_state_', names(text))
+  names(text) <- gsub('^n_', 'pop_state_', names(text))
   out         <- .parse_vr_formulae(text, kernel_env)
 
   return(out)
@@ -537,8 +550,11 @@
   # for DC. CD is easy, it's just a sequence 1:n_mesh_p. DC is (0:n_mesh_p * n_mesh_p) + 1
   # to get the first value in each row (e.g. the first column of the iteration matrix).
   # Append names of the state variable to each so that we can access them later.
+  # We do not want to do this for continuous states that don't exist - e.g. n_mesh_p = NA
+  # This throws an error, so reduce the list to !is.na() entries.
 
-  dc_cd_nms <- names(domain_list)[!grepl('_not_applicable', names(domain_list))]
+  dc_cd_nms     <- names(domain_list)[!grepl('_not_applicable', names(domain_list))]
+  n_mesh_p_cont <- n_mesh_p[!is.na(n_mesh_p)]
 
   for(i in seq_along(dc_cd_nms)) {
 
@@ -546,11 +562,11 @@
     dc_nm <- paste('dc_ind_', dc_cd_nms[i], sep = "")
 
     to_bind <- rlang::list2(!! cd_nm := seq(1,
-                                            n_mesh_p[[i]],
+                                            n_mesh_p_cont[[i]],
                                             by = 1),
                             !! dc_nm := (seq(0,
-                                             n_mesh_p[[i]] - 1,
-                                             by = 1) * n_mesh_p[[i]]) + 1)
+                                             n_mesh_p_cont[[i]] - 1,
+                                             by = 1) * n_mesh_p_cont[[i]]) + 1)
 
     rlang::env_bind(master_env,
                     !!! to_bind)
@@ -561,19 +577,22 @@
   # hence the "by = 2". This only applies for midpoint rule IPMs, others will need
   # different weights, etc.
 
-  for(i in seq(1, length(mids), by = 2)){
+  cont_svs <- strsplit(names(domain_list), '_[0-9]') %>% unlist()
+  cont_svs <- cont_svs[!grepl('not_applicable', cont_svs)] %>%
+    unique()
 
-    domain_grid        <- expand.grid(mids[[i]],
-                                      mids[[i + 1]])
+  for(i in cont_svs) {
 
-    names(domain_grid) <- c(names(mids)[i], names(mids)[i + 1])
+    mid_ind <- grepl(i, names(mids))
+
+    domain_grid        <- expand.grid(mids[mid_ind])
+
+    names(domain_grid) <- c(names(mids)[mid_ind])
 
     rlang::env_bind(master_env,
                     !!! domain_grid)
 
-    sv <- strsplit(names(domain_list)[i], '_[0-9]')[[1]][1]
-
-    nm <- paste0('d_', sv, sep = "")
+    nm <- paste0('d_', i, sep = "")
 
     h  <- domain_grid[2, 1] - domain_grid[1, 1]
 
@@ -786,48 +805,23 @@
 
 #' @noRd
 
-.bind_all_constants <- function(pop_state = NA_real_,
-                                env_state = NA_real_,
+.bind_all_constants <- function(env_state = NA_real_,
                                 env_to_bind) {
 
-  if(!all(is.na(pop_state))) {
-    if(rlang::is_list(pop_state)) {
-      pop_state <- .flatten_to_depth(pop_state, 1)
-    }
-
-    # Turn pop_states for continuous vars into column vectors
-
-    cls_test <- lapply(pop_state,
-                       function(x) inherits(x, 'matrix'))
-
-
-    for(i in seq_along(pop_state)) {
-
-      if(length(pop_state[[i]]) > 1 && ! cls_test[[i]]) {
-
-        # Will not work for rectangular continuous state spaces!
-        # Need to work out the right procedure for that, but I think
-        # that's a challenge for a later date
-
-        pop_state[[i]] <- matrix(pop_state[[i]],
-                                 nrow = length(pop_state[[i]]),
-                                 ncol = 1)
-      }
-    }
-  }
 
   if(!all(is.na(env_state))) {
     if(rlang::is_list(env_state)) {
       env_state <- .flatten_to_depth(env_state, 1)
+
+      to_bind <- .drop_duplicated_names_and_splice(env_state)
+
+      rlang::env_bind(env_to_bind,
+                      !!! to_bind)
+
     }
   }
 
-  temp    <- purrr::splice(pop_state, env_state)
 
-  to_bind <- .drop_duplicated_names_and_splice(temp)
-
-  rlang::env_bind(env_to_bind,
-                  !!! to_bind)
 
 
   return(env_to_bind)
@@ -989,6 +983,11 @@
                                   state_var_end,
                                   master_env) {
 
+  # store class of function to append to result. It gets stripped out
+  # by `[` I think.
+
+  fun_cls <- class(fun)[1]
+
   test_vec <- c(state_var_start, state_var_end)
 
   ind_lgl  <- vapply(test_vec,
@@ -1044,7 +1043,7 @@
 
   out <- matrix(fun, nrow = n_mesh_p_end, ncol = n_mesh_p_start, byrow = TRUE)
 
-  class(out) <- c(class(fun[[1]]), class(out))
+  class(out) <- c(fun_cls, class(out))
 
   return(out)
 
@@ -1082,3 +1081,36 @@ set_ipmr_classes <- function(to_set, cls = NULL) {
   return(out)
 
 }
+
+
+#' @noRd
+# Function to prepare env_list, kern_seq, and pop_state. ifelse() returns
+# values that are the same length as the input, so a logical(1L) input
+# returns a single entry. This isn't ideal because pop_state, env_list,
+# and kern_seq can all be lists of length > 1.
+
+.prep_other_output <- function(env_list,
+                               kern_seq,
+                               pop_state,
+                               return_all,
+                               iterate) {
+
+  out <- list()
+
+  if(return_all) {
+    out$env_ret <- env_list
+  } else {
+    out$env_ret <- NA_character_
+  }
+
+  if(iterate) {
+    out$env_seq_ret <- kern_seq
+    out$pop_ret     <- pop_state
+  } else {
+    out$env_seq_ret <- NA_integer_
+    out$pop_ret     <- temp$pop_state
+  }
+
+  return(out)
+}
+

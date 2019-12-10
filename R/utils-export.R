@@ -117,7 +117,7 @@ define_pop_state <- function(proto_ipm, ..., pop_vectors = list()) {
 
   pop_quos            <- rlang::enquos(...)
 
-  temp                <- rlang::list2(pop_quos, !!! pop_vectors)
+  temp                <- rlang::list2(!!! pop_quos, !!! pop_vectors)
 
   out                 <- Filter(Negate(rlang::is_empty), temp)
 

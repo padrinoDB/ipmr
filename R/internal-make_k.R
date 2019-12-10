@@ -184,15 +184,46 @@
 
 .add_pop_state_to_master_env <- function(pop_state, master_env) {
 
-  if(!rlang::is_empty(pop_state)) {
+
+  if(!all(is.na(pop_state))) {
+    if(rlang::is_list(pop_state)) {
+      pop_state <- .flatten_to_depth(pop_state, 1)
+    }
+
+    # Turn pop_states for continuous vars into column vectors. discrete
+    # vars get a 1x1 matrix
+
     for(i in seq_along(pop_state)) {
 
+      # Check for quosures. At this point, they really shouldn't be there,
+      # more of a sanity check than anything else.
+
+      if(rlang::is_quosure(pop_state[[i]]) || rlang::is_quosures(pop_state[[i]])) {
+        pop_state[[i]] <- rlang::eval_tidy(pop_state[[i]])
+      }
+
+      # We have our matrix. Next, we need to create the n_*t helper variable.
+      # This is always initialized as the first column of the size x time population
+      # state matrix.
+
       nm <- paste0(names(pop_state)[i], '_t', sep = "")
-      assign(nm, pop_state[[i]][ , 1], envir = master_env)
+      time_t <- pop_state[[i]][ , 1]
+      assign(nm, time_t, envir = master_env)
+
+      # Finally, we need to bind the complete pop_state_list with size x time
+      # matrices so these can be updated at each iteration (if iteration is requested)
+      # by .iterate_kerns_* functions. Not using env_bind because that will
+      # sometimes return a list of zaps invisibly when used with assignment at
+      # the next level up (I don't think it'd happen here since master_env is
+      # explicitly returned, but just being safe!)
+
+      assign(names(pop_state)[i], pop_state[[i]], envir = master_env)
+
     }
   }
 
   return(master_env)
+
 }
 
 #' @noRd
