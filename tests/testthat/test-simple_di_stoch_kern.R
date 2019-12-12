@@ -380,3 +380,138 @@ test_that('classes are correctly set', {
   expect_s3_class(monocarp_sys, 'simple_di_stoch_kern_ipm')
 
 })
+
+
+test_that("order of kernel definition doesn't matter", {
+
+  test_order_1 <- init_ipm('simple_di_stoch_kern') %>%
+    define_kernel(
+      name             = "F_yr",
+      formula          = f_r * f_s_yr * f_d,
+      family           = "CC",
+      f_r              = inv_logit(ht_1, f_r_int, f_r_slope),
+      f_s_yr           = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr),
+      f_d              = dnorm(ht_2, mu_fd, sd_fd),
+      data_list        = params,
+      states           = list(c('ht')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_levels,
+      evict            = TRUE,
+      evict_fun        = truncated_distributions('norm', 'f_d')
+    ) %>%
+    define_kernel(
+      name             = 'P_yr',
+      formula          = s_g_mult(s_yr, g_yr) ,
+      family           = "CC",
+      s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
+        (1 - inv_logit(ht_1, f_r_int, f_r_slope)),
+      g_yr             = dnorm(ht_2, mu_g_yr, sd_g),
+      mu_g_yr          = g_int + g_slope * ht_1 + g_r_yr,
+      data_list        = params,
+      states           = list(c('ht')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_levels,
+      evict = TRUE,
+      evict_fun        = truncated_distributions('norm', 'g_yr')
+    ) %>%
+    define_k(
+      name             = 'K_yr',
+      K_yr             = P_yr + F_yr,
+      family           = "IPM",
+      data_list        = params,
+      states           = list(c("ht")),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_levels
+    ) %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c("F_yr", "P_yr", "K_yr"),
+        int_rule     = rep("midpoint", 3),
+        dom_start    = rep("ht", 3),
+        dom_end      = rep("ht", 3)
+      )
+    ) %>%
+    define_domains(ht = c(0.2, 40, 100)) %>%
+    make_ipm(usr_funs = list(inv_logit   = inv_logit,
+                             inv_logit_r = inv_logit_r,
+                             pois_r      = pois_r))
+
+  lambdas_test <- vapply(test_order_1$iterators,
+                         function(x) Re(eigen(x)$values[1]),
+                         numeric(1))
+  ws_test <- vapply(test_order_1$iterators,
+                    function(x) Re(eigen(x)$vectors[ , 1]),
+                    numeric(100L))
+
+
+    expect_equal(lambdas_ipmr, lambdas_test, tolerance = 1e-10)
+    expect_equal(ws_ipmr[ ,1], ws_test[ ,1], tolerance = 1e-13)
+    expect_equal(ws_ipmr[ ,2], ws_test[ ,2], tolerance = 1e-13)
+    expect_equal(ws_ipmr[ ,3], ws_test[ ,3], tolerance = 1e-13)
+    expect_equal(ws_ipmr[ ,4], ws_test[ ,4], tolerance = 1e-13)
+    expect_equal(ws_ipmr[ ,5], ws_test[ ,5], tolerance = 1e-13)
+
+
+
+})
+
+test_that("return_all gets all of the environments back", {
+
+  test_order_1 <- init_ipm('simple_di_stoch_kern') %>%
+    define_kernel(
+      name             = "F_yr",
+      formula          = f_r * f_s_yr * f_d,
+      family           = "CC",
+      f_r              = inv_logit(ht_1, f_r_int, f_r_slope),
+      f_s_yr           = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr),
+      f_d              = dnorm(ht_2, mu_fd, sd_fd),
+      data_list        = params,
+      states           = list(c('ht')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_levels,
+      evict            = TRUE,
+      evict_fun        = truncated_distributions('norm', 'f_d')
+    ) %>%
+    define_kernel(
+      name             = 'P_yr',
+      formula          = s_g_mult(s_yr, g_yr) ,
+      family           = "CC",
+      s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
+        (1 - inv_logit(ht_1, f_r_int, f_r_slope)),
+      g_yr             = dnorm(ht_2, mu_g_yr, sd_g),
+      mu_g_yr          = g_int + g_slope * ht_1 + g_r_yr,
+      data_list        = params,
+      states           = list(c('ht')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_levels,
+      evict = TRUE,
+      evict_fun        = truncated_distributions('norm', 'g_yr')
+    ) %>%
+    define_k(
+      name             = 'K_yr',
+      K_yr             = P_yr + F_yr,
+      family           = "IPM",
+      data_list        = params,
+      states           = list(c("ht")),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_levels
+    ) %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c("F_yr", "P_yr", "K_yr"),
+        int_rule     = rep("midpoint", 3),
+        dom_start    = rep("ht", 3),
+        dom_end      = rep("ht", 3)
+      )
+    ) %>%
+    define_domains(ht = c(0.2, 40, 100)) %>%
+    make_ipm(usr_funs = list(inv_logit   = inv_logit,
+                             inv_logit_r = inv_logit_r,
+                             pois_r      = pois_r),
+             return_all = TRUE)
+
+  env_list_nms <- c('master_env', c(paste('F', 1:5, sep = '_'),
+                                    paste("P", 1:5, sep = "_")))
+
+  expect_equal(names(test_order_1$env_list), env_list_nms)
+})

@@ -121,20 +121,10 @@
 
 
   sv <- names(proto$domain[[id]])
-  if(grepl('_not_applicable', sv[1])) {
-    return(kern_text)
-  }
 
   sv <- gsub('_[0-9]', "", sv)
 
-  if(all(!is.na(sv))) {
-    use_var <- sv[1]
-  } else {
-    ind <- which(!is.na(sv))
-    use_var <- sv[ind]
-  }
-
-  out <- paste(kern_text, ' * d_', use_var, sep = "")
+  out <- paste(kern_text, ' * d_', unique(sv), sep = "")
 
   return(out)
 }

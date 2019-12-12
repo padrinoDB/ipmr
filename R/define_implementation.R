@@ -40,13 +40,6 @@ define_impl <- function(proto_ipm,
 
     proto_ipm$domain[proto_ind]   <- list(domain_info)
 
-    # Name of the pop vector should correspond to the beginning domain, as that
-    # is the one that the kernel will be multiplied by during iteration
-
-    pop_info                       <- .state_to_pop_info(kernel_impl_list[[i]]$dom_start)
-
-    proto_ipm$pop_state[proto_ind] <- list(pop_info)
-
   }
 
   class(proto_ipm) <- cls
@@ -68,7 +61,8 @@ make_impl_args_list <- function(kernel_names,
   if(ln != length(int_rule)) {
 
     warning("Assuming that all kernels are implemented with the same",
-            " 'int_rule'.")
+            " 'int_rule'.",
+            call. = FALSE)
 
     i_rule   <- replicate(ln, int_rule, simplify = FALSE) %>%
       unlist()
@@ -78,7 +72,8 @@ make_impl_args_list <- function(kernel_names,
   if(ln != length(dom_start)) {
 
     warning("Assuming that all kernels are implemented with the same",
-            " 'dom_start'.")
+            " 'dom_start'.",
+            call. = FALSE)
 
     ds_rule   <- replicate(ln, dom_start, simplify = FALSE) %>%
       unlist()
@@ -89,7 +84,8 @@ make_impl_args_list <- function(kernel_names,
   if(ln != length(dom_end)) {
 
     warning("Assuming that all kernels are implemented with the same",
-            " 'dom_end'.")
+            " 'dom_end'.",
+            call. = FALSE)
 
     de_rule <- replicate(ln, dom_end, simplify = FALSE) %>%
       unlist()

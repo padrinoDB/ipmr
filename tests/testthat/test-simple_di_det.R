@@ -141,3 +141,158 @@ test_that('classes are correctly set', {
 
 })
 
+
+test_that('define_impl() can handle mismatched argument lengths', {
+
+  expect_warning(
+    test_impl <- x$proto_ipm %>%
+      define_impl(
+        make_impl_args_list(
+          kernel_names = c('K', 'P', "F"),
+          int_rule     = 'midpoint',
+          dom_start    = rep('dbh', 3),
+          dom_end      = rep('dbh', 3)
+        )
+      ) %>%
+      define_domains(dbh = c(0, 50, 100)) %>%
+      make_ipm(usr_funs = list(inv_logit = inv_logit)),
+
+    regexp = "Assuming that all kernels are implemented with the same 'int_rule'."
+
+  )
+
+  expect_warning(
+    test_impl <- x$proto_ipm %>%
+      define_impl(
+        make_impl_args_list(
+          kernel_names = c('K', 'P', "F"),
+          int_rule     = 'midpoint',
+          dom_start    = rep('dbh', 3),
+          dom_end      = 'dbh'
+        )
+      ) %>%
+      define_domains(dbh = c(0, 50, 100)) %>%
+      make_ipm(usr_funs = list(inv_logit = inv_logit)),
+
+    regexp = "Assuming that all kernels are implemented with the same 'dom_end'."
+
+  )
+
+  expect_warning(
+    test_impl <- x$proto_ipm %>%
+      define_impl(
+        make_impl_args_list(
+          kernel_names = c('K', 'P', "F"),
+          int_rule     = rep('midpoint', 3),
+          dom_start    = 'dbh',
+          dom_end      = rep('dbh', 3)
+        )
+      ) %>%
+      define_domains(dbh = c(0, 50, 100)) %>%
+      make_ipm(usr_funs = list(inv_logit = inv_logit)),
+
+    regexp = "Assuming that all kernels are implemented with the same 'dom_start'."
+
+  )
+
+  test_impl_lambda <- Re(eigen(test_impl$iterators$K)$values[1])
+
+  expect_equal(test_impl_lambda, lambda_ipmr, tol = 1e-10)
+
+})
+
+
+test_that("order of kernel_definition doesn't matter", {
+
+  y <- init_ipm('simple_di_det') %>%
+    define_kernel('F',
+                  formula = f_r * f_s * f_d,
+                  family = 'CC',
+                  f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
+                  f_s = exp(f_s_int + f_s_slope * dbh_1),
+                  f_d = dnorm(dbh_2, mu_fd, sd_fd),
+                  data_list = data_list,
+                  states = states,
+                  evict = TRUE,
+                  evict_fun = truncated_distributions('norm',
+                                                      'f_d')
+    ) %>%
+    define_kernel("P",
+                  formula = s_g_mult(s, g),
+                  family = "CC",
+                  s = inv_logit(s_int, s_slope, dbh_1),
+                  g = dnorm(dbh_2, mu_g, sd_g),
+                  mu_g = g_int + g_slope * dbh_1,
+                  data_list = data_list,
+                  states = states,
+                  evict = TRUE,
+                  evict_fun = truncated_distributions('norm',
+                                                      'g')
+    ) %>%
+    define_k('K',
+             K = P + F,
+             family = 'IPM',
+             data_list = list(),
+             states = states,
+             evict = FALSE) %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c('F', 'P', "K"),
+        int_rule = rep('midpoint', 3),
+        dom_start = rep('dbh', 3),
+        dom_end   = rep('dbh', 3)
+      )) %>%
+    define_domains(dbh = c(0, 50, 100)) %>%
+    make_ipm(usr_funs = list(inv_logit = inv_logit))
+
+  lambda_out_of_order <- Re(eigen(y$iterators$K)$values[1])
+
+  expect_equal(lambda_ipmr, lambda_out_of_order)
+
+  y <- init_ipm('simple_di_det') %>%
+    define_k('K',
+             K = P + F,
+             family = 'IPM',
+             data_list = list(),
+             states = states,
+             evict = FALSE) %>%
+    define_kernel('F',
+                  formula = f_r * f_s * f_d,
+                  family = 'CC',
+                  f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
+                  f_s = exp(f_s_int + f_s_slope * dbh_1),
+                  f_d = dnorm(dbh_2, mu_fd, sd_fd),
+                  data_list = data_list,
+                  states = states,
+                  evict = TRUE,
+                  evict_fun = truncated_distributions('norm',
+                                                      'f_d')
+    ) %>%
+    define_kernel("P",
+                  formula = s_g_mult(s, g),
+                  family = "CC",
+                  s = inv_logit(s_int, s_slope, dbh_1),
+                  g = dnorm(dbh_2, mu_g, sd_g),
+                  mu_g = g_int + g_slope * dbh_1,
+                  data_list = data_list,
+                  states = states,
+                  evict = TRUE,
+                  evict_fun = truncated_distributions('norm',
+                                                      'g')
+    )  %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c('K', 'F', 'P'),
+        int_rule = rep('midpoint', 3),
+        dom_start = rep('dbh', 3),
+        dom_end   = rep('dbh', 3)
+      )
+    ) %>%
+    define_domains(dbh = c(0, 50, 100)) %>%
+    make_ipm(usr_funs = list(inv_logit = inv_logit))
+
+  lambda_out_of_order_2 <- Re(eigen(y$iterators$K)$values[1])
+
+  expect_equal(lambda_ipmr, lambda_out_of_order_2)
+
+})

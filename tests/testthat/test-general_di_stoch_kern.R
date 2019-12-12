@@ -646,11 +646,11 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
     name             = 'k_xz_site',
     family           = 'CC',
     formula          = sig_n_site         *
-      (1 - mu_n_site)    *
-      beta_n_site       *
-      gamma_rn_site     *
-      tau               *
-      d_ln_leaf_l,
+                       (1 - mu_n_site)    *
+                        beta_n_site       *
+                        gamma_rn_site     *
+                        tau               *
+                        d_ln_leaf_l,
 
     sig_n_site        = inv_logit(nr_s_z_int_site, nr_s_z_b_site, ln_leaf_l_1),
     mu_n_site         = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
@@ -716,11 +716,19 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
                        'K_site'),
       int_rule     = rep('midpoint', 7),
       dom_start    = c('ln_leaf_l',
-                       'sqrt_area', NA_character_,
-                       'ln_leaf_l', 'ln_leaf_l', 'sqrt_area', NA_character_),
+                       'sqrt_area',
+                       NA_character_,
+                       'ln_leaf_l',
+                       'ln_leaf_l',
+                       'sqrt_area',
+                       NA_character_),
       dom_end      = c('ln_leaf_l',
-                       'ln_leaf_l', 'ln_leaf_l',
-                       'sqrt_area', NA_character_, NA_character_, NA_character_)
+                       'ln_leaf_l',
+                       'ln_leaf_l',
+                       'sqrt_area',
+                       NA_character_,
+                       NA_character_,
+                       NA_character_)
     )
   ) %>%
   define_domains(
@@ -969,3 +977,97 @@ test_that('general stochastic simulations match hand generated ones', {
 
 })
 
+
+test_that('evict_fun warnings are correctly generated', {
+
+  test_evict_fun <-
+    gen_di_stoch_kern$proto_ipm[!grepl('k_zx_site', gen_di_stoch_kern$proto_ipm$kernel_id), ]
+
+  wrngs <- capture_warnings(
+    test_evict_fun_warning <- test_evict_fun %>%
+      define_kernel(
+        name             = 'k_zx_site',
+        family           = 'CC',
+
+        formula          = (
+          phi_site        *
+            nu_site         *
+            gamma_sr_site   +
+            sig_r_site      *
+            (1 - mu_r_site) *
+            gamma_nr_site
+        )                *
+          d_sqrt_area,
+
+        phi_site      = pois(f_s_int_site, f_s_slope_site, sqrt_area_1),
+        nu_site       = sdl_es_r_site,
+        gamma_sr_site = dnorm(ln_leaf_l_2, sdl_z_int_site, sdl_z_sd_site),
+        sig_r_site    = inv_logit(ra_s_z_int_site, ra_s_z_b_site, sqrt_area_1),
+        mu_r_site     = inv_logit(ra_d_z_int_site, ra_d_z_b_site, sqrt_area_1),
+        gamma_nr_site = dnorm(ln_leaf_l_2, mu_ra_nr_site, ra_n_z_sd_site),
+        mu_ra_nr_site = ra_n_z_int_site + ra_n_z_b_site * sqrt_area_1,
+
+        data_list    = full_data_list,
+        states       = list(c('sqrt_area', 'ln_leaf_l')),
+        has_hier_effs = TRUE,
+        levels_hier_effs = hier_effs,
+        evict = TRUE,
+        evict_fun = truncated_distributions('norm',
+                                            c('gamma_nr_site',
+                                              'gamma_sr_site'))
+      ) %>%
+      define_impl(
+        make_impl_args_list(
+          kernel_names = c(
+            'k_xx_site',
+            'k_dx_site',
+            'k_xz_site',
+            'k_xd_site',
+            'k_zd_site',
+            'K_site',
+            'k_zx_site'
+          ),
+          int_rule     = rep('midpoint', 7),
+          dom_start    = c('ln_leaf_l',
+                           NA_character_,
+                           'ln_leaf_l',
+                           'ln_leaf_l',
+                           'sqrt_area',
+                           NA_character_,
+                           'sqrt_area'),
+          dom_end      = c('ln_leaf_l',
+                           'ln_leaf_l',
+                           'sqrt_area',
+                           NA_character_,
+                           NA_character_,
+                           NA_character_,
+                           'ln_leaf_l')
+        )
+      ) %>%
+      define_domains(
+        sqrt_area = c(0.63 * 0.9, 3.87 * 1.1, 50),
+        ln_leaf_l = c(0.26 * 0.9, 2.70 * 1.1, 50)
+      ) %>%
+      define_pop_state(
+        pop_vectors = list(
+          n_ln_leaf_l_site = init_pop_vec$ln_leaf_l,
+          n_sqrt_area_site = init_pop_vec$sqrt_area,
+          n_d_site         = 10
+        )
+      ) %>%
+      make_ipm(
+        return_all = TRUE,
+        usr_funs   = list(
+          inv_logit = inv_logit,
+          pois      = pois
+        ),
+        iterations = 100
+      )
+    )
+
+  test_text <-
+    "length of 'fun' in 'truncated_distributions()' is not equal to length of 'param'. Recycling 'fun'."
+
+  expect_equal(wrngs[1], test_text)
+
+})

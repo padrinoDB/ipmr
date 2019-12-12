@@ -38,9 +38,10 @@ truncated_distributions <- function(fun,
 
     if(length(fun) != length(param)) {
       warning("length of 'fun' in 'truncated_distributions()' is not equal to ",
-              "length of 'param. Recycling 'fun'.")
+              "length of 'param'. Recycling 'fun'.",
+              call. = FALSE)
 
-      use_fun <- fun[1]
+      use_fun <- fun
     } else {
       use_fun <- fun[i]
     }
@@ -160,41 +161,7 @@ truncated_distributions <- function(fun,
     )
   )
 
-  # If it's a list of calls, then evaluate them one at a time.b
-  if(ev_call_nm == 'list') {
-
-    expr_list <- rlang::call_args(
-      rlang::quo_squash(unlist(proto$evict_fun)[[1]])
-    )
-
-    temp <- lapply(expr_list, function(x){
-      rlang::as_quosure(x,
-                        env = rlang::empty_env())
-    })
-
-    for(i in seq_along(temp)) {
-
-      ev_fun <- temp[[i]]
-
-      if(grepl('truncated_distributions', rlang::quo_text(ev_fun))) {
-
-        text <- gsub(')$', ', proto = proto[i, ])', rlang::quo_text(ev_fun))
-        rep_expr <- rlang::parse_expr(text)
-        ev_fun <- rlang::quo_set_expr(ev_fun, rep_expr)
-
-      }
-
-      evict_fun <- rlang::quo_set_env(ev_fun, rlang::caller_env())
-
-      out <- rlang::eval_tidy(evict_fun)
-
-    }
-
-  # The single call gets evaluated in the standard (or rather, haphazard) way
-  # I came up with when writing the simple_* methods.
-  # This whole thing is RIPE for refactoring.
-
-  } else if(ev_call_nm == 'truncated_distributions' |
+ if(ev_call_nm == 'truncated_distributions' |
             ev_call_nm == 'rescale_kernel') {
 
     evict_fun <- unlist(proto$evict_fun)[[1]]
