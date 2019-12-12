@@ -653,7 +653,7 @@
 
   if(is.null(kernel_seq)) {
 
-    seq_type   <- 'internal_generated'
+    seq_type   <- 'NA'
 
   } else {
 
@@ -670,8 +670,7 @@
   }
 
   out <- switch(seq_type,
-                'internal_generated' = .make_internal_seq(kernels,
-                                                          iterations),
+                'NA'                 = NULL,
                 'markov_chain_mat'   = .make_markov_seq(proto,
                                                         kernels,
                                                         kernel_seq,
@@ -712,16 +711,25 @@
 
 .make_usr_seq <- function(kernels, kernel_seq, iterations) {
 
-  int_test <- vapply(kernel_seq, function(x) is.integer(x), logical(1))
+  if(is.integer(kernel_seq)) {
 
-  if(!all(int_test)) {
-    stop("All values in 'kernel_seq' must be integers.")
+    kernel_seq <- as.character(kernel_seq)
+
   }
 
-  max_test <- max(kernel_seq)
+  # Make sure everything in kernel_seq appears is actually an option
 
-  if(max_test > length(kernels)) {
-    stop("Maximum value of 'kernel_seq' cannot exceed the number of kernels.")
+  nms_test <- logical(length(unique(kernel_seq)))
+
+  for(i in seq_along(unique(kernel_seq))) {
+
+    nms_test[i] <- any(grepl(kernel_seq[i], names(kernels)))
+
+  }
+
+  if(! all(nms_test)) {
+    stop("Not all values of 'kern_seq' are present in kernel names. Please ",
+         "check the model definition.")
   }
 
   if(length(kernel_seq) > iterations) {
@@ -846,9 +854,17 @@
 
     .check_n_t(n_t)
 
-    k_selector <- kern_seq[i]
+    if(!is.null(kern_seq)) {
 
-    n_t_1      <- right_mult(iterators[[k_selector]], n_t)
+      k_selector <- which(grepl(kern_seq[i], names(iterators)))
+
+      n_t_1      <- right_mult(iterators[[k_selector]], n_t)
+
+    } else {
+
+      n_t_1 <- right_mult(iterators, n_t)
+
+    }
 
     pop_holder[ , (i + 1)] <- n_t <- n_t_1
 
@@ -879,9 +895,36 @@
 
   for(i in seq_len(iterations)) {
 
-    pop_list_t_1 <- .eval_general_det(k_row         = k_row,
+    # Select kernels from kern_seq, or just use all of them if it's
+    # a deterministic simulation. Similarly, we need to subset the k_rows
+    # object so that .eval_general_det doesn't loop over ones which include
+    # expressions for other levels of 'kern_seq'
+
+    if(!is.null(kern_seq)) {
+
+      if(is.character(kern_seq)) {
+
+        use_kerns <- sub_kern_list[grepl(kern_seq[i], names(sub_kern_list))]
+
+        use_k     <- k_row[grepl(kern_seq[i], k_row$kernel_id), ]
+
+      } else {
+
+        use_kerns <- sub_kern_list[kern_seq[i]]
+
+        use_k     <- k_row[kern_seq[i] , ]
+      }
+
+    } else {
+
+      use_kerns <- sub_kern_list
+      use_k     <- k_row
+
+    }
+
+    pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                       proto_ipm     = proto_ipm,
-                                      sub_kern_list = sub_kern_list,
+                                      sub_kern_list = use_kerns,
                                       pop_state     = pop_state,
                                       master_env    = master_env)
 
@@ -1108,7 +1151,7 @@ set_ipmr_classes <- function(to_set, cls = NULL) {
     out$pop_ret     <- pop_state
   } else {
     out$env_seq_ret <- NA_integer_
-    out$pop_ret     <- temp$pop_state
+    out$pop_ret     <- NA_real_
   }
 
   return(out)

@@ -1,7 +1,3 @@
-if(rlang::is_interactive()) {
-  library(testthat)
-}
-
 # print(search())
 context('general density independent stochastic kernel models')
 
@@ -399,7 +395,7 @@ names(pop_holders) <- hier_effs$site
 # All populations will get the same initial population vector, and it's
 # just a random set of numbers in their range of possible values
 
-# set.seed(214512)
+set.seed(214512)
 
 init_pop_vec      <- list(ln_leaf_l = runif(domains$sqrt_area[3]),
                           sqrt_area = runif(domains$sqrt_area[3]))
@@ -802,9 +798,11 @@ test_that('ipmr version matches simulation', {
   }
 
   if(any(! kern_tests)) warning('kernel indices: ', which(! kern_tests),
-                               ' are not identical')
+                                ' are not identical')
 
   expect_true(all(kern_tests))
+
+
 
 })
 
@@ -814,6 +812,160 @@ test_that('ipmr version matches simulation', {
 # machinery correctly). Since we've already verified that the kernels are all identical,
 # there should never be any issues here.
 
+usr_seq <- sample(hier_effs$site,
+                  n_iterations,
+                  replace = TRUE)
 
 
+pop_holder_stoch <- list(
+
+  n_ln_leaf_l = array(NA_real_,
+                      dim = c(domains$ln_leaf_l[3],
+                              (n_iterations + 1))),
+  n_sqrt_area = array(NA_real_,
+                      dim = c(domains$sqrt_area[3],
+                              (n_iterations + 1))),
+  n_d         = array(NA_real_,
+                      dim = c(1,
+                              (n_iterations + 1)))
+)
+
+pop_holder_stoch$n_ln_leaf_l[ , 1] <- init_pop_vec$ln_leaf_l
+pop_holder_stoch$n_sqrt_area[ , 1] <- init_pop_vec$sqrt_area
+pop_holder_stoch$n_d[ , 1]         <- 10
+
+for(i in seq_len(n_iterations)) {
+
+  temp <- models[[usr_seq[i]]]
+
+  x_t_1 <- temp$kern_xx %*% pop_holder_stoch$n_ln_leaf_l[ , i] +
+           temp$kern_zx %*% pop_holder_stoch$n_sqrt_area[ , i] +
+           temp$kern_dx %*% pop_holder_stoch$n_d[ , i]
+
+  z_t_1 <- temp$kern_xz %*% pop_holder_stoch$n_ln_leaf_l[ , i]
+
+  d_t_1 <- temp$kern_xd %*% pop_holder_stoch$n_ln_leaf_l[ , i] +
+           temp$kern_zd %*% pop_holder_stoch$n_sqrt_area[ , i]
+
+
+  pop_holder_stoch$n_ln_leaf_l[ , (i + 1)] <- x_t_1
+  pop_holder_stoch$n_sqrt_area[ , (i + 1)] <- z_t_1
+  pop_holder_stoch$n_d[ , (i + 1)]         <- d_t_1
+
+}
+
+stoch_mod_hand <- list(pop_state = pop_holder_stoch)
+
+
+# ipmr_version
+
+temp_proto <- gen_di_stoch_kern$proto_ipm[!grepl('K_site',
+                                                 gen_di_stoch_kern$proto_ipm$kernel_id), ]
+
+stoch_mod_ipmr <- temp_proto %>%
+  define_k(
+    name = 'K_site',
+    n_ln_leaf_l_t_1 = k_xx_site %*% n_ln_leaf_l_t +
+                      k_zx_site %*% n_sqrt_area_t +
+                      k_dx_site %*% n_d_t,
+    n_sqrt_area_t_1 = k_xz_site %*% n_ln_leaf_l_t,
+    n_d_t_1         = k_xd_site %*% n_ln_leaf_l_t +
+                      k_zd_site %*% n_sqrt_area_t,
+    family = 'IPM',
+    data_list = full_data_list,
+    states    = list(c('sqrt_area', 'ln_leaf_l')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = hier_effs
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c(paste('k_',
+                             c('xx',
+                               'zx', 'dx', 'xz', 'xd', 'zd'),
+                             '_site',
+                             sep = ""),
+                       'K_site'),
+      int_rule     = rep('midpoint', 7),
+      dom_start    = c('ln_leaf_l',
+                       'sqrt_area', NA_character_,
+                       'ln_leaf_l', 'ln_leaf_l', 'sqrt_area', NA_character_),
+      dom_end      = c('ln_leaf_l',
+                       'ln_leaf_l', 'ln_leaf_l',
+                       'sqrt_area', NA_character_, NA_character_, NA_character_)
+    )
+  ) %>%
+  define_domains(
+    sqrt_area = c(0.63 * 0.9, 3.87 * 1.1, 50),
+    ln_leaf_l = c(0.26 * 0.9, 2.70 * 1.1, 50)
+  ) %>%
+  define_pop_state(
+    pop_vectors = list(
+      n_ln_leaf_l = init_pop_vec$ln_leaf_l,
+      n_sqrt_area = init_pop_vec$sqrt_area,
+      n_d         = 10
+    )
+  ) %>%
+  make_ipm(
+    return_all = TRUE,
+    usr_funs   = list(
+      inv_logit = inv_logit,
+      pois      = pois
+    ),
+    iterations = 100,
+    kernel_seq = usr_seq
+  )
+
+
+pop_ipmr    <- stoch_mod_ipmr$pop_state
+all_lambdas <- list(
+  hand = numeric(100L),
+  ipmr = numeric(100L)
+)
+
+for(i in seq_len(n_iterations)) {
+
+  hand_t <- lapply(pop_holder_stoch,
+                   function(x, it) {
+                     sum(x[ , it])
+
+                   },
+                   it = i) %>%
+    unlist() %>%
+    sum()
+
+  hand_t_1 <- lapply(pop_holder_stoch,
+                     function(x, it) {
+                       sum(x[ , (it + 1)])
+                     },
+                     it = i) %>%
+    unlist() %>%
+    sum()
+
+
+  ipmr_t <- lapply(pop_ipmr,
+                   function(x, it) {
+                     sum(x[ , it])
+
+                   },
+                   it = i) %>%
+    unlist() %>%
+    sum()
+
+  ipmr_t_1 <- lapply(pop_ipmr,
+                     function(x, it) {
+                       sum(x[ , (it + 1)])
+                     },
+                     it = i) %>%
+    unlist() %>%
+    sum()
+
+  all_lambdas$hand[i] <- hand_t_1 / hand_t
+  all_lambdas$ipmr[i] <- ipmr_t_1 / ipmr_t
+}
+
+test_that('general stochastic simulations match hand generated ones', {
+
+  expect_equal(all_lambdas$hand, all_lambdas$ipmr, tol = 1e-4)
+
+})
 

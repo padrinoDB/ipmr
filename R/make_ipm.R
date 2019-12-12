@@ -25,11 +25,13 @@
 #' @param iterations If \code{iterate} is \code{TRUE}, then the number of iterations
 #' to simulate.
 #' @param kernel_seq The sequence of kernels to use during the iterations.
-#' This can either be a vector of integers corresponding to kernel indices,
-#' a character vector corresponding to kernel names, a Markov chain matrix with
+#' This can either be a vector of integers corresponding to kernel names (e.g.
+#' kernels for different years - \code{2011:2018}),
+#' a character vector corresponding to kernel names (e.g. kernels from different
+#' sites - \code{'a', 'b', 'c'}), a Markov chain matrix with
 #' transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
-#' If empty, a random sequence will be generated internally from a uniform
-#' distribution.
+#' If empty, the model will try to run deterministically for each unique combination
+#' of hierarchical variables (if any).
 #'
 #' @return
 #'  The \code{make_ipm.*} methods will always return a list of length 6
@@ -60,10 +62,14 @@
 #' In addition to the list class, each object will have the class from
 #' \code{model_class} defined in \code{init_ipm} plus \code{'_ipm'}. This is to
 #' facilitate \code{print}, \code{plot}, and \code{lambda} methods. For example,
-#' a \code{'simple_di_stoch_kern'} model will have the class \code{'simple_di_stoch_kern_ipm'}
-#' once it has been implemented using \code{make_ipm}.
+#' a \code{'simple_di_stoch_kern'} model will have the class
+#' \code{'simple_di_stoch_kern_ipm'} once it has been implemented using
+#' \code{make_ipm}.
 #'
-#'
+#' @details When \code{kernel_seq} is a character vector, names
+#' are matched using \code{grepl()}. When it is an integer vector, the vector
+#' is first checked to make sure they are all present in kernel names. The model
+#' procedure will stop if thay are not all present.
 #'
 #' @author Sam Levin
 #'
@@ -424,7 +430,8 @@ make_ipm.general_di_det <- function(proto_ipm,
                                         proto_ipm,
                                         sub_kern_list,
                                         iterations,
-                                        kern_seq,
+                                        # Single set of kernels - no stochastic possible
+                                        kern_seq = NULL,
                                         temp$pop_state,
                                         master_env)
   }
@@ -565,8 +572,7 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
     env_list    = env_ret,
     env_seq     = env_seq_ret,
     pop_state   = pop_ret,
-    proto_ipm   = proto_ipm,
-    final_proto = rbind(others, k_row)
+    proto_ipm   = proto_ipm
   )
 
   class(out) <- c('general_di_stoch_kern_ipm', 'list')
