@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute the per-capita growth rate for an IPM object — lambda • ipmr</title>
+<title>Print proto_ipms or *_ipm objects — print.proto_ipm • ipmr</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,9 @@
 
 
 
-<meta property="og:title" content="Compute the per-capita growth rate for an IPM object — lambda" />
-<meta property="og:description" content="Compute the per-capita growth rate for an IPM object" />
+<meta property="og:title" content="Print proto_ipms or *_ipm objects — print.proto_ipm" />
+<meta property="og:description" content="Print proto_ipms or *_ipm objects
+Generics for IPM classes" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -118,94 +119,86 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute the per-capita growth rate for an IPM object</h1>
+    <h1>Print proto_ipms or *_ipm objects</h1>
     
-    <div class="hidden name"><code>lambda.Rd</code></div>
+    <div class="hidden name"><code>print_star.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compute the per-capita growth rate for an IPM object</p>
+    <p>Print proto_ipms or *_ipm objects</p>
+<p>Generics for IPM classes</p>
     </div>
 
-    <pre class="usage"><span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='co'># S3 method for proto_ipm</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"deterministic"</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='kw'>compute_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for simple_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span>(
-  <span class='no'>ipm</span>,
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"stochastic"</span>,
-  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>),
-  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(
+  <span class='no'>x</span>,
+  <span class='kw'>compute_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>lambda_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"stochastic"</span>, <span class='st'>"deterministic"</span>),
+  <span class='kw'>compute_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pop_size"</span>, <span class='st'>"eigen"</span>),
+  <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
   <span class='no'>...</span>
 )
 
 <span class='co'># S3 method for simple_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-
-<span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>type</span>, <span class='no'>...</span>)
-
-<span class='co'># S3 method for general_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-
-<span class='co'># S3 method for general_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(
+  <span class='no'>x</span>,
+  <span class='kw'>compute_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>lambda_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"stochastic"</span>, <span class='st'>"deterministic"</span>),
+  <span class='kw'>compute_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pop_size"</span>, <span class='st'>"eigen"</span>),
+  <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>ipm</th>
-      <td><p>An object returned by <code><a href='make_ipm.html'>make_ipm()</a></code>.</p></td>
+      <th>x</th>
+      <td><p>An object produced by <code>make_ipm</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>other arguments passed to methods.</p></td>
+      <td><p>Ignored</p></td>
     </tr>
     <tr>
-      <th>type</th>
-      <td><p>Either <code>"stochastic"</code> or <code>"deterministic"</code>.
-<code>"stochastic"</code> also has two types - <code>"eigen"</code> and <code>"pop_size"</code>.
-See details for more information.</p></td>
+      <th>compute_lambda</th>
+      <td><p>A logical indicating whether or not to calculate lambdas
+for the iteration kernels and display them</p></td>
     </tr>
     <tr>
-      <th>comp_method</th>
-      <td><p>Either <code>"eigen"</code> or <code>"pop_size"</code>. <code>"eigen"</code>
-is not possible except for <code>"simple_*_stoch_kern"</code> and <code>"simple_*_det"</code>.</p></td>
+      <th>sig_digits</th>
+      <td><p>The number of significant digits to round to if <code>
+compute_lambda = TRUE</code>.</p></td>
     </tr>
     <tr>
-      <th>all_lambdas</th>
-      <td><p>A logical to return lamdas for each individual kernel, or a single
-number. For <code>comp_method = 'pop_size'</code> and <code>all_lambdas = FALSE</code>,
-this will return the final value of computed lambdas (e.g. presumably when
-convergence has been reached). For <code>comp_method = 'eigen'</code> and
-<code>all_lambdas = FALSE</code>, it will return the geometric mean of the
-dominant eigenvalues for each projection matrix. For <code>all_lambdas = TRUE</code>,
-it will always return a numeric vector of lambdas computed either from the ratio
-of population sizes or dominant eigenvalues of each kernel.</p></td>
+      <th>lambda_type</th>
+      <td><p>If <code>compute_lambda</code> is <code>TRUE</code>, then either
+<code>"stochastic"</code> or <code>"deterministic"</code>. <code>"deterministic"</code> will return
+the dominant eigenvalue of the iteration kernel from each iteration. <code>
+"stochastic"</code> depends on <code>compute_type</code>.</p></td>
+    </tr>
+    <tr>
+      <th>compute_type</th>
+      <td><p>Either <code>"pop_size"</code> or <code>"eigen"</code>. <code>"pop_size"</code>
+computes lambda as the ratio of population sizes between successive time steps
+and then takes the geometric mean. <code>"eigen"</code> computes the dominant eigenvalue
+of each iteration kernel and then takes the geometric mean. For large population
+vectors, <code>"pop_size"</code> will likely be substantially faster. Note that
+option <code>"pop_size"</code> is only possible if an initial population vector was
+supplied when constructing the IPM.
+ @export</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A single numeric vector or single value.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Determinstic lambda is computed as the dominant eigenvalue of the
-iteration kernel(s) where possible. For <code>simple_*_stoch_kern_ipm</code> models,
-a vector containing the dominant eigenvalue of each entry in
-<code>ipm$iterators</code>. For <code>simple_*_det_ipm</code> models, a single value.</p>
-<p>NOTE ^^^^ Needs clarification for simple_dd_det models - that can either be
- pop_size or eigen. implement the make_ipm methods before returning!</p>
-<p>Because <code>ipmr</code> doesn't construct the iteration
-kernel for <code>general_*</code> IPMs the way that they are typically implemented in
-interactive sessions (e.g. by r/cbind()ing discrete and continuous stages together),
-lambda must be computed by dividing successive population sizes
-by their prior sizes. Thus, only
-<code>type = 'stochastic'</code> and <code>comp_method = "pop_size"</code> are available
-for these models.</p>
+    <p><code>x</code> invisibly.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -213,7 +206,6 @@ for these models.</p>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
     </ul>
 
   </div>

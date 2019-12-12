@@ -1,7 +1,7 @@
 # Print----------------
 
-#' Methods for proto_ipms
-#' @rdname proto_generics
+#' @title Print proto_ipms or *_ipm objects
+#' @rdname print_star
 #'
 #' @param x An object of class \code{proto_ipm}
 #' @param ... Ignored
@@ -60,14 +60,14 @@ print.proto_ipm <- function(x, ...) {
   return(out)
 }
 
-#' @rdname ipm-generics
+#' @rdname print_star
 #' @title Generics for IPM classes
 #'
 #' @param x An object produced by \code{make_ipm}.
 #' @param compute_lambda A logical indicating whether or not to calculate lambdas
 #' for the iteration kernels and display them
 #' @param sig_digits The number of significant digits to round to if \code{
-#' comput_lambda = TRUE}.
+#' compute_lambda = TRUE}.
 #' @param ... Ignored
 #'
 #' @return \code{x} invisibly.
@@ -102,7 +102,7 @@ print.simple_di_det_ipm <- function(x, compute_lambda = TRUE,
 
 }
 
-#' @rdname ipm-generics
+#' @rdname print_star
 #' @param lambda_type If \code{compute_lambda} is \code{TRUE}, then either
 #' \code{"stochastic"} or \code{"deterministic"}. \code{"deterministic"} will return
 #' the dominant eigenvalue of the iteration kernel from each iteration. \code{
@@ -151,7 +151,7 @@ print.simple_di_stoch_kern_ipm <- function(x,
   invisible(x)
 }
 
-#' @rdname ipm-generics
+#' @rdname print_star
 #' @export
 print.simple_di_stoch_param_ipm <- function(x,
                                             compute_lambda = TRUE,
@@ -282,7 +282,7 @@ lambda.general_di_stoch_param_ipm <- function(ipm, ...) {
 # Authors - whoever wrote the code from the IPM book
 
 #' @title Plot a matrix or an *_ipm object
-#' @rdname plot-methods
+#' @rdname plot_star
 #'
 #' @param x,y Either the values of the meshpoints or \code{NULL}. If \code{NULL},
 #' then a sequence is generated so that meshpoints are given sequential bin numbers.
@@ -375,7 +375,7 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
 }
 
 
-#' @rdname plot-methods
+#' @rdname plot_star
 #' @param sub_kernels A logical - also plot the sub-kernels?
 #' @param exponent The exponent to raise each kernel to. Setting this to a low
 #' number can help visualize kernels that are overwhelmed by a few very large numbers.
@@ -426,7 +426,7 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
   invisible(ipm)
 }
 
-#' @rdname plot-methods
+#' @rdname plot_star
 #' @export
 
 plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
@@ -474,7 +474,7 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
   invisible(ipm)
 }
 
-#' @rdname plot-methods
+#' @rdname plot_star
 #' @export
 
 plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,

@@ -16,9 +16,6 @@
     <loc>https://levisc8.github.io/ipmr/reference/init_ipm.html</loc>
   </url>
   <url>
-    <loc>https://levisc8.github.io/ipmr/reference/ipm-generics.html</loc>
-  </url>
-  <url>
     <loc>https://levisc8.github.io/ipmr/reference/kernel-definitions.html</loc>
   </url>
   <url>
@@ -31,10 +28,10 @@
     <loc>https://levisc8.github.io/ipmr/reference/pipe.html</loc>
   </url>
   <url>
-    <loc>https://levisc8.github.io/ipmr/reference/plot-methods.html</loc>
+    <loc>https://levisc8.github.io/ipmr/reference/plot_star.html</loc>
   </url>
   <url>
-    <loc>https://levisc8.github.io/ipmr/reference/proto_generics.html</loc>
+    <loc>https://levisc8.github.io/ipmr/reference/print_star.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/tidyeval.html</loc>

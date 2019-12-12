@@ -6,6 +6,7 @@
 \alias{lambda.simple_di_stoch_kern_ipm}
 \alias{lambda.simple_di_stoch_param_ipm}
 \alias{lambda.general_di_det_ipm}
+\alias{lambda.general_di_stoch_kern_ipm}
 \alias{lambda.general_di_stoch_param_ipm}
 \title{Compute the per-capita growth rate for an IPM object}
 \usage{
@@ -24,6 +25,8 @@ lambda(ipm, ...)
 \method{lambda}{simple_di_stoch_param_ipm}(ipm, ..., all_lambdas = TRUE)
 
 \method{lambda}{general_di_det_ipm}(ipm, type, ...)
+
+\method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., all_lambdas = TRUE)
 
 \method{lambda}{general_di_stoch_param_ipm}(ipm, ...)
 }

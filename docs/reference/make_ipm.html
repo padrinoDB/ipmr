@@ -178,6 +178,18 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
   <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>
+)
+
+<span class='co'># S3 method for general_di_stoch_kern</span>
+<span class='fu'>make_ipm</span>(
+  <span class='no'>proto_ipm</span>,
+  <span class='kw'>return_all</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='no'>...</span>,
+  <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -225,11 +237,13 @@ to simulate.</p></td>
     <tr>
       <th>kernel_seq</th>
       <td><p>The sequence of kernels to use during the iterations.
-This can either be a vector of integers corresponding to kernel indices,
-a character vector corresponding to kernel names, a Markov chain matrix with
+This can either be a vector of integers corresponding to kernel names (e.g.
+kernels for different years - <code>2011:2018</code>),
+a character vector corresponding to kernel names (e.g. kernels from different
+sites - <code>'a', 'b', 'c'</code>), a Markov chain matrix with
 transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
-If empty, a random sequence will be generated internally from a uniform
-distribution.</p></td>
+If empty, the model will try to run deterministically for each unique combination
+of hierarchical variables (if any).</p></td>
     </tr>
     </table>
 
@@ -262,8 +276,15 @@ containing the following components:</p>
 <p>In addition to the list class, each object will have the class from
 <code>model_class</code> defined in <code>init_ipm</code> plus <code>'_ipm'</code>. This is to
 facilitate <code>print</code>, <code>plot</code>, and <code>lambda</code> methods. For example,
-a <code>'simple_di_stoch_kern'</code> model will have the class <code>'simple_di_stoch_kern_ipm'</code>
-once it has been implemented using <code>make_ipm</code>.</p>
+a <code>'simple_di_stoch_kern'</code> model will have the class
+<code>'simple_di_stoch_kern_ipm'</code> once it has been implemented using
+<code>make_ipm</code>.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>When <code>kernel_seq</code> is a character vector, names
+are matched using <code><a href='https://rdrr.io/r/base/grep.html'>grepl()</a></code>. When it is an integer vector, the vector
+is first checked to make sure they are all present in kernel names. The model
+procedure will stop if thay are not all present.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -271,6 +292,7 @@ once it has been implemented using <code>make_ipm</code>.</p>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
     </ul>
 
     <h2>Author</h2>

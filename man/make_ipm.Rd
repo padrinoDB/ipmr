@@ -6,6 +6,7 @@
 \alias{make_ipm.simple_di_stoch_kern}
 \alias{make_ipm.simple_di_stoch_param}
 \alias{make_ipm.general_di_det}
+\alias{make_ipm.general_di_stoch_kern}
 \title{Methods to implement an IPM}
 \usage{
 make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
@@ -50,6 +51,17 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   iterate = TRUE,
   iterations = 50
 )
+
+\method{make_ipm}{general_di_stoch_kern}(
+  proto_ipm,
+  return_all = FALSE,
+  usr_funs = list(),
+  ...,
+  domain_list = NULL,
+  iterate = TRUE,
+  iterations = 50,
+  kernel_seq = NULL
+)
 }
 \arguments{
 \item{proto_ipm}{The proto_ipm object you wish to implement. This should be the
@@ -78,11 +90,13 @@ be \code{TRUE}.}
 to simulate.}
 
 \item{kernel_seq}{The sequence of kernels to use during the iterations.
-This can either be a vector of integers corresponding to kernel indices,
-a character vector corresponding to kernel names, a Markov chain matrix with
+This can either be a vector of integers corresponding to kernel names (e.g.
+kernels for different years - \code{2011:2018}),
+a character vector corresponding to kernel names (e.g. kernels from different
+sites - \code{'a', 'b', 'c'}), a Markov chain matrix with
 transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
-If empty, a random sequence will be generated internally from a uniform
-distribution.}
+If empty, the model will try to run deterministically for each unique combination
+of hierarchical variables (if any).}
 }
 \value{
 The \code{make_ipm.*} methods will always return a list of length 6
@@ -113,14 +127,21 @@ containing the following components:
 In addition to the list class, each object will have the class from
 \code{model_class} defined in \code{init_ipm} plus \code{'_ipm'}. This is to
 facilitate \code{print}, \code{plot}, and \code{lambda} methods. For example,
-a \code{'simple_di_stoch_kern'} model will have the class \code{'simple_di_stoch_kern_ipm'}
-once it has been implemented using \code{make_ipm}.
+a \code{'simple_di_stoch_kern'} model will have the class
+\code{'simple_di_stoch_kern_ipm'} once it has been implemented using
+\code{make_ipm}.
 }
 \description{
 The \code{make_ipm.*} methods convert a \code{proto_ipm} into a
 set of discretized kernels and population vectors. Methods have different
 requirements, so be sure to read the parameter documentation. \code{
 vignettes('Introduction to ipmr', 'ipmr')} also contains helpful information.
+}
+\details{
+When \code{kernel_seq} is a character vector, names
+are matched using \code{grepl()}. When it is an integer vector, the vector
+is first checked to make sure they are all present in kernel names. The model
+procedure will stop if thay are not all present.
 }
 \author{
 Sam Levin
