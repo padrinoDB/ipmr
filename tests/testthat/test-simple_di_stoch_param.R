@@ -1,7 +1,6 @@
 # test simple_di_stoch_param
 library(mvtnorm)
 library(rlang)
-# library(ipmr)
 
 context('Simple density independent stochastic parameter resampled models')
 
@@ -35,9 +34,6 @@ fec <- function(sv1, sv2, params, L, U) {
   f_r(sv1, params[1:2]) * f_s(sv1, params[3:4]) * (f_d(sv2, params[5:6]) / ev)
 }
 
-update_r_effs <- function(to_add, r_eff_list) {
-  purrr::map2(r_eff_list, to_add, .f = function(.x, .y) c(.y, .x))
-}
 
 data_list <- list(s_slope = 0.2,
                   g_slope = 0.99,
