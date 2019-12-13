@@ -433,17 +433,6 @@ pop_holders <- lapply(seq_along(pop_holders),
   flatten_to_depth(2L)
 
 
-# Now, we're all set to begin simulating! The first step is to see if
-# the simulation I code below reproduces what happens in the paper.
-# If that works, then I'll create an ipmr version of the model and
-# see if I can match the simulation. The reason I don't try to match the ipmr
-# version to the paper version is that coefficients are only reported to 4 decimals,
-# and we only have deterministic lambdas for each kernel (which themselves were
-# obtained using dataThief - not the most precise method!!), and so our expected
-# numerical accuracy would be much lower for that comparison.
-# This could potentially obscure small, but important flaws in the logic of the
-# make_ipm.general_di_stoch_kern method!
-
 # Make mesh bounds and mid points. length.out = length + 1 because we are making
 # bounds. when the meshpoints are generated, the resulting length is length(bounds - 1)
 
