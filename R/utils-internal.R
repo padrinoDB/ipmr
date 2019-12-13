@@ -28,9 +28,13 @@
 .drop_duplicated_names_and_splice <- function(to_drop) {
 
   if(!any(duplicated(names(to_drop)))) {
+
     test <- vapply(to_drop, function(x) all(is.na(x)), logical(1))
+
     if(!any(test)) {
+
       return(to_drop)
+
     } else {
       to_drop <- to_drop[!test]
       return(to_drop)
@@ -48,8 +52,10 @@
     out         <- temp_2[-ind]
 
     for(i in ind) {
+
       to_splice <- temp_2[[i]]
       out       <- purrr::splice(out, to_splice)
+
     }
 
   } else {

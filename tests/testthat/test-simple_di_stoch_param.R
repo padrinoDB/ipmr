@@ -239,6 +239,13 @@ test_that('eigenvectors/values are all good', {
   expect_equal(ws_ipmr[ ,3], ws[ ,3], tolerance = 1e-13)
   expect_equal(ws_ipmr[ ,4], ws[ ,4], tolerance = 1e-13)
   expect_equal(ws_ipmr[ ,5], ws[ ,5], tolerance = 1e-13)
+
+  # Reproductive values
+  expect_equal(vs_ipmr[ ,1], vs[ ,1], tolerance = 1e-13)
+  expect_equal(vs_ipmr[ ,2], vs[ ,2], tolerance = 1e-13)
+  expect_equal(vs_ipmr[ ,3], vs[ ,3], tolerance = 1e-13)
+  expect_equal(vs_ipmr[ ,4], vs[ ,4], tolerance = 1e-13)
+  expect_equal(vs_ipmr[ ,5], vs[ ,5], tolerance = 1e-13)
 })
 
 
