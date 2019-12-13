@@ -57,6 +57,49 @@
   return(res)
 }
 
+.make_sub_kernel_general_lazy <- function(proto, master_env, return_envs = FALSE) {
+
+  env_state_funs <- lapply(
+    proto$env_state,
+    function(x, master_env) {
+
+      temp <- x$env_quos
+
+      if(rlang::is_quosure(temp[[1]]) || rlang::is_quosures(temp[[1]])) {
+        out <- lapply(temp,
+                      function(x, master_env) {
+                        rlang::quo_set_env(x,
+                                           master_env)
+                      },
+                      master_env = master_env)
+      } else {
+        out <- NULL
+      }
+
+      return(out)
+    },
+    master_env = master_env)
+
+  nms <- lapply(env_state_funs, names) %>% unlist()
+
+  ind <- duplicated(nms)
+
+  env_state_funs <- env_state_funs[!ind]
+
+  master_env     <- .bind_env_exprs(master_env, env_state_funs)
+
+  env_list       <- list(master_env = master_env)
+
+  sys            <- .make_sub_kernel_general(proto,
+                                             env_list,
+                                             return_envs = return_envs)
+
+  out            <- list(ipm_system = sys,
+                         master_env = master_env)
+
+  return(out)
+}
+
 #' @noRd
 
 .make_sub_kernel_simple <- function(proto, env_list, return_envs = FALSE) {
@@ -135,7 +178,7 @@
 # kernel resampling is preferred when a viable alternative (at least within
 # the context of ipmr).
 
-.make_sub_kernel_lazy <- function(proto, master_env, return_envs = FALSE) {
+.make_sub_kernel_simple_lazy <- function(proto, master_env, return_envs = FALSE) {
 
   env_state_funs <- lapply(
     proto$env_state,
@@ -335,6 +378,7 @@
   }
 
   # Determine who's a kernel and who's a pop_vector!
+
   ipm_system <- .flatten_to_depth(ipm_system, 1)
 
   kern_ind   <- lapply(ipm_system, function(x) dim(x)[2] != 1) %>%
@@ -343,6 +387,7 @@
   iterator   <- ipm_system[kern_ind]
 
   # make names a bit prettier to help distinguish between iterations
+
   names(sub_kernels) <- paste(names(sub_kernels),
                               current_iteration,
                               sep = "_")

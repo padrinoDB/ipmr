@@ -317,9 +317,9 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
     # multiple parameters meant to come from a joint distribution really come from
     # the joint distribution!
 
-    sys         <- .make_sub_kernel_lazy(others,
-                                         master_env,
-                                         return_envs = return_all)
+    sys         <- .make_sub_kernel_simple_lazy(others,
+                                                master_env,
+                                                return_envs = return_all)
 
     sub_kernels <- sys$ipm_system$sub_kernels
 
@@ -585,9 +585,116 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
 make_ipm.general_di_stoch_param <- function(proto_ipm,
                                             return_all = FALSE,
                                             usr_funs = list(),
-                                            ...) {
+                                            ...,
+                                            domain_list = NULL,
+                                            iterate     = TRUE,
+                                            iterations  = 50) {
 
-  # DEFINE ME
+  proto_list <- .initialize_kernels(proto_ipm, iterate)
+
+  others <- proto_list$others
+  k_row  <- proto_list$k_row
+
+  # Initialize the master_environment so these values can all be found at
+  # evaluation time
+
+  if(is.null(domain_list)) {
+    master_env <- .make_master_env(others$domain, usr_funs)
+  } else {
+    master_env <- .make_master_env(domain_list, usr_funs)
+  }
+
+  # Bind env_exprs, constants, and pop_vectors to master_env so that
+  # we can always find them and avoid that miserable repitition
+
+  master_env <- .bind_all_constants(env_state   = others$env_state[[1]]$constants,
+                                    env_to_bind = master_env)
+
+  temp       <- .prep_di_output(others, k_row, proto_ipm, iterations)
+
+  # initialize the pop_state vectors in master_env so they can be found
+  # at evaluation time
+
+  if(all(is.na(proto_ipm$pop_state[[1]]))) {
+
+    stop("All general_* IPMs must have a 'pop_state' defined.",
+         "See ?define_pop_state() for more details." )
+
+  } else {
+
+    master_env  <- .add_pop_state_to_master_env(temp$pop_state, master_env)
+
+  }
+
+  env_list      <- list(master_env = master_env)
+
+  if(!iterate || iterations < 1) {
+    stop("All 'general_*_stoch_param' models must be iterated at least once!",
+         call. = FALSE)
+  }
+
+  for(i in seq_len(iterations)) {
+
+    # Lazy variant makes sure that whatever functions that generate parameter
+    # values stochastically are only evaluated 1 time per iteration! This is so
+    # multiple parameters meant to come from a joint distribution really come from
+    # the joint distribution!
+
+    sys         <- .make_sub_kernel_general_lazy(others,
+                                                 master_env,
+                                                 return_envs = return_all)
+
+    sub_kernels <- sys$ipm_system$sub_kernels
+
+    # Generate the pop_state for a single iteration! This is critical to ensuring
+    # env_state_funs are only evaluated once per iteration.
+
+    pop_state <- .iterate_kerns_general(k_row,
+                                        proto_ipm,
+                                        sub_kern_list,
+                                        iterations = 1,
+                                        kern_seq,
+                                        temp$pop_state,
+                                        master_env)
+
+    if(return_all) {
+
+      env_ret <- sys$data_envs
+
+    } else {
+      env_ret <- NA_character_
+    }
+
+
+    # Need to think about introducing a new function  here - below will
+    # work for simple ones that have an iterator slot, but will not for general.
+    # Christmas party rapidly approaching though, so a task for another day.
+
+    out         <- .update_param_resamp_output(sub_kernels,
+                                               sys_i,
+                                               env_ret,
+                                               master_env,
+                                               out,
+                                               iterations,
+                                               i)
+
+    # turn current pop_state_t_1 into pop_state_t in master_env so next computation
+    # can occur
+    master_env <- .update_master_env(out$pop_state,
+                                     master_env,
+                                     i)
+
+  }
+
+  out$iterators   <- set_ipmr_classes(out$iterators)
+  out$sub_kernels <- set_ipmr_classes(out$sub_kernels)
+
+  if(return_all) out$data_envs <- purrr::splice(out$data_envs, env_list)
+
+  class(out) <- c('general_di_stoch_param_ipm', 'list')
+
+  return(out)
+
 }
 
 # Density dependent methods----------
