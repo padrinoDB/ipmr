@@ -24,7 +24,7 @@ lambda(ipm, ...)
 
 \method{lambda}{simple_di_stoch_param_ipm}(ipm, ..., all_lambdas = TRUE)
 
-\method{lambda}{general_di_det_ipm}(ipm, type, ...)
+\method{lambda}{general_di_det_ipm}(ipm, type, ..., all_lambdas = FALSE)
 
 \method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., all_lambdas = TRUE)
 

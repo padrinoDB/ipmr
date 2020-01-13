@@ -75,9 +75,11 @@
 
 .det_lambda <- function(x) {
 
-  vapply(x$iterators,
-         function(y) Re(eigen(y)$values[1]),
-         numeric(1))
+  return(
+    vapply(x$iterators,
+           function(y) Re(eigen(y)$values[1]),
+           numeric(1))
+  )
 
 }
 

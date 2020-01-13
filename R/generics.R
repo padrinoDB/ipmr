@@ -251,8 +251,8 @@ lambda.simple_di_stoch_param_ipm <- function(ipm, ..., all_lambdas = TRUE) {
 #' @rdname lambda
 #' @export
 #'
-lambda.general_di_det_ipm <- function(ipm, type, ...) {
-  .stoch_lambda_pop_size(ipm)
+lambda.general_di_det_ipm <- function(ipm, type, ..., all_lambdas = FALSE) {
+  .stoch_lambda_pop_size(ipm, all_lambdas = all_lambdas)
 }
 
 
