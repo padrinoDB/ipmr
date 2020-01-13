@@ -328,7 +328,7 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                       master_env)
 
 
-    out         <- .update_param_resamp_output(sub_kernels,
+    out         <- .update_param_simple_output(sub_kernels,
                                                sys_i,
                                                ifelse(return_all,
                                                       sys$data_envs,
@@ -430,6 +430,7 @@ make_ipm.general_di_det <- function(proto_ipm,
                                         proto_ipm,
                                         sub_kern_list,
                                         iterations,
+                                        current_iteration = NA_integer_,
                                         # Single set of kernels - no stochastic possible
                                         kern_seq = NULL,
                                         temp$pop_state,
@@ -455,7 +456,7 @@ make_ipm.general_di_det <- function(proto_ipm,
   pop_ret     <- temp_other_out$pop_ret
 
   out <- list(
-    iterators   = NA_character_,
+    iterators   = NA_real_,
     sub_kernels = sub_kern_list,
     env_list    = env_ret,
     env_seq     = env_seq_ret,
@@ -544,6 +545,7 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
                                         proto_ipm,
                                         sub_kern_list,
                                         iterations,
+                                        current_iteration = NA_integer_,
                                         kern_seq,
                                         temp$pop_state,
                                         master_env)
@@ -567,7 +569,7 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
   pop_ret     <- temp_other_out$pop_ret
 
   out <- list(
-    iterators   = NA_character_,
+    iterators   = NA_real_,
     sub_kernels = sub_kern_list,
     env_list    = env_ret,
     env_seq     = env_seq_ret,
@@ -647,49 +649,56 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
     sub_kernels <- sys$ipm_system$sub_kernels
 
     # Generate the pop_state for a single iteration! This is critical to ensuring
-    # env_state_funs are only evaluated once per iteration.
+    # env_state_funs are only evaluated once per iteration. kern_seq = NULL
+    # because the environmental parameters are generated on the fly by the
+    # user defined function
 
     pop_state <- .iterate_kerns_general(k_row,
                                         proto_ipm,
-                                        sub_kern_list,
+                                        sub_kernels,
                                         iterations = 1,
-                                        kern_seq,
+                                        current_iteration = i,
+                                        kern_seq = NULL,
                                         temp$pop_state,
                                         master_env)
 
     if(return_all) {
 
-      env_ret <- sys$data_envs
+      env_ret <- sys$ipm_system$env_list
 
     } else {
+
       env_ret <- NA_character_
+
     }
 
+    # Variant that doesn't require an "iterator" slot. also skips a few
+    # steps that are now handled by .iterate_kerns_general. See comment below.
 
-    # Need to think about introducing a new function  here - below will
-    # work for simple ones that have an iterator slot, but will not for general.
-    # Christmas party rapidly approaching though, so a task for another day.
+    temp         <- .update_param_general_output(sub_kernels,
+                                                 pop_state,
+                                                 env_ret,
+                                                 master_env,
+                                                 temp,
+                                                 iterations,
+                                                 i)
 
-    out         <- .update_param_resamp_output(sub_kernels,
-                                               sys_i,
-                                               env_ret,
-                                               master_env,
-                                               out,
-                                               iterations,
-                                               i)
-
-    # turn current pop_state_t_1 into pop_state_t in master_env so next computation
-    # can occur
-    master_env <- .update_master_env(out$pop_state,
-                                     master_env,
-                                     i)
+    # Differs from update pop_sate here because master_env is modified
+    # in .iterate_kerns_general. Thus, once we've updated the sub_kernel and
+    # env_* slots, we're done!
 
   }
 
-  out$iterators   <- set_ipmr_classes(out$iterators)
-  out$sub_kernels <- set_ipmr_classes(out$sub_kernels)
+  out <- list(
+    iterators   = NA_real_,
+    sub_kernels = temp$sub_kernels,
+    env_list    = temp$sub_kernel_envs,
+    env_seq     = temp$env_seq,
+    pop_state   = temp$pop_state,
+    proto_ipm   = temp$proto_ipm
+  )
 
-  if(return_all) out$data_envs <- purrr::splice(out$data_envs, env_list)
+  out$sub_kernels <- set_ipmr_classes(out$sub_kernels)
 
   class(out) <- c('general_di_stoch_param_ipm', 'list')
 

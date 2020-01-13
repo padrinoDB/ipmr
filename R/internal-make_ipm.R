@@ -5,7 +5,6 @@
 
 .make_sub_kernel_general <- function(proto, env_list, return_envs = FALSE) {
 
-  # browser()
   out <- list()
   master_env <- env_list$master_env
 
@@ -331,7 +330,7 @@
 
 #' @noRd
 
-.update_param_resamp_output <- function(sub_kernels,
+.update_param_simple_output <- function(sub_kernels,
                                         ipm_system,
                                         data_envs = NA_character_,
                                         master_env,
@@ -339,43 +338,14 @@
                                         tot_iterations,
                                         current_iteration) {
 
-  # Determine if env_state is comprised of functions. If so, get whatever
-  # they returned for that iteration. If not, grab the constants (I think this
-  # is more useful for troubleshooting than anyone actually using it - if the
-  # environment isn't varying, then they shouldn't be using this method anyway).
-  if(!rlang::is_empty(names(output$proto_ipm$env_state[[1]]$env_quos))) {
+  # Updates env_seq and data_environments part of output. env, perhaps confusingly,
+  # refers to environment in both the programming and the biological sense
 
-    env_vars <- names(output$proto_ipm$env_state[[1]]$env_quos)
-
-  } else {
-
-    env_vars <- names(output$proto_ipm$env_state[[1]]$constants)
-  }
-
-  env_temp   <- rlang::env_get_list(master_env,
-                                    env_vars,
-                                    default = NA_real_,
-                                    inherit = FALSE) %>%
-    unlist()
-
-  if(current_iteration == 1) {
-
-    output$env_seq <- matrix(NA_real_,
-                             nrow = tot_iterations,
-                             ncol = length(env_temp),
-                             byrow = TRUE,
-                             dimnames = list(c(NULL),
-                                             c(names(env_temp))))
-
-  }
-
-  output$env_seq[current_iteration, ] <-  env_temp
-
-  # On to the rest of the output
-
-  if(!all(is.na(data_envs))) {
-    out$sub_kernel_envs <- purrr::splice(out$sub_kernel_envs, data_envs)
-  }
+  output <- .update_env_output(output,
+                               master_env        = master_env,
+                               data_envs         = data_envs,
+                               tot_iterations    = tot_iterations,
+                               current_iteration = current_iteration)
 
   # Determine who's a kernel and who's a pop_vector!
 
@@ -413,14 +383,109 @@
 
 #' @noRd
 
+.update_param_general_output <- function(sub_kernels,
+                                         pop_state,
+                                         data_envs,
+                                         master_env,
+                                         output,
+                                         tot_iterations,
+                                         current_iteration) {
+
+  # Updates env_seq and data_environments part of output. env, perhaps confusingly,
+  # refers to environment in both the programming and the biological sense
+
+  output <- .update_env_output(output            = output,
+                               master_env        = master_env,
+                               data_envs         = data_envs,
+                               tot_iterations    = tot_iterations,
+                               current_iteration = current_iteration)
+
+  # The rest differs from update_param_simple in that we don't really have
+  # "iterators" - we just use the formulae in K to relate sub_kernels to pop_state
+  # and solve the system numerically. Thus, iterator slot is NA_real_
+
+  names(sub_kernels) <- paste(names(sub_kernels),
+                              current_iteration,
+                              sep = "_")
+
+  output$sub_kernels <- purrr::splice(output$sub_kernels, sub_kernels)
+
+  output$pop_state   <- pop_state
+
+  return(output)
+
+
+}
+
+# Modifies output in place - updates environmental parameter sequence
+# AND the data_envs list slot. "env" refers to both programming environments
+# and to biological environments - might need to improve terminology for long
+# term maintenance.
+
+.update_env_output <- function(output,
+                               master_env,
+                               data_envs,
+                               tot_iterations,
+                               current_iteration) {
+
+  # Determine if env_state is comprised of functions. If so, get whatever
+  # they returned for that iteration. If not, grab the constants (I think this
+  # is more useful for troubleshooting than anyone actually using it - if the
+  # environment isn't varying, then they shouldn't be using this method anyway).
+
+  if(!rlang::is_empty(names(output$proto_ipm$env_state[[1]]$env_quos))) {
+
+    env_vars <- names(output$proto_ipm$env_state[[1]]$env_quos)
+
+  } else {
+
+    env_vars <- names(output$proto_ipm$env_state[[1]]$constants)
+  }
+
+  env_temp   <- rlang::env_get_list(master_env,
+                                    env_vars,
+                                    default = NA_real_,
+                                    inherit = FALSE) %>%
+    unlist()
+
+  if(current_iteration == 1) {
+
+    output$env_seq <- matrix(NA_real_,
+                             nrow = tot_iterations,
+                             ncol = length(env_temp),
+                             byrow = TRUE,
+                             dimnames = list(c(NULL),
+                                             c(names(env_temp))))
+
+  }
+
+  output$env_seq[current_iteration, ] <-  env_temp
+
+  # On to the rest of the output
+
+  if(!all(is.na(data_envs))) {
+
+    names(data_envs)       <- paste(names(data_envs),
+                                    current_iteration,
+                                    sep = "_")
+
+    output$sub_kernel_envs <- purrr::splice(output$sub_kernel_envs, data_envs)
+
+  }
+
+  return(output)
+}
+
+#' @noRd
+
 .update_pop_state <- function(pop_history, pop_out_t_1, iteration) {
 
-  pop_out_t_1 <- unlist(pop_out_t_1)
+
 
   if(is.list(pop_history)) {
     for(i in seq_along(pop_history)) {
 
-      pop_history[[i]][ , (iteration + 1)] <- pop_out_t_1
+      pop_history[[i]][ , (iteration + 1)] <- pop_out_t_1[[i]]
 
     }
 
@@ -914,6 +979,7 @@
                                    proto_ipm,
                                    sub_kern_list,
                                    iterations,
+                                   current_iteration,
                                    kern_seq,
                                    pop_state,
                                    master_env) {
@@ -929,6 +995,15 @@
   }
 
   for(i in seq_len(iterations)) {
+
+    # stoch_param uses iterate_kerns with "iterations = 1" and a loop
+    # in the outer layer, whereas stoch_kern uses this loop for iterating
+    # through time. Thus, we need a switch to ensure that the index
+    # for inserting the pop_state at t+1 is correctly drawn.
+
+    iteration_ind <- ifelse(is.na(current_iteration),
+                            i,
+                            current_iteration)
 
     # Select kernels from kern_seq, or just use all of them if it's
     # a deterministic simulation. Similarly, we need to subset the k_rows
@@ -978,7 +1053,7 @@
 
                                          return(.x)
                                        },
-                                       iteration = i
+                                       iteration = iteration_ind
     )
 
     # Now, update the names so that we can bind the new n_*_t to

@@ -82,8 +82,9 @@ test_that('print.simple_di_det returns correctly', {
 test_that('plot.simple_di_det returns correctly', {
 
   plot_str <- plot(sim_di_det,
-                   sub_kernels = TRUE,
-                   exponent = 0.05)
+                   # sub_kernels = TRUE,
+                   exponent = 0.025,
+                   do_contour = TRUE)
 
   expect_s3_class(plot_str,
                   'simple_di_det_ipm')
@@ -243,7 +244,7 @@ data_list <- list(s_slope = 0.2,
                   f_d_sd = 0.75)
 
 r_means <- c(s_int_yr = 0.8,
-             g_int_yr = 0.1,
+             g_int_yr = 0.8,
              f_r_int_yr = 0.3,
              f_s_int_yr = 0.01)
 

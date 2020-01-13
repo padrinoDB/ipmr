@@ -18,6 +18,7 @@ to_mu_sd <- function(x) {
          })
 }
 
+flatten_to_depth <- ipmr:::.flatten_to_depth
 
 # Hacky estimates of parameter means and variances. Those without any variance
 # will be converted to fixed point estimates, those with variance will get
@@ -103,7 +104,14 @@ ind_rand <- map_lgl(all_params,
 
 ind_fixed <- ! ind_rand
 
+# Next, split fixed and random variables. Flatten fixed ones out since
+# we are only using their point estimates
+
 fixed_params <- all_params[ind_fixed]
+
+fixed_params <- lapply(fixed_params,
+                       function(x) x$mu)
+
 rando_means  <- vapply(all_params[ind_rand],
                        function(x) x$mu,
                        numeric(1L))
@@ -136,6 +144,22 @@ mvt_wrapper <- function(r_means, r_sigmas, nms) {
 
 }
 
+inv_logit <- function(int, slope, sv) {
+
+  1 / (1 + exp(-(int + slope * sv)))
+}
+
+pois <- function(int, slope, sv) {
+
+  exp(int + slope * sv)
+
+}
+
+init_pop_vec <- list(
+  ln_leaf_l = runif(50),
+  sqrt_area = runif(50)
+)
+
 # Implement the ipmr version. We'll use the env_seq slot from the output
 # to iterate a hand coded version with identical parameter estimates to ensure
 # we're creating the same model. No seeds set, so this test changes slightly
@@ -151,11 +175,11 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
                        gamma_nn     *
                        d_ln_leaf_l,
 
-    sig_n        = inv_logit(nr_s_z_int, nr_s_z_b, ln_leaf_l_1),
+    sig_n        = inv_logit(env_params$nr_s_z_int, env_params$nr_s_z_b, ln_leaf_l_1),
     gamma_nn     = dnorm(ln_leaf_l_2, nr_nr_mu, nr_nr_sd),
-    nr_nr_mu     = nr_nr_int + nr_nr_b * ln_leaf_l_1,
+    nr_nr_mu     = env_params$nr_nr_int + env_params$nr_nr_b * ln_leaf_l_1,
     mu_n         = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
-    beta_n       = inv_logit(nr_f_z_int, nr_f_z_b, ln_leaf_l_1),
+    beta_n       = inv_logit(env_params$nr_f_z_int, env_params$nr_f_z_b, ln_leaf_l_1),
 
     data_list        = fixed_params,
     states           = list(c('ln_leaf_l')),
@@ -178,10 +202,10 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
                       )            *
                         d_sqrt_area,
 
-    phi           = pois(f_s_int, f_s_slope, sqrt_area_1),
-    nu            = sdl_es_r,
-    gamma_sr      = dnorm(ln_leaf_l_2, sdl_z_int, sdl_z_sd),
-    sig_r         = inv_logit(ra_s_z_int, ra_s_z_b, sqrt_area_1),
+    phi           = pois(env_params$f_s_int, env_params$f_s_slope, sqrt_area_1),
+    nu            = env_params$sdl_es_r,
+    gamma_sr      = dnorm(ln_leaf_l_2, env_params$sdl_z_int, sdl_z_sd),
+    sig_r         = inv_logit(env_params$ra_s_z_int, ra_s_z_b, sqrt_area_1),
     mu_r          = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
     gamma_nr      = dnorm(ln_leaf_l_2, mu_ra_nr, ra_n_z_sd),
     mu_ra_nr      = ra_n_z_int + ra_n_z_b * sqrt_area_1,
@@ -220,12 +244,12 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
                        tau           *
                        d_ln_leaf_l,
 
-    sig_n            = inv_logit(nr_s_z_int, nr_s_z_b, ln_leaf_l_1),
+    sig_n            = inv_logit(env_params$nr_s_z_int, env_params$nr_s_z_b, ln_leaf_l_1),
     mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
-    beta_n           = inv_logit(nr_f_z_int, nr_f_z_b, ln_leaf_l_1),
+    beta_n           = inv_logit(env_params$nr_f_z_int, env_params$nr_f_z_b, ln_leaf_l_1),
     gamma_rn         = dnorm(sqrt_area_2, mu_nr_ra, nr_ra_sd),
-    mu_nr_ra         = nr_ra_int + nr_ra_b * ln_leaf_l_1,
-    tau              = inv_logit(tau_int, tau_b, ln_leaf_l_1),
+    mu_nr_ra         = env_params$nr_ra_int + nr_ra_b * ln_leaf_l_1,
+    tau              = inv_logit(env_params$tau_int, tau_b, ln_leaf_l_1),
 
     data_list        = fixed_params,
     states           = list(c('sqrt_area', 'ln_leaf_l')),
@@ -239,7 +263,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     name             = 'k_xd',
     family           = 'CD',
     formula          = sig_n * mu_n * d_ln_leaf_l,
-    sig_n            = inv_logit(nr_s_z_int, nr_s_z_b, ln_leaf_l_1),
+    sig_n            = inv_logit(env_params$nr_s_z_int, env_params$nr_s_z_b, ln_leaf_l_1),
     mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
     data_list        = fixed_params,
     states           = list(c('ln_leaf_l')),
@@ -250,9 +274,9 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     name             = 'k_zd',
     family           = 'CD',
     formula          = sig_r * mu_r * d_sqrt_area,
-    sig_r            = inv_logit(ra_s_z_int, ra_s_z_b, sqrt_area_1),
+    sig_r            = inv_logit(env_params$ra_s_z_int, ra_s_z_b, sqrt_area_1),
     mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
-    data_list        = full_data_list,
+    data_list        = fixed_params,
     states           = list(c('sqrt_area')),
     has_hier_effs    = FALSE,
     evict            = FALSE
@@ -309,7 +333,9 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
                              rand_sigs,
                              nms = rando_names),
     data_list  = list(
-      rando_means = rando_means
+      rando_means = rando_means,
+      rand_sigs   = rando_sigmas,
+      rando_names = rando_names
     )
   ) %>%
   make_ipm(
@@ -322,4 +348,313 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     iterations = 100
   )
 
+
+# Store for comparison!
+ipmr_lambdas <- ipmr:::.stoch_lambda_pop_size(gen_di_stoch_param,
+                                              all_lambdas = TRUE)
+
+# Now, get the sequence of environmental parameters. These will get inserted into
+# the test case to make sure we're recapturing the population dynamics
+use_param_seq <- as.data.frame(gen_di_stoch_param$env_seq)
+names(use_param_seq) <- gsub('env_params\\.', '', names(use_param_seq))
+
+
+k_xx <- function(fixed_params, env_params, dom_1, dom_2) {
+
+  d_z <- dom_1[2] - dom_1[1]
+  l   <- min(dom_1) - d_z / 2
+  u   <- max(dom_1) + d_z / 2
+
+  nr_nr_mu <- env_params$nr_nr_int + env_params$nr_nr_b * dom_1
+
+  sig_n    <- inv_logit(env_params$nr_s_z_int, env_params$nr_s_z_b, dom_1)
+
+  ev <- pnorm(u, nr_nr_mu, fixed_params$nr_nr_sd) -
+        pnorm(l, nr_nr_mu, fixed_params$nr_nr_sd)
+
+  gamma_nn <- dnorm(dom_2, nr_nr_mu, fixed_params$nr_nr_sd) /
+              ev
+
+  mu_n     <- inv_logit(fixed_params$nr_d_z_int, fixed_params$nr_d_z_b, dom_1)
+
+  beta_n   <- inv_logit(env_params$nr_f_z_int, env_params$nr_f_z_b, dom_1)
+
+  disc_fun <- (
+    sig_n        *
+    (1 - mu_n)   *
+    (1 - beta_n) *
+    gamma_nn     *
+    d_z
+  ) %>%
+    matrix(nrow = 50, ncol = 50, byrow = TRUE)
+
+  return(disc_fun)
+}
+
+k_zx <- function(fixed_params, env_params, dom_1, dom_2, dom_3, dom_4) {
+
+  d_z  <- dom_3[2] - dom_3[1]
+  d_z1 <- dom_1[2] - dom_1[1]
+  l   <- min(dom_2) - d_z1 / 2
+  u   <- max(dom_2) + d_z1 / 2
+
+  phi           <- pois(env_params$f_s_int, env_params$f_s_slope, dom_3)
+  nu            <- env_params$sdl_es_r
+
+  ev_sr         <- pnorm(u, env_params$sdl_z_int, fixed_params$sdl_z_sd) -
+                   pnorm(l, env_params$sdl_z_int, fixed_params$sdl_z_sd)
+
+  gamma_sr      <- dnorm(dom_2, env_params$sdl_z_int, fixed_params$sdl_z_sd) /
+                   ev_sr
+  sig_r         <- inv_logit(env_params$ra_s_z_int, fixed_params$ra_s_z_b, dom_3)
+  mu_r          <- inv_logit(fixed_params$ra_d_z_int, fixed_params$ra_d_z_b, dom_3)
+  mu_ra_nr      <- fixed_params$ra_n_z_int + fixed_params$ra_n_z_b * dom_3
+
+  ev_nr         <- pnorm(u, mu_ra_nr, fixed_params$ra_n_z_sd) -
+                   pnorm(l, mu_ra_nr, fixed_params$ra_n_z_sd)
+
+  gamma_nr      <- dnorm(dom_2, mu_ra_nr, fixed_params$ra_n_z_sd) /
+                    ev_nr
+  disc_fun <- (
+    (
+      phi        *
+      nu         *
+      gamma_sr   +
+
+      sig_r      *
+      (1 - mu_r) *
+      gamma_nr
+    )            *
+      d_z
+
+  ) %>%
+    matrix(nrow = 50, ncol = 50, byrow = TRUE)
+
+  return(disc_fun)
+}
+
+k_dx <- function(fixed_params, dom_1, dom_2) {
+
+  d_z <- dom_1[2] - dom_1[1]
+  l   <- min(dom_2) - d_z / 2
+  u   <- max(dom_2) + d_z / 2
+
+  ev        <- pnorm(u, fixed_params$dc_nr_int, fixed_params$dc_nr_sd) -
+               pnorm(l, fixed_params$dc_nr_int, fixed_params$dc_nr_sd)
+
+  gamma_nd  <-  dnorm(dom_2, fixed_params$dc_nr_int, fixed_params$dc_nr_sd) /
+    ev
+
+  ind <- seq(1, length(gamma_nd), by = 50)
+
+  disc_fun <- (gamma_nd * d_z) %>%
+    .[ind] %>%
+    matrix(nrow = 50, ncol = 1, byrow = TRUE)
+
+  return(disc_fun)
+
+}
+
+k_xz <- function(fixed_params, env_params, dom_1, dom_2, dom_3, dom_4) {
+
+  d_z  <- dom_1[2] - dom_1[1]
+  d_z1 <- dom_3[2] - dom_3[1]
+  l   <- min(dom_3) - d_z1 / 2
+  u   <- max(dom_3) + d_z1 / 2
+
+  sig_n    <- inv_logit(env_params$nr_s_z_int, env_params$nr_s_z_b, dom_1)
+  mu_n     <- inv_logit(fixed_params$nr_d_z_int, fixed_params$nr_d_z_b, dom_1)
+  beta_n   <- inv_logit(env_params$nr_f_z_int, env_params$nr_f_z_b, dom_1)
+  mu_nr_ra <- env_params$nr_ra_int + fixed_params$nr_ra_b * dom_1
+  tau      <- inv_logit(env_params$tau_int, fixed_params$tau_b, dom_1)
+
+  ev       <- pnorm(u, mu_nr_ra, fixed_params$nr_ra_sd) -
+              pnorm(l, mu_nr_ra, fixed_params$nr_ra_sd)
+
+  gamma_rn <- dnorm(dom_4, mu_nr_ra, fixed_params$nr_ra_sd) /
+    ev
+
+
+  disc_fun <- (
+    sig_n         *
+    (1 - mu_n)    *
+    beta_n        *
+    gamma_rn      *
+    tau           *
+    d_z
+
+  ) %>%
+    matrix(nrow = 50, ncol = 50, byrow = TRUE)
+
+  return(disc_fun)
+}
+
+k_xd <- function(fixed_params, env_params, dom_1, dom_2) {
+
+  d_z <- dom_1[2] - dom_1[1]
+  sig_n <- inv_logit(env_params$nr_s_z_int, env_params$nr_s_z_b, dom_1)
+  mu_n  <- inv_logit(fixed_params$nr_d_z_int, fixed_params$nr_d_z_b, dom_1)
+
+  disc_fun <- (sig_n * mu_n * d_z) %>%
+    unique() %>%
+    matrix(nrow = 1, ncol = 50, byrow = TRUE)
+
+  return(disc_fun)
+}
+
+k_zd <- function(fixed_params, env_params, dom_1, dom_2) {
+
+  d_z <- dom_1[2] - dom_1[1]
+
+  sig_r <- inv_logit(env_params$ra_s_z_int, fixed_params$ra_s_z_b, dom_1)
+  mu_r  <- inv_logit(fixed_params$ra_d_z_int, fixed_params$ra_d_z_b, dom_1)
+
+  disc_fun <- (sig_r * mu_r * d_z) %>%
+    unique() %>%
+    matrix(nrow = 1, ncol = 50, byrow = TRUE)
+
+  return(disc_fun)
+}
+
+iterate_model <- function(env_params,
+                          fixed_params,
+                          dom_1,
+                          dom_2,
+                          dom_3,
+                          dom_4,
+                          pop_list,
+                          iteration) {
+
+  k_xx_temp <- k_xx(fixed_params,
+                    env_params,
+                    dom_1, dom_2)
+  k_zx_temp <- k_zx(fixed_params,
+                    env_params,
+                    dom_1, dom_2,
+                    dom_3, dom_4)
+  k_dx_temp <- k_dx(fixed_params,
+                    dom_1, dom_2)
+  k_xz_temp <- k_xz(fixed_params,
+                    env_params,
+                    dom_1,
+                    dom_2,
+                    dom_3,
+                    dom_4)
+  k_xd_temp <- k_xd(fixed_params,
+                    env_params,
+                    dom_1,
+                    dom_2)
+  k_zd_temp <- k_zd(fixed_params,
+                    env_params,
+                    dom_3,
+                    dom_4)
+
+  n_ln_leaf_l_t_1 <- k_xx_temp %*% pop_list$n_ln_leaf_l[ , iteration] +
+                     k_zx_temp %*% pop_list$n_sqrt_area[ , iteration] +
+                     k_dx_temp %*% pop_list$n_d[ , iteration]
+
+  n_sqrt_area_t_1 <- k_xz_temp %*% pop_list$n_ln_leaf_l[ , iteration]
+
+  n_d_t_1         <- k_xd_temp %*% pop_list$n_ln_leaf_l[ , iteration] +
+                     k_zd_temp %*% pop_list$n_sqrt_area[ , iteration]
+
+  pop_list$n_ln_leaf_l[ , (iteration + 1)] <- n_ln_leaf_l_t_1
+  pop_list$n_sqrt_area[ , (iteration + 1)] <- n_sqrt_area_t_1
+  pop_list$n_d[ , (iteration + 1)]         <- n_d_t_1
+
+
+  kerns_temp <- list(k_xx = k_xx_temp,
+                     k_zx = k_zx_temp,
+                     k_dx = k_dx_temp,
+                     k_xz = k_xz_temp,
+                     k_xd = k_xd_temp,
+                     k_zd = k_zd_temp)
+
+  out_list = list(kernels = kerns_temp,
+                  pop_list = pop_list)
+
+  return(out_list)
+
+}
+
+
+# Now, we can iterate the model 100 times and check to see if we get identical
+# values. We absolutely should be if we're using the same parameter values as
+# in the ipmr version.
+
+pop_list <- list(
+  n_ln_leaf_l = matrix(NA_real_, nrow = 50, ncol = 101),
+  n_sqrt_area = matrix(NA_real_, nrow = 50, ncol = 101),
+  n_d         = matrix(NA_real_, nrow = 1,  ncol = 101)
+)
+
+pop_list$n_ln_leaf_l[ , 1] <- init_pop_vec$ln_leaf_l
+pop_list$n_sqrt_area[ , 1] <- init_pop_vec$sqrt_area
+pop_list$n_d[ , 1]         <- 10
+
+sqrt_area_bounds <- seq(0.63 * 0.9,
+                        3.87 * 1.1,
+                        length.out = 51)
+
+ln_leaf_l_bounds <- seq(0.26 * 0.9,
+                        2.70 * 1.1,
+                        length.out = 51)
+
+sqrt_area_mids   <- (sqrt_area_bounds[2:51] + sqrt_area_bounds[1:50]) * 0.5
+ln_leaf_l_mids   <- (ln_leaf_l_bounds[2:51] + ln_leaf_l_bounds[1:50]) * 0.5
+
+domain_list <- list(expand.grid(sqrt_area_1 = sqrt_area_mids,
+                                sqrt_area_2 = sqrt_area_mids),
+                    expand.grid(ln_leaf_l_1 = ln_leaf_l_mids,
+                                ln_leaf_l_2 = ln_leaf_l_mids)) %>%
+  flatten_to_depth(1)
+
+
+
+kernel_holder <- list()
+
+for(i in seq(1, 100, 1)) {
+
+  env_params_it <- as.list(use_param_seq[i , ])
+
+  temp <- iterate_model(env_params_it,
+                        fixed_params,
+                        domain_list$ln_leaf_l_1,
+                        domain_list$ln_leaf_l_2,
+                        domain_list$sqrt_area_1,
+                        domain_list$sqrt_area_2,
+                        pop_list,
+                        iteration = i)
+
+  pop_list          <- temp$pop_list
+  kerns_temp        <- temp$kernels
+  names(kerns_temp) <- paste(names(kerns_temp), i, sep = '_')
+  kernel_holder     <- splice(kernel_holder, kerns_temp)
+
+}
+
+pop_list <- list(pop_state = pop_list)
+
+usr_lambdas <- ipmr:::.stoch_lambda_pop_size(pop_list, all_lambdas = TRUE)
+
+ipmr_sub_kernels <- gen_di_stoch_param$sub_kernels
+
+test_that('ipmr lambdas match user generated ones', {
+
+  expect_equal(ipmr_lambdas, usr_lambdas, tol = 1e-10)
+
+  kern_test <- map2_lgl(
+    ipmr_sub_kernels,
+    kernel_holder,
+    .f = ~isTRUE(
+      all.equal(
+        unclass(.x),
+                .y
+      )
+    )
+  )
+
+  expect_true(all(kern_test))
+
+})
 

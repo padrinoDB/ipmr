@@ -1,3 +1,4 @@
+# Reduces the depth/nestedness of a list to "depth".
 
 .flatten_to_depth <- function(to_flatten, depth) {
   if(rlang::is_empty(to_flatten) |
@@ -12,6 +13,8 @@
     .flatten_to_depth(to_flatten, depth)
   }
 }
+
+# Finds depth of current list
 
 .depth <- function(l, start = 0) {
   if(!is.list(l)) {
