@@ -95,6 +95,9 @@ vignettes('Introduction to ipmr', 'ipmr') also contains helpful information." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/general-ipms.html">General IPMs</a>
+    </li>
+    <li>
       <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
     </li>
     <li>
@@ -190,6 +193,17 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
   <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)
+
+<span class='co'># S3 method for general_di_stoch_param</span>
+<span class='fu'>make_ipm</span>(
+  <span class='no'>proto_ipm</span>,
+  <span class='kw'>return_all</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='no'>...</span>,
+  <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>

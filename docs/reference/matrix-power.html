@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Initialize an IPM — init_ipm • ipmr</title>
+<title>Raise a matrix to a power — %^% • ipmr</title>
 
 
 <!-- jquery -->
@@ -35,10 +35,10 @@
 
 
 
-<meta property="og:title" content="Initialize an IPM — init_ipm" />
-<meta property="og:description" content="This is always the first step in constructing an IPM with ipmr.
-All you need for this is to know what type of IPM you want to construct - the rest comes later
-with define_kernel, define_k, make_ipm, and associated helper functions." />
+<meta property="og:title" content="Raise a matrix to a power — %^%" />
+<meta property="og:description" content="Raises a matrix x to the y-th power. x ^ y computes
+element wise powers, whereas this computes y - 1 matrix multiplications.
+mat_power(x, y) is identical to x %^% y." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,82 +123,37 @@ with define_kernel, define_k, make_ipm, and associated helper functions." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Initialize an IPM</h1>
+    <h1>Raise a matrix to a power</h1>
     
-    <div class="hidden name"><code>init_ipm.Rd</code></div>
+    <div class="hidden name"><code>matrix-power.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This is always the first step in constructing an IPM with <code>ipmr</code>.
-All you need for this is to know what type of IPM you want to construct - the rest comes later
-with <code>define_kernel</code>, <code>define_k</code>, <code>make_ipm</code>, and associated helper functions.</p>
+    <p>Raises a matrix <code>x</code> to the <code>y</code>-th power. <code>x ^ y</code> computes
+element wise powers, whereas this computes <em>y - 1</em> matrix multiplications.
+<code>mat_power(x, y)</code> is identical to <code>x %^% y</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>init_ipm</span>(<span class='no'>model_class</span>)</pre>
+    <pre class="usage"><span class='no'>x</span> <span class='kw'>%^%</span> <span class='no'>y</span>
+
+<span class='fu'>mat_power</span>(<span class='no'>x</span>, <span class='no'>y</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>model_class</th>
-      <td><p>The type of IPM. See <code>Details</code> for more information on classes</p></td>
+      <th>x</th>
+      <td><p>A numeric or integer matrix.</p></td>
+    </tr>
+    <tr>
+      <th>y</th>
+      <td><p>An integer.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of classes <code>proto_ipm</code> and <code>class</code></p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Combinations of <code>simple</code> or <code>general</code>, <code>dd</code> or <code>di</code>,
-and <code>det</code> or <code>stoch</code> are separated by an underscore to tell <code>ipmr</code>
-the type of model you will be constructing (e.g. <code>"simple_di_det"</code> for a
-deterministic IPM with a single continuous state variable and no discrete stages
-or density dependence).</p>
-<p>Within <code>stoch</code> model types, there are two additional options to append to
-the class: <code>"kern"</code> or code"param". These distinguish between models that
-use kernel resampling vs those that use parameter resampling (<em>sensu</em> Metcalf et al.
-2015). Below are quick definitions, more detailed explanations can be found
-in the <code><a href='https://rdrr.io/r/utils/vignette.html'>vignettes("classes", package = 'ipmr')</a></code>.</p>
-<ul>
-<li><p>One of</p><ul>
-<li><p><code>simple</code>: an IPM with a single continuous state variable that does not include
-    any discrete stages. Simple IPMs can still be stochastic and/or density dependent.</p></li>
-<li><p><code>general</code>: an IPM with more than one continuous state variable
-    and/or a model that includes discrete stages.</p></li>
-</ul></li>
-<li><p>and one of</p><ul>
-<li><p><code>dd</code>: used to denote a density dependent IPM.</p></li>
-<li><p><code>di</code>: used to denote a density independent IPM.</p></li>
-</ul></li>
-<li><p>and one of</p><ul>
-<li><p><code>det</code>: used to denote a deterministic IPM. Use this when you are
-    building a single iteration kernel.</p></li>
-<li><p><code>stoch</code>: used to denote a stochastic IPM. Stochasticity can be implemented
-    in two ways in <code>ipmr</code>: <code>"kern"</code> resampling, and <code>"param"</code> resampling.</p></li>
-</ul></li>
-<li><p>If using <code>det</code>, this should be omitted. If using <code>stoch</code>, then one of the following:</p><ul>
-<li><p><code>kern</code>: used to denote an IPM that uses kernel resampling. Briefly,
-    these models build all of the iteration kernels ahead of time and then choose one
-    at random or in a user-specified order as they move from iteration to iteration. The
-    user-specified population vector is multiplied by the chosen kernel and the result
-    is multiplied by the next kernel for the desired number of iterations or until
-    convergence is reached (depending on what you request following <code><a href='make_ipm.html'>make_ipm()</a></code>.</p></li>
-<li><p><code>param</code>: used to denote parameter resampling. This generates distributions
-    for each parameter based on user-specified functions supplied to <code>define_env()</code>,
-    and then resamples those distributions at each iteration. This will be a bit slower than
-    <code>"kern"</code> resampling because iteration matrices need to be reconstructed
-    from new parameters at every time step. The <code>vignette("classes", package = "ipmr")</code>
-    contains more details and a number of suggestions for further reading on how to avoid this
-    slow down.</p></li>
-</ul></li>
-</ul>
-
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
-
-    <p>Metcalf et al. (2015). Statistical modelling of annual variation for inference on stochastic
-population dynamics using Integral Projection Models. Methods in Ecology and Evolution, 6: 1007-1017</p>
-<p><strong>UPDATE WITH MORE REFERENCES/MAKE COMPLETE LATER</strong></p>
+    <p>A matrix.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -206,8 +161,6 @@ population dynamics using Integral Projection Models. Methods in Ecology and Evo
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#references">References</a></li>
     </ul>
 
   </div>

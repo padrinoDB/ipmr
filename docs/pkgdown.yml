@@ -2,6 +2,7 @@ pandoc: 2.7.2
 pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
+  general-ipms: general-ipms.html
   hierarchical-notation: hierarchical-notation.html
   ipmr-introduction: ipmr-introduction.html
   proto-ipms: proto-ipms.html

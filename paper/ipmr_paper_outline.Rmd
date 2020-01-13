@@ -11,6 +11,9 @@ Coauthors - SCL, RSG, TMK, AC, DZC
 
 1. Integral projection models (IPMs) have become one of the tools of choice for discrete time demographers studying structured populations. Since Easterling, Ellner & Dixon's (2000) seminal paper, there have been XXX publications using IPMs. Their main power lies in the fact that they allow for continuously distributed state variables to describe vital rates, as opposed to historically favored methods that relied on sometimes arbitrary delineation of classes.
 
+IPMs are flexible models that rely on raw data to drive their functional form. Regression analysis has been a standard tool for ecologists for quite some time now, and the field is mature enough to accomodate almost any type of data (e.g. Wood 2011, Bates et al. 2015). Regression models are usually easier to estimate than matrix parameters when data sets are small, facilitating analysis of population dynamics for threatened or endangered species in a way that matrix models cannot (Ramula et al. 2009). This flexibility has lead to an exponential increase in their appearance in the literature (Figure 1), and there are few signs that the model will fall out of favor soon.
+
+
 *Point about flexibility, lead to figure 1*
 
 ```{r figure 1, eval = FALSE}
@@ -20,39 +23,105 @@ Coauthors - SCL, RSG, TMK, AC, DZC
 ```
 
 
-2. To date, there has been only one serious effort to implement an R package to assist with integral projection modeling (Metcalf et al. XXXX). IPMpack was a major leap forward in allowing users to go from raw data to set of iteration kernels in a matter of a few lines of code. Indeed, a number of authors of `ipmr` have used to it to great effect on their own data, as well as in teaching how to fit IPMs to students and mentees. BUT:
+2. To date, there has been only one serious effort to implement an R package to assist with integral projection modeling: `IPMpack` (Metcalf et al. XXXX). `IPMpack` was a major leap forward in allowing users to go from raw data to a set of iteration kernels in a matter of a few lines of code. Indeed, a number of the authors of `ipmr` have used it to great effect on their own data, as well as in teaching how to fit IPMs to students and mentees. Unfortunately, `IPMpack` is not a fully generalized set of tools, and there are certain types of models that it struggles or outright fails to implement. For example:
     
-    + Clunky interface for general IPMs, age x size IPMs
+    + The interface for general IPMs (sensu Ellner, Rees & Childs 2016) is quite clunky, and requires detailed knowledge of the internal class structure to implement, for example, an age x size IPM.
     
-    + Continuous environments can only sort of be modeled
+    + Continuously varying environments are quite tricky to model, if not impossible.
     
-    + Restricted integration types
+    + It includes only two methods for integration - cumulative density functions and the midpoint rule for PDFs. This is problematic when vital rate functions are largely deterministic and generate spiky kernels (e.g. growth in long-lived trees). 
     
-    + Generally too high a level of abstraction to fully harness the power of IPMs
+    + The common thread here is that it is operating at too high of a level of abstraction.
     
-        + S4  obfuscates too much of what is going on 
+        + S4  obfuscates much of what is going on, and makes defining highly customized models far more difficult.
         
-        + Less flexible vital rate models without an exceptional understanding of S4 OOP
+        + Less flexible vital rate models without an exceptional understanding of S4 OOP.
+            
+            + Even with a detailed understanding, incorporating complex sets of covariates is difficult.
+        
+    + Cannot model multiple continuous state variables.
 
-        + Above points can actually hinder learning the methods in the long run, as they don't require a user to understand the fundamentals of what is going on with an IPM
+    + Above points can actually hinder learning the methods in the long run, as they don't require a user to understand the fundamentals of what is going on with an IPM.
     
+All of the above points are basically just critiques of using OOP to try to tackle the IPM problem. For example, if one wanted to fit a GAM for survival with `IPMpack`, then one would be in trouble, as the standard `makeSurvObj` function allows for `glm`'s and a subset of functions from `nlme`.  A functional programming approach allows us to define a more general, domain-specific language that does not constrict what types of models are available. 
 
 ## What makes us different??
 
-3. `ipmr` is a lower-level framework that uses mathematical expressions, rather than model objects, to generate iteration kernels. It also does not try to abstract away the actual vital rate model fitting process - we feel that is a substantially different question (e.g. how to model vital rates is a statistical question, not a model implementation one) that is best left to the user. This also means that users are free to specify vital rate models of *any* form. 
+`ipmr` is a lower-level framework that uses mathematical expressions, rather than model objects, to generate iteration kernels. Importantly, it does not try to abstract away the actual vital rate model fitting process - we feel that is a substantially different question (e.g. how to model vital rates is a statistical question, not a model implementation one) that is best left to the user. This also means that users are free to specify vital rate models of *any* functional form. 
 
-`ipmr` is largely powered by `rlang` (Henry & Wickham 2019) and works by building up expressions that reference each other at higher and higher levels in the model hierarchy. `ipmr` is relatively dependency-free, requiring only `purrr` and `magrittr` (in addition to the packages included in the base R distribution. It may also not even require `purrr` in a technical sense - I've just been lazy about using `lapply/vapply`) to work as advertized. 
+`ipmr` is largely powered by `rlang` (Henry & Wickham 2019) and works by building up expressions that reference each other at higher and higher levels in the model hierarchy. `ipmr` is relatively dependency-free, requiring only `rlang`, `purrr`, and `magrittr` (in addition to a few of the packages included in the base R distribution e.g. `graphics`, `utils`). 
 
 The package itself can handle any set of valid R code that is presented to it, so user-specified functions, in addition to ones available from other packages, can all be included in the expressions that the user passes to `ipmr` functions. Figure 2 shows a generic IPM workflow from collecting the raw data to biological inference, highlighting the stages at which `ipmr` is useful.
 
 
-```{r figure 2, eval = FALSE}
+```{r figure 2, fig.cap = "Example workflow chart. Definitely need revision!", echo = FALSE}
 
-# Figure 2 - Work flow from raw data to IPM construction
+library(DiagrammeR)
+
+grViz("digraph flowchart {
+      node[fontname = Helvetica, shape = rectangle]
+      tab1[label = '@@1']
+      tab2[label = '@@2']
+      tab3[label = '@@3']
+      tab4[label = '@@4']
+      tab5[label = '@@5']
+      tab6[label = '@@6']
+      
+      tab1 -> tab2 -> tab3 -> tab4 -> tab5 -> tab6;
+      }
+      
+      
+      [1]: 'Fit vital rate models using other packages (e.g. lme4, nlme, mgcv)'
+      [2]: 'Move coefficients or model objects into a named list'
+      [3]: 'Decide whether the model is stochastic or deterministic and init_ipm() using the appropriate class'
+      [4]: 'Build expressions for the individual kernels (e.g. P = s_g_mult(s, g)). When models are implemented from hierarchical vital rate models, take advantage of built-in suffix recognition in ipmr! (e.g. s_g_mult(s_yr, g_yr))'
+      [5]: 'Build expressions for the individual vital rates using mathematical syntax, R functions, or some combination thereof (e.g. s = inv_logit(s_int, s_slope, sv_1))' 
+      [6]: 'Generate an implementation argument list, define domains, and make_ipm()'
+      
+      
+      ")
 
 ```
 
-Table 1 (comparative checklist of available tools) to compare `IPMpack`, `ipmr`, and base R implementations.
+
+```{r table 1, echo = FALSE}
+library(tibble)
+library(knitr)
+library(kableExtra)
+
+knitr::kable(
+  tibble::tribble(
+    ~Feature,                                                  ~ipmr,  ~IPMpack,
+    "Implement simple kernels",                                  "X",       "X",
+    "Prospective perturbation analyses (kernel level)",          "X",       "X", 
+    "Prospective perturbation analyses (coefficient level)",     "X",       "X", 
+    "Prospective perturbation analyses (vital rate level)",      "X",      "No", 
+    "Implement discrete/continuous combinations",                "X",       "X",
+    "Basic implementation diagnostics",                          "X",       "X",
+    "Age-specific demographic functions",                        "X",       "X",
+    "Plot, print methods",                                       "X",       "X",
+    "Model discretely varying environemnts",                     "X",       "X",
+    "Model continuously varying environments",                   "X", "Sort of",
+    "Multiple continuous state variables",                       "X",      "No",
+    "Life table respose experiments",                            "X",      "No",
+    "Density dependent models",                                  "X",      "No",
+    "Common underlying data structure for all models",           "X",      "No"
+    
+  ),
+  format = 'html',
+  escape = FALSE,
+  caption = "Table 1: Comparison of ipmr and IPMpack features."
+) %>%
+  column_spec(1, border_left = TRUE) %>%
+  column_spec(2, border_left =  TRUE, border_right = TRUE) %>%
+  column_spec(3, border_right = TRUE) %>%
+  kable_styling()
+
+
+
+```
+
+
 
 At the core of `ipmr` is the `proto_ipm` data structure. It is a data frame containing all the information necessary to implement each sub-kernel, as well as the information needed to 
 
@@ -60,13 +129,13 @@ Introduce the `proto_ipm` data structure - becomes a key point in the discussion
 
 4. Highlight flexibility - Table 2 w/ classes, descriptions RESERVED WORDS!!!!!!!.
 
-    + Reserved words
-        
-        + `pop_state`
-        
-        + `K`
-        
-        + 
+
+```{r}
+
+
+
+
+```
 
 ## Examples 
 
@@ -220,5 +289,21 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     
     + 
     
+    
+# Citation list
+
+1. Bates et al 2015: Fitting mixed effects models using lme4
+
+2. Wood 2011: Fast stable restricted maximum likelihood and marginal likelihood estimates of semiparametric genearlized linear models. 
+
+3. IPMpack paper Metcalf et al.
+
+4. Ellner, Rees & Childs 2016
+
+5. Easterling, Ellner & Dixon 2000
+
+6. Caswell 2001
+
+7. Ramula, Rees & Buckley 2009: Integral projection models perform better for small demographic data sets than matrix population models: a case study of two perennial herbs
 
 

@@ -41,6 +41,8 @@ caption = "and possibly one of", row.names = FALSE)
 
 ```
 
+The rest of this vignette will deal with simple, density independent IPMs. If you already know that you need a general IPM (e.g. an IPM with discrete stages, or multiple continuous state variables), hop over [here](https://levisc8.github.io/ipmr/articles/general-ipms.html) for an introduction to these.
+
 ## Specifying a simple deterministic IPM without density dependence
 
 This is the simplest model that `ipmr` works with. it is an IPM with a single continuous state variable, no density dependent functions, and parameters that define a single iteration kernel (as opposed to many iteration kernels). This will walk through the steps required to implement such an IPM.
@@ -458,7 +460,7 @@ In this example, there are no additional arguments that need to be passed to `ma
 
 - `env_seq` contains either an integer vector with the sequence of indices used to select kernels from the `iterators` during a stochastic simulation (`*_stoch_kern`), or a matrix of parameter estimates from each iteration of the stochastic simulation (`*_kern_param`). Not relevant for `*_det` methods with a single iteration kernel.
 
-- `pop_state` contains a list of matrices for each `state` described. The columns of each matrix correspond to the population state at each time step of a simulation.
+- `pop_state` contains a list of matrices for each `state` described. The columns of each matrix correspond to the population state at each time step of a simulation. In this case, we never defined the initial population state, so it will be empty.
 
 - `proto_ipm` contains the `proto_ipm` object used to generate the model. This is useful for rebuilding the model with a different set of `impl_args` to see how that changes your results.
 
@@ -470,13 +472,13 @@ In the example above, we created a model with a single, deterministic kernel def
 
 `ipmr` uses a special syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the example above. The first type of model will be a stochastic, kernel-resampled simulation (`"simple_di_stoch_kern"`). 
 
-This example will use `rlang` and `purrr` to make the first bit of code a bit more concise. This chunk takes the place of fitting regression models to actual data, so by the time you get using `ipmr`, this step shouldn't be necessary!
+This example will use `purrr` to make the first bit of code a bit more concise. This chunk takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of `coef(some_vital_rate_model`))
 
 ```{r eval = FALSE}
-library(rlang)
 library(purrr)
 
 # Define some fixed parameters
+
 data_list <- list(
   s_int     = 1.03,
   s_slope   = 2.2,
@@ -492,6 +494,7 @@ data_list <- list(
 )
 
 # Now, simulate some random intercepts for growth (g_), survival (s_), and offspring production (f_s_)
+
 g_r_int   <- rnorm(5, 0, 0.3)
 s_r_int   <- rnorm(5, 0, 0.7)
 f_s_r_int <- rnorm(5, 0, 0.2)
@@ -502,14 +505,15 @@ names(g_r_int)   <- paste('g_', nms, sep = "")
 names(s_r_int)   <- paste('s_', nms, sep = "")
 names(f_s_r_int) <- paste('f_s_', nms, sep = "")
 
-# The !!! operator used inside of list2 from rlang takes the named vector
-# and converts it to a named list. This can be spliced into the data list
-# to rapidly make a parameter set suitable for usage in the data_list argument
-# of define_kernel
+# Each set of parameters is converted to a named list. The names should match
+# the variables referenced in each define_kernel()/define_k() call.
 
-g_params   <- rlang::list2(!!! g_r_int)
-s_params   <- rlang::list2(!!! s_r_int)
-f_s_params <- rlang::list2(!!! f_s_r_int)
+g_params   <- as.list(g_r_int)
+s_params   <- as.list(s_r_int)
+f_s_params <- as.list(f_s_r_int)
+
+# purrr::splice combines each separate list into one without creating any 
+# additional depth to it. This keeps things a bit tidier.
 
 params     <- purrr::splice(data_list, g_params, s_params, f_s_params)
 
@@ -528,7 +532,8 @@ inv_logit <- function(sv, int, slope) {
   )
 }
 
-# same as above, but handles the contrast from the random effect we simulated.
+# same as above, but handles the extra term from the random effect we simulated.
+
 inv_logit_r <- function(sv, int, slope, r_eff) {
   return(
     1/(1 + exp(-(int + slope * sv + r_eff)))
@@ -548,11 +553,11 @@ my_funs <- list(inv_logit   = inv_logit,
                 pois_r      = pois_r)
 ```
 
-The only requirement for these functions is that they contain valid R code, and their return types are numeric.
+The only requirement for these functions is that they contain valid R code, and their return types are numeric or integer.
 
 ### Initializing the IPM
 
-With the functions and parameter values in hand, we are now ready to begin composing the model. Each expression's syntax will look a little different from before, because we are appending a suffix corresponding to the hierarchical component of the model to each parameter/vital rate/kernel that is affected by it. In this case, we're using it as a year effect, denoted `_yr`, but any suffix will work. The first line creates a list with the suffix as the name and a vector corresponding to the levels it takes on. This can be a character or integer vector, and the list can have as many entries as required by the model (e.g. `yr` for years *and* `pl` for plots, etc.). The calls to `define_kernel` and `define_k` now have `has_hier_effs = TRUE`, and `levels_hier_effs = hier_levels`. Otherwise, the code should look quite familiar.
+With the functions and parameter values defined, we are now ready to begin composing the model. Each expression's syntax will look a little different from before, because we are appending a suffix corresponding to the hierarchical component of the model to each parameter/vital rate/kernel that is affected by it. In this case, we're using it as a year effect, denoted `_yr`, but any suffix will work. The first line creates a list with the suffix as the name and a vector corresponding to the levels it takes on. This can be a character or integer vector, and the list can have as many entries as required by the model (e.g. `yr` for years *and* `pl` for plots. The suffix would then become `_yr_pl`). The calls to `define_kernel` and `define_k` now have `has_hier_effs = TRUE`, and `levels_hier_effs = hier_levels`. Otherwise, the code should look quite familiar.
 
 ```{r eval = FALSE}
 
@@ -566,6 +571,11 @@ my_ipm <- init_ipm('simple_di_stoch_kern') %>%
     s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr), 
     g_yr             = dnorm(ht_2, mean = mu_g_yr, sd = sd_g),
     mu_g_yr          = g_int + g_slope * ht_1 + g_r_yr,
+    
+    # params contains the named parameters g_r_1, g_r_2, s_r_1, s_r_2, etc.
+    # This is the only level where the user is required to fully expand the name
+    # X hier_level combinations. 
+    
     data_list        = params,
     states           = list(c('ht')),
     has_hier_effs    = TRUE,
@@ -575,9 +585,10 @@ my_ipm <- init_ipm('simple_di_stoch_kern') %>%
     # reference to g_yr in evict_fun is also updated
     
     evict_fun        = truncated_distributions("norm", "g_yr")
+    
   ) %>%
   define_kernel(
-    name             = "F_yr",
+    name             = "F_yr",             # Update the names as we did for the P kernel
     formula          = f_r * f_s_yr * f_d,
     family           = "CC",
     f_r              = inv_logit(ht_1, f_r_int, f_r_slope),
@@ -587,7 +598,8 @@ my_ipm <- init_ipm('simple_di_stoch_kern') %>%
     states           = list(c('ht')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict            = FALSE
+    evict            = TRUE,
+    evict_fun        = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
     name             = 'K_yr',
@@ -597,8 +609,7 @@ my_ipm <- init_ipm('simple_di_stoch_kern') %>%
     states           = list(c("ht")),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict            = TRUE,
-    evict_fun        = truncated_distributions("norm", "f_d")
+    evict            = FALSE
   ) %>%
   define_impl(
     make_impl_args_list(
@@ -621,9 +632,9 @@ Syntax aside, the only real difference between the first example and this one is
 
 ## Working with parameter distributions 
 
-In some cases, it is not desirable to work with point estimates of a random variable, and we prefer to work with entire distribution it comes from. Quantifying uncertainty is a critical part of demography, and methods for propagating uncertainty in parameter estimates throughout a model are well established. Unfortunately, this also means that we can't obtain a set of kernels without iterating the model at least once. This is where the `*_stoch_param` methods come in handy.
+In some cases, it is not desirable to work with point estimates of a random variable, and we prefer to work with the distributions they comes from. Quantifying uncertainty is a critical part of demography, and methods for propagating uncertainty in parameter estimates throughout a model are well established. Unfortunately, this also means that we can't obtain a set of kernels without iterating the model at least once. This is where the `*_stoch_param` methods come in handy.
 
-`*_stoch_param` methods are, on the surface, slightly less computationally efficient than their `*_stoch_kern*` counterparts because they must rebuild the iteration kernel for every single iteration. However, they are fantastic tools for propagating uncertainty in parameter estimates throughout the model. In fact, the time they save on boot-strapping and re-building the vital rate models can make them even more efficient than their kernel-resampled counterparts. Below is an example that uses a multivariate normal distribution to re-generate parameter estimates for each iteration of the model. `ipmr` is careful to only evaluate each function only once per iteration, so you can use multivariate distributions without worrying about accidentally drawing too many times.
+`*_stoch_param` methods are, on the surface, slightly less computationally efficient than their `*_stoch_kern*` counterparts because they must rebuild the iteration kernel for every single iteration. However, they are fantastic tools for propagating uncertainty in parameter estimates throughout the model. Below is an example that uses a multivariate normal distribution to re-generate parameter estimates for each iteration of the model. `ipmr` is careful to only evaluate each function in `define_env_state()` only once per iteration, so you can use multivariate joint distributions correctly.
 
 ### Defining initial conditions
 
@@ -631,8 +642,7 @@ Stochastic simulations require specification of the initial conditions. `ipmr` a
 
 ### `define_pop_state()`
 
-`define_pop_state()` takes either a named set of expressions that, when evaluated, generate a population vector, or a named list of pre-generated population vectors in the `pop_vectors` argument. One important thing to note about working with population vectors in `ipmr` is that they should take the form `n_statevariable_t` and `n_statevariable_t_1`. `ipmr` uses these key words to make sure that population states are matched to the kernels that use them, and so the strict syntax in this area is needed to ensure accuracy in more complicated models. 
-
+`define_pop_state()` takes either a named set of expressions that, when evaluated, generate a population vector, or a named list of pre-generated population vectors in the `pop_vectors` argument. One important thing to note about working with population vectors in `ipmr` is that they should take the form `n_StateVariable_t` and `n_StateVariable_t_1`. `ipmr` uses these key words to make sure that population states are matched to the kernels that use them, and so the strict syntax in this area is needed to ensure accuracy in more complicated models. 
 
 ### `define_env_state()`
 
@@ -678,14 +688,18 @@ init_pop_vec <- runif(100)
 
 # We define a wrapper function around rmvnorm to make sure
 # that the names of the returned values match those in the vital rate
-# expressions.
+# expressions. Note that if you've already loaded mvtnorm via library(mvtnorm),
+# you do not need the package::function() syntax. It is simply added here to 
+# emphasize the rmvnorm does not come from ipmr.
 
 mvt_wrapper <- function(r_means, r_sigma, nms) {
+  
   out <- mvtnorm::rmvnorm(1, r_means, r_sigma) %>%
     as.list()
   
   names(out) <- nms
   return(out)
+  
 }
 
 
@@ -741,7 +755,7 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
     # population states are multiplied by the kernels correctly.
     
     K               = P + F,
-    n_surf_area_t_1 = right_mult(K, n_surf_area_t),
+    # n_surf_area_t_1 = right_mult(K, n_surf_area_t),
     family          = 'IPM',
     data_list       = data_list,
     states          = list(c('surf_area')),
@@ -758,20 +772,22 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
   ) %>%
   define_domains(surf_area = c(0, 10, 100)) %>%
   define_env_state(
-    env_params = mvt_wrapper(r_means, r_sigma, nms = c('s_int_yr',
-                                                       'g_int_yr',
-                                                       'f_r_int_yr',
-                                                       'f_s_int_yr')),
+    env_params = mvt_wrapper(r_means,
+                             r_sigma, 
+                             nms = c('s_int_yr',
+                                     'g_int_yr',
+                                     'f_r_int_yr',
+                                     'f_s_int_yr')),
     data_list = list(
       r_means = r_means,
       r_sigma = r_sigma
     )
   ) %>%
-  define_pop_state(
-    pop_vectors = list(
-      n_surf_area_t = init_pop_vec
-    ),
-  ) %>%
+  # define_pop_state(
+  #   pop_vectors = list(
+  #     n_surf_area_t = init_pop_vec
+  #   ),
+  # ) %>%
   make_ipm(usr_funs   = list(inv_logit   = inv_logit,
                              mvt_wrapper = mvt_wrapper),
            iterate    = TRUE,

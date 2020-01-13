@@ -93,6 +93,9 @@ Generics for IPM classes" />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/general-ipms.html">General IPMs</a>
+    </li>
+    <li>
       <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
     </li>
     <li>
@@ -188,11 +191,10 @@ the dominant eigenvalue of the iteration kernel from each iteration. <code>
       <td><p>Either <code>"pop_size"</code> or <code>"eigen"</code>. <code>"pop_size"</code>
 computes lambda as the ratio of population sizes between successive time steps
 and then takes the geometric mean. <code>"eigen"</code> computes the dominant eigenvalue
-of each iteration kernel and then takes the geometric mean. For large population
+of each iteration kernel. For large population
 vectors, <code>"pop_size"</code> will likely be substantially faster. Note that
 option <code>"pop_size"</code> is only possible if an initial population vector was
-supplied when constructing the IPM.
- @export</p></td>
+supplied when constructing the IPM.</p></td>
     </tr>
     </table>
 

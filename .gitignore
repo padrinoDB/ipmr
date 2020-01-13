@@ -3,7 +3,7 @@ inst/doc
 .Rhistory
 .RData
 .Ruserdata
-paper/ipmr_paper_outline.html
+paper/*.html
 experimental_funs
 .html
 compadre*
