@@ -110,11 +110,12 @@ print.simple_di_det_ipm <- function(x, compute_lambda = TRUE,
 #' @param compute_type Either \code{"pop_size"} or \code{"eigen"}. \code{"pop_size"}
 #' computes lambda as the ratio of population sizes between successive time steps
 #' and then takes the geometric mean. \code{"eigen"} computes the dominant eigenvalue
-#' of each iteration kernel and then takes the geometric mean. For large population
+#' of each iteration kernel. For large population
 #' vectors, \code{"pop_size"} will likely be substantially faster. Note that
 #' option \code{"pop_size"} is only possible if an initial population vector was
 #' supplied when constructing the IPM.
-#'  @export
+#' @export
+
 print.simple_di_stoch_kern_ipm <- function(x,
                                            compute_lambda = TRUE,
                                            lambda_type = c("stochastic",

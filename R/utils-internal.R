@@ -141,3 +141,9 @@
   }
 
 }
+
+#' @noRd
+
+is_square <- function(x) {
+  dim(x)[1] == dim(x)[2]
+}

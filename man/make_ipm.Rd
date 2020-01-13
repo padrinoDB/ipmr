@@ -7,6 +7,7 @@
 \alias{make_ipm.simple_di_stoch_param}
 \alias{make_ipm.general_di_det}
 \alias{make_ipm.general_di_stoch_kern}
+\alias{make_ipm.general_di_stoch_param}
 \title{Methods to implement an IPM}
 \usage{
 make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
@@ -61,6 +62,16 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   iterate = TRUE,
   iterations = 50,
   kernel_seq = NULL
+)
+
+\method{make_ipm}{general_di_stoch_param}(
+  proto_ipm,
+  return_all = FALSE,
+  usr_funs = list(),
+  ...,
+  domain_list = NULL,
+  iterate = TRUE,
+  iterations = 50
 )
 }
 \arguments{

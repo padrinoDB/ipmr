@@ -354,3 +354,41 @@ test_that('plot.simple_di_stoch_param returns correctly', {
                   'simple_di_stoch_param_ipm')
 
 })
+
+
+test_that("`%^%` is working correctly", {
+
+  # Test from expm::`%^%` helper file
+  test_mat <- cbind(1, 2 * diag(3)[,-1])
+
+  target   <- matrix(c(1, 0, 0,
+                       3, 4, 0,
+                       3, 0, 4),
+                     nrow = 3, byrow = TRUE)
+
+  test_exp <- test_mat %^% 2L
+
+  expect_equal(target, test_exp)
+
+  test_mat_2 <- runif(25) %>%
+    matrix(nrow = 5, ncol = 5)
+
+  target_2   <- test_mat_2 %*% test_mat_2 %*% test_mat_2 %*% test_mat_2
+
+  test_exp_2 <- test_mat_2 %^% 4L
+
+  expect_equal(test_exp_2, target_2)
+
+  wrns <- catch_cnd({test_mat_2 %^% 3})$message
+  expect_true(grepl("coercing second argument to an integer", wrns))
+
+  err_mat <- rnorm(6) %>%
+    matrix(ncol = 3, nrow = 2)
+
+  errs <- catch_cnd(err_mat %^% 2L)
+  expect_true(grepl("not implemented for non-square matrices", errs))
+
+  expect_equal(mat_power(target, 3L), target %^% 3L)
+
+})
+

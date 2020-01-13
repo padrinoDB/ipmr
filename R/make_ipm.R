@@ -270,6 +270,7 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 #' @rdname make_ipm
 #'
 #' @export
+
 make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                            return_all  = FALSE,
                                            usr_funs    = list(),
@@ -583,6 +584,10 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
 
 }
 
+
+#' @rdname make_ipm
+#'
+#' @export
 
 make_ipm.general_di_stoch_param <- function(proto_ipm,
                                             return_all = FALSE,

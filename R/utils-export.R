@@ -223,3 +223,55 @@ s_g_mult <- function(s, g) {
   return(t(s * t(g)))
 
 }
+
+#' @title Raise a matrix to a power
+#' @rdname matrix-power
+#'
+#' @description Raises a matrix \code{x} to the \code{y}-th power. \code{x ^ y} computes
+#' element wise powers, whereas this computes \emph{y - 1} matrix multiplications.
+#' \code{mat_power(x, y)} is identical to \code{x \%^\% y}.
+#'
+#' @param x A numeric or integer matrix.
+#' @param y An integer.
+#'
+#' @return A matrix.
+#'
+#' @export
+#'
+
+`%^%` <- function(x, y) {
+
+  if(!is_square(x)) {
+    stop('not implemented for non-square matrices')
+  }
+
+  if(!is.integer(y)) {
+
+    warning("`%^%` is coercing second argument to an integer",
+            call. = FALSE)
+
+    y <- as.integer(y)
+
+  }
+
+  init_dim <- dim(x)[1]
+
+  use_list <- lapply(seq_len(y), function(a, b) b, b = x)
+
+  init_i   <- diag(init_dim)
+
+  out <- Reduce('%*%', use_list, init = init_i)
+
+  return(out)
+
+}
+
+#' @rdname matrix-power
+#'
+#' @export
+
+mat_power <- function(x, y) {
+
+  return(x %^% y)
+
+}
