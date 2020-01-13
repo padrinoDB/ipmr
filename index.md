@@ -116,7 +116,7 @@ The following possibilities are currently or will become available in
 
 3.  `"simple_dd_stoch_param"`
 
--   General, density independent models: **Currently in progress**
+-   General, density independent models: **Completed and ready**
 
 1.  `"general_di_det"`
 
@@ -138,12 +138,17 @@ Examples for implemented IPM types
 Simple density-independent deterministic, simple kernel-resampled
 stochastic, and simple parameter resampled stochastic models
 (`simple_di_det`, `simple_di_stoch_kern`, `simple_di_stoch_param`) are
-now functional. However, expect changes as more complicated methods are
-implemented! See below for an example of how to implement an IPM in this
-framework.
+now functional. The `general_*` versions of these are also ready, and an
+introduction to them is available
+[here](https://levisc8.github.io/ipmr/articles/general-ipms.html).
+However, expect changes as more complicated methods are implemented! See
+below for an example of how to implement an IPM in this framework.
 
-Next on the implementation to-do list are the general versions of these
-(still density independent).
+Next on the to-do list is to write generic functions for `lambda`,
+`right_ev` (right eigenvector), `left_ev` (left eigenvector),
+`sensitivity`, `elasticity`, and `plot`/`print` methods for all exported
+classes (`proto_ipm`, implemented `ipm` objects). After that, density
+dependent model classes will get implemented.
 
 ``` r
 # Example of the setup for a simple IPM without density dependence or environmental

@@ -138,7 +138,7 @@
 <li><p><code>"simple_dd_stoch_param"</code></p></li>
 </ol>
 <ul>
-<li>General, density independent models: <strong>Currently in progress</strong>
+<li>General, density independent models: <strong>Completed and ready</strong>
 </li>
 </ul>
 <ol>
@@ -159,8 +159,8 @@
 <div id="examples-for-implemented-ipm-types" class="section level2">
 <h2 class="hasAnchor">
 <a href="#examples-for-implemented-ipm-types" class="anchor"></a>Examples for implemented IPM types</h2>
-<p>Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (<code>simple_di_det</code>, <code>simple_di_stoch_kern</code>, <code>simple_di_stoch_param</code>) are now functional. However, expect changes as more complicated methods are implemented! See below for an example of how to implement an IPM in this framework.</p>
-<p>Next on the implementation to-do list are the general versions of these (still density independent).</p>
+<p>Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (<code>simple_di_det</code>, <code>simple_di_stoch_kern</code>, <code>simple_di_stoch_param</code>) are now functional. The <code>general_*</code> versions of these are also ready, and an introduction to them is available <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">here</a>. However, expect changes as more complicated methods are implemented! See below for an example of how to implement an IPM in this framework.</p>
+<p>Next on the to-do list is to write generic functions for <code>lambda</code>, <code>right_ev</code> (right eigenvector), <code>left_ev</code> (left eigenvector), <code>sensitivity</code>, <code>elasticity</code>, and <code>plot</code>/<code>print</code> methods for all exported classes (<code>proto_ipm</code>, implemented <code>ipm</code> objects). After that, density dependent model classes will get implemented.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># Example of the setup for a simple IPM without density dependence or environmental</span></a>
 <a class="sourceLine" id="cb1-2" title="2"><span class="co"># stochasticity</span></a>
 <a class="sourceLine" id="cb1-3" title="3"></a>
