@@ -3,9 +3,9 @@ inst/doc
 .Rhistory
 .RData
 .Ruserdata
-paper/*.html
 experimental_funs
 .html
 compadre*
 tests/testthat/Rplots.*
 tests/sim_tests/*.PNG
+paper/ipmr_paper_outline.html
