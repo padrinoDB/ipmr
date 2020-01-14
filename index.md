@@ -346,7 +346,6 @@ the framework.
 # This is intended to simulate a monocarpic perennial life history where flowering is always fatal.
 # Note that this means the survival function also includes the probability of reproduction function.
 
-library(rlang)
 library(ipmr)
 library(purrr)
 
@@ -418,14 +417,15 @@ names(g_r_int)   <- paste('g_', nms, sep = "")
 names(s_r_int)   <- paste('s_', nms, sep = "")
 names(f_s_r_int) <- paste('f_s_', nms, sep = "")
 
-# The !!! operator used inside of list2 from rlang takes the named vector
-# and converts it to a named list. This can be spliced into the data list
-# to rapidly make a parameter set suitable for usage in the data_list argument
-# of define_kernel
+# Each set of parameters is converted to a named list. The names should match
+# the variables referenced in each define_kernel()/define_k() call.
 
-g_params   <- list2(!!! g_r_int)
-s_params   <- list2(!!! s_r_int)
-f_s_params <- list2(!!! f_s_r_int)
+g_params   <- as.list(g_r_int)
+s_params   <- as.list(s_r_int)
+f_s_params <- as.list(f_s_r_int)
+
+# purrr::splice combines each separate list into one without creating any 
+# additional depth to it. This keeps things a bit tidier.
 
 params     <- splice(data_list, g_params, s_params, f_s_params)
 
