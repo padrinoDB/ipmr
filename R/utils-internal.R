@@ -78,7 +78,7 @@
   return(
     vapply(x$iterators,
            function(y) Re(eigen(y)$values[1]),
-           numeric(1))
+           numeric(1L))
   )
 
 }
@@ -98,7 +98,7 @@
 
 #' @noRd
 
-.stoch_lambda_pop_size <- function(x, all_lambdas = FALSE) {
+.lambda_pop_size <- function(x, all_lambdas = TRUE) {
 
   pops  <- x$pop_state
   n_its <- dim(pops[[1]])[2]
@@ -132,22 +132,21 @@
 
 }
 
-.stoch_lambda_eigen <- function(x, all_lambdas = FALSE) {
+.lambda_eigen <- function(x) {
 
   eigs <- .det_lambda(x)
 
-  if(!all_lambdas) {
-    return(.geom_mean(eigs))
-  } else {
-    return(eigs)
-  }
+  return(eigs)
+
 
 }
 
 #' @noRd
 
 is_square <- function(x) {
+
   dim(x)[1] == dim(x)[2]
+
 }
 
 
@@ -160,8 +159,11 @@ is_conv_to_asymptotic <- function(x, tol = 1e-7) {
 
   if(is.matrix(x)) {
 
+    # Standardize columns first
+    x <- apply(x, 2, FUN = function(y) y / sum(y))
+
     n_col     <- end_ind <- dim(x)[2]
-    start_ind <- n_col - 5
+    start_ind <- n_col - 1
 
     start_val <- x[ , start_ind]
     end_val   <- x[ , end_ind]
@@ -169,13 +171,12 @@ is_conv_to_asymptotic <- function(x, tol = 1e-7) {
   } else if(is.vector(x)) {
 
     len       <- end_ind <- length(x)
-    start_ind <- len - 5
+    start_ind <- len - 1
 
     start_val <- x[start_ind]
     end_val   <- x[end_ind]
 
   }
-
 
   return(
     isTRUE(

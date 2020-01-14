@@ -15,7 +15,6 @@
 
   k_form        <- .parse_vr_formulae(formula,
                                       k_env)
-  names(k_form) <- k_rows$kernel_id
 
   rlang::env_bind_lazy(k_env,
                        !!! k_form,

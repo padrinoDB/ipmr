@@ -138,10 +138,12 @@ make_ipm.simple_di_det <- function(proto_ipm,
 
     kern_seq  <- rep(1, iterations)
 
+    init_pop_state <- .init_pop_state_list(others, iterations)
+
     pop_state <- .iterate_kerns_simple(iterators,
                                        iterations,
                                        kern_seq,
-                                       pop_state)
+                                       init_pop_state)
   }
 
   if(return_all) {

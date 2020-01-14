@@ -280,6 +280,10 @@
 
       for(i in seq_along(pop_state)) {
 
+        if(rlang::is_quosure(pop_state[[i]])) {
+          pop_state[[i]] <- rlang::eval_tidy(pop_state[[i]])
+        }
+
         dim_pop_out <- ifelse(is.matrix(pop_state[[i]]),
                               dim(pop_state[[i]]),
                               length(pop_state[[i]]))
@@ -301,27 +305,6 @@
 
       names(out)           <- gsub("_t", "", names(pop_state))
 
-    } else {
-
-      # single continuous state
-      dim_pop_out <- ifelse(is.matrix(pop_state),
-                            dim(pop_state),
-                            length(pop_state))
-
-      # Need to work out exactly how to know the indexing procedure here -
-      # higher dimensional kernels will have time as the 3rd, 4th, or 5th
-      # dimension (so trippy!) and normal bracket notation won't necessarily
-      # work without some awful if{...}else{} sequence. Right now, this will
-      # only work for single continuous state vars
-
-      pop_out            <- array(0, dim = c(dim_pop_out, iterations + 1))
-
-
-
-      pop_out[ , 1]      <- eval(others$pop_state[[1]])
-
-      out[[1]]           <- pop_out
-      names(out)         <- gsub('_t', '', names(pop_state))
     }
   }
 
@@ -956,7 +939,11 @@
 
     if(!is.null(kern_seq)) {
 
-      k_selector <- which(grepl(kern_seq[i], names(iterators)))
+      if(length(iterators) == 1) {
+        k_selector <- 1
+      } else {
+        k_selector <- which(grepl(kern_seq[i], names(iterators)))
+      }
 
       n_t_1      <- right_mult(iterators[[k_selector]], n_t)
 
