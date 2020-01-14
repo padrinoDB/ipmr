@@ -5,27 +5,66 @@
 \alias{print.simple_di_det_ipm}
 \alias{print.simple_di_stoch_kern_ipm}
 \alias{print.simple_di_stoch_param_ipm}
+\alias{print.general_di_det_ipm}
+\alias{print.general_di_stoch_kern_ipm}
+\alias{print.general_di_stoch_param_ipm}
 \title{Print proto_ipms or *_ipm objects}
 \usage{
 \method{print}{proto_ipm}(x, ...)
 
-\method{print}{simple_di_det_ipm}(x, compute_lambda = TRUE, sig_digits = 3, ...)
+\method{print}{simple_di_det_ipm}(
+  x,
+  comp_lambda = TRUE,
+  comp_method = "eigen",
+  all_lambdas = FALSE,
+  sig_digits = 3,
+  check_conv = TRUE,
+  ...
+)
 
 \method{print}{simple_di_stoch_kern_ipm}(
   x,
-  compute_lambda = TRUE,
-  lambda_type = c("stochastic", "deterministic"),
-  compute_type = c("pop_size", "eigen"),
+  comp_lambda = TRUE,
+  comp_method = c("pop_size", "eigen"),
+  all_lambdas = FALSE,
   sig_digits = 3,
   ...
 )
 
 \method{print}{simple_di_stoch_param_ipm}(
   x,
-  compute_lambda = TRUE,
-  lambda_type = c("stochastic", "deterministic"),
-  compute_type = c("pop_size", "eigen"),
+  comp_lambda = TRUE,
+  comp_method = c("pop_size", "eigen"),
+  all_lambdas = FALSE,
   sig_digits = 3,
+  ...
+)
+
+\method{print}{general_di_det_ipm}(
+  x,
+  comp_lambda = TRUE,
+  comp_method = "pop_size",
+  sig_digits = 3,
+  all_lambdas = TRUE,
+  check_conv = TRUE,
+  ...
+)
+
+\method{print}{general_di_stoch_kern_ipm}(
+  x,
+  comp_lambda = TRUE,
+  comp_method = "pop_size",
+  sig_digits = 3,
+  all_lambdas = TRUE,
+  ...
+)
+
+\method{print}{general_di_stoch_param_ipm}(
+  x,
+  comp_lambda = TRUE,
+  comp_method = "pop_size",
+  sig_digits = 3,
+  all_lambdas = TRUE,
   ...
 )
 }
@@ -34,24 +73,28 @@
 
 \item{...}{Ignored}
 
-\item{compute_lambda}{A logical indicating whether or not to calculate lambdas
-for the iteration kernels and display them}
+\item{comp_lambda}{A logical indicating whether or not to calculate lambdas
+for the iteration kernels and display them.}
 
-\item{sig_digits}{The number of significant digits to round to if \code{
-compute_lambda = TRUE}.}
-
-\item{lambda_type}{If \code{compute_lambda} is \code{TRUE}, then either
-\code{"stochastic"} or \code{"deterministic"}. \code{"deterministic"} will return
-the dominant eigenvalue of the iteration kernel from each iteration. \code{
-"stochastic"} depends on \code{compute_type}.}
-
-\item{compute_type}{Either \code{"pop_size"} or \code{"eigen"}. \code{"pop_size"}
+\item{comp_method}{Either \code{"pop_size"} or \code{"eigen"}. \code{"pop_size"}
 computes lambda as the ratio of population sizes between successive time steps
 and then takes the geometric mean. \code{"eigen"} computes the dominant eigenvalue
-of each iteration kernel. For large population
-vectors, \code{"pop_size"} will likely be substantially faster. Note that
-option \code{"pop_size"} is only possible if an initial population vector was
-supplied when constructing the IPM.}
+of each iteration kernel. See \code{\link{lambda}} for more details.}
+
+\item{all_lambdas}{A logical: print lambdas for each individual kernel/time step,
+or just the final one? Only applies to \code{comp_method = "pop_size"}. When
+\code{TRUE}, returns the ratio of population sizes for every iteration of the
+model. When \code{FALSE}, only returns the ratio of population sizes for the
+final iteration. \code{comp_method = 'eigen'} always returns the lambda values
+for every single kernel in the \code{x$iterators} slot.}
+
+\item{sig_digits}{The number of significant digits to round to if \code{
+comp_lambda = TRUE}.}
+
+\item{check_conv}{A logical: for \code{general_*} models, check if population state
+has converged to asymptotic dynamics? If \code{TRUE} and the model has not
+converged, a message will be printed. Only applies to \code{*_det}  when
+\code{comp_method = 'pop_size'}}
 }
 \value{
 \code{x} invisibly.

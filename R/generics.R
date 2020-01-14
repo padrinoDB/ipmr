@@ -36,26 +36,51 @@ print.proto_ipm <- function(x, ...) {
 #' @noRd
 
 .pretty_class <- function(cls_switch) {
-  out <- switch(cls_switch,
-                'simple_di_det'          = "simple, density independent, deterministic",
-                'simple_di_stoch_kern'   = "simple, density independent, stochastic, kernel-resampled",
-                'simple_di_stoch_param'  = "simple, density independent, stochastic, parmaeter-resampled",
+  out <-
+    switch(
+      cls_switch,
 
-                'simple_dd_det'          = "simple, density dependent, deterministic",
-                'simple_dd_stoch_kern'   = "simple, density dependent, stochastic, kernel-resampled",
-                'simple_dd_stoch_param'  = "simple, density dependent, stochastic, parmaeter-resampled",
+      # IPM classes -----------------------------
 
-                'general_di_det'         = "general, density independent, deterministic",
-                'general_di_stoch_kern'  = "general, density independent, stochastic, kernel-resampled",
-                'general_di_stoch_param' = "general, density independent, stochastic, parmaeter-resampled",
+      'simple_di_det_ipm'          = "simple, density independent, deterministic",
+      'simple_di_stoch_kern_ipm'   = "simple, density independent, stochastic, kernel-resampled",
+      'simple_di_stoch_param_ipm'  = "simple, density independent, stochastic, parameter-resampled",
 
-                'general_dd_det'         = "general, density dependent, deterministic",
-                'general_dd_stoch_kern'  = "general, density dependent, stochastic, kernel-resampled",
-                'general_dd_stoch_param' = "general, density dependent, stochastic, parmaeter-resampled"
+      'simple_dd_det_ipm'          = "simple, density dependent, deterministic",
+      'simple_dd_stoch_kern_ipm'   = "simple, density dependent, stochastic, kernel-resampled",
+      'simple_dd_stoch_param_ipm'  = "simple, density dependent, stochastic, parameter-resampled",
 
-                # Perhaps add in the age x state_var as well, but work out what that
-                # even looks like first
-  )
+      'general_di_det_ipm'         = "general, density independent, deterministic",
+      'general_di_stoch_kern_ipm'  = "general, density independent, stochastic, kernel-resampled",
+      'general_di_stoch_param_ipm' = "general, density independent, stochastic, parameter-resampled",
+
+      'general_dd_det_ipm'         = "general, density dependent, deterministic",
+      'general_dd_stoch_kern_ipm'  = "general, density dependent, stochastic, kernel-resampled",
+      'general_dd_stoch_param_ipm' = "general, density dependent, stochastic, parameter-resampled",
+
+      # proto_ipm classes -----------------------
+
+      'simple_di_det'          = "simple, density independent, deterministic",
+      'simple_di_stoch_kern'   = "simple, density independent, stochastic, kernel-resampled",
+      'simple_di_stoch_param'  = "simple, density independent, stochastic, parameter-resampled",
+
+      'simple_dd_det'          = "simple, density dependent, deterministic",
+      'simple_dd_stoch_kern'   = "simple, density dependent, stochastic, kernel-resampled",
+      'simple_dd_stoch_param'  = "simple, density dependent, stochastic, parameter-resampled",
+
+      'general_di_det'         = "general, density independent, deterministic",
+      'general_di_stoch_kern'  = "general, density independent, stochastic, kernel-resampled",
+      'general_di_stoch_param' = "general, density independent, stochastic, parameter-resampled",
+
+      'general_dd_det'         = "general, density dependent, deterministic",
+      'general_dd_stoch_kern'  = "general, density dependent, stochastic, kernel-resampled",
+      'general_dd_stoch_param' = "general, density dependent, stochastic, parameter-resampled"
+
+      # Perhaps add in the age x state_var as well, but work out what that
+      # even looks like first
+
+
+    )
 
   return(out)
 }
@@ -64,38 +89,78 @@ print.proto_ipm <- function(x, ...) {
 #' @title Generics for IPM classes
 #'
 #' @param x An object produced by \code{make_ipm}.
-#' @param compute_lambda A logical indicating whether or not to calculate lambdas
-#' for the iteration kernels and display them
+#' @param comp_lambda A logical indicating whether or not to calculate lambdas
+#' for the iteration kernels and display them.
+#' @param comp_method Either \code{"pop_size"} or \code{"eigen"}. \code{"pop_size"}
+#' computes lambda as the ratio of population sizes between successive time steps
+#' and then takes the geometric mean. \code{"eigen"} computes the dominant eigenvalue
+#' of each iteration kernel. See \code{\link{lambda}} for more details.
 #' @param sig_digits The number of significant digits to round to if \code{
-#' compute_lambda = TRUE}.
+#' comp_lambda = TRUE}.
+#' @param all_lambdas A logical: print lambdas for each individual kernel/time step,
+#' or just the final one? Only applies to \code{comp_method = "pop_size"}. When
+#' \code{TRUE}, returns the ratio of population sizes for every iteration of the
+#' model. When \code{FALSE}, only returns the ratio of population sizes for the
+#' final iteration. \code{comp_method = 'eigen'} always returns the lambda values
+#' for every single kernel in the \code{x$iterators} slot.
+#' @param check_conv A logical: for \code{general_*} models, check if population state
+#' has converged to asymptotic dynamics? If \code{TRUE} and the model has not
+#' converged, a message will be printed. Only applies to \code{*_det}  when
+#' \code{comp_method = 'pop_size'}
 #' @param ... Ignored
 #'
 #' @return \code{x} invisibly.
 #'
 #' @export
 
-print.simple_di_det_ipm <- function(x, compute_lambda = TRUE,
+print.simple_di_det_ipm <- function(x,
+                                    comp_lambda = TRUE,
+                                    comp_method = 'eigen',
+                                    all_lambdas = FALSE,
                                     sig_digits = 3,
+                                    check_conv = TRUE,
                                     ...) {
-  msg <- paste0('A simple, density independent, deterministic IPM with ',
+
+  pretty_cls <- .pretty_class(class(x)[1])
+
+  msg <- paste0('A ',
+                pretty_cls,
+                ' IPM with ',
                 length(x$iterators),
                 ' iteration kernel(s) and ',
                 length(x$sub_kernels),
                 ' sub-kernel(s) defined.', sep = "")
 
-  if(compute_lambda) {
+  if(comp_lambda) {
 
     nm_ks  <- names(x$iterators)
 
-    lambda <- .det_lambda(x)
+    lambda <- lambda(x, comp_method = comp_method, all_lambdas = all_lambdas)
 
     l_msg  <- paste0('\nDeterministic lambda for ', nm_ks,' = ', lambda, sep = "" )
 
     msg    <- c(msg, l_msg)
 
+    if(comp_method == 'pop_size' &&
+       check_conv &&
+       !is_conv_to_asymptotic(lambda)) {
+
+      # Captures the name of the model that the user gave rather than
+      # just print "x isn't converged"
+
+      mod_nm <- deparse(substitute(x))
+
+      message(
+        paste(mod_nm,
+              ' has has not converged to asymptotic dynamics!',
+              sep = "")
+      )
+
+    }
+
   }
 
-  cat(msg)
+  print(msg)
 
   invisible(x)
 
@@ -103,41 +168,29 @@ print.simple_di_det_ipm <- function(x, compute_lambda = TRUE,
 }
 
 #' @rdname print_star
-#' @param lambda_type If \code{compute_lambda} is \code{TRUE}, then either
-#' \code{"stochastic"} or \code{"deterministic"}. \code{"deterministic"} will return
-#' the dominant eigenvalue of the iteration kernel from each iteration. \code{
-#' "stochastic"} depends on \code{compute_type}.
-#' @param compute_type Either \code{"pop_size"} or \code{"eigen"}. \code{"pop_size"}
-#' computes lambda as the ratio of population sizes between successive time steps
-#' and then takes the geometric mean. \code{"eigen"} computes the dominant eigenvalue
-#' of each iteration kernel. For large population
-#' vectors, \code{"pop_size"} will likely be substantially faster. Note that
-#' option \code{"pop_size"} is only possible if an initial population vector was
-#' supplied when constructing the IPM.
 #' @export
 
 print.simple_di_stoch_kern_ipm <- function(x,
-                                           compute_lambda = TRUE,
-                                           lambda_type = c("stochastic",
-                                                           "deterministic"),
-                                           compute_type = c('pop_size',
-                                                            'eigen'),
-                                           sig_digits = 3, ...) {
+                                           comp_lambda = TRUE,
+                                           comp_method = c('pop_size',
+                                                           'eigen'),
+                                           all_lambdas = FALSE,
+                                           sig_digits = 3,
+                                           ...) {
 
-  msg <- paste0('A simple, density independent, deterministic IPM with ',
+  pretty_cls <- .pretty_class(class(x)[1])
+
+  msg <- paste0('A ',
+                pretty_cls,
+                ' IPM with ',
                 length(x$iterators),
                 ' iteration kernel(s) and ',
                 length(x$sub_kernels),
                 ' sub-kernel(s) defined.', sep = "")
 
-  if(compute_lambda){
+  if(comp_lambda) {
     nm_ks  <- names(x$iterators)
-    lambda <- switch(lambda_type,
-                     'stochastic'    = switch(compute_type,
-                                              'pop_size' = .stoch_lambda_pop_size(x),
-                                              'eigen'    = .stoch_lambda_eigen(x)),
-                     'deterministic' = .det_lambda(x))
-
+    lambda <- lambda(x, comp_method = comp_method, all_lambdas = all_lambdas)
 
     l_msg  <- paste0('\nDeterministic lambda for ',
                      nm_ks,
@@ -154,44 +207,264 @@ print.simple_di_stoch_kern_ipm <- function(x,
 
 #' @rdname print_star
 #' @export
+
 print.simple_di_stoch_param_ipm <- function(x,
-                                            compute_lambda = TRUE,
-                                            lambda_type = c("stochastic",
-                                                            "deterministic"),
-                                            compute_type = c('pop_size',
-                                                             'eigen'),
-                                            sig_digits = 3,
+                                            comp_lambda = TRUE,
+                                            comp_method = c('pop_size',
+                                                            'eigen'),
+                                            all_lambdas = FALSE,
+                                            sig_digits  = 3,
                                             ...) {
-  cat('not yet implemented')
+  pretty_cls <- .pretty_class(class(x)[1])
+
+  msg <- paste0('A ',
+                pretty_cls,
+                ' IPM with ',
+                length(x$iterators),
+                ' iteration kernel(s) and ',
+                length(x$sub_kernels),
+                ' sub-kernel(s) defined.', sep = "")
+
+  if(comp_lambda) {
+    nm_ks  <- names(x$iterators)
+    lambda <- lambda(x, comp_method = comp_method, all_lambdas = all_lambdas)
+
+    l_msg  <- paste0('\nDeterministic lambda for ',
+                     nm_ks,
+                     ' = ',
+                     round(lambda, sig_digits),
+                     sep = "" )
+
+    msg <- c(msg, l_msg)
+  }
+  cat(msg)
+
+  invisible(x)
+
+}
+
+#' @rdname print_star
+#' @export
+
+print.general_di_det_ipm <- function(x,
+                                     comp_lambda = TRUE,
+                                     comp_method = 'pop_size',
+                                     sig_digits  = 3,
+                                     all_lambdas = TRUE,
+                                     check_conv  = TRUE,
+                                     ...) {
+
+  pretty_cls <- .pretty_class(class(x)[1])
+
+  msg <- paste0('A ',
+                pretty_cls,
+                ' IPM with ',
+                length(x$sub_kernels),
+                ' sub-kernel(s) and ',
+                length(x$pop_state),
+                ' population vectors defined.', sep = "")
+
+  if(comp_lambda) {
+
+    all_lams <- lambda(x, comp_method = 'pop_size', all_lambdas = TRUE)
+
+    if(!all_lambdas) {
+
+      ret_lam  <- all_lams[length(all_lams)]
+
+      l_msg <- paste('\nLambda for the final time step of the model is: ',
+                     round(ret_lam, sig_digits),
+                     sep = "")
+
+    } else {
+
+      ret_lam <- all_lams
+
+      l_msg <- paste('\nLambda for time step ',
+                     seq_len(length(ret_lam)),
+                     ' is: ',
+                     round(ret_lam, sig_digits),
+                     sep = "")
+
+    }
+
+    if(check_conv && !is_conv_to_asymptotic(all_lams)) {
+
+      # Captures the name of the model that the user gave rather than
+      # just print "x isn't converged"
+
+      mod_nm <- deparse(substitute(x))
+
+
+      message(
+        paste(mod_nm,
+              ' has has not converged to asymptotic dynamics!',
+              sep = "")
+      )
+    }
+
+    msg <- c(msg, l_msg)
+
+  }
+
+  cat(msg)
+
+  invisible(x)
+
+}
+
+#' @rdname print_star
+#' @export
+
+print.general_di_stoch_kern_ipm <- function(x,
+                                            comp_lambda = TRUE,
+                                            comp_method = 'pop_size',
+                                            sig_digits  = 3,
+                                            all_lambdas = TRUE,
+                                            ...) {
+
+  pretty_cls <- .pretty_class(class(x)[1])
+
+  msg <- paste0('A ',
+                pretty_cls,
+                ' IPM with ',
+                length(x$sub_kernels),
+                ' sub-kernel(s) and ',
+                length(x$pop_state),
+                ' population vectors defined.',
+                sep = "")
+
+  if(comp_lambda) {
+
+    all_lams <- lambda(x, comp_method = 'pop_size', all_lambdas = TRUE)
+
+    if(!all_lambdas) {
+
+      ret_lam  <- all_lams[length(all_lams)]
+
+      l_msg <- paste('\nLambda for the final time step of the model is: ',
+                     round(ret_lam, sig_digits),
+                     sep = "")
+
+    } else {
+
+      ret_lam <- all_lams
+
+      l_msg <- paste('\nLambda for time step ',
+                     seq_len(length(ret_lam)),
+                     ' is: ',
+                     round(ret_lam, sig_digits),
+                     sep = "")
+
+    }
+
+    msg <- c(msg, l_msg)
+
+  }
+
+  # No check for convergence here - there may quite reasonably be no
+  # convergence for
+
+  cat(msg)
   invisible(x)
 }
 
+
+
+#' @rdname print_star
+#' @export
+
+print.general_di_stoch_param_ipm <- function(x,
+                                             comp_lambda = TRUE,
+                                             comp_method = 'pop_size',
+                                             sig_digits  = 3,
+                                             all_lambdas = TRUE,
+                                             ...) {
+
+  pretty_cls <- .pretty_class(class(x)[1])
+
+  msg <- paste0(
+    'A ',
+    pretty_cls,
+    ' IPM with ',
+    length(x$sub_kernels),
+    ' sub-kernel(s), ',
+    length(x$pop_state),
+    ' population vectors, and ',
+    dim(x$env_seq)[2],
+    ' environmental parameters defined.',
+    sep = ""
+  )
+
+  env_nms <- vapply(dimnames(x$env_seq)[[2]],
+                    FUN = function(x) strsplit(x, '\\.')[[1]][2],
+                    FUN.VALUE = character(1L))
+  msg <- c(msg,
+           paste(
+             '\nEnvironmental variables are: ',
+             paste(
+               paste(env_nms, collapse = ', ')
+             )
+           ))
+
+  if(comp_lambda) {
+
+    all_lams <- lambda(x, comp_method = 'pop_size', all_lambdas = TRUE)
+
+    if(!all_lambdas) {
+
+      ret_lam  <- all_lams[length(all_lams)]
+
+      l_msg <- paste('\nLambda for the final time step of the model is: ',
+                     round(ret_lam, sig_digits),
+                     sep = "")
+
+    } else {
+
+      ret_lam <- all_lams
+
+      l_msg <- paste('\nLambda for time step ',
+                     seq_len(length(ret_lam)),
+                     ' is: ',
+                     round(ret_lam, sig_digits),
+                     sep = "")
+
+    }
+
+    msg <- c(msg, l_msg)
+
+  }
+
+  # No check for convergence here - there may quite reasonably be no
+  # convergence for
+
+  cat(msg)
+  invisible(x)
+}
 
 # Lambda------------
 #' @title Compute the per-capita growth rate for an IPM object
 #' @rdname lambda
 #'
 #' @param ipm An object returned by \code{make_ipm()}.
+#' @param comp_method Either \code{"eigen"} or \code{"pop_size"}. \code{"eigen"}
+#' is only possible for \code{"simple_*"} methods.
+#' @param all_lambdas A logical: return lambdas for each individual kernel, or
+#' a single number? Only applies to \code{comp_method = "pop_size"}. When
+#' \code{TRUE}, returns the ratio of population sizes for every iteration of the
+#' model. When \code{FALSE}, only returns the ratio of population sizes for the
+#' final iteration.
 #' @param ... other arguments passed to methods.
 #'
 #' @return A single numeric vector or single value.
 #'
 #'
-#' @details Determinstic lambda is computed as the dominant eigenvalue of the
-#' iteration kernel(s) where possible. For \code{simple_*_stoch_kern_ipm} models,
-#' a vector containing the dominant eigenvalue of each entry in
-#' \code{ipm$iterators}. For \code{simple_*_det_ipm} models, a single value.
-#'
-#'  NOTE ^^^^ Needs clarification for simple_dd_det models - that can either be
-#'  pop_size or eigen. implement the make_ipm methods before returning!
-#'
-#' Because \code{ipmr} doesn't construct the iteration
-#' kernel for \code{general_*} IPMs the way that they are typically implemented in
-#' interactive sessions (e.g. by r/cbind()ing discrete and continuous stages together),
-#' lambda must be computed by dividing successive population sizes
-#' by their prior sizes. Thus, only
-#' \code{type = 'stochastic'} and \code{comp_method = "pop_size"} are available
-#' for these models.
+#' @details There are two possible methods for computing \code{lambda} and these
+#' are controlled by the \code{comp_method} argument. Possible values are
+#' \code{"eigen"} and \code{"pop_size"}. The first computes the dominant
+#' eigenvalue of all entries in \code{ipm$iterators} slot of the \code{*_ipm}
+#' object. Since iteration kernels aren't generated for \code{general_*} methods,
+#' \code{"pop_size"} is the only possible option for those objects.
 #'
 #' @export
 
@@ -200,59 +473,53 @@ lambda <- function(ipm, ...) {
 }
 
 #' @rdname lambda
-#' @param type Either \code{"stochastic"} or \code{"deterministic"}.
-#' \code{"stochastic"} also has two types - \code{"eigen"} and \code{"pop_size"}.
-#' See details for more information.
 #'
 #' @export
 
-lambda.simple_di_det_ipm <- function(ipm, type = "deterministic", ...) {
+lambda.simple_di_det_ipm <- function(ipm,
+                                     comp_method = c("eigen", "pop_size"),
+                                     all_lambdas = TRUE,
+                                     ...) {
 
-  .det_lambda(ipm)
+  switch(comp_method,
+         'eigen'    = .lambda_eigen(ipm),
+         'pop_size' = .lambda_pop_size(ipm, all_lambdas = all_lambdas))
 
 }
 
 #' @rdname lambda
-#' @param comp_method Either \code{"eigen"} or \code{"pop_size"}. \code{"eigen"}
-#' is not possible except for \code{"simple_*_stoch_kern"} and \code{"simple_*_det"}.
-#' @param all_lambdas A logical to return lamdas for each individual kernel, or a single
-#' number. For \code{comp_method = 'pop_size'} and \code{all_lambdas = FALSE},
-#' this will return the final value of computed lambdas (e.g. presumably when
-#' convergence has been reached). For \code{comp_method = 'eigen'} and
-#' \code{all_lambdas = FALSE}, it will return the geometric mean of the
-#' dominant eigenvalues for each projection matrix. For \code{all_lambdas = TRUE},
-#' it will always return a numeric vector of lambdas computed either from the ratio
-#' of population sizes or dominant eigenvalues of each kernel.
-#'
 #'
 #' @export
 
 lambda.simple_di_stoch_kern_ipm <- function(ipm,
-                                            type = "stochastic",
                                             comp_method = c("eigen", "pop_size"),
                                             all_lambdas = TRUE,
                                             ...) {
 
   switch(comp_method,
-         'eigen'    = .stoch_lambda_eigen(ipm, all_lambdas = all_lambdas),
-         'pop_size' = .stoch_lambda_pop_size(ipm, all_lambdas = all_lambdas))
+         'eigen'    = .lambda_eigen(ipm),
+         'pop_size' = .lambda_pop_size(ipm, all_lambdas = all_lambdas))
 }
 
 #' @rdname lambda
 #'
 #' @export
 
-lambda.simple_di_stoch_param_ipm <- function(ipm, ..., all_lambdas = TRUE) {
+lambda.simple_di_stoch_param_ipm <- function(ipm,
+                                             comp_method = c("eigen", "pop_size"),
+                                             all_lambdas = TRUE,
+                                             ...) {
 
-  .stoch_lambda_pop_size(ipm, all_lambdas = all_lambdas)
-
+  switch(comp_method,
+         'eigen'    = .lambda_eigen(ipm),
+         'pop_size' = .lambda_pop_size(ipm, all_lambdas = all_lambdas))
 }
 
 #' @rdname lambda
 #' @export
 #'
-lambda.general_di_det_ipm <- function(ipm, type, ..., all_lambdas = FALSE) {
-  .stoch_lambda_pop_size(ipm, all_lambdas = all_lambdas)
+lambda.general_di_det_ipm <- function(ipm, all_lambdas = TRUE, ...) {
+  .lambda_pop_size(ipm, all_lambdas = all_lambdas)
 }
 
 
@@ -262,7 +529,7 @@ lambda.general_di_det_ipm <- function(ipm, type, ..., all_lambdas = FALSE) {
 #'
 lambda.general_di_stoch_kern_ipm <- function(ipm, ..., all_lambdas = TRUE) {
 
-  .stoch_lambda_pop_size(ipm, all_lambdas = all_lambdas)
+  .lambda_pop_size(ipm, all_lambdas = all_lambdas)
 
 }
 
@@ -270,9 +537,9 @@ lambda.general_di_stoch_kern_ipm <- function(ipm, ..., all_lambdas = TRUE) {
 #'
 #' @export
 #'
-lambda.general_di_stoch_param_ipm <- function(ipm, ...) {
+lambda.general_di_stoch_param_ipm <- function(ipm, ..., all_lambdas = TRUE) {
 
-  .stoch_lambda_pop_size(ipm)
+  .lambda_pop_size(ipm, all_lambdas = all_lambdas)
 
 }
 

@@ -12,44 +12,31 @@
 \usage{
 lambda(ipm, ...)
 
-\method{lambda}{simple_di_det_ipm}(ipm, type = "deterministic", ...)
+\method{lambda}{simple_di_det_ipm}(ipm, comp_method = c("eigen", "pop_size"), all_lambdas = TRUE, ...)
 
-\method{lambda}{simple_di_stoch_kern_ipm}(
-  ipm,
-  type = "stochastic",
-  comp_method = c("eigen", "pop_size"),
-  all_lambdas = TRUE,
-  ...
-)
+\method{lambda}{simple_di_stoch_kern_ipm}(ipm, comp_method = c("eigen", "pop_size"), all_lambdas = TRUE, ...)
 
-\method{lambda}{simple_di_stoch_param_ipm}(ipm, ..., all_lambdas = TRUE)
+\method{lambda}{simple_di_stoch_param_ipm}(ipm, comp_method = c("eigen", "pop_size"), all_lambdas = TRUE, ...)
 
-\method{lambda}{general_di_det_ipm}(ipm, type, ..., all_lambdas = FALSE)
+\method{lambda}{general_di_det_ipm}(ipm, all_lambdas = TRUE, ...)
 
 \method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., all_lambdas = TRUE)
 
-\method{lambda}{general_di_stoch_param_ipm}(ipm, ...)
+\method{lambda}{general_di_stoch_param_ipm}(ipm, ..., all_lambdas = TRUE)
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
 
 \item{...}{other arguments passed to methods.}
 
-\item{type}{Either \code{"stochastic"} or \code{"deterministic"}.
-\code{"stochastic"} also has two types - \code{"eigen"} and \code{"pop_size"}.
-See details for more information.}
-
 \item{comp_method}{Either \code{"eigen"} or \code{"pop_size"}. \code{"eigen"}
-is not possible except for \code{"simple_*_stoch_kern"} and \code{"simple_*_det"}.}
+is only possible for \code{"simple_*"} methods.}
 
-\item{all_lambdas}{A logical to return lamdas for each individual kernel, or a single
-number. For \code{comp_method = 'pop_size'} and \code{all_lambdas = FALSE},
-this will return the final value of computed lambdas (e.g. presumably when
-convergence has been reached). For \code{comp_method = 'eigen'} and
-\code{all_lambdas = FALSE}, it will return the geometric mean of the
-dominant eigenvalues for each projection matrix. For \code{all_lambdas = TRUE},
-it will always return a numeric vector of lambdas computed either from the ratio
-of population sizes or dominant eigenvalues of each kernel.}
+\item{all_lambdas}{A logical: return lambdas for each individual kernel, or
+a single number? Only applies to \code{comp_method = "pop_size"}. When
+\code{TRUE}, returns the ratio of population sizes for every iteration of the
+model. When \code{FALSE}, only returns the ratio of population sizes for the
+final iteration.}
 }
 \value{
 A single numeric vector or single value.
@@ -58,19 +45,10 @@ A single numeric vector or single value.
 Compute the per-capita growth rate for an IPM object
 }
 \details{
-Determinstic lambda is computed as the dominant eigenvalue of the
-iteration kernel(s) where possible. For \code{simple_*_stoch_kern_ipm} models,
-a vector containing the dominant eigenvalue of each entry in
-\code{ipm$iterators}. For \code{simple_*_det_ipm} models, a single value.
-
- NOTE ^^^^ Needs clarification for simple_dd_det models - that can either be
- pop_size or eigen. implement the make_ipm methods before returning!
-
-Because \code{ipmr} doesn't construct the iteration
-kernel for \code{general_*} IPMs the way that they are typically implemented in
-interactive sessions (e.g. by r/cbind()ing discrete and continuous stages together),
-lambda must be computed by dividing successive population sizes
-by their prior sizes. Thus, only
-\code{type = 'stochastic'} and \code{comp_method = "pop_size"} are available
-for these models.
+There are two possible methods for computing \code{lambda} and these
+are controlled by the \code{comp_method} argument. Possible values are
+\code{"eigen"} and \code{"pop_size"}. The first computes the dominant
+eigenvalue of all entries in \code{ipm$iterators} slot of the \code{*_ipm}
+object. Since iteration kernels aren't generated for \code{general_*} methods,
+\code{"pop_size"} is the only possible option for those objects.
 }
