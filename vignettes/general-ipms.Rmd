@@ -206,6 +206,14 @@ all.equal(range(last_10)[1], range(last_10)[2])
 
 ```
 
+## General hierarchical models
 
 
-##
+
+## General models with continuously varying environments
+
+
+
+## Code to construct your own mega-matrices
+
+

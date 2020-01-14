@@ -212,8 +212,8 @@ for(i in seq_len(n_runs)) {
 pop_size_co <- list(pop_state = pop_state[3:4])
 pop_size_cr <- list(pop_state = pop_state[1:2])
 
-lam_s_cr <- ipmr:::.stoch_lambda_pop_size(pop_size_cr)
-lam_s_co <- ipmr:::.stoch_lambda_pop_size(pop_size_co)
+lam_s_cr <- ipmr:::.lambda_pop_size(pop_size_cr)
+lam_s_co <- ipmr:::.lambda_pop_size(pop_size_co)
 
 ## ipmr version --------
 states <- list(c('ht', 'sb'))

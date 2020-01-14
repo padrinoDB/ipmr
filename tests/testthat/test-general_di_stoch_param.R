@@ -350,7 +350,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
 
 
 # Store for comparison!
-ipmr_lambdas <- ipmr:::.stoch_lambda_pop_size(gen_di_stoch_param,
+ipmr_lambdas <- ipmr:::.lambda_pop_size(gen_di_stoch_param,
                                               all_lambdas = TRUE)
 
 # Now, get the sequence of environmental parameters. These will get inserted into
@@ -635,7 +635,7 @@ for(i in seq(1, 100, 1)) {
 
 pop_list <- list(pop_state = pop_list)
 
-usr_lambdas <- ipmr:::.stoch_lambda_pop_size(pop_list, all_lambdas = TRUE)
+usr_lambdas <- ipmr:::.lambda_pop_size(pop_list, all_lambdas = TRUE)
 
 ipmr_sub_kernels <- gen_di_stoch_param$sub_kernels
 

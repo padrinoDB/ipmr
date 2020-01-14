@@ -554,7 +554,8 @@ for(i in seq_along(models)) {
 }
 
 actual_lambdas <- vapply(pop_holders,
-                         function(x) ipmr:::.stoch_lambda_pop_size(x),
+                         function(x) ipmr:::.lambda_pop_size(x,
+                                                             all_lambdas = FALSE),
                          numeric(1L))
 
 # And now, for the ipmr version.
@@ -753,7 +754,8 @@ ipmr_pop_sizes <- list(
 )
 
 ipmr_lambdas <- vapply(ipmr_pop_sizes,
-                       function(x) ipmr:::.stoch_lambda_pop_size(x),
+                       function(x) ipmr:::.lambda_pop_size(x,
+                                                           all_lambdas = FALSE),
                        numeric(1L))
 
 test_that('ipmr version matches simulation', {

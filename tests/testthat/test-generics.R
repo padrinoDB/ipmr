@@ -34,7 +34,7 @@ impl_args <- make_impl_args_list(c('P', 'F', 'K'),
 
 states <- c('dbh', 'dbh')
 
-sim_di_det <- init_ipm('simple_di_det') %>%
+sim_di_det_1 <- init_ipm('simple_di_det') %>%
   define_kernel("P",
                 formula = s_g_mult(s, g),
                 family = "CC",
@@ -60,28 +60,127 @@ sim_di_det <- init_ipm('simple_di_det') %>%
                                                     'f_d')
   ) %>%
   define_k('K',
-           K = P + F,
-           family = 'IPM',
+           K         = P + F,
+           family    = 'IPM',
            data_list = list(),
-           states = states,
-           evict = FALSE) %>%
+           states    = states,
+           evict     = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit))
 
+
+sim_di_det_2 <- init_ipm('simple_di_det') %>%
+  define_kernel("P",
+                formula = s_g_mult(s, g),
+                family = "CC",
+                s = inv_logit(s_int, s_slope, dbh_1),
+                g = dnorm(dbh_2, mu_g, sd_g),
+                mu_g = g_int + g_slope * dbh_1,
+                data_list = data_list,
+                states = states,
+                evict = TRUE,
+                evict_fun = truncated_distributions('norm',
+                                                    'g')
+  ) %>%
+  define_kernel('F',
+                formula = f_r * f_s * f_d,
+                family = 'CC',
+                f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
+                f_s = exp(f_s_int + f_s_slope * dbh_1),
+                f_d = dnorm(dbh_2, mu_fd, sd_fd),
+                data_list = data_list,
+                states = states,
+                evict = TRUE,
+                evict_fun = truncated_distributions('norm',
+                                                    'f_d')
+  ) %>%
+  define_k('K',
+           K         = P + F,
+           n_dbh_t_1 = K %*% n_dbh_t,
+           family    = 'IPM',
+           data_list = list(),
+           states    = states,
+           evict     = FALSE) %>%
+  define_impl(impl_args) %>%
+  define_domains(dbh = c(0, 50, 100)) %>%
+  define_pop_state(n_dbh_t = runif(100)) %>%
+  make_ipm(usr_funs = list(inv_logit = inv_logit),
+           iterate = TRUE,
+           iterations = 100)
+
+
+sim_di_det_3 <- init_ipm('simple_di_det') %>%
+  define_kernel("P",
+                formula = s_g_mult(s, g),
+                family = "CC",
+                s = inv_logit(s_int, s_slope, dbh_1),
+                g = dnorm(dbh_2, mu_g, sd_g),
+                mu_g = g_int + g_slope * dbh_1,
+                data_list = data_list,
+                states = states,
+                evict = TRUE,
+                evict_fun = truncated_distributions('norm',
+                                                    'g')
+  ) %>%
+  define_kernel('F',
+                formula = f_r * f_s * f_d,
+                family = 'CC',
+                f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
+                f_s = exp(f_s_int + f_s_slope * dbh_1),
+                f_d = dnorm(dbh_2, mu_fd, sd_fd),
+                data_list = data_list,
+                states = states,
+                evict = TRUE,
+                evict_fun = truncated_distributions('norm',
+                                                    'f_d')
+  ) %>%
+  define_k('K',
+           K         = P + F,
+           n_dbh_t_1 = K %*% n_dbh_t,
+           family    = 'IPM',
+           data_list = list(),
+           states    = states,
+           evict     = FALSE) %>%
+  define_impl(impl_args) %>%
+  define_domains(dbh = c(0, 50, 100)) %>%
+  define_pop_state(n_dbh_t = runif(100)) %>%
+  make_ipm(usr_funs = list(inv_logit = inv_logit),
+           iterate = TRUE,
+           iterations = 5)
+
 test_that('print.simple_di_det returns correctly', {
 
-  print_str <- print(sim_di_det)
+  p <- capture_output(print_str <- print(sim_di_det_1))
+
+  print_msg <- capture_output_lines(print(sim_di_det_2,
+                                          comp_method = 'pop_size',
+                                          all_lambdas = TRUE))
 
   expect_s3_class(print_str,
                   'simple_di_det_ipm')
 
+  expect_true(
+    any(
+      grepl('A simple, density independent, deterministic IPM',
+            print_msg)
+    )
+  )
 
+  wrn_msg    <- catch_cnd(print(sim_di_det_3,
+                                comp_method = 'pop_size'))$message
+
+  expect_true(
+    grepl(
+      'sim_di_det_3 has has not converged to asymptotic dynamics!',
+      wrn_msg
+    )
+  )
 })
 
 test_that('plot.simple_di_det returns correctly', {
 
-  plot_str <- plot(sim_di_det,
+  plot_str <- plot(sim_di_det_1,
                    # sub_kernels = TRUE,
                    exponent = 0.025,
                    do_contour = TRUE)
@@ -210,13 +309,22 @@ sim_di_stoch_kern <- init_ipm('simple_di_stoch_kern') %>%
 
 test_that('print.simple_di_stoch_kern returns correctly', {
 
-  print_str <- print(sim_di_stoch_kern,
-                     lambda_type = 'deterministic',
-                     compute_type = 'eigen')
+  p <- capture_output(print_str <- print(sim_di_stoch_kern,
+                                         comp_method = 'eigen'))
 
   expect_s3_class(print_str,
                   'simple_di_stoch_kern_ipm')
 
+  print_msg <- capture_output_lines(
+    print(sim_di_stoch_kern, comp_method = 'eigen')
+  )
+
+  expect_true(
+    any(
+      grepl('A simple, density independent, stochastic, kernel-resampled IPM',
+            print_msg)
+    )
+  )
 
 })
 
@@ -336,10 +444,23 @@ sim_di_stoch_param <- init_ipm('simple_di_stoch_param') %>%
 
 test_that('print.simple_di_stoch_param returns correctly', {
 
-  print_str <- print(sim_di_stoch_param)
+  p <- capture_output(print_str <- print(sim_di_stoch_param,
+                                         comp_method = 'eigen'))
 
   expect_s3_class(print_str,
                   'simple_di_stoch_param_ipm')
+
+  print_msg <- capture_output_lines(
+    print(sim_di_stoch_param,
+          comp_method = 'eigen')
+  )
+
+  expect_true(
+    any(
+      grepl('A simple, density independent, stochastic, parameter-resampled IPM',
+            print_msg)
+    )
+  )
 
 
 })
@@ -348,10 +469,986 @@ test_that('plot.simple_di_stoch_param returns correctly', {
 
   plot_str <- plot(sim_di_stoch_param,
                    sub_kernels = TRUE,
-                   exponent = 0.05)
+                   exponent = 0.05,
+                   do_legend = TRUE)
 
   expect_s3_class(plot_str,
                   'simple_di_stoch_param_ipm')
+
+})
+
+context('general_di_det print methods')
+
+init_pop_vec   <- runif(500)
+init_seed_bank <- 20
+
+data_list <- list(
+  g_int     = 5.781,
+  g_slope   = 0.988,
+  g_sd      = 20.55699,
+  s_int     = -0.352,
+  s_slope   = 0.122,
+  s_slope_2 = -0.000213,
+  f_r_int   = -11.46,
+  f_r_slope = 0.0835,
+  f_s_int   = 2.6204,
+  f_s_slope = 0.01256,
+  f_d_mu    = 5.6655,
+  f_d_sd    = 2.0734,
+  e_p       = 0.15,
+  g_i       = 0.5067
+)
+
+# The lower and upper bounds for the continuous state variable and the number
+# of meshpoints for the midpoint rule integration.
+
+L <- 1.02
+U <- 624
+n <- 500
+
+# Initialize the state list and add some helper functions. The survival function
+# in this model is a quadratic function.
+
+states <- list(c('ht', 'sb'))
+
+inv_logit <- function(int, slope, sv) {
+  1/(1 + exp(-(int + slope * sv)))
+}
+
+inv_logit_2 <- function(int, slope, slope_2, sv) {
+  1/(1 + exp(-(int + slope * sv + slope_2 * sv ^ 2)))
+}
+
+gen_di_det_1 <- init_ipm("general_di_det") %>%
+  define_kernel(
+    name          = "P",
+    formula       = s_g_mult(s, g) * d_ht,
+    family        = "CC",
+    g             = dnorm(ht_2, g_mu, g_sd),
+    g_mu          = g_int + g_slope * ht_1,
+    s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE,
+    evict         = TRUE,
+    evict_fun     = truncated_distributions('norm',
+                                            'g')
+  ) %>%
+  define_kernel(
+    name          = "go_discrete",
+    formula       = f_r * f_s * g_i,
+    family        = 'CD',
+    f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
+    f_s           = exp(f_s_int + f_s_slope * ht_1),
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE
+  ) %>%
+  define_kernel(
+    name    = 'stay_discrete',
+    formula = 0,
+    family  = "DD",
+    states  = states,
+    evict = FALSE
+  ) %>%
+  define_kernel(
+    name          = 'leave_discrete',
+    formula       = e_p * f_d * d_ht,
+    f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
+    family        = 'DC',
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE,
+    evict         = TRUE,
+    evict_fun     = truncated_distributions('norm',
+                                            'f_d')
+  ) %>%
+  define_k(
+    name          = "K",
+    family        = "IPM",
+    n_b_t_1       = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
+    n_ht_t_1      = leave_discrete %*% n_b_t + P %*% n_ht_t,
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
+      int_rule     = c(rep("midpoint", 5)),
+      dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
+      dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+    )
+  ) %>%
+  define_domains(
+    ht = c(L, U, n)
+  ) %>%
+  define_pop_state(
+    pop_vectors = list(
+      n_ht = init_pop_vec,
+      n_b  = init_seed_bank
+    )
+  ) %>%
+  make_ipm(iterations = 100,
+           usr_funs = list(inv_logit   = inv_logit,
+                           inv_logit_2 = inv_logit_2))
+
+# Test unconverged warnings
+
+gen_di_det_2 <- init_ipm("general_di_det") %>%
+  define_kernel(
+    name          = "P",
+    formula       = s_g_mult(s, g) * d_ht,
+    family        = "CC",
+    g             = dnorm(ht_2, g_mu, g_sd),
+    g_mu          = g_int + g_slope * ht_1,
+    s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE,
+    evict         = TRUE,
+    evict_fun     = truncated_distributions('norm',
+                                            'g')
+  ) %>%
+  define_kernel(
+    name          = "go_discrete",
+    formula       = f_r * f_s * g_i,
+    family        = 'CD',
+    f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
+    f_s           = exp(f_s_int + f_s_slope * ht_1),
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE
+  ) %>%
+  define_kernel(
+    name    = 'stay_discrete',
+    formula = 0,
+    family  = "DD",
+    states  = states,
+    evict = FALSE
+  ) %>%
+  define_kernel(
+    name          = 'leave_discrete',
+    formula       = e_p * f_d * d_ht,
+    f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
+    family        = 'DC',
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE,
+    evict         = TRUE,
+    evict_fun     = truncated_distributions('norm',
+                                            'f_d')
+  ) %>%
+  define_k(
+    name          = "K",
+    family        = "IPM",
+    n_b_t_1       = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
+    n_ht_t_1      = leave_discrete %*% n_b_t + P %*% n_ht_t,
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
+      int_rule     = c(rep("midpoint", 5)),
+      dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
+      dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+    )
+  ) %>%
+  define_domains(
+    ht = c(L, U, n)
+  ) %>%
+  define_pop_state(
+    pop_vectors = list(
+      n_ht = init_pop_vec,
+      n_b  = init_seed_bank
+    )
+  ) %>%
+  make_ipm(iterations = 10,
+           usr_funs = list(inv_logit   = inv_logit,
+                           inv_logit_2 = inv_logit_2))
+
+test_that('print.general_di_det returns correctly', {
+
+  p <- capture_output(print_str <- print(gen_di_det_1))
+
+  print_msg <- capture_output_lines(print(gen_di_det_1,
+                                          comp_method = 'pop_size',
+                                          all_lambdas = TRUE))
+
+  expect_s3_class(print_str,
+                  'general_di_det_ipm')
+
+  expect_true(
+    any(
+      grepl('A general, density independent, deterministic IPM',
+            print_msg)
+    )
+  )
+
+  wrn_msg    <- catch_cnd(print(gen_di_det_2,
+                                comp_method = 'pop_size'))$message
+
+  expect_true(
+    grepl(
+      'gen_di_det_2 has has not converged to asymptotic dynamics!',
+      wrn_msg
+    )
+  )
+})
+
+
+context('general_di_stoch_kern print methods')
+
+flatten_to_depth <- ipmr:::.flatten_to_depth
+
+hier_effs <- list(
+  site = c(
+    'whitetop',
+    'mt_rogers',
+    'roan',
+    'big_bald',
+    'bob_bald',
+    'oak_knob'
+  )
+)
+
+inv_logit <- function(int, slope, sv) {
+
+  1/(1 + exp(-(int + slope * sv)))
+
+}
+
+pois      <- function(int, slope, sv) {
+
+  exp(int + slope * sv)
+
+}
+
+lin_prob <- function(int, slope, sigma, sv1, sv2, L, U) {
+
+  mus <- int + slope * sv1
+
+  ev <- pnorm(U, mus, sigma) - pnorm(L, mus, sigma)
+
+  dnorm(sv2, mus, sigma) / ev
+
+}
+
+# pass to usr_funs in make_ipm
+vr_funs <- list(
+  pois      = pois,
+  inv_logit = inv_logit
+)
+
+# non-reproductive transitions + vrs
+nr_data_list <- list(
+  nr_s_z_int = c(-1.1032, -1.0789, -1.3436,
+                 -1.3188, -0.9635, -1.3243), # survival
+  nr_s_z_b   = c(1.6641, 0.7961, 1.5443,
+                 1.4561, 1.2375, 1.2168),    # survival
+  nr_d_z_int = rep(-1.009, 6),               # dormancy prob
+  nr_d_z_b   = rep(-1.3180, 6),              # dormancy prob
+  nr_f_z_int = c(-7.3702, -4.3854, -9.0733,
+                 -6.7287, -9.0416, -7.4223), # flowering prob
+  nr_f_z_b   = c(4.0272, 2.2895, 4.7366,
+                 3.1670, 4.7410, 4.0834),    # flowering prob
+  nr_nr_int  = c(0.4160, 0.7812, 0.5697,
+                 0.5426, 0.3744, 0.6548),    # growth w/ stasis in NR stage
+  nr_nr_b    = c(0.6254, 0.3742, 0.5325,
+                 0.6442, 0.6596, 0.4809),    # growth w/ stasis in NR stage
+  nr_nr_sd   = rep(0.3707, 6),               # growth w/ stasis in NR stage
+  nr_ra_int  = c(0.8695, 0.7554, 0.9789,
+                 1.1824, 0.8918, 1.0027),    # growth w/ move to RA stage
+  nr_ra_b    = rep(0.5929, 6),               # growth w/ move to RA stage
+  nr_ra_sd   = rep(0.4656, 6)                # growth w/ move to RA stage
+
+)
+
+# reproductive output parameters. not sure if this applies only to reproductive ones,
+# or if they include it for non-reproductive ones that transition to flowering
+# as well!
+
+fec_data_list <- list(
+  f_s_int   = c(4.1798, 3.6093, 4.0945,
+                3.8689, 3.4776, 2.4253), # flower/seed number intercept
+  f_s_slope = c(0.9103, 0.5606, 1.0898,
+                0.9101, 1.2352, 1.6022), # flower/seed number slope
+  tau_int   = c(3.2428, 0.4263, 2.6831,
+                1.5475, 1.3831, 2.5715), # Survival through summer for flowering plants
+  tau_b     = rep(0, 6)
+)
+
+# reproductive vital rates
+
+ra_data_list <- list(
+  ra_s_z_int = c(-0.6624, -0.9061, -0.0038,
+                 -1.3844, -0.1084, -0.6477), # survival
+  ra_s_z_b   = rep(0, 6),                    # survival
+  ra_d_z_int = rep(-1.6094, 6),              # dormancy prob
+  ra_d_z_b   = rep(0, 6),                    # dormancy prob
+  ra_n_z_int = rep(0.9463, 6),               # transition to non-reproductive status
+  ra_n_z_b   = rep(0, 6),                    # transition to non-reproductive status
+  ra_n_z_sd  = rep(0.4017, 6)                # transition to non-reproductive status
+)
+
+# dormany - nra + recruitment parameters (e.g. discrete -> continuous parameters)
+
+dc_data_list <- list(
+  dc_nr_int = rep(0.9687, 6),            # dormant -> NR transition prob
+  dc_nr_sd  = rep(0.4846, 6),            # dormant -> NR transition sd
+  sdl_z_int = c(0.4992, 0.5678, 0.6379,
+                0.6066, 0.5147, 0.5872), # recruit size mu
+  sdl_z_b   = rep(0, 6),
+  sdl_z_sd  = rep(0.1631, 6),            # recruit size sd
+  sdl_es_r  = c(0.1233, 0.1217, 0.0817,
+                0.1800, 0.1517, 0.0533)  # establishment probabilities
+)
+
+# Extracted domains from figure 4F in main text - these are approximations
+# but should be pretty damn close to the actual limits of integration.
+
+domains <- list(sqrt_area = c(0.63 * 0.9, 3.87 * 1.1, 50),
+                ln_leaf_l = c(0.26 * 0.9, 2.70 * 1.1, 50))
+
+
+# helper to get data_list's into a format that ipmr can actually use
+
+rename_data_list <- function(data_list, nms) {
+
+  for(j in seq_along(data_list)) {
+
+    # Isolate entries in big list
+    temp <- data_list[[j]]
+
+    for(i in seq_along(temp)) {
+
+      # loop over parameter entries - there should be 6 for every one
+      # e.g. 1 for every population
+
+      nm_i <- names(temp)[i]
+
+      # make new names
+
+      x <- temp[[i]]
+      names(x) <- paste(nm_i, '_', nms, sep = "")
+
+      temp[[i]] <- as.list(x)
+    }
+
+    # replace unnamed with freshly named!
+
+    data_list[[j]] <- temp
+
+  }
+
+  # finito
+
+  return(data_list)
+
+}
+
+all_params <- list(nr_data_list,
+                   fec_data_list,
+                   ra_data_list,
+                   dc_data_list)
+
+full_data_list <- rename_data_list(data_list = all_params,
+                                   nms       = unlist(hier_effs)) %>%
+  flatten_to_depth(1)
+
+init_pop_vec <- list(
+  ln_leaf_l = runif(50),
+  sqrt_area = runif(50)
+)
+
+gen_di_stoch_kern_1 <- init_ipm('general_di_stoch_kern') %>%
+  define_kernel(
+    name             = 'k_xx_site',
+    family           = "CC",
+    formula          = sig_n_site          *
+      (1 - mu_n_site)   *
+      (1 - beta_n_site) *
+      gamma_nn_site     *
+      d_ln_leaf_l,
+
+    sig_n_site        = inv_logit(nr_s_z_int_site, nr_s_z_b_site, ln_leaf_l_1),
+    gamma_nn_site     = dnorm(ln_leaf_l_2, nr_nr_mu_site, nr_nr_sd_site),
+    nr_nr_mu_site     = nr_nr_int_site + nr_nr_b_site * ln_leaf_l_1,
+    mu_n_site         = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
+    beta_n_site       = inv_logit(nr_f_z_int_site, nr_f_z_b_site, ln_leaf_l_1),
+
+    data_list        = full_data_list,
+    states           = list(c('ln_leaf_l')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = hier_effs,
+    evict            =  TRUE,
+    evict_fun        = truncated_distributions('norm',
+                                               'gamma_nn_site')
+  ) %>%
+  define_kernel(
+    name             = 'k_zx_site',
+    family           = 'CC',
+
+    formula          = (
+      phi_site        *
+        nu_site         *
+        gamma_sr_site   +
+        sig_r_site      *
+        (1 - mu_r_site) *
+        gamma_nr_site
+    )                *
+      d_sqrt_area,
+
+    phi_site      = pois(f_s_int_site, f_s_slope_site, sqrt_area_1),
+    nu_site       = sdl_es_r_site,
+    gamma_sr_site = dnorm(ln_leaf_l_2, sdl_z_int_site, sdl_z_sd_site),
+    sig_r_site    = inv_logit(ra_s_z_int_site, ra_s_z_b_site, sqrt_area_1),
+    mu_r_site     = inv_logit(ra_d_z_int_site, ra_d_z_b_site, sqrt_area_1),
+    gamma_nr_site = dnorm(ln_leaf_l_2, mu_ra_nr_site, ra_n_z_sd_site),
+    mu_ra_nr_site = ra_n_z_int_site + ra_n_z_b_site * sqrt_area_1,
+
+    data_list    = full_data_list,
+    states       = list(c('sqrt_area', 'ln_leaf_l')),
+    has_hier_effs = TRUE,
+    levels_hier_effs = hier_effs,
+    evict = TRUE,
+    evict_fun = truncated_distributions(c('norm', 'norm'),
+                                        c('gamma_nr_site',
+                                          'gamma_sr_site'))
+  ) %>%
+  define_kernel(
+    name = 'k_dx_site',
+    family = 'DC',
+
+    formula = gamma_nd_site * d_ln_leaf_l,
+
+    gamma_nd_site = dnorm(ln_leaf_l_2, dc_nr_int_site, dc_nr_sd_site),
+
+    data_list = full_data_list,
+    states = list(c('ln_leaf_l')),
+    has_hier_effs = TRUE,
+    levels_hier_effs = hier_effs,
+    evict = TRUE,
+    evict_fun = truncated_distributions('norm',
+                                        'gamma_nd_site')
+  ) %>%
+  define_kernel(
+    name             = 'k_xz_site',
+    family           = 'CC',
+    formula          = sig_n_site         *
+      (1 - mu_n_site)    *
+      beta_n_site       *
+      gamma_rn_site     *
+      tau               *
+      d_ln_leaf_l,
+
+    sig_n_site        = inv_logit(nr_s_z_int_site, nr_s_z_b_site, ln_leaf_l_1),
+    mu_n_site         = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
+    beta_n_site       = inv_logit(nr_f_z_int_site, nr_f_z_b_site, ln_leaf_l_1),
+    gamma_rn_site     = dnorm(sqrt_area_2, mu_nr_ra_site, nr_ra_sd_site),
+    mu_nr_ra_site     = nr_ra_int_site + nr_ra_b_site * ln_leaf_l_1,
+    tau               = inv_logit(tau_int_site, tau_b_site, ln_leaf_l_1),
+
+    data_list        = full_data_list,
+    states           = list(c('sqrt_area', 'ln_leaf_l')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = hier_effs,
+    evict            = TRUE,
+    evict_fun        = truncated_distributions('norm',
+                                               'gamma_rn_site')
+
+  ) %>%
+  define_kernel(
+    name             = 'k_xd_site',
+    family           = 'CD',
+    formula          = sig_n_site * mu_n_site * d_ln_leaf_l,
+    sig_n_site       = inv_logit(nr_s_z_int_site, nr_s_z_b_site, ln_leaf_l_1),
+    mu_n_site        = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
+    data_list        = full_data_list,
+    states           = list(c('ln_leaf_l')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = hier_effs,
+    evict            = FALSE
+  ) %>%
+  define_kernel(
+    name             = 'k_zd_site',
+    family           = 'CD',
+    formula          = sig_r_site * mu_r_site * d_sqrt_area,
+    sig_r_site        = inv_logit(ra_s_z_int_site, ra_s_z_b_site, sqrt_area_1),
+    mu_r_site         = inv_logit(ra_d_z_int_site, ra_d_z_b_site, sqrt_area_1),
+    data_list        = full_data_list,
+    states           = list(c('sqrt_area')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = hier_effs,
+    evict            = FALSE
+  ) %>%
+  define_k(
+    name = 'K_site',
+    n_ln_leaf_l_site_t_1 = k_xx_site %*% n_ln_leaf_l_site_t +
+      k_zx_site %*% n_sqrt_area_site_t +
+      k_dx_site %*% n_d_site_t,
+    n_sqrt_area_site_t_1 = k_xz_site %*% n_ln_leaf_l_site_t,
+    n_d_site_t_1 =         k_xd_site %*% n_ln_leaf_l_site_t +
+      k_zd_site %*% n_sqrt_area_site_t,
+    family = 'IPM',
+    data_list = full_data_list,
+    states    = list(c('sqrt_area', 'ln_leaf_l')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = hier_effs
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c(paste('k_',
+                             c('xx',
+                               'zx', 'dx', 'xz', 'xd', 'zd'),
+                             '_site',
+                             sep = ""),
+                       'K_site'),
+      int_rule     = rep('midpoint', 7),
+      dom_start    = c('ln_leaf_l',
+                       'sqrt_area',
+                       NA_character_,
+                       'ln_leaf_l',
+                       'ln_leaf_l',
+                       'sqrt_area',
+                       NA_character_),
+      dom_end      = c('ln_leaf_l',
+                       'ln_leaf_l',
+                       'ln_leaf_l',
+                       'sqrt_area',
+                       NA_character_,
+                       NA_character_,
+                       NA_character_)
+    )
+  ) %>%
+  define_domains(
+    sqrt_area = c(0.63 * 0.9, 3.87 * 1.1, 50),
+    ln_leaf_l = c(0.26 * 0.9, 2.70 * 1.1, 50)
+  ) %>%
+  define_pop_state(
+    pop_vectors = list(
+      n_ln_leaf_l_site = init_pop_vec$ln_leaf_l,
+      n_sqrt_area_site = init_pop_vec$sqrt_area,
+      n_d_site         = 10
+    )
+  ) %>%
+  make_ipm(
+    return_all = TRUE,
+    usr_funs   = list(
+      inv_logit = inv_logit,
+      pois      = pois
+    ),
+    iterations = 100
+  )
+
+test_that('print.general_di_stoch_kern works', {
+
+  p <- capture_output(print_str <- print(gen_di_stoch_kern_1))
+
+  print_msg <- capture_output_lines(print(gen_di_stoch_kern_1,
+                                          comp_method = 'pop_size',
+                                          all_lambdas = TRUE))
+
+  expect_s3_class(print_str,
+                  'general_di_stoch_kern_ipm')
+
+  expect_true(
+    any(
+      grepl('A general, density independent, stochastic, kernel-resampled IPM',
+            print_msg)
+    )
+  )
+
+  expect_true(length(print_msg) == 101L)
+
+
+})
+
+context('general_di_stoch_param print method')
+
+to_mu_sd <- function(x) {
+  lapply(x,
+         function(y){
+           list(
+             mu    = mean(y),
+             sigma = sd(y)
+           )
+         })
+}
+
+flatten_to_depth <- ipmr:::.flatten_to_depth
+
+# Hacky estimates of parameter means and variances. Those without any variance
+# will be converted to fixed point estimates, those with variance will get
+# converted into a multivariate joint distribution with simulated values for the
+# variance-covariance matrix
+
+nr_data_list <- list(
+  nr_s_z_int = c(-1.1032, -1.0789, -1.3436,
+                 -1.3188, -0.9635, -1.3243), # survival
+  nr_s_z_b   = c(1.6641, 0.7961, 1.5443,
+                 1.4561, 1.2375, 1.2168),    # survival
+  nr_d_z_int = rep(-1.009, 6),               # dormancy prob
+  nr_d_z_b   = rep(-1.3180, 6),              # dormancy prob
+  nr_f_z_int = c(-7.3702, -4.3854, -9.0733,
+                 -6.7287, -9.0416, -7.4223), # flowering prob
+  nr_f_z_b   = c(4.0272, 2.2895, 4.7366,
+                 3.1670, 4.7410, 4.0834),    # flowering prob
+  nr_nr_int  = c(0.4160, 0.7812, 0.5697,
+                 0.5426, 0.3744, 0.6548),    # growth w/ stasis in NR stage
+  nr_nr_b    = c(0.6254, 0.3742, 0.5325,
+                 0.6442, 0.6596, 0.4809),    # growth w/ stasis in NR stage
+  nr_nr_sd   = rep(0.3707, 6),               # growth w/ stasis in NR stage
+  nr_ra_int  = c(0.8695, 0.7554, 0.9789,
+                 1.1824, 0.8918, 1.0027),    # growth w/ move to RA stage
+  nr_ra_b    = rep(0.5929, 6),               # growth w/ move to RA stage
+  nr_ra_sd   = rep(0.4656, 6)                # growth w/ move to RA stage
+
+) %>%
+  to_mu_sd()
+
+fec_data_list <- list(
+  f_s_int   = c(4.1798, 3.6093, 4.0945,
+                3.8689, 3.4776, 2.4253), # flower/seed number intercept
+  f_s_slope = c(0.9103, 0.5606, 1.0898,
+                0.9101, 1.2352, 1.6022), # flower/seed number slope
+  tau_int   = c(3.2428, 0.4263, 2.6831,
+                1.5475, 1.3831, 2.5715), # Survival through summer for flowering plants
+  tau_b     = rep(0, 6)
+) %>%
+  to_mu_sd()
+
+# reproductive vital rates
+
+ra_data_list <- list(
+  ra_s_z_int = c(-0.6624, -0.9061, -0.0038,
+                 -1.3844, -0.1084, -0.6477), # survival
+  ra_s_z_b   = rep(0, 6),                    # survival
+  ra_d_z_int = rep(-1.6094, 6),              # dormancy prob
+  ra_d_z_b   = rep(0, 6),                    # dormancy prob
+  ra_n_z_int = rep(0.9463, 6),               # transition to non-reproductive status
+  ra_n_z_b   = rep(0, 6),                    # transition to non-reproductive status
+  ra_n_z_sd  = rep(0.4017, 6)                # transition to non-reproductive status
+) %>%
+  to_mu_sd()
+
+# dormany - nra + recruitment parameters (e.g. discrete -> continuous parameters)
+
+dc_data_list <- list(
+  dc_nr_int = rep(0.9687, 6),            # dormant -> NR transition prob
+  dc_nr_sd  = rep(0.4846, 6),            # dormant -> NR transition sd
+  sdl_z_int = c(0.4992, 0.5678, 0.6379,
+                0.6066, 0.5147, 0.5872), # recruit size mu
+  sdl_z_b   = rep(0, 6),
+  sdl_z_sd  = rep(0.1631, 6),            # recruit size sd
+  sdl_es_r  = c(0.1233, 0.1217, 0.0817,
+                0.1800, 0.1517, 0.0533)  # establishment probabilities
+) %>%
+  to_mu_sd()
+
+
+# Compile full list, then split out fixed parameters into list form (passed to
+# define_kernel) and random parameters into vector form (passed to mvtnorm)
+
+all_params <- purrr::splice(nr_data_list,
+                            fec_data_list,
+                            ra_data_list,
+                            dc_data_list)
+
+ind_rand <- map_lgl(all_params,
+                    .f = function(.x) {
+                      .x$sigma != 0
+                    })
+
+ind_fixed <- ! ind_rand
+
+# Next, split fixed and random variables. Flatten fixed ones out since
+# we are only using their point estimates
+
+fixed_params <- all_params[ind_fixed]
+
+fixed_params <- lapply(fixed_params,
+                       function(x) x$mu)
+
+rando_means  <- vapply(all_params[ind_rand],
+                       function(x) x$mu,
+                       numeric(1L))
+
+rando_sigs  <- vapply(all_params[ind_rand],
+                      function(x) x$sigma,
+                      numeric(1L))
+
+# Check names really quickly
+stopifnot(names(rando_means) == names(rando_sigs))
+
+# Var-covar matrix - this makes it symmetrical. perhaps not the "correct" way to
+# generate it, but this is a unit test for something else entirely.
+
+rando_sigmas <- rando_sigs %*% t(rando_sigs)
+
+rando_names  <- names(rando_means)
+
+# Define a wrapper for mvtnorm that generates a list of parameter draws and
+# names them correctly. This gets passed to define_env_state
+
+mvt_wrapper <- function(r_means, r_sigmas, nms) {
+
+  out <- rmvnorm(1, r_means, r_sigmas) %>%
+    as.list()
+
+  names(out) <- nms
+
+  return(out)
+
+}
+
+inv_logit <- function(int, slope, sv) {
+
+  1 / (1 + exp(-(int + slope * sv)))
+}
+
+pois <- function(int, slope, sv) {
+
+  exp(int + slope * sv)
+
+}
+
+init_pop_vec <- list(
+  ln_leaf_l = runif(50),
+  sqrt_area = runif(50)
+)
+
+# Implement the ipmr version. We'll use the env_seq slot from the output
+# to iterate a hand coded version with identical parameter estimates to ensure
+# we're creating the same model. No seeds set, so this test changes slightly
+# every time
+
+gen_di_stoch_param_1 <- init_ipm('general_di_stoch_param') %>%
+  define_kernel(
+    name             = 'k_xx',
+    family           = "CC",
+    formula          = sig_n        *
+      (1 - mu_n)   *
+      (1 - beta_n) *
+      gamma_nn     *
+      d_ln_leaf_l,
+
+    sig_n        = inv_logit(env_params$nr_s_z_int, env_params$nr_s_z_b, ln_leaf_l_1),
+    gamma_nn     = dnorm(ln_leaf_l_2, nr_nr_mu, nr_nr_sd),
+    nr_nr_mu     = env_params$nr_nr_int + env_params$nr_nr_b * ln_leaf_l_1,
+    mu_n         = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
+    beta_n       = inv_logit(env_params$nr_f_z_int, env_params$nr_f_z_b, ln_leaf_l_1),
+
+    data_list        = fixed_params,
+    states           = list(c('ln_leaf_l')),
+    has_hier_effs    = FALSE,
+    evict            = TRUE,
+    evict_fun        = truncated_distributions('norm',
+                                               'gamma_nn')
+  ) %>%
+  define_kernel(
+    name             = 'k_zx',
+    family           = 'CC',
+
+    formula          = (
+      phi        *
+        nu         *
+        gamma_sr   +
+        sig_r      *
+        (1 - mu_r) *
+        gamma_nr
+    )            *
+      d_sqrt_area,
+
+    phi           = pois(env_params$f_s_int, env_params$f_s_slope, sqrt_area_1),
+    nu            = env_params$sdl_es_r,
+    gamma_sr      = dnorm(ln_leaf_l_2, env_params$sdl_z_int, sdl_z_sd),
+    sig_r         = inv_logit(env_params$ra_s_z_int, ra_s_z_b, sqrt_area_1),
+    mu_r          = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
+    gamma_nr      = dnorm(ln_leaf_l_2, mu_ra_nr, ra_n_z_sd),
+    mu_ra_nr      = ra_n_z_int + ra_n_z_b * sqrt_area_1,
+
+    data_list     = fixed_params,
+    states        = list(c('sqrt_area', 'ln_leaf_l')),
+    has_hier_effs = FALSE,
+    evict         = TRUE,
+    evict_fun     = truncated_distributions(c('norm', 'norm'),
+                                            c('gamma_nr',
+                                              'gamma_sr'))
+  ) %>%
+  define_kernel(
+    name      = 'k_dx',
+    family    = 'DC',
+
+    formula   = gamma_nd * d_ln_leaf_l,
+
+    gamma_nd  = dnorm(ln_leaf_l_2, dc_nr_int, dc_nr_sd),
+
+    data_list = fixed_params,
+    states    = list(c('ln_leaf_l')),
+
+    has_hier_effs = FALSE,
+    evict         = TRUE,
+    evict_fun     = truncated_distributions('norm',
+                                            'gamma_nd')
+  ) %>%
+  define_kernel(
+    name             = 'k_xz',
+    family           = 'CC',
+    formula          = sig_n         *
+      (1 - mu_n)    *
+      beta_n        *
+      gamma_rn      *
+      tau           *
+      d_ln_leaf_l,
+
+    sig_n            = inv_logit(env_params$nr_s_z_int, env_params$nr_s_z_b, ln_leaf_l_1),
+    mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
+    beta_n           = inv_logit(env_params$nr_f_z_int, env_params$nr_f_z_b, ln_leaf_l_1),
+    gamma_rn         = dnorm(sqrt_area_2, mu_nr_ra, nr_ra_sd),
+    mu_nr_ra         = env_params$nr_ra_int + nr_ra_b * ln_leaf_l_1,
+    tau              = inv_logit(env_params$tau_int, tau_b, ln_leaf_l_1),
+
+    data_list        = fixed_params,
+    states           = list(c('sqrt_area', 'ln_leaf_l')),
+    has_hier_effs    = FALSE,
+    evict            = TRUE,
+    evict_fun        = truncated_distributions('norm',
+                                               'gamma_rn')
+
+  ) %>%
+  define_kernel(
+    name             = 'k_xd',
+    family           = 'CD',
+    formula          = sig_n * mu_n * d_ln_leaf_l,
+    sig_n            = inv_logit(env_params$nr_s_z_int, env_params$nr_s_z_b, ln_leaf_l_1),
+    mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
+    data_list        = fixed_params,
+    states           = list(c('ln_leaf_l')),
+    has_hier_effs    = FALSE,
+    evict            = FALSE
+  ) %>%
+  define_kernel(
+    name             = 'k_zd',
+    family           = 'CD',
+    formula          = sig_r * mu_r * d_sqrt_area,
+    sig_r            = inv_logit(env_params$ra_s_z_int, ra_s_z_b, sqrt_area_1),
+    mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
+    data_list        = fixed_params,
+    states           = list(c('sqrt_area')),
+    has_hier_effs    = FALSE,
+    evict            = FALSE
+  ) %>%
+  define_k(
+    name = 'K',
+    n_ln_leaf_l_t_1 = k_xx %*% n_ln_leaf_l_t +
+      k_zx %*% n_sqrt_area_t +
+      k_dx %*% n_d_t,
+    n_sqrt_area_t_1 = k_xz %*% n_ln_leaf_l_t,
+    n_d_t_1         = k_xd %*% n_ln_leaf_l_t +
+      k_zd %*% n_sqrt_area_t,
+    family = 'IPM',
+    data_list = fixed_params,
+    states    = list(c('sqrt_area', 'ln_leaf_l'))
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c(paste('k_',
+                             c('xx',
+                               'zx', 'dx', 'xz', 'xd', 'zd'),
+                             sep = ""),
+                       'K'),
+      int_rule     = rep('midpoint', 7),
+      dom_start    = c('ln_leaf_l',
+                       'sqrt_area',
+                       NA_character_,
+                       'ln_leaf_l',
+                       'ln_leaf_l',
+                       'sqrt_area',
+                       NA_character_),
+      dom_end      = c('ln_leaf_l',
+                       'ln_leaf_l',
+                       'ln_leaf_l',
+                       'sqrt_area',
+                       NA_character_,
+                       NA_character_,
+                       NA_character_)
+    )
+  ) %>%
+  define_domains(
+    sqrt_area = c(0.63 * 0.9, 3.87 * 1.1, 50),
+    ln_leaf_l = c(0.26 * 0.9, 2.70 * 1.1, 50)
+  ) %>%
+  define_pop_state(
+    pop_vectors = list(
+      n_ln_leaf_l = init_pop_vec$ln_leaf_l,
+      n_sqrt_area = init_pop_vec$sqrt_area,
+      n_d         = 10
+    )
+  ) %>%
+  define_env_state(
+    env_params = mvt_wrapper(rando_means,
+                             rand_sigs,
+                             nms = rando_names),
+    data_list  = list(
+      rando_means = rando_means,
+      rand_sigs   = rando_sigmas,
+      rando_names = rando_names
+    )
+  ) %>%
+  make_ipm(
+    return_all = TRUE,
+    usr_funs   = list(
+      inv_logit   = inv_logit,
+      pois        = pois,
+      mvt_wrapper = mvt_wrapper
+    ),
+    iterations = 100
+  )
+
+test_that('print.general_di_stoch_param works', {
+
+  p <- capture_output(print_str <- print(gen_di_stoch_param_1))
+
+  print_msg <- capture_output_lines(print(gen_di_stoch_param_1,
+                                          comp_method = 'pop_size',
+                                          all_lambdas = TRUE))
+
+  expect_s3_class(print_str,
+                  'general_di_stoch_param_ipm')
+
+  expect_true(
+    any(
+      grepl('A general, density independent, stochastic, parameter-resampled IPM',
+            print_msg)
+    )
+  )
+
+  expect_true(length(print_msg) == 102L)
+
+
+})
+
+context('print.proto_ipm is working correctly')
+
+test_that('print.proto_ipm is working correctly', {
+
+  test_proto <- sim_di_det_1$proto_ipm
+
+  print_msg <- capture_output_lines(
+    print(test_proto)
+  )
+
+  expect_true(
+    any(
+      grepl(
+        'A simple, density independent, deterministic proto_ipm with 3 kernels defined',
+        print_msg
+      )
+    )
+  )
 
 })
 
