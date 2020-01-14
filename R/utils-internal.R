@@ -149,3 +149,40 @@
 is_square <- function(x) {
   dim(x)[1] == dim(x)[2]
 }
+
+
+#' @noRd
+# Checks for convergence to asymptotic dynamics. Supports either
+# eigenvalues or population vectors. For population vectors, assumes each column
+# of the  matrix represents a single population vector
+
+is_conv_to_asymptotic <- function(x, tol = 1e-7) {
+
+  if(is.matrix(x)) {
+
+    n_col     <- end_ind <- dim(x)[2]
+    start_ind <- n_col - 5
+
+    start_val <- x[ , start_ind]
+    end_val   <- x[ , end_ind]
+
+  } else if(is.vector(x)) {
+
+    len       <- end_ind <- length(x)
+    start_ind <- len - 5
+
+    start_val <- x[start_ind]
+    end_val   <- x[end_ind]
+
+  }
+
+
+  return(
+    isTRUE(
+      all.equal(
+        start_val, end_val, tolerance = tol
+      )
+    )
+  )
+
+}
