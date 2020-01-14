@@ -133,28 +133,22 @@
     <pre class="usage"><span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"deterministic"</span>, <span class='no'>...</span>)
+<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>), <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for simple_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span>(
-  <span class='no'>ipm</span>,
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"stochastic"</span>,
-  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>),
-  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='no'>...</span>
-)
+<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>), <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for simple_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>), <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>type</span>, <span class='no'>...</span>, <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for general_di_stoch_kern_ipm</span>
 <span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># S3 method for general_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -168,26 +162,17 @@
       <td><p>other arguments passed to methods.</p></td>
     </tr>
     <tr>
-      <th>type</th>
-      <td><p>Either <code>"stochastic"</code> or <code>"deterministic"</code>.
-<code>"stochastic"</code> also has two types - <code>"eigen"</code> and <code>"pop_size"</code>.
-See details for more information.</p></td>
-    </tr>
-    <tr>
       <th>comp_method</th>
       <td><p>Either <code>"eigen"</code> or <code>"pop_size"</code>. <code>"eigen"</code>
-is not possible except for <code>"simple_*_stoch_kern"</code> and <code>"simple_*_det"</code>.</p></td>
+is only possible for <code>"simple_*"</code> methods.</p></td>
     </tr>
     <tr>
       <th>all_lambdas</th>
-      <td><p>A logical to return lamdas for each individual kernel, or a single
-number. For <code>comp_method = 'pop_size'</code> and <code>all_lambdas = FALSE</code>,
-this will return the final value of computed lambdas (e.g. presumably when
-convergence has been reached). For <code>comp_method = 'eigen'</code> and
-<code>all_lambdas = FALSE</code>, it will return the geometric mean of the
-dominant eigenvalues for each projection matrix. For <code>all_lambdas = TRUE</code>,
-it will always return a numeric vector of lambdas computed either from the ratio
-of population sizes or dominant eigenvalues of each kernel.</p></td>
+      <td><p>A logical: return lambdas for each individual kernel, or
+a single number? Only applies to <code>comp_method = "pop_size"</code>. When
+<code>TRUE</code>, returns the ratio of population sizes for every iteration of the
+model. When <code>FALSE</code>, only returns the ratio of population sizes for the
+final iteration.</p></td>
     </tr>
     </table>
 
@@ -196,19 +181,12 @@ of population sizes or dominant eigenvalues of each kernel.</p></td>
     <p>A single numeric vector or single value.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Determinstic lambda is computed as the dominant eigenvalue of the
-iteration kernel(s) where possible. For <code>simple_*_stoch_kern_ipm</code> models,
-a vector containing the dominant eigenvalue of each entry in
-<code>ipm$iterators</code>. For <code>simple_*_det_ipm</code> models, a single value.</p>
-<p>NOTE ^^^^ Needs clarification for simple_dd_det models - that can either be
- pop_size or eigen. implement the make_ipm methods before returning!</p>
-<p>Because <code>ipmr</code> doesn't construct the iteration
-kernel for <code>general_*</code> IPMs the way that they are typically implemented in
-interactive sessions (e.g. by r/cbind()ing discrete and continuous stages together),
-lambda must be computed by dividing successive population sizes
-by their prior sizes. Thus, only
-<code>type = 'stochastic'</code> and <code>comp_method = "pop_size"</code> are available
-for these models.</p>
+    <p>There are two possible methods for computing <code>lambda</code> and these
+are controlled by the <code>comp_method</code> argument. Possible values are
+<code>"eigen"</code> and <code>"pop_size"</code>. The first computes the dominant
+eigenvalue of all entries in <code>ipm$iterators</code> slot of the <code>*_ipm</code>
+object. Since iteration kernels aren't generated for <code>general_*</code> methods,
+<code>"pop_size"</code> is the only possible option for those objects.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

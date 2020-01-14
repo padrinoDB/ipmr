@@ -136,14 +136,22 @@ Generics for IPM classes" />
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='kw'>compute_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(
+  <span class='no'>x</span>,
+  <span class='kw'>comp_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"eigen"</span>,
+  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>check_conv</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='no'>...</span>
+)
 
 <span class='co'># S3 method for simple_di_stoch_kern_ipm</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(
   <span class='no'>x</span>,
-  <span class='kw'>compute_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>lambda_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"stochastic"</span>, <span class='st'>"deterministic"</span>),
-  <span class='kw'>compute_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pop_size"</span>, <span class='st'>"eigen"</span>),
+  <span class='kw'>comp_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pop_size"</span>, <span class='st'>"eigen"</span>),
+  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
   <span class='no'>...</span>
 )
@@ -151,10 +159,41 @@ Generics for IPM classes" />
 <span class='co'># S3 method for simple_di_stoch_param_ipm</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(
   <span class='no'>x</span>,
-  <span class='kw'>compute_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>lambda_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"stochastic"</span>, <span class='st'>"deterministic"</span>),
-  <span class='kw'>compute_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pop_size"</span>, <span class='st'>"eigen"</span>),
+  <span class='kw'>comp_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pop_size"</span>, <span class='st'>"eigen"</span>),
+  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='no'>...</span>
+)
+
+<span class='co'># S3 method for general_di_det_ipm</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(
+  <span class='no'>x</span>,
+  <span class='kw'>comp_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
+  <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>check_conv</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='no'>...</span>
+)
+
+<span class='co'># S3 method for general_di_stoch_kern_ipm</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(
+  <span class='no'>x</span>,
+  <span class='kw'>comp_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
+  <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='no'>...</span>
+)
+
+<span class='co'># S3 method for general_di_stoch_param_ipm</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(
+  <span class='no'>x</span>,
+  <span class='kw'>comp_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
+  <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='no'>...</span>
 )</pre>
 
@@ -170,31 +209,37 @@ Generics for IPM classes" />
       <td><p>Ignored</p></td>
     </tr>
     <tr>
-      <th>compute_lambda</th>
+      <th>comp_lambda</th>
       <td><p>A logical indicating whether or not to calculate lambdas
-for the iteration kernels and display them</p></td>
+for the iteration kernels and display them.</p></td>
+    </tr>
+    <tr>
+      <th>comp_method</th>
+      <td><p>Either <code>"pop_size"</code> or <code>"eigen"</code>. <code>"pop_size"</code>
+computes lambda as the ratio of population sizes between successive time steps
+and then takes the geometric mean. <code>"eigen"</code> computes the dominant eigenvalue
+of each iteration kernel. See <code><a href='lambda.html'>lambda</a></code> for more details.</p></td>
+    </tr>
+    <tr>
+      <th>all_lambdas</th>
+      <td><p>A logical: print lambdas for each individual kernel/time step,
+or just the final one? Only applies to <code>comp_method = "pop_size"</code>. When
+<code>TRUE</code>, returns the ratio of population sizes for every iteration of the
+model. When <code>FALSE</code>, only returns the ratio of population sizes for the
+final iteration. <code>comp_method = 'eigen'</code> always returns the lambda values
+for every single kernel in the <code>x$iterators</code> slot.</p></td>
     </tr>
     <tr>
       <th>sig_digits</th>
       <td><p>The number of significant digits to round to if <code>
-compute_lambda = TRUE</code>.</p></td>
+comp_lambda = TRUE</code>.</p></td>
     </tr>
     <tr>
-      <th>lambda_type</th>
-      <td><p>If <code>compute_lambda</code> is <code>TRUE</code>, then either
-<code>"stochastic"</code> or <code>"deterministic"</code>. <code>"deterministic"</code> will return
-the dominant eigenvalue of the iteration kernel from each iteration. <code>
-"stochastic"</code> depends on <code>compute_type</code>.</p></td>
-    </tr>
-    <tr>
-      <th>compute_type</th>
-      <td><p>Either <code>"pop_size"</code> or <code>"eigen"</code>. <code>"pop_size"</code>
-computes lambda as the ratio of population sizes between successive time steps
-and then takes the geometric mean. <code>"eigen"</code> computes the dominant eigenvalue
-of each iteration kernel. For large population
-vectors, <code>"pop_size"</code> will likely be substantially faster. Note that
-option <code>"pop_size"</code> is only possible if an initial population vector was
-supplied when constructing the IPM.</p></td>
+      <th>check_conv</th>
+      <td><p>A logical: for <code>general_*</code> models, check if population state
+has converged to asymptotic dynamics? If <code>TRUE</code> and the model has not
+converged, a message will be printed. Only applies to <code>*_det</code>  when
+<code>comp_method = 'pop_size'</code></p></td>
     </tr>
     </table>
 

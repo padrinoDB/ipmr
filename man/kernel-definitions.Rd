@@ -100,7 +100,7 @@ See Details for more info
 
 The preferred method of defining a \code{K} kernel is to use the left
 hand side of the \code{...} to reference the population vectors that the right
-hand side creates (e.g. \code{n_T_1 = (P + F) * n_T}). This enables powerful
+hand side creates (e.g. \code{n_T_1 = (P + F) \%*\% n_T}). This enables powerful
 iteration-based methods to work properly. On the other hand, these iteration
 based methods can be quite time consuming, and many applications only require
 an iteration matrix while not necessarily requiring the population vectors (e.g.

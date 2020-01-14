@@ -84,7 +84,7 @@
       <h1>General IPMs</h1>
                         <h4 class="author">Sam Levin</h4>
             
-            <h4 class="date">2020-01-13</h4>
+            <h4 class="date">2020-01-14</h4>
       
       
       <div class="hidden name"><code>general-ipms.Rmd</code></div>
@@ -262,7 +262,26 @@
 <a class="sourceLine" id="cb3-144" title="144"><span class="co"># written!).</span></a>
 <a class="sourceLine" id="cb3-145" title="145"></a>
 <a class="sourceLine" id="cb3-146" title="146"><span class="kw"><a href="../reference/lambda.html">lambda</a></span>(general_ipm)</a></code></pre></div>
-<pre><code>## [1] 1.222062</code></pre>
+<pre><code>##   [1] 2187.1227110    0.6758805    0.9326462    0.9885243    1.0062025
+##   [6]    1.0258490    1.0633070    1.1188610    1.1793407    1.2286636
+##  [11]    1.2585211    1.2701130    1.2692162    1.2616792    1.2517021
+##  [16]    1.2418096    1.2333137    1.2267509    1.2221894    1.2194275
+##  [21]    1.2181235    1.2178852    1.2183326    1.2191393    1.2200540
+##  [26]    1.2209070    1.2216023    1.2221031    1.2224144    1.2225656
+##  [31]    1.2225971    1.2225501    1.2224606    1.2223566    1.2222570
+##  [36]    1.2221730    1.2221092    1.2220658    1.2220404    1.2220289
+##  [41]    1.2220271    1.2220312    1.2220382    1.2220458    1.2220527
+##  [46]    1.2220581    1.2220618    1.2220640    1.2220649    1.2220650
+##  [51]    1.2220645    1.2220638    1.2220630    1.2220624    1.2220619
+##  [56]    1.2220616    1.2220614    1.2220614    1.2220615    1.2220616
+##  [61]    1.2220618    1.2220619    1.2220620    1.2220621    1.2220622
+##  [66]    1.2220623    1.2220623    1.2220623    1.2220623    1.2220623
+##  [71]    1.2220623    1.2220623    1.2220623    1.2220623    1.2220623
+##  [76]    1.2220623    1.2220623    1.2220623    1.2220623    1.2220623
+##  [81]    1.2220623    1.2220623    1.2220623    1.2220623    1.2220623
+##  [86]    1.2220623    1.2220623    1.2220623    1.2220623    1.2220623
+##  [91]    1.2220623    1.2220623    1.2220623    1.2220623    1.2220623
+##  [96]    1.2220623    1.2220623    1.2220623    1.2220623    1.2220623</code></pre>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># If we are worried about whether or not the model converged to the stable</span></a>
 <a class="sourceLine" id="cb5-2" title="2"><span class="co"># dynamics, we can call lambda with all_lambdas = TRUE and examine the final</span></a>
 <a class="sourceLine" id="cb5-3" title="3"><span class="co"># iterations to make sure it has. The snippet below prints lambda from the </span></a>
@@ -279,8 +298,17 @@
 <a class="sourceLine" id="cb5-14" title="14"><span class="kw"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/range.html">range</a></span>(last_<span class="dv">10</span>)[<span class="dv">1</span>], <span class="kw"><a href="https://rdrr.io/r/base/range.html">range</a></span>(last_<span class="dv">10</span>)[<span class="dv">2</span>])</a></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
-<div id="section" class="section level2">
-<h2></h2>
+<div id="general-hierarchical-models" class="section level2">
+<h2 class="hasAnchor">
+<a href="#general-hierarchical-models" class="anchor"></a>General hierarchical models</h2>
+</div>
+<div id="general-models-with-continuously-varying-environments" class="section level2">
+<h2 class="hasAnchor">
+<a href="#general-models-with-continuously-varying-environments" class="anchor"></a>General models with continuously varying environments</h2>
+</div>
+<div id="code-to-construct-your-own-mega-matrices" class="section level2">
+<h2 class="hasAnchor">
+<a href="#code-to-construct-your-own-mega-matrices" class="anchor"></a>Code to construct your own mega-matrices</h2>
 </div>
   </div>
 
@@ -292,7 +320,9 @@
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#simple-ipms-vs-general-ipms">Simple IPMs vs General IPMs</a></li>
       <li><a href="#a-general-density-independent-deterministic-ipm">A general, density independent, deterministic IPM</a></li>
-      <li><a href="#section"></a></li>
+      <li><a href="#general-hierarchical-models">General hierarchical models</a></li>
+      <li><a href="#general-models-with-continuously-varying-environments">General models with continuously varying environments</a></li>
+      <li><a href="#code-to-construct-your-own-mega-matrices">Code to construct your own mega-matrices</a></li>
       </ul>
 </div>
       </div>
