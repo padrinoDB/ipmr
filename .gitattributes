@@ -1,2 +1,6 @@
 docs/* linguist-documentation
 paper/* linguist-vendored
+* text=auto
+data/* binary
+src/* text=lf
+R/* text=lf
