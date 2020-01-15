@@ -16,7 +16,7 @@
   x,
   comp_lambda = TRUE,
   comp_method = "eigen",
-  all_lambdas = FALSE,
+  type_lambda = "all",
   sig_digits = 3,
   check_conv = TRUE,
   ...
@@ -25,8 +25,8 @@
 \method{print}{simple_di_stoch_kern_ipm}(
   x,
   comp_lambda = TRUE,
-  comp_method = c("pop_size", "eigen"),
-  all_lambdas = FALSE,
+  comp_method = c("pop_size"),
+  type_lambda = "all",
   sig_digits = 3,
   ...
 )
@@ -34,8 +34,8 @@
 \method{print}{simple_di_stoch_param_ipm}(
   x,
   comp_lambda = TRUE,
-  comp_method = c("pop_size", "eigen"),
-  all_lambdas = FALSE,
+  comp_method = c("pop_size"),
+  type_lambda = "stochastic",
   sig_digits = 3,
   ...
 )
@@ -44,8 +44,9 @@
   x,
   comp_lambda = TRUE,
   comp_method = "pop_size",
+  type_lambda = "all",
   sig_digits = 3,
-  all_lambdas = TRUE,
+  all_lambdas = FALSE,
   check_conv = TRUE,
   ...
 )
@@ -54,8 +55,8 @@
   x,
   comp_lambda = TRUE,
   comp_method = "pop_size",
+  type_lambda = "stochastic",
   sig_digits = 3,
-  all_lambdas = TRUE,
   ...
 )
 
@@ -63,8 +64,8 @@
   x,
   comp_lambda = TRUE,
   comp_method = "pop_size",
+  type_lambda = "stochastic",
   sig_digits = 3,
-  all_lambdas = TRUE,
   ...
 )
 }
@@ -81,12 +82,8 @@ computes lambda as the ratio of population sizes between successive time steps
 and then takes the geometric mean. \code{"eigen"} computes the dominant eigenvalue
 of each iteration kernel. See \code{\link{lambda}} for more details.}
 
-\item{all_lambdas}{A logical: print lambdas for each individual kernel/time step,
-or just the final one? Only applies to \code{comp_method = "pop_size"}. When
-\code{TRUE}, returns the ratio of population sizes for every iteration of the
-model. When \code{FALSE}, only returns the ratio of population sizes for the
-final iteration. \code{comp_method = 'eigen'} always returns the lambda values
-for every single kernel in the \code{x$iterators} slot.}
+\item{type_lambda}{Either \code{'all'} or \code{'stochastic'}. See
+\code{\link{lambda}} for more details.}
 
 \item{sig_digits}{The number of significant digits to round to if \code{
 comp_lambda = TRUE}.}
@@ -95,6 +92,8 @@ comp_lambda = TRUE}.}
 has converged to asymptotic dynamics? If \code{TRUE} and the model has not
 converged, a message will be printed. Only applies to \code{*_det}  when
 \code{comp_method = 'pop_size'}}
+
+\item{all_lambdas}{Return lambdas for every time step or just the final one?}
 }
 \value{
 \code{x} invisibly.

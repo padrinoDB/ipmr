@@ -152,12 +152,19 @@ is_square <- function(x) {
 
 #' @noRd
 # Checks for convergence to asymptotic dynamics. Supports either
-# eigenvalues or population vectors. For population vectors, assumes each column
-# of the  matrix represents a single population vector
+# eigenvalues or pop_state entries. For eigenvalues, looks at a vector,
+# for pop_state entries, two possibilities:
+#
+# SIMPLE_*_ipm: pop_state is a list holding a single matrix. this function
+# is called with ipm$pop_state[[1]], and the matrix is passed to code in first
+# if()
+#
+# GENERAL_*_ipm: pop_state is a list with multiple matrices. this function is
+# called on ipm$pop_state, and the list is passed to the code in the second if()
 
-is_conv_to_asymptotic <- function(x, tol = 1e-7) {
+is_conv_to_asymptotic <- function(x, tol = 1e-10) {
 
-  if(is.matrix(x)) {
+  if(is.matrix(x) && dim(x)[1] > 1) {
 
     # Standardize columns first
     x <- apply(x, 2, FUN = function(y) y / sum(y))
@@ -168,10 +175,31 @@ is_conv_to_asymptotic <- function(x, tol = 1e-7) {
     start_val <- x[ , start_ind]
     end_val   <- x[ , end_ind]
 
+  } else if(is.list(x)) {
+
+    # General
+
+    n_col     <- end_ind <- dim(x[[1]])[2]
+    start_ind <- n_col - 1
+
+    start_col <- lapply(x,
+                        function(y, ind) matrix(y[ , ind], ncol = 1),
+                        ind = start_ind) %>%
+      do.call("rbind", args = .)
+
+    start_val <- start_col / sum(start_col)
+
+    end_col   <- lapply(x,
+                        function(y, ind) matrix(y[ , ind], ncol = 1),
+                        ind = end_ind) %>%
+      do.call("rbind", args = .)
+
+    end_val <- end_col / sum(end_col)
+
   } else if(is.vector(x)) {
 
-    len       <- end_ind <- length(x)
-    start_ind <- len - 1
+    n_col     <- end_ind <- length(x)
+    start_ind <- n_col - 1
 
     start_val <- x[start_ind]
     end_val   <- x[end_ind]

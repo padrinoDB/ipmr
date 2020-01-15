@@ -824,19 +824,17 @@
 }
 
 #' @noRd
-.check_ipm_definition <- function(proto_ipm ,iterate) {
+.check_ipm_definition <- function(proto_ipm, iterate) {
 
-  .check_pop_state(proto_ipm)
+  .check_pop_state(proto_ipm, iterate)
   .check_env_state(proto_ipm)
 
   ipm_type <- class(proto_ipm)[1]
 
-  if(grepl('_param|dd', ipm_type) & !iterate) {
+  if(grepl('general|_param|dd', ipm_type) & !iterate) {
     stop("Stochastic, parameter resampled and density dependent models must be\n",
          "iterated! Set 'iterate' to 'TRUE' and re-run.")
   }
-
-  # probably want to add more here -------
 
 
   invisible(TRUE)
@@ -845,13 +843,18 @@
 
 #' @noRd
 
-.check_pop_state <- function(proto_ipm) {
+.check_pop_state <- function(proto_ipm, iterate) {
 
   # ipm type is always first in class(proto)
   ipm_type   <- class(proto_ipm)[1]
 
   pop_state  <- unlist(proto_ipm$pop_state) %>%
     unique()
+
+  if(any(is.na(pop_state)) && iterate) {
+    stop("'iterate = TRUE' but 'pop_state' is not defined!",
+         call. = FALSE)
+  }
 
   state_vars <- unlist(proto_ipm$state_var) %>%
     unique()

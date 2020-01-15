@@ -12,17 +12,27 @@
 \usage{
 lambda(ipm, ...)
 
-\method{lambda}{simple_di_det_ipm}(ipm, comp_method = c("eigen", "pop_size"), all_lambdas = TRUE, ...)
+\method{lambda}{simple_di_det_ipm}(ipm, comp_method = c("eigen", "pop_size"), type_lambda = "all", ...)
 
-\method{lambda}{simple_di_stoch_kern_ipm}(ipm, comp_method = c("eigen", "pop_size"), all_lambdas = TRUE, ...)
+\method{lambda}{simple_di_stoch_kern_ipm}(
+  ipm,
+  comp_method = c("eigen", "pop_size"),
+  type_lambda = c("all", "stochastic"),
+  ...
+)
 
-\method{lambda}{simple_di_stoch_param_ipm}(ipm, comp_method = c("eigen", "pop_size"), all_lambdas = TRUE, ...)
+\method{lambda}{simple_di_stoch_param_ipm}(
+  ipm,
+  comp_method = c("eigen", "pop_size"),
+  type_lambda = c("all", "stochastic"),
+  ...
+)
 
-\method{lambda}{general_di_det_ipm}(ipm, all_lambdas = TRUE, ...)
+\method{lambda}{general_di_det_ipm}(ipm, type_lambda = "all", ...)
 
-\method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., all_lambdas = TRUE)
+\method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., type_lambda = c("all", "stochastic"))
 
-\method{lambda}{general_di_stoch_param_ipm}(ipm, ..., all_lambdas = TRUE)
+\method{lambda}{general_di_stoch_param_ipm}(ipm, ..., type_lambda = c("all", "stochastic"))
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
@@ -32,11 +42,11 @@ lambda(ipm, ...)
 \item{comp_method}{Either \code{"eigen"} or \code{"pop_size"}. \code{"eigen"}
 is only possible for \code{"simple_*"} methods.}
 
-\item{all_lambdas}{A logical: return lambdas for each individual kernel, or
-a single number? Only applies to \code{comp_method = "pop_size"}. When
-\code{TRUE}, returns the ratio of population sizes for every iteration of the
-model. When \code{FALSE}, only returns the ratio of population sizes for the
-final iteration.}
+\item{type_lambda}{Either \code{'all'} or \code{'stochastic'}. \code{'all'}
+returns a vector of lambda values for each time step of the simulation (equal
+in length to the \code{iterations} argument of \code{make_ipm()}).
+\code{'stochastic'} returns a single value which is the geometric mean
+of log-per-capita growth rate from each time step.}
 }
 \value{
 A single numeric vector or single value.

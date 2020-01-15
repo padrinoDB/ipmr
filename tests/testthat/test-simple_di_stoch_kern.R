@@ -356,7 +356,9 @@ for(i in seq_len(50)) {
 pop_sizes_ipmr <- colSums(ipmr_pop_state)
 pop_sizes_test <- colSums(pop_holder)
 
-lambda_generic_lambdas <- lambda(iterated_sys, comp_method = 'pop_size')
+lambda_generic_lambdas <- lambda(iterated_sys,
+                                 comp_method = 'pop_size',
+                                 type_lambda = 'all')
 
 test_that('.iterate_kerns is acting correctly', {
   expect_equal(pop_size_lambdas, pop_size_lambdas_ipmr, tolerance = 1e-10)

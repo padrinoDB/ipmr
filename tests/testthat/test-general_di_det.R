@@ -302,7 +302,8 @@ ipmr_cr <- init_ipm("general_di_det") %>%
            return_all = TRUE)
 
 
-ipmr_lam_cr <- lambda(ipmr_cr)
+ipmr_lam_cr <- lambda(ipmr_cr,
+                      type_lambda = 'all')
 
 
 test_that('ipmr version matches hand version', {
@@ -411,7 +412,8 @@ test_that("kernel definition order doesn't matter", {
                              inv_logit_2 = inv_logit_2),
              return_all = TRUE)
 
-  test_lam_cr <- lambda(test_order)
+  test_lam_cr <- lambda(test_order,
+                        type_lambda = 'all')
 
   expect_equal(ipmr_lam_cr, test_lam_cr)
 

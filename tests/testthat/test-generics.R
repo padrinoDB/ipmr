@@ -155,7 +155,7 @@ test_that('print.simple_di_det returns correctly', {
 
   print_msg <- capture_output_lines(print(sim_di_det_2,
                                           comp_method = 'pop_size',
-                                          all_lambdas = TRUE))
+                                          type_lambda = 'all'))
 
   expect_s3_class(print_str,
                   'simple_di_det_ipm')
@@ -675,7 +675,7 @@ test_that('print.general_di_det returns correctly', {
 
   print_msg <- capture_output_lines(print(gen_di_det_1,
                                           comp_method = 'pop_size',
-                                          all_lambdas = TRUE))
+                                          type_lambda = 'all'))
 
   expect_s3_class(print_str,
                   'general_di_det_ipm')
@@ -1049,7 +1049,7 @@ test_that('print.general_di_stoch_kern works', {
 
   print_msg <- capture_output_lines(print(gen_di_stoch_kern_1,
                                           comp_method = 'pop_size',
-                                          all_lambdas = TRUE))
+                                          type_lambda = 'stochastic'))
 
   expect_s3_class(print_str,
                   'general_di_stoch_kern_ipm')
@@ -1061,8 +1061,7 @@ test_that('print.general_di_stoch_kern works', {
     )
   )
 
-  expect_true(length(print_msg) == 101L)
-
+  expect_length(print_msg, 4L)
 
 })
 
@@ -1414,7 +1413,7 @@ test_that('print.general_di_stoch_param works', {
 
   print_msg <- capture_output_lines(print(gen_di_stoch_param_1,
                                           comp_method = 'pop_size',
-                                          all_lambdas = TRUE))
+                                          type_lambda = 'stochastic'))
 
   expect_s3_class(print_str,
                   'general_di_stoch_param_ipm')
@@ -1426,7 +1425,7 @@ test_that('print.general_di_stoch_param works', {
     )
   )
 
-  expect_true(length(print_msg) == 102L)
+  expect_length(print_msg, 5L)
 
 
 })
@@ -1452,6 +1451,7 @@ test_that('print.proto_ipm is working correctly', {
 
 })
 
+context('mat_power is working correctly')
 
 test_that("`%^%` is working correctly", {
 
@@ -1489,3 +1489,472 @@ test_that("`%^%` is working correctly", {
 
 })
 
+context('right_ev is working correctly')
+
+
+data_list = list(s_int = 2.2,
+                 s_slope = 0.25,
+                 g_int = 0.2,
+                 g_slope = 1.02,
+                 sd_g = 0.7,
+                 f_r_int = 0.003,
+                 f_r_slope = 0.015,
+                 f_s_int = 1.3,
+                 f_s_slope = 0.075,
+                 mu_fd = 2,
+                 sd_fd = 0.3)
+
+impl_args <- make_impl_args_list(c('P', 'F', 'K'),
+                                 int_rule = rep('midpoint', 3),
+                                 dom_start = rep('dbh', 3),
+                                 dom_end = rep('dbh', 3))
+
+inv_logit <- function(int, slope, sv) {
+  return(1/(1 + exp(-(int + slope * sv))))
+}
+
+impl_args <- make_impl_args_list(c('P', 'F', 'K'),
+                                 int_rule = rep('midpoint', 3),
+                                 dom_start = rep('dbh', 3),
+                                 dom_end = rep('dbh', 3))
+
+states <- c('dbh', 'dbh')
+
+sim_di_det_1 <- init_ipm('simple_di_det') %>%
+  define_kernel("P",
+                formula = s_g_mult(s, g),
+                family = "CC",
+                s = inv_logit(s_int, s_slope, dbh_1),
+                g = dnorm(dbh_2, mu_g, sd_g),
+                mu_g = g_int + g_slope * dbh_1,
+                data_list = data_list,
+                states = states,
+                evict = TRUE,
+                evict_fun = truncated_distributions('norm',
+                                                    'g')
+  ) %>%
+  define_kernel('F',
+                formula = f_r * f_s * f_d,
+                family = 'CC',
+                f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
+                f_s = exp(f_s_int + f_s_slope * dbh_1),
+                f_d = dnorm(dbh_2, mu_fd, sd_fd),
+                data_list = data_list,
+                states = states,
+                evict = TRUE,
+                evict_fun = truncated_distributions('norm',
+                                                    'f_d')
+  ) %>%
+  define_k('K',
+           K         = P + F,
+           family    = 'IPM',
+           data_list = list(),
+           states    = states,
+           evict     = FALSE) %>%
+  define_impl(impl_args) %>%
+  define_domains(dbh = c(0, 50, 100)) %>%
+  make_ipm(usr_funs = list(inv_logit = inv_logit))
+
+target <- Re(eigen(sim_di_det_1$iterators$K)$vectors[ , 1])
+target <- target / sum(target)
+
+test_that('right_ev.simple_di_det iterates un-iterated model correctly', {
+
+  # compute standardized right eigenvector using eigen for comparison to iterated
+  # eigenvector
+  target <- Re(eigen(sim_di_det_1$iterators$K)$vectors[ , 1])
+  target <- target / sum(target)
+
+  ipmr_w <- right_ev(sim_di_det_1)
+
+  expect_equal(target, ipmr_w, tol = 1e-10)
+
+})
+
+sim_di_det_2 <- init_ipm('simple_di_det') %>%
+  define_kernel("P",
+                formula = s_g_mult(s, g),
+                family = "CC",
+                s = inv_logit(s_int, s_slope, dbh_1),
+                g = dnorm(dbh_2, mu_g, sd_g),
+                mu_g = g_int + g_slope * dbh_1,
+                data_list = data_list,
+                states = states,
+                evict = TRUE,
+                evict_fun = truncated_distributions('norm',
+                                                    'g')
+  ) %>%
+  define_kernel('F',
+                formula = f_r * f_s * f_d,
+                family = 'CC',
+                f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
+                f_s = exp(f_s_int + f_s_slope * dbh_1),
+                f_d = dnorm(dbh_2, mu_fd, sd_fd),
+                data_list = data_list,
+                states = states,
+                evict = TRUE,
+                evict_fun = truncated_distributions('norm',
+                                                    'f_d')
+  ) %>%
+  define_k('K',
+           K         = P + F,
+           n_dbh_t_1 = K %*% n_dbh_t,
+           family    = 'IPM',
+           data_list = list(),
+           states    = states,
+           evict     = FALSE) %>%
+  define_impl(impl_args) %>%
+  define_domains(dbh = c(0, 50, 100)) %>%
+  define_pop_state(n_dbh_t = runif(100)) %>%
+  make_ipm(usr_funs = list(inv_logit = inv_logit),
+           iterate = TRUE,
+           iterations = 200)
+
+sim_di_det_3 <- init_ipm('simple_di_det') %>%
+  define_kernel("P",
+                formula = s_g_mult(s, g),
+                family = "CC",
+                s = inv_logit(s_int, s_slope, dbh_1),
+                g = dnorm(dbh_2, mu_g, sd_g),
+                mu_g = g_int + g_slope * dbh_1,
+                data_list = data_list,
+                states = states,
+                evict = TRUE,
+                evict_fun = truncated_distributions('norm',
+                                                    'g')
+  ) %>%
+  define_kernel('F',
+                formula = f_r * f_s * f_d,
+                family = 'CC',
+                f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
+                f_s = exp(f_s_int + f_s_slope * dbh_1),
+                f_d = dnorm(dbh_2, mu_fd, sd_fd),
+                data_list = data_list,
+                states = states,
+                evict = TRUE,
+                evict_fun = truncated_distributions('norm',
+                                                    'f_d')
+  ) %>%
+  define_k('K',
+           K         = P + F,
+           family    = 'IPM',
+           data_list = list(),
+           states    = states,
+           evict     = FALSE) %>%
+  define_impl(impl_args) %>%
+  define_pop_state(n_dbh_t = runif(100)) %>%
+  define_domains(dbh = c(0, 50, 100)) %>%
+  make_ipm(usr_funs = list(inv_logit = inv_logit),
+           iterate = TRUE,
+           iterations = 5)
+
+test_that('right_ev can handle iterated models', {
+
+  ipmr_w <- right_ev(sim_di_det_2)
+
+  expect_equal(target, ipmr_w, tol = 1e-10)
+
+  ipmr_w <- right_ev(sim_di_det_3)
+
+  expect_equal(target, ipmr_w, tol = 1e-10)
+
+})
+
+test_that('right_ev messages are being produced correctly', {
+
+  test_message <- catch_cnd(
+    right_ev(sim_di_det_1)
+  )
+
+  expect_true(
+    grepl(
+      "Generating a population vector using runif\\(\\)",
+      test_message$message
+    )
+  )
+
+  # If the model is already iterated, there will not be any messages!
+  # skip onward to sim_di_det_3
+
+  test_message <- catch_cnd(
+    right_ev(sim_di_det_3)
+  )
+
+  expect_true(
+    grepl(
+      "did not converge to asymptotic dynamics after 6 iterations",
+      test_message$message
+    )
+  )
+
+  # Now, test out failure to converge warnings from right_ev
+
+  test_message <- capture_warning(
+    right_ev(sim_di_det_3,
+             n_iterations = 2)
+  )
+
+  expect_true(
+    grepl(
+      'did not converge after 8 iterations\\. Returning NA',
+      test_message$message
+    )
+  )
+
+  test_message <- capture_warning(
+    right_ev(sim_di_det_1,
+             n_iterations = 3)
+  )
+
+  expect_true(
+    grepl(
+      'did not converge after 3 iterations\\. Returning NA',
+      test_message$message
+    )
+  )
+
+})
+
+context('right_ev.general_di_det_ipm is working correctly')
+
+init_pop_vec   <- runif(500)
+init_seed_bank <- 20
+
+data_list <- list(
+  g_int     = 5.781,
+  g_slope   = 0.988,
+  g_sd      = 20.55699,
+  s_int     = -0.352,
+  s_slope   = 0.122,
+  s_slope_2 = -0.000213,
+  f_r_int   = -11.46,
+  f_r_slope = 0.0835,
+  f_s_int   = 2.6204,
+  f_s_slope = 0.01256,
+  f_d_mu    = 5.6655,
+  f_d_sd    = 2.0734,
+  e_p       = 0.15,
+  g_i       = 0.5067
+)
+
+# The lower and upper bounds for the continuous state variable and the number
+# of meshpoints for the midpoint rule integration.
+
+L <- 1.02
+U <- 624
+n <- 500
+
+# Initialize the state list and add some helper functions. The survival function
+# in this model is a quadratic function.
+
+states <- list(c('ht', 'sb'))
+
+inv_logit <- function(int, slope, sv) {
+  1/(1 + exp(-(int + slope * sv)))
+}
+
+inv_logit_2 <- function(int, slope, slope_2, sv) {
+  1/(1 + exp(-(int + slope * sv + slope_2 * sv ^ 2)))
+}
+
+gen_di_det_1 <- init_ipm("general_di_det") %>%
+  define_kernel(
+    name          = "P",
+    formula       = s_g_mult(s, g) * d_ht,
+    family        = "CC",
+    g             = dnorm(ht_2, g_mu, g_sd),
+    g_mu          = g_int + g_slope * ht_1,
+    s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE,
+    evict         = TRUE,
+    evict_fun     = truncated_distributions('norm',
+                                            'g')
+  ) %>%
+  define_kernel(
+    name          = "go_discrete",
+    formula       = f_r * f_s * g_i,
+    family        = 'CD',
+    f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
+    f_s           = exp(f_s_int + f_s_slope * ht_1),
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE
+  ) %>%
+  define_kernel(
+    name    = 'stay_discrete',
+    formula = 0,
+    family  = "DD",
+    states  = states,
+    evict = FALSE
+  ) %>%
+  define_kernel(
+    name          = 'leave_discrete',
+    formula       = e_p * f_d * d_ht,
+    f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
+    family        = 'DC',
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE,
+    evict         = TRUE,
+    evict_fun     = truncated_distributions('norm',
+                                            'f_d')
+  ) %>%
+  define_k(
+    name          = "K",
+    family        = "IPM",
+    n_b_t_1       = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
+    n_ht_t_1      = leave_discrete %*% n_b_t + P %*% n_ht_t,
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
+      int_rule     = c(rep("midpoint", 5)),
+      dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
+      dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+    )
+  ) %>%
+  define_domains(
+    ht = c(L, U, n)
+  ) %>%
+  define_pop_state(
+    pop_vectors = list(
+      n_ht = init_pop_vec,
+      n_b  = init_seed_bank
+    )
+  ) %>%
+  make_ipm(iterations = 100,
+           usr_funs = list(inv_logit   = inv_logit,
+                           inv_logit_2 = inv_logit_2))
+
+
+
+mega_k <- rbind(
+  cbind(gen_di_det_1$sub_kernels$stay_discrete,
+        gen_di_det_1$sub_kernels$go_discrete),
+  cbind(gen_di_det_1$sub_kernels$leave_discrete,
+        gen_di_det_1$sub_kernels$P)
+)
+
+target <- Re(eigen(mega_k)$vectors[ , 1])
+target <- target / sum(target)
+
+test_that('right_ev.general_di_det returns the same as mega-matrix methods', {
+
+  ipmr_temp <- right_ev(gen_di_det_1)
+  ipmr_w    <- c(ipmr_temp$pop_state_b,
+                 ipmr_temp$pop_state_ht)
+
+  expect_equal(target, ipmr_w, tol = 1e-10)
+
+})
+
+
+gen_di_det_2 <- init_ipm("general_di_det") %>%
+  define_kernel(
+    name          = "P",
+    formula       = s_g_mult(s, g) * d_ht,
+    family        = "CC",
+    g             = dnorm(ht_2, g_mu, g_sd),
+    g_mu          = g_int + g_slope * ht_1,
+    s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE,
+    evict         = TRUE,
+    evict_fun     = truncated_distributions('norm',
+                                            'g')
+  ) %>%
+  define_kernel(
+    name          = "go_discrete",
+    formula       = f_r * f_s * g_i,
+    family        = 'CD',
+    f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
+    f_s           = exp(f_s_int + f_s_slope * ht_1),
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE
+  ) %>%
+  define_kernel(
+    name    = 'stay_discrete',
+    formula = 0,
+    family  = "DD",
+    states  = states,
+    evict = FALSE
+  ) %>%
+  define_kernel(
+    name          = 'leave_discrete',
+    formula       = e_p * f_d * d_ht,
+    f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
+    family        = 'DC',
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE,
+    evict         = TRUE,
+    evict_fun     = truncated_distributions('norm',
+                                            'f_d')
+  ) %>%
+  define_k(
+    name          = "K",
+    family        = "IPM",
+    n_b_t_1       = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
+    n_ht_t_1      = leave_discrete %*% n_b_t + P %*% n_ht_t,
+    data_list     = data_list,
+    states        = states,
+    has_hier_effs = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
+      int_rule     = c(rep("midpoint", 5)),
+      dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
+      dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+    )
+  ) %>%
+  define_domains(
+    ht = c(L, U, n)
+  ) %>%
+  define_pop_state(
+    pop_vectors = list(
+      n_ht = init_pop_vec,
+      n_b  = init_seed_bank
+    )
+  ) %>%
+  make_ipm(iterations = 5,
+           usr_funs = list(inv_logit   = inv_logit,
+                           inv_logit_2 = inv_logit_2))
+
+
+
+test_that('right_ev.general_di_det can re-iterate models', {
+
+  test_reiterate <- right_ev(gen_di_det_2,
+                             n_iterations = 100)
+
+  ipmr_w <- c(test_reiterate$pop_state_b,
+              test_reiterate$pop_state_ht)
+
+  expect_equal(target, ipmr_w, tol = 1e-10)
+
+})
+
+
+test_that('right_ev.general_di_det returns NAs and warnings properly', {
+
+  test_message <- capture_warning(
+    right_ev(gen_di_det_2,
+             n_iterations = 3)
+  )
+
+  expect_true(
+    grepl(
+      'did not converge after 3 iterations\\. Returning NA',
+      test_message$message
+    )
+  )
+
+})

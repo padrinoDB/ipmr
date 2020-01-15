@@ -153,7 +153,7 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
 pop_state_ipmr <- test_stoch_param$pop_state$pop_state_surf_area
 lambda_ipmr <- lambda(test_stoch_param,
                       comp_method = 'pop_size',
-                      all_lambdas = TRUE)
+                      type_lambda = 'all')
 
 # Now, use the env_seq to plug into this loop for each iteration and see if
 # lambdas are identical. If not, then find a bridge and jump
