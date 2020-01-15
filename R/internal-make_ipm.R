@@ -1254,3 +1254,28 @@ set_ipmr_classes <- function(to_set, cls = NULL) {
   return(out)
 }
 
+
+#' @noRd
+# Attaches usr_funs to the proto_ipm. These are duplicated for every kernel in
+# case a user subsets out some kernels in subsequent re-implementations
+# ( or something)
+
+.append_usr_funs_to_proto <- function(proto, usr_funs) {
+
+  # Generates a list of length dim(proto)[1] consisting of duplicates of
+  # usr_funs
+
+  proto$usr_funs <- I(
+    lapply(
+      seq_len(
+        dim(proto)[1]
+      ),
+      function(x, y) y,
+      y = usr_funs
+    )
+  )
+
+  return(proto)
+
+}
+

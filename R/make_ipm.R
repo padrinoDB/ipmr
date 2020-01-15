@@ -87,7 +87,6 @@ make_ipm <- function(proto_ipm,
 
 #' @rdname make_ipm
 #'
-#' @importFrom methods hasArg
 #' @export
 
 make_ipm.simple_di_det <- function(proto_ipm,
@@ -99,7 +98,20 @@ make_ipm.simple_di_det <- function(proto_ipm,
                                    iterations = 50
 ) {
 
-  # checks pop_state, env_state, domain_definitions
+  # Figure out if we're dealing with a new model or an old one that is
+  # being reimplemented. If the proto is not new and usr_funs isn't passed to the new
+  # make_ipm call, then restore the old version. If usr_funs are passed,
+  # we append them regardless of whether or not the model has been implemented.
+
+  if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
+
+    usr_funs  <- proto_ipm$usr_funs[[1]]
+
+  } else if(!rlang::is_empty(usr_funs)) {
+
+    proto_ipm <- .append_usr_funs_to_proto(proto_ipm, usr_funs)
+
+  }
 
   proto_list <- .initialize_kernels(proto_ipm, iterate)
 
@@ -110,9 +122,10 @@ make_ipm.simple_di_det <- function(proto_ipm,
   # evaluation time
 
   if(is.null(domain_list)){
-    master_env <- .make_master_env(others$domain, usr_funs)
+    master_env       <- .make_master_env(others$domain, usr_funs)
   } else {
-    master_env <- .make_master_env(domain_list, usr_funs)
+    master_env       <- .make_master_env(domain_list, usr_funs)
+    proto_ipm$domain <- I(list(domain_list))
   }
 
   # construct the kernels from their function defintions
@@ -172,9 +185,11 @@ make_ipm.simple_di_det <- function(proto_ipm,
               env_list    = out_ret,
               env_seq     = out_seq,
               pop_state   = out_pop,
-              proto_ipm   = proto_ipm)
+              proto_ipm   = proto_ipm
+  )
 
-  class(out) <- c('simple_di_det_ipm', 'list')
+  attr(out$proto_ipm, 'implemented') <- TRUE
+  class(out)                         <- c('simple_di_det_ipm', 'list')
 
   return(out)
 
@@ -192,6 +207,18 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
                                           iterations  = 50,
                                           kernel_seq  = NULL) {
 
+  # Work out whether to append usr_funs to proto or to restore them from prior
+  # implemenation. Logic is documented in make_ipm.simple_di_det()
+
+  if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
+
+    usr_funs  <- proto_ipm$usr_funs[[1]]
+
+  } else if(!rlang::is_empty(usr_funs)) {
+
+    proto_ipm <- .append_usr_funs_to_proto(proto_ipm, usr_funs)
+
+  }
 
   # checks pop_state, env_state, domain_definitions
 
@@ -261,9 +288,11 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
               env_list    = out_ret,
               env_seq     = kern_seq,
               pop_state   = pop_state,
-              proto_ipm   = proto_ipm)
+              proto_ipm   = proto_ipm
 
+  )
 
+  attr(out$proto_ipm, 'implemented') <- TRUE
   class(out) <- c('simple_di_stoch_kern_ipm', 'list')
 
   return(out)
@@ -280,6 +309,19 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                            domain_list = NULL,
                                            iterate     = TRUE,
                                            iterations  = 50) {
+
+  # Work out whether to append usr_funs to proto or to restore them from prior
+  # implemenation. Logic is documented in make_ipm.simple_di_det()
+
+  if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
+
+    usr_funs  <- proto_ipm$usr_funs[[1]]
+
+  } else if(!rlang::is_empty(usr_funs)) {
+
+    proto_ipm <- .append_usr_funs_to_proto(proto_ipm, usr_funs)
+
+  }
 
   proto_list <- .initialize_kernels(proto_ipm, iterate)
 
@@ -330,12 +372,18 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                       sub_kernels,
                                       master_env)
 
+    if(return_all) {
 
+      env_ret <- sys$data_envs
+
+    } else {
+
+      env_ret <- NA_character_
+
+    }
     out         <- .update_param_simple_output(sub_kernels,
                                                sys_i,
-                                               ifelse(return_all,
-                                                      sys$data_envs,
-                                                      NA_character_),
+                                               env_ret,
                                                master_env,
                                                out,
                                                iterations,
@@ -352,9 +400,10 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
   out$iterators   <- set_ipmr_classes(out$iterators)
   out$sub_kernels <- set_ipmr_classes(out$sub_kernels)
 
-  if(return_all) out$data_envs <- purrr::splice(out$data_envs, env_list)
-
+  attr(out$proto_ipm, 'implemented') <- TRUE
   class(out) <- c('simple_di_stoch_param_ipm', 'list')
+
+  if(return_all) out$data_envs <- purrr::splice(env_list, out$data_envs)
 
   return(out)
 
@@ -373,6 +422,19 @@ make_ipm.general_di_det <- function(proto_ipm,
                                     domain_list = NULL,
                                     iterate     = TRUE,
                                     iterations  = 50) {
+
+  # Work out whether to append usr_funs to proto or to restore them from prior
+  # implemenation. Logic is documented in make_ipm.simple_di_det()
+
+  if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
+
+    usr_funs  <- proto_ipm$usr_funs[[1]]
+
+  } else if(!rlang::is_empty(usr_funs)) {
+
+    proto_ipm <- .append_usr_funs_to_proto(proto_ipm, usr_funs)
+
+  }
 
   # initialize others + k_row
 
@@ -467,6 +529,7 @@ make_ipm.general_di_det <- function(proto_ipm,
     proto_ipm   = proto_ipm
   )
 
+  attr(out$proto_ipm, 'implemented') <- TRUE
   class(out) <- c('general_di_det_ipm', 'list')
 
   return(out)
@@ -486,6 +549,19 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
                                            iterations  = 50,
                                            kernel_seq  = NULL) {
 
+  # Work out whether to append usr_funs to proto or to restore them from prior
+  # implemenation. Logic is documented in make_ipm.simple_di_det()
+
+  if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
+
+    usr_funs  <- proto_ipm$usr_funs[[1]]
+
+  } else if(!rlang::is_empty(usr_funs)) {
+
+    proto_ipm <- .append_usr_funs_to_proto(proto_ipm, usr_funs)
+
+  }
+
   # initialize others + k_row
 
   proto_list <- .initialize_kernels(proto_ipm, iterate)
@@ -494,9 +570,13 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
   k_row  <- proto_list$k_row
 
   if(is.null(domain_list)) {
+
     master_env <- .make_master_env(others$domain, usr_funs)
+
   } else {
+
     master_env <- .make_master_env(domain_list, usr_funs)
+
   }
 
   # Bind env_exprs, constants, and pop_vectors to master_env so that
@@ -558,9 +638,6 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
   # with items that depend on `return_all` and `iterate` switches, but have
   # length > 1 (ifelse() output always equals length(input))
 
-  sub_kern_list  <- set_ipmr_classes(sub_kern_list)
-
-
   temp_other_out <- .prep_other_output(env_list,
                                        kern_seq,
                                        pop_state,
@@ -571,6 +648,8 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
   env_seq_ret <- temp_other_out$env_seq_ret
   pop_ret     <- temp_other_out$pop_ret
 
+  sub_kern_list  <- set_ipmr_classes(sub_kern_list)
+
   out <- list(
     iterators   = NA_real_,
     sub_kernels = sub_kern_list,
@@ -580,6 +659,7 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
     proto_ipm   = proto_ipm
   )
 
+  attr(out$proto_ipm, 'implemented') <- TRUE
   class(out) <- c('general_di_stoch_kern_ipm', 'list')
 
   return(out)
@@ -598,6 +678,19 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
                                             domain_list = NULL,
                                             iterate     = TRUE,
                                             iterations  = 50) {
+
+  # Work out whether to append usr_funs to proto or to restore them from prior
+  # implemenation. Logic is documented in make_ipm.simple_di_det()
+
+  if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
+
+    usr_funs  <- proto_ipm$usr_funs[[1]]
+
+  } else if(!rlang::is_empty(usr_funs)) {
+
+    proto_ipm <- .append_usr_funs_to_proto(proto_ipm, usr_funs)
+
+  }
 
   proto_list <- .initialize_kernels(proto_ipm, iterate)
 
@@ -634,8 +727,6 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
     master_env  <- .add_pop_state_to_master_env(temp$pop_state, master_env)
 
   }
-
-  env_list      <- list(master_env = master_env)
 
   if(!iterate || iterations < 1) {
     stop("All 'general_*_stoch_param' models must be iterated at least once!",
@@ -702,10 +793,11 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
     env_list    = temp$sub_kernel_envs,
     env_seq     = temp$env_seq,
     pop_state   = temp$pop_state,
-    proto_ipm   = temp$proto_ipm
+    proto_ipm   = proto_ipm
   )
 
-  out$sub_kernels <- set_ipmr_classes(out$sub_kernels)
+  attr(out$proto_ipm, 'implemented') <- TRUE
+  out$sub_kernels                    <- set_ipmr_classes(out$sub_kernels)
 
   class(out) <- c('general_di_stoch_param_ipm', 'list')
 

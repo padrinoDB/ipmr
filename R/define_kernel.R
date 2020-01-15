@@ -70,6 +70,7 @@
 #' @importFrom purrr map_chr map
 #' @importFrom rlang := list2 enquo enquos parse_expr parse_exprs quo_text
 #' quo_is_null is_quosure
+#' @importFrom methods hasArg
 #'
 #' @export
 
@@ -117,18 +118,19 @@ define_kernel <- function(proto_ipm,
   if(!methods::hasArg(levels_hier_effs)) levels_hier_effs <- list(levels = NA)
 
   temp <- data.frame(
-    id = 'A1',
-    kernel_id = name,
-    domain = I(list(NA_character_)),
-    state_var = I(rlang::list2(!!name := states)),
-    int_rule = NA_character_,
-    evict = evict,
-    evict_fun = I(list(evict_fun)),
-    pop_state = I(list(NA_character_)),
-    env_state = I(list(NA_character_)),
-    has_hier_effs = has_hier_effs,
+    id               = 'A1',
+    kernel_id        = name,
+    domain           = I(list(NA_character_)),
+    state_var        = I(rlang::list2(!!name := states)),
+    int_rule         = NA_character_,
+    evict            = evict,
+    evict_fun        = I(list(evict_fun)),
+    pop_state        = I(list(NA_character_)),
+    env_state        = I(list(NA_character_)),
+    has_hier_effs    = has_hier_effs,
     levels_hier_effs = I(rlang::list2(levels_hier_effs)),
-    params = I(rlang::list2(!! name := param_tree)),
+    params           = I(rlang::list2(!! name := param_tree)),
+    usr_funs         = I(list(NA_character_)),
     stringsAsFactors = FALSE
   )
 
@@ -196,17 +198,18 @@ define_k <- function(proto_ipm,
 
   temp <- data.frame(
     id = 'A1',
-    kernel_id = name,
-    domain = I(list(NA_character_)),
-    state_var = I(rlang::list2(!!name := states)),
-    int_rule = NA_character_,
-    evict = evict,
-    evict_fun = I(list(evict_fun)),
-    pop_state = I(list(NA_character_)),
-    env_state = I(list(NA_character_)),
-    has_hier_effs = has_hier_effs,
+    kernel_id        = name,
+    domain           = I(list(NA_character_)),
+    state_var        = I(rlang::list2(!! name := states)),
+    int_rule         = NA_character_,
+    evict            = evict,
+    evict_fun        = I(list(evict_fun)),
+    pop_state        = I(list(NA_character_)),
+    env_state        = I(list(NA_character_)),
+    has_hier_effs    = has_hier_effs,
     levels_hier_effs = I(rlang::list2(levels_hier_effs)),
-    params = I(rlang::list2(!! name := param_tree)),
+    params           = I(rlang::list2(!! name := param_tree)),
+    usr_funs         = I(list(NA_character_)),
     stringsAsFactors = FALSE
   )
 
