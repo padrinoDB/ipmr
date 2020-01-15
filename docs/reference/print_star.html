@@ -140,7 +140,7 @@ Generics for IPM classes" />
   <span class='no'>x</span>,
   <span class='kw'>comp_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"eigen"</span>,
-  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"all"</span>,
   <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
   <span class='kw'>check_conv</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='no'>...</span>
@@ -150,8 +150,8 @@ Generics for IPM classes" />
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(
   <span class='no'>x</span>,
   <span class='kw'>comp_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pop_size"</span>, <span class='st'>"eigen"</span>),
-  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pop_size"</span>),
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"all"</span>,
   <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
   <span class='no'>...</span>
 )
@@ -160,8 +160,8 @@ Generics for IPM classes" />
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(
   <span class='no'>x</span>,
   <span class='kw'>comp_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pop_size"</span>, <span class='st'>"eigen"</span>),
-  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"pop_size"</span>),
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"stochastic"</span>,
   <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
   <span class='no'>...</span>
 )
@@ -171,8 +171,9 @@ Generics for IPM classes" />
   <span class='no'>x</span>,
   <span class='kw'>comp_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"all"</span>,
   <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>check_conv</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='no'>...</span>
 )
@@ -182,8 +183,8 @@ Generics for IPM classes" />
   <span class='no'>x</span>,
   <span class='kw'>comp_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"stochastic"</span>,
   <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='no'>...</span>
 )
 
@@ -192,8 +193,8 @@ Generics for IPM classes" />
   <span class='no'>x</span>,
   <span class='kw'>comp_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"stochastic"</span>,
   <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='no'>...</span>
 )</pre>
 
@@ -221,13 +222,9 @@ and then takes the geometric mean. <code>"eigen"</code> computes the dominant ei
 of each iteration kernel. See <code><a href='lambda.html'>lambda</a></code> for more details.</p></td>
     </tr>
     <tr>
-      <th>all_lambdas</th>
-      <td><p>A logical: print lambdas for each individual kernel/time step,
-or just the final one? Only applies to <code>comp_method = "pop_size"</code>. When
-<code>TRUE</code>, returns the ratio of population sizes for every iteration of the
-model. When <code>FALSE</code>, only returns the ratio of population sizes for the
-final iteration. <code>comp_method = 'eigen'</code> always returns the lambda values
-for every single kernel in the <code>x$iterators</code> slot.</p></td>
+      <th>type_lambda</th>
+      <td><p>Either <code>'all'</code> or <code>'stochastic'</code>. See
+<code><a href='lambda.html'>lambda</a></code> for more details.</p></td>
     </tr>
     <tr>
       <th>sig_digits</th>
@@ -240,6 +237,10 @@ comp_lambda = TRUE</code>.</p></td>
 has converged to asymptotic dynamics? If <code>TRUE</code> and the model has not
 converged, a message will be printed. Only applies to <code>*_det</code>  when
 <code>comp_method = 'pop_size'</code></p></td>
+    </tr>
+    <tr>
+      <th>all_lambdas</th>
+      <td><p>Return lambdas for every time step or just the final one?</p></td>
     </tr>
     </table>
 

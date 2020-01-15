@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • ipmr</title>
+<title>Compute sensitivity — sensitivity • ipmr</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,9 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Compute sensitivity — sensitivity" />
+<meta property="og:description" content="Compute sensitivity" />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -54,7 +56,7 @@
   </head>
 
   <body>
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -117,120 +119,65 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Compute sensitivity</h1>
+    
+    <div class="hidden name"><code>sensitivity.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>Compute sensitivity</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>sensitivity</span>(
+  <span class='no'>ipm</span>,
+  <span class='kw'>level</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"kernel"</span>, <span class='st'>"vital_rate"</span>, <span class='st'>"parameter"</span>),
+  <span class='kw'>subset</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
+  <span class='no'>...</span>
+)</pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      <tr>
-        
-        <td>
-          <p><code><a href="define_star.html">define_impl()</a></code> <code><a href="define_star.html">make_impl_args_list()</a></code> <code><a href="define_star.html">define_domains()</a></code> <code><a href="define_star.html">define_pop_state()</a></code> <code><a href="define_star.html">define_state_vars()</a></code> <code><a href="define_star.html">define_env_state()</a></code> <code><a href="define_star.html">define_hier_effs()</a></code> </p>
-        </td>
-        <td><p>Helpers for IPM construction</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="eigenvectors.html">right_ev()</a></code> <code><a href="eigenvectors.html">left_ev()</a></code> </p>
-        </td>
-        <td><p>Compute left and right eigenvectors via iteration</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="elasticity.html">elasticity()</a></code> </p>
-        </td>
-        <td><p>Compute elasticity</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="eviction.html">truncated_distributions()</a></code> </p>
-        </td>
-        <td><p>Eviction correction</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="fun-mult-helpers.html">right_mult()</a></code> <code><a href="fun-mult-helpers.html">s_g_mult()</a></code> </p>
-        </td>
-        <td><p>Function multiplication helpers</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="init_ipm.html">init_ipm()</a></code> </p>
-        </td>
-        <td><p>Initialize an IPM</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="kernel-definitions.html">define_kernel()</a></code> <code><a href="kernel-definitions.html">define_k()</a></code> </p>
-        </td>
-        <td><p>Functions to initialize and define IPM kernels</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="lambda.html">lambda()</a></code> </p>
-        </td>
-        <td><p>Compute the per-capita growth rate for an IPM object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="make_ipm.html">make_ipm()</a></code> </p>
-        </td>
-        <td><p>Methods to implement an IPM</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="matrix-power.html">`%^%`</a></code> <code><a href="matrix-power.html">mat_power()</a></code> </p>
-        </td>
-        <td><p>Raise a matrix to a power</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plot_star.html">plot(<i>&lt;ipmr_matrix&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;simple_di_det_ipm&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;simple_di_stoch_param_ipm&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;simple_di_stoch_kern_ipm&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Plot a matrix or an *_ipm object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="print_star.html">print(<i>&lt;proto_ipm&gt;</i>)</a></code> <code><a href="print_star.html">print(<i>&lt;simple_di_det_ipm&gt;</i>)</a></code> <code><a href="print_star.html">print(<i>&lt;simple_di_stoch_kern_ipm&gt;</i>)</a></code> <code><a href="print_star.html">print(<i>&lt;simple_di_stoch_param_ipm&gt;</i>)</a></code> <code><a href="print_star.html">print(<i>&lt;general_di_det_ipm&gt;</i>)</a></code> <code><a href="print_star.html">print(<i>&lt;general_di_stoch_kern_ipm&gt;</i>)</a></code> <code><a href="print_star.html">print(<i>&lt;general_di_stoch_param_ipm&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Print proto_ipms or *_ipm objects</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sensitivity.html">sensitivity()</a></code> </p>
-        </td>
-        <td><p>Compute sensitivity</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="vec-operations.html">vec()</a></code> <code><a href="vec-operations.html">inv_vec()</a></code> </p>
-        </td>
-        <td><p>Perform the <em>vec</em> operation and it's inverse</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>ipm</th>
+      <td><p>Output from <code><a href='make_ipm.html'>make_ipm()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>level</th>
+      <td><p>The level to compute sensitivity at. <code>"kernel"</code> computes
+the model wide sensitivity surface and returns that. <code>"vital_rate"</code>
+computes lambda's sensitivity to specific vital rates, <code>"parameter"</code> lambda's
+sensitivity to each parameter. Use <code>subset</code> to specify a subset of
+vital rates or parameters to compute values for.</p></td>
+    </tr>
+    <tr>
+      <th>subset</th>
+      <td><p>A character vector corresponding to the <code>"vital_rates"</code> or
+<code>"parameters"</code> you want to compute  sensitivities for. Can save time if
+only a few parameters or vital rates are of interest.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>other arguments passed to methods</p></td>
+    </tr>
     </table>
-  </div>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A list. Contains either kernel response surfaces, vital rate level
+sensitivity values, or parameter level sensitivity values. The class is always
+<code><a href='https://rdrr.io/r/base/c.html'>c("ipmr_sensitivity", "list")</a></code> (for internal usage and plot methods).</p>
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
     </ul>
+
   </div>
 </div>
 

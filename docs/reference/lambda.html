@@ -133,22 +133,32 @@
     <pre class="usage"><span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>), <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
+<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>), <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"all"</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for simple_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>), <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
+<span class='fu'>lambda</span>(
+  <span class='no'>ipm</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>),
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"stochastic"</span>),
+  <span class='no'>...</span>
+)
 
 <span class='co'># S3 method for simple_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>), <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
+<span class='fu'>lambda</span>(
+  <span class='no'>ipm</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>),
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"stochastic"</span>),
+  <span class='no'>...</span>
+)
 
 <span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
+<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"all"</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for general_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"stochastic"</span>))
 
 <span class='co'># S3 method for general_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"stochastic"</span>))</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -167,12 +177,12 @@
 is only possible for <code>"simple_*"</code> methods.</p></td>
     </tr>
     <tr>
-      <th>all_lambdas</th>
-      <td><p>A logical: return lambdas for each individual kernel, or
-a single number? Only applies to <code>comp_method = "pop_size"</code>. When
-<code>TRUE</code>, returns the ratio of population sizes for every iteration of the
-model. When <code>FALSE</code>, only returns the ratio of population sizes for the
-final iteration.</p></td>
+      <th>type_lambda</th>
+      <td><p>Either <code>'all'</code> or <code>'stochastic'</code>. <code>'all'</code>
+returns a vector of lambda values for each time step of the simulation (equal
+in length to the <code>iterations</code> argument of <code><a href='make_ipm.html'>make_ipm()</a></code>).
+<code>'stochastic'</code> returns a single value which is the geometric mean
+of log-per-capita growth rate from each time step.</p></td>
     </tr>
     </table>
 

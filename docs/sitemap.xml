@@ -7,6 +7,12 @@
     <loc>https://levisc8.github.io/ipmr/reference/define_star.html</loc>
   </url>
   <url>
+    <loc>https://levisc8.github.io/ipmr/reference/eigenvectors.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/reference/elasticity.html</loc>
+  </url>
+  <url>
     <loc>https://levisc8.github.io/ipmr/reference/eviction.html</loc>
   </url>
   <url>
@@ -35,6 +41,9 @@
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/print_star.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/reference/sensitivity.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/tidyeval.html</loc>
