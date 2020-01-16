@@ -828,13 +828,22 @@ plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
 
 #' @rdname eigenvectors
 #'
-#' @title Compute left and right eigenvectors via iteration
+#' @title Compute the standardized left and right eigenvectors via iteration
 #'
 #' @param ipm Output from \code{make_ipm()}.
 #' @param ... other arguments passed to methods
 #'
-#' @value A list of named numeric vector corresponding to the stable trait distribution
+#' @value A list of named numeric vector(s) corresponding to the stable trait distribution
 #' function (\code{right_ev}) or the reproductive values for each trait (\code{left_ev}).
+#'
+#' @details If the model has already been iterated, then these functions
+#' will just extract population state of the final iteration and return
+#' that in a named list. Each element of the list is a vector with length
+#' \code{>= 1} and corresponds each state variable's portion of the eigenvector.
+#'
+#' Note that \code{right/left_ev} methods only exist for deterministic IPMs. To
+#'  see if there is a quasi-stable distribution for stochastic models, use
+#' \code{\link{qsd_converge()}}.
 #'
 #' @export
 
@@ -846,7 +855,7 @@ right_ev <- function(ipm, ...) {
 
 #' @rdname eigenvectors
 #' @param n_iterations The number of times to iterate the model to reach
-#' convergence. default is 100.
+#' convergence. Default is 100.
 #'
 #' @export
 
@@ -855,6 +864,12 @@ right_ev.simple_di_det_ipm <- function(ipm,
                                        ...) {
 
   mod_nm <- deparse(substitute(ipm))
+  # Identify state variable name
+
+  pop_nm      <- ipm$proto_ipm$state_var %>%
+    unlist() %>%
+    unique() %>%
+    .[1]
 
   # if it's already been iterated to convergence, we don't have much work to do.
 
@@ -865,7 +880,8 @@ right_ev.simple_di_det_ipm <- function(ipm,
 
     if(is_conv_to_asymptotic(ipm$pop_state[[1]])) {
 
-      out <- ipm$pop_state[[1]][ , final_it]
+      out    <- ipm$pop_state[[1]][ , final_it]
+      out_nm <- paste(pop_nm, 'w', sep = "_")
 
     } else {
 
@@ -906,7 +922,10 @@ right_ev.simple_di_det_ipm <- function(ipm,
       if(is_conv_to_asymptotic(test_conv$pop_state[[1]])) {
 
         final_it <- dim(test_conv$pop_state[[1]])[2]
+
         out      <- test_conv$pop_state[[1]][ , final_it]
+
+        out_nm   <- paste(pop_nm, 'w', sep = "_")
 
         message('model is now converged :)')
 
@@ -953,13 +972,6 @@ right_ev.simple_di_det_ipm <- function(ipm,
     # so we can also be confident that it'll never reach this point for the
     # vast majority of cases.
 
-    # Identify state variable name
-
-    pop_nm      <- ipm$proto_ipm$state_var %>%
-      unlist() %>%
-      unique() %>%
-      .[1]
-
     # Create variables for internal usage
 
     pop_states  <- paste('n', pop_nm, c('t', 't_1'), sep = '_')
@@ -995,7 +1007,8 @@ right_ev.simple_di_det_ipm <- function(ipm,
 
     if(is_conv_to_asymptotic(test_conv$pop_state[[1]])) {
 
-      out <- test_conv$pop_state[[1]][ , (n_iterations + 1)]
+      out    <- test_conv$pop_state[[1]][ , (n_iterations + 1)]
+      out_nm <- paste(pop_nm, 'w', sep = "_")
 
     } else {
 
@@ -1016,7 +1029,12 @@ right_ev.simple_di_det_ipm <- function(ipm,
 
   }
 
-  return(out / sum(out))
+  # Stuff into a list and standardize
+
+  out <- rlang::list2(!! out_nm := (out / sum(out)))
+
+  return(out)
+
 }
 
 #' @rdname eigenvectors
@@ -1032,7 +1050,7 @@ right_ev.general_di_det_ipm <- function(ipm,
 
   if(is_conv_to_asymptotic(ipm$pop_state)) {
 
-    out <- .extract_r_ev_general(ipm$pop_state)
+    out <- .extract_conv_ev_general(ipm$pop_state)
 
   } else {
 
@@ -1068,7 +1086,7 @@ right_ev.general_di_det_ipm <- function(ipm,
 
     if(is_conv_to_asymptotic(test_conv$pop_state)) {
 
-      out <- .extract_r_ev_general(test_conv$pop_state)
+      out <- .extract_conv_ev_general(test_conv$pop_state)
 
     } else {
 
@@ -1092,34 +1110,6 @@ right_ev.general_di_det_ipm <- function(ipm,
   return(out)
 }
 
-#' @noRd
-# We need the total pop size to standardize our vectors, but we don't really
-# know the proper order in which to combine them to create a single output.
-# thus, we keep them in a list with entries corresponding to states, and
-# use Reduce to compute the total size. The final output will be the list
-# of states standardized by this total population size.
-
-.extract_r_ev_general <- function(pop_state) {
-
-  final_it <- dim(pop_state[[1]])[2]
-
-  temp <- lapply(pop_state,
-                 function(x, final_it) {
-
-                   x[ , final_it]
-
-                 },
-                 final_it = final_it)
-
-  pop_std <- Reduce('sum', unlist(temp), init = 0)
-
-  out <- lapply(temp,
-                function(x, pop_std) x / pop_std,
-                pop_std = pop_std)
-
-  return(out)
-}
-
 # left_ev -----------------
 
 #' @rdname eigenvectors
@@ -1128,6 +1118,165 @@ right_ev.general_di_det_ipm <- function(ipm,
 left_ev <- function(ipm, ...) {
 
   UseMethod('left_ev')
+
+}
+
+left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
+
+  mod_nm  <- deparse(substitute(ipm))
+
+  # Identify state variable name
+
+  pop_nm <- ipm$proto_ipm$state_var %>%
+    unlist() %>%
+    unique() %>%
+    .[1]
+
+  # If it's already iterated, then we need to wrap K with a t()
+  if(.already_iterated(ipm)) {
+
+    # Models that are already iterated may have additional things.
+    # however, the id of the kernel should match the top level kernel in this
+    # list, so we'll use that.
+
+    k_nm  <- names(ipm$iterators)
+    k_ind <- ifelse(length(k_nm) > 1,
+                    which(k_nm %in% ipm$proto_ipm$kernel_id),
+                    1)
+
+    t_k   <- t(ipm$iterators[[1]])
+
+    # next, we pull out the initial population vector and set up
+    # something to hold the population state while we iterate. Simple ipms don't
+    # have a complicated pop_state structure, so this is straightforward.
+
+    n_row          <- dim(ipm$pop_state[[1]])[1]
+    temp_pop_state <- matrix(NA_real_,
+                             nrow = n_row,
+                             ncol = (n_iterations + 1))
+
+    temp_pop_state[ , 1] <- ipm$pop_state[[1]][ , 1]
+
+    for(i in seq_len(n_iterations)) {
+
+      temp_pop_state[ , (i + 1)] <- t_k %*% temp_pop_state[ , i]
+
+    }
+
+    if(is_conv_to_asymptotic(temp_pop_state)) {
+
+      out <- temp_pop_state[ , (n_iterations + 1)]
+      out_nm <- paste(pop_nm, 'v', sep = "_")
+    } else {
+
+      warning(
+        paste(
+          "'",
+          mod_nm,
+          "'",
+          ' did not converge after ',
+          n_iterations,
+          ' iterations. Returning NA, please try again with more iterations.',
+          sep = ""
+        )
+      )
+
+      return(NA_real_)
+
+    }
+
+  } else {
+
+    # If not iterated, we need to generate a population vector and t(k)
+    message(
+      paste(
+        "'",
+        mod_nm,
+        "'",
+        ' has not been iterated yet. ',
+        'Generating a population vector using runif() and\niterating the model ',
+        n_iterations,
+        ' times to check for convergence to asymptotic dynamics',
+        sep = ""
+      )
+    )
+
+    t_k    <- t(ipm$iterators[[1]])
+
+    # Create variables for internal usage
+
+    k_nm        <- names(ipm$iterators)
+
+    # Final step is to generate an initial pop_state. This is always just
+    # vector drawn from a random uniform distribution
+
+    len_pop_state <- dim(ipm$iterators[[1]])[1]
+
+    temp_pop_state <- matrix(NA_real_,
+                             nrow = len_pop_state,
+                             ncol = (n_iterations + 1))
+
+    temp_pop_state[ , 1] <- runif(len_pop_state)
+
+    for(i in seq_len(n_iterations)) {
+
+      temp_pop_state[ , (i + 1)] <- t_k %*% temp_pop_state[ , i]
+
+    }
+
+    if(is_conv_to_asymptotic(temp_pop_state)) {
+
+      out    <- temp_pop_state[ , (n_iterations + 1)]
+      out_nm <- paste(pop_nm, 'v', sep = "_")
+    } else {
+
+      warning(
+        paste(
+          "'",
+          mod_nm,
+          "'",
+          ' did not converge after ',
+          n_iterations,
+          ' iterations. Returning NA, please try again with more iterations.',
+          sep = ""
+        )
+      )
+
+      return(NA_real_)
+    }
+
+  }
+
+  out <- rlang::list2(!! out_nm := (out / sum(out)))
+
+  return(out)
+}
+
+
+left_ev.general_di_det_ipm <- function(ipm,
+                                       n_iterations = 100,
+                                       ...) {
+
+
+
+
+  param_ind <- vapply(ipm$proto_ipm$params[[proto_ind]]$formula,
+                      function(x) grepl(k_nm,
+                                        x),
+                      logical(1L))
+
+  text_call <- ipm$proto_ipm$params[[proto_ind]]$formula[[param_ind]]
+  mod_call  <- gsub(k_nm,
+                    paste('t(', k_nm, ')', sep = ""),
+                    text_call)
+
+  ipm$proto_ipm$params[[proto_ind]]$formula[[param_ind]] <- mod_call
+
+  iterated <- ipm$proto_ipm %>%
+    make_ipm(iterate    = TRUE,
+             iterations = n_iterations)
+
+
 
 }
 
@@ -1149,6 +1298,101 @@ left_ev <- function(ipm, ...) {
 
 }
 
+#' @noRd
+
+# We need the total pop size to standardize our vectors, but we don't really
+# know the proper order in which to combine them to create a single output.
+# thus, we keep them in a list with entries corresponding to states, and
+# use Reduce to compute the total size. The final output will be the list
+# of states standardized by this total population size.
+
+.extract_conv_ev_general <- function(pop_state) {
+
+  final_it <- dim(pop_state[[1]])[2]
+
+  temp <- lapply(pop_state,
+                 function(x, final_it) {
+
+                   x[ , final_it]
+
+                 },
+                 final_it = final_it)
+
+  pop_std <- Reduce('sum', unlist(temp), init = 0)
+
+  out <- lapply(temp,
+                function(x, pop_std) x / pop_std,
+                pop_std = pop_std)
+
+  return(out)
+}
+
+
+#' @rdname qsd
+#' @title Compute the quasi-stable trait distribution for a stochastic model
+#'
+#' @param ipm The output from \code{make_ipm}
+#' @param p_nms The name of the survival/growth kernel(s)
+#' @param tol The distance between each kernels true eigenvector and the
+#' quasi-stable distribution that is acceptable. Computed as
+#' \code{0.5 * sum(abs(pop_size - right_ev))}. Default is \code{1e-7}
+#' @param start_life The index of the population vector to start on. Should
+#' be a named list where names correspond to population states and entries
+#' are length 1 integer vectors. Default is 1.
+#' @param n_steps The number of times to iterate the model before checking
+#' for convergence. Default is 1000.
+#' @param ... other arguments passed to methods.
+#'
+
+qsd_converge <- function(ipm, p_nms, tol, start_life, n_steps, ...) {
+
+  UseMethod('qsd_converge')
+
+}
+
+qsd_converge.simple_di_stoch_kern_ipm <- function(ipm,
+                                                  p_nms,
+                                                  tol = 1e-7,
+                                                  start_life = rep(1,
+                                                                   length(p_nms)),
+                                                  n_steps = 1000,
+                                                  ...) {
+
+  mat_ps <- ipm$sub_kernels[p_nms]
+
+  r_evs  <- lapply(mat_ps,
+                   function(x) Re(eigen(x)$vectors[ , 1])
+  )
+
+  ns     <- lapply(mat_ps,
+                   function(x) rep(0, dim(x)[1]))
+
+  ns     <- lapply(seq_along(ns),
+                   function(ind, evs, pop_states, start_lifes) {
+
+                     pop_states[[ind]][start_lifes[ind]] <- sum(evs[[ind]])
+                   },
+                   evs         = r_evs,
+                   pop_states  = ns,
+                   start_lifes = start_life)
+
+  dist <- numeric(n_steps)
+
+  # Resume here------------------
+  for(i in seq_len(n_steps)) {
+    # p <- n / sum(n)
+    dist[i] <- 0.5 * (sum(abs(n - r_ev)))
+    n <- mat_p %*% n
+  }
+
+  if(min(dist, na.rm = TRUE) < tol) {
+    out <- which.min(dist < tol)
+  } else {
+    out <- NA_integer_
+  }
+
+  return(out)
+}
 # Sensitivitiy ---------------
 
 #' @rdname sensitivity

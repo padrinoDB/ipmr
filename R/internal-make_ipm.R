@@ -1,6 +1,5 @@
 # make_ipm internal helpers
 
-
 #' @noRd
 
 .make_sub_kernel_general <- function(proto, env_list, return_envs = FALSE) {

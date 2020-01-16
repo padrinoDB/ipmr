@@ -1491,7 +1491,6 @@ test_that("`%^%` is working correctly", {
 
 context('right_ev is working correctly')
 
-
 data_list = list(s_int = 2.2,
                  s_slope = 0.25,
                  g_int = 0.2,
@@ -1565,7 +1564,7 @@ test_that('right_ev.simple_di_det iterates un-iterated model correctly', {
   target <- Re(eigen(sim_di_det_1$iterators$K)$vectors[ , 1])
   target <- target / sum(target)
 
-  ipmr_w <- right_ev(sim_di_det_1)
+  ipmr_w <- right_ev(sim_di_det_1)[[1]]
 
   expect_equal(target, ipmr_w, tol = 1e-10)
 
@@ -1650,11 +1649,11 @@ sim_di_det_3 <- init_ipm('simple_di_det') %>%
 
 test_that('right_ev can handle iterated models', {
 
-  ipmr_w <- right_ev(sim_di_det_2)
+  ipmr_w <- right_ev(sim_di_det_2)[[1]]
 
   expect_equal(target, ipmr_w, tol = 1e-10)
 
-  ipmr_w <- right_ev(sim_di_det_3)
+  ipmr_w <- right_ev(sim_di_det_3)[[1]]
 
   expect_equal(target, ipmr_w, tol = 1e-10)
 
@@ -1712,6 +1711,25 @@ test_that('right_ev messages are being produced correctly', {
       test_message$message
     )
   )
+
+})
+
+context('left_ev.simple_di_det_ipm works')
+
+target_l <- Re(eigen(t(sim_di_det_1$iterators$K))$vectors[ , 1])
+target_l <- target_l / sum(target_l)
+
+test_that('left_ev.simple_di_det_ipm is working correctly', {
+
+  ipmr_v <- left_ev(sim_di_det_1)[[1]]
+  expect_equal(target_l, ipmr_v, tol = 1e-10)
+
+})
+
+test_that('left_ev.simple_di_det_ipm can re-iterate models', {
+
+  ipmr_v <- left_ev(sim_di_det_3)[[1]]
+  expect_equal(target_l, ipmr_v, tol = 1e-10)
 
 })
 
