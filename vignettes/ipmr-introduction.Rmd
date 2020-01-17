@@ -389,6 +389,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     name      = "P",
     formula   = s_g_mult(s, g),
     family    = "CC",
+    
     s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
     g         = dnorm(dbh_2, g_mu, g_sd),
     g_mu      = g_int + g_slope * dbh_1,
@@ -423,7 +424,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
     evict         = TRUE,
-    evict_fun     = truncated_distributions("norm", "g")
+    evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
     name          = "K",
@@ -448,6 +449,11 @@ my_ipm <- init_ipm('simple_di_det') %>%
   ) %>% 
   make_ipm()
 
+lambda_ipmr <- lambda(my_ipm, 
+                      comp_method = 'eigen')
+repro_value <- left_ev(my_ipm)
+stable_dist <- right_ev(my_ipm)
+
 ```
 
 In this example, there are no additional arguments that need to be passed to `make_ipm()` - the `proto_ipm` has all of the information needed to generate a deterministic iteration kernel. All of the `make_ipm()` methods return a list with a length of 6 with entries: 
@@ -463,6 +469,8 @@ In this example, there are no additional arguments that need to be passed to `ma
 - `pop_state` contains a list of matrices for each `state` described. The columns of each matrix correspond to the population state at each time step of a simulation. In this case, we never defined the initial population state, so it will be empty.
 
 - `proto_ipm` contains the `proto_ipm` object used to generate the model. This is useful for rebuilding the model with a different set of `impl_args` to see how that changes your results.
+
+`lambda`, `left_ev`, and `right_ev` are generic functions corresponding to the dominant eigenvalue, dominant left eigenvector, and dominant right eigenvector respectively. `lambda` is available for all classes of IPMs, while `left/right_ev` is available for all deterministic IPMs. Stochastic equivalents of the latter will be implemented eventually. 
 
 ## Defining more complicated models
 

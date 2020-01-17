@@ -185,14 +185,14 @@ general_ipm <- init_ipm("general_di_det") %>%
 # of different options which are explored in the "Generics" vignette (still to be
 # written!).
 
-lambda(general_ipm)
+lambda(general_ipm)[100]
 
-# If we are worried about whether or not the model converged to the stable
-# dynamics, we can call lambda with all_lambdas = TRUE and examine the final
+# If we are worried about whether or not the model converged to stable
+# dynamics, we can call lambda with type_lambda = 'all' and examine the final
 # iterations to make sure it has. The snippet below prints lambda from the 
 # the last 10 iterations of the model
 
-lambdas <- lambda(general_ipm, all_lambdas = TRUE)
+lambdas <- lambda(general_ipm, type_lambda = 'all')
 
 lambda_ind <- seq((length(lambdas) - 10), length(lambdas), by = 1)
 
@@ -200,7 +200,11 @@ last_10 <- lambdas[lambda_ind]
 
 # If it's converged, then this should return TRUE
 
-all.equal(range(last_10)[1], range(last_10)[2])
+isTRUE(
+  all.equal(
+    range(last_10)[1], range(last_10)[2]
+  )
+)
 
 
 

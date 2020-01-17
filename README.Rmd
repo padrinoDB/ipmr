@@ -253,8 +253,9 @@ x <- init_ipm('simple_di_det') %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit))
 
 
-lambda_ipmr <- Re(eigen(x$iterators$K)$values[1])
-w_ipmr      <- Re(eigen(x$iterators$K)$vectors[ , 1])
+lambda_ipmr <- lambda(x)
+w_ipmr      <- right_ev(x)
+v_ipmr      <- left_ev(x)
 
 
 lambda_ipmr - lambda_usr

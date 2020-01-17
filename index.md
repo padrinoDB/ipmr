@@ -314,8 +314,9 @@ x <- init_ipm('simple_di_det') %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit))
 
 
-lambda_ipmr <- Re(eigen(x$iterators$K)$values[1])
-w_ipmr      <- Re(eigen(x$iterators$K)$vectors[ , 1])
+lambda_ipmr <- lambda(x)
+w_ipmr      <- right_ev(x)
+v_ipmr      <- left_ev(x)
 
 
 lambda_ipmr - lambda_usr
@@ -344,7 +345,7 @@ reproducing. This is meant to (hopefully) demonstrate the flexibility of
 the framework.
 
 ``` r
-# rlang is a useful shortcut for splicing named values into lists. purrr is used to manipulate said lists.
+# purrr is used to manipulate parameter lists.
 # This is intended to simulate a monocarpic perennial life history where flowering is always fatal.
 # Note that this means the survival function also includes the probability of reproduction function.
 
@@ -650,6 +651,12 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
 lambda_ipmr <- vapply(monocarp_sys$iterators, 
                       function(x) Re(eigen(x)$values[1]), 
                       numeric(1))
+
+lambda_ipmr <- lambda(monocarp_sys,
+                      comp_method = 'eigen',
+                      type_lambda = 'all')
+
+# Should all be 0
 
 lambda_ipmr - lambdas
 ```
