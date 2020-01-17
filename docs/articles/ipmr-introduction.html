@@ -84,7 +84,7 @@
       <h1>Introduction to ipmr</h1>
                         <h4 class="author">Sam Levin</h4>
             
-            <h4 class="date">2020-01-15</h4>
+            <h4 class="date">2020-01-17</h4>
       
       
       <div class="hidden name"><code>ipmr-introduction.Rmd</code></div>
@@ -484,64 +484,70 @@
 <a class="sourceLine" id="cb6-3" title="3">    <span class="dt">name      =</span> <span class="st">"P"</span>,</a>
 <a class="sourceLine" id="cb6-4" title="4">    <span class="dt">formula   =</span> <span class="kw"><a href="../reference/fun-mult-helpers.html">s_g_mult</a></span>(s, g),</a>
 <a class="sourceLine" id="cb6-5" title="5">    <span class="dt">family    =</span> <span class="st">"CC"</span>,</a>
-<a class="sourceLine" id="cb6-6" title="6">    <span class="dt">s         =</span> <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(s_int <span class="op">+</span><span class="st"> </span>s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>))),</a>
-<a class="sourceLine" id="cb6-7" title="7">    <span class="dt">g         =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(dbh_<span class="dv">2</span>, g_mu, g_sd),</a>
-<a class="sourceLine" id="cb6-8" title="8">    <span class="dt">g_mu      =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb6-9" title="9">    </a>
-<a class="sourceLine" id="cb6-10" title="10">    <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb6-11" title="11">      <span class="dt">s_int     =</span> <span class="fl">0.2</span>,</a>
-<a class="sourceLine" id="cb6-12" title="12">      <span class="dt">s_slope   =</span> <span class="fl">0.5</span>,</a>
-<a class="sourceLine" id="cb6-13" title="13">      <span class="dt">g_int     =</span> <span class="fl">0.1</span>,</a>
-<a class="sourceLine" id="cb6-14" title="14">      <span class="dt">g_slope   =</span> <span class="fl">1.033</span>,</a>
-<a class="sourceLine" id="cb6-15" title="15">      <span class="dt">g_sd      =</span> <span class="fl">2.2</span></a>
-<a class="sourceLine" id="cb6-16" title="16">    ),</a>
-<a class="sourceLine" id="cb6-17" title="17">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
-<a class="sourceLine" id="cb6-18" title="18">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb6-19" title="19">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb6-20" title="20">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
-<a class="sourceLine" id="cb6-21" title="21">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-22" title="22"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb6-23" title="23">    <span class="dt">name      =</span> <span class="st">"F"</span>,</a>
-<a class="sourceLine" id="cb6-24" title="24">    <span class="dt">formula   =</span> f_r <span class="op">*</span><span class="st"> </span>f_s <span class="op">*</span><span class="st"> </span>f_d,</a>
-<a class="sourceLine" id="cb6-25" title="25">    <span class="dt">family    =</span> <span class="st">"CC"</span>,</a>
-<a class="sourceLine" id="cb6-26" title="26">    <span class="dt">f_r       =</span> <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(f_r_int <span class="op">+</span><span class="st"> </span>f_r_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>))),</a>
-<a class="sourceLine" id="cb6-27" title="27">    <span class="dt">f_s       =</span> <span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(f_s_int <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb6-28" title="28">    <span class="dt">f_d       =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(dbh_<span class="dv">2</span>, f_d_mu, f_d_sd),</a>
-<a class="sourceLine" id="cb6-29" title="29">    <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb6-30" title="30">      <span class="dt">f_r_int   =</span> <span class="fl">0.5</span>,</a>
-<a class="sourceLine" id="cb6-31" title="31">      <span class="dt">f_r_slope =</span> <span class="fl">0.1</span>,</a>
-<a class="sourceLine" id="cb6-32" title="32">      <span class="dt">f_s_int   =</span> <span class="fl">1.2</span>,</a>
-<a class="sourceLine" id="cb6-33" title="33">      <span class="dt">f_s_slope =</span> <span class="fl">0.03</span>,</a>
-<a class="sourceLine" id="cb6-34" title="34">      <span class="dt">f_d_mu    =</span> <span class="fl">1.2</span>,</a>
-<a class="sourceLine" id="cb6-35" title="35">      <span class="dt">f_d_sd    =</span> <span class="fl">0.7</span></a>
-<a class="sourceLine" id="cb6-36" title="36">    ),</a>
-<a class="sourceLine" id="cb6-37" title="37">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
-<a class="sourceLine" id="cb6-38" title="38">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb6-39" title="39">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb6-40" title="40">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
-<a class="sourceLine" id="cb6-41" title="41">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb6-42" title="42"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_k</a></span>(</a>
-<a class="sourceLine" id="cb6-43" title="43">    <span class="dt">name          =</span> <span class="st">"K"</span>,</a>
-<a class="sourceLine" id="cb6-44" title="44">    <span class="dt">family        =</span> <span class="st">"IPM"</span>,</a>
-<a class="sourceLine" id="cb6-45" title="45">    <span class="dt">K             =</span> P <span class="op">+</span><span class="st"> </span>F,</a>
-<a class="sourceLine" id="cb6-46" title="46">    <span class="dt">data_list     =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(),</a>
-<a class="sourceLine" id="cb6-47" title="47">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
-<a class="sourceLine" id="cb6-48" title="48">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb6-49" title="49">    <span class="dt">evict         =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb6-50" title="50">  )  <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb6-51" title="51"><span class="st">  </span><span class="co"># Alternative 2, put the call to make_impl_args_list() inside of define_impl(). </span></a>
-<a class="sourceLine" id="cb6-52" title="52"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_impl</a></span>(</a>
-<a class="sourceLine" id="cb6-53" title="53">    <span class="kw"><a href="../reference/define_star.html">make_impl_args_list</a></span>(</a>
-<a class="sourceLine" id="cb6-54" title="54">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"K"</span>, <span class="st">"P"</span>, <span class="st">"F"</span>),</a>
-<a class="sourceLine" id="cb6-55" title="55">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb6-56" title="56">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb6-57" title="57">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>,<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb6-58" title="58">    )</a>
-<a class="sourceLine" id="cb6-59" title="59">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb6-60" title="60"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_domains</a></span>(</a>
-<a class="sourceLine" id="cb6-61" title="61">    <span class="dt">dbh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>, <span class="dv">30</span>, <span class="dv">200</span>)</a>
-<a class="sourceLine" id="cb6-62" title="62">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-63" title="63"><span class="st">  </span><span class="kw"><a href="../reference/make_ipm.html">make_ipm</a></span>()</a></code></pre></div>
+<a class="sourceLine" id="cb6-6" title="6">    </a>
+<a class="sourceLine" id="cb6-7" title="7">    <span class="dt">s         =</span> <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(s_int <span class="op">+</span><span class="st"> </span>s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb6-8" title="8">    <span class="dt">g         =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(dbh_<span class="dv">2</span>, g_mu, g_sd),</a>
+<a class="sourceLine" id="cb6-9" title="9">    <span class="dt">g_mu      =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb6-10" title="10">    </a>
+<a class="sourceLine" id="cb6-11" title="11">    <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb6-12" title="12">      <span class="dt">s_int     =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb6-13" title="13">      <span class="dt">s_slope   =</span> <span class="fl">0.5</span>,</a>
+<a class="sourceLine" id="cb6-14" title="14">      <span class="dt">g_int     =</span> <span class="fl">0.1</span>,</a>
+<a class="sourceLine" id="cb6-15" title="15">      <span class="dt">g_slope   =</span> <span class="fl">1.033</span>,</a>
+<a class="sourceLine" id="cb6-16" title="16">      <span class="dt">g_sd      =</span> <span class="fl">2.2</span></a>
+<a class="sourceLine" id="cb6-17" title="17">    ),</a>
+<a class="sourceLine" id="cb6-18" title="18">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
+<a class="sourceLine" id="cb6-19" title="19">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb6-20" title="20">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb6-21" title="21">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
+<a class="sourceLine" id="cb6-22" title="22">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-23" title="23"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb6-24" title="24">    <span class="dt">name      =</span> <span class="st">"F"</span>,</a>
+<a class="sourceLine" id="cb6-25" title="25">    <span class="dt">formula   =</span> f_r <span class="op">*</span><span class="st"> </span>f_s <span class="op">*</span><span class="st"> </span>f_d,</a>
+<a class="sourceLine" id="cb6-26" title="26">    <span class="dt">family    =</span> <span class="st">"CC"</span>,</a>
+<a class="sourceLine" id="cb6-27" title="27">    <span class="dt">f_r       =</span> <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(f_r_int <span class="op">+</span><span class="st"> </span>f_r_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb6-28" title="28">    <span class="dt">f_s       =</span> <span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(f_s_int <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb6-29" title="29">    <span class="dt">f_d       =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(dbh_<span class="dv">2</span>, f_d_mu, f_d_sd),</a>
+<a class="sourceLine" id="cb6-30" title="30">    <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb6-31" title="31">      <span class="dt">f_r_int   =</span> <span class="fl">0.5</span>,</a>
+<a class="sourceLine" id="cb6-32" title="32">      <span class="dt">f_r_slope =</span> <span class="fl">0.1</span>,</a>
+<a class="sourceLine" id="cb6-33" title="33">      <span class="dt">f_s_int   =</span> <span class="fl">1.2</span>,</a>
+<a class="sourceLine" id="cb6-34" title="34">      <span class="dt">f_s_slope =</span> <span class="fl">0.03</span>,</a>
+<a class="sourceLine" id="cb6-35" title="35">      <span class="dt">f_d_mu    =</span> <span class="fl">1.2</span>,</a>
+<a class="sourceLine" id="cb6-36" title="36">      <span class="dt">f_d_sd    =</span> <span class="fl">0.7</span></a>
+<a class="sourceLine" id="cb6-37" title="37">    ),</a>
+<a class="sourceLine" id="cb6-38" title="38">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
+<a class="sourceLine" id="cb6-39" title="39">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb6-40" title="40">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb6-41" title="41">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
+<a class="sourceLine" id="cb6-42" title="42">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-43" title="43"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_k</a></span>(</a>
+<a class="sourceLine" id="cb6-44" title="44">    <span class="dt">name          =</span> <span class="st">"K"</span>,</a>
+<a class="sourceLine" id="cb6-45" title="45">    <span class="dt">family        =</span> <span class="st">"IPM"</span>,</a>
+<a class="sourceLine" id="cb6-46" title="46">    <span class="dt">K             =</span> P <span class="op">+</span><span class="st"> </span>F,</a>
+<a class="sourceLine" id="cb6-47" title="47">    <span class="dt">data_list     =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(),</a>
+<a class="sourceLine" id="cb6-48" title="48">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
+<a class="sourceLine" id="cb6-49" title="49">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb6-50" title="50">    <span class="dt">evict         =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb6-51" title="51">  )  <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-52" title="52"><span class="st">  </span><span class="co"># Alternative 2, put the call to make_impl_args_list() inside of define_impl(). </span></a>
+<a class="sourceLine" id="cb6-53" title="53"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_impl</a></span>(</a>
+<a class="sourceLine" id="cb6-54" title="54">    <span class="kw"><a href="../reference/define_star.html">make_impl_args_list</a></span>(</a>
+<a class="sourceLine" id="cb6-55" title="55">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"K"</span>, <span class="st">"P"</span>, <span class="st">"F"</span>),</a>
+<a class="sourceLine" id="cb6-56" title="56">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb6-57" title="57">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb6-58" title="58">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>,<span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb6-59" title="59">    )</a>
+<a class="sourceLine" id="cb6-60" title="60">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-61" title="61"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_domains</a></span>(</a>
+<a class="sourceLine" id="cb6-62" title="62">    <span class="dt">dbh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>, <span class="dv">30</span>, <span class="dv">200</span>)</a>
+<a class="sourceLine" id="cb6-63" title="63">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-64" title="64"><span class="st">  </span><span class="kw"><a href="../reference/make_ipm.html">make_ipm</a></span>()</a>
+<a class="sourceLine" id="cb6-65" title="65"></a>
+<a class="sourceLine" id="cb6-66" title="66">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="../reference/lambda.html">lambda</a></span>(my_ipm, </a>
+<a class="sourceLine" id="cb6-67" title="67">                      <span class="dt">comp_method =</span> <span class="st">'eigen'</span>)</a>
+<a class="sourceLine" id="cb6-68" title="68">repro_value &lt;-<span class="st"> </span><span class="kw"><a href="../reference/eigenvectors.html">left_ev</a></span>(my_ipm)</a>
+<a class="sourceLine" id="cb6-69" title="69">stable_dist &lt;-<span class="st"> </span><span class="kw"><a href="../reference/eigenvectors.html">right_ev</a></span>(my_ipm)</a></code></pre></div>
 <p>In this example, there are no additional arguments that need to be passed to <code><a href="../reference/make_ipm.html">make_ipm()</a></code> - the <code>proto_ipm</code> has all of the information needed to generate a deterministic iteration kernel. All of the <code><a href="../reference/make_ipm.html">make_ipm()</a></code> methods return a list with a length of 6 with entries:</p>
 <ul>
 <li><p><code>iterators</code> contains iteration kernels, or <code>K</code>s.</p></li>
@@ -551,6 +557,7 @@
 <li><p><code>pop_state</code> contains a list of matrices for each <code>state</code> described. The columns of each matrix correspond to the population state at each time step of a simulation. In this case, we never defined the initial population state, so it will be empty.</p></li>
 <li><p><code>proto_ipm</code> contains the <code>proto_ipm</code> object used to generate the model. This is useful for rebuilding the model with a different set of <code>impl_args</code> to see how that changes your results.</p></li>
 </ul>
+<p><code>lambda</code>, <code>left_ev</code>, and <code>right_ev</code> are generic functions corresponding to the dominant eigenvalue, dominant left eigenvector, and dominant right eigenvector respectively. <code>lambda</code> is available for all classes of IPMs, while <code>left/right_ev</code> is available for all deterministic IPMs. Stochastic equivalents of the latter will be implemented eventually.</p>
 </div>
 <div id="defining-more-complicated-models" class="section level2">
 <h2 class="hasAnchor">

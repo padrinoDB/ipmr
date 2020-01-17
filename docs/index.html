@@ -123,34 +123,34 @@
 <li>Simple, density independent models: <strong>Completed and ready</strong>
 </li>
 </ul>
-<ol>
+<!-- end list --><ol>
 <li><p><code>"simple_di_det"</code></p></li>
 <li><p><code>"simple_di_stoch_kern"</code></p></li>
 <li><p><code>"simple_di_stoch_param"</code></p></li>
 </ol>
-<ul>
+<!-- end list --><ul>
 <li>Simple, density dependent models: <strong>Please be patient</strong>
 </li>
 </ul>
-<ol>
+<!-- end list --><ol>
 <li><p><code>"simple_dd_det"</code></p></li>
 <li><p><code>"simple_dd_stoch_kern"</code></p></li>
 <li><p><code>"simple_dd_stoch_param"</code></p></li>
 </ol>
-<ul>
+<!-- end list --><ul>
 <li>General, density independent models: <strong>Completed and ready</strong>
 </li>
 </ul>
-<ol>
+<!-- end list --><ol>
 <li><p><code>"general_di_det"</code></p></li>
 <li><p><code>"general_di_stoch_kern"</code></p></li>
 <li><p><code>"general_di_stoch_param"</code></p></li>
 </ol>
-<ul>
+<!-- end list --><ul>
 <li>General, density dependent models: <strong>Please be patient</strong>
 </li>
 </ul>
-<ol>
+<!-- end list --><ol>
 <li><p><code>"general_dd_det"</code></p></li>
 <li><p><code>"general_dd_stoch_kern"</code></p></li>
 <li><p><code>"general_dd_stoch_param"</code></p></li>
@@ -322,11 +322,12 @@
 <a class="sourceLine" id="cb1-159" title="159"><span class="st">  </span><span class="kw"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">inv_logit =</span> inv_logit))</a>
 <a class="sourceLine" id="cb1-160" title="160"></a>
 <a class="sourceLine" id="cb1-161" title="161"></a>
-<a class="sourceLine" id="cb1-162" title="162">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span>(x<span class="op">$</span>iterators<span class="op">$</span>K)<span class="op">$</span>values[<span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb1-163" title="163">w_ipmr      &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span>(x<span class="op">$</span>iterators<span class="op">$</span>K)<span class="op">$</span>vectors[ , <span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb1-164" title="164"></a>
+<a class="sourceLine" id="cb1-162" title="162">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="reference/lambda.html">lambda</a></span>(x)</a>
+<a class="sourceLine" id="cb1-163" title="163">w_ipmr      &lt;-<span class="st"> </span><span class="kw"><a href="reference/eigenvectors.html">right_ev</a></span>(x)</a>
+<a class="sourceLine" id="cb1-164" title="164">v_ipmr      &lt;-<span class="st"> </span><span class="kw"><a href="reference/eigenvectors.html">left_ev</a></span>(x)</a>
 <a class="sourceLine" id="cb1-165" title="165"></a>
-<a class="sourceLine" id="cb1-166" title="166">lambda_ipmr <span class="op">-</span><span class="st"> </span>lambda_usr</a></code></pre></div>
+<a class="sourceLine" id="cb1-166" title="166"></a>
+<a class="sourceLine" id="cb1-167" title="167">lambda_ipmr <span class="op">-</span><span class="st"> </span>lambda_usr</a></code></pre></div>
 </div>
 <div id="simple-density-independent-stochastic-kernel-resampled-models" class="section level2">
 <h2 class="hasAnchor">
@@ -334,7 +335,7 @@
 <p>These models are typically the result of vital rate models that are fit in a mixed effects framework (e.g. multiple sites or multiple years of data). They have a special syntax that mirrors the mathematical notation of these models (and has the side effect of saving you a considerable amount of copying/pasting/typing in general).</p>
 <p>The syntax uses a <code>name_hierarchicalVariable</code> notation. These names are automatically expanded to include the multiple levels of the hierarchical variable. For example, the P kernel for a model with 5 years of data could be <code>name</code>’d <code>P_yr</code>, and the underlying vital rates would be denoted <code>vitalRate_yr</code>. The parameter values in the <code>data_list</code> are the exception to this - they must be labeled with the actual values that the hierarchical variable takes.</p>
 <p>The example below simulates a lifecycle where reproduction is always fatal. Thus, the survival term also includes the probability of reproducing. This is meant to (hopefully) demonstrate the flexibility of the framework.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># rlang is a useful shortcut for splicing named values into lists. purrr is used to manipulate said lists.</span></a>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># purrr is used to manipulate parameter lists.</span></a>
 <a class="sourceLine" id="cb2-2" title="2"><span class="co"># This is intended to simulate a monocarpic perennial life history where flowering is always fatal.</span></a>
 <a class="sourceLine" id="cb2-3" title="3"><span class="co"># Note that this means the survival function also includes the probability of reproduction function.</span></a>
 <a class="sourceLine" id="cb2-4" title="4"></a>
@@ -635,11 +636,11 @@
 <a class="sourceLine" id="cb2-299" title="299">                           <span class="dt">inv_logit_r =</span> inv_logit_r,</a>
 <a class="sourceLine" id="cb2-300" title="300">                           <span class="dt">pois_r      =</span> pois_r))</a>
 <a class="sourceLine" id="cb2-301" title="301"></a>
-<a class="sourceLine" id="cb2-302" title="302"></a>
-<a class="sourceLine" id="cb2-303" title="303"></a>
-<a class="sourceLine" id="cb2-304" title="304">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span>(monocarp_sys<span class="op">$</span>iterators, </a>
-<a class="sourceLine" id="cb2-305" title="305">                      <span class="cf">function</span>(x) <span class="kw"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span>(x)<span class="op">$</span>values[<span class="dv">1</span>]), </a>
-<a class="sourceLine" id="cb2-306" title="306">                      <span class="kw"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb2-302" title="302">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="reference/lambda.html">lambda</a></span>(monocarp_sys,</a>
+<a class="sourceLine" id="cb2-303" title="303">                      <span class="dt">comp_method =</span> <span class="st">'eigen'</span>,</a>
+<a class="sourceLine" id="cb2-304" title="304">                      <span class="dt">type_lambda =</span> <span class="st">'all'</span>)</a>
+<a class="sourceLine" id="cb2-305" title="305"></a>
+<a class="sourceLine" id="cb2-306" title="306"><span class="co"># Should all be 0</span></a>
 <a class="sourceLine" id="cb2-307" title="307"></a>
 <a class="sourceLine" id="cb2-308" title="308">lambda_ipmr <span class="op">-</span><span class="st"> </span>lambdas</a></code></pre></div>
 </div>
@@ -785,16 +786,11 @@
 <a class="sourceLine" id="cb3-130" title="130">           <span class="dt">iterate    =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb3-131" title="131">           <span class="dt">iterations =</span> <span class="dv">10</span>)</a>
 <a class="sourceLine" id="cb3-132" title="132"></a>
-<a class="sourceLine" id="cb3-133" title="133">pop_state_ipmr &lt;-<span class="st"> </span>param_resamp_model<span class="op">$</span>pop_state<span class="op">$</span>pop_state_surf_area</a>
-<a class="sourceLine" id="cb3-134" title="134">lambda_ipmr    &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(iterations)</a>
-<a class="sourceLine" id="cb3-135" title="135"></a>
-<a class="sourceLine" id="cb3-136" title="136"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dv">2</span>, <span class="kw"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(pop_state_ipmr)[<span class="dv">2</span>], <span class="dv">1</span>)) {</a>
-<a class="sourceLine" id="cb3-137" title="137">  </a>
-<a class="sourceLine" id="cb3-138" title="138">  lambda_ipmr[(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(pop_state_ipmr[ ,i]) <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(pop_state_ipmr[ ,(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)])</a>
-<a class="sourceLine" id="cb3-139" title="139">  </a>
-<a class="sourceLine" id="cb3-140" title="140">}</a>
-<a class="sourceLine" id="cb3-141" title="141"></a>
-<a class="sourceLine" id="cb3-142" title="142">lambda_ipmr</a></code></pre></div>
+<a class="sourceLine" id="cb3-133" title="133">lambda_ipmr &lt;-<span class="st"> </span><span class="kw"><a href="reference/lambda.html">lambda</a></span>(param_resamp_model, </a>
+<a class="sourceLine" id="cb3-134" title="134">                      <span class="dt">comp_method =</span> <span class="st">'pop_size'</span>,</a>
+<a class="sourceLine" id="cb3-135" title="135">                      <span class="dt">type_lambda =</span> <span class="st">'all'</span>)</a>
+<a class="sourceLine" id="cb3-136" title="136"></a>
+<a class="sourceLine" id="cb3-137" title="137">lambda_ipmr</a></code></pre></div>
 </div>
 </div>
 

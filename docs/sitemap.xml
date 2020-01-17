@@ -16,7 +16,13 @@
     <loc>https://levisc8.github.io/ipmr/reference/eviction.html</loc>
   </url>
   <url>
+    <loc>https://levisc8.github.io/ipmr/reference/format_mega_matrix.html</loc>
+  </url>
+  <url>
     <loc>https://levisc8.github.io/ipmr/reference/fun-mult-helpers.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/reference/gen_di_det.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/init_ipm.html</loc>
@@ -43,7 +49,13 @@
     <loc>https://levisc8.github.io/ipmr/reference/print_star.html</loc>
   </url>
   <url>
+    <loc>https://levisc8.github.io/ipmr/reference/qsd_converge.html</loc>
+  </url>
+  <url>
     <loc>https://levisc8.github.io/ipmr/reference/sensitivity.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/reference/sim_di_det.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/tidyeval.html</loc>

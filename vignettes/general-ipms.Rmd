@@ -16,7 +16,7 @@ vignette: >
 
 General IPMs are distinguished from simple ones in that they incorporate multiple state variables and/or include transitions between continuous and discrete states. A more specific defintion is provided in Ellner, Childs & Rees, Chapter 6 (2016). 
 
-`ipmr` handles general IPMs fairly differently from `IPMpack` in that it requires the population state to be defined initially and will compute all quantities via iteration. This is opposed to the "mega-matrix" construction that goes on under the hood in `IPMpack`, and means that eigenvalue based approaches for things like per-capita growth rates and stable stage distributions aren't available. Fortunately, it also enables a more generalized approach to implementing complicated models, and so it is preferred because of that. Of course, one can always extract the individual sub-kernels from the final model object and build their own mega-matrices if a certain technique requires it. An example of how to do that is shown at the end of this vignette.
+`ipmr` handles general IPMs fairly differently from `IPMpack` in that it requires the population state to be defined initially and will compute all quantities via iteration. For almost everything, `ipmr` skips building a mega-matrix (though `left_ev()` methods for general IPMs do require it). If the mega-matrix approach is preferable for some reason, the function `format_mega_matrix` can assist with constructing one. An example of how to do that is shown at the end of this vignette.
 
 ## A general, density independent, deterministic IPM
 
@@ -24,7 +24,7 @@ We'll start with the least complicated of the general IPMs and build progressive
 
 1. We are required to `define_pop_state()` before calling `make_ipm()`. 
 
-2. Each kernel that has an integration requires that `d_statevariable` get appended to the kernel `formula`. This is equivalent to the "dz" in $\int_L^U K(z',z) n(z,t) \mathrm{dz}$ `ipmr` automatically generates this variable internally, so there is no need to define it in the `data_list`. We skipped this step in the simple IPMs because it is easy to figure out what to append when there is only one continuous state variable  and no discrete states. It is decidedly less easy to determine that for general IPMs where there may be many continuous and/or discrete states. 
+2. Each kernel that has an integration requires that `d_statevariable` get appended to the kernel `formula`. This is equivalent to the "dz" in $\int_L^U K(z',z) n(z,t) \mathrm{dz}$. `ipmr` automatically generates this variable internally, so there is no need to define it in the `data_list`. We skipped this step in the simple IPMs because it gets appended internally. Unfortunately, it is decidedly less easy to infer the correct state variable to `d_z` with for general IPMs where there may be many continuous and/or discrete states. 
 
 3. We don't necessarily define a formula for $K(ht',ht)$ as we did in the simple IPMs. This is due to the point above about using iteration based methods for computing. Instead, we define how the kernels manipulate different population states at time $t$ to produce new states at time $t+1$.
 

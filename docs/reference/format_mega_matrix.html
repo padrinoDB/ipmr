@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute the standardized left and right eigenvectors via iteration — right_ev • ipmr</title>
+<title>Format a mega-matrix — format_mega_matrix • ipmr</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Compute the standardized left and right eigenvectors via iteration — right_ev" />
-<meta property="og:description" content="Compute the standardized left and right eigenvectors via iteration" />
+<meta property="og:title" content="Format a mega-matrix — format_mega_matrix" />
+<meta property="og:description" content="Format a mega-matrix" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -121,99 +121,52 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute the standardized left and right eigenvectors via iteration</h1>
+    <h1>Format a mega-matrix</h1>
     
-    <div class="hidden name"><code>eigenvectors.Rd</code></div>
+    <div class="hidden name"><code>format_mega_matrix.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compute the standardized left and right eigenvectors via iteration</p>
+    <p>Format a mega-matrix</p>
     </div>
 
-    <pre class="usage"><span class='fu'>right_ev</span>(<span class='no'>ipm</span>, <span class='no'>...</span>)
-
-<span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>right_ev</span>(<span class='no'>ipm</span>, <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='no'>...</span>)
-
-<span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>right_ev</span>(<span class='no'>ipm</span>, <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='no'>...</span>)
-
-<span class='fu'>left_ev</span>(<span class='no'>ipm</span>, <span class='no'>...</span>)
-
-<span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>left_ev</span>(<span class='no'>ipm</span>, <span class='no'>mega_mat</span>, <span class='no'>mega_pop_vec</span>, <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>format_mega_matrix</span>(<span class='no'>ipm</span>, <span class='no'>mega_mat</span>, <span class='kw'>presets</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>ipm</th>
-      <td><p>Output from <code><a href='make_ipm.html'>make_ipm()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>other arguments passed to methods</p></td>
-    </tr>
-    <tr>
-      <th>n_iterations</th>
-      <td><p>The number of times to iterate the model to reach
-convergence. Default is 100.</p></td>
+      <td><p>Output from <code>make_ipm</code>.</p></td>
     </tr>
     <tr>
       <th>mega_mat</th>
-      <td><p>A vector of names and/or 0s specifying the relationship
-between the kernels in the model. The names should correspond to kernel
-names, with 0s corresponding to sparse areas of the mega-matrix. The names can
-be either symbols or characters.</p></td>
+      <td><p>A vector with symbols and/or 0s representing the matrix blocks.
+They should be specified in ROW MAJOR order! See examples.</p></td>
     </tr>
     <tr>
-      <th>mega_pop_vec</th>
-      <td><p>A vector of names specifying the format of the population
-vector. The names can be either symbols or characters.</p></td>
+      <th>presets</th>
+      <td><p>Either empty or one of 'age-size' or 'hier_effs'. Currently
+not implemented</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list of named numeric vector(s) corresponding to the stable trait distribution
-function (<code>right_ev</code>) or the reproductive values for each trait (<code>left_ev</code>).</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>If the model has already been iterated, then these functions
-will just extract population state of the final iteration and return
-that in a named list. Each element of the list is a vector with length
-<code>&gt;= 1</code> and corresponds each state variable's portion of the eigenvector.</p>
-<p>Note that <code>right/left_ev</code> methods only exist for deterministic IPMs. To
- see if there is a quasi-stable distribution for stochastic models, use
-<code><a href='qsd_converge.html'>qsd_converge()</a></code>.</p>
-<p><code>mega_mat</code> fits the pieces of the model together to create a
-a transpose of the model to iterate with. Kernel names/0s should be supplied
-in ROW MAJOR order (think <code>byrow = TRUE</code>. <code>ipmr</code> supplies
-a helper function for large models <code>format_mega_mat</code>
-to help with age-size models or ones with a lot of hierarchical effects.</p>
+    <p>A large matrix</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>gen_di_det_ex</span>)
 
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>gen_di_det_ex</span>)
-
-<span class='co'># mega matrix is specifed as a row-major vector/matrix of symbols. You can also</span>
-<span class='co'># supply a character vector/matrix. mega_pop_vec is done the same way.</span>
-<span class='co'># DO NOT supply arguments like nrow or ncol if using \code{matrix(...)}.</span>
-<span class='co'># The function expects to work these out on its own.</span>
-
-<span class='no'>ipmr_v</span> <span class='kw'>&lt;-</span> <span class='fu'>left_ev</span>(<span class='no'>gen_di_det_ex</span>,
-                  <span class='kw'>mega_mat</span>     <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>stay_discrete</span>, <span class='no'>go_discrete</span>,
-                                   <span class='no'>leave_discrete</span>, <span class='no'>P</span>),
-                  <span class='kw'>mega_pop_vec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>b</span>, <span class='no'>ht</span>),
-                  <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>)</div></pre>
+<span class='no'>big_k</span> <span class='kw'>&lt;-</span> <span class='fu'>format_mega_matrix</span>(<span class='no'>gen_di_det_ex</span>,
+                            <span class='kw'>mega_mat</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='no'>go_discrete</span>,
+                                         <span class='no'>leave_discrete</span>, <span class='no'>P</span>))</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 
