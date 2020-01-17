@@ -105,7 +105,7 @@ make_ipm.simple_di_det <- function(proto_ipm,
 
   if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
 
-    if(!is.na(proto_ipm$usr_funs[[1]])) {
+    if(!is.na(proto_ipm$usr_funs[[1]][1])) {
 
       usr_funs  <- proto_ipm$usr_funs[[1]]
 
@@ -216,7 +216,7 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 
   if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
 
-    if(!is.na(proto_ipm$usr_funs[[1]])) {
+    if(!is.na(proto_ipm$usr_funs[[1]][1])) {
 
       usr_funs  <- proto_ipm$usr_funs[[1]]
 
@@ -323,7 +323,7 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
   if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
 
-    if(!is.na(proto_ipm$usr_funs[[1]])) {
+    if(!is.na(proto_ipm$usr_funs[[1]][1])) {
 
       usr_funs  <- proto_ipm$usr_funs[[1]]
 
@@ -440,15 +440,15 @@ make_ipm.general_di_det <- function(proto_ipm,
 
   if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
 
-    usr_funs  <- proto_ipm$usr_funs[[1]]
-
-  } else if(!rlang::is_empty(usr_funs)) {
-
-    if(!is.na(proto_ipm$usr_funs[[1]])) {
+    if(!is.na(proto_ipm$usr_funs[[1]][1])) {
 
       usr_funs  <- proto_ipm$usr_funs[[1]]
 
     }
+
+  } else if(!rlang::is_empty(usr_funs)) {
+
+    proto_ipm <- .append_usr_funs_to_proto(proto_ipm, usr_funs)
 
   }
 
@@ -570,7 +570,7 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
 
   if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
 
-    if(!is.na(proto_ipm$usr_funs[[1]])) {
+    if(!is.na(proto_ipm$usr_funs[[1]][1])) {
 
       usr_funs  <- proto_ipm$usr_funs[[1]]
 
@@ -704,7 +704,7 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
 
   if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
 
-    if(!is.na(proto_ipm$usr_funs[[1]])) {
+    if(!is.na(proto_ipm$usr_funs[[1]][1])) {
 
       usr_funs  <- proto_ipm$usr_funs[[1]]
 
