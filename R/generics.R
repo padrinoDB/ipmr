@@ -833,7 +833,7 @@ plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
 #' @param ipm Output from \code{make_ipm()}.
 #' @param ... other arguments passed to methods
 #'
-#' @value A list of named numeric vector(s) corresponding to the stable trait distribution
+#' @return A list of named numeric vector(s) corresponding to the stable trait distribution
 #' function (\code{right_ev}) or the reproductive values for each trait (\code{left_ev}).
 #'
 #' @details If the model has already been iterated, then these functions
@@ -843,7 +843,7 @@ plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
 #'
 #' Note that \code{right/left_ev} methods only exist for deterministic IPMs. To
 #'  see if there is a quasi-stable distribution for stochastic models, use
-#' \code{\link{qsd_converge()}}.
+#' \code{qsd_converge()}.
 #'
 #' @export
 
@@ -866,10 +866,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
   mod_nm <- deparse(substitute(ipm))
   # Identify state variable name
 
-  pop_nm      <- ipm$proto_ipm$state_var %>%
-    unlist() %>%
-    unique() %>%
-    .[1]
+  pop_nm <- .get_pop_nm_simple(ipm)
 
   # if it's already been iterated to convergence, we don't have much work to do.
 
@@ -1107,6 +1104,9 @@ right_ev.general_di_det_ipm <- function(ipm,
     }
   }
 
+  names(out) <- gsub('pop_state_', '', names(out))
+  names(out) <- paste(names(out), 'w', sep = '_')
+
   return(out)
 }
 
@@ -1127,10 +1127,7 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
 
   # Identify state variable name
 
-  pop_nm <- ipm$proto_ipm$state_var %>%
-    unlist() %>%
-    unique() %>%
-    .[1]
+  pop_nm <- .get_pop_nm_simple(ipm)
 
   # If it's already iterated, then we need to wrap K with a t()
   if(.already_iterated(ipm)) {
@@ -1144,7 +1141,7 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
                     which(k_nm %in% ipm$proto_ipm$kernel_id),
                     1)
 
-    t_k   <- t(ipm$iterators[[1]])
+    t_k   <- t(ipm$iterators[[k_ind]])
 
     # next, we pull out the initial population vector and set up
     # something to hold the population state while we iterate. Simple ipms don't
@@ -1167,6 +1164,7 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
 
       out <- temp_pop_state[ , (n_iterations + 1)]
       out_nm <- paste(pop_nm, 'v', sep = "_")
+
     } else {
 
       warning(
@@ -1228,6 +1226,7 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
 
       out    <- temp_pop_state[ , (n_iterations + 1)]
       out_nm <- paste(pop_nm, 'v', sep = "_")
+
     } else {
 
       warning(
@@ -1252,36 +1251,121 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
   return(out)
 }
 
+#' @rdname eigenvectors
+#' @param mega_mat A vector of names and/or 0s specifying the relationship
+#' between the kernels in the model. The names should correspond to kernel
+#' names, with 0s corresponding to sparse areas of the mega-matrix. The names can
+#' be either symbols or characters.
+#' @param mega_pop_vec A vector of names specifying the format of the population
+#' vector. The names can be either symbols or characters.
+#'
+#' @details \code{mega_mat} fits the pieces of the model together to create a
+#' a transpose of the model to iterate with. Kernel names/0s should be supplied
+#' in ROW MAJOR order (think \code{byrow = TRUE}. \code{ipmr} supplies
+#' a helper function for large models \code{format_mega_mat}
+#' to help with age-size models or ones with a lot of hierarchical effects.
+#'
+#' @examples
+#'
+#'
+#' data(gen_di_det_ex)
+#'
+#' # mega matrix is specifed as a row-major vector/matrix of symbols. You can also
+#' # supply a character vector/matrix. mega_pop_vec is done the same way.
+#' # DO NOT supply arguments like nrow or ncol if using \code{matrix(...)}.
+#' # The function expects to work these out on its own.
+#'
+#' ipmr_v <- left_ev(gen_di_det_ex,
+#'                   mega_mat     = c(stay_discrete, go_discrete,
+#'                                    leave_discrete, P),
+#'                   mega_pop_vec = c(b, ht),
+#'                   n_iterations = 100)
+#'
+#'
+#'
+#' @export
 
 left_ev.general_di_det_ipm <- function(ipm,
+                                       mega_mat,
+                                       mega_pop_vec,
                                        n_iterations = 100,
                                        ...) {
 
+  # capture expressions and model names
+
+  mega_mat     <- rlang::enquo(mega_mat)
+  mega_pop_vec <- rlang::enquo(mega_pop_vec)
+
+  mod_nm       <- deparse(substitute(ipm))
+
+  # extract kernels and make a mega_k. same for initial population vector
+  sub_kernels  <- ipm$sub_kernels
 
 
+  # Set everything up and iterate the transposed model
 
-  param_ind <- vapply(ipm$proto_ipm$params[[proto_ind]]$formula,
-                      function(x) grepl(k_nm,
-                                        x),
-                      logical(1L))
+  mega_k       <- .make_mega_mat(mega_mat    , sub_kernels)
+  mega_vec     <- .make_mega_vec(mega_pop_vec, ipm$pop_state)
+  t_k          <- t(mega_k)
 
-  text_call <- ipm$proto_ipm$params[[proto_ind]]$formula[[param_ind]]
-  mod_call  <- gsub(k_nm,
-                    paste('t(', k_nm, ')', sep = ""),
-                    text_call)
+  pop_holder   <- matrix(NA_real_,
+                         nrow = length(mega_vec),
+                         ncol = (n_iterations + 1))
 
-  ipm$proto_ipm$params[[proto_ind]]$formula[[param_ind]] <- mod_call
+  # Insert t_0 into pop_holder, then iterate!
 
-  iterated <- ipm$proto_ipm %>%
-    make_ipm(iterate    = TRUE,
-             iterations = n_iterations)
+  pop_holder[ , 1] <- mega_vec
 
+  for(i in seq_len(n_iterations)) {
 
+    pop_holder[ , (i + 1)] <- t_k %*%  pop_holder[ , i]
 
+  }
+
+  # Convert output back to ipmr style list. I *really* hate this mega-matrix
+  # method, but genuinely have no idea how else to solve this.
+
+  if(is_conv_to_asymptotic(pop_holder)) {
+
+    # Convert *back* to standard ipmr pop_state format - so dumb. Not worrying
+    # about this right now - Revisit once the core functionality is actually
+    # working
+
+    # pop_holder <- .mega_vec_to_list(mega_pop_vec,
+    #                                 pop_holder,
+    #                                 ipm$pop_state)
+
+    # out        <- .extract_conv_ev_general(pop_holder)
+    out <- pop_holder[ , dim(pop_holder)[2]]
+
+  } else {
+
+    warning(
+      paste(
+        "'",
+        mod_nm,
+        "'",
+        ' did not converge after ',
+        n_iterations,
+        ' iterations. Returning NA, please try again with more iterations.',
+        sep = ""
+      )
+    )
+
+    return(NA_real_)
+
+  }
+
+  # See note L 1330-1332
+  # names(out) <- gsub('pop_state_', '', names(out))
+  # names(out) <- paste(names(out), 'v', sep = '_')
+
+  return(out / sum(out))
 }
 
 # ev helper functions -------------
 
+#' @noRd
 # Checks if model has already been iterated, saving us from re-iterating a model
 # when we can just use the pop_state slot
 
@@ -1299,7 +1383,6 @@ left_ev.general_di_det_ipm <- function(ipm,
 }
 
 #' @noRd
-
 # We need the total pop size to standardize our vectors, but we don't really
 # know the proper order in which to combine them to create a single output.
 # thus, we keep them in a list with entries corresponding to states, and
@@ -1327,8 +1410,218 @@ left_ev.general_di_det_ipm <- function(ipm,
   return(out)
 }
 
+#' @noRd
 
-#' @rdname qsd
+.get_pop_nm_simple <- function(ipm) {
+
+  pop_nm      <- ipm$proto_ipm$state_var %>%
+    unlist() %>%
+    unique() %>%
+    .[1]
+
+  return(pop_nm)
+}
+
+#' @noRd
+
+.make_mega_mat <- function(mega_mat, sub_kernels) {
+
+  # Extract names of sub_kernels. We shouldn't need mega-mat after this
+  # because call_args() returns the mega_mat call's arguments in order!
+
+  sub_mats <- rlang::call_args(mega_mat)
+
+  sub_mat_nms <- Filter(Negate(function(x) x == 0 ), sub_mats)
+
+  if(!all(as.character(unlist(sub_mat_nms)) %in% names(sub_kernels))) {
+
+    stop("names in 'mega_mat' are not all present in 'ipm$sub_kernels'")
+
+  } else if( (sqrt(length(sub_mats)) %% 1L) != 0L) {
+
+    stop('mega_mat is not square!')
+
+  }
+
+  # Next, we need to work out the dimensions of each row + column so that any 0s
+  # can be appropriately duplicated. If there aren't any 0s in 'mega_mat', then
+  # just skip straight to the creation step.
+
+  zero_test <- vapply(sub_mats,
+                      function(x) x == 0,
+                      logical(1L))
+
+  if(any(zero_test)) {
+
+    sub_mats <- .fill_0s(sub_mats, sub_kernels)
+
+  }
+
+  # *_impl = implementation. This evaluates the calls generated by
+  # .prep_mega_mat_call
+
+  out <- .make_mega_mat_impl(sub_mats, sub_kernels)
+
+  return(out)
+
+}
+
+#' @noRd
+
+.make_mega_mat_impl <- function(sub_mats, sub_kernels, mega_mat) {
+
+  # Get number of blocks and then bind
+
+  block_dim <- sqrt(length(sub_mats))
+
+  kern_env  <- rlang::env(!!! sub_kernels)
+
+  sub_mats  <- lapply(sub_mats,
+                      function(sub_kern, eval_env) {
+                        rlang::eval_tidy(sub_kern, env = eval_env)
+                      },
+                      eval_env = kern_env)
+
+  # now, we just need to generate an index to subset the sub_mats for
+  # generating each row of the block matrix
+
+  blocks <- vector('list', length = block_dim)
+
+  for(i in seq_len(block_dim)) {
+
+    if(i == 1) {
+      block_ind <- seq(1, block_dim, by = 1)
+    } else {
+      block_ind <- block_ind + block_dim
+    }
+
+    blocks[[i]] <- do.call(cbind, sub_mats[block_ind])
+
+  }
+
+  out <- do.call(rbind, blocks)
+
+  return(out)
+}
+
+#' @noRd
+
+.fill_0s <- function(sub_mats, sub_kernels) {
+
+  # Create a character matrix that contains the dimensions of each
+  # block in the mega-matrix
+
+  kern_dims <- lapply(sub_kernels,
+                      function(x) {
+                        temp <- dim(x)
+                        out <- paste(temp, collapse = ', ')
+                      })
+
+  mega_block_dim <- sqrt(length(sub_mats))
+  dim_env <- rlang::env()
+
+  rlang::env_bind(!!! kern_dims,
+                  .env = dim_env)
+
+  dim_mat        <- lapply(sub_mats,
+                           function(x, env_) rlang::eval_tidy(x, env = env_),
+                           env_ = dim_env) %>%
+    unlist() %>%
+    matrix(ncol = mega_block_dim,
+           nrow = mega_block_dim,
+           byrow = TRUE)
+
+  # Now, loop over and determine the required dimensions for each 0 entry
+
+  it          <- 1
+  zero_nm_ind <- 1
+
+  for(ro in seq_len(mega_block_dim)) {
+
+    for(co in seq_len(mega_block_dim)) {
+
+      if(dim_mat[ro, co] == "0") {
+
+        ro_dim <- vapply(dim_mat[ro, ],
+                         function(x) {
+                          strsplit(x, ', ')[[1]][1]
+                         },
+                         character(1L)) %>%
+          as.integer() %>%
+          max(na.rm = TRUE) # Need to remove the NAs generated by entries of 0!
+
+        co_dim <- vapply(dim_mat[ , co],
+                         function(x) {
+                           strsplit(x, ', ')[[1]][2]
+                         },
+                         character(1L)) %>%
+          as.integer() %>%
+          max(na.rm = TRUE)
+
+        # Generate an expression and insert it into sub_mats. These get
+        # evaluated and c/rbinded in the next stage
+        zero_call <- paste('matrix(rep(0, times = ',
+                                 ro_dim * co_dim,
+                                 '), nrow = ',
+                                 ro_dim,
+                                 ', ncol = ',
+                                 co_dim,
+                                 ')', sep = "") %>%
+          rlang::parse_expr()
+
+        sub_mats[[it]]      <- zero_call
+        names(sub_mats)[it] <- paste('zero_', zero_nm_ind, sep = "")
+        zero_nm_ind         <- zero_nm_ind + 1
+      } else {
+
+        names(sub_mats)[it] <- as.character(sub_mats[[it]])
+
+      }
+      it <- it + 1
+
+    }   # columns
+  }     # end rows
+
+
+  return(sub_mats)
+
+}
+
+#' @noRd
+# Evaluates the pop_vec
+
+.make_mega_vec <- function(pop_vec, pop_state) {
+
+  names(pop_state) <- gsub('pop_state_', "", names(pop_state))
+
+  temp_pop_state <- lapply(pop_state, function(x) x[ , 1])
+
+  vec_env <- rlang::env(!!! temp_pop_state)
+
+  pop_vec <- rlang::quo_set_env(pop_vec, env = vec_env)
+
+  out <- rlang::eval_tidy(pop_vec, env = vec_env)
+
+  return(out)
+
+}
+
+.mega_vec_to_list <- function(mega_pop_vec, pop_holder, init_pop_state) {
+
+  n_rows <- lapply(init_pop_state,
+                   function(x) dim(x)[1])
+
+  for(i in seq_along(init_pop_state)) {
+
+    nm_out <- names(init_pop_state)[i]
+
+
+  }
+
+}
+
+# qsd_converge methods --------------
+#' @rdname qsd_converge
 #' @title Compute the quasi-stable trait distribution for a stochastic model
 #'
 #' @param ipm The output from \code{make_ipm}
@@ -1350,6 +1643,8 @@ qsd_converge <- function(ipm, p_nms, tol, start_life, n_steps, ...) {
 
 }
 
+#' @rdname qsd_converge
+#' @export
 qsd_converge.simple_di_stoch_kern_ipm <- function(ipm,
                                                   p_nms,
                                                   tol = 1e-7,
@@ -1381,8 +1676,8 @@ qsd_converge.simple_di_stoch_kern_ipm <- function(ipm,
   # Resume here------------------
   for(i in seq_len(n_steps)) {
     # p <- n / sum(n)
-    dist[i] <- 0.5 * (sum(abs(n - r_ev)))
-    n <- mat_p %*% n
+    dist[i] <- 0.5 * (sum(abs(n - r_evs)))
+    n <- mat_ps %*% n
   }
 
   if(min(dist, na.rm = TRUE) < tol) {

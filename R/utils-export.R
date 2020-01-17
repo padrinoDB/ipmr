@@ -275,3 +275,36 @@ mat_power <- function(x, y) {
   return(x %^% y)
 
 }
+
+#' @title Format a mega-matrix
+#'
+#' @param ipm Output from \code{make_ipm}.
+#' @param mega_mat A vector with symbols and/or 0s representing the matrix blocks.
+#' They should be specified in ROW MAJOR order! See examples.
+#' @param presets Either empty or one of 'age-size' or 'hier_effs'. Currently
+#' not implemented
+#'
+#' @return A large matrix
+#'
+#' @examples
+
+#' data(gen_di_det_ex)
+#'
+#' big_k <- format_mega_matrix(gen_di_det_ex,
+#'                             mega_mat = c(0, go_discrete,
+#'                                          leave_discrete, P))
+#'
+#'
+#'
+#' @export
+
+format_mega_matrix <- function(ipm, mega_mat, presets = NULL) {
+
+  mega_mat    <- rlang::enquo(mega_mat)
+  sub_kernels <- ipm$sub_kernels
+
+  out         <- .make_mega_mat(mega_mat, sub_kernels)
+
+  return(out)
+
+}
