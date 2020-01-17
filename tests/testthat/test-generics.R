@@ -1489,7 +1489,7 @@ test_that("`%^%` is working correctly", {
 
 })
 
-context('right_ev is working correctly')
+context('right_ev.simple_di_det is working correctly')
 
 data_list = list(s_int = 2.2,
                  s_slope = 0.25,
@@ -1716,20 +1716,57 @@ test_that('right_ev messages are being produced correctly', {
 
 context('left_ev.simple_di_det_ipm works')
 
-target_l <- Re(eigen(t(sim_di_det_1$iterators$K))$vectors[ , 1])
-target_l <- target_l / sum(target_l)
+target_v <- Re(eigen(t(sim_di_det_1$iterators$K))$vectors[ , 1])
+target_v <- target_v / sum(target_v)
 
 test_that('left_ev.simple_di_det_ipm is working correctly', {
 
   ipmr_v <- left_ev(sim_di_det_1)[[1]]
-  expect_equal(target_l, ipmr_v, tol = 1e-10)
+  expect_equal(target_v, ipmr_v, tol = 1e-10)
 
 })
 
 test_that('left_ev.simple_di_det_ipm can re-iterate models', {
 
   ipmr_v <- left_ev(sim_di_det_3)[[1]]
-  expect_equal(target_l, ipmr_v, tol = 1e-10)
+  expect_equal(target_v, ipmr_v, tol = 1e-10)
+
+})
+
+test_that('warnings are produced correctly', {
+
+  msg <- catch_cnd(left_ev(sim_di_det_3,
+                           n_iterations = 3))
+
+  expect_true(
+    grepl(
+      'did not converge after 3 iterations\\. Returning NA',
+      msg$message
+    )
+  )
+
+  msg <- catch_cnd(left_ev(sim_di_det_1))
+
+  expect_true(
+    grepl(
+      'has not been iterated yet\\. Generating a population vector using runif\\(\\)',
+      msg$message
+    )
+  )
+
+  msg <- capture_warning(
+    left_ev(sim_di_det_1,
+            n_iterations = 2
+    )
+  )
+
+  expect_true(
+    grepl(
+      'did not converge after 2 iterations\\. Returning NA',
+      msg$message
+    )
+  )
+
 
 })
 
@@ -1765,7 +1802,7 @@ n <- 500
 # Initialize the state list and add some helper functions. The survival function
 # in this model is a quadratic function.
 
-states <- list(c('ht', 'sb'))
+states <- list(c('ht', 'b'))
 
 inv_logit <- function(int, slope, sv) {
   1/(1 + exp(-(int + slope * sv)))
@@ -1864,8 +1901,8 @@ target <- target / sum(target)
 test_that('right_ev.general_di_det returns the same as mega-matrix methods', {
 
   ipmr_temp <- right_ev(gen_di_det_1)
-  ipmr_w    <- c(ipmr_temp$pop_state_b,
-                 ipmr_temp$pop_state_ht)
+  ipmr_w    <- c(ipmr_temp$b_w,
+                 ipmr_temp$ht_w)
 
   expect_equal(target, ipmr_w, tol = 1e-10)
 
@@ -1953,8 +1990,8 @@ test_that('right_ev.general_di_det can re-iterate models', {
   test_reiterate <- right_ev(gen_di_det_2,
                              n_iterations = 100)
 
-  ipmr_w <- c(test_reiterate$pop_state_b,
-              test_reiterate$pop_state_ht)
+  ipmr_w <- c(test_reiterate$b_w,
+              test_reiterate$ht_w)
 
   expect_equal(target, ipmr_w, tol = 1e-10)
 
@@ -1966,6 +2003,62 @@ test_that('right_ev.general_di_det returns NAs and warnings properly', {
   test_message <- capture_warning(
     right_ev(gen_di_det_2,
              n_iterations = 3)
+  )
+
+  expect_true(
+    grepl(
+      'did not converge after 3 iterations\\. Returning NA',
+      test_message$message
+    )
+  )
+
+})
+
+context('left_ev.general_di_det works')
+target_v <- Re(eigen(t(mega_k))$vectors[ , 1])
+target_v <- target_v / sum(target_v)
+
+test_that('left_ev.gen_di_det returns the same as mega-matrix models', {
+
+  ipmr_v <- left_ev(gen_di_det_1,
+                    mega_mat = c(
+                      stay_discrete, go_discrete,
+                      leave_discrete, P
+                    ),
+                    mega_pop_vec = c(b, ht))
+  # ipmr_v <- c(ipmr_v$b_w, ipmr_v$ht_w)
+  expect_equal(target_v, ipmr_v, tol = 1e-10)
+
+})
+
+test_that('left_ev.general_di_det can re-iterate models', {
+
+  # THis really shouldn't make a difference for hte left eigenvector,
+  # We don't actually use make_ipm() to re-iterate things
+  ipmr_v <- left_ev(gen_di_det_2,
+                    mega_mat = c(
+                      stay_discrete, go_discrete,
+                      leave_discrete, P
+                    ),
+                    mega_pop_vec = c(b, ht))
+  # ipmr_v <- c(ipmr_v$b_w, ipmr_v$ht_w)
+
+  expect_equal(target_v, ipmr_v, tol = 1e-10)
+
+
+})
+
+
+test_that('left_ev.general_di_det returns warnings properly', {
+
+  test_message <- capture_warning(
+    left_ev(gen_di_det_2,
+            mega_mat = c(
+              stay_discrete, go_discrete,
+              leave_discrete, P
+            ),
+            mega_pop_vec = c(b, ht),
+            n_iterations = 3)
   )
 
   expect_true(

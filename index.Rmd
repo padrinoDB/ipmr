@@ -1,7 +1,7 @@
 ---
 output: 
   md_document:
-    variant: markdown_github
+    variant: gfm
 ---
 [![Travis build status](https://travis-ci.org/levisc8/ipmr.svg?branch=master)](https://travis-ci.org/levisc8/ipmr)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/levisc8/ipmr?branch=master&svg=true)](https://ci.appveyor.com/project/levisc8/ipmr)
@@ -574,12 +574,6 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
                            inv_logit_r = inv_logit_r,
                            pois_r      = pois_r))
 
-
-
-lambda_ipmr <- vapply(monocarp_sys$iterators, 
-                      function(x) Re(eigen(x)$values[1]), 
-                      numeric(1))
-
 lambda_ipmr <- lambda(monocarp_sys,
                       comp_method = 'eigen',
                       type_lambda = 'all')
@@ -737,14 +731,9 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
            iterate    = TRUE,
            iterations = 10)
 
-pop_state_ipmr <- param_resamp_model$pop_state$pop_state_surf_area
-lambda_ipmr    <- numeric(iterations)
-
-for(i in seq(2, dim(pop_state_ipmr)[2], 1)) {
-  
-  lambda_ipmr[(i - 1)] <- sum(pop_state_ipmr[ ,i]) / sum(pop_state_ipmr[ ,(i - 1)])
-  
-}
+lambda_ipmr <- lambda(param_resamp_model, 
+                      comp_method = 'pop_size',
+                      type_lambda = 'all')
 
 lambda_ipmr
 

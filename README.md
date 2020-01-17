@@ -9,8 +9,7 @@ status](https://www.r-pkg.org/badges/version/ipmr)](https://cran.r-project.org/p
 [![Codecov test
 coverage](https://codecov.io/gh/levisc8/ipmr/branch/master/graph/badge.svg)](https://codecov.io/gh/levisc8/ipmr?branch=master)
 
-ipmr
-====
+# ipmr
 
 `ipmr` is a package for implementing Integral Projection Models (IPMs)
 in *R*. It relies heavily on the mathematical syntax of the models, and
@@ -22,7 +21,7 @@ brief overview of how `ipmr` classifies different model types followed
 by examples of how to implement those types in this framework.
 
 Note that this package **will not** help with the process of fitting
-vital rate models at all! That is a sufficiently different (and vast)
+vital rate models at all\! That is a sufficiently different (and vast)
 question that we decided it was not within the scope of this project.
 This will only help you turn those regression models into an IPM without
 shooting yourself in the foot. Thus, everything that follows assumes you
@@ -33,8 +32,7 @@ Below is a brief overview of the package and some examples of how to
 implement models with it. A more thorough introduction is available
 [here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
 
-Model classes
--------------
+## Model classes
 
 The first step of defining a model in `ipmr` (assuming all parameters
 have already been estimated) is to initialize the model using
@@ -46,36 +44,36 @@ character string with at least 3 (but possibly 4) entries separated by
 underscores (`_`). Below, the are the possible entries for each
 position.
 
--   Position 1: `"simple"`/`"general"`
+  - Position 1: `"simple"`/`"general"`
 
--   1.  **simple**: This describes an IPM with a single continuous state
+  - 1.  **simple**: This describes an IPM with a single continuous state
         variable and no discrete stages.
 
--   1.  **general**: This describes and IPM with either more than one
+  - 2.  **general**: This describes and IPM with either more than one
         continuous state variable, one or more discrete stages, or both
         of the above. Basically, anything other than an IPM with a
         single continuous state variable.
 
--   Position 2: `"di"`/`"dd"`
+  - Position 2: `"di"`/`"dd"`
 
--   A. **di**: This is used to denote a density-independent IPM.
+  - A. **di**: This is used to denote a density-independent IPM.
 
--   B. **dd**: This is used to denote a density-dependent IPM.
+  - B. **dd**: This is used to denote a density-dependent IPM.
 
--   Position 3: `"det"`/`"stoch"`
+  - Position 3: `"det"`/`"stoch"`
 
--   A. **det**: This is used to denote a deterministic IPM. If this is
+  - A. **det**: This is used to denote a deterministic IPM. If this is
     used in the third position of `model_class`, there should not be a
     fourth entry.
 
--   B. **stoch**: This is used to denote a stochastic IPM. If this is
+  - B. **stoch**: This is used to denote a stochastic IPM. If this is
     used in the third position of `model_class`, there should always be
     a fourth entry. The two possibilities for the fourth are described
     next.
 
--   Position 4: `"kern"`/`"param"`
+  - Position 4: `"kern"`/`"param"`
 
--   A. **kern**: This describes an IPM with discretely varying
+  - A. **kern**: This describes an IPM with discretely varying
     parameters such that there values are known before the model is
     specified. This is usually the case with models that estimate random
     year/site effects and for which defining a multivariate joint
@@ -85,7 +83,7 @@ position.
     the iteration procedure begins, as opposed to requiring
     reconstruction for every single iteration.
 
--   B. **param**: This describes an IPM with parameters that are
+  - B. **param**: This describes an IPM with parameters that are
     re-sampled from some distribution at each iteration of the model
     (usually a multivariate joint distribution). This can be a
     multivariate normal defined by covarying slopes and intercepts, or
@@ -97,13 +95,15 @@ position.
     inspiration in writing those.
 
 With the type of model selected, the `model_class` becomes a string and
-the call to `init_ipm` is composed like so:
-`init_ipm(model_class = "position1_position_2_position3_position4")`.
+the call to `init_ipm` is composed like so: `init_ipm(model_class =
+"position1_position_2_position3_position4")`.
 
 The following possibilities are currently or will become available in
 `ipmr` (bold text denotes development progress):
 
--   Simple, density independent models: **Completed and ready**
+  - Simple, density independent models: **Completed and ready**
+
+<!-- end list -->
 
 1.  `"simple_di_det"`
 
@@ -111,32 +111,43 @@ The following possibilities are currently or will become available in
 
 3.  `"simple_di_stoch_param"`
 
--   Simple, density dependent models: **Please be patient**
+<!-- end list -->
 
-1.  `"simple_dd_det"`
+  - Simple, density dependent models: **Please be patient**
 
-2.  `"simple_dd_stoch_kern"`
+<!-- end list -->
 
-3.  `"simple_dd_stoch_param"`
+4.  `"simple_dd_det"`
 
--   General, density independent models: **Completed and ready**
+5.  `"simple_dd_stoch_kern"`
 
-1.  `"general_di_det"`
+6.  `"simple_dd_stoch_param"`
 
-2.  `"general_di_stoch_kern"`
+<!-- end list -->
 
-3.  `"general_di_stoch_param"`
+  - General, density independent models: **Completed and ready**
 
--   General, density dependent models: **Please be patient**
+<!-- end list -->
 
-1.  `"general_dd_det"`
+7.  `"general_di_det"`
 
-2.  `"general_dd_stoch_kern"`
+8.  `"general_di_stoch_kern"`
 
-3.  `"general_dd_stoch_param"`
+9.  `"general_di_stoch_param"`
 
-Examples for implemented IPM types
-----------------------------------
+<!-- end list -->
+
+  - General, density dependent models: **Please be patient**
+
+<!-- end list -->
+
+10. `"general_dd_det"`
+
+11. `"general_dd_stoch_kern"`
+
+12. `"general_dd_stoch_param"`
+
+## Examples for implemented IPM types
 
 Simple density-independent deterministic, simple kernel-resampled
 stochastic, and simple parameter resampled stochastic models
@@ -146,8 +157,8 @@ functional and detailed below as well as
 The `general_*` versions of these are also ready, and an introduction to
 them is available
 [here](https://levisc8.github.io/ipmr/articles/general-ipms.html).
-However, expect changes as more complicated methods are implemented! See
-below for an example of how to implement an IPM in this framework.
+However, expect changes as more complicated methods are implemented\!
+See below for an example of how to implement an IPM in this framework.
 
 Next on the to-do list is to write generic functions for `lambda`,
 `right_ev` (right eigenvector), `left_ev` (left eigenvector),
@@ -325,8 +336,7 @@ v_ipmr      <- left_ev(x)
 lambda_ipmr - lambda_usr
 ```
 
-Simple, density independent, stochastic kernel resampled models
----------------------------------------------------------------
+## Simple, density independent, stochastic kernel resampled models
 
 These models are typically the result of vital rate models that are fit
 in a mixed effects framework (e.g. multiple sites or multiple years of
@@ -651,15 +661,14 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
 
 
 
-lambda_ipmr <- vapply(monocarp_sys$iterators, 
-                      function(x) Re(eigen(x)$values[1]), 
-                      numeric(1))
+lambda_ipmr <- lambda(monocarp_sys, 
+                      comp_method = 'eigen',
+                      type_lambda = 'all')
 
 lambda_ipmr - lambdas
 ```
 
-Simple, density independet, parameter resampled models
-------------------------------------------------------
+## Simple, density independet, parameter resampled models
 
 These models are stochastic, but rather than building the iteration
 kernels first and then iterating them - distributions for varying
@@ -819,14 +828,9 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
            iterate    = TRUE,
            iterations = 10)
 
-pop_state_ipmr <- param_resamp_model$pop_state$pop_state_surf_area
-lambda_ipmr    <- numeric(iterations)
-
-for(i in seq(2, dim(pop_state_ipmr)[2], 1)) {
-  
-  lambda_ipmr[(i - 1)] <- sum(pop_state_ipmr[ ,i]) / sum(pop_state_ipmr[ ,(i - 1)])
-  
-}
+lambda(param_resamp_model,
+       comp_method = 'pop_size',
+       type_lambda = 'all')
 
 lambda_ipmr
 ```
