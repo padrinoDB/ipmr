@@ -2069,3 +2069,57 @@ test_that('left_ev.general_di_det returns warnings properly', {
   )
 
 })
+
+context('mega-matrix functionality')
+
+test_that('fill_0s is working as it should', {
+
+  mega_mat <- rlang::quo(
+    c(
+      x, 0, y,
+      z, a, 0,
+      b, c, d
+    )
+  )
+
+  sub_kernels <- list(
+    x = matrix(rnorm(9, 10), 3, 3),
+    y = matrix(rnorm(12), 3, 4),
+    z = matrix(rnorm(15, 25), 5, 3),
+    a = matrix(rnorm(25, 50), 5, 5),
+    b = matrix(runif(18), 6, 3),
+    c = matrix(rnorm(30, -20), 6, 5),
+    d = matrix(rnorm(24, -70), 6, 4)
+  )
+
+  mega_k   <- .make_mega_mat(mega_mat, sub_kernels)
+  mega_dim <- dim(mega_k)
+
+  expect_equal(14, mega_dim[1])
+  expect_equal(12, mega_dim[2])
+
+  expect_equal(mega_k[1:3, 1:3], sub_kernels$x)
+  expect_equal(mega_k[4:8, 4:8], sub_kernels$a)
+  expect_equal(matrix(rep(0, 15), 3, 5), mega_k[1:3, 4:8])
+  expect_equal(matrix(rep(0, 20), 5, 4), mega_k[4:8, 9:12])
+  expect_equal(mega_k[9:14, 9:12], sub_kernels$d)
+
+})
+
+test_that('format_mega_mat works as advertize', {
+
+  test_mat <- format_mega_matrix(gen_di_det_2,
+                                 mega_mat = c(
+                                   stay_discrete, go_discrete,
+                                   leave_discrete, P
+                                 ))
+
+  expect_equal(unclass(gen_di_det_2$sub_kernels$P),
+               test_mat[2:501, 2:501])
+
+  disc <- unclass(gen_di_det_2$sub_kernels$go_discrete) %>%
+    as.vector()
+
+  expect_equal(disc,
+               test_mat[1, 2:501])
+})
