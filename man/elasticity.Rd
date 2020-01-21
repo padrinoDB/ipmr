@@ -2,17 +2,32 @@
 % Please edit documentation in R/generics.R
 \name{elasticity}
 \alias{elasticity}
+\alias{elasticity.simple_di_det_ipm}
 \title{Compute elasticity}
 \usage{
 elasticity(
   ipm,
+  what = c("r_0", "lambda", "gen_t"),
   level = c("kernel", "vital_rate", "parameter"),
   subset = NA_character_,
+  ...
+)
+
+\method{elasticity}{simple_di_det_ipm}(
+  ipm,
+  what = "lambda",
+  level = "kernel",
+  subset = NA_character_,
+  n_iterations = 100,
   ...
 )
 }
 \arguments{
 \item{ipm}{Output from \code{make_ipm()}.}
+
+\item{what}{The numerator of the partial derivative for sensitivity.
+Possible options \code{"lambda"} (default), \code{"r_0"},
+and \code{"gen_t"}. More will probably be added later.}
 
 \item{level}{The level to compute elasticity at. \code{"kernel"} computes
 the model wide elasticity surface and returns that. \code{"vital_rate"}
@@ -25,6 +40,10 @@ vital rates or parameters to compute values for.}
 only a few parameters or vital rates are of interest.}
 
 \item{...}{other arguments passed to methods}
+
+\item{n_iterations}{The number of times to iterate the model when computing
+the left and right eigenvectors. Default is 100 for deterministic IPMs, and varies
+depending on the stochastic IPM.}
 }
 \value{
 A list. Contains either kernel response surfaces, vital rate level

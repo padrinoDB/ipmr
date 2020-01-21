@@ -358,6 +358,19 @@
 }
 
 #' @noRd
+# x = an object from make_ipm()
+
+.det_lambda <- function(x) {
+
+  return(
+    vapply(x$iterators,
+           function(y) Re(eigen(y)$values[1]),
+           numeric(1L))
+  )
+
+}
+
+#' @noRd
 
 is_square <- function(x) {
 

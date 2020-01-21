@@ -509,7 +509,7 @@ n <- 500
 # Initialize the state list and add some helper functions. The survival function
 # in this model is a quadratic function.
 
-states <- list(c('ht', 'sb'))
+states <- list(c('ht'))
 
 inv_logit <- function(int, slope, sv) {
   1/(1 + exp(-(int + slope * sv)))

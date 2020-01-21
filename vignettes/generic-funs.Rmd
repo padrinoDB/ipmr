@@ -1,0 +1,40 @@
+---
+title: "List of Generic and Helper Functions in ipmr"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{generic-funs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+`ipmr` includes a host of generic functions to analyze your IPM. Below is a list of all of them, grouped roughly by the type of analysis they might be useful for. Some of these may not be available for certain classes of IPMs, so be sure to see each functions help page for more information. 
+
+## Asymptotic behavior
+
+- [`lambda()`](https://levisc8.github.io/ipmr/reference/lambda.html)
+
+- [`right_ev()`](https://levisc8.github.io/ipmr/reference/eigenvectors.html)
+
+- [`left_ev()`](https://levisc8.github.io/ipmr/reference/eigenvectors.html)
+
+
+## Prospective perturbations
+
+- [`sensitivity()`](https://levisc8.github.io/ipmr/reference/sensitivity.html)
+
+- [`elasticity()`](https://levisc8.github.io/ipmr/reference/elasticity.html)
+
+- 
+
+## Miscellaneous helpers
+
+- [`format_mega_matrix()`](https://levisc8.github.io/ipmr/reference/format_mega_matrix.html)
+
+

@@ -75,20 +75,6 @@
 }
 
 #' @noRd
-# x = an pbject from make_ipm()
-
-.det_lambda <- function(x) {
-
-  return(
-    vapply(x$iterators,
-           function(y) Re(eigen(y)$values[1]),
-           numeric(1L))
-  )
-
-}
-
-
-#' @noRd
 # Checks if model has already been iterated, saving us from re-iterating a model
 # when we can just use the pop_state slot
 

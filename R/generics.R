@@ -468,7 +468,6 @@ lambda <- function(ipm, ...) {
 }
 
 #' @rdname lambda
-#'
 #' @export
 
 lambda.simple_di_det_ipm <- function(ipm,
@@ -483,7 +482,6 @@ lambda.simple_di_det_ipm <- function(ipm,
 }
 
 #' @rdname lambda
-#'
 #' @export
 
 lambda.simple_di_stoch_kern_ipm <- function(ipm,
@@ -505,7 +503,6 @@ lambda.simple_di_stoch_kern_ipm <- function(ipm,
 }
 
 #' @rdname lambda
-#'
 #' @export
 
 lambda.simple_di_stoch_param_ipm <- function(ipm,
@@ -528,7 +525,7 @@ lambda.simple_di_stoch_param_ipm <- function(ipm,
 
 #' @rdname lambda
 #' @export
-#'
+
 lambda.general_di_det_ipm <- function(ipm, type_lambda = 'all', ...) {
 
   temp <- .lambda_pop_size(ipm, all_lambdas = TRUE)
@@ -542,9 +539,8 @@ lambda.general_di_det_ipm <- function(ipm, type_lambda = 'all', ...) {
 
 
 #' @rdname lambda
-#'
 #' @export
-#'
+
 lambda.general_di_stoch_kern_ipm <- function(ipm,
                                              ...,
                                              type_lambda = c('all', 'stochastic')) {
@@ -559,9 +555,8 @@ lambda.general_di_stoch_kern_ipm <- function(ipm,
 }
 
 #' @rdname lambda
-#'
 #' @export
-#'
+
 lambda.general_di_stoch_param_ipm <- function(ipm,
                                               ...,
                                               type_lambda = c('all', 'stochastic')) {
@@ -680,6 +675,7 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
 #' @param sub_kernels A logical - also plot the sub-kernels?
 #' @param exponent The exponent to raise each kernel to. Setting this to a low
 #' number can help visualize kernels that are overwhelmed by a few very large numbers.
+#'
 #' @export
 
 plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
@@ -1513,14 +1509,17 @@ sensitivity <- function(ipm,
 }
 
 #' @rdname sensitivity
+#' @param n_iterations The number of times to iterate the model when computing
+#' the left and right eigenvectors. Default is 100 for deterministic IPMs, and varies
+#' depending on the stochastic IPM.
 #' @export
 
 sensitivity.simple_di_det_ipm <- function(ipm,
-                                      what   = "lambda",
-                                      level  = "kernel",
-                                      subset = NA_character_,
-                                      n_iterations = 100,
-                                      ...) {
+                                          what   = "lambda",
+                                          level  = "kernel",
+                                          subset = NA_character_,
+                                          n_iterations = 100,
+                                          ...) {
 
   to_do <- paste(what, level, sep = "_")
 
@@ -1532,28 +1531,28 @@ sensitivity.simple_di_det_ipm <- function(ipm,
   out   <- switch(to_do,
                   "lambda_kernel"     = .sens_lam_kern(ipm,
                                                        n_iterations),
-                  'lambda_vital_rate' = .sens_lam_vr(ipm,
-                                                     n_iterations,
-                                                     subset),
-                  'lambda_parameter'  = .sens_lam_param(ipm,
-                                                        n_iterations,
-                                                        subset),
-                  'r_0_kernel'        = .sens_r_0_kern(ipm,
-                                                       n_iterations),
-                  'r_0_vital_rate'    = .sens_r_0_vr(ipm,
-                                                     n_iterations,
-                                                     subset),
-                  'r_0_parameter'     = .sens_r_0_param(ipm,
-                                                        n_iterations,
-                                                        subset),
-                  'gen_t_kernel'      = .sens_gen_t_kern(ipm,
-                                                         n_iterations),
-                  'gen_t_vital_rate'  = .sens_gen_t_vr(ipm,
-                                                       n_iterations,
-                                                       subset),
-                  'gen_t_parameter'   = .sens_gen_t_param(ipm,
-                                                          n_iterations,
-                                                          subset)
+                  # 'lambda_vital_rate' = .sens_lam_vr(ipm,
+                  #                                    n_iterations,
+                  #                                    subset),
+                  # 'lambda_parameter'  = .sens_lam_param(ipm,
+                  #                                       n_iterations,
+                  #                                       subset),
+                  # 'r_0_kernel'        = .sens_r_0_kern(ipm,
+                  #                                      n_iterations),
+                  # 'r_0_vital_rate'    = .sens_r_0_vr(ipm,
+                  #                                    n_iterations,
+                  #                                    subset),
+                  # 'r_0_parameter'     = .sens_r_0_param(ipm,
+                  #                                       n_iterations,
+                  #                                       subset),
+                  # 'gen_t_kernel'      = .sens_gen_t_kern(ipm,
+                  #                                        n_iterations),
+                  # 'gen_t_vital_rate'  = .sens_gen_t_vr(ipm,
+                  #                                      n_iterations,
+                  #                                      subset),
+                  # 'gen_t_parameter'   = .sens_gen_t_param(ipm,
+                  #                                         n_iterations,
+                  #                                         subset)
   )
 
 
@@ -1594,28 +1593,28 @@ sensitivity.general_di_det_ipm <- function(ipm,
                                                        n_iterations,
                                                        mega_mat,
                                                        mega_vec),
-                  'lambda_vital_rate' = .sens_lam_vr(ipm,
-                                                     n_iterations,
-                                                     subset),
-                  'lambda_parameter'  = .sens_lam_param(ipm,
-                                                        n_iterations,
-                                                        subset),
-                  'r_0_kernel'        = .sens_r_0_kern(ipm,
-                                                       n_iterations),
-                  'r_0_vital_rate'    = .sens_r_0_vr(ipm,
-                                                     n_iterations,
-                                                     subset),
-                  'r_0_parameter'     = .sens_r_0_param(ipm,
-                                                        n_iterations,
-                                                        subset),
-                  'gen_t_kernel'      = .sens_gen_t_kern(ipm,
-                                                         n_iterations),
-                  'gen_t_vital_rate'  = .sens_gen_t_vr(ipm,
-                                                       n_iterations,
-                                                       subset),
-                  'gen_t_parameter'   = .sens_gen_t_param(ipm,
-                                                          n_iterations,
-                                                          subset)
+                  # 'lambda_vital_rate' = .sens_lam_vr(ipm,
+                  #                                    n_iterations,
+                  #                                    subset),
+                  # 'lambda_parameter'  = .sens_lam_param(ipm,
+                  #                                       n_iterations,
+                  #                                       subset),
+                  # 'r_0_kernel'        = .sens_r_0_kern(ipm,
+                  #                                      n_iterations),
+                  # 'r_0_vital_rate'    = .sens_r_0_vr(ipm,
+                  #                                    n_iterations,
+                  #                                    subset),
+                  # 'r_0_parameter'     = .sens_r_0_param(ipm,
+                  #                                       n_iterations,
+                  #                                       subset),
+                  # 'gen_t_kernel'      = .sens_gen_t_kern(ipm,
+                  #                                        n_iterations),
+                  # 'gen_t_vital_rate'  = .sens_gen_t_vr(ipm,
+                  #                                      n_iterations,
+                  #                                      subset),
+                  # 'gen_t_parameter'   = .sens_gen_t_param(ipm,
+                  #                                         n_iterations,
+                  #                                         subset)
   )
 
 
@@ -1630,6 +1629,9 @@ sensitivity.general_di_det_ipm <- function(ipm,
 #' @title Compute elasticity
 #'
 #' @param ipm Output from \code{make_ipm()}.
+#' @param what The numerator of the partial derivative for sensitivity.
+#' Possible options \code{"lambda"} (default), \code{"r_0"},
+#' and \code{"gen_t"}. More will probably be added later.
 #' @param level The level to compute elasticity at. \code{"kernel"} computes
 #' the model wide elasticity surface and returns that. \code{"vital_rate"}
 #' computes lambda's elasticity to specific vital rates, \code{"parameter"} lambda's
@@ -1644,6 +1646,8 @@ sensitivity.general_di_det_ipm <- function(ipm,
 #' elasticity values, or parameter level elasticity values. The class is always
 #' \code{c("ipmr_elasticity", "list")} (for internal usage and plot methods).
 #'
+#' @export
+
 elasticity <- function(ipm,
                        what = c("r_0", 'lambda', 'gen_t'),
                        level = c('kernel', 'vital_rate', 'parameter'),
@@ -1653,6 +1657,59 @@ elasticity <- function(ipm,
   UseMethod('elasticity')
 
 }
+
+#' @rdname elasticity
+#' @param n_iterations The number of times to iterate the model when computing
+#' the left and right eigenvectors. Default is 100 for deterministic IPMs, and varies
+#' depending on the stochastic IPM.
+#' @export
+
+elasticity.simple_di_det_ipm <- function(ipm,
+                                         what   = "lambda",
+                                         level  = "kernel",
+                                         subset = NA_character_,
+                                         n_iterations = 100,
+                                         ...) {
+
+  to_do <- paste(what, level, sep = "_")
+
+  # The internal functions called here are all generics and operate on ipm object
+  # plus the additional arguments that get passed onward depending on methods.
+  # sensitivity itself is generic so that we can anticipate inputs to the internal
+  # generics and calls to switch don't get ludicrously complicated for simple IPMs
+
+  out   <- switch(to_do,
+                  "lambda_kernel"     = .elas_lam_kern(ipm,
+                                                       n_iterations),
+                  # 'lambda_vital_rate' = .elas_lam_vr(ipm,
+                  #                                    n_iterations,
+                  #                                    subset),
+                  # 'lambda_parameter'  = .elas_lam_param(ipm,
+                  #                                       n_iterations,
+                  #                                       subset),
+                  # 'r_0_kernel'        = .elas_r_0_kern(ipm,
+                  #                                      n_iterations),
+                  # 'r_0_vital_rate'    = .elas_r_0_vr(ipm,
+                  #                                    n_iterations,
+                  #                                    subset),
+                  # 'r_0_parameter'     = .elas_r_0_param(ipm,
+                  #                                       n_iterations,
+                  #                                       subset),
+                  # 'gen_t_kernel'      = .elas_gen_t_kern(ipm,
+                  #                                        n_iterations),
+                  # 'gen_t_vital_rate'  = .elas_gen_t_vr(ipm,
+                  #                                      n_iterations,
+                  #                                      subset),
+                  # 'gen_t_parameter'   = .elas_gen_t_param(ipm,
+                  #                                         n_iterations,
+                  #                                         subset)
+  )
+
+
+  return(out)
+
+}
+
 
 # diagnose ---------------
 
