@@ -57,6 +57,9 @@
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
+      <a href="../articles/generic-funs.html">List of Generic and Helper Functions in ipmr</a>
+    </li>
+    <li>
       <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
     </li>
     <li>
@@ -84,7 +87,7 @@
       <h1>General IPMs</h1>
                         <h4 class="author">Sam Levin</h4>
             
-            <h4 class="date">2020-01-17</h4>
+            <h4 class="date">2020-01-21</h4>
       
       
       <div class="hidden name"><code>general-ipms.Rmd</code></div>
@@ -105,7 +108,7 @@
 <p>We’ll start with the least complicated of the general IPMs and build progressively from there. If you’ve already covered the <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">Intro to ipmr</a>, then most of this will look pretty familiar. There are three new bits:</p>
 <ol style="list-style-type: decimal">
 <li><p>We are required to <code><a href="../reference/define_star.html">define_pop_state()</a></code> before calling <code><a href="../reference/make_ipm.html">make_ipm()</a></code>.</p></li>
-<li><p>Each kernel that has an integration requires that <code>d_statevariable</code> get appended to the kernel <code>formula</code>. This is equivalent to the “dz” in <span class="math inline">\(\int_L^U K(z',z) n(z,t) \mathrm{dz}\)</span> <code>ipmr</code> automatically generates this variable internally, so there is no need to define it in the <code>data_list</code>. We skipped this step in the simple IPMs because it gets appended internally. Unfortunately, it is decidedly less easy to infer the correct state variable to <code>d_z</code> with for general IPMs where there may be many continuous and/or discrete states.</p></li>
+<li><p>Each kernel that has an integration requires that <code>d_statevariable</code> get appended to the kernel <code>formula</code>. This is equivalent to the “dz” in <span class="math inline">\(\int_L^U K(z',z) n(z,t) \mathrm{dz}\)</span>. <code>ipmr</code> automatically generates this variable internally, so there is no need to define it in the <code>data_list</code>. We skipped this step in the simple IPMs because it gets appended internally. Unfortunately, it is decidedly less easy to infer the correct state variable to <code>d_z</code> with for general IPMs where there may be many continuous and/or discrete states.</p></li>
 <li><p>We don’t necessarily define a formula for <span class="math inline">\(K(ht',ht)\)</span> as we did in the simple IPMs. This is due to the point above about using iteration based methods for computing. Instead, we define how the kernels manipulate different population states at time <span class="math inline">\(t\)</span> to produce new states at time <span class="math inline">\(t+1\)</span>.</p></li>
 </ol>
 <p>This example will use a single discrete stage (seed bank, abbreviated <code>b</code>) and a single continuous state (height, abbreviated <code>ht</code>). Reproduction is time-lagged so all seeds must enter the seed bank (so <code>stay_discrete</code> = 0). They can either germinate in the next year, or they can die. Thus, the full model takes the following form:</p>

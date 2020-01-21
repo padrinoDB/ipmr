@@ -95,6 +95,9 @@
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
+      <a href="../articles/generic-funs.html">List of Generic and Helper Functions in ipmr</a>
+    </li>
+    <li>
       <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
     </li>
     <li>
@@ -136,12 +139,19 @@
 <span class='fu'>right_ev</span>(<span class='no'>ipm</span>, <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>right_ev</span>(<span class='no'>ipm</span>, <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='no'>...</span>)
+<span class='fu'>right_ev</span>(
+  <span class='no'>ipm</span>,
+  <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>mega_mat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>mega_vec</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>keep_mega</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='no'>...</span>
+)
 
 <span class='fu'>left_ev</span>(<span class='no'>ipm</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>left_ev</span>(<span class='no'>ipm</span>, <span class='no'>mega_mat</span>, <span class='no'>mega_pop_vec</span>, <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>left_ev</span>(<span class='no'>ipm</span>, <span class='no'>mega_mat</span>, <span class='no'>mega_vec</span>, <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>keep_mega</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -164,12 +174,20 @@ convergence. Default is 100.</p></td>
       <td><p>A vector of names and/or 0s specifying the relationship
 between the kernels in the model. The names should correspond to kernel
 names, with 0s corresponding to sparse areas of the mega-matrix. The names can
-be either symbols or characters.</p></td>
+be either symbols or characters. These functions support suffix expansion as in
+<code><a href='kernel-definitions.html'>define_k(ernel)</a></code>, so expressions don't need to be re-written for every
+combination hierarchical effects.</p></td>
     </tr>
     <tr>
-      <th>mega_pop_vec</th>
+      <th>mega_vec</th>
       <td><p>A vector of names specifying the format of the population
 vector. The names can be either symbols or characters.</p></td>
+    </tr>
+    <tr>
+      <th>keep_mega</th>
+      <td><p>A logical. TRUE returns a list with the mega matrix
+and full eigenvector, FALSE returns a list with each state's contribution
+to eigenvector. Default is FALSE, mostly for internal usage.</p></td>
     </tr>
     </table>
 
@@ -183,9 +201,10 @@ function (<code>right_ev</code>) or the reproductive values for each trait (<cod
 will just extract population state of the final iteration and return
 that in a named list. Each element of the list is a vector with length
 <code>&gt;= 1</code> and corresponds each state variable's portion of the eigenvector.</p>
-<p>Note that <code>right/left_ev</code> methods only exist for deterministic IPMs. To
- see if there is a quasi-stable distribution for stochastic models, use
-<code><a href='qsd_converge.html'>qsd_converge()</a></code>.</p>
+<p>Note that for <code>*_di_stoch_kern_ipm</code>'s, these generics will create a mean
+matrix and then compute the left/right eigenvectors for that. For
+<code>*_di_stoch_param_ipm</code>'s, it will compute the average environment kernel
+(e.g. using the means from the <code>env_seq</code> slot of the IPM).</p>
 <p><code>mega_mat</code> fits the pieces of the model together to create a
 a transpose of the model to iterate with. Kernel names/0s should be supplied
 in ROW MAJOR order (think <code>byrow = TRUE</code>. <code>ipmr</code> supplies
@@ -194,18 +213,17 @@ to help with age-size models or ones with a lot of hierarchical effects.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>gen_di_det_ex</span>)
 
 <span class='co'># mega matrix is specifed as a row-major vector/matrix of symbols. You can also</span>
-<span class='co'># supply a character vector/matrix. mega_pop_vec is done the same way.</span>
+<span class='co'># supply a character vector/matrix. mega_vec is done the same way.</span>
 <span class='co'># DO NOT supply arguments like nrow or ncol if using \code{matrix(...)}.</span>
 <span class='co'># The function expects to work these out on its own.</span>
 
 <span class='no'>ipmr_v</span> <span class='kw'>&lt;-</span> <span class='fu'>left_ev</span>(<span class='no'>gen_di_det_ex</span>,
                   <span class='kw'>mega_mat</span>     <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>stay_discrete</span>, <span class='no'>go_discrete</span>,
                                    <span class='no'>leave_discrete</span>, <span class='no'>P</span>),
-                  <span class='kw'>mega_pop_vec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>b</span>, <span class='no'>ht</span>),
+                  <span class='kw'>mega_vec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>b</span>, <span class='no'>ht</span>),
                   <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

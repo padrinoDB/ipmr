@@ -95,6 +95,9 @@
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
+      <a href="../articles/generic-funs.html">List of Generic and Helper Functions in ipmr</a>
+    </li>
+    <li>
       <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
     </li>
     <li>
@@ -132,8 +135,31 @@
 
     <pre class="usage"><span class='fu'>sensitivity</span>(
   <span class='no'>ipm</span>,
+  <span class='kw'>what</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"r_0"</span>, <span class='st'>"lambda"</span>, <span class='st'>"gen_t"</span>),
   <span class='kw'>level</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"kernel"</span>, <span class='st'>"vital_rate"</span>, <span class='st'>"parameter"</span>),
   <span class='kw'>subset</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
+  <span class='no'>...</span>
+)
+
+<span class='co'># S3 method for simple_di_det_ipm</span>
+<span class='fu'>sensitivity</span>(
+  <span class='no'>ipm</span>,
+  <span class='kw'>what</span> <span class='kw'>=</span> <span class='st'>"lambda"</span>,
+  <span class='kw'>level</span> <span class='kw'>=</span> <span class='st'>"kernel"</span>,
+  <span class='kw'>subset</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
+  <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='no'>...</span>
+)
+
+<span class='co'># S3 method for general_di_det_ipm</span>
+<span class='fu'>sensitivity</span>(
+  <span class='no'>ipm</span>,
+  <span class='kw'>what</span> <span class='kw'>=</span> <span class='st'>"lambda"</span>,
+  <span class='kw'>level</span> <span class='kw'>=</span> <span class='st'>"kernel"</span>,
+  <span class='kw'>subset</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
+  <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100L</span>,
+  <span class='no'>mega_mat</span>,
+  <span class='no'>mega_vec</span>,
   <span class='no'>...</span>
 )</pre>
 
@@ -145,12 +171,18 @@
       <td><p>Output from <code><a href='make_ipm.html'>make_ipm()</a></code>.</p></td>
     </tr>
     <tr>
+      <th>what</th>
+      <td><p>The numerator of the partial derivative for sensitivity.
+Possible options <code>"lambda"</code> (default), <code>"r_0"</code>,
+and <code>"gen_t"</code>. More will probably be added later.</p></td>
+    </tr>
+    <tr>
       <th>level</th>
-      <td><p>The level to compute sensitivity at. <code>"kernel"</code> computes
-the model wide sensitivity surface and returns that. <code>"vital_rate"</code>
-computes lambda's sensitivity to specific vital rates, <code>"parameter"</code> lambda's
-sensitivity to each parameter. Use <code>subset</code> to specify a subset of
-vital rates or parameters to compute values for.</p></td>
+      <td><p>The denominator of the partial derivative for sensitivity.
+<code>"kernel"</code> computes the model wide sensitivity surface and returns that.
+<code>"vital_rate"</code> computes lambda's sensitivity to specific vital rates,
+<code>"parameter"</code> lambda's sensitivity to each parameter. Use <code>subset</code>
+to specify a subset of vital rates or parameters to compute values for.</p></td>
     </tr>
     <tr>
       <th>subset</th>
@@ -161,6 +193,26 @@ only a few parameters or vital rates are of interest.</p></td>
     <tr>
       <th>...</th>
       <td><p>other arguments passed to methods</p></td>
+    </tr>
+    <tr>
+      <th>n_iterations</th>
+      <td><p>The number of times to iterate the model when computing
+the left and right eigenvectors. Default is 100 for deterministic IPMs, and varies
+depending on the stochastic IPM.</p></td>
+    </tr>
+    <tr>
+      <th>mega_mat</th>
+      <td><p>A vector of names and/or 0s specifying the relationship
+between the kernels in the model. The names should correspond to kernel
+names, with 0s corresponding to sparse areas of the mega-matrix. The names can
+be either symbols or characters. These functions support suffix expansion as in
+<code><a href='kernel-definitions.html'>define_k(ernel)</a></code>, so expressions don't need to be re-written for every
+combination hierarchical effects.</p></td>
+    </tr>
+    <tr>
+      <th>mega_vec</th>
+      <td><p>A vector of names specifying the format of the population
+vector. The names can be either symbols or characters.</p></td>
     </tr>
     </table>
 
