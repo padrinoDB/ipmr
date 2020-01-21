@@ -217,7 +217,18 @@
 
   names(pop_state) <- gsub('pop_state_', "", names(pop_state))
 
-  temp_pop_state   <- lapply(pop_state, function(x) x[ , 1])
+  # if {...} else {...} to handle the case in right_ev where it is working
+  # just with a list of vectors. In general, most instances should be a list
+  # of matrices. This just helps generalize a bit more.
+
+  temp_pop_state   <- lapply(pop_state,
+                             function(x) {
+                               if(is.matrix(x)) {
+                                 x[ , 1]
+                               } else {
+                                 x
+                               }
+                             })
 
   vec_env          <- rlang::env(!!! temp_pop_state)
 
@@ -229,9 +240,9 @@
 
 }
 
-.mega_vec_to_list <- function(mega_pop_vec, pop_holder, init_pop_state) {
+.mega_vec_to_list <- function(mega_vec, pop_holder, init_pop_state) {
 
-  # Get the number of cells for each state variable in the mega_pop_vec,
+  # Get the number of cells for each state variable in the mega_vec,
   # and conver that to the
 
   n_rows        <- lapply(init_pop_state,
@@ -239,12 +250,12 @@
 
   names(n_rows) <- gsub('pop_state_', '', names(n_rows))
 
-  order_ind     <- rlang::eval_tidy(mega_pop_vec, data = n_rows)
+  order_ind     <- rlang::eval_tidy(mega_vec, data = n_rows)
 
   # Convert the call arguments to characters so we can use them
   # to name the output list
 
-  mega_vec_nm   <- rlang::call_args(mega_pop_vec) %>%
+  mega_vec_nm   <- rlang::call_args(mega_vec) %>%
     vapply(as.character, character(1L))
 
   out <- list()

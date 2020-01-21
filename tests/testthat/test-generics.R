@@ -1908,7 +1908,6 @@ test_that('right_ev.general_di_det returns the same as mega-matrix methods', {
 
 })
 
-
 gen_di_det_2 <- init_ipm("general_di_det") %>%
   define_kernel(
     name          = "P",
@@ -1997,6 +1996,21 @@ test_that('right_ev.general_di_det can re-iterate models', {
 
 })
 
+test_that('right_ev(keep_mega = TRUE) works', {
+
+  mega_sys <- right_ev(gen_di_det_1,
+                       mega_mat = c(
+                         stay_discrete, go_discrete,
+                         leave_discrete, P
+                       ),
+                       mega_vec = c(b, ht),
+                       keep_mega = TRUE)
+
+  expect_equal(mega_sys$mega_mat, mega_k)
+  expect_equal(mega_sys$mega_vec, target)
+
+})
+
 
 test_that('right_ev.general_di_det returns NAs and warnings properly', {
 
@@ -2025,7 +2039,7 @@ test_that('left_ev.gen_di_det returns the same as mega-matrix models', {
                       stay_discrete, go_discrete,
                       leave_discrete, P
                     ),
-                    mega_pop_vec = c(b, ht),
+                    mega_vec = c(b, ht),
                     n_iterations = 400)
 
   ipmr_v <- c(ipmr_v$b_v, ipmr_v$ht_v)
@@ -2044,7 +2058,7 @@ test_that('left_ev.general_di_det can re-iterate models', {
                       stay_discrete, go_discrete,
                       leave_discrete, P
                     ),
-                    mega_pop_vec = c(b, ht))
+                    mega_vec = c(b, ht))
 
   ipmr_v <- c(ipmr_v$b_v, ipmr_v$ht_v)
 
@@ -2053,6 +2067,20 @@ test_that('left_ev.general_di_det can re-iterate models', {
 
 })
 
+test_that('left_ev(keep_mega = TRUE) works', {
+
+  mega_sys <- left_ev(gen_di_det_1,
+                      mega_mat = c(
+                        stay_discrete, go_discrete,
+                        leave_discrete, P
+                      ),
+                      mega_vec = c(b, ht),
+                      keep_mega = TRUE)
+
+  expect_equal(mega_sys$mega_mat, mega_k)
+  expect_equal(mega_sys$mega_vec, target_v)
+
+})
 
 test_that('left_ev.general_di_det returns warnings properly', {
 
@@ -2062,7 +2090,7 @@ test_that('left_ev.general_di_det returns warnings properly', {
               stay_discrete, go_discrete,
               leave_discrete, P
             ),
-            mega_pop_vec = c(b, ht),
+            mega_vec = c(b, ht),
             n_iterations = 3)
   )
 

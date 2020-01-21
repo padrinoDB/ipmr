@@ -29,7 +29,9 @@ convergence. Default is 100.}
 \item{mega_mat}{A vector of names and/or 0s specifying the relationship
 between the kernels in the model. The names should correspond to kernel
 names, with 0s corresponding to sparse areas of the mega-matrix. The names can
-be either symbols or characters.}
+be either symbols or characters. These functions support suffix expansion as in
+\code{define_k(ernel)}, so expressions don't need to be re-written for every
+combination hierarchical effects.}
 
 \item{mega_pop_vec}{A vector of names specifying the format of the population
 vector. The names can be either symbols or characters.}
@@ -47,9 +49,10 @@ will just extract population state of the final iteration and return
 that in a named list. Each element of the list is a vector with length
 \code{>= 1} and corresponds each state variable's portion of the eigenvector.
 
-Note that \code{right/left_ev} methods only exist for deterministic IPMs. To
- see if there is a quasi-stable distribution for stochastic models, use
-\code{qsd_converge()}.
+Note that for \code{*_di_stoch_kern_ipm}'s, these generics will create a mean
+matrix and then compute the left/right eigenvectors for that. For
+\code{*_di_stoch_param_ipm}'s, it will compute the average environment kernel
+(e.g. using the means from the \code{env_seq} slot of the IPM).
 
 \code{mega_mat} fits the pieces of the model together to create a
 a transpose of the model to iterate with. Kernel names/0s should be supplied

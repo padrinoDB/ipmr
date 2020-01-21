@@ -1,5 +1,7 @@
 # Reduces the depth/nestedness of a list to "depth".
 
+#' @noRd
+
 .flatten_to_depth <- function(to_flatten, depth) {
   if(rlang::is_empty(to_flatten) |
      !rlang::is_list(to_flatten)) {
@@ -27,6 +29,8 @@
     )
   }
 }
+
+#' @noRd
 
 .drop_duplicated_names_and_splice <- function(to_drop) {
 
