@@ -264,7 +264,5 @@ define_k <- function(proto_ipm,
     fun <- NA_character_
   }
 
-
-
   return(fun)
 }
