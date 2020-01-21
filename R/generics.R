@@ -779,14 +779,14 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
 #' @export
 
 plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
-                                           ipm = NULL,
-                                           sub_kernels = FALSE,
-                                           col = rainbow(100, start=0.67, end=0),
-                                           bw = FALSE,
-                                           do_contour = FALSE,
-                                           do_legend = FALSE,
-                                           exponent = 1,
-                                           ...) {
+                                          ipm = NULL,
+                                          sub_kernels = FALSE,
+                                          col = rainbow(100, start=0.67, end=0),
+                                          bw = FALSE,
+                                          do_contour = FALSE,
+                                          do_legend = FALSE,
+                                          exponent = 1,
+                                          ...) {
 
   # This is used so that users can just say plot(my_model) instead of
   # plot(ipm = my_model). ipmr_matrix expects x and y to both be NULL
@@ -1292,6 +1292,7 @@ left_ev.general_di_det_ipm <- function(ipm,
                                        mega_mat,
                                        mega_pop_vec,
                                        n_iterations = 100,
+                                       keep_mega = FALSE,
                                        ...) {
 
   # capture expressions and model names
@@ -1335,19 +1336,25 @@ left_ev.general_di_det_ipm <- function(ipm,
 
     use_pop    <- pop_holder[ , dim(pop_holder)[2]]
 
-    pop_holder <- .mega_vec_to_list(mega_pop_vec,
-                                    use_pop,
-                                    ipm$pop_state)
+    if(! keep_mega) {
+      pop_holder <- .mega_vec_to_list(mega_pop_vec,
+                                      use_pop,
+                                      ipm$pop_state)
 
-    # I'm foolish and wrote .extract_conv_ev in a way that isn't compatible with
-    # the pop_holder format here, so we perform the standardization by hand
-    # before returning.
+      # I'm foolish and wrote .extract_conv_ev in a way that isn't compatible with
+      # the pop_holder format here, so we perform the standardization by hand
+      # before returning.
 
-    pop_std <- Reduce('sum', unlist(pop_holder), init = 0)
+      pop_std <- Reduce('sum', unlist(pop_holder), init = 0)
 
-    out     <- lapply(pop_holder,
-                      function(x, pop_std) x / pop_std,
-                      pop_std = pop_std)
+      out     <- lapply(pop_holder,
+                        function(x, pop_std) x / pop_std,
+                        pop_std = pop_std)
+    } else {
+
+      out <- use_pop / sum(use_pop)
+
+    }
   } else {
 
     warning(
@@ -1554,7 +1561,7 @@ left_ev.general_di_det_ipm <- function(ipm,
 
         ro_dim <- vapply(dim_mat[ro, ],
                          function(x) {
-                          strsplit(x, ', ')[[1]][1]
+                           strsplit(x, ', ')[[1]][1]
                          },
                          character(1L)) %>%
           as.integer() %>%
@@ -1571,12 +1578,12 @@ left_ev.general_di_det_ipm <- function(ipm,
         # Generate an expression and insert it into sub_mats. These get
         # evaluated and c/rbinded in the next stage
         zero_call <- paste('matrix(rep(0, times = ',
-                                 ro_dim * co_dim,
-                                 '), nrow = ',
-                                 ro_dim,
-                                 ', ncol = ',
-                                 co_dim,
-                                 ')', sep = "") %>%
+                           ro_dim * co_dim,
+                           '), nrow = ',
+                           ro_dim,
+                           ', ncol = ',
+                           co_dim,
+                           ')', sep = "") %>%
           rlang::parse_expr()
 
         sub_mats[[it]]      <- zero_call
@@ -1749,11 +1756,14 @@ qsd_converge.simple_di_stoch_kern_ipm <- function(ipm,
 #' @title Compute sensitivity
 #'
 #' @param ipm Output from \code{make_ipm()}.
-#' @param level The level to compute sensitivity at. \code{"kernel"} computes
-#' the model wide sensitivity surface and returns that. \code{"vital_rate"}
-#' computes lambda's sensitivity to specific vital rates, \code{"parameter"} lambda's
-#' sensitivity to each parameter. Use \code{subset} to specify a subset of
-#' vital rates or parameters to compute values for.
+#' @param what The numerator of the partial derivative for sensitivity.
+#' Possible options \code{"lambda"} (default), \code{"r_0"},
+#' and \code{"gen_t"}. More will probably be added later.
+#' @param level The denominator of the partial derivative for sensitivity.
+#' \code{"kernel"} computes the model wide sensitivity surface and returns that.
+#' \code{"vital_rate"} computes lambda's sensitivity to specific vital rates,
+#' \code{"parameter"} lambda's sensitivity to each parameter. Use \code{subset}
+#' to specify a subset of vital rates or parameters to compute values for.
 #' @param subset A character vector corresponding to the \code{"vital_rates"} or
 #' \code{"parameters"} you want to compute  sensitivities for. Can save time if
 #' only a few parameters or vital rates are of interest.
@@ -1766,11 +1776,82 @@ qsd_converge.simple_di_stoch_kern_ipm <- function(ipm,
 #' @export
 
 sensitivity <- function(ipm,
+                        what = c("r_0", 'lambda', 'gen_t'),
                         level  = c('kernel', 'vital_rate', 'parameter'),
                         subset = NA_character_,
                         ...) {
 
   UseMethod('sensitivity')
+
+}
+
+sensitivity.simple_di_det_ipm <- function(ipm,
+                                      what   = "lambda",
+                                      level  = "kernel",
+                                      subset = NA_character_,
+                                      n_iterations = 100,
+                                      ...) {
+
+  to_do <- paste(what, level, sep = "_")
+
+  # The internal functions called here are all generics and operate on ipm
+
+  out   <- switch(to_do,
+                  "lambda_kernel"     = .sens_lam_kern(ipm,
+                                                       n_iterations),
+                  'lambda_vital_rate' = .sens_lam_vr(ipm,
+                                                     n_iterations,
+                                                     subset),
+                  'lambda_parameter'  = .sens_lam_param(ipm,
+                                                        n_iterations,
+                                                        subset),
+                  'r_0_kernel'        = .sens_r_0_kern(ipm,
+                                                       n_iterations),
+                  'r_0_vital_rate'    = .sens_r_0_vr(ipm,
+                                                     n_iterations,
+                                                     subset),
+                  'r_0_parameter'     = .sens_r_0_param(ipm,
+                                                        n_iterations,
+                                                        subset),
+                  'gen_t_kernel'      = .sens_gen_t_kern(ipm,
+                                                         n_iterations),
+                  'gen_t_vital_rate'  = .sens_gen_t_vr(ipm,
+                                                       n_iterations,
+                                                       subset),
+                  'gen_t_parameter'   = .sens_gen_t_param(ipm,
+                                                          n_iterations,
+                                                          subset)
+  )
+
+
+  return(out)
+
+}
+
+
+#' @rdname sensitivity
+#' @param mega_mat A vector of names and/or 0s specifying the relationship
+#' between the kernels in the model. The names should correspond to kernel
+#' names, with 0s corresponding to sparse areas of the mega-matrix. The names can
+#' be either symbols or characters. These functions support suffix expansion as in
+#' \code{define_k(ernel)}, so expressions don't need to be re-written for every
+#' combination hierarchical effects.
+#' @param mega_pop_vec A vector of names specifying the format of the population
+#' vector. The names can be either symbols or characters.
+#' @export
+
+sensitivity.general_di_det_ipm <- function(ipm,
+                                           what         = 'lambda',
+                                           level        = 'kernel',
+                                           subset       = NA_character_,
+                                           n_iterations = 100L,
+                                           mega_mat,
+                                           mega_pop_vec,
+                                           ...) {
+
+  mega_mat     <- rlang::enquo(mega_mat)
+  mega_pop_vec <- rlang::enquo(mega_pop_vec)
+
 
 }
 
@@ -1795,6 +1876,7 @@ sensitivity <- function(ipm,
 #' \code{c("ipmr_elasticity", "list")} (for internal usage and plot methods).
 #'
 elasticity <- function(ipm,
+                       what = c("r_0", 'lambda', 'gen_t'),
                        level = c('kernel', 'vital_rate', 'parameter'),
                        subset = NA_character_,
                        ...) {
