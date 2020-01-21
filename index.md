@@ -160,8 +160,10 @@ See below for an example of how to implement an IPM in this framework.
 Next on the to-do list is to write generic functions for `lambda`,
 `right_ev` (right eigenvector), `left_ev` (left eigenvector),
 `sensitivity`, `elasticity`, and `plot`/`print` methods for all exported
-classes (`proto_ipm`, implemented `ipm` objects). After that, density
-dependent model classes will get implemented.
+classes (`proto_ipm`, implemented `ipm` objects). After that, Tables 3.2
+and 3.3 from Ellner, Childs & Rees (2016). Finally, density dependant
+methods for `make_ipm()` and the above mentioned generics (if
+applicable).
 
 ``` r
 # Example of the setup for a simple IPM without density dependence or environmental
