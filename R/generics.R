@@ -836,15 +836,6 @@ plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
 #' @return A list of named numeric vector(s) corresponding to the stable trait distribution
 #' function (\code{right_ev}) or the reproductive values for each trait (\code{left_ev}).
 #'
-#' @details If the model has already been iterated, then these functions
-#' will just extract population state of the final iteration and return
-#' that in a named list. Each element of the list is a vector with length
-#' \code{>= 1} and corresponds each state variable's portion of the eigenvector.
-#'
-#' Note that \code{right/left_ev} methods only exist for deterministic IPMs. To
-#'  see if there is a quasi-stable distribution for stochastic models, use
-#' \code{qsd_converge()}.
-#'
 #' @export
 
 right_ev <- function(ipm, ...) {
@@ -1255,11 +1246,23 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
 #' @param mega_mat A vector of names and/or 0s specifying the relationship
 #' between the kernels in the model. The names should correspond to kernel
 #' names, with 0s corresponding to sparse areas of the mega-matrix. The names can
-#' be either symbols or characters.
+#' be either symbols or characters. These functions support suffix expansion as in
+#' \code{define_k(ernel)}, so expressions don't need to be re-written for every
+#' combination hierarchical effects.
 #' @param mega_pop_vec A vector of names specifying the format of the population
 #' vector. The names can be either symbols or characters.
 #'
-#' @details \code{mega_mat} fits the pieces of the model together to create a
+#' @details If the model has already been iterated, then these functions
+#' will just extract population state of the final iteration and return
+#' that in a named list. Each element of the list is a vector with length
+#' \code{>= 1} and corresponds each state variable's portion of the eigenvector.
+#'
+#' Note that for \code{*_di_stoch_kern_ipm}'s, these generics will create a mean
+#' matrix and then compute the left/right eigenvectors for that. For
+#' \code{*_di_stoch_param_ipm}'s, it will compute the average environment kernel
+#' (e.g. using the means from the \code{env_seq} slot of the IPM).
+#'
+#' \code{mega_mat} fits the pieces of the model together to create a
 #' a transpose of the model to iterate with. Kernel names/0s should be supplied
 #' in ROW MAJOR order (think \code{byrow = TRUE}. \code{ipmr} supplies
 #' a helper function for large models \code{format_mega_mat}
@@ -1327,17 +1330,24 @@ left_ev.general_di_det_ipm <- function(ipm,
 
   if(is_conv_to_asymptotic(pop_holder)) {
 
-    # Convert *back* to standard ipmr pop_state format - so dumb. Not worrying
-    # about this right now - Revisit once the core functionality is actually
-    # working
+    # Convert *back* to standard ipmr pop_state format - so dumb. Get the final
+    # iteration and convert it back to a pop_state list
 
-    # pop_holder <- .mega_vec_to_list(mega_pop_vec,
-    #                                 pop_holder,
-    #                                 ipm$pop_state)
+    use_pop    <- pop_holder[ , dim(pop_holder)[2]]
 
-    # out        <- .extract_conv_ev_general(pop_holder)
-    out <- pop_holder[ , dim(pop_holder)[2]]
+    pop_holder <- .mega_vec_to_list(mega_pop_vec,
+                                    use_pop,
+                                    ipm$pop_state)
 
+    # I'm foolish and wrote .extract_conv_ev in a way that isn't compatible with
+    # the pop_holder format here, so we perform the standardization by hand
+    # before returning.
+
+    pop_std <- Reduce('sum', unlist(pop_holder), init = 0)
+
+    out     <- lapply(pop_holder,
+                      function(x, pop_std) x / pop_std,
+                      pop_std = pop_std)
   } else {
 
     warning(
@@ -1356,11 +1366,8 @@ left_ev.general_di_det_ipm <- function(ipm,
 
   }
 
-  # See note L 1330-1332
-  # names(out) <- gsub('pop_state_', '', names(out))
-  # names(out) <- paste(names(out), 'v', sep = '_')
 
-  return(out / sum(out))
+  return(out)
 }
 
 # ev helper functions -------------
@@ -1393,19 +1400,19 @@ left_ev.general_di_det_ipm <- function(ipm,
 
   final_it <- dim(pop_state[[1]])[2]
 
-  temp <- lapply(pop_state,
-                 function(x, final_it) {
+  temp     <- lapply(pop_state,
+                     function(x, final_it) {
 
-                   x[ , final_it]
+                       x[ , final_it]
 
-                 },
-                 final_it = final_it)
+                     },
+                     final_it = final_it)
 
   pop_std <- Reduce('sum', unlist(temp), init = 0)
 
-  out <- lapply(temp,
-                function(x, pop_std) x / pop_std,
-                pop_std = pop_std)
+  out     <- lapply(temp,
+                    function(x, pop_std) x / pop_std,
+                    pop_std = pop_std)
 
   return(out)
 }
@@ -1414,7 +1421,7 @@ left_ev.general_di_det_ipm <- function(ipm,
 
 .get_pop_nm_simple <- function(ipm) {
 
-  pop_nm      <- ipm$proto_ipm$state_var %>%
+  pop_nm <- ipm$proto_ipm$state_var %>%
     unlist() %>%
     unique() %>%
     .[1]
@@ -1429,7 +1436,7 @@ left_ev.general_di_det_ipm <- function(ipm,
   # Extract names of sub_kernels. We shouldn't need mega-mat after this
   # because call_args() returns the mega_mat call's arguments in order!
 
-  sub_mats <- rlang::call_args(mega_mat)
+  sub_mats    <- rlang::call_args(mega_mat)
 
   sub_mat_nms <- Filter(Negate(function(x) x == 0 ), sub_mats)
 
@@ -1453,12 +1460,15 @@ left_ev.general_di_det_ipm <- function(ipm,
 
   if(any(zero_test)) {
 
+    # This actually just creates calls to rep(0, times = dim_1 * dim_2)
+    # and makes sure those calls are substituted in for the actual 0s.
+    # These get evaluated in .make_mega_mat_impl in the next step.
+
     sub_mats <- .fill_0s(sub_mats, sub_kernels)
 
   }
 
-  # *_impl = implementation. This evaluates the calls generated by
-  # .prep_mega_mat_call
+  # *_impl = implementation. This actually generates the full kernel
 
   out <- .make_mega_mat_impl(sub_mats, sub_kernels)
 
@@ -1468,7 +1478,7 @@ left_ev.general_di_det_ipm <- function(ipm,
 
 #' @noRd
 
-.make_mega_mat_impl <- function(sub_mats, sub_kernels, mega_mat) {
+.make_mega_mat_impl <- function(sub_mats, sub_kernels) {
 
   # Get number of blocks and then bind
 
@@ -1518,7 +1528,7 @@ left_ev.general_di_det_ipm <- function(ipm,
                       })
 
   mega_block_dim <- sqrt(length(sub_mats))
-  dim_env <- rlang::env()
+  dim_env        <- rlang::env()
 
   rlang::env_bind(!!! kern_dims,
                   .env = dim_env)
@@ -1594,13 +1604,13 @@ left_ev.general_di_det_ipm <- function(ipm,
 
   names(pop_state) <- gsub('pop_state_', "", names(pop_state))
 
-  temp_pop_state <- lapply(pop_state, function(x) x[ , 1])
+  temp_pop_state   <- lapply(pop_state, function(x) x[ , 1])
 
-  vec_env <- rlang::env(!!! temp_pop_state)
+  vec_env          <- rlang::env(!!! temp_pop_state)
 
-  pop_vec <- rlang::quo_set_env(pop_vec, env = vec_env)
+  pop_vec          <- rlang::quo_set_env(pop_vec, env = vec_env)
 
-  out <- rlang::eval_tidy(pop_vec, env = vec_env)
+  out              <- rlang::eval_tidy(pop_vec, env = vec_env)
 
   return(out)
 
@@ -1608,15 +1618,60 @@ left_ev.general_di_det_ipm <- function(ipm,
 
 .mega_vec_to_list <- function(mega_pop_vec, pop_holder, init_pop_state) {
 
-  n_rows <- lapply(init_pop_state,
-                   function(x) dim(x)[1])
+  # Get the number of cells for each state variable in the mega_pop_vec,
+  # and conver that to the
 
-  for(i in seq_along(init_pop_state)) {
+  n_rows        <- lapply(init_pop_state,
+                          function(x) dim(x)[1])
 
-    nm_out <- names(init_pop_state)[i]
+  names(n_rows) <- gsub('pop_state_', '', names(n_rows))
+
+  order_ind     <- rlang::eval_tidy(mega_pop_vec, data = n_rows)
+
+  # Convert the call arguments to characters so we can use them
+  # to name the output list
+
+  mega_vec_nm   <- rlang::call_args(mega_pop_vec) %>%
+    vapply(as.character, character(1L))
+
+  out <- list()
 
 
+  # Generate indices for subsetting and set up the new names for the output
+
+  for(i in seq_along(order_ind)) {
+
+    pop_holder_len <- order_ind[i]
+
+    nm             <- paste(mega_vec_nm[i], 'v', sep = '_')
+
+    if(i == 1) {
+
+      # The first sequences always start from 1
+
+      pop_holder_ind <- seq(1, pop_holder_len, by = 1)
+
+    } else {
+
+      # Anything afterwards is index by the sum of the prior
+      # indices + 1, so that we start grabbing values from where the
+      # previous one left off
+
+      pop_holder_start <- sum(order_ind[(1:(i - 1))]) + 1
+
+      pop_holder_end   <- pop_holder_start + order_ind[i] - 1
+
+      pop_holder_ind   <- seq(pop_holder_start,
+                              pop_holder_end,
+                              by = 1)
+    }
+
+    temp_pop <- rlang::list2(!! nm := pop_holder[pop_holder_ind])
+
+    out      <- purrr::splice(out, temp_pop)
   }
+
+  return(out)
 
 }
 

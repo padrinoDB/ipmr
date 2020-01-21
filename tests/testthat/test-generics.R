@@ -2025,23 +2025,28 @@ test_that('left_ev.gen_di_det returns the same as mega-matrix models', {
                       stay_discrete, go_discrete,
                       leave_discrete, P
                     ),
-                    mega_pop_vec = c(b, ht))
-  # ipmr_v <- c(ipmr_v$b_w, ipmr_v$ht_w)
+                    mega_pop_vec = c(b, ht),
+                    n_iterations = 400)
+
+  ipmr_v <- c(ipmr_v$b_v, ipmr_v$ht_v)
+
   expect_equal(target_v, ipmr_v, tol = 1e-10)
 
 })
 
 test_that('left_ev.general_di_det can re-iterate models', {
 
-  # THis really shouldn't make a difference for hte left eigenvector,
+  # THis really shouldn't make a difference for the left eigenvector,
   # We don't actually use make_ipm() to re-iterate things
+
   ipmr_v <- left_ev(gen_di_det_2,
                     mega_mat = c(
                       stay_discrete, go_discrete,
                       leave_discrete, P
                     ),
                     mega_pop_vec = c(b, ht))
-  # ipmr_v <- c(ipmr_v$b_w, ipmr_v$ht_w)
+
+  ipmr_v <- c(ipmr_v$b_v, ipmr_v$ht_v)
 
   expect_equal(target_v, ipmr_v, tol = 1e-10)
 
