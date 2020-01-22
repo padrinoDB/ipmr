@@ -3,6 +3,7 @@
 \name{elasticity}
 \alias{elasticity}
 \alias{elasticity.simple_di_det_ipm}
+\alias{elasticity.general_di_det_ipm}
 \title{Compute elasticity}
 \usage{
 elasticity(
@@ -19,6 +20,17 @@ elasticity(
   level = "kernel",
   subset = NA_character_,
   n_iterations = 100,
+  ...
+)
+
+\method{elasticity}{general_di_det_ipm}(
+  ipm,
+  what = "lambda",
+  level = "kernel",
+  subset = NA_character_,
+  n_iterations = 100,
+  mega_mat,
+  mega_vec,
   ...
 )
 }
@@ -44,6 +56,16 @@ only a few parameters or vital rates are of interest.}
 \item{n_iterations}{The number of times to iterate the model when computing
 the left and right eigenvectors. Default is 100 for deterministic IPMs, and varies
 depending on the stochastic IPM.}
+
+\item{mega_mat}{A vector of names and/or 0s specifying the relationship
+between the kernels in the model. The names should correspond to kernel
+names, with 0s corresponding to sparse areas of the mega-matrix. The names can
+be either symbols or characters. These functions support suffix expansion as in
+\code{define_k(ernel)}, so expressions don't need to be re-written for every
+combination hierarchical effects.}
+
+\item{mega_vec}{A vector of names specifying the format of the population
+vector. The names can be either symbols or characters.}
 }
 \value{
 A list. Contains either kernel response surfaces, vital rate level
