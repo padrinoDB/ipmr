@@ -31,20 +31,34 @@
 
 #' @noRd
 
-.sens_lam_kern.general_di_det <- function(ipm,
-                                          n_iterations,
-                                          mega_mat,
-                                          mega_vec,
-                                          ...) {
+.sens_lam_kern.general_di_det_ipm <- function(ipm,
+                                              n_iterations,
+                                              mega_mat,
+                                              mega_vec,
+                                              ...) {
+
 
   r_ev <- right_ev(ipm, n_iterations, keep_mega = FALSE)
   l_ev <- left_ev(ipm,
-                  mega_mat,
-                  mega_vec,
+                  !! mega_mat,
+                  !! mega_vec,
                   n_iterations,
                   keep_mega = FALSE)
 
-  d_zs <- .match_d_zs
+  # Don't think this works for multiple continuous state variables unless
+  # z is rectangular (e.g. won't work for size_type_1 and size_type_2 sort
+  # of domains, but will for size x quality).
+
+  d_zs        <- .get_d_z_vars(ipm)
+  big_dz      <- Reduce("*", d_zs, init = 1)
+
+  # .sens_kern_lam_general matches d_zs to their respective portions
+  # of r/l_ev, and then generates a mega_vec out of each and computes
+  # the sensitivity kernel using the standard formula
+
+  out         <- .sens_kern_lam_general(r_ev, l_ev, big_dz, mega_vec)
+
+  return(out)
 
 }
 
@@ -85,33 +99,58 @@
                                               mega_mat,
                                               mega_vec) {
 
-  sens_kern <- .sens_lam_kern(ipm, n_iterations, mega_mat, mega_vec)
+  sens_kern <- .sens_lam_kern(ipm,
+                              n_iterations,
+                              mega_mat,
+                              mega_vec)
 
   all_lams  <- lambda(ipm, type_lambda = 'all')
   use_lam   <- all_lams[length(all_lams)]
 
-  # Won't work at the moment because we need to make sure each portion of the
-  # kernel is divided by it's respective d_z. I think that'll have to come
-  # using a combination the mega_mat formula and the kernel/K expressions in
-  # the IPM's proto
-  d_zs      <- .match_d_zs(ipm)
+  # Won't work for Ks that comprise multiple state variables that aren't crossed
+  # with each other. For example, size X quality or size X age is fine, but
+  # something like K_size_type_1 and K_size_type_2 will fail I think. An older form
+  # of this segregated K/h by matching the K to the appropriate h, but that produce
+  # inaccurate results for models with discrete states. See
+  # experimental_funs/possibly_retired_funs.txt for that implementation.
 
-  # Above-mentioned step should go here, then make the mega_k using the altered
-  # sub-kernels
+  d_zs      <- .get_d_z_vars(ipm)
 
-  sub_kern_funs <- .iteration_mat_to_fun(ipm$sub_kernels,
-                                         d_zs)
+  d_zs      <- Reduce("*", d_zs, init = 1)
 
-  use_k     <- .make_mega_mat(mega_mat, sub_kern_funs)
+  k_fun         <- .make_mega_mat(mega_mat, ipm$sub_kernels) / d_zs
 
-
-
-  out       <- sens_kern * (use_k / d_zs) / use_lam
+  out           <- sens_kern * k_fun / use_lam
 
   return(out)
 }
 
 # Helpers us ed by both sensitivity and elasticity -----------
+
+#' @noRd
+
+.sens_kern_lam_general <- function(r_ev, l_ev, d_zs, mega_vec) {
+
+  names(r_ev) <- gsub('_w', "", names(r_ev))
+  names(l_ev) <- gsub('_v', "", names(l_ev))
+
+  r_ev_vec   <- .make_mega_vec(mega_vec, r_ev)
+  l_ev_vec   <- .make_mega_vec(mega_vec, l_ev)
+
+  # Already multiplied by d_zs
+
+  vw        <- sum(r_ev_vec * l_ev_vec * d_zs)
+  pert_kern <- outer(l_ev_vec, r_ev_vec)
+
+  out <- pert_kern / vw
+
+  return(out)
+}
+
+# I think almost everything below is getting retired, but need to reinspect
+# this implementation if/when I do get it working to see who's currently
+# surplus to requirements. It could be that we *do* need it for IPMs
+# with multiple, uncrossed continuous states...
 
 #' @noRd
 
@@ -142,10 +181,19 @@
                                   d_z_nms = d_z_nms)
 
 
-  # Continue here. Currently working out how to retain list structure/depth
-  # to know how deeply, say, a K-expr is buried in with a d_z
-  out <- rlang::eval_tidy()
+  # The unlist %>% as.list pattern seems dumb, but it basically generates
+  # a named list of depth 1 that preserves names of each entry regardless of
+  # depth. Basically, just want to gsub() out the periods for underscores
 
+  out <- lapply(d_z_in_kerns,
+                function(x, data_list) .eval_list(x, data_list),
+                data_list = as.list(d_z_vec)) %>%
+    unlist() %>%
+    as.list()
+
+  names(out) <- gsub('\\.', '_', names(out))
+
+  return(out)
 }
 
 .find_d_zs <- function(form_expr, d_z_nms) {
@@ -161,13 +209,28 @@
   return(out)
 }
 
+.eval_list <- function(x, data_list) {
+
+  if(rlang::is_callable(x) ||
+     rlang::is_bare_numeric(x)) {
+    out <- rlang::eval_tidy(x, data = data_list)
+    return(out)
+  } else if(is.character(x)) {
+    stop('all entries in form_expr_list should be symbols or numbers by now')
+  } else {
+    lapply(x,
+           function(x, data_list) .eval_list(x, data_list),
+           data_list = data_list)
+  }
+
+}
+
 #' @noRd
-#' @importFrom rlang is_callable
+#' @importFrom rlang is_callable is_bare_numeric
 
 .match_dz_to_kern <- function(form_expr, nm) {
 
-  if(is.integer(form_expr) ||
-     is.numeric(form_expr)) {
+  if(rlang::is_bare_numeric(form_expr)) {
     return(1L)
   }
 
@@ -207,8 +270,25 @@
     master_env <- ipm$env_list$master_env
   }
 
-  d_z_vars   <- ipm$proto_ipm$state_var %>%
+  # Gnarly pipe. first extract names of domains used in the model. Some of these
+  # will be start/end_not_applicable because the kernels they're associated with
+  # are DC, CD, or DD (and have no continuous state). We just want to find unique
+  # names, but those will have _1/_2 appended, so find those variables only.
+  # then filter out the unneeded ones, split open the continuous states to just
+  # get the variable they describe, and then unique them to make sure we don't
+  # duplicate anything.
+
+  rm_disc_state_nms <- function(x) {
+    grepl('_1|_2', x)
+  }
+
+  d_z_vars   <- lapply(ipm$proto_ipm$domain,
+                       names) %>%
     unlist() %>%
+    unique() %>%
+    Filter(f = rm_disc_state_nms, x = .) %>%
+    vapply(FUN = function(x) strsplit(x, '_')[[1]][1],
+           FUN.VALUE = character(1L)) %>%
     unique()
 
   d_z_var_nms  <- paste('d_', d_z_vars, sep = "")
@@ -245,5 +325,41 @@
 
 .iteration_mat_to_fun <- function(sub_kernels,
                                   d_zs) {
-  stop("not implemented")
+
+  # just want to work with kernels we need. split out the others so they can
+  # be appended before exit
+
+  is_not_1 <- function(x) x != 1
+  use_dzs <- Filter(is_not_1, d_zs)
+
+  nm_in_dz <- names(sub_kernels) %in% names(use_dzs)
+
+  use_sub_kerns <- sub_kernels[nm_in_dz]
+  append_to_out <- sub_kernels[!nm_in_dz]
+
+  use_sub_kerns <- use_sub_kerns[names(use_dzs)]
+
+  # Perform the conversion and restore the names so .make_mega_mat can find the
+  # right objects.
+
+  kern_funs <- lapply(seq_along(use_sub_kerns),
+                      function(i, sub_kern_list, dz_list) {
+                        out <- sub_kern_list[[i]] / dz_list[[i]]
+                        return(out)
+                      },
+                      sub_kern_list = use_sub_kerns,
+                      dz_list       = use_dzs)
+
+  names(kern_funs) <- names(use_sub_kerns)
+
+  out <- purrr::splice(kern_funs, append_to_out)
+
+  return(out)
 }
+
+
+
+
+
+
+

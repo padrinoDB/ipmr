@@ -51,11 +51,10 @@ to specify a subset of vital rates or parameters to compute values for.}
 \code{"parameters"} you want to compute  sensitivities for. Can save time if
 only a few parameters or vital rates are of interest.}
 
-\item{...}{other arguments passed to methods}
+\item{...}{other arguments passed to methods.}
 
-\item{n_iterations}{The number of times to iterate the model when computing
-the left and right eigenvectors. Default is 100 for deterministic IPMs, and varies
-depending on the stochastic IPM.}
+\item{n_iterations}{For simple IPMs, number of times to iterate the model
+when computing the left and right eigenvectors.}
 
 \item{mega_mat}{A vector of names and/or 0s specifying the relationship
 between the kernels in the model. The names should correspond to kernel

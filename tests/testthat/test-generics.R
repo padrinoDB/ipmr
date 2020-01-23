@@ -1886,8 +1886,6 @@ gen_di_det_1 <- init_ipm("general_di_det") %>%
            usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_2 = inv_logit_2))
 
-
-
 mega_k <- rbind(
   cbind(gen_di_det_1$sub_kernels$stay_discrete,
         gen_di_det_1$sub_kernels$go_discrete),

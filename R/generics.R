@@ -1490,7 +1490,7 @@ qsd_converge.simple_di_stoch_kern_ipm <- function(ipm,
 #' @param subset A character vector corresponding to the \code{"vital_rates"} or
 #' \code{"parameters"} you want to compute  sensitivities for. Can save time if
 #' only a few parameters or vital rates are of interest.
-#' @param ... other arguments passed to methods
+#' @param ... other arguments passed to methods.
 #'
 #' @return A list. Contains either kernel response surfaces, vital rate level
 #' sensitivity values, or parameter level sensitivity values. The class is always
@@ -1509,9 +1509,9 @@ sensitivity <- function(ipm,
 }
 
 #' @rdname sensitivity
-#' @param n_iterations The number of times to iterate the model when computing
-#' the left and right eigenvectors. Default is 100 for deterministic IPMs, and varies
-#' depending on the stochastic IPM.
+#' @param n_iterations For simple IPMs, number of times to iterate the model
+#' when computing the left and right eigenvectors.
+#'
 #' @export
 
 sensitivity.simple_di_det_ipm <- function(ipm,
@@ -1681,6 +1681,70 @@ elasticity.simple_di_det_ipm <- function(ipm,
   out   <- switch(to_do,
                   "lambda_kernel"     = .elas_lam_kern(ipm,
                                                        n_iterations),
+                  # 'lambda_vital_rate' = .elas_lam_vr(ipm,
+                  #                                    n_iterations,
+                  #                                    subset),
+                  # 'lambda_parameter'  = .elas_lam_param(ipm,
+                  #                                       n_iterations,
+                  #                                       subset),
+                  # 'r_0_kernel'        = .elas_r_0_kern(ipm,
+                  #                                      n_iterations),
+                  # 'r_0_vital_rate'    = .elas_r_0_vr(ipm,
+                  #                                    n_iterations,
+                  #                                    subset),
+                  # 'r_0_parameter'     = .elas_r_0_param(ipm,
+                  #                                       n_iterations,
+                  #                                       subset),
+                  # 'gen_t_kernel'      = .elas_gen_t_kern(ipm,
+                  #                                        n_iterations),
+                  # 'gen_t_vital_rate'  = .elas_gen_t_vr(ipm,
+                  #                                      n_iterations,
+                  #                                      subset),
+                  # 'gen_t_parameter'   = .elas_gen_t_param(ipm,
+                  #                                         n_iterations,
+                  #                                         subset)
+  )
+
+
+  return(out)
+
+}
+
+#' @rdname elasticity
+#' @param mega_mat A vector of names and/or 0s specifying the relationship
+#' between the kernels in the model. The names should correspond to kernel
+#' names, with 0s corresponding to sparse areas of the mega-matrix. The names can
+#' be either symbols or characters. These functions support suffix expansion as in
+#' \code{define_k(ernel)}, so expressions don't need to be re-written for every
+#' combination hierarchical effects.
+#' @param mega_vec A vector of names specifying the format of the population
+#' vector. The names can be either symbols or characters.
+#' @export
+
+elasticity.general_di_det_ipm <- function(ipm,
+                                         what   = "lambda",
+                                         level  = "kernel",
+                                         subset = NA_character_,
+                                         n_iterations = 100,
+                                         mega_mat,
+                                         mega_vec,
+                                         ...) {
+
+  mega_mat <- rlang::enquo(mega_mat)
+  mega_vec <- rlang::enquo(mega_vec)
+
+  to_do <- paste(what, level, sep = "_")
+
+  # The internal functions called here are all generics and operate on ipm object
+  # plus the additional arguments that get passed onward depending on methods.
+  # sensitivity itself is generic so that we can anticipate inputs to the internal
+  # generics and calls to switch don't get ludicrously complicated for simple IPMs
+
+  out   <- switch(to_do,
+                  "lambda_kernel"     = .elas_lam_kern(ipm,
+                                                       n_iterations,
+                                                       mega_mat,
+                                                       mega_vec),
                   # 'lambda_vital_rate' = .elas_lam_vr(ipm,
                   #                                    n_iterations,
                   #                                    subset),
