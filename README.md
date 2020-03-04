@@ -32,6 +32,14 @@ Below is a brief overview of the package and some examples of how to
 implement models with it. A more thorough introduction is available
 [here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
 
+## Installation
+
+``` r 
+if(!require('remotes', quietly = TRUE)) install.packages('remotes')
+
+remotes::install_github('levisc8/ipmr')
+```
+
 ## Model classes
 
 The first step of defining a model in `ipmr` (assuming all parameters
