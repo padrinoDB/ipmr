@@ -134,6 +134,8 @@ make_ipm.simple_di_det <- function(proto_ipm,
 
   temp       <- .prep_di_output(others, k_row, proto_ipm, iterations)
 
+  master_env     <- .add_pop_state_to_master_env(temp$pop_state, master_env)
+
   # construct the kernels from their function defintions
   env_list      <- list(master_env = master_env)
 
@@ -155,10 +157,6 @@ make_ipm.simple_di_det <- function(proto_ipm,
   }
 
   if(iterate) {
-
-    pop_state <- .init_pop_state_list(others, iterations)
-
-    master_env     <- .add_pop_state_to_master_env(pop_state, master_env)
 
     pop_state <- .iterate_kerns_simple(iterators,
                                        sub_kern_list,
@@ -252,6 +250,8 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 
   temp       <- .prep_di_output(others, k_row, proto_ipm, iterations)
 
+  master_env <- .add_pop_state_to_master_env(temp$pop_state, master_env)
+
   # construct the kernels from their function defintions
 
   env_list      <- list(master_env = master_env)
@@ -276,10 +276,6 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
                                    kernel_seq)
 
   if(iterate) {
-
-    # pop_state <- .init_pop_state_list(others, iterations)
-
-    master_env     <- .add_pop_state_to_master_env(temp$pop_state, master_env)
 
     pop_state      <- .iterate_kerns_simple(iterators,
                                             sub_kern_list,
