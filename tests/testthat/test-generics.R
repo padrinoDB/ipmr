@@ -1636,6 +1636,7 @@ sim_di_det_3 <- init_ipm('simple_di_det') %>%
   ) %>%
   define_k('K',
            K         = P + F,
+           n_dbh_t_1 = K %*% n_dbh_t,
            family    = 'IPM',
            data_list = list(),
            states    = states,

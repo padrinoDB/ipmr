@@ -318,13 +318,23 @@ test_that('eigenvectors and values are correct', {
 # Test whether .iterate kerns does what it should
 kern_seq <- sample(1:5, 50, replace = TRUE)
 
-proto <- monocarp_sys$proto_ipm
+proto <- monocarp_sys$proto_ipm[!grepl('K', monocarp_sys$proto_ipm$kernel_id), ]
 
 init_pop_vec <- runif(100)
 
 iterated_sys <- proto %>%
+  define_k(
+    name             = 'K_yr',
+    K_yr             = P_yr + F_yr,
+    n_ht_t_1         = K_yr %*% n_ht_t,
+    family           = "IPM",
+    data_list        = params,
+    states           = list(c("ht")),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = hier_levels
+  ) %>%
   define_pop_state(
-    pop_vectors = list(ht = init_pop_vec)
+    n_ht = init_pop_vec
   ) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit,
                            inv_logit_r = inv_logit_r,
@@ -507,6 +517,9 @@ test_that("return_all gets all of the environments back", {
       )
     ) %>%
     define_domains(ht = c(0.2, 40, 100)) %>%
+    define_pop_state(
+      n_ht = runif(100)
+    ) %>%
     make_ipm(usr_funs = list(inv_logit   = inv_logit,
                              inv_logit_r = inv_logit_r,
                              pois_r      = pois_r),
@@ -517,3 +530,4 @@ test_that("return_all gets all of the environments back", {
 
   expect_equal(names(test_order_1$env_list), env_list_nms)
 })
+
