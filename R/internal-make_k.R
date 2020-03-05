@@ -54,8 +54,7 @@
     kern_form        <- .parse_k_formulae(param_tree$formula,
                                           kern_env)
 
-    names(kern_form) <- k_id
-
+    kern_form <- kern_form[k_id]
 
     rlang::env_bind_lazy(kern_env,
                          !!! kern_form,

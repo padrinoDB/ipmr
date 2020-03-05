@@ -923,43 +923,107 @@
 
 #' @noRd
 
-.iterate_kerns_simple <- function(iterators, iterations, kern_seq, pop_state) {
+.iterate_kerns_simple <- function(iterators,
+                                  sub_kern_list,
+                                  iterations,
+                                  kern_seq,
+                                  pop_state,
+                                  master_env,
+                                  proto_ipm,
+                                  k_row) {
 
   if(rlang::is_quosure(pop_state)) {
     pop_state <- rlang::eval_tidy(pop_state)
-  } else {
-    pop_state <- pop_state[[1]][ , 1]
   }
 
-  pop_holder  <- array(NA_real_, dim = c(length(pop_state), (iterations + 1)))
-
-  pop_holder[ , 1] <- n_t <-  pop_state
 
   for(i in seq_len(iterations)) {
 
-    .check_n_t(n_t)
+    # .check_n_t(n_t)
+
+    # Select kernels from kern_seq, or just use all of them if it's
+    # a deterministic simulation. Similarly, we need to subset the k_rows
+    # object so that .eval_general_det doesn't loop over ones which include
+    # expressions for other levels of 'kern_seq'
 
     if(!is.null(kern_seq)) {
 
-      if(length(iterators) == 1) {
-        k_selector <- 1
-      } else {
-        k_selector <- which(grepl(kern_seq[i], names(iterators)))
-      }
+      if(is.character(kern_seq)) {
 
-      n_t_1      <- right_mult(iterators[[k_selector]], n_t)
+        # Almost identical to integer kern_seq method, but need to return
+        # a character value from vapply for exact matching. Earlier version
+        # used fuzzy matching which I think is too risky.
+
+        kern_ind <- vapply(names(sub_kern_list),
+                           function(x) strsplit(x, '_')[[1]][2],
+                           character(1L))
+        kern_ind <- which(kern_ind == kern_seq[i])
+        k_row_ind <- which(grepl(kern_seq[i], k_row$kernel_id))
+
+
+        use_kerns <- sub_kern_list[kern_ind]
+        use_k     <- k_row[k_row_ind, ]
+
+      } else {
+
+        kern_ind <- vapply(names(sub_kern_list),
+                           function(x) as.integer(strsplit(x, '_')[[1]][2]),
+                           integer(1L)) %>%
+          which(. == kern_seq[i])
+
+        k_row_ind <- which(grepl(kern_seq[i], k_row$kernel_id))
+
+
+        use_kerns <- sub_kern_list[kern_ind]
+
+        use_k     <- k_row[k_row_ind, ]
+      }
 
     } else {
 
-      n_t_1 <- right_mult(iterators, n_t)
+      use_kerns <- sub_kern_list
+      use_k     <- k_row
 
     }
 
-    pop_holder[ , (i + 1)] <- n_t <- n_t_1
+    # Need to return an iterated pop_state object
+
+    pop_list_t_1 <- .eval_general_det(k_row         = use_k,
+                                      proto_ipm     = proto_ipm,
+                                      sub_kern_list = use_kerns,
+                                      pop_state     = pop_state,
+                                      master_env    = master_env)
+
+    # make names match pop_state and then reorder the list for easy
+    # insertion
+    names(pop_list_t_1) <- gsub('_t_1', '', names(pop_list_t_1))
+
+    pop_list_t_1        <- pop_list_t_1[names(pop_state)]
+
+    pop_state           <- purrr::map2(.x = pop_state,
+                                       .y = pop_list_t_1,
+                                       .f = function(.x, .y, iteration) {
+
+                                         .x[ , (iteration + 1)] <- .y
+
+                                         return(.x)
+                                       },
+                                       iteration = i
+    )
+
+    # Now, update the names so that we can bind the new n_*_t to
+    # master_env so that the next iteration is evaluated correctly
+
+    names(pop_list_t_1) <- names(pop_list_t_1) %>%
+      paste(., '_t', sep = "")
+
+
+    rlang::env_bind(.env = master_env,
+                    !!! pop_list_t_1)
 
   }
 
-  return(list(pop_state = pop_holder))
+  return(pop_state)
 }
 
 #' @noRd
