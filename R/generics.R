@@ -1133,6 +1133,9 @@ left_ev <- function(ipm, ...) {
 
 }
 
+#' @export
+#' @rdname eigenvectors
+
 left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
 
   mod_nm  <- deparse(substitute(ipm))

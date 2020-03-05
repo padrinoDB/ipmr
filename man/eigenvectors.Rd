@@ -5,6 +5,7 @@
 \alias{right_ev.simple_di_det_ipm}
 \alias{right_ev.general_di_det_ipm}
 \alias{left_ev}
+\alias{left_ev.simple_di_det_ipm}
 \alias{left_ev.general_di_det_ipm}
 \title{Compute the standardized left and right eigenvectors via iteration}
 \usage{
@@ -22,6 +23,8 @@ right_ev(ipm, ...)
 )
 
 left_ev(ipm, ...)
+
+\method{left_ev}{simple_di_det_ipm}(ipm, n_iterations = 100, ...)
 
 \method{left_ev}{general_di_det_ipm}(ipm, mega_mat, mega_vec, n_iterations = 100, keep_mega = FALSE, ...)
 }

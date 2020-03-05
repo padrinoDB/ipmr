@@ -10,3 +10,5 @@ tests/testthat/Rplots.*
 tests/sim_tests/*.PNG
 paper/ipmr_paper_outline.html
 *.xlsx
+paper/workshop-feedback.Rmd
+bug_reports/*

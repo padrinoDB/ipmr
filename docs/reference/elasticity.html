@@ -106,6 +106,9 @@
     <li>
       <a href="../articles/proto-ipms.html">proto_ipm data structure</a>
     </li>
+    <li>
+      <a href="../articles/sanity-checks.html">Sanity checks for ipmr examples</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -149,6 +152,18 @@
   <span class='kw'>subset</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
   <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>,
   <span class='no'>...</span>
+)
+
+<span class='co'># S3 method for general_di_det_ipm</span>
+<span class='fu'>elasticity</span>(
+  <span class='no'>ipm</span>,
+  <span class='kw'>what</span> <span class='kw'>=</span> <span class='st'>"lambda"</span>,
+  <span class='kw'>level</span> <span class='kw'>=</span> <span class='st'>"kernel"</span>,
+  <span class='kw'>subset</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
+  <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='no'>mega_mat</span>,
+  <span class='no'>mega_vec</span>,
+  <span class='no'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -187,6 +202,20 @@ only a few parameters or vital rates are of interest.</p></td>
       <td><p>The number of times to iterate the model when computing
 the left and right eigenvectors. Default is 100 for deterministic IPMs, and varies
 depending on the stochastic IPM.</p></td>
+    </tr>
+    <tr>
+      <th>mega_mat</th>
+      <td><p>A vector of names and/or 0s specifying the relationship
+between the kernels in the model. The names should correspond to kernel
+names, with 0s corresponding to sparse areas of the mega-matrix. The names can
+be either symbols or characters. These functions support suffix expansion as in
+<code><a href='kernel-definitions.html'>define_k(ernel)</a></code>, so expressions don't need to be re-written for every
+combination hierarchical effects.</p></td>
+    </tr>
+    <tr>
+      <th>mega_vec</th>
+      <td><p>A vector of names specifying the format of the population
+vector. The names can be either symbols or characters.</p></td>
     </tr>
     </table>
 
