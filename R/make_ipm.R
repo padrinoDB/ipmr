@@ -161,6 +161,7 @@ make_ipm.simple_di_det <- function(proto_ipm,
     pop_state <- .iterate_kerns_simple(iterators,
                                        sub_kern_list,
                                        iterations,
+                                       current_iteration = NA_integer_,
                                        kern_seq = NULL,
                                        temp$pop_state,
                                        master_env,
@@ -280,6 +281,7 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
     pop_state      <- .iterate_kerns_simple(iterators,
                                             sub_kern_list,
                                             iterations,
+                                            current_iteration = NA_integer_,
                                             kern_seq,
                                             temp$pop_state,
                                             master_env,
@@ -386,7 +388,8 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
     sys         <- .make_sub_kernel_simple_lazy(others,
                                                 master_env,
-                                                return_envs = return_all)
+                                                return_envs = return_all,
+                                                dd = 'n')
 
     sub_kernels <- sys$ipm_system$sub_kernels
 
@@ -844,9 +847,123 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
 make_ipm.simple_dd_det <- function(proto_ipm,
                                    return_all = FALSE,
                                    usr_funs = list(),
-                                   ...) {
+                                   ...,
+                                   domain_list = NULL,
+                                   iterate     = TRUE,
+                                   iterations  = 50) {
 
-  # DEFINE ME
+  # Work out whether to append usr_funs to proto or to restore them from prior
+  # implemenation. Logic is documented in make_ipm.simple_di_det()
+
+  if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
+
+    if(!is.na(proto_ipm$usr_funs[[1]][1])) {
+
+      usr_funs  <- proto_ipm$usr_funs[[1]]
+
+    }
+
+  } else if(!rlang::is_empty(usr_funs)) {
+
+    proto_ipm <- .append_usr_funs_to_proto(proto_ipm, usr_funs)
+
+  }
+
+  proto_list <- .initialize_kernels_dd(proto_ipm, iterate)
+
+  others <- proto_list$others
+  k_row  <- proto_list$k_row
+
+  # Initialize the master_environment so these values can all be found at
+  # evaluation time
+
+  if(is.null(domain_list)) {
+    master_env <- .make_master_env(others$domain, usr_funs)
+  } else {
+    master_env <- .make_master_env(domain_list, usr_funs)
+  }
+
+  # prepare dd output. I'm not sure how this would be different
+  # than di output, so I'm going to keep using the di function for now.
+  # will change to something else
+
+  out        <- .prep_di_output(others, k_row, proto_ipm, iterations)
+  pop_state  <- out$pop_state
+
+  # initialize the pop_state vectors in master_env so they can be found
+  # at evaluation time
+
+  master_env <- .add_pop_state_to_master_env(out$pop_state,
+                                             master_env)
+
+  # list to hold the possibly returned evaluation environments
+
+  env_list <- list(master_env = master_env)
+
+  for(i in seq_len(iterations)) {
+
+    # Lazy variant makes sure that whatever functions that generate parameter
+    # values stochastically are only evaluated 1 time per iteration! This is so
+    # multiple parameters meant to come from a joint distribution really come from
+    # the joint distribution!
+
+    env_list <- list(master_env = master_env)
+
+    sys         <- .make_sub_kernel_simple(others,
+                                           env_list,
+                                           return_envs = return_all)
+
+    sub_kernels <- sys$sub_kernels
+
+    iterator       <- .make_k_simple(k_row,
+                                     proto_ipm,
+                                     sub_kernels,
+                                     master_env)
+
+    if(return_all) {
+
+      env_ret <- sys$data_envs
+
+    } else {
+
+      env_ret <- NA_character_
+
+    }
+
+    # Use iterate_kerns_simple with iterations = 1. We have to rebuild kernels
+    # each time so don't want to pass more than that
+
+    pop_state <- .iterate_kerns_simple(iterator,
+                                       sub_kernels,
+                                       iterations = 1,
+                                       current_iteration = i,
+                                       kern_seq = NULL,
+                                       pop_state,
+                                       master_env,
+                                       proto_ipm,
+                                       k_row)
+
+    names(iterator)    <- paste(names(iterator), i, sep = "_")
+    names(sub_kernels) <- paste(names(sub_kernels), i, sep = "_")
+
+    out$iterators   <- purrr::splice(out$iterators, iterator)
+    out$sub_kernels <- purrr::splice(out$sub_kernels, sub_kernels)
+
+  }
+
+  out$iterators   <- set_ipmr_classes(out$iterators)
+  out$sub_kernels <- set_ipmr_classes(out$sub_kernels)
+
+  out$pop_state   <- pop_state
+
+  attr(out$proto_ipm, 'implemented') <- TRUE
+  class(out) <- c('simple_dd_stoch_param_ipm', 'list')
+
+  if(return_all) out$data_envs <- purrr::splice(env_list, out$data_envs)
+
+  return(out)
+
+
 }
 
 make_ipm.simple_dd_stoch_kern <- function(proto_ipm,

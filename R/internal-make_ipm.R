@@ -176,7 +176,35 @@
 # kernel resampling is preferred when a viable alternative (at least within
 # the context of ipmr).
 
-.make_sub_kernel_simple_lazy <- function(proto, master_env, return_envs = FALSE) {
+.make_sub_kernel_simple_lazy <- function(proto, master_env, return_envs = FALSE,
+                                         dd = 'n') {
+
+  out <- switch(dd,
+                'n' = .make_sub_kernel_simple_lazy_di(proto,
+                                                      master_env,
+                                                      return_envs),
+                'y' = .make_sub_kernel_simple_lazy_dd(proto,
+                                                      master_env,
+                                                      return_envs))
+
+  return(out)
+
+}
+
+.make_sub_kernel_simple_lazy_dd <- function(proto,
+                                            master_env,
+                                            return_envs) {
+
+
+  out <- .make_sub_kernel_simple(proto,
+                                 list(master_env = master_env),
+                                 return_envs = return_envs)
+
+  return(out)
+
+}
+
+.make_sub_kernel_simple_lazy_di <- function(proto, master_env, return_envs = FALSE) {
 
   env_state_funs <- lapply(
     proto$env_state,
@@ -328,6 +356,51 @@
                                data_envs         = data_envs,
                                tot_iterations    = tot_iterations,
                                current_iteration = current_iteration)
+
+  # Determine who's a kernel and who's a pop_vector!
+
+  ipm_system <- .flatten_to_depth(ipm_system, 1)
+
+  kern_ind   <- lapply(ipm_system, function(x) dim(x)[2] != 1) %>%
+    unlist()
+
+  iterator   <- ipm_system[kern_ind]
+
+  # make names a bit prettier to help distinguish between iterations
+
+  names(sub_kernels) <- paste(names(sub_kernels),
+                              current_iteration,
+                              sep = "_")
+
+  names(iterator)    <- paste(names(iterator), current_iteration, sep = "_")
+
+  output$sub_kernels <- purrr::splice(output$sub_kernels, sub_kernels)
+  output$iterators   <- purrr::splice(output$iterators, iterator)
+
+  ps_ind             <- lapply(ipm_system, function(x) dim(x)[2] == 1) %>%
+    unlist()
+
+  if(sum(ps_ind) > 0){
+    output$pop_state <- .update_pop_state(output$pop_state,
+                                          ipm_system[ps_ind],
+                                          current_iteration)
+  }
+
+
+  return(output)
+
+}
+
+
+#' @noRd
+
+.update_param_dd_output <- function(sub_kernels,
+                                    ipm_system,
+                                    data_envs = NA_character_,
+                                    master_env,
+                                    output,
+                                    tot_iterations,
+                                    current_iteration) {
 
   # Determine who's a kernel and who's a pop_vector!
 
@@ -926,6 +999,7 @@
 .iterate_kerns_simple <- function(iterators,
                                   sub_kern_list,
                                   iterations,
+                                  current_iteration,
                                   kern_seq,
                                   pop_state,
                                   master_env,
@@ -939,7 +1013,14 @@
 
   for(i in seq_len(iterations)) {
 
-    # .check_n_t(n_t)
+    # dd_* uses iterate_kerns with "iterations = 1" and a loop
+    # in the outer layer, whereas di_* uses this loop for iterating
+    # through time. Thus, we need a switch to ensure that the index
+    # for inserting the pop_state at t+1 is correctly drawn.
+
+    iteration_ind <- ifelse(is.na(current_iteration),
+                            i,
+                            current_iteration)
 
     # Select kernels from kern_seq, or just use all of them if it's
     # a deterministic simulation. Similarly, we need to subset the k_rows
@@ -957,8 +1038,8 @@
         kern_ind <- vapply(names(sub_kern_list),
                            function(x) strsplit(x, '_')[[1]][2],
                            character(1L))
-        kern_ind <- which(kern_ind == kern_seq[i])
-        k_row_ind <- which(grepl(kern_seq[i], k_row$kernel_id))
+        kern_ind <- which(kern_ind == kern_seq[iteration_ind])
+        k_row_ind <- which(grepl(kern_seq[iteration_ind], k_row$kernel_id))
 
 
         use_kerns <- sub_kern_list[kern_ind]
@@ -969,9 +1050,9 @@
         kern_ind <- vapply(names(sub_kern_list),
                            function(x) as.integer(strsplit(x, '_')[[1]][2]),
                            integer(1L)) %>%
-          which(. == kern_seq[i])
+          which(. == kern_seq[iteration_ind])
 
-        k_row_ind <- which(grepl(kern_seq[i], k_row$kernel_id))
+        k_row_ind <- which(grepl(kern_seq[iteration_ind], k_row$kernel_id))
 
 
         use_kerns <- sub_kern_list[kern_ind]
@@ -1008,7 +1089,7 @@
 
                                          return(.x)
                                        },
-                                       iteration = i
+                                       iteration = iteration_ind
     )
 
     # Now, update the names so that we can bind the new n_*_t to
@@ -1182,6 +1263,97 @@
 
   return(out)
 
+}
+
+#' @noRd
+# Returns a list with entries others and k_row with hier_effs split out
+# Checks ipm definition. slightly modified so that it can manipulate
+# vr_text as well.
+
+.initialize_kernels_dd <- function(proto_ipm, iterate) {
+
+  # checks pop_state, env_state, domain definitions
+  .check_ipm_definition(proto_ipm, iterate)
+
+  # modifies vr_text so that it density dependent parts are also gsub'd
+
+  proto_ipm <- .sub_dd_terms(proto_ipm)
+
+  # Split out K from Fothers so it isn't evaluated until we're ready. If it
+  # isn't there, then proceed as usual
+
+  K_row    <- which(grepl("K|^n_.*?_t", proto_ipm$kernel_id))
+
+  if(length(K_row) > 0) {
+
+    k_row  <- proto_ipm[K_row, ]
+    others <- proto_ipm[-c(K_row), ]
+
+  } else {
+
+    others <- proto_ipm
+    k_row <- NA_character_
+
+  }
+
+  # If vital rates are fit with a hierarchical model of any kind,
+  # then split those out into their respective years/plots/what-have-you
+
+  if(any(others$has_hier_effs) | any(k_row$has_hier_effs)) {
+
+    others <- .split_hier_effs(others)
+    k_row  <- .split_hier_effs(k_row)
+
+  }
+
+  out <- list(others = others,
+              k_row  = k_row)
+
+  return(out)
+
+}
+
+.sub_dd_terms <- function(proto) {
+
+  possible_svs <- unlist(proto$state_var) %>%
+    unique()
+
+  for(i in seq_along(proto$params)) {
+
+    kern_row <- proto$params[[i]]
+
+    for(j in seq_along(possible_svs)) {
+
+      test    <- paste('n_', possible_svs[j], '_t', sep = "")
+      replace <- paste('pop_state_', possible_svs[j], '_t', sep = "")
+
+      kern_row$vr_text <- lapply(kern_row$vr_text,
+                                 function(vr_fun,
+                                          test,
+                                          to_sub) {
+
+                                   gsub(test, to_sub, vr_fun)
+                                 },
+                                 test   = test,
+                                 to_sub = replace)
+
+      kern_row$formula <- lapply(kern_row$formula,
+                                 function(vr_fun,
+                                          test,
+                                          to_sub) {
+                                   gsub(test, to_sub, vr_fun)
+                                 },
+                                 test   = test,
+                                 to_sub = replace)
+    }
+
+
+
+    proto$params[[i]] <- kern_row
+
+  }
+
+  return(proto)
 }
 
 .fun_to_iteration_mat <- function(fun,

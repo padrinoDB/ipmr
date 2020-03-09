@@ -14,3 +14,4 @@
 ^index\.Rmd$
 ^index\.md$
 ^appveyor\.yml$
+^bug_reports/*$

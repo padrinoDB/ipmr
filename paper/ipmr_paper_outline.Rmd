@@ -74,10 +74,9 @@ grViz("digraph flowchart {
       [1]: 'Fit vital rate models using other packages (e.g. lme4, nlme, mgcv)'
       [2]: 'Move coefficients or model objects into a named list'
       [3]: 'Decide whether the model is stochastic or deterministic and init_ipm() using the appropriate class'
-      [4]: 'Build expressions for the individual kernels (e.g. P = s_g_mult(s, g)). When models are implemented from hierarchical vital rate models, take advantage of built-in suffix recognition in ipmr! (e.g. s_g_mult(s_yr, g_yr))'
+      [4]: 'Build expressions for the individual kernels (e.g. P = s_g_mult(s, g)). When models are implemented from hierarchical vital rate models, take advantage of built-in suffix recognition in ipmr!'
       [5]: 'Build expressions for the individual vital rates using mathematical syntax, R functions, or some combination thereof (e.g. s = inv_logit(s_int, s_slope, sv_1))' 
       [6]: 'Generate an implementation argument list, define domains, and make_ipm()'
-      
       
       ")
 
@@ -93,19 +92,16 @@ knitr::kable(
   tibble::tribble(
     ~Feature,                                                  ~ipmr,  ~IPMpack,
     "Implement simple kernels",                                  "X",       "X",
-    "Prospective perturbation analyses (kernel level)",          "X",       "X", 
-    "Prospective perturbation analyses (coefficient level)",     "X",       "X", 
-    "Prospective perturbation analyses (vital rate level)",      "X",      "No", 
     "Implement discrete/continuous combinations",                "X",       "X",
     "Basic implementation diagnostics",                          "X",       "X",
-    "Age-specific demographic functions",                        "X",       "X",
+    "Fully customizable vital rate functions",                   "X",       "No",
+    "Age-specific demographic functions",                        "In prep", "X",
     "Plot, print methods",                                       "X",       "X",
     "Model discretely varying environemnts",                     "X",       "X",
-    "Model continuously varying environments",                   "X", "Sort of",
-    "Multiple continuous state variables",                       "X",      "No",
-    "Life table respose experiments",                            "X",      "No",
-    "Density dependent models",                                  "X",      "No",
-    "Common underlying data structure for all models",           "X",      "No"
+    "Model continuously varying environments",                   "X",       "Sort of",
+    "Multiple continuous state variables",                       "X",       "No",
+    "Density dependent models",                                  "In prep", "No",
+    "Common underlying data structure for all models",           "X",       "No"
     
   ),
   format = 'html',
@@ -116,8 +112,6 @@ knitr::kable(
   column_spec(2, border_left =  TRUE, border_right = TRUE) %>%
   column_spec(3, border_right = TRUE) %>%
   kable_styling()
-
-
 
 ```
 
@@ -130,8 +124,36 @@ Introduce the `proto_ipm` data structure - becomes a key point in the discussion
 4. Highlight flexibility - Table 2 w/ classes, descriptions RESERVED WORDS!!!!!!!.
 
 
-```{r}
+```{r table 2 }
 
+
+knitr::kable(
+  tibble::tribble(
+    ~Class,                                                          ~Completed, 
+    "Simple, density independent, deterministic",                     'Yes',           
+    "Simple, density independent, stochastic, kernel-resampled",      'Yes',
+    "Simple, density independent, stochastic, parameter-resampled",   "Yes",
+    
+    "General, density independent, deterministic",                    "Yes",
+    "General, density independent, stochastic, kernel-resampled",     "Yes",
+    "General, density independent, stochastic, parameter-resampled",  "Yes",
+    
+    "Simple, density depdendent, deterministic",                      "No",
+    "Simple, density depdendent, stochastic, kernel-resampled",       "No",
+    "Simple, density depdendent, stochastic, parameter-resampled",    "No",
+    
+    "General, density depdendent, deterministic",                     "No",
+    "General, density depdendent, stochastic, kernel-resampled",      "No",
+    "General, density depdendent, stochastic, parameter-resampled",   "No"
+    
+  ),
+  format = 'html',
+  escape = FALSE,
+  caption = "Table 1: Comparison of ipmr and IPMpack features."
+) %>%
+  column_spec(1, border_left = TRUE) %>%
+  column_spec(2, border_left =  TRUE, border_right = TRUE) %>%
+  kable_styling()
 
 
 
@@ -148,6 +170,8 @@ Introduce the `proto_ipm` data structure - becomes a key point in the discussion
 ```{r Figure 3, eval = FALSE}
 
 # Figure 3 - diagnostic plots and general output from plot.* methods in ipmr
+
+
 
 ```
     
@@ -191,9 +215,9 @@ names(f_s_r_int) <- paste('f_s_', nms, sep = "")
 # to rapidly make a parameter set suitable for usage in the data_list argument
 # of define_kernel
 
-g_params <- list2(!!! g_r_int)
-s_params <- list2(!!! s_r_int)
-f_s_params <- list2(!!! f_s_r_int)
+g_params   <- as.list(g_r_int)
+s_params   <- as.list(s_r_int)
+f_s_params <- as.list(f_s_r_int)
 
 params <- splice(data_list, g_params, s_params, f_s_params)
 
@@ -286,6 +310,8 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     + the `proto_ipm` provides a natural intermediate data structure for user- and database-specified IPMs
     
     + viable mechanism for reproducing published IPMs without relying on raw data and associated code
+    
+    + provides a framework for generating user-specified ones that emphasizes the math over the code
     
     + 
     
