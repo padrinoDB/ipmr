@@ -95,7 +95,7 @@ x <- init_ipm('simple_di_det') %>%
                 mu_g = g_int + g_slope * dbh_1,
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'g')
   ) %>%
@@ -107,7 +107,7 @@ x <- init_ipm('simple_di_det') %>%
                 f_d = dnorm(dbh_2, mu_fd, sd_fd),
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
   ) %>%
@@ -116,7 +116,7 @@ x <- init_ipm('simple_di_det') %>%
            family = 'IPM',
            data_list = list(),
            states = states,
-           evict = FALSE) %>%
+           evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit))
@@ -213,7 +213,7 @@ test_that("order of kernel_definition doesn't matter", {
                   f_d = dnorm(dbh_2, mu_fd, sd_fd),
                   data_list = data_list,
                   states = states,
-                  evict = TRUE,
+                  evict_cor = TRUE,
                   evict_fun = truncated_distributions('norm',
                                                       'f_d')
     ) %>%
@@ -225,7 +225,7 @@ test_that("order of kernel_definition doesn't matter", {
                   mu_g = g_int + g_slope * dbh_1,
                   data_list = data_list,
                   states = states,
-                  evict = TRUE,
+                  evict_cor = TRUE,
                   evict_fun = truncated_distributions('norm',
                                                       'g')
     ) %>%
@@ -234,7 +234,7 @@ test_that("order of kernel_definition doesn't matter", {
              family = 'IPM',
              data_list = list(),
              states = states,
-             evict = FALSE) %>%
+             evict_cor = FALSE) %>%
     define_impl(
       make_impl_args_list(
         kernel_names = c('F', 'P', "K"),
@@ -255,7 +255,7 @@ test_that("order of kernel_definition doesn't matter", {
              family = 'IPM',
              data_list = list(),
              states = states,
-             evict = FALSE) %>%
+             evict_cor = FALSE) %>%
     define_kernel('F',
                   formula = f_r * f_s * f_d,
                   family = 'CC',
@@ -264,7 +264,7 @@ test_that("order of kernel_definition doesn't matter", {
                   f_d = dnorm(dbh_2, mu_fd, sd_fd),
                   data_list = data_list,
                   states = states,
-                  evict = TRUE,
+                  evict_cor = TRUE,
                   evict_fun = truncated_distributions('norm',
                                                       'f_d')
     ) %>%
@@ -276,7 +276,7 @@ test_that("order of kernel_definition doesn't matter", {
                   mu_g = g_int + g_slope * dbh_1,
                   data_list = data_list,
                   states = states,
-                  evict = TRUE,
+                  evict_cor = TRUE,
                   evict_fun = truncated_distributions('norm',
                                                       'g')
     )  %>%
@@ -309,7 +309,7 @@ test_that('iteration methods work the same as eigenvalue methods', {
                   mu_g = g_int + g_slope * dbh_1,
                   data_list = data_list,
                   states = states,
-                  evict = TRUE,
+                  evict_cor = TRUE,
                   evict_fun = truncated_distributions('norm',
                                                       'g')
     ) %>%
@@ -321,7 +321,7 @@ test_that('iteration methods work the same as eigenvalue methods', {
                   f_d = dnorm(dbh_2, mu_fd, sd_fd),
                   data_list = data_list,
                   states = states,
-                  evict = TRUE,
+                  evict_cor = TRUE,
                   evict_fun = truncated_distributions('norm',
                                                       'f_d')
     ) %>%
@@ -331,7 +331,7 @@ test_that('iteration methods work the same as eigenvalue methods', {
              family = 'IPM',
              data_list = list(),
              states = states,
-             evict = FALSE) %>%
+             evict_cor = FALSE) %>%
     define_impl(impl_args) %>%
     define_pop_state(
       n_dbh = runif(100)

@@ -254,7 +254,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     states           = list(c('ht')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm', 'g_yr')
   ) %>%
   define_kernel(
@@ -268,7 +268,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     states           = list(c('ht')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict            = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm', 'f_d')
   ) %>%
   define_k(
@@ -408,7 +408,7 @@ test_that("order of kernel definition doesn't matter", {
       states           = list(c('ht')),
       has_hier_effs    = TRUE,
       levels_hier_effs = hier_levels,
-      evict            = TRUE,
+      evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'f_d')
     ) %>%
     define_kernel(
@@ -423,7 +423,7 @@ test_that("order of kernel definition doesn't matter", {
       states           = list(c('ht')),
       has_hier_effs    = TRUE,
       levels_hier_effs = hier_levels,
-      evict = TRUE,
+      evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'g_yr')
     ) %>%
     define_k(
@@ -481,7 +481,7 @@ test_that("return_all gets all of the environments back", {
       states           = list(c('ht')),
       has_hier_effs    = TRUE,
       levels_hier_effs = hier_levels,
-      evict            = TRUE,
+      evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'f_d')
     ) %>%
     define_kernel(
@@ -496,7 +496,7 @@ test_that("return_all gets all of the environments back", {
       states           = list(c('ht')),
       has_hier_effs    = TRUE,
       levels_hier_effs = hier_levels,
-      evict = TRUE,
+      evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'g_yr')
     ) %>%
     define_k(

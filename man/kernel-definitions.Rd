@@ -15,7 +15,7 @@ define_kernel(
   states,
   has_hier_effs = FALSE,
   levels_hier_effs = list(),
-  evict = FALSE,
+  evict_cor = FALSE,
   evict_fun = NULL
 )
 
@@ -28,7 +28,7 @@ define_k(
   states,
   has_hier_effs = FALSE,
   levels_hier_effs = list(),
-  evict = FALSE,
+  evict_cor = FALSE,
   evict_fun = NULL
 )
 }
@@ -73,17 +73,17 @@ on the syntax for this feature for more details (\code{vignettes(
 the hierarchical variable can take. Entries in this list should be a single
 vector and should be character or integer typed.}
 
-\item{evict}{A logical indicating whether an eviction correction should be applied
+\item{evict_cor}{A logical indicating whether an eviction correction should be applied
 to the kernel. It is generally recommended to use a function in the vital rate
 definition as opposed to using this option Default is \code{FALSE}.}
 
-\item{evict_fun}{If \code{evict == TRUE}, then a function that corrects for it.
+\item{evict_fun}{If \code{evict_cor== TRUE}, then a function that corrects for it.
 Currently, the only implemented function is \code{truncated_distributions}.
 This works by modifying the functional form of the vital rate expressions
 \code{...}, and so supplying your own function in this slot will be difficult.
 One can also specify \code{usr_funs} function that performs the correction
 during the numerical implementation of the model itself. In that case,
-set \code{evict} to \code{FALSE}.}
+set \code{evict_cor} to \code{FALSE}.}
 }
 \value{
 All functions described here return a \code{proto_ipm}.

@@ -237,7 +237,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
     data_list     = data_list_cr,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'g')
   ) %>%
@@ -256,7 +256,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
     formula = 0,
     family  = "DD",
     states  = states,
-    evict = FALSE
+    evict_cor = FALSE
   ) %>%
   define_kernel(
     name          = 'leave_discrete',
@@ -266,7 +266,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
     data_list     = data_list_cr,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
   ) %>%
@@ -353,7 +353,7 @@ test_that("kernel definition order doesn't matter", {
       formula = 0,
       family  = "DD",
       states  = states,
-      evict = FALSE
+      evict_cor = FALSE
     ) %>%
     define_kernel(
       name          = 'leave_discrete',
@@ -363,7 +363,7 @@ test_that("kernel definition order doesn't matter", {
       data_list     = data_list_cr,
       states        = states,
       has_hier_effs = FALSE,
-      evict         = TRUE,
+      evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'f_d')
     ) %>%
@@ -377,7 +377,7 @@ test_that("kernel definition order doesn't matter", {
       data_list     = data_list_cr,
       states        = states,
       has_hier_effs = FALSE,
-      evict         = TRUE,
+      evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'g')
     ) %>%

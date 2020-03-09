@@ -172,10 +172,10 @@ my_simple_ipm <- init_ipm('simple_di_det') %>%
     data_list = data_list,
     states    = list(c('dbh')),
     
-    # If you want to correct for eviction, set evict = TRUE and specify an
+    # If you want to correct for eviction, set evict_cor = TRUE and specify an
     # evict_fun. ipmr provides truncated_distributions() to help.
     
-    evict     = TRUE,
+    evict_cor = TRUE,
     evict_fun = truncated_distributions('norm',
                                         'g')
   ) %>%
@@ -204,7 +204,7 @@ my_simple_ipm <- init_ipm('simple_di_det') %>%
                 # Again, we'll correct for eviction in new recruits by
                 # truncating the normal distribution.
                 
-                evict     = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
   ) %>%
@@ -230,7 +230,7 @@ my_simple_ipm <- init_ipm('simple_di_det') %>%
            states    = list(c('dbh')),
            # We've already corrected eviction in the sub-kernels, so there's no
            # need to do that here
-           evict     = FALSE
+           evict_cor = FALSE
   ) %>%
   # Next, we have to define the implementation details for the model. 
   # We need to tell ipmr how each kernel is integrated, what domain
@@ -271,26 +271,6 @@ These models are usually used to model discretely varying environments. For exam
 The syntax uses a `name_hierarchicalVariable` notation. These names are automatically expanded to include the multiple levels of the hierarchical variable. For example, the P kernel for a model with 5 years of data could be `name`'d `P_yr`, and the underlying vital rates would be denoted `vitalRate_yr`. The parameter values in the `data_list` are the exception to this - they must be labeled with the actual values that the hierarchical variable takes.
 
 The example below simulates a lifecycle where reproduction is always fatal. Thus, the survival term also includes the probability of reproducing. This is meant to (hopefully) demonstrate the flexibility of the framework. Along the way, it'll make use of the `purrr` R package to manipulate parameters and lists. The vital rates take the following form:
-
-1. survival (`s`): a logistic regression with a random year intercept (`s_r_yr`). 
-
-    - Example model formula: `glmer(surv ~ size_1 + (1 | yr), data = my_surv_data, family = binomial()))`
-
-2. growth (`g`): A linear regression random year intercept (`g_r_yr`).
-
-    - Example model formula: `lmer(size_2 ~ size_1 + (1 | yr), data = my_grow_data, family = gaussian()))`
-
-3. pr(flowering) (`p_r`): A logistic regression. This has no random year effect.
-
-    - Example model formula: `glm(flower ~ size_1 , data = my_surv_data, family = binomial()))`
-
-4. seed production (`f_s`): A poisson regression with a random year intercept (`f_s_r_yr`)
-
-    - Example model formula: `glmer(seed_num ~ size_1 + (1 | yr), data = my_surv_data, family = poisson()))`
-
-5. recruit size distribution (`f_d`): A normal distribution with two constant parameters, the mean (`mu_fd`) and standard deviation (`sd_fd`).
-
-In this example, the random effects are not correlated with each other, corresponding to separate models for each vital rate. 
 
 
 ```{r eval = FALSE}
@@ -426,7 +406,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     # Again, correct for eviction. Note that the 2nd parameter is also modified
     # with the _yr suffix
     
-    evict            = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "g_yr")
   ) %>%
   define_kernel(
@@ -444,7 +424,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     states           = list(c('ht')), 
     has_hier_effs    = TRUE,
     levels_hier_effs = list(yr = 1:5),
-    evict            = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
@@ -558,7 +538,7 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
     data_list     = data_list,
     states        = list(c('surf_area')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>%
   define_kernel(
@@ -575,7 +555,7 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
     data_list     = data_list,
     states        = list(c('surf_area')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
@@ -592,7 +572,7 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
     data_list       = data_list,
     states          = list(c('surf_area')),
     has_hier_effs   = FALSE,
-    evict           = FALSE
+    evict_cor       = FALSE
   ) %>%
   define_impl(
     make_impl_args_list(

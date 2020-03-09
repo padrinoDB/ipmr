@@ -108,7 +108,7 @@ general_ipm <- init_ipm("general_di_det") %>%
     data_list     = data_list,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'g')
   ) %>%
@@ -131,7 +131,7 @@ general_ipm <- init_ipm("general_di_det") %>%
     formula = 0,
     family  = "DD",
     states  = states,
-    evict = FALSE
+    evict_cor = FALSE
   ) %>%
   define_kernel(
     name          = 'leave_discrete',
@@ -141,7 +141,7 @@ general_ipm <- init_ipm("general_di_det") %>%
     data_list     = data_list,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
   ) %>%

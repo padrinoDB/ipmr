@@ -71,7 +71,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     ),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) 
 
@@ -96,7 +96,7 @@ The `states` argument refers to the state variables in use. When composing the v
 
 `has_hier_effs` is a logical indicating whether or not the model contains hierarchical effects. In this example, the model is a simple, deterministic one and so this is set to `FALSE`. However, `*_stoch_kern` kernels will almost always need this to be set to `TRUE`. See the next example for a demonstration of that syntax (there will also be a whole vignette at some point, just not there yet).
 
-`evict` refers to whether or not to correct for eviction in the kernel. If this is set to `TRUE`, then you must supply a function specifying which expressions need to be corrected. `ipmr` provides `truncated_distributions` for now, though others will be implemented as well. Note that the `n_mesh_p` argument will probably disappear from this function as `ipmr` gets a bit smarter.
+`evict_cor` refers to whether or not to correct for eviction in the kernel. If this is set to `TRUE`, then you must supply a function specifying which expressions need to be corrected. `ipmr` provides `truncated_distributions` for now, though others will be implemented as well. 
 
 Finally, `ipmr` is meant to be pipe-friendly, so all functions associated with constructing a model take a `proto_ipm` as their first argument and always return a `proto_ipm`, meaning operations can be chained together with the `%>%` operator. Not that this is re-exported in `ipmr`, so there is no need to load any other packages to access it (e.g. `dplyr` or `magrittr`). 
 
@@ -121,7 +121,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     ),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>% 
   define_kernel(
@@ -141,7 +141,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     ),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   )
 
@@ -174,7 +174,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     ),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>% 
   define_kernel(
@@ -194,7 +194,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     ),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
@@ -204,12 +204,12 @@ my_ipm <- init_ipm('simple_di_det') %>%
     data_list     = list(),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = FALSE
+    evict_cor     = FALSE
   ) 
 
 ```
 
-Here, the `...` take over the role that `formula` took in the previous kernels. This is to facilitate passing multiple expressions for the iteration kernel when defining more complex models (e.g. an age x size model). In this example, the left hand side of the expression should match the `name` because we aren't actually iterating this kernel with a population vector (see below for examples of that!). Note that there are no additional parameters that need to be passed to complete the construction of the kernel, so `data_list` can be empty. It never hurts to pass the same `data_list` containing all of the parameters to each call to `define_k()`/`define_kernel() though - if the parameter names aren't in a given kernels definition, they are simply ignored. Finally, we specify `evict = FALSE` in the `K` because we've already corrected for it in the previous kernel defintions.
+Here, the `...` take over the role that `formula` took in the previous kernels. This is to facilitate passing multiple expressions for the iteration kernel when defining more complex models (e.g. an age x size model). In this example, the left hand side of the expression should match the `name` because we aren't actually iterating this kernel with a population vector (see below for examples of that!). Note that there are no additional parameters that need to be passed to complete the construction of the kernel, so `data_list` can be empty. It never hurts to pass the same `data_list` containing all of the parameters to each call to `define_k()`/`define_kernel()` though - if the parameter names aren't in a given kernels definition, they are simply ignored. Finally, we specify `evict_cor = FALSE` in the `K` because we've already corrected for it in the previous kernel defintions.
 
 ### Defining the implementation arguments (`impl_args`)
 
@@ -252,7 +252,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     ),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor        = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>% 
   define_kernel(
@@ -272,7 +272,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     ),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
@@ -282,7 +282,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     data_list     = list(),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = FALSE
+    evict_cor     = FALSE
   )  %>%
   # Alternative 2, put the call to make_impl_args_list() inside of define_impl(). 
   define_impl(
@@ -298,7 +298,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
 
 ### Defining domains for state variables
 
-The final step essential step in creating an IPM with `ipmr` is to define the domain of each state variable in the `states` list. This is done with the `define_domains()` function. When the `int_rule` is `"midpoint"`, this takes a named set of vectors that have 3 entries each. The name corresponds to the `state` it is describing, the first entry is the lower bound, the second the upper bound, and the third is the number of meshpoints.
+The final essential step in creating an IPM with `ipmr` is to define the domain of each state variable in the `states` list. This is done with the `define_domains()` function. When the `int_rule` is `"midpoint"`, this takes a named set of vectors that have 3 entries each. The name corresponds to the `state` it is describing, the first entry is the lower bound, the second the upper bound, and the third is the number of meshpoints.
 
 Note that for other `int_rule`s, the vectors associated with each domain will look different. However, those are not yet implemented and so beyond the scope of this vignette for now.
 
@@ -331,7 +331,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     ),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>% 
   define_kernel(
@@ -351,7 +351,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     ),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
@@ -361,7 +361,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     data_list     = list(),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = FALSE
+    evict_cor        = FALSE
   )  %>%
   # Alternative 2, put the call to make_impl_args_list() inside of define_impl(). 
   define_impl(
@@ -403,7 +403,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     ),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>% 
   define_kernel(
@@ -423,7 +423,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     ),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor        = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
@@ -433,7 +433,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     data_list     = list(),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict         = FALSE
+    evict_cor        = FALSE
   )  %>%
   # Alternative 2, put the call to make_impl_args_list() inside of define_impl(). 
   define_impl(
@@ -462,13 +462,13 @@ In this example, there are no additional arguments that need to be passed to `ma
 
 - `sub_kernels` contains, in this example, `P` and `F`.
 
-- `env_list` contains the evaluation environments for each kernel and sub-kernel. This is really just for developer debugging and will likely be removed in the not so distant future.
+- `env_list` contains the evaluation environments for each kernel and sub-kernel. These are used by subsequent analysis methods and so are important for internal usage, but are probably of limited use to most users. 
 
-- `env_seq` contains either an integer vector with the sequence of indices used to select kernels from the `iterators` during a stochastic simulation (`*_stoch_kern`), or a matrix of parameter estimates from each iteration of the stochastic simulation (`*_kern_param`). Not relevant for `*_det` methods with a single iteration kernel.
+- `env_seq` contains either an integer vector with the sequence of indices used to select kernels from the `iterators` during a stochastic simulation (`*_stoch_kern`), or a matrix of parameter estimates from each iteration of the stochastic simulation (`*_kern_param`). Not relevant for `*_det` methods with a single iteration kernel and so  contains either as sequence of 1s or `NA`s
 
-- `pop_state` contains a list of matrices for each `state` described. The columns of each matrix correspond to the population state at each time step of a simulation. In this case, we never defined the initial population state, so it will be empty.
+- `pop_state` contains a list of matrices for each item defined in `define_pop_state()`. In this case, we never defined the initial population state, so it will be empty. When `define_pop_state()` is used with `iterate = TRUE`, the rows of each matrix correspond to the population state and columns are time steps.
 
-- `proto_ipm` contains the `proto_ipm` object used to generate the model. This is useful for rebuilding the model with a different set of `impl_args` to see how that changes your results.
+- `proto_ipm` contains the `proto_ipm` object used to generate the model. This is useful for rebuilding the model with a different set of `impl_args` or parameters to see how that changes your results.
 
 `lambda`, `left_ev`, and `right_ev` are generic functions corresponding to the dominant eigenvalue, dominant left eigenvector, and dominant right eigenvector respectively. `lambda` is available for all classes of IPMs, while `left/right_ev` is available for all deterministic IPMs. Stochastic equivalents of the latter will be implemented eventually. 
 
@@ -478,9 +478,30 @@ In the example above, we created a model with a single, deterministic kernel def
 
 ### Defining a hierarchical model with ipmr
 
-`ipmr` uses a special syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the example above. The first type of model will be a stochastic, kernel-resampled simulation (`"simple_di_stoch_kern"`). 
+`ipmr` uses a syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the example above. The first type of model will be a stochastic, kernel-resampled simulation (`"simple_di_stoch_kern"`). 
 
-This example will use `purrr` to make the first bit of code a bit more concise. This chunk takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of `coef(some_vital_rate_model`))
+The vital rate models are as follows:
+
+1. survival (`s`): a logistic regression with a random year intercept (`s_r_yr`). 
+
+    - Example model formula: `glmer(surv ~ size_1 + (1 | yr), data = my_surv_data, family = binomial()))`
+
+2. growth (`g`): A linear regression random year intercept (`g_r_yr`).
+
+    - Example model formula: `lmer(size_2 ~ size_1 + (1 | yr), data = my_grow_data, family = gaussian()))`
+
+3. pr(flowering) (`p_r`): A logistic regression. This has no random year effect.
+
+    - Example model formula: `glm(flower ~ size_1 , data = my_surv_data, family = binomial()))`
+
+4. seed production (`f_s`): A poisson regression with a random year intercept (`f_s_r_yr`)
+
+    - Example model formula: `glmer(seed_num ~ size_1 + (1 | yr), data = my_surv_data, family = poisson()))`
+    
+5. recruit size distribution (`f_d`): A normal distribution with two constant parameters, the mean (`mu_fd`) and standard deviation (`sd_fd`).
+
+In this example, the random effects are not correlated with each other, corresponding to separate models for each vital rate. We will use the `purrr` package to make the first bit of code a bit more concise. This chunk takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of `coef(some_vital_rate_model`)).
+
 
 ```{r eval = FALSE}
 library(purrr)
@@ -588,7 +609,7 @@ my_ipm <- init_ipm('simple_di_stoch_kern') %>%
     states           = list(c('ht')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict            = TRUE,
+    evict_cor           = TRUE,
     
     # reference to g_yr in evict_fun is also updated
     
@@ -606,7 +627,7 @@ my_ipm <- init_ipm('simple_di_stoch_kern') %>%
     states           = list(c('ht')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict            = TRUE,
+    evict_cor           = TRUE,
     evict_fun        = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
@@ -617,7 +638,7 @@ my_ipm <- init_ipm('simple_di_stoch_kern') %>%
     states           = list(c("ht")),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict            = FALSE
+    evict_cor           = FALSE
   ) %>%
   define_impl(
     make_impl_args_list(
@@ -739,7 +760,7 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
     # but in a continuous manner.
     
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor        = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>%
   define_kernel(
@@ -752,7 +773,7 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
     data_list     = data_list,
     states        = list(c('surf_area')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor        = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
@@ -768,7 +789,7 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
     data_list       = data_list,
     states          = list(c('surf_area')),
     has_hier_effs   = FALSE,
-    evict           = FALSE
+    evict_cor          = FALSE
   ) %>%
   define_impl(
     make_impl_args_list(

@@ -184,7 +184,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     data_list        = fixed_params,
     states           = list(c('ln_leaf_l')),
     has_hier_effs    = FALSE,
-    evict            = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_nn')
   ) %>%
@@ -213,7 +213,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     data_list     = fixed_params,
     states        = list(c('sqrt_area', 'ln_leaf_l')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions(c('norm', 'norm'),
                                             c('gamma_nr',
                                               'gamma_sr'))
@@ -230,7 +230,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     states    = list(c('ln_leaf_l')),
 
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'gamma_nd')
   ) %>%
@@ -254,7 +254,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     data_list        = fixed_params,
     states           = list(c('sqrt_area', 'ln_leaf_l')),
     has_hier_effs    = FALSE,
-    evict            = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_rn')
 
@@ -268,7 +268,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     data_list        = fixed_params,
     states           = list(c('ln_leaf_l')),
     has_hier_effs    = FALSE,
-    evict            = FALSE
+    evict_cor        = FALSE
   ) %>%
   define_kernel(
     name             = 'k_zd',
@@ -279,7 +279,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     data_list        = fixed_params,
     states           = list(c('sqrt_area')),
     has_hier_effs    = FALSE,
-    evict            = FALSE
+    evict_cor        = FALSE
   ) %>%
   define_k(
     name = 'K',

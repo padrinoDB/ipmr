@@ -97,7 +97,7 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     data_list = data_list,
     states = list(c('surf_area')),
     has_hier_effs = FALSE,
-    evict = TRUE,
+    evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'g')
   ) %>%
   define_kernel(
@@ -110,7 +110,7 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     data_list = data_list,
     states = list(c('surf_area')),
     has_hier_effs = FALSE,
-    evict = TRUE,
+    evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'f_d')
   ) %>%
   define_k(
@@ -121,7 +121,7 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     data_list = data_list,
     states = list(c('surf_area')),
     has_hier_effs = FALSE,
-    evict = FALSE
+    evict_cor = FALSE
   ) %>%
   define_impl(
     make_impl_args_list(

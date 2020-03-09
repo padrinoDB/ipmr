@@ -43,7 +43,7 @@ sim_di_det_1 <- init_ipm('simple_di_det') %>%
                 mu_g = g_int + g_slope * dbh_1,
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'g')
   ) %>%
@@ -55,7 +55,7 @@ sim_di_det_1 <- init_ipm('simple_di_det') %>%
                 f_d = dnorm(dbh_2, mu_fd, sd_fd),
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
   ) %>%
@@ -64,7 +64,7 @@ sim_di_det_1 <- init_ipm('simple_di_det') %>%
            family    = 'IPM',
            data_list = list(),
            states    = states,
-           evict     = FALSE) %>%
+           evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit))
@@ -79,7 +79,7 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
                 mu_g = g_int + g_slope * dbh_1,
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'g')
   ) %>%
@@ -91,7 +91,7 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
                 f_d = dnorm(dbh_2, mu_fd, sd_fd),
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
   ) %>%
@@ -101,7 +101,7 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
            family    = 'IPM',
            data_list = list(),
            states    = states,
-           evict     = FALSE) %>%
+           evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   define_pop_state(n_dbh_t = runif(100)) %>%
@@ -119,7 +119,7 @@ sim_di_det_3 <- init_ipm('simple_di_det') %>%
                 mu_g = g_int + g_slope * dbh_1,
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'g')
   ) %>%
@@ -131,7 +131,7 @@ sim_di_det_3 <- init_ipm('simple_di_det') %>%
                 f_d = dnorm(dbh_2, mu_fd, sd_fd),
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
   ) %>%
@@ -141,7 +141,7 @@ sim_di_det_3 <- init_ipm('simple_di_det') %>%
            family    = 'IPM',
            data_list = list(),
            states    = states,
-           evict     = FALSE) %>%
+           evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   define_pop_state(n_dbh_t = runif(100)) %>%
@@ -267,7 +267,7 @@ sim_di_stoch_kern <- init_ipm('simple_di_stoch_kern') %>%
     states           = list(c('ht')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm', 'g_yr')
   ) %>%
   define_kernel(
@@ -281,7 +281,7 @@ sim_di_stoch_kern <- init_ipm('simple_di_stoch_kern') %>%
     states           = list(c('ht')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_levels,
-    evict            = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm', 'f_d')
   ) %>%
   define_k(
@@ -388,7 +388,7 @@ sim_di_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     data_list = data_list,
     states = list(c('surf_area')),
     has_hier_effs = FALSE,
-    evict = TRUE,
+    evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'g')
   ) %>%
   define_kernel(
@@ -401,7 +401,7 @@ sim_di_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     data_list = data_list,
     states = list(c('surf_area')),
     has_hier_effs = FALSE,
-    evict = TRUE,
+    evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'f_d')
   ) %>%
   define_k(
@@ -412,7 +412,7 @@ sim_di_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     data_list = data_list,
     states = list(c('surf_area')),
     has_hier_effs = FALSE,
-    evict = FALSE
+    evict_cor = FALSE
   ) %>%
   define_impl(
     make_impl_args_list(
@@ -530,7 +530,7 @@ gen_di_det_1 <- init_ipm("general_di_det") %>%
     data_list     = data_list,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'g')
   ) %>%
@@ -549,7 +549,7 @@ gen_di_det_1 <- init_ipm("general_di_det") %>%
     formula = 0,
     family  = "DD",
     states  = states,
-    evict = FALSE
+    evict_cor = FALSE
   ) %>%
   define_kernel(
     name          = 'leave_discrete',
@@ -559,7 +559,7 @@ gen_di_det_1 <- init_ipm("general_di_det") %>%
     data_list     = data_list,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
   ) %>%
@@ -606,7 +606,7 @@ gen_di_det_2 <- init_ipm("general_di_det") %>%
     data_list     = data_list,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'g')
   ) %>%
@@ -625,7 +625,7 @@ gen_di_det_2 <- init_ipm("general_di_det") %>%
     formula = 0,
     family  = "DD",
     states  = states,
-    evict = FALSE
+    evict_cor = FALSE
   ) %>%
   define_kernel(
     name          = 'leave_discrete',
@@ -635,7 +635,7 @@ gen_di_det_2 <- init_ipm("general_di_det") %>%
     data_list     = data_list,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
   ) %>%
@@ -883,7 +883,7 @@ gen_di_stoch_kern_1 <- init_ipm('general_di_stoch_kern') %>%
     states           = list(c('ln_leaf_l')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_effs,
-    evict            =  TRUE,
+    evict_cor        =  TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_nn_site')
   ) %>%
@@ -913,7 +913,7 @@ gen_di_stoch_kern_1 <- init_ipm('general_di_stoch_kern') %>%
     states       = list(c('sqrt_area', 'ln_leaf_l')),
     has_hier_effs = TRUE,
     levels_hier_effs = hier_effs,
-    evict = TRUE,
+    evict_cor = TRUE,
     evict_fun = truncated_distributions(c('norm', 'norm'),
                                         c('gamma_nr_site',
                                           'gamma_sr_site'))
@@ -930,7 +930,7 @@ gen_di_stoch_kern_1 <- init_ipm('general_di_stoch_kern') %>%
     states = list(c('ln_leaf_l')),
     has_hier_effs = TRUE,
     levels_hier_effs = hier_effs,
-    evict = TRUE,
+    evict_cor = TRUE,
     evict_fun = truncated_distributions('norm',
                                         'gamma_nd_site')
   ) %>%
@@ -955,7 +955,7 @@ gen_di_stoch_kern_1 <- init_ipm('general_di_stoch_kern') %>%
     states           = list(c('sqrt_area', 'ln_leaf_l')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_effs,
-    evict            = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_rn_site')
 
@@ -970,7 +970,7 @@ gen_di_stoch_kern_1 <- init_ipm('general_di_stoch_kern') %>%
     states           = list(c('ln_leaf_l')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_effs,
-    evict            = FALSE
+    evict_cor        = FALSE
   ) %>%
   define_kernel(
     name             = 'k_zd_site',
@@ -982,7 +982,7 @@ gen_di_stoch_kern_1 <- init_ipm('general_di_stoch_kern') %>%
     states           = list(c('sqrt_area')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_effs,
-    evict            = FALSE
+    evict_cor        = FALSE
   ) %>%
   define_k(
     name = 'K_site',
@@ -1243,7 +1243,7 @@ gen_di_stoch_param_1 <- init_ipm('general_di_stoch_param') %>%
     data_list        = fixed_params,
     states           = list(c('ln_leaf_l')),
     has_hier_effs    = FALSE,
-    evict            = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_nn')
   ) %>%
@@ -1272,7 +1272,7 @@ gen_di_stoch_param_1 <- init_ipm('general_di_stoch_param') %>%
     data_list     = fixed_params,
     states        = list(c('sqrt_area', 'ln_leaf_l')),
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions(c('norm', 'norm'),
                                             c('gamma_nr',
                                               'gamma_sr'))
@@ -1289,7 +1289,7 @@ gen_di_stoch_param_1 <- init_ipm('general_di_stoch_param') %>%
     states    = list(c('ln_leaf_l')),
 
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'gamma_nd')
   ) %>%
@@ -1313,7 +1313,7 @@ gen_di_stoch_param_1 <- init_ipm('general_di_stoch_param') %>%
     data_list        = fixed_params,
     states           = list(c('sqrt_area', 'ln_leaf_l')),
     has_hier_effs    = FALSE,
-    evict            = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_rn')
 
@@ -1327,7 +1327,7 @@ gen_di_stoch_param_1 <- init_ipm('general_di_stoch_param') %>%
     data_list        = fixed_params,
     states           = list(c('ln_leaf_l')),
     has_hier_effs    = FALSE,
-    evict            = FALSE
+    evict_cor        = FALSE
   ) %>%
   define_kernel(
     name             = 'k_zd',
@@ -1338,7 +1338,7 @@ gen_di_stoch_param_1 <- init_ipm('general_di_stoch_param') %>%
     data_list        = fixed_params,
     states           = list(c('sqrt_area')),
     has_hier_effs    = FALSE,
-    evict            = FALSE
+    evict_cor        = FALSE
   ) %>%
   define_k(
     name = 'K',
@@ -1528,7 +1528,7 @@ sim_di_det_1 <- init_ipm('simple_di_det') %>%
                 mu_g = g_int + g_slope * dbh_1,
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'g')
   ) %>%
@@ -1540,7 +1540,7 @@ sim_di_det_1 <- init_ipm('simple_di_det') %>%
                 f_d = dnorm(dbh_2, mu_fd, sd_fd),
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
   ) %>%
@@ -1549,7 +1549,7 @@ sim_di_det_1 <- init_ipm('simple_di_det') %>%
            family    = 'IPM',
            data_list = list(),
            states    = states,
-           evict     = FALSE) %>%
+           evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit))
@@ -1579,7 +1579,7 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
                 mu_g = g_int + g_slope * dbh_1,
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'g')
   ) %>%
@@ -1591,7 +1591,7 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
                 f_d = dnorm(dbh_2, mu_fd, sd_fd),
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
   ) %>%
@@ -1601,7 +1601,7 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
            family    = 'IPM',
            data_list = list(),
            states    = states,
-           evict     = FALSE) %>%
+           evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   define_pop_state(n_dbh_t = runif(100)) %>%
@@ -1618,7 +1618,7 @@ sim_di_det_3 <- init_ipm('simple_di_det') %>%
                 mu_g = g_int + g_slope * dbh_1,
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'g')
   ) %>%
@@ -1630,7 +1630,7 @@ sim_di_det_3 <- init_ipm('simple_di_det') %>%
                 f_d = dnorm(dbh_2, mu_fd, sd_fd),
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
   ) %>%
@@ -1640,7 +1640,7 @@ sim_di_det_3 <- init_ipm('simple_di_det') %>%
            family    = 'IPM',
            data_list = list(),
            states    = states,
-           evict     = FALSE) %>%
+           evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_pop_state(n_dbh_t = runif(100)) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
@@ -1824,7 +1824,7 @@ gen_di_det_1 <- init_ipm("general_di_det") %>%
     data_list     = data_list,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'g')
   ) %>%
@@ -1843,7 +1843,7 @@ gen_di_det_1 <- init_ipm("general_di_det") %>%
     formula = 0,
     family  = "DD",
     states  = states,
-    evict = FALSE
+    evict_cor = FALSE
   ) %>%
   define_kernel(
     name          = 'leave_discrete',
@@ -1853,7 +1853,7 @@ gen_di_det_1 <- init_ipm("general_di_det") %>%
     data_list     = data_list,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
   ) %>%
@@ -1918,7 +1918,7 @@ gen_di_det_2 <- init_ipm("general_di_det") %>%
     data_list     = data_list,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'g')
   ) %>%
@@ -1937,7 +1937,7 @@ gen_di_det_2 <- init_ipm("general_di_det") %>%
     formula = 0,
     family  = "DD",
     states  = states,
-    evict = FALSE
+    evict_cor = FALSE
   ) %>%
   define_kernel(
     name          = 'leave_discrete',
@@ -1947,7 +1947,7 @@ gen_di_det_2 <- init_ipm("general_di_det") %>%
     data_list     = data_list,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
   ) %>%

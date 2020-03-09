@@ -25,7 +25,7 @@ single_state <- init_ipm('simple_di_det') %>%
                                  g_slope = 1.02,
                                  sd_g = 0.7),
                 states = states_single,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions(g,
                                                     n_mesh_p = 100)) %>%
   define_kernel('F',
@@ -41,7 +41,7 @@ single_state <- init_ipm('simple_di_det') %>%
                                  mu_fd = 0.5,
                                  sd_fd = 0.2),
                 states = states_single,
-                evict = FALSE) %>%#,
+                evict_cor = FALSE) %>%#,
   # evict_fun = truncated_distributions(f_d,
   #                                     n_mesh_p = 100)) %>%
   define_k(
@@ -50,7 +50,7 @@ single_state <- init_ipm('simple_di_det') %>%
     family = 'IPM',
     data_list = list(),
     states = states_single,
-    evict = FALSE) %>%
+    evict_cor = FALSE) %>%
   define_impl(impl_args_single) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   define_pop_state(dbh = rep(1:50, 2))
@@ -75,7 +75,7 @@ two_state <- init_ipm('simple_di_det') %>%
                                  g_slope = 0.99,
                                  sd_g = 0.6),
                 states = states_2,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions(g,
                                                     n_mesh_p = 100)) %>%
   define_kernel("P_2",
@@ -90,7 +90,7 @@ two_state <- init_ipm('simple_di_det') %>%
                                  g_slope = 1.02,
                                  sd_g = 0.7),
                 states = states_2,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions(g,
                                                     n_mesh_p = 100)) %>%
   define_kernel('F',
@@ -106,7 +106,7 @@ two_state <- init_ipm('simple_di_det') %>%
                                  mu_fd = 0.5,
                                  sd_fd = 0.2),
                 states = states_2,
-                evict = FALSE) %>%#,
+                evict_cor = FALSE) %>%#,
   # evict_fun = truncated_distributions(f_d,
   #                                     n_mesh_p = 100)) %>%
   define_k(
@@ -115,7 +115,7 @@ two_state <- init_ipm('simple_di_det') %>%
     family = 'IPM',
     data_list = list(),
     states = states_2,
-    evict = FALSE) %>%
+    evict_cor = FALSE) %>%
   define_impl(impl_args_2) %>%
   define_domains(dbh = c(0, 50, 100),
                  ht = c(0, 10, 100)) %>%

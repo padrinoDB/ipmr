@@ -581,7 +581,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
     states           = list(c('ln_leaf_l')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_effs,
-    evict            =  TRUE,
+    evict_cor        =  TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_nn_site')
   ) %>%
@@ -611,7 +611,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
     states       = list(c('sqrt_area', 'ln_leaf_l')),
     has_hier_effs = TRUE,
     levels_hier_effs = hier_effs,
-    evict = TRUE,
+    evict_cor = TRUE,
     evict_fun = truncated_distributions(c('norm', 'norm'),
                                         c('gamma_nr_site',
                                           'gamma_sr_site'))
@@ -628,7 +628,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
     states = list(c('ln_leaf_l')),
     has_hier_effs = TRUE,
     levels_hier_effs = hier_effs,
-    evict = TRUE,
+    evict_cor = TRUE,
     evict_fun = truncated_distributions('norm',
                                         'gamma_nd_site')
   ) %>%
@@ -653,7 +653,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
     states           = list(c('sqrt_area', 'ln_leaf_l')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_effs,
-    evict            = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_rn_site')
 
@@ -668,7 +668,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
     states           = list(c('ln_leaf_l')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_effs,
-    evict            = FALSE
+    evict_cor        = FALSE
   ) %>%
   define_kernel(
     name             = 'k_zd_site',
@@ -680,7 +680,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
     states           = list(c('sqrt_area')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_effs,
-    evict            = FALSE
+    evict_cor        = FALSE
   ) %>%
   define_k(
     name = 'K_site',
@@ -1002,7 +1002,7 @@ test_that('evict_fun warnings are correctly generated', {
         states       = list(c('sqrt_area', 'ln_leaf_l')),
         has_hier_effs = TRUE,
         levels_hier_effs = hier_effs,
-        evict = TRUE,
+        evict_cor = TRUE,
         evict_fun = truncated_distributions('norm',
                                             c('gamma_nr_site',
                                               'gamma_sr_site'))

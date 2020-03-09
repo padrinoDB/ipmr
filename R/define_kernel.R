@@ -38,16 +38,16 @@
 #' @param levels_hier_effs A named list with vectors corresponding the various levels
 #' the hierarchical variable can take. Entries in this list should be a single
 #' vector and should be character or integer typed.
-#' @param evict A logical indicating whether an eviction correction should be applied
+#' @param evict_cor A logical indicating whether an eviction correction should be applied
 #' to the kernel. It is generally recommended to use a function in the vital rate
 #' definition as opposed to using this option Default is \code{FALSE}.
-#' @param evict_fun If \code{evict == TRUE}, then a function that corrects for it.
+#' @param evict_fun If \code{evict_cor== TRUE}, then a function that corrects for it.
 #' Currently, the only implemented function is \code{truncated_distributions}.
 #' This works by modifying the functional form of the vital rate expressions
 #' \code{...}, and so supplying your own function in this slot will be difficult.
 #' One can also specify \code{usr_funs} function that performs the correction
 #' during the numerical implementation of the model itself. In that case,
-#' set \code{evict} to \code{FALSE}.
+#' set \code{evict_cor} to \code{FALSE}.
 #'
 #' @section \code{define_k}:
 #'
@@ -84,7 +84,7 @@ define_kernel <- function(proto_ipm,
                           states,
                           has_hier_effs = FALSE,
                           levels_hier_effs = list(),
-                          evict = FALSE,
+                          evict_cor= FALSE,
                           evict_fun = NULL) {
 
   cls <- class(proto_ipm)
@@ -98,7 +98,7 @@ define_kernel <- function(proto_ipm,
   # make sure eviction function is correctly specified
 
   evict_fun <- rlang::enquo(evict_fun)
-  evict_fun <- .check_evict_fun(evict, evict_fun)
+  evict_fun <- .check_evict_fun(evict_cor, evict_fun)
 
   # protos store text rather than quos. They get converted back into quos later
   form_text <- rlang::quo_text(formula)
@@ -123,7 +123,7 @@ define_kernel <- function(proto_ipm,
     domain           = I(list(NA_character_)),
     state_var        = I(rlang::list2(!!name := states)),
     int_rule         = NA_character_,
-    evict            = evict,
+    evict            = evict_cor,
     evict_fun        = I(list(evict_fun)),
     pop_state        = I(list(NA_character_)),
     env_state        = I(list(NA_character_)),
@@ -156,7 +156,7 @@ define_k <- function(proto_ipm,
                      states,
                      has_hier_effs = FALSE,
                      levels_hier_effs = list(),
-                     evict = FALSE,
+                     evict_cor = FALSE,
                      evict_fun = NULL) {
 
   cls <- class(proto_ipm)
@@ -171,7 +171,7 @@ define_k <- function(proto_ipm,
 
   # make sure eviction function is correctly specified
   evict_fun <- rlang::enquo(evict_fun)
-  evict_fun <- .check_evict_fun(evict, evict_fun)
+  evict_fun <- .check_evict_fun(evict_cor, evict_fun)
 
   # protos store text rather than quos. They get converted back into quos later
   forms_text <- lapply(forms, function(x) {
@@ -202,7 +202,7 @@ define_k <- function(proto_ipm,
     domain           = I(list(NA_character_)),
     state_var        = I(rlang::list2(!! name := states)),
     int_rule         = NA_character_,
-    evict            = evict,
+    evict            = evict_cor,
     evict_fun        = I(list(evict_fun)),
     pop_state        = I(list(NA_character_)),
     env_state        = I(list(NA_character_)),
@@ -241,14 +241,14 @@ define_k <- function(proto_ipm,
 
 }
 
-.check_evict_fun <- function(evict, fun) {
+.check_evict_fun <- function(evict_cor, fun) {
 
 
   # need to supply a function if you want to correct for eviction!
 
-  if(evict & rlang::quo_is_null(fun)) {
+  if(evict_cor && rlang::quo_is_null(fun)) {
 
-    stop('"evict" is TRUE but no fun supplied!')
+    stop('"evict_cor" is TRUE but no fun supplied!')
 
     # if we have one, we need to get the name of the corrected object
 

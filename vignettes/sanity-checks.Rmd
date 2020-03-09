@@ -71,10 +71,10 @@ my_simple_ipm <- init_ipm('simple_di_det') %>%
     data_list = data_list,
     states    = list(c('dbh')),
     
-    # If you want to correct for eviction, set evict = TRUE and specify an
+    # If you want to correct for eviction, set evict_cor = TRUE and specify an
     # evict_fun. ipmr provides truncated_distributions() to help.
     
-    evict     = TRUE,
+    evict_cor = TRUE,
     evict_fun = truncated_distributions('norm',
                                         'g')
   ) %>%
@@ -103,7 +103,7 @@ my_simple_ipm <- init_ipm('simple_di_det') %>%
                 # Again, we'll correct for eviction in new recruits by
                 # truncating the normal distribution.
                 
-                evict     = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
   ) %>%
@@ -129,7 +129,7 @@ my_simple_ipm <- init_ipm('simple_di_det') %>%
            states    = list(c('dbh')),
            # We've already corrected eviction in the sub-kernels, so there's no
            # need to do that here
-           evict     = FALSE
+           evict_cor     = FALSE
   ) %>%
   # Next, we have to define the implementation details for the model. 
   # We need to tell ipmr how each kernel is integrated, what domain
@@ -377,7 +377,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     # Again, correct for eviction. Note that the 2nd parameter is also modified
     # with the _yr suffix
     
-    evict            = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "g_yr")
   ) %>%
   define_kernel(
@@ -395,7 +395,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     states           = list(c('ht')), 
     has_hier_effs    = TRUE,
     levels_hier_effs = list(yr = 1:5),
-    evict            = TRUE,
+    evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "f_d")
   ) %>%
   define_k(
