@@ -60,6 +60,9 @@
       <a href="../articles/generic-funs.html">List of Generic and Helper Functions in ipmr</a>
     </li>
     <li>
+      <a href="../articles/generic-progress.html">Generic Progress</a>
+    </li>
+    <li>
       <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
     </li>
     <li>
@@ -90,7 +93,7 @@
       <h1>General IPMs</h1>
                         <h4 class="author">Sam Levin</h4>
             
-            <h4 class="date">2020-03-05</h4>
+            <h4 class="date">2020-03-10</h4>
       
       
       <div class="hidden name"><code>general-ipms.Rmd</code></div>
@@ -190,7 +193,7 @@
 <a class="sourceLine" id="cb3-66" title="66">    <span class="dt">data_list     =</span> data_list,</a>
 <a class="sourceLine" id="cb3-67" title="67">    <span class="dt">states        =</span> states,</a>
 <a class="sourceLine" id="cb3-68" title="68">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb3-69" title="69">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb3-69" title="69">    <span class="dt">evict_cor     =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb3-70" title="70">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">'norm'</span>,</a>
 <a class="sourceLine" id="cb3-71" title="71">                                            <span class="st">'g'</span>)</a>
 <a class="sourceLine" id="cb3-72" title="72">  ) <span class="op">%&gt;%</span></a>
@@ -213,7 +216,7 @@
 <a class="sourceLine" id="cb3-89" title="89">    <span class="dt">formula =</span> <span class="dv">0</span>,</a>
 <a class="sourceLine" id="cb3-90" title="90">    <span class="dt">family  =</span> <span class="st">"DD"</span>,</a>
 <a class="sourceLine" id="cb3-91" title="91">    <span class="dt">states  =</span> states,</a>
-<a class="sourceLine" id="cb3-92" title="92">    <span class="dt">evict =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb3-92" title="92">    <span class="dt">evict_cor =</span> <span class="ot">FALSE</span></a>
 <a class="sourceLine" id="cb3-93" title="93">  ) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb3-94" title="94"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
 <a class="sourceLine" id="cb3-95" title="95">    <span class="dt">name          =</span> <span class="st">'leave_discrete'</span>,</a>
@@ -223,7 +226,7 @@
 <a class="sourceLine" id="cb3-99" title="99">    <span class="dt">data_list     =</span> data_list,</a>
 <a class="sourceLine" id="cb3-100" title="100">    <span class="dt">states        =</span> states,</a>
 <a class="sourceLine" id="cb3-101" title="101">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb3-102" title="102">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb3-102" title="102">    <span class="dt">evict_cor     =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb3-103" title="103">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">'norm'</span>,</a>
 <a class="sourceLine" id="cb3-104" title="104">                                            <span class="st">'f_d'</span>)</a>
 <a class="sourceLine" id="cb3-105" title="105">  ) <span class="op">%&gt;%</span></a>
@@ -270,23 +273,10 @@
 <a class="sourceLine" id="cb3-146" title="146"><span class="kw"><a href="../reference/lambda.html">lambda</a></span>(general_ipm)[<span class="dv">100</span>]</a></code></pre></div>
 <pre><code>## [1] 1.222062</code></pre>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># If we are worried about whether or not the model converged to stable</span></a>
-<a class="sourceLine" id="cb5-2" title="2"><span class="co"># dynamics, we can call lambda with type_lambda = 'all' and examine the final</span></a>
-<a class="sourceLine" id="cb5-3" title="3"><span class="co"># iterations to make sure it has. The snippet below prints lambda from the </span></a>
-<a class="sourceLine" id="cb5-4" title="4"><span class="co"># the last 10 iterations of the model</span></a>
-<a class="sourceLine" id="cb5-5" title="5"></a>
-<a class="sourceLine" id="cb5-6" title="6">lambdas &lt;-<span class="st"> </span><span class="kw"><a href="../reference/lambda.html">lambda</a></span>(general_ipm, <span class="dt">type_lambda =</span> <span class="st">'all'</span>)</a>
-<a class="sourceLine" id="cb5-7" title="7"></a>
-<a class="sourceLine" id="cb5-8" title="8">lambda_ind &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>((<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(lambdas) <span class="op">-</span><span class="st"> </span><span class="dv">10</span>), <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(lambdas), <span class="dt">by =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb5-9" title="9"></a>
-<a class="sourceLine" id="cb5-10" title="10">last_<span class="dv">10</span> &lt;-<span class="st"> </span>lambdas[lambda_ind]</a>
-<a class="sourceLine" id="cb5-11" title="11"></a>
-<a class="sourceLine" id="cb5-12" title="12"><span class="co"># If it's converged, then this should return TRUE</span></a>
-<a class="sourceLine" id="cb5-13" title="13"></a>
-<a class="sourceLine" id="cb5-14" title="14"><span class="kw"><a href="https://rdrr.io/r/base/Logic.html">isTRUE</a></span>(</a>
-<a class="sourceLine" id="cb5-15" title="15">  <span class="kw"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span>(</a>
-<a class="sourceLine" id="cb5-16" title="16">    <span class="kw"><a href="https://rdrr.io/r/base/range.html">range</a></span>(last_<span class="dv">10</span>)[<span class="dv">1</span>], <span class="kw"><a href="https://rdrr.io/r/base/range.html">range</a></span>(last_<span class="dv">10</span>)[<span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb5-17" title="17">  )</a>
-<a class="sourceLine" id="cb5-18" title="18">)</a></code></pre></div>
+<a class="sourceLine" id="cb5-2" title="2"><span class="co"># dynamics, we can use the exported utility is_conv_to_asymptotic. The default</span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="co"># tolerance for convergence is 1e-10, but can be changed with the 'tol' argument.</span></a>
+<a class="sourceLine" id="cb5-4" title="4"></a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="kw"><a href="../reference/check_convergence.html">is_conv_to_asymptotic</a></span>(general_ipm, <span class="dt">tol =</span> <span class="fl">1e-10</span>)</a></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="general-hierarchical-models" class="section level2">

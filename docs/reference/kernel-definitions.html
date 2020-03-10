@@ -102,6 +102,9 @@ See Details for more info" />
       <a href="../articles/generic-funs.html">List of Generic and Helper Functions in ipmr</a>
     </li>
     <li>
+      <a href="../articles/generic-progress.html">Generic Progress</a>
+    </li>
+    <li>
       <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
     </li>
     <li>
@@ -154,7 +157,7 @@ See Details for more info</p>
   <span class='no'>states</span>,
   <span class='kw'>has_hier_effs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>evict</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>evict_cor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )
 
@@ -167,7 +170,7 @@ See Details for more info</p>
   <span class='no'>states</span>,
   <span class='kw'>has_hier_effs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>evict</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>evict_cor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
@@ -233,20 +236,20 @@ the hierarchical variable can take. Entries in this list should be a single
 vector and should be character or integer typed.</p></td>
     </tr>
     <tr>
-      <th>evict</th>
+      <th>evict_cor</th>
       <td><p>A logical indicating whether an eviction correction should be applied
 to the kernel. It is generally recommended to use a function in the vital rate
 definition as opposed to using this option Default is <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>evict_fun</th>
-      <td><p>If <code>evict == TRUE</code>, then a function that corrects for it.
+      <td><p>If <code>evict_cor== TRUE</code>, then a function that corrects for it.
 Currently, the only implemented function is <code>truncated_distributions</code>.
 This works by modifying the functional form of the vital rate expressions
 <code>...</code>, and so supplying your own function in this slot will be difficult.
 One can also specify <code>usr_funs</code> function that performs the correction
 during the numerical implementation of the model itself. In that case,
-set <code>evict</code> to <code>FALSE</code>.</p></td>
+set <code>evict_cor</code> to <code>FALSE</code>.</p></td>
     </tr>
     </table>
 

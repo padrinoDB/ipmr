@@ -60,6 +60,9 @@
       <a href="../articles/generic-funs.html">List of Generic and Helper Functions in ipmr</a>
     </li>
     <li>
+      <a href="../articles/generic-progress.html">Generic Progress</a>
+    </li>
+    <li>
       <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
     </li>
     <li>
@@ -158,10 +161,10 @@
 <a class="sourceLine" id="cb1-56" title="56">    <span class="dt">data_list =</span> data_list,</a>
 <a class="sourceLine" id="cb1-57" title="57">    <span class="dt">states    =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb1-58" title="58">    </a>
-<a class="sourceLine" id="cb1-59" title="59">    <span class="co"># If you want to correct for eviction, set evict = TRUE and specify an</span></a>
+<a class="sourceLine" id="cb1-59" title="59">    <span class="co"># If you want to correct for eviction, set evict_cor = TRUE and specify an</span></a>
 <a class="sourceLine" id="cb1-60" title="60">    <span class="co"># evict_fun. ipmr provides truncated_distributions() to help.</span></a>
 <a class="sourceLine" id="cb1-61" title="61">    </a>
-<a class="sourceLine" id="cb1-62" title="62">    <span class="dt">evict     =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb1-62" title="62">    <span class="dt">evict_cor =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb1-63" title="63">    <span class="dt">evict_fun =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">'norm'</span>,</a>
 <a class="sourceLine" id="cb1-64" title="64">                                        <span class="st">'g'</span>)</a>
 <a class="sourceLine" id="cb1-65" title="65">  ) <span class="op">%&gt;%</span></a>
@@ -190,7 +193,7 @@
 <a class="sourceLine" id="cb1-88" title="88">                <span class="co"># Again, we'll correct for eviction in new recruits by</span></a>
 <a class="sourceLine" id="cb1-89" title="89">                <span class="co"># truncating the normal distribution.</span></a>
 <a class="sourceLine" id="cb1-90" title="90">                </a>
-<a class="sourceLine" id="cb1-91" title="91">                <span class="dt">evict     =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb1-91" title="91">                <span class="dt">evict_cor =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb1-92" title="92">                <span class="dt">evict_fun =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">'norm'</span>,</a>
 <a class="sourceLine" id="cb1-93" title="93">                                                    <span class="st">'f_d'</span>)</a>
 <a class="sourceLine" id="cb1-94" title="94">  ) <span class="op">%&gt;%</span></a>
@@ -216,7 +219,7 @@
 <a class="sourceLine" id="cb1-114" title="114">           <span class="dt">states    =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb1-115" title="115">           <span class="co"># We've already corrected eviction in the sub-kernels, so there's no</span></a>
 <a class="sourceLine" id="cb1-116" title="116">           <span class="co"># need to do that here</span></a>
-<a class="sourceLine" id="cb1-117" title="117">           <span class="dt">evict     =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb1-117" title="117">           <span class="dt">evict_cor     =</span> <span class="ot">FALSE</span></a>
 <a class="sourceLine" id="cb1-118" title="118">  ) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb1-119" title="119"><span class="st">  </span><span class="co"># Next, we have to define the implementation details for the model. </span></a>
 <a class="sourceLine" id="cb1-120" title="120"><span class="st">  </span><span class="co"># We need to tell ipmr how each kernel is integrated, what domain</span></a>
@@ -460,7 +463,7 @@
 <a class="sourceLine" id="cb2-126" title="126">    <span class="co"># Again, correct for eviction. Note that the 2nd parameter is also modified</span></a>
 <a class="sourceLine" id="cb2-127" title="127">    <span class="co"># with the _yr suffix</span></a>
 <a class="sourceLine" id="cb2-128" title="128">    </a>
-<a class="sourceLine" id="cb2-129" title="129">    <span class="dt">evict            =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb2-129" title="129">    <span class="dt">evict_cor        =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb2-130" title="130">    <span class="dt">evict_fun        =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g_yr"</span>)</a>
 <a class="sourceLine" id="cb2-131" title="131">  ) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb2-132" title="132"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
@@ -478,7 +481,7 @@
 <a class="sourceLine" id="cb2-144" title="144">    <span class="dt">states           =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ht'</span>)), </a>
 <a class="sourceLine" id="cb2-145" title="145">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb2-146" title="146">    <span class="dt">levels_hier_effs =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">yr =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>),</a>
-<a class="sourceLine" id="cb2-147" title="147">    <span class="dt">evict            =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb2-147" title="147">    <span class="dt">evict_cor        =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb2-148" title="148">    <span class="dt">evict_fun        =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
 <a class="sourceLine" id="cb2-149" title="149">  ) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb2-150" title="150"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_k</a></span>(</a>

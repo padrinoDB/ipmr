@@ -1,0 +1,46 @@
+---
+title: "Generic Progress"
+author: "Sam Levin"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette
+---
+
+## Generic implementation progress 
+
+Below is a table indicating which methods are implemented for each class defined in `ipmr`. If the column has an "X" in it, that means it is ready. Some methods don't apply to certain types (i.e. `make_ipm()` for IPMs that have already been built).
+
+
+```{r echo = FALSE}
+
+library(tibble)
+library(kableExtra)
+
+tab <- read.csv("../paper/generic_progress.csv",
+                stringsAsFactors = FALSE) %>%
+  .[-c(1, 8), ] %>% 
+  as_tibble()
+
+
+kab <- knitr::kable(tab,
+                    format = 'html',
+                    aligh = paste(c('l', rep('c', 7)), collapse = "")) %>%
+  kable_styling(
+    fixed_thead = TRUE
+    
+  ) %>%
+  add_header_above(c(' ', "Function" = 7)) %>%
+  pack_rows(
+    'proto_ipm', 1, 6
+  ) %>%
+  pack_rows(
+    'ipm', 7, 12 
+  ) %>%
+  column_spec(1:7,
+              border_left = TRUE,
+              border_right = TRUE)
+
+print(kab)
+
+
+```

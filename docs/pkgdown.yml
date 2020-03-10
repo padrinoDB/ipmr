@@ -4,6 +4,7 @@ pkgdown_sha: ~
 articles:
   general-ipms: general-ipms.html
   generic-funs: generic-funs.html
+  generic-progress: generic-progress.html
   hierarchical-notation: hierarchical-notation.html
   ipmr-introduction: ipmr-introduction.html
   proto-ipms: proto-ipms.html

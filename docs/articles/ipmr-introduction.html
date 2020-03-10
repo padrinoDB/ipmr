@@ -60,6 +60,9 @@
       <a href="../articles/generic-funs.html">List of Generic and Helper Functions in ipmr</a>
     </li>
     <li>
+      <a href="../articles/generic-progress.html">Generic Progress</a>
+    </li>
+    <li>
       <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
     </li>
     <li>
@@ -90,7 +93,7 @@
       <h1>Introduction to ipmr</h1>
                         <h4 class="author">Sam Levin</h4>
             
-            <h4 class="date">2020-03-05</h4>
+            <h4 class="date">2020-03-10</h4>
       
       
       <div class="hidden name"><code>ipmr-introduction.Rmd</code></div>
@@ -102,178 +105,175 @@
 <div id="overview" class="section level2">
 <h2 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h2>
-<p><code>ipmr</code> is a package for implementing integral projection models of varying degrees of complexity. It uses mathematical-ish expressions to build up the iteration kernels from smaller pieces, as well as helpers to ensure that models are implemented correctly. Finally, it provides machinery for stochastic simulations and model diagnostics.</p>
+<p><code>ipmr</code> is a package for implementing integral projection models of varying degrees of complexity. It uses mathematical-ish expressions to build up the iteration kernels from smaller pieces, as well as helpers to ensure that models are implemented correctly. Finally, it provides machinery for stochastic simulations. basic analyses, and model diagnostics. More complicated analysis functions are being implemented in the <a href="https://github.com/levisc8/irage">irage package</a>.</p>
 <p><strong>This package does not help with fitting regression models to demographic data!</strong> This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a far better job helping you with that than I can. Some of the best are <code>lme4</code>, <code>brms</code>, <code>mgcv</code>, and <code>nlme</code>. <code>IPMpack</code> is a package that can assist in that regard, though be forewarned, there are certain types of models that you simply cannot construct with it!</p>
 </div>
 <div id="types-of-models-in-ipmr" class="section level2">
 <h2 class="hasAnchor">
 <a href="#types-of-models-in-ipmr" class="anchor"></a>Types of models in <code>ipmr</code>
 </h2>
-<p>Implementing an IPM with <code>ipmr</code> almost always begins with a call to <code><a href="../reference/init_ipm.html">init_ipm()</a></code>. This function takes a single argument, <code>model_class</code>, and initializes an object called a <code>proto_ipm</code> that holds all of the information needed to implement the IPM. The precise details of the <code>proto_ipm</code> won’t be that important to most users, but there is a separate vignette that describes them for those who are interested (<code><a href="https://rdrr.io/r/utils/vignette.html">vignettes('proto-ipm', 'ipmr')</a></code>).</p>
-<p><code>ipmr</code> divides IPMs into 12 different classes, one of which is passed to the <code>model_class</code> argument of <code><a href="../reference/init_ipm.html">init_ipm()</a></code>. These are contstructed by choosing one of the two options from the first three tables, and possibly an option from the fourth, and then combining them with underscores. For example, a simple, density independent deterministic model is initialized with <code><a href="../reference/init_ipm.html">init_ipm('simple_di_det')</a></code> while a general, density dependent, stochastic, parameter resampled model would be initialized with <code><a href="../reference/init_ipm.html">init_ipm('general_dd_stoch_param')</a></code>. The entries in <code>model_class</code> should <em>always</em> be in that order. The tables below is a brief overview of how to construct them.</p>
-<table class="table">
-<colgroup>
-<col width="9%">
-<col width="90%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Entry</th>
-<th align="left">Explanation</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">simple</td>
-<td align="left">An IPM that has a single continuous state variable and no discrete stages</td>
-</tr>
-<tr class="even">
-<td align="left">general</td>
-<td align="left">An IPM that has more than 1 continuous state variable and/or discrete stages</td>
-</tr>
-</tbody>
-</table>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Entry</th>
-<th align="left">Explanation</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">di</td>
-<td align="left">A density independent IPM</td>
-</tr>
-<tr class="even">
-<td align="left">dd</td>
-<td align="left">A density dependent IPM</td>
-</tr>
-</tbody>
-</table>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Entry</th>
-<th align="left">Explanation</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">det</td>
-<td align="left">A deterministic IPM</td>
-</tr>
-<tr class="even">
-<td align="left">stoch</td>
-<td align="left">A stochastic IPM</td>
-</tr>
-</tbody>
-</table>
-<table class="table">
-<colgroup>
-<col width="4%">
-<col width="95%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Entry</th>
-<th align="left">Explanation</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">param</td>
-<td align="left">If <code>stoch</code>, this indicates that parameters are resampled in each iteration and kernels are reconstructed with the new parameters</td>
-</tr>
-<tr class="even">
-<td align="left">kern</td>
-<td align="left">If <code>stoch</code>, this indicates that kernels constructed from parameters ahead of time and then re-sampled at each iteration</td>
-</tr>
-</tbody>
-</table>
+<p>The first step of defining a model in <code>ipmr</code> (assuming all parameters have already been estimated) is to initialize the model using <code><a href="../reference/init_ipm.html">init_ipm()</a></code>. This function takes a single argument: <code>model_class</code>. The <code>model_class</code> defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. <code>model_class</code> should be a character string with at least 3 (but possibly 4) entries separated by underscores (<code>_</code>). Below, the are the possible entries for each position.</p>
+<ul>
+<li><p>Position 1: <code>"simple"</code>/<code>"general"</code></p></li>
+<li><ol style="list-style-type: upper-alpha">
+<li>
+<strong>simple</strong>: This describes an IPM with a single continuous state variable and no discrete stages.</li>
+</ol></li>
+<li><ol start="2" style="list-style-type: upper-alpha">
+<li>
+<strong>general</strong>: This describes and IPM with either more than one continuous state variable, one or more discrete stages, or both of the above. Basically, anything other than an IPM with a single continuous state variable.</li>
+</ol></li>
+<li><p>Position 2: <code>"di"</code>/<code>"dd"</code></p></li>
+<li><p>A. <strong>di</strong>: This is used to denote a density-independent IPM.</p></li>
+<li><p>B. <strong>dd</strong>: This is used to denote a density-dependent IPM.</p></li>
+<li><p>Position 3: <code>"det"</code>/<code>"stoch"</code></p></li>
+<li><p>A. <strong>det</strong>: This is used to denote a deterministic IPM. If this is used in the third position of <code>model_class</code>, there should not be a fourth entry.</p></li>
+<li><p>B. <strong>stoch</strong>: This is used to denote a stochastic IPM. If this is used in the third position of <code>model_class</code>, there should always be a fourth entry. The two possibilities for the fourth are described next.</p></li>
+<li><p>Position 4: <code>"kern"</code>/<code>"param"</code></p></li>
+<li><p>A. <strong>kern</strong>: This describes an IPM with discretely varying parameters such that there values are known before the model is specified. This is usually the case with models that estimate random year/site effects and for which defining a multivariate joint distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the <code>param</code> alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration.</p></li>
+<li><p>B. <strong>param</strong>: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model (usually a multivariate joint distribution). This can be a multivariate normal defined by covarying slopes and intercepts, or posterior distribution from a Bayesian model. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the <code>"simple_di_stoch_param"</code> example for some inspiration in writing those.</p></li>
+</ul>
+<p>With the type of model selected, the <code>model_class</code> becomes a string and the call to <code>init_ipm</code> is composed like so: <code><a href="../reference/init_ipm.html">init_ipm(model_class = "position1_position_2_position3_position4")</a></code>.</p>
 <p>The rest of this vignette will deal with simple, density independent IPMs. If you already know that you need a general IPM (e.g. an IPM with discrete stages, or multiple continuous state variables), hop over <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">here</a> for an introduction to these.</p>
 </div>
 <div id="specifying-a-simple-deterministic-ipm-without-density-dependence" class="section level2">
 <h2 class="hasAnchor">
 <a href="#specifying-a-simple-deterministic-ipm-without-density-dependence" class="anchor"></a>Specifying a simple deterministic IPM without density dependence</h2>
-<p>This is the simplest model that <code>ipmr</code> works with. it is an IPM with a single continuous state variable, no density dependent functions, and parameters that define a single iteration kernel (as opposed to many iteration kernels). This will walk through the steps required to implement such an IPM.</p>
+<p>This is the simplest model that <code>ipmr</code> works with. It is an IPM with a single continuous state variable, no density dependent functions, and parameters that define a single iteration kernel (as opposed to many iteration kernels). This will walk through the steps required to implement such an IPM.</p>
+<p>The vital rate functions and code that might be used to generate models corresponding to them are below.</p>
+<ol style="list-style-type: decimal">
+<li>
+<p>Survival (<code>s</code>): a generalized linear model w/ a logit link.</p>
+<ul>
+<li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(surv ~ size_1, data = my_surv_data, family = binomial())</a></code>
+</li>
+</ul>
+</li>
+<li>
+<p>Growth (<code>g</code>): a linear model with a Normal error distribution.</p>
+<ul>
+<li>Example model formula: <code><a href="https://rdrr.io/r/stats/lm.html">lm(size_2 ~ size_1, data = my_grow_data)</a></code>
+</li>
+</ul>
+</li>
+<li>
+<p>Pr(flowering) (<code>f_r</code>): a generalized linear model w/ a logit link.</p>
+<ul>
+<li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(flower ~ size_1, data = my_repro_data, family = binomial())</a></code>
+</li>
+</ul>
+</li>
+<li>
+<p>Seed production (<code>f_s</code>): a generalized linear model w/ log link.</p>
+<ul>
+<li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(seeds ~ size_1, data = my_flower_data, family = poisson())</a></code>
+</li>
+</ul>
+</li>
+<li>
+<p>Recruit size distribution (<code>f_d</code>): a normal distribution w parameters <code>mu_fd</code> (mean) and <code>sd_fd</code> (standard deviation).</p>
+<ul>
+<li>Example code: <code>mu_fd = mean(my_recr_data$size_2, na.rm = TRUE)</code> and <code>sd_fd = sd(my_recr_data$size_2, na.rm = TRUE)</code>
+</li>
+</ul>
+</li>
+</ol>
 <div id="defining-kernels" class="section level3">
 <h3 class="hasAnchor">
 <a href="#defining-kernels" class="anchor"></a>Defining kernels</h3>
 <p>The next step is to define the actual kernels comprising the IPM. These are defined individually with calls to <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">my_ipm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_det'</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb1-3" title="3">    <span class="dt">name      =</span> <span class="st">"P"</span>,</a>
-<a class="sourceLine" id="cb1-4" title="4">    <span class="dt">formula   =</span> <span class="kw"><a href="../reference/fun-mult-helpers.html">s_g_mult</a></span>(s, g),</a>
-<a class="sourceLine" id="cb1-5" title="5">    <span class="dt">family    =</span> <span class="st">"CC"</span>,</a>
-<a class="sourceLine" id="cb1-6" title="6">    <span class="dt">s         =</span> <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(s_int <span class="op">+</span><span class="st"> </span>s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>))),</a>
-<a class="sourceLine" id="cb1-7" title="7">    <span class="dt">g         =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(dbh_<span class="dv">2</span>, g_mu, g_sd),</a>
-<a class="sourceLine" id="cb1-8" title="8">    <span class="dt">g_mu      =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb1-9" title="9">    </a>
-<a class="sourceLine" id="cb1-10" title="10">    <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb1-11" title="11">      <span class="dt">s_int     =</span> <span class="fl">0.2</span>,</a>
-<a class="sourceLine" id="cb1-12" title="12">      <span class="dt">s_slope   =</span> <span class="fl">0.5</span>,</a>
-<a class="sourceLine" id="cb1-13" title="13">      <span class="dt">g_int     =</span> <span class="fl">0.1</span>,</a>
-<a class="sourceLine" id="cb1-14" title="14">      <span class="dt">g_slope   =</span> <span class="fl">1.033</span>,</a>
-<a class="sourceLine" id="cb1-15" title="15">      <span class="dt">g_sd      =</span> <span class="fl">2.2</span></a>
-<a class="sourceLine" id="cb1-16" title="16">    ),</a>
-<a class="sourceLine" id="cb1-17" title="17">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
-<a class="sourceLine" id="cb1-18" title="18">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb1-19" title="19">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb1-20" title="20">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
-<a class="sourceLine" id="cb1-21" title="21">  ) </a></code></pre></div>
-<p>This function takes the kernel <code>name</code>, the mathematical <code>formula</code> for the kernel, and expressions for the vital rates that comprise it (<code>s</code>, <code>g</code>, <code>g_mu</code>). Note that <code>s_g_mult</code> is a convenience function to ensure that survival and growth are multiplied correctly, as that can be tricky to get right sometimes.</p>
-<p>The <code>family</code> argument refers to the type of transition that the kernel describes and has 4 options:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">my_ipm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_det'</span>)</a>
+<a class="sourceLine" id="cb1-2" title="2"></a>
+<a class="sourceLine" id="cb1-3" title="3">my_ipm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb1-4" title="4">  <span class="dt">proto_ipm =</span> my_ipm</a>
+<a class="sourceLine" id="cb1-5" title="5">  <span class="dt">name      =</span> <span class="st">"P"</span>,</a>
+<a class="sourceLine" id="cb1-6" title="6">  <span class="dt">formula   =</span> s <span class="op">*</span><span class="st"> </span>g,</a>
+<a class="sourceLine" id="cb1-7" title="7">  <span class="dt">family    =</span> <span class="st">"CC"</span>,</a>
+<a class="sourceLine" id="cb1-8" title="8">  </a>
+<a class="sourceLine" id="cb1-9" title="9">  <span class="dt">s         =</span> <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(s_int <span class="op">+</span><span class="st"> </span>s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb1-10" title="10">  <span class="dt">g         =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(dbh_<span class="dv">2</span>, g_mu, g_sd),</a>
+<a class="sourceLine" id="cb1-11" title="11">  <span class="dt">g_mu      =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb1-12" title="12">  </a>
+<a class="sourceLine" id="cb1-13" title="13">  <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb1-14" title="14">    <span class="dt">s_int     =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb1-15" title="15">    <span class="dt">s_slope   =</span> <span class="fl">0.5</span>,</a>
+<a class="sourceLine" id="cb1-16" title="16">    <span class="dt">g_int     =</span> <span class="fl">0.1</span>,</a>
+<a class="sourceLine" id="cb1-17" title="17">    <span class="dt">g_slope   =</span> <span class="fl">1.033</span>,</a>
+<a class="sourceLine" id="cb1-18" title="18">    <span class="dt">g_sd      =</span> <span class="fl">2.2</span></a>
+<a class="sourceLine" id="cb1-19" title="19">  ),</a>
+<a class="sourceLine" id="cb1-20" title="20">  <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
+<a class="sourceLine" id="cb1-21" title="21">  <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb1-22" title="22">  <span class="dt">evict_cor     =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb1-23" title="23">  <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
+<a class="sourceLine" id="cb1-24" title="24">) </a></code></pre></div>
+<p>This function takes the kernel <code>name</code>, the mathematical <code>formula</code> for the kernel, and expressions for the vital rates that comprise it (<code>s</code>, <code>g</code>, <code>g_mu</code>).</p>
+<p>The <code>family</code> argument refers to the type of transition that the kernel describes and has 5 options:</p>
 <ol style="list-style-type: decimal">
 <li><p>“CC” - a continuous -&gt; continuous transition</p></li>
 <li><p>“CD” - a continuous -&gt; discrete transition</p></li>
 <li><p>“DC” - a discrete -&gt; continuous transition</p></li>
 <li><p>“DD” - a discrete -&gt; discrete transition</p></li>
+<li><p>“IPM” - This is reserved for the <code><a href="../reference/kernel-definitions.html">define_k()</a></code> function introduced below.</p></li>
 </ol>
-<p>These aren’t important for <code>simple_*</code> IPMs, as all transitions are from a continuous state to a continuous state, but they are required for <code>general_*</code> IPMs to build properly. As such, they are required to be specified for <em>all</em> kernels. In addition, the <code>data_list</code> argument holds the constant parameters (e.g. regression coefficient estimates).</p>
-<p>The <code>states</code> argument refers to the state variables in use. When composing the vital rate expressions, note that the <code>ipmr</code> appends an <code>_1</code> and <code>_2</code> to the names in <code>states</code>, and those are then available to reference as the state at time T and state at T + 1.</p>
-<p><code>has_hier_effs</code> is a logical indicating whether or not the model contains hierarchical effects. In this example, the model is a simple, deterministic one and so this is set to <code>FALSE</code>. However, <code>*_stoch_kern</code> kernels will almost always need this to be set to <code>TRUE</code>. See the next example for a demonstration of that syntax (there will also be a whole vignette at some point, just not there yet).</p>
-<p><code>evict</code> refers to whether or not to correct for eviction in the kernel. If this is set to <code>TRUE</code>, then you must supply a function specifying which expressions need to be corrected. <code>ipmr</code> provides <code>truncated_distributions</code> for now, though others will be implemented as well. Note that the <code>n_mesh_p</code> argument will probably disappear from this function as <code>ipmr</code> gets a bit smarter.</p>
-<p>Finally, <code>ipmr</code> is meant to be pipe-friendly, so all functions associated with constructing a model take a <code>proto_ipm</code> as their first argument and always return a <code>proto_ipm</code>, meaning operations can be chained together with the <code><a href="../reference/pipe.html">%&gt;%</a></code> operator. Not that this is re-exported in <code>ipmr</code>, so there is no need to load any other packages to access it (e.g. <code>dplyr</code> or <code>magrittr</code>).</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">my_ipm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_det'</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb2-3" title="3">    <span class="dt">name      =</span> <span class="st">"P"</span>,</a>
-<a class="sourceLine" id="cb2-4" title="4">    <span class="dt">formula   =</span> <span class="kw"><a href="../reference/fun-mult-helpers.html">s_g_mult</a></span>(s, g),</a>
-<a class="sourceLine" id="cb2-5" title="5">    <span class="dt">family    =</span> <span class="st">"CC"</span>,</a>
-<a class="sourceLine" id="cb2-6" title="6">    <span class="dt">s         =</span> <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(s_int <span class="op">+</span><span class="st"> </span>s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>))),</a>
-<a class="sourceLine" id="cb2-7" title="7">    <span class="dt">g         =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(dbh_<span class="dv">2</span>, g_mu, g_sd),</a>
-<a class="sourceLine" id="cb2-8" title="8">    <span class="dt">g_mu      =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb2-9" title="9">    </a>
-<a class="sourceLine" id="cb2-10" title="10">    <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb2-11" title="11">      <span class="dt">s_int     =</span> <span class="fl">0.2</span>,</a>
-<a class="sourceLine" id="cb2-12" title="12">      <span class="dt">s_slope   =</span> <span class="fl">0.5</span>,</a>
-<a class="sourceLine" id="cb2-13" title="13">      <span class="dt">g_int     =</span> <span class="fl">0.1</span>,</a>
-<a class="sourceLine" id="cb2-14" title="14">      <span class="dt">g_slope   =</span> <span class="fl">1.033</span>,</a>
-<a class="sourceLine" id="cb2-15" title="15">      <span class="dt">g_sd      =</span> <span class="fl">2.2</span></a>
-<a class="sourceLine" id="cb2-16" title="16">    ),</a>
-<a class="sourceLine" id="cb2-17" title="17">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
-<a class="sourceLine" id="cb2-18" title="18">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb2-19" title="19">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb2-20" title="20">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
-<a class="sourceLine" id="cb2-21" title="21">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-22" title="22"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb2-23" title="23">    <span class="dt">name      =</span> <span class="st">"F"</span>,</a>
-<a class="sourceLine" id="cb2-24" title="24">    <span class="dt">formula   =</span> f_r <span class="op">*</span><span class="st"> </span>f_s <span class="op">*</span><span class="st"> </span>f_d,</a>
-<a class="sourceLine" id="cb2-25" title="25">    <span class="dt">family    =</span> <span class="st">"CC"</span>,</a>
-<a class="sourceLine" id="cb2-26" title="26">    <span class="dt">f_r       =</span> <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(f_r_int <span class="op">+</span><span class="st"> </span>f_r_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>))),</a>
-<a class="sourceLine" id="cb2-27" title="27">    <span class="dt">f_s       =</span> <span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(f_s_int <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb2-28" title="28">    <span class="dt">f_d       =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(dbh_<span class="dv">2</span>, f_d_mu, f_d_sd),</a>
-<a class="sourceLine" id="cb2-29" title="29">    <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb2-30" title="30">      <span class="dt">f_r_int   =</span> <span class="fl">0.5</span>,</a>
-<a class="sourceLine" id="cb2-31" title="31">      <span class="dt">f_r_slope =</span> <span class="fl">0.1</span>,</a>
-<a class="sourceLine" id="cb2-32" title="32">      <span class="dt">f_s_int   =</span> <span class="fl">1.2</span>,</a>
-<a class="sourceLine" id="cb2-33" title="33">      <span class="dt">f_s_slope =</span> <span class="fl">0.03</span>,</a>
-<a class="sourceLine" id="cb2-34" title="34">      <span class="dt">f_d_mu    =</span> <span class="fl">1.2</span>,</a>
-<a class="sourceLine" id="cb2-35" title="35">      <span class="dt">f_d_sd    =</span> <span class="fl">0.7</span></a>
-<a class="sourceLine" id="cb2-36" title="36">    ),</a>
-<a class="sourceLine" id="cb2-37" title="37">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
-<a class="sourceLine" id="cb2-38" title="38">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb2-39" title="39">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb2-40" title="40">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
-<a class="sourceLine" id="cb2-41" title="41">  )</a></code></pre></div>
+<p>These aren’t important for <code>simple_*</code> IPMs, as all transitions are from a continuous state to a continuous state, but they are required for <code>general_*</code> IPMs to build properly. As such, they are required to be specified for <em>all</em> kernels.</p>
+<p>In addition, the <code>data_list</code> argument holds the constant parameters (e.g. regression coefficient estimates).</p>
+<p>The <code>states</code> argument refers to the state variables in use. <code>ipmr</code> internally appends an <code>_1</code> and <code>_2</code> to the names in <code>states</code>, and creates variables for them that are the meshpoints for integration. These correspond to time <em>t</em> and <em>t+1</em>, and can be used in vital rate expressions to indicate which state at which time is being acted upon.</p>
+<p><code>has_hier_effs</code> is a logical indicating whether or not the model contains hierarchical effects. In this example, the model is a simple, deterministic one and so this is set to <code>FALSE</code>. However, <code>*_stoch_kern</code> kernels will almost always need this to be set to <code>TRUE</code>, and <code>*_stoch_param</code> models can also use them. See the next example for a demonstration of that syntax (there will also be a whole vignette at some point, just not there yet).</p>
+<p><code>evict_cor</code> refers to whether or not to correct for eviction in the kernel. If this is set to <code>TRUE</code>, then you must supply a function specifying which expressions need to be corrected. <code>ipmr</code> provides <code>truncated_distributions</code> for now, though others will eventually be implemented as well. Subsequent additions are mainly to accomadate models in PADRINO, and I suggest sticking to <code>truncated_distributions</code> for user-defined models in almost all cases.</p>
+<p>Finally, <code>ipmr</code> is meant to be pipe-friendly, so all functions prefixed with <code>define_*</code> take a <code>proto_ipm</code> as their first argument and always return a <code>proto_ipm</code>, meaning operations can be chained together with the <code><a href="../reference/pipe.html">%&gt;%</a></code> operator. Note that this is re-exported in <code>ipmr</code>, so there is no need to load any other packages to access it (e.g. <code>dplyr</code> or <code>magrittr</code>). The first chunk below is equivalent to the chunk above.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># the %&gt;% takes the result of the first operation and passes it as the first</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="co"># argument to the second function.</span></a>
+<a class="sourceLine" id="cb2-3" title="3"></a>
+<a class="sourceLine" id="cb2-4" title="4">my_ipm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_det'</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb2-6" title="6">    <span class="dt">name      =</span> <span class="st">"P"</span>,</a>
+<a class="sourceLine" id="cb2-7" title="7">    <span class="dt">formula   =</span> <span class="kw"><a href="../reference/fun-mult-helpers.html">s_g_mult</a></span>(s, g),</a>
+<a class="sourceLine" id="cb2-8" title="8">    <span class="dt">family    =</span> <span class="st">"CC"</span>,</a>
+<a class="sourceLine" id="cb2-9" title="9">    <span class="dt">s         =</span> <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(s_int <span class="op">+</span><span class="st"> </span>s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb2-10" title="10">    <span class="dt">g         =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(dbh_<span class="dv">2</span>, g_mu, g_sd),</a>
+<a class="sourceLine" id="cb2-11" title="11">    <span class="dt">g_mu      =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb2-12" title="12">    </a>
+<a class="sourceLine" id="cb2-13" title="13">    <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb2-14" title="14">      <span class="dt">s_int     =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb2-15" title="15">      <span class="dt">s_slope   =</span> <span class="fl">0.5</span>,</a>
+<a class="sourceLine" id="cb2-16" title="16">      <span class="dt">g_int     =</span> <span class="fl">0.1</span>,</a>
+<a class="sourceLine" id="cb2-17" title="17">      <span class="dt">g_slope   =</span> <span class="fl">1.033</span>,</a>
+<a class="sourceLine" id="cb2-18" title="18">      <span class="dt">g_sd      =</span> <span class="fl">2.2</span></a>
+<a class="sourceLine" id="cb2-19" title="19">    ),</a>
+<a class="sourceLine" id="cb2-20" title="20">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
+<a class="sourceLine" id="cb2-21" title="21">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb2-22" title="22">    <span class="dt">evict_cor     =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb2-23" title="23">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
+<a class="sourceLine" id="cb2-24" title="24">  ) </a>
+<a class="sourceLine" id="cb2-25" title="25"></a>
+<a class="sourceLine" id="cb2-26" title="26">my_ipm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb2-27" title="27">  <span class="dt">proto_ipm =</span> my_ipm,</a>
+<a class="sourceLine" id="cb2-28" title="28">  <span class="dt">name      =</span> <span class="st">"F"</span>,</a>
+<a class="sourceLine" id="cb2-29" title="29">  <span class="dt">formula   =</span> f_r <span class="op">*</span><span class="st"> </span>f_s <span class="op">*</span><span class="st"> </span>f_d,</a>
+<a class="sourceLine" id="cb2-30" title="30">  <span class="dt">family    =</span> <span class="st">"CC"</span>,</a>
+<a class="sourceLine" id="cb2-31" title="31">  <span class="dt">f_r       =</span> <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(f_r_int <span class="op">+</span><span class="st"> </span>f_r_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb2-32" title="32">  <span class="dt">f_s       =</span> <span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(f_s_int <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>dbh_<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb2-33" title="33">  <span class="dt">f_d       =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(dbh_<span class="dv">2</span>, f_d_mu, f_d_sd),</a>
+<a class="sourceLine" id="cb2-34" title="34">  <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb2-35" title="35">    <span class="dt">f_r_int   =</span> <span class="fl">0.5</span>,</a>
+<a class="sourceLine" id="cb2-36" title="36">    <span class="dt">f_r_slope =</span> <span class="fl">0.1</span>,</a>
+<a class="sourceLine" id="cb2-37" title="37">    <span class="dt">f_s_int   =</span> <span class="fl">1.2</span>,</a>
+<a class="sourceLine" id="cb2-38" title="38">    <span class="dt">f_s_slope =</span> <span class="fl">0.03</span>,</a>
+<a class="sourceLine" id="cb2-39" title="39">    <span class="dt">f_d_mu    =</span> <span class="fl">1.2</span>,</a>
+<a class="sourceLine" id="cb2-40" title="40">    <span class="dt">f_d_sd    =</span> <span class="fl">0.7</span></a>
+<a class="sourceLine" id="cb2-41" title="41">  ),</a>
+<a class="sourceLine" id="cb2-42" title="42">  <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
+<a class="sourceLine" id="cb2-43" title="43">  <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb2-44" title="44">  <span class="dt">evict_cor     =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb2-45" title="45">  <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
+<a class="sourceLine" id="cb2-46" title="46">)</a></code></pre></div>
 <p>The <code>F</code> kernel has the same form as the <code>P</code> kernel. We are now ready to define the <code>K</code> kernel, sometimes referred to as the iteration kernel.</p>
 </div>
 <div id="defining-an-iteration-kernel" class="section level3">
 <h3 class="hasAnchor">
 <a href="#defining-an-iteration-kernel" class="anchor"></a>Defining an iteration kernel</h3>
 <p>These kernels are treated slightly differently in <code>ipmr</code>. They are defined with their own function, <code><a href="../reference/kernel-definitions.html">define_k()</a></code>. It has fewer arguments than <code>define_kernel</code>.</p>
+<p>The rest of the model definition sequence in this example will use the <code><a href="../reference/pipe.html">%&gt;%</a></code> operator. <em>It is not a requirement</em> - you can assign a value to <code>my_ipm</code> at each step and the model will be identical. Choose which ever process is more comfortable for you!</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">my_ipm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_det'</span>) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb3-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
 <a class="sourceLine" id="cb3-3" title="3">    <span class="dt">name      =</span> <span class="st">"P"</span>,</a>
@@ -292,7 +292,7 @@
 <a class="sourceLine" id="cb3-16" title="16">    ),</a>
 <a class="sourceLine" id="cb3-17" title="17">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb3-18" title="18">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb3-19" title="19">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb3-19" title="19">    <span class="dt">evict_cor     =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb3-20" title="20">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
 <a class="sourceLine" id="cb3-21" title="21">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb3-22" title="22"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
@@ -312,7 +312,7 @@
 <a class="sourceLine" id="cb3-36" title="36">    ),</a>
 <a class="sourceLine" id="cb3-37" title="37">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb3-38" title="38">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb3-39" title="39">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb3-39" title="39">    <span class="dt">evict_cor     =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb3-40" title="40">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
 <a class="sourceLine" id="cb3-41" title="41">  ) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb3-42" title="42"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_k</a></span>(</a>
@@ -322,14 +322,14 @@
 <a class="sourceLine" id="cb3-46" title="46">    <span class="dt">data_list     =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(),</a>
 <a class="sourceLine" id="cb3-47" title="47">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb3-48" title="48">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb3-49" title="49">    <span class="dt">evict         =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb3-49" title="49">    <span class="dt">evict_cor     =</span> <span class="ot">FALSE</span></a>
 <a class="sourceLine" id="cb3-50" title="50">  ) </a></code></pre></div>
-<p>Here, the <code>...</code> take over the role that <code>formula</code> took in the previous kernels. This is to facilitate passing multiple expressions for the iteration kernel when defining more complex models (e.g. an age x size model). In this example, the left hand side of the expression should match the <code>name</code> because we aren’t actually iterating this kernel with a population vector (see below for examples of that!). Note that there are no additional parameters that need to be passed to complete the construction of the kernel, so <code>data_list</code> can be empty. It never hurts to pass the same <code>data_list</code> containing all of the parameters to each call to <code><a href="../reference/kernel-definitions.html">define_k()</a></code>/<code>define_kernel() though - if the parameter names aren't in a given kernels definition, they are simply ignored. Finally, we specify</code>evict = FALSE<code>in the</code>K` because we’ve already corrected for it in the previous kernel defintions.</p>
+<p>Here, the <code>...</code> take over the role that <code>formula</code> took in the previous kernels. This is to facilitate passing multiple expressions for the iteration kernel when defining more complex models (i.e. how the population state changes with time or an age x size model). In this example, the left hand side of the expression should match the <code>name</code> because we aren’t actually iterating this kernel with a population vector. Note that there are no additional parameters that need to be passed to complete the construction of the kernel, so <code>data_list</code> can be empty. It never hurts to pass the same <code>data_list</code> containing all of the parameters to each call to <code><a href="../reference/kernel-definitions.html">define_k()</a></code>/<code><a href="../reference/kernel-definitions.html">define_kernel()</a></code> though - if the parameter aren’t used in a given kernel’s definition, they are simply ignored. Finally, we specify <code>evict_cor = FALSE</code> in the <code>K</code> because we’ve already corrected for it in the previous kernel definitions.</p>
 </div>
 <div id="defining-the-implementation-arguments-impl_args" class="section level3">
 <h3 class="hasAnchor">
 <a href="#defining-the-implementation-arguments-impl_args" class="anchor"></a>Defining the implementation arguments (<code>impl_args</code>)</h3>
-<p>Next, we need to define how the kernels are to be implemented. This is where we define the integration rule <code>int_rule</code>, the domain the kernels begin on <code>dom_start</code>, and the domain that they finish on <code>dom_end</code>. This is done wiht the <code><a href="../reference/define_star.html">define_impl()</a></code> function. It takes a named list where names correspond to the kernels, and each entry is itself a list of length 3 containing slots <code>int_rule</code>, <code>dom_start</code>, and <code>dom_end</code>. Because this is a bit specific, there is a helper function that can be called within <code>define_impl</code> or called before initializing the IPM to make sure everything is formatted correctly - <code>make_ipml_args_list()</code>.</p>
+<p>Next, we need to define how the kernels are implemented numerically. This is where we define the integration rule <code>int_rule</code>, the domain the kernels begin on <code>dom_start</code>, and the domain that they finish on <code>dom_end</code>. This is done with the <code><a href="../reference/define_star.html">define_impl()</a></code> function. It takes a named list where names correspond to the kernels, and each entry is itself a list of length 3 containing slots <code>int_rule</code>, <code>dom_start</code>, and <code>dom_end</code>. Because this is a bit specific, there is a helper function that can be called within <code>define_impl</code> or called before initializing the IPM to make sure everything is formatted correctly - <code>make_ipml_args_list()</code>.</p>
 <p>The first argument to the <code>make_ipml_args_list()</code> function is <code>kernel_names</code>. This is a character vector with kernel names for which the implementation arguments are being supplied.</p>
 <p>Next, <code>int_rule</code> is a character vector, and currently <code>'midpoint'</code> is the only option that is implemented. <code>'trapezoid'</code> and <code>'g-l'</code> (Gauss-Legendre) are on the to-do list. Additional rules may be added if there is more demand for certain ones (e.g. cumulative density functions like in <code>IPMpack</code>).</p>
 <p><code>dom_start</code> and <code>dom_end</code> are always the same in <code>simple_*</code> IPMs. In <code>general_*</code> ones, they may be different, or, if describing a transition involving a discrete state, they may be <code>NA</code>. For all non-<code>NA</code> <code>dom_*</code>’s, they are one of the variables in the <code>states</code> list. <code>dom_start</code>’s have <code>_1</code> and <code>dom_end</code>’s have <code>_2</code> appended to them internally, so they may be referenced by vital rate functions without explicitly creating a variable for them.</p>
@@ -361,7 +361,7 @@
 <a class="sourceLine" id="cb4-25" title="25">    ),</a>
 <a class="sourceLine" id="cb4-26" title="26">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb4-27" title="27">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb4-28" title="28">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb4-28" title="28">    <span class="dt">evict_cor        =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb4-29" title="29">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
 <a class="sourceLine" id="cb4-30" title="30">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb4-31" title="31"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
@@ -381,7 +381,7 @@
 <a class="sourceLine" id="cb4-45" title="45">    ),</a>
 <a class="sourceLine" id="cb4-46" title="46">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb4-47" title="47">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb4-48" title="48">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb4-48" title="48">    <span class="dt">evict_cor     =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb4-49" title="49">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
 <a class="sourceLine" id="cb4-50" title="50">  ) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb4-51" title="51"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_k</a></span>(</a>
@@ -391,7 +391,7 @@
 <a class="sourceLine" id="cb4-55" title="55">    <span class="dt">data_list     =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(),</a>
 <a class="sourceLine" id="cb4-56" title="56">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb4-57" title="57">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb4-58" title="58">    <span class="dt">evict         =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb4-58" title="58">    <span class="dt">evict_cor     =</span> <span class="ot">FALSE</span></a>
 <a class="sourceLine" id="cb4-59" title="59">  )  <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb4-60" title="60"><span class="st">  </span><span class="co"># Alternative 2, put the call to make_impl_args_list() inside of define_impl(). </span></a>
 <a class="sourceLine" id="cb4-61" title="61"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_impl</a></span>(</a>
@@ -402,11 +402,12 @@
 <a class="sourceLine" id="cb4-66" title="66">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>,<span class="dv">3</span>)</a>
 <a class="sourceLine" id="cb4-67" title="67">    )</a>
 <a class="sourceLine" id="cb4-68" title="68">  )</a></code></pre></div>
+<p>Elements of each vector in each argument in <code><a href="../reference/define_star.html">make_impl_args_list()</a></code> are matched by position. Thus, if you specify <code>"K"</code> as the first entry in <code>kernel_names</code>, then the first entries of <code>int_rule</code>, <code>dom_start</code>, and <code>dom_end</code> should all correspond to the “K” kernel.</p>
 </div>
 <div id="defining-domains-for-state-variables" class="section level3">
 <h3 class="hasAnchor">
 <a href="#defining-domains-for-state-variables" class="anchor"></a>Defining domains for state variables</h3>
-<p>The final step essential step in creating an IPM with <code>ipmr</code> is to define the domain of each state variable in the <code>states</code> list. This is done with the <code><a href="../reference/define_star.html">define_domains()</a></code> function. When the <code>int_rule</code> is <code>"midpoint"</code>, this takes a named set of vectors that have 3 entries each. The name corresponds to the <code>state</code> it is describing, the first entry is the lower bound, the second the upper bound, and the third is the number of meshpoints.</p>
+<p>The final essential step in creating an IPM with <code>ipmr</code> is to define the domain of each state variable in the <code>states</code> list. This is done with the <code><a href="../reference/define_star.html">define_domains()</a></code> function. When the <code>int_rule</code> is <code>"midpoint"</code>, this takes a named set of vectors that have 3 entries each. The name corresponds to the <code>state</code> it is describing, the first entry is the lower bound, the second the upper bound, and the third is the number of meshpoints.</p>
 <p>Note that for other <code>int_rule</code>s, the vectors associated with each domain will look different. However, those are not yet implemented and so beyond the scope of this vignette for now.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># Alternative one - call make_impl_args_list() before beginning the IPM creation pipe</span></a>
 <a class="sourceLine" id="cb5-2" title="2"></a>
@@ -435,7 +436,7 @@
 <a class="sourceLine" id="cb5-25" title="25">    ),</a>
 <a class="sourceLine" id="cb5-26" title="26">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb5-27" title="27">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb5-28" title="28">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb5-28" title="28">    <span class="dt">evict_cor     =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb5-29" title="29">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
 <a class="sourceLine" id="cb5-30" title="30">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb5-31" title="31"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
@@ -455,7 +456,7 @@
 <a class="sourceLine" id="cb5-45" title="45">    ),</a>
 <a class="sourceLine" id="cb5-46" title="46">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb5-47" title="47">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb5-48" title="48">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb5-48" title="48">    <span class="dt">evict_cor     =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb5-49" title="49">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
 <a class="sourceLine" id="cb5-50" title="50">  ) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb5-51" title="51"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_k</a></span>(</a>
@@ -465,7 +466,7 @@
 <a class="sourceLine" id="cb5-55" title="55">    <span class="dt">data_list     =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(),</a>
 <a class="sourceLine" id="cb5-56" title="56">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb5-57" title="57">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb5-58" title="58">    <span class="dt">evict         =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb5-58" title="58">    <span class="dt">evict_cor        =</span> <span class="ot">FALSE</span></a>
 <a class="sourceLine" id="cb5-59" title="59">  )  <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb5-60" title="60"><span class="st">  </span><span class="co"># Alternative 2, put the call to make_impl_args_list() inside of define_impl(). </span></a>
 <a class="sourceLine" id="cb5-61" title="61"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_impl</a></span>(</a>
@@ -477,14 +478,18 @@
 <a class="sourceLine" id="cb5-67" title="67">    )</a>
 <a class="sourceLine" id="cb5-68" title="68">  ) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb5-69" title="69"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_domains</a></span>(</a>
-<a class="sourceLine" id="cb5-70" title="70">    <span class="dt">dbh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>, <span class="dv">30</span>, <span class="dv">200</span>)</a>
-<a class="sourceLine" id="cb5-71" title="71">  )</a></code></pre></div>
+<a class="sourceLine" id="cb5-70" title="70">    <span class="dt">dbh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(        <span class="co"># the name of the state variable</span></a>
+<a class="sourceLine" id="cb5-71" title="71">      <span class="dv">1</span>,            <span class="co"># the lower bound for the domain</span></a>
+<a class="sourceLine" id="cb5-72" title="72">      <span class="dv">30</span>,           <span class="co"># the upper bound for the domain</span></a>
+<a class="sourceLine" id="cb5-73" title="73">      <span class="dv">200</span>           <span class="co"># the number of mesh points to use for integration</span></a>
+<a class="sourceLine" id="cb5-74" title="74">    )    </a>
+<a class="sourceLine" id="cb5-75" title="75">  )</a></code></pre></div>
 </div>
 </div>
 <div id="implement-the-ipm" class="section level2">
 <h2 class="hasAnchor">
 <a href="#implement-the-ipm" class="anchor"></a>Implement the IPM</h2>
-<p>The minimal set of information to generate a single deterministic kernel is now wrapped up in our <code>proto_ipm</code> and it is time to <code><a href="../reference/make_ipm.html">make_ipm()</a></code>! <code><a href="../reference/make_ipm.html">make_ipm()</a></code> is a generic and will work with any combination of <code>model_class</code>es (or, rather, it will when the package is truly ready for distribution).</p>
+<p>The minimal set of information to generate a single deterministic kernel is now wrapped up in our <code>proto_ipm</code> and it is time to <code><a href="../reference/make_ipm.html">make_ipm()</a></code>! <code><a href="../reference/make_ipm.html">make_ipm()</a></code> is a generic function and will work with any combination of <code>model_class</code>es that are listed as “<strong>Completed and ready</strong>” <a href="https://levisc8.github.io/ipmr">here</a>.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">my_ipm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_det'</span>) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb6-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
 <a class="sourceLine" id="cb6-3" title="3">    <span class="dt">name      =</span> <span class="st">"P"</span>,</a>
@@ -504,7 +509,7 @@
 <a class="sourceLine" id="cb6-17" title="17">    ),</a>
 <a class="sourceLine" id="cb6-18" title="18">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb6-19" title="19">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb6-20" title="20">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb6-20" title="20">    <span class="dt">evict_cor     =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb6-21" title="21">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
 <a class="sourceLine" id="cb6-22" title="22">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb6-23" title="23"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
@@ -524,7 +529,7 @@
 <a class="sourceLine" id="cb6-37" title="37">    ),</a>
 <a class="sourceLine" id="cb6-38" title="38">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb6-39" title="39">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb6-40" title="40">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb6-40" title="40">    <span class="dt">evict_cor        =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb6-41" title="41">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
 <a class="sourceLine" id="cb6-42" title="42">  ) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb6-43" title="43"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_k</a></span>(</a>
@@ -534,7 +539,7 @@
 <a class="sourceLine" id="cb6-47" title="47">    <span class="dt">data_list     =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(),</a>
 <a class="sourceLine" id="cb6-48" title="48">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),</a>
 <a class="sourceLine" id="cb6-49" title="49">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb6-50" title="50">    <span class="dt">evict         =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb6-50" title="50">    <span class="dt">evict_cor        =</span> <span class="ot">FALSE</span></a>
 <a class="sourceLine" id="cb6-51" title="51">  )  <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb6-52" title="52"><span class="st">  </span><span class="co"># Alternative 2, put the call to make_impl_args_list() inside of define_impl(). </span></a>
 <a class="sourceLine" id="cb6-53" title="53"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_impl</a></span>(</a>
@@ -558,327 +563,434 @@
 <ul>
 <li><p><code>iterators</code> contains iteration kernels, or <code>K</code>s.</p></li>
 <li><p><code>sub_kernels</code> contains, in this example, <code>P</code> and <code>F</code>.</p></li>
-<li><p><code>env_list</code> contains the evaluation environments for each kernel and sub-kernel. This is really just for developer debugging and will likely be removed in the not so distant future.</p></li>
-<li><p><code>env_seq</code> contains either an integer vector with the sequence of indices used to select kernels from the <code>iterators</code> during a stochastic simulation (<code>*_stoch_kern</code>), or a matrix of parameter estimates from each iteration of the stochastic simulation (<code>*_kern_param</code>). Not relevant for <code>*_det</code> methods with a single iteration kernel.</p></li>
-<li><p><code>pop_state</code> contains a list of matrices for each <code>state</code> described. The columns of each matrix correspond to the population state at each time step of a simulation. In this case, we never defined the initial population state, so it will be empty.</p></li>
-<li><p><code>proto_ipm</code> contains the <code>proto_ipm</code> object used to generate the model. This is useful for rebuilding the model with a different set of <code>impl_args</code> to see how that changes your results.</p></li>
+<li><p><code>env_list</code> contains the evaluation environments for each kernel and sub-kernel. These are used by subsequent analysis methods and so are important for internal usage, but are probably of limited use to most users.</p></li>
+<li><p><code>env_seq</code> contains either an integer vector with the sequence of indices used to select kernels from the <code>iterators</code> during a stochastic simulation (<code>*_stoch_kern</code>), or a matrix of parameter estimates from each iteration of the stochastic simulation (<code>*_kern_param</code>). Not relevant for <code>*_det</code> methods with a single iteration kernel and so contains either as sequence of 1s or <code>NA</code>s</p></li>
+<li><p><code>pop_state</code> contains a list of matrices for each item defined in <code><a href="../reference/define_star.html">define_pop_state()</a></code>. In this case, we never defined the initial population state, so it will be empty. When <code><a href="../reference/define_star.html">define_pop_state()</a></code> is used with <code>iterate = TRUE</code>, the rows of each matrix correspond to the population state and columns are time steps.</p></li>
+<li><p><code>proto_ipm</code> contains the <code>proto_ipm</code> object used to generate the model. This is useful for rebuilding the model with a different set of <code>impl_args</code> or parameters to see how that changes your results.</p></li>
 </ul>
 <p><code>lambda</code>, <code>left_ev</code>, and <code>right_ev</code> are generic functions corresponding to the dominant eigenvalue, dominant left eigenvector, and dominant right eigenvector respectively. <code>lambda</code> is available for all classes of IPMs, while <code>left/right_ev</code> is available for all deterministic IPMs. Stochastic equivalents of the latter will be implemented eventually.</p>
 </div>
 <div id="defining-more-complicated-models" class="section level2">
 <h2 class="hasAnchor">
 <a href="#defining-more-complicated-models" class="anchor"></a>Defining more complicated models</h2>
-<p>In the example above, we created a model with a single, deterministic kernel defined by a single state variable. Next, we’ll use an example analogous to the case where vital models are fit with a hierarchical model to demonstrate <code>ipmr</code>’s flexibility.</p>
-<div id="defining-a-hierarchical-model-with-ipmr" class="section level3">
+<p>In the example above, we created a model with a single, deterministic kernel defined by a single state variable. Next, we’ll go through an example showing how to build kernels that are constructed from discretely varying parameter estimates.</p>
+<div id="defining-a-simple-ipm-in-a-discretely-varying-environment" class="section level3">
 <h3 class="hasAnchor">
-<a href="#defining-a-hierarchical-model-with-ipmr" class="anchor"></a>Defining a hierarchical model with ipmr</h3>
-<p><code>ipmr</code> uses a special syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the example above. The first type of model will be a stochastic, kernel-resampled simulation (<code>"simple_di_stoch_kern"</code>).</p>
-<p>This example will use <code>purrr</code> to make the first bit of code a bit more concise. This chunk takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of <code>coef(some_vital_rate_model</code>))</p>
+<a href="#defining-a-simple-ipm-in-a-discretely-varying-environment" class="anchor"></a>Defining a simple IPM in a discretely varying environment</h3>
+<p><code>ipmr</code> uses a syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the example above. The first type of model will be a stochastic, kernel-resampled simulation (<code>"simple_di_stoch_kern"</code>).</p>
+<p>The vital rate models are as follows:</p>
+<ol style="list-style-type: decimal">
+<li>
+<p>survival (<code>s_yr</code>): a logistic regression with a random year intercept (<code>s_r_yr</code>).</p>
+<ul>
+<li>Example model formula: <code>glmer(surv ~ size_1 + (1 | yr), data = my_surv_data, family = binomial()))</code>
+</li>
+</ul>
+</li>
+<li>
+<p>growth (<code>g_yr</code>): A linear regression random year intercept (<code>g_r_yr</code>).</p>
+<ul>
+<li>Example model formula: <code>lmer(size_2 ~ size_1 + (1 | yr), data = my_grow_data, family = gaussian()))</code>
+</li>
+</ul>
+</li>
+<li>
+<p>pr(flowering) (<code>p_r</code>): A logistic regression. This has no random year effect.</p>
+<ul>
+<li>Example model formula: <code>glm(flower ~ size_1 , data = my_surv_data, family = binomial()))</code>
+</li>
+</ul>
+</li>
+<li>
+<p>seed production (<code>f_s_yr</code>): A poisson regression with a random year intercept (<code>f_s_r_yr</code>)</p>
+<ul>
+<li>Example model formula: <code>glmer(seed_num ~ size_1 + (1 | yr), data = my_surv_data, family = poisson()))</code>
+</li>
+</ul>
+</li>
+<li><p>recruit size distribution (<code>f_d</code>): A normal distribution with two constant parameters, the mean (<code>mu_fd</code>) and standard deviation (<code>sd_fd</code>).</p></li>
+</ol>
+<p>The vital rates here are not conditional on each other as they come from separate models. For models where parameters come from a joint distribution (e.g. regressions with multiple responses, Bayesian multi-level models), <code>*_stoch_param</code> methods are usually more appropriate.</p>
+<p>We will use the <code>purrr</code> package to make the first bit of code a bit more concise. This chunk takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of <code>coef(some_vital_rate_model</code>)).</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(purrr)</a>
 <a class="sourceLine" id="cb7-2" title="2"></a>
 <a class="sourceLine" id="cb7-3" title="3"><span class="co"># Define some fixed parameters</span></a>
 <a class="sourceLine" id="cb7-4" title="4"></a>
-<a class="sourceLine" id="cb7-5" title="5">data_list &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb7-6" title="6">  <span class="dt">s_int     =</span> <span class="fl">1.03</span>,</a>
-<a class="sourceLine" id="cb7-7" title="7">  <span class="dt">s_slope   =</span> <span class="fl">2.2</span>,</a>
-<a class="sourceLine" id="cb7-8" title="8">  <span class="dt">g_int     =</span> <span class="fl">3.7</span>,</a>
-<a class="sourceLine" id="cb7-9" title="9">  <span class="dt">g_slope   =</span> <span class="fl">0.92</span>,</a>
-<a class="sourceLine" id="cb7-10" title="10">  <span class="dt">sd_g      =</span> <span class="fl">0.9</span>,</a>
-<a class="sourceLine" id="cb7-11" title="11">  <span class="dt">f_r_int   =</span> <span class="fl">0.09</span>,</a>
-<a class="sourceLine" id="cb7-12" title="12">  <span class="dt">f_r_slope =</span> <span class="fl">0.05</span>,</a>
-<a class="sourceLine" id="cb7-13" title="13">  <span class="dt">f_s_int   =</span> <span class="fl">0.1</span>,</a>
-<a class="sourceLine" id="cb7-14" title="14">  <span class="dt">f_s_slope =</span> <span class="fl">0.005</span>,</a>
-<a class="sourceLine" id="cb7-15" title="15">  <span class="dt">mu_fd     =</span> <span class="dv">9</span>,</a>
-<a class="sourceLine" id="cb7-16" title="16">  <span class="dt">sd_fd     =</span> <span class="dv">2</span></a>
-<a class="sourceLine" id="cb7-17" title="17">)</a>
-<a class="sourceLine" id="cb7-18" title="18"></a>
-<a class="sourceLine" id="cb7-19" title="19"><span class="co"># Now, simulate some random intercepts for growth (g_), survival (s_), and offspring production (f_s_)</span></a>
-<a class="sourceLine" id="cb7-20" title="20"></a>
-<a class="sourceLine" id="cb7-21" title="21">g_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.3</span>)</a>
-<a class="sourceLine" id="cb7-22" title="22">s_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.7</span>)</a>
-<a class="sourceLine" id="cb7-23" title="23">f_s_r_int &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.2</span>)</a>
-<a class="sourceLine" id="cb7-24" title="24"></a>
-<a class="sourceLine" id="cb7-25" title="25">nms &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"r_"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dt">sep =</span> <span class="st">""</span>)</a>
-<a class="sourceLine" id="cb7-26" title="26"></a>
-<a class="sourceLine" id="cb7-27" title="27"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(g_r_int)   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'g_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
-<a class="sourceLine" id="cb7-28" title="28"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(s_r_int)   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'s_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
-<a class="sourceLine" id="cb7-29" title="29"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(f_s_r_int) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'f_s_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
-<a class="sourceLine" id="cb7-30" title="30"></a>
-<a class="sourceLine" id="cb7-31" title="31"><span class="co"># Each set of parameters is converted to a named list. The names should match</span></a>
-<a class="sourceLine" id="cb7-32" title="32"><span class="co"># the variables referenced in each define_kernel()/define_k() call.</span></a>
-<a class="sourceLine" id="cb7-33" title="33"></a>
-<a class="sourceLine" id="cb7-34" title="34">g_params   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(g_r_int)</a>
-<a class="sourceLine" id="cb7-35" title="35">s_params   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(s_r_int)</a>
-<a class="sourceLine" id="cb7-36" title="36">f_s_params &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(f_s_r_int)</a>
-<a class="sourceLine" id="cb7-37" title="37"></a>
-<a class="sourceLine" id="cb7-38" title="38"><span class="co"># purrr::splice combines each separate list into one without creating any </span></a>
-<a class="sourceLine" id="cb7-39" title="39"><span class="co"># additional depth to it. This keeps things a bit tidier.</span></a>
-<a class="sourceLine" id="cb7-40" title="40"></a>
-<a class="sourceLine" id="cb7-41" title="41">params     &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/splice.html">splice</a></span>(data_list, g_params, s_params, f_s_params)</a></code></pre></div>
+<a class="sourceLine" id="cb7-5" title="5">fixed_list &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb7-6" title="6">  <span class="dt">s_int     =</span> <span class="fl">1.03</span>,   <span class="co"># fixef(my_surv_mod)[1] - uses fixef because we now have a model with random effects</span></a>
+<a class="sourceLine" id="cb7-7" title="7">  <span class="dt">s_slope   =</span> <span class="fl">2.2</span>,    <span class="co"># fixef(my_surv_mod)[2]</span></a>
+<a class="sourceLine" id="cb7-8" title="8">  <span class="dt">g_int     =</span> <span class="fl">3.7</span>,    <span class="co"># fixef(my_grow_mod)[1]</span></a>
+<a class="sourceLine" id="cb7-9" title="9">  <span class="dt">g_slope   =</span> <span class="fl">0.92</span>,   <span class="co"># fixef(my_grow_mod)[2]</span></a>
+<a class="sourceLine" id="cb7-10" title="10">  <span class="dt">sd_g      =</span> <span class="fl">0.9</span>,    <span class="co"># sd(resid(my_grow_mod))</span></a>
+<a class="sourceLine" id="cb7-11" title="11">  <span class="dt">f_r_int   =</span> <span class="fl">0.09</span>,   <span class="co"># coef(my_repro_mod)[1] - uses coef because there are no random effects in this model</span></a>
+<a class="sourceLine" id="cb7-12" title="12">  <span class="dt">f_r_slope =</span> <span class="fl">0.05</span>,   <span class="co"># coef(my_repro_mod)[2]</span></a>
+<a class="sourceLine" id="cb7-13" title="13">  <span class="dt">f_s_int   =</span> <span class="fl">0.1</span>,    <span class="co"># fixef(my_flower_mod)[1]</span></a>
+<a class="sourceLine" id="cb7-14" title="14">  <span class="dt">f_s_slope =</span> <span class="fl">0.005</span>,  <span class="co"># fixef(my_flower_mod)[2]</span></a>
+<a class="sourceLine" id="cb7-15" title="15">  <span class="dt">mu_fd     =</span> <span class="dv">9</span>,      <span class="co"># mean(my_recr_data$size_2, na.rm = TRUE)</span></a>
+<a class="sourceLine" id="cb7-16" title="16">  <span class="dt">sd_fd     =</span> <span class="dv">2</span>       <span class="co"># sd(my_recr_data$size_2, na.rm = TRUE)</span></a>
+<a class="sourceLine" id="cb7-17" title="17">)</a></code></pre></div>
+<p>We’ve defined a <code>fixed_list</code> that holds all of the fixed parameters in our model. Next, we’ll make up some random year specific intercepts, and add those to the <code>fixed_list</code>, naming it <code>all_params_list</code>. You don’t necessarily need to rename anything, this is just for disambiguation.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># Now, simulate some random intercepts for growth (g_), survival (s_), </span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="co"># and offspring production (f_s_). This part is for the purpose of the example.</span></a>
+<a class="sourceLine" id="cb8-3" title="3"></a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="co"># First, we create vector of values corresponding to </span></a>
+<a class="sourceLine" id="cb8-5" title="5"></a>
+<a class="sourceLine" id="cb8-6" title="6">g_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.3</span>) <span class="co"># t(ranef(my_grow_mod)) for an lme4 output</span></a>
+<a class="sourceLine" id="cb8-7" title="7">s_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.7</span>) <span class="co"># t(ranef(my_surv_mod)) for an lme4 output</span></a>
+<a class="sourceLine" id="cb8-8" title="8">f_s_r_int &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.2</span>) <span class="co"># t(ranef(my_flower_mod)) for an lme4 output</span></a>
+<a class="sourceLine" id="cb8-9" title="9"></a>
+<a class="sourceLine" id="cb8-10" title="10">nms &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"r_"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dt">sep =</span> <span class="st">""</span>)</a>
+<a class="sourceLine" id="cb8-11" title="11"></a>
+<a class="sourceLine" id="cb8-12" title="12"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(g_r_int)   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'g_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
+<a class="sourceLine" id="cb8-13" title="13"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(s_r_int)   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'s_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
+<a class="sourceLine" id="cb8-14" title="14"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(f_s_r_int) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'f_s_'</span>, nms, <span class="dt">sep =</span> <span class="st">""</span>)</a>
+<a class="sourceLine" id="cb8-15" title="15"></a>
+<a class="sourceLine" id="cb8-16" title="16"><span class="co"># Each set of parameters is converted to a named list. The names should match</span></a>
+<a class="sourceLine" id="cb8-17" title="17"><span class="co"># the variables referenced in each define_kernel()/define_k() call.</span></a>
+<a class="sourceLine" id="cb8-18" title="18"></a>
+<a class="sourceLine" id="cb8-19" title="19">g_params   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(g_r_int)</a>
+<a class="sourceLine" id="cb8-20" title="20">s_params   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(s_r_int)</a>
+<a class="sourceLine" id="cb8-21" title="21">f_s_params &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(f_s_r_int)</a>
+<a class="sourceLine" id="cb8-22" title="22"></a>
+<a class="sourceLine" id="cb8-23" title="23"><span class="co"># purrr::splice combines each separate list into one without creating any </span></a>
+<a class="sourceLine" id="cb8-24" title="24"><span class="co"># additional depth to it. This keeps things a bit tidier.</span></a>
+<a class="sourceLine" id="cb8-25" title="25"></a>
+<a class="sourceLine" id="cb8-26" title="26">all_params_list &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/splice.html">splice</a></span>(fixed_list, g_params, s_params, f_s_params)</a></code></pre></div>
+<p>We’ve now created a list where each entry is named and contains a single parameter value. This is now ready for use in <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code></p>
 </div>
 <div id="defining-custom-functions-to-pass-to-the-building-process" class="section level3">
 <h3 class="hasAnchor">
 <a href="#defining-custom-functions-to-pass-to-the-building-process" class="anchor"></a>Defining custom functions to pass to the building process</h3>
 <p>We now have some parameter values. In the next step, we’ll compose some helper functions to make the vital rate expressions inside of <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code> a bit more concise and expressive. These are passed in a list to the <code>usr_funs</code> argument of <code><a href="../reference/make_ipm.html">make_ipm()</a></code>.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">inv_logit &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope) {</a>
-<a class="sourceLine" id="cb8-2" title="2">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(</a>
-<a class="sourceLine" id="cb8-3" title="3">    <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv)))</a>
-<a class="sourceLine" id="cb8-4" title="4">  )</a>
-<a class="sourceLine" id="cb8-5" title="5">}</a>
-<a class="sourceLine" id="cb8-6" title="6"></a>
-<a class="sourceLine" id="cb8-7" title="7"><span class="co"># same as above, but handles the extra term from the random effect we simulated.</span></a>
-<a class="sourceLine" id="cb8-8" title="8"></a>
-<a class="sourceLine" id="cb8-9" title="9">inv_logit_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope, r_eff) {</a>
-<a class="sourceLine" id="cb8-10" title="10">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(</a>
-<a class="sourceLine" id="cb8-11" title="11">    <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv <span class="op">+</span><span class="st"> </span>r_eff)))</a>
-<a class="sourceLine" id="cb8-12" title="12">  )</a>
-<a class="sourceLine" id="cb8-13" title="13">}</a>
-<a class="sourceLine" id="cb8-14" title="14"></a>
-<a class="sourceLine" id="cb8-15" title="15">pois_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope, r_eff) {</a>
-<a class="sourceLine" id="cb8-16" title="16">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(</a>
-<a class="sourceLine" id="cb8-17" title="17">    <span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(</a>
-<a class="sourceLine" id="cb8-18" title="18">      int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv <span class="op">+</span><span class="st"> </span>r_eff</a>
-<a class="sourceLine" id="cb8-19" title="19">    )</a>
-<a class="sourceLine" id="cb8-20" title="20">  )</a>
-<a class="sourceLine" id="cb8-21" title="21">}</a>
-<a class="sourceLine" id="cb8-22" title="22"></a>
-<a class="sourceLine" id="cb8-23" title="23">my_funs &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">inv_logit   =</span> inv_logit,</a>
-<a class="sourceLine" id="cb8-24" title="24">                <span class="dt">inv_logit_r =</span> inv_logit_r,</a>
-<a class="sourceLine" id="cb8-25" title="25">                <span class="dt">pois_r      =</span> pois_r)</a></code></pre></div>
-<p>The only requirement for these functions is that they contain valid R code, and their return types are numeric or integer.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">inv_logit &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope) {</a>
+<a class="sourceLine" id="cb9-2" title="2">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(</a>
+<a class="sourceLine" id="cb9-3" title="3">    <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv)))</a>
+<a class="sourceLine" id="cb9-4" title="4">  )</a>
+<a class="sourceLine" id="cb9-5" title="5">}</a>
+<a class="sourceLine" id="cb9-6" title="6"></a>
+<a class="sourceLine" id="cb9-7" title="7"><span class="co"># same as above, but handles the extra term from the random effect we simulated.</span></a>
+<a class="sourceLine" id="cb9-8" title="8"></a>
+<a class="sourceLine" id="cb9-9" title="9">inv_logit_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope, r_eff) {</a>
+<a class="sourceLine" id="cb9-10" title="10">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(</a>
+<a class="sourceLine" id="cb9-11" title="11">    <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv <span class="op">+</span><span class="st"> </span>r_eff)))</a>
+<a class="sourceLine" id="cb9-12" title="12">  )</a>
+<a class="sourceLine" id="cb9-13" title="13">}</a>
+<a class="sourceLine" id="cb9-14" title="14"></a>
+<a class="sourceLine" id="cb9-15" title="15">pois_r &lt;-<span class="st"> </span><span class="cf">function</span>(sv, int, slope, r_eff) {</a>
+<a class="sourceLine" id="cb9-16" title="16">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(</a>
+<a class="sourceLine" id="cb9-17" title="17">    <span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(</a>
+<a class="sourceLine" id="cb9-18" title="18">      int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv <span class="op">+</span><span class="st"> </span>r_eff</a>
+<a class="sourceLine" id="cb9-19" title="19">    )</a>
+<a class="sourceLine" id="cb9-20" title="20">  )</a>
+<a class="sourceLine" id="cb9-21" title="21">}</a>
+<a class="sourceLine" id="cb9-22" title="22"></a>
+<a class="sourceLine" id="cb9-23" title="23">my_funs &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">inv_logit   =</span> inv_logit,</a>
+<a class="sourceLine" id="cb9-24" title="24">                <span class="dt">inv_logit_r =</span> inv_logit_r,</a>
+<a class="sourceLine" id="cb9-25" title="25">                <span class="dt">pois_r      =</span> pois_r)</a></code></pre></div>
+<p>The only requirement for these functions is that they contain valid R code, and their return types are either numeric or integer.</p>
 </div>
 <div id="initializing-the-ipm" class="section level3">
 <h3 class="hasAnchor">
 <a href="#initializing-the-ipm" class="anchor"></a>Initializing the IPM</h3>
-<p>With the functions and parameter values defined, we are now ready to begin composing the model. Each expression’s syntax will look a little different from before, because we are appending a suffix corresponding to the hierarchical component of the model to each parameter/vital rate/kernel that is affected by it. In this case, we’re using it as a year effect, denoted <code>_yr</code>, but any suffix will work. The first line creates a list with the suffix as the name and a vector corresponding to the levels it takes on. This can be a character or integer vector, and the list can have as many entries as required by the model (e.g. <code>yr</code> for years <em>and</em> <code>pl</code> for plots. The suffix would then become <code>_yr_pl</code>). The calls to <code>define_kernel</code> and <code>define_k</code> now have <code>has_hier_effs = TRUE</code>, and <code>levels_hier_effs = hier_levels</code>. Otherwise, the code should look quite familiar.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">hier_levels &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">yr =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb9-2" title="2"></a>
-<a class="sourceLine" id="cb9-3" title="3">my_ipm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_stoch_kern'</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-4" title="4"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb9-5" title="5">    <span class="dt">name             =</span> <span class="st">'P_yr'</span>,               <span class="co"># P because P_yr</span></a>
-<a class="sourceLine" id="cb9-6" title="6">    <span class="dt">formula          =</span> <span class="kw"><a href="../reference/fun-mult-helpers.html">s_g_mult</a></span>(s_yr, g_yr), <span class="co"># g and s become g_yr and s_yr, respectively</span></a>
-<a class="sourceLine" id="cb9-7" title="7">    <span class="dt">family           =</span> <span class="st">"CC"</span>,</a>
-<a class="sourceLine" id="cb9-8" title="8">    <span class="dt">s_yr             =</span> <span class="kw">inv_logit_r</span>(ht_<span class="dv">1</span>, s_int, s_slope, s_r_yr), </a>
-<a class="sourceLine" id="cb9-9" title="9">    <span class="dt">g_yr             =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(ht_<span class="dv">2</span>, <span class="dt">mean =</span> mu_g_yr, <span class="dt">sd =</span> sd_g),</a>
-<a class="sourceLine" id="cb9-10" title="10">    <span class="dt">mu_g_yr          =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>ht_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>g_r_yr,</a>
-<a class="sourceLine" id="cb9-11" title="11">    </a>
-<a class="sourceLine" id="cb9-12" title="12">    <span class="co"># params contains the named parameters g_r_1, g_r_2, s_r_1, s_r_2, etc.</span></a>
-<a class="sourceLine" id="cb9-13" title="13">    <span class="co"># This is the only level where the user is required to fully expand the name</span></a>
-<a class="sourceLine" id="cb9-14" title="14">    <span class="co"># X hier_level combinations. </span></a>
-<a class="sourceLine" id="cb9-15" title="15">    </a>
-<a class="sourceLine" id="cb9-16" title="16">    <span class="dt">data_list        =</span> params,</a>
-<a class="sourceLine" id="cb9-17" title="17">    <span class="dt">states           =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ht'</span>)),</a>
-<a class="sourceLine" id="cb9-18" title="18">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb9-19" title="19">    <span class="dt">levels_hier_effs =</span> hier_levels,</a>
-<a class="sourceLine" id="cb9-20" title="20">    <span class="dt">evict            =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb9-21" title="21">    </a>
-<a class="sourceLine" id="cb9-22" title="22">    <span class="co"># reference to g_yr in evict_fun is also updated</span></a>
-<a class="sourceLine" id="cb9-23" title="23">    </a>
-<a class="sourceLine" id="cb9-24" title="24">    <span class="dt">evict_fun        =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g_yr"</span>)</a>
-<a class="sourceLine" id="cb9-25" title="25">    </a>
-<a class="sourceLine" id="cb9-26" title="26">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-27" title="27"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb9-28" title="28">    <span class="dt">name             =</span> <span class="st">"F_yr"</span>,             <span class="co"># Update the names as we did for the P kernel</span></a>
-<a class="sourceLine" id="cb9-29" title="29">    <span class="dt">formula          =</span> f_r <span class="op">*</span><span class="st"> </span>f_s_yr <span class="op">*</span><span class="st"> </span>f_d,</a>
-<a class="sourceLine" id="cb9-30" title="30">    <span class="dt">family           =</span> <span class="st">"CC"</span>,</a>
-<a class="sourceLine" id="cb9-31" title="31">    <span class="dt">f_r              =</span> <span class="kw">inv_logit</span>(ht_<span class="dv">1</span>, f_r_int, f_r_slope),</a>
-<a class="sourceLine" id="cb9-32" title="32">    <span class="dt">f_s_yr           =</span> <span class="kw">pois_r</span>(ht_<span class="dv">1</span>, f_s_int, f_s_slope, f_s_r_yr),</a>
-<a class="sourceLine" id="cb9-33" title="33">    <span class="dt">f_d              =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(ht_<span class="dv">2</span>, <span class="dt">mean =</span> mu_fd, <span class="dt">sd =</span> sd_fd),</a>
-<a class="sourceLine" id="cb9-34" title="34">    <span class="dt">data_list        =</span> params,</a>
-<a class="sourceLine" id="cb9-35" title="35">    <span class="dt">states           =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ht'</span>)),</a>
-<a class="sourceLine" id="cb9-36" title="36">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb9-37" title="37">    <span class="dt">levels_hier_effs =</span> hier_levels,</a>
-<a class="sourceLine" id="cb9-38" title="38">    <span class="dt">evict            =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb9-39" title="39">    <span class="dt">evict_fun        =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
-<a class="sourceLine" id="cb9-40" title="40">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-41" title="41"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_k</a></span>(</a>
-<a class="sourceLine" id="cb9-42" title="42">    <span class="dt">name             =</span> <span class="st">'K_yr'</span>,</a>
-<a class="sourceLine" id="cb9-43" title="43">    <span class="dt">K_yr             =</span> P_yr <span class="op">+</span><span class="st"> </span>F_yr,</a>
-<a class="sourceLine" id="cb9-44" title="44">    <span class="dt">family           =</span> <span class="st">"IPM"</span>,</a>
-<a class="sourceLine" id="cb9-45" title="45">    <span class="dt">data_list        =</span> params,</a>
-<a class="sourceLine" id="cb9-46" title="46">    <span class="dt">states           =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ht"</span>)),</a>
-<a class="sourceLine" id="cb9-47" title="47">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb9-48" title="48">    <span class="dt">levels_hier_effs =</span> hier_levels,</a>
-<a class="sourceLine" id="cb9-49" title="49">    <span class="dt">evict            =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb9-50" title="50">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-51" title="51"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_impl</a></span>(</a>
-<a class="sourceLine" id="cb9-52" title="52">    <span class="kw"><a href="../reference/define_star.html">make_impl_args_list</a></span>(</a>
-<a class="sourceLine" id="cb9-53" title="53">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"K_yr"</span>, <span class="st">"P_yr"</span>, <span class="st">"F_yr"</span>),</a>
-<a class="sourceLine" id="cb9-54" title="54">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb9-55" title="55">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"ht"</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb9-56" title="56">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"ht"</span>, <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb9-57" title="57">    )</a>
-<a class="sourceLine" id="cb9-58" title="58">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-59" title="59"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_domains</a></span>(<span class="dt">ht =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.2</span>, <span class="dv">40</span>, <span class="dv">100</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-60" title="60"><span class="st">  </span><span class="kw"><a href="../reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs =</span> my_funs,</a>
-<a class="sourceLine" id="cb9-61" title="61">           <span class="dt">iterate  =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
-<p><code>ipmr</code> automatically substitutes in the <code>hier_levels</code> for each suffix occurrence, thus changing <code>P_yr</code> to <code>P_1</code>, <code>P_2</code>, <code>P_3</code>, <code>P_4</code>, <code>P_5</code>, <code>s_yr</code> to <code>s_1</code>, <code>s_2</code>, <code>s_3</code>, <code>s_4</code>, and <code>s_5</code>. <code>s_r_yr</code> is converted to <code>s_r_1</code>, <code>s_r_2</code>, etc. In the case of the lowest level parameters <code>s_r_yr</code>, <code>g_r_yr</code>, etc., provided that the names in the <code>data_list</code> match the expanded names, all will go well!</p>
+<p>With the functions and parameter values defined, we are now ready to begin composing the model. Each expression’s syntax will look a little different from before, because we are appending a suffix corresponding to the hierarchical component of the model to each parameter/vital rate/kernel that is affected by it. In this case, we’re pretending it is a year effect, denoted <code>_yr</code>, but almost any suffix will work. This can be a character or integer vector, and the list can have as many entries as required by the model (e.g. <code>yr</code> for years <em>and</em> <code>pl</code> for plots. The suffix would then become <code>_yr_pl</code>). The calls to <code>define_kernel</code> and <code>define_k</code> now have <code>has_hier_effs = TRUE</code>, and <code>levels_hier_effs = list(yr = 1:5)</code>. Otherwise, the code should look quite familiar.</p>
+<p><strong>NOTE:</strong> Because of the way <code>ipmr</code> handles population vectors internally, <strong>the only suffix that isn’t allowed is <code>_pop</code></strong>. This is unfortunate, but can be worked around. Please use <code>_site</code> or <code>_popul</code> or something instead. Sorry!</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">my_ipm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_stoch_kern'</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb10-3" title="3">    <span class="dt">name             =</span> <span class="st">'P_yr'</span>,               <span class="co"># P because P_yr</span></a>
+<a class="sourceLine" id="cb10-4" title="4">    <span class="dt">formula          =</span> <span class="kw"><a href="../reference/fun-mult-helpers.html">s_g_mult</a></span>(s_yr, g_yr), <span class="co"># g and s become g_yr and s_yr, respectively</span></a>
+<a class="sourceLine" id="cb10-5" title="5">    <span class="dt">family           =</span> <span class="st">"CC"</span>,</a>
+<a class="sourceLine" id="cb10-6" title="6">    </a>
+<a class="sourceLine" id="cb10-7" title="7">    <span class="co"># Note the usage of the inv_logit_r, which we defined in the block above.</span></a>
+<a class="sourceLine" id="cb10-8" title="8">    <span class="co"># it is passed to make_ipm() </span></a>
+<a class="sourceLine" id="cb10-9" title="9">    </a>
+<a class="sourceLine" id="cb10-10" title="10">    <span class="dt">s_yr             =</span> <span class="kw">inv_logit_r</span>(ht_<span class="dv">1</span>, s_int, s_slope, s_r_yr), </a>
+<a class="sourceLine" id="cb10-11" title="11">    <span class="dt">g_yr             =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(ht_<span class="dv">2</span>, <span class="dt">mean =</span> mu_g_yr, <span class="dt">sd =</span> sd_g),</a>
+<a class="sourceLine" id="cb10-12" title="12">    <span class="dt">mu_g_yr          =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>ht_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>g_r_yr,</a>
+<a class="sourceLine" id="cb10-13" title="13">    </a>
+<a class="sourceLine" id="cb10-14" title="14">    <span class="co"># all_params_list contains the named parameters g_r_1, g_r_2, s_r_1, s_r_2, etc.</span></a>
+<a class="sourceLine" id="cb10-15" title="15">    <span class="co"># This is the only level where the user is required to fully expand the name</span></a>
+<a class="sourceLine" id="cb10-16" title="16">    <span class="co"># X hier_level combinations. </span></a>
+<a class="sourceLine" id="cb10-17" title="17">    </a>
+<a class="sourceLine" id="cb10-18" title="18">    <span class="dt">data_list        =</span> all_params_list,</a>
+<a class="sourceLine" id="cb10-19" title="19">    <span class="dt">states           =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ht'</span>)),</a>
+<a class="sourceLine" id="cb10-20" title="20">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb10-21" title="21">    <span class="dt">levels_hier_effs =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">yr =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb10-22" title="22">    <span class="dt">evict_cor        =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb10-23" title="23">    </a>
+<a class="sourceLine" id="cb10-24" title="24">    <span class="co"># reference to g_yr in evict_fun is also updated</span></a>
+<a class="sourceLine" id="cb10-25" title="25">    </a>
+<a class="sourceLine" id="cb10-26" title="26">    <span class="dt">evict_fun        =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g_yr"</span>)</a>
+<a class="sourceLine" id="cb10-27" title="27">    </a>
+<a class="sourceLine" id="cb10-28" title="28">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-29" title="29"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb10-30" title="30">    <span class="dt">name             =</span> <span class="st">"F_yr"</span>,             <span class="co"># Update the names as we did for the P kernel</span></a>
+<a class="sourceLine" id="cb10-31" title="31">    <span class="dt">formula          =</span> f_r <span class="op">*</span><span class="st"> </span>f_s_yr <span class="op">*</span><span class="st"> </span>f_d,</a>
+<a class="sourceLine" id="cb10-32" title="32">    <span class="dt">family           =</span> <span class="st">"CC"</span>,</a>
+<a class="sourceLine" id="cb10-33" title="33">    <span class="dt">f_r              =</span> <span class="kw">inv_logit</span>(ht_<span class="dv">1</span>, f_r_int, f_r_slope),</a>
+<a class="sourceLine" id="cb10-34" title="34">    <span class="dt">f_s_yr           =</span> <span class="kw">pois_r</span>(ht_<span class="dv">1</span>, f_s_int, f_s_slope, f_s_r_yr),</a>
+<a class="sourceLine" id="cb10-35" title="35">    <span class="dt">f_d              =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(ht_<span class="dv">2</span>, <span class="dt">mean =</span> mu_fd, <span class="dt">sd =</span> sd_fd),</a>
+<a class="sourceLine" id="cb10-36" title="36">    <span class="dt">data_list        =</span> all_params_list,</a>
+<a class="sourceLine" id="cb10-37" title="37">    <span class="dt">states           =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ht'</span>)),</a>
+<a class="sourceLine" id="cb10-38" title="38">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb10-39" title="39">    <span class="dt">levels_hier_effs =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">yr =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb10-40" title="40">    <span class="dt">evict_cor        =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb10-41" title="41">    <span class="dt">evict_fun        =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
+<a class="sourceLine" id="cb10-42" title="42">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-43" title="43"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_k</a></span>(</a>
+<a class="sourceLine" id="cb10-44" title="44">    <span class="dt">name             =</span> <span class="st">'K_yr'</span>,</a>
+<a class="sourceLine" id="cb10-45" title="45">    <span class="dt">K_yr             =</span> P_yr <span class="op">+</span><span class="st"> </span>F_yr,</a>
+<a class="sourceLine" id="cb10-46" title="46">    <span class="dt">family           =</span> <span class="st">"IPM"</span>,</a>
+<a class="sourceLine" id="cb10-47" title="47">    <span class="dt">data_list        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(),</a>
+<a class="sourceLine" id="cb10-48" title="48">    <span class="dt">states           =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ht"</span>)),</a>
+<a class="sourceLine" id="cb10-49" title="49">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb10-50" title="50">    <span class="dt">levels_hier_effs =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">yr =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb10-51" title="51">    <span class="dt">evict_cor        =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb10-52" title="52">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-53" title="53"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_impl</a></span>(</a>
+<a class="sourceLine" id="cb10-54" title="54">    <span class="kw"><a href="../reference/define_star.html">make_impl_args_list</a></span>(</a>
+<a class="sourceLine" id="cb10-55" title="55">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"K_yr"</span>, <span class="st">"P_yr"</span>, <span class="st">"F_yr"</span>),</a>
+<a class="sourceLine" id="cb10-56" title="56">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb10-57" title="57">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"ht"</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb10-58" title="58">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"ht"</span>, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb10-59" title="59">    )</a>
+<a class="sourceLine" id="cb10-60" title="60">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-61" title="61"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_domains</a></span>(<span class="dt">ht =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.2</span>, <span class="dv">40</span>, <span class="dv">100</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-62" title="62"><span class="st">  </span><span class="kw"><a href="../reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs =</span> my_funs,</a>
+<a class="sourceLine" id="cb10-63" title="63">           <span class="dt">iterate  =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<p><code>ipmr</code> automatically substitutes 1, 2, 3, 4, and 5 for each occurence of <code>yr</code> in the vital rate expressions. Thus, <code>P_yr</code> is expanded to <code>P_1</code>, <code>P_2</code>, <code>P_3</code>, <code>P_4</code>, <code>P_5</code>, <code>s_yr</code> to <code>s_1</code>, <code>s_2</code>, <code>s_3</code>, <code>s_4</code>, and <code>s_5</code>. <code>s_r_yr</code> is converted to <code>s_r_1</code>, <code>s_r_2</code>, etc. This is why we needed to make sure the names in <code>all_params_list</code> had the actual numbers appended to them.</p>
 <p>Syntax aside, the only real difference between the first example and this one is that we’ve passed custom functions to the call to <code><a href="../reference/make_ipm.html">make_ipm()</a></code>, and altered our vital rate expressions to use them instead of the pure math for each variable transformation.</p>
 </div>
 </div>
-<div id="working-with-parameter-distributions" class="section level2">
+<div id="simple-ipms-for-continuously-varying-environments" class="section level2">
 <h2 class="hasAnchor">
-<a href="#working-with-parameter-distributions" class="anchor"></a>Working with parameter distributions</h2>
-<p>In some cases, it is not desirable to work with point estimates of a random variable, and we prefer to work with the distributions they comes from. Quantifying uncertainty is a critical part of demography, and methods for propagating uncertainty in parameter estimates throughout a model are well established. Unfortunately, this also means that we can’t obtain a set of kernels without iterating the model at least once. This is where the <code>*_stoch_param</code> methods come in handy.</p>
-<p><code>*_stoch_param</code> methods are, on the surface, slightly less computationally efficient than their <code>*_stoch_kern*</code> counterparts because they must rebuild the iteration kernel for every single iteration. However, they are fantastic tools for propagating uncertainty in parameter estimates throughout the model. Below is an example that uses a multivariate normal distribution to re-generate parameter estimates for each iteration of the model. <code>ipmr</code> is careful to only evaluate each function in <code><a href="../reference/define_star.html">define_env_state()</a></code> only once per iteration, so you can use multivariate joint distributions correctly.</p>
+<a href="#simple-ipms-for-continuously-varying-environments" class="anchor"></a>Simple IPMs for continuously varying environments</h2>
+<p>In some cases, it is not desirable to work with single estimates of a random variable, and we prefer to work with the distributions they come from. Quantifying uncertainty is a critical part of demography. Additionally, environmental variables like climate may be random with reasonably well known distributions. A stochastic simulation can incorporate information to help us understand the consequences.</p>
+<p>Unfortunately, this also means that we can’t obtain a set of kernels without iterating the model at least once, because we have to sample from the parameter distributions at least once (well, technically, we can, but this is probably not the desired behavior). This is where the <code>*_stoch_param</code> methods come in handy. <code>*_stoch_param</code> methods are slightly less computationally efficient than their <code>*_stoch_kern*</code> counterparts because they must rebuild the iteration kernel for every single iteration. However, they are fantastic tools for propagating uncertainty in parameter estimates throughout the model.</p>
+<p>Below is an example that demonstrates how to work with posterior distributions from Bayesian models. <code>ipmr</code> is careful to only evaluate each function in <code><a href="../reference/define_star.html">define_env_state()</a></code> once per iteration, so you can use multivariate joint distributions correctly.</p>
+<p>Equivalent code is demonstrated in the comments, but switches to a Bayesian model for growth and survival, specifically <a href="https://paul-buerkner.github.io/brms/"><code>brms</code></a>. The parameters for the growth and survival functions will be sampled from posterior distributions one time per iteration, and an example of a function to pass to <code><a href="../reference/define_star.html">define_env_state()</a></code> is included in the first chunk below.</p>
+<p>There are a multitude of ways to incorporate parameter uncertainty and/or continuous environmental variation, and that variety is beyond the scope of this vignette. If the example below is not as helpful as you’d hoped, then my suggestion would be to start reading on GLMMs <a href="https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#introduction">here</a> and continue reading on their applications to IPMs <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12405">here</a>. After that, hopefully the example below will make more sense.</p>
 <div id="defining-initial-conditions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#defining-initial-conditions" class="anchor"></a>Defining initial conditions</h3>
-<p>Stochastic simulations require specification of the initial conditions. <code>ipmr</code> aims to make this straightforward for you by providing two helpers - <code><a href="../reference/define_star.html">define_pop_state()</a></code> and <code><a href="../reference/define_star.html">define_env_state()</a></code>. Both are flexible in their syntax, though each does have a learning curve if you are not used to writing your own functions. The example below will use both when defining the model.</p>
-</div>
-<div id="define_pop_state" class="section level3">
-<h3 class="hasAnchor">
+<p>Stochastic simulations require specification of the initial conditions. <code>ipmr</code> aims to make this straightforward for you by providing two helpers - <code><a href="../reference/define_star.html">define_pop_state()</a></code> and <code><a href="../reference/define_star.html">define_env_state()</a></code>.</p>
+<div id="define_pop_state" class="section level4">
+<h4 class="hasAnchor">
 <a href="#define_pop_state" class="anchor"></a><code>define_pop_state()</code>
-</h3>
-<p><code><a href="../reference/define_star.html">define_pop_state()</a></code> takes either a named set of expressions that, when evaluated, generate a population vector, or a named list of pre-generated population vectors in the <code>pop_vectors</code> argument. One important thing to note about working with population vectors in <code>ipmr</code> is that they should take the form <code>n_StateVariable_t</code> and <code>n_StateVariable_t_1</code>. <code>ipmr</code> uses these key words to make sure that population states are matched to the kernels that use them, and so the strict syntax in this area is needed to ensure accuracy in more complicated models.</p>
+</h4>
+<p><code><a href="../reference/define_star.html">define_pop_state()</a></code> takes either</p>
+<ol style="list-style-type: decimal">
+<li>
+<p>a named set of expressions that, when evaluated, generate a population vector</p>
+<ul>
+<li>example: <code>define_pop_state(n_dbh = runif(100)</code>) for a model with 100 meshpoints.</li>
+</ul>
+</li>
+</ol>
+<p><strong>or</strong></p>
+<ol start="2" style="list-style-type: decimal">
+<li>
+<p>a named list of pre-generated population vectors in the <code>pop_vectors</code> argument</p>
+<ul>
+<li>example: <code><a href="../reference/define_star.html">define_pop_state(pop_vectors = list(n_dbh = init_dbh_vector))</a></code>, where <code>init_dbh_vector</code> is generated somewhere earlier in the script.</li>
+</ul>
+</li>
+</ol>
+<p>In <code><a href="../reference/define_star.html">define_pop_state()</a></code>, populations should be defined as <code>n_&lt;insertStateVariableHere&gt;</code>. If this function is used in the IPM definition code, then 2 additional helper variables are generated: <code>n_stateVariable_t</code> and <code>n_stateVariable_t_1</code>. These can be used to reference the population states in vital rate and/or kernel expressions. They must be referenced in the <code>...</code> of <code><a href="../reference/kernel-definitions.html">define_k()</a></code> as well, because otherwise, <code>ipmr</code> doesn’t know how to iterate the model.</p>
 </div>
-<div id="define_env_state" class="section level3">
-<h3 class="hasAnchor">
+<div id="define_env_state" class="section level4">
+<h4 class="hasAnchor">
 <a href="#define_env_state" class="anchor"></a><code>define_env_state()</code>
-</h3>
-<p><code><a href="../reference/define_star.html">define_env_state()</a></code> takes a named set of expressions in the <code>...</code> and then a data list, much like how <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code>/<code><a href="../reference/kernel-definitions.html">define_k()</a></code> take them. The key difference here is that you will need to use the name on the left hand side of the <code>...</code> to access the values on the right hand side. In the example below, the function passed to <code><a href="../reference/define_star.html">define_env_state()</a></code> returns a named list of length 4. However, we only want to access a single parameter in each vital rate expression. Since the list is named <code>env_params</code> and the variables we really want are named <code>s_int_yr</code>, <code>g_int_yr</code>, <code>f_r_int_yr</code>, <code>f_s_int_yr</code>, we access them using standard <code><a href="https://rdrr.io/r/base/Extract.html">$</a></code> syntax (e.g. <code>env_params$s_int_yr</code>) in each of the vital rate expressions.</p>
-<p>Finally, this example uses the <code>mvtnorm</code> library to access the <code>rmvnorm</code> function for generating parameter estimates from a multivariate normal distribution during each model iteration.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ipmr)</a>
-<a class="sourceLine" id="cb10-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(mvtnorm)</a>
-<a class="sourceLine" id="cb10-3" title="3"></a>
-<a class="sourceLine" id="cb10-4" title="4"><span class="co"># Define the fixed parameters in a list</span></a>
-<a class="sourceLine" id="cb10-5" title="5"></a>
-<a class="sourceLine" id="cb10-6" title="6">data_list &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">s_slope   =</span> <span class="fl">0.3</span>,</a>
-<a class="sourceLine" id="cb10-7" title="7">                  <span class="dt">g_slope   =</span> <span class="fl">0.99</span>,</a>
-<a class="sourceLine" id="cb10-8" title="8">                  <span class="dt">g_sd      =</span> <span class="fl">0.2</span>,</a>
-<a class="sourceLine" id="cb10-9" title="9">                  <span class="dt">f_r_slope =</span> <span class="fl">0.03</span>,</a>
-<a class="sourceLine" id="cb10-10" title="10">                  <span class="dt">f_s_slope =</span> <span class="fl">0.001</span>,</a>
-<a class="sourceLine" id="cb10-11" title="11">                  <span class="dt">f_d_mu    =</span> <span class="fl">1.1</span>,</a>
-<a class="sourceLine" id="cb10-12" title="12">                  <span class="dt">f_d_sd    =</span> <span class="fl">0.1</span>)</a>
-<a class="sourceLine" id="cb10-13" title="13"></a>
-<a class="sourceLine" id="cb10-14" title="14"><span class="co"># Simulate some random parameters to define the multivariate distribution</span></a>
-<a class="sourceLine" id="cb10-15" title="15"><span class="co"># to sample from. In user-specified models, these will likely come from mixed</span></a>
-<a class="sourceLine" id="cb10-16" title="16"><span class="co"># effects models fit to real data.</span></a>
-<a class="sourceLine" id="cb10-17" title="17"></a>
-<a class="sourceLine" id="cb10-18" title="18">r_means &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dt">s_int_yr   =</span> <span class="fl">0.8</span>,</a>
-<a class="sourceLine" id="cb10-19" title="19">             <span class="dt">g_int_yr   =</span> <span class="fl">0.1</span>,</a>
-<a class="sourceLine" id="cb10-20" title="20">             <span class="dt">f_r_int_yr =</span> <span class="fl">0.3</span>,</a>
-<a class="sourceLine" id="cb10-21" title="21">             <span class="dt">f_s_int_yr =</span> <span class="fl">0.4</span>)</a>
-<a class="sourceLine" id="cb10-22" title="22"></a>
-<a class="sourceLine" id="cb10-23" title="23">r_sigma &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="dv">16</span>)</a>
-<a class="sourceLine" id="cb10-24" title="24">r_sigma &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(r_sigma, <span class="dt">nrow =</span> <span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb10-25" title="25"></a>
-<a class="sourceLine" id="cb10-26" title="26">r_sigma &lt;-<span class="st"> </span>r_sigma <span class="op">%*%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(r_sigma) <span class="co"># make symmetrical - most users can/should skip this step.</span></a>
-<a class="sourceLine" id="cb10-27" title="27"></a>
-<a class="sourceLine" id="cb10-28" title="28">iterations &lt;-<span class="st"> </span><span class="dv">10</span></a>
-<a class="sourceLine" id="cb10-29" title="29"></a>
-<a class="sourceLine" id="cb10-30" title="30"><span class="co"># Specify an initial population vector. This can also be done in the call to</span></a>
-<a class="sourceLine" id="cb10-31" title="31"><span class="co"># define_pop_state</span></a>
-<a class="sourceLine" id="cb10-32" title="32"></a>
-<a class="sourceLine" id="cb10-33" title="33">init_pop_vec &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb10-34" title="34"></a>
-<a class="sourceLine" id="cb10-35" title="35"><span class="co"># We define a wrapper function around rmvnorm to make sure</span></a>
-<a class="sourceLine" id="cb10-36" title="36"><span class="co"># that the names of the returned values match those in the vital rate</span></a>
-<a class="sourceLine" id="cb10-37" title="37"><span class="co"># expressions. Note that if you've already loaded mvtnorm via library(mvtnorm),</span></a>
-<a class="sourceLine" id="cb10-38" title="38"><span class="co"># you do not need the package::function() syntax. It is simply added here to </span></a>
-<a class="sourceLine" id="cb10-39" title="39"><span class="co"># emphasize the rmvnorm does not come from ipmr.</span></a>
-<a class="sourceLine" id="cb10-40" title="40"></a>
-<a class="sourceLine" id="cb10-41" title="41">mvt_wrapper &lt;-<span class="st"> </span><span class="cf">function</span>(r_means, r_sigma, nms) {</a>
-<a class="sourceLine" id="cb10-42" title="42">  </a>
-<a class="sourceLine" id="cb10-43" title="43">  out &lt;-<span class="st"> </span>mvtnorm<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html">rmvnorm</a></span>(<span class="dv">1</span>, r_means, r_sigma) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb10-44" title="44"><span class="st">    </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>()</a>
-<a class="sourceLine" id="cb10-45" title="45">  </a>
-<a class="sourceLine" id="cb10-46" title="46">  <span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(out) &lt;-<span class="st"> </span>nms</a>
-<a class="sourceLine" id="cb10-47" title="47">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(out)</a>
-<a class="sourceLine" id="cb10-48" title="48">  </a>
-<a class="sourceLine" id="cb10-49" title="49">}</a>
-<a class="sourceLine" id="cb10-50" title="50"></a>
-<a class="sourceLine" id="cb10-51" title="51"></a>
-<a class="sourceLine" id="cb10-52" title="52"><span class="co"># Again, we can define our own functions and pass them into calls to make_ipm. This</span></a>
-<a class="sourceLine" id="cb10-53" title="53"><span class="co"># isn't strictly necessary, but makes the model code more readable.</span></a>
-<a class="sourceLine" id="cb10-54" title="54"></a>
-<a class="sourceLine" id="cb10-55" title="55">inv_logit &lt;-<span class="st"> </span><span class="cf">function</span>(int, slope, sv1) {</a>
-<a class="sourceLine" id="cb10-56" title="56">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv1)))</a>
-<a class="sourceLine" id="cb10-57" title="57">}</a>
-<a class="sourceLine" id="cb10-58" title="58"></a>
-<a class="sourceLine" id="cb10-59" title="59">param_resamp_model &lt;-<span class="st"> </span><span class="kw"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_stoch_param'</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb10-60" title="60"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb10-61" title="61">    <span class="dt">name    =</span> <span class="st">'P'</span>,</a>
-<a class="sourceLine" id="cb10-62" title="62">    <span class="dt">formula =</span> <span class="kw"><a href="../reference/fun-mult-helpers.html">s_g_mult</a></span>(s, g),</a>
-<a class="sourceLine" id="cb10-63" title="63">    <span class="dt">family  =</span> <span class="st">'CC'</span>,</a>
-<a class="sourceLine" id="cb10-64" title="64">    </a>
-<a class="sourceLine" id="cb10-65" title="65">    <span class="co"># Note here that the growth and survival intercepts are prefaced with env_params$...</span></a>
-<a class="sourceLine" id="cb10-66" title="66">    <span class="co"># This is because the mvt_wrapper function is named env_params in the call</span></a>
-<a class="sourceLine" id="cb10-67" title="67">    <span class="co"># to define_env_state(). env_params is not a reserved word, so you can call</span></a>
-<a class="sourceLine" id="cb10-68" title="68">    <span class="co"># it whatever you like.</span></a>
-<a class="sourceLine" id="cb10-69" title="69">    </a>
-<a class="sourceLine" id="cb10-70" title="70">    <span class="dt">g_mu      =</span> env_params<span class="op">$</span>g_int_yr <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>surf_area_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb10-71" title="71">    <span class="dt">s         =</span> <span class="kw">inv_logit</span>(env_params<span class="op">$</span>s_int_yr, s_slope, surf_area_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb10-72" title="72">    <span class="dt">g         =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(surf_area_<span class="dv">2</span>, g_mu, g_sd),</a>
-<a class="sourceLine" id="cb10-73" title="73">    <span class="dt">data_list =</span> data_list,</a>
-<a class="sourceLine" id="cb10-74" title="74">    <span class="dt">states    =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'surf_area'</span>)),</a>
-<a class="sourceLine" id="cb10-75" title="75">    </a>
-<a class="sourceLine" id="cb10-76" title="76">    <span class="co"># In this case, we do not specify hier_effs as the kernels don't vary discretely,</span></a>
-<a class="sourceLine" id="cb10-77" title="77">    <span class="co"># but in a continuous manner.</span></a>
-<a class="sourceLine" id="cb10-78" title="78">    </a>
-<a class="sourceLine" id="cb10-79" title="79">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb10-80" title="80">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb10-81" title="81">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
-<a class="sourceLine" id="cb10-82" title="82">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb10-83" title="83"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
-<a class="sourceLine" id="cb10-84" title="84">    <span class="dt">name          =</span> <span class="st">'F'</span>,</a>
-<a class="sourceLine" id="cb10-85" title="85">    <span class="dt">formula       =</span> f_r <span class="op">*</span><span class="st"> </span>f_s <span class="op">*</span><span class="st"> </span>f_d,</a>
-<a class="sourceLine" id="cb10-86" title="86">    <span class="dt">family        =</span> <span class="st">'CC'</span>,</a>
-<a class="sourceLine" id="cb10-87" title="87">    <span class="dt">f_r           =</span> <span class="kw">inv_logit</span>(env_params<span class="op">$</span>f_r_int_yr, f_r_slope, surf_area_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb10-88" title="88">    <span class="dt">f_s           =</span> <span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(env_params<span class="op">$</span>f_s_int_yr <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>surf_area_<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb10-89" title="89">    <span class="dt">f_d           =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(surf_area_<span class="dv">2</span>, f_d_mu, f_d_sd),</a>
-<a class="sourceLine" id="cb10-90" title="90">    <span class="dt">data_list     =</span> data_list,</a>
-<a class="sourceLine" id="cb10-91" title="91">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'surf_area'</span>)),</a>
-<a class="sourceLine" id="cb10-92" title="92">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb10-93" title="93">    <span class="dt">evict         =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb10-94" title="94">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
-<a class="sourceLine" id="cb10-95" title="95">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb10-96" title="96"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_k</a></span>(</a>
-<a class="sourceLine" id="cb10-97" title="97">    <span class="dt">name =</span> <span class="st">'K'</span>,</a>
-<a class="sourceLine" id="cb10-98" title="98">    </a>
-<a class="sourceLine" id="cb10-99" title="99">    <span class="co"># Note that here, we specify both the form of the iteration kernel and</span></a>
-<a class="sourceLine" id="cb10-100" title="100">    <span class="co"># the iteration procedure. right_mult() is a helper function to make sure</span></a>
-<a class="sourceLine" id="cb10-101" title="101">    <span class="co"># population states are multiplied by the kernels correctly.</span></a>
-<a class="sourceLine" id="cb10-102" title="102">    </a>
-<a class="sourceLine" id="cb10-103" title="103">    <span class="dt">K               =</span> P <span class="op">+</span><span class="st"> </span>F,</a>
-<a class="sourceLine" id="cb10-104" title="104">    <span class="co"># n_surf_area_t_1 = right_mult(K, n_surf_area_t),</span></a>
-<a class="sourceLine" id="cb10-105" title="105">    <span class="dt">family          =</span> <span class="st">'IPM'</span>,</a>
-<a class="sourceLine" id="cb10-106" title="106">    <span class="dt">data_list       =</span> data_list,</a>
-<a class="sourceLine" id="cb10-107" title="107">    <span class="dt">states          =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'surf_area'</span>)),</a>
-<a class="sourceLine" id="cb10-108" title="108">    <span class="dt">has_hier_effs   =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb10-109" title="109">    <span class="dt">evict           =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb10-110" title="110">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb10-111" title="111"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_impl</a></span>(</a>
-<a class="sourceLine" id="cb10-112" title="112">    <span class="kw"><a href="../reference/define_star.html">make_impl_args_list</a></span>(</a>
-<a class="sourceLine" id="cb10-113" title="113">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"P"</span>, <span class="st">"F"</span>, <span class="st">"K"</span>),</a>
-<a class="sourceLine" id="cb10-114" title="114">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">'midpoint'</span>, <span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb10-115" title="115">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">'surf_area'</span>,<span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb10-116" title="116">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">'surf_area'</span>, <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb10-117" title="117">    )</a>
-<a class="sourceLine" id="cb10-118" title="118">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb10-119" title="119"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_domains</a></span>(<span class="dt">surf_area =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">100</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb10-120" title="120"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_env_state</a></span>(</a>
-<a class="sourceLine" id="cb10-121" title="121">    <span class="dt">env_params =</span> <span class="kw">mvt_wrapper</span>(r_means,</a>
-<a class="sourceLine" id="cb10-122" title="122">                             r_sigma, </a>
-<a class="sourceLine" id="cb10-123" title="123">                             <span class="dt">nms =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'s_int_yr'</span>,</a>
-<a class="sourceLine" id="cb10-124" title="124">                                     <span class="st">'g_int_yr'</span>,</a>
-<a class="sourceLine" id="cb10-125" title="125">                                     <span class="st">'f_r_int_yr'</span>,</a>
-<a class="sourceLine" id="cb10-126" title="126">                                     <span class="st">'f_s_int_yr'</span>)),</a>
-<a class="sourceLine" id="cb10-127" title="127">    <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
-<a class="sourceLine" id="cb10-128" title="128">      <span class="dt">r_means =</span> r_means,</a>
-<a class="sourceLine" id="cb10-129" title="129">      <span class="dt">r_sigma =</span> r_sigma</a>
-<a class="sourceLine" id="cb10-130" title="130">    )</a>
-<a class="sourceLine" id="cb10-131" title="131">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb10-132" title="132"><span class="st">  </span><span class="co"># define_pop_state(</span></a>
-<a class="sourceLine" id="cb10-133" title="133"><span class="st">  </span><span class="co">#   pop_vectors = list(</span></a>
-<a class="sourceLine" id="cb10-134" title="134"><span class="st">  </span><span class="co">#     n_surf_area_t = init_pop_vec</span></a>
-<a class="sourceLine" id="cb10-135" title="135"><span class="st">  </span><span class="co">#   ),</span></a>
-<a class="sourceLine" id="cb10-136" title="136"><span class="st">  </span><span class="co"># ) %&gt;%</span></a>
-<a class="sourceLine" id="cb10-137" title="137"><span class="st">  </span><span class="kw"><a href="../reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs   =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">inv_logit   =</span> inv_logit,</a>
-<a class="sourceLine" id="cb10-138" title="138">                             <span class="dt">mvt_wrapper =</span> mvt_wrapper),</a>
-<a class="sourceLine" id="cb10-139" title="139">           <span class="dt">iterate    =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb10-140" title="140">           <span class="dt">iterations =</span> <span class="dv">10</span>)</a></code></pre></div>
+</h4>
+<p><code><a href="../reference/define_star.html">define_env_state()</a></code> takes a named set of expressions in the <code>...</code> and then a data list, much like how <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code>/<code><a href="../reference/kernel-definitions.html">define_k()</a></code> take them. The values created need to be in a list that has names corresponding to the parameter names in the vital rate expressions. In this example, they are called <code>s_int</code>, <code>s_slope</code>, <code>g_int</code>, <code>g_slope</code>, and <code>g_sd</code>. The <code>data_list</code> in for this section should contain any variables used in the function you define (in this example, <code>posterior_distribs</code>). You can reference them in the vital rate expressions in each kernel definition as if they were in the <code>data_list</code> of <code>define_kernel/define_k()</code>.</p>
 </div>
+</div>
+<div id="the-model" class="section level3">
+<h3 class="hasAnchor">
+<a href="#the-model" class="anchor"></a>The model</h3>
+<p>The first chunk below initializes the parameters, population vector, and functions that the model uses. It takes the place of the usual vital rate model fitting process. The vital rate functions and models for this example are as follows:</p>
+<ol style="list-style-type: decimal">
+<li>
+<p>survival (<code>s</code>): a Bayesian logistic regression.</p>
+<ul>
+<li>example model formula: <code>brm(survival ~ size_1, data = my_surv_data, family = bernoulli(), chains = 4,iter = 2000, warmup = 1000)</code>
+</li>
+</ul>
+</li>
+<li>
+<p>growth (<code>g</code>): a Bayesian linear regression</p>
+<ul>
+<li>example model formula: <code>brm(size_2 ~ size_1, data = my_grow_data, family = gaussian(), chains = 4,iter = 2000, warmup = 1000)</code>
+</li>
+</ul>
+</li>
+<li>
+<p>flower probability (<code>f_r</code>): A non-bayesian logistic regression.</p>
+<ul>
+<li>example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(repro ~ size_1, data = my_repro_data, family = binomial())</a></code>
+</li>
+</ul>
+</li>
+<li>
+<p>seed production (<code>f_s</code>): a non-bayesian logistic regression.</p>
+<ul>
+<li>example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(flower_n ~ size_1, data = my_flower_data, family = poisson())</a></code>
+</li>
+</ul>
+</li>
+<li>
+<p>recruit sizes (<code>f_d</code>): A normal distribution</p>
+<ul>
+<li>example code: mean (<code>f_d_mu</code>) <code><a href="https://rdrr.io/r/base/mean.html">mean(my_recruit_data$size_2, na.rm = TRUE)</a></code> and standard deviation (<code>f_d_sd</code>) <code><a href="https://rdrr.io/r/stats/sd.html">sd(my_recruit_data$size_2, na.rm = TRUE)</a></code>
+</li>
+</ul>
+</li>
+</ol>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ipmr)</a>
+<a class="sourceLine" id="cb11-2" title="2"></a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="co"># Define the fixed parameters in a list</span></a>
+<a class="sourceLine" id="cb11-4" title="4"></a>
+<a class="sourceLine" id="cb11-5" title="5">data_list &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">f_r_int   =</span> <span class="fl">0.3</span>,</a>
+<a class="sourceLine" id="cb11-6" title="6">                  <span class="dt">f_r_slope =</span> <span class="fl">0.03</span>,</a>
+<a class="sourceLine" id="cb11-7" title="7">                  <span class="dt">f_s_int   =</span> <span class="fl">0.4</span>,</a>
+<a class="sourceLine" id="cb11-8" title="8">                  <span class="dt">f_s_slope =</span> <span class="fl">0.001</span>,</a>
+<a class="sourceLine" id="cb11-9" title="9">                  <span class="dt">f_d_mu    =</span> <span class="fl">1.1</span>,</a>
+<a class="sourceLine" id="cb11-10" title="10">                  <span class="dt">f_d_sd    =</span> <span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb11-11" title="11"></a>
+<a class="sourceLine" id="cb11-12" title="12"><span class="co"># Simulate some random parameters to define the multivariate distribution</span></a>
+<a class="sourceLine" id="cb11-13" title="13"><span class="co"># to sample from. In user specified models, this might be replaced by</span></a>
+<a class="sourceLine" id="cb11-14" title="14"><span class="co"># cbind(posterior_samples(my_surv_mod), posterior_samples(my_grow_mod)).</span></a>
+<a class="sourceLine" id="cb11-15" title="15"></a>
+<a class="sourceLine" id="cb11-16" title="16">posterior_distribution &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
+<a class="sourceLine" id="cb11-17" title="17">  <span class="dt">s_int     =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">4000</span>, <span class="dt">mean =</span> <span class="dv">-10</span>, <span class="dt">sd =</span> <span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb11-18" title="18">  <span class="dt">s_slope   =</span> <span class="kw"><a href="https://rdrr.io/r/stats/GammaDist.html">rgamma</a></span>(<span class="dv">4000</span>, <span class="dt">shape =</span> <span class="dv">1</span>), <span class="co"># slope should be positive for this example</span></a>
+<a class="sourceLine" id="cb11-19" title="19">  <span class="dt">g_int     =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">4000</span>),</a>
+<a class="sourceLine" id="cb11-20" title="20">  <span class="dt">g_slope   =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="dv">4000</span>, <span class="fl">0.85</span>, <span class="fl">1.15</span>),</a>
+<a class="sourceLine" id="cb11-21" title="21">  <span class="dt">g_sd      =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="dv">4000</span>, <span class="fl">0.75</span>, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb11-22" title="22">)</a>
+<a class="sourceLine" id="cb11-23" title="23"></a>
+<a class="sourceLine" id="cb11-24" title="24"><span class="co"># set the names to the parameter names you want to use in the model. These </span></a>
+<a class="sourceLine" id="cb11-25" title="25"><span class="co"># are already set in this example, but outputs from brms/rstan/lme4 may not be</span></a>
+<a class="sourceLine" id="cb11-26" title="26"><span class="co"># as conveniently named. </span></a>
+<a class="sourceLine" id="cb11-27" title="27"></a>
+<a class="sourceLine" id="cb11-28" title="28"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(posterior_distribution) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(</a>
+<a class="sourceLine" id="cb11-29" title="29">  <span class="st">'s_int'</span>,</a>
+<a class="sourceLine" id="cb11-30" title="30">  <span class="st">'s_slope'</span>,</a>
+<a class="sourceLine" id="cb11-31" title="31">  <span class="st">'g_int'</span>,</a>
+<a class="sourceLine" id="cb11-32" title="32">  <span class="st">'g_slope'</span>,</a>
+<a class="sourceLine" id="cb11-33" title="33">  <span class="st">'g_sd'</span></a>
+<a class="sourceLine" id="cb11-34" title="34">)</a>
+<a class="sourceLine" id="cb11-35" title="35"></a>
+<a class="sourceLine" id="cb11-36" title="36"><span class="co"># Specify an initial population vector. This can also be done in the call to</span></a>
+<a class="sourceLine" id="cb11-37" title="37"><span class="co"># define_pop_state</span></a>
+<a class="sourceLine" id="cb11-38" title="38"></a>
+<a class="sourceLine" id="cb11-39" title="39">init_pop_vec &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb11-40" title="40"></a>
+<a class="sourceLine" id="cb11-41" title="41"><span class="co"># We define a wrapper function that samples from a data frame containing the</span></a>
+<a class="sourceLine" id="cb11-42" title="42"><span class="co"># joint posterior distribution of each parameter. In this case, all posterior</span></a>
+<a class="sourceLine" id="cb11-43" title="43"><span class="co"># samples are weighted as equally probable for the sake of simplicity. </span></a>
+<a class="sourceLine" id="cb11-44" title="44"></a>
+<a class="sourceLine" id="cb11-45" title="45">posterior_sample &lt;-<span class="st"> </span><span class="cf">function</span>(posterior_distrib) {</a>
+<a class="sourceLine" id="cb11-46" title="46">  </a>
+<a class="sourceLine" id="cb11-47" title="47">  sample_pos &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dv">1</span>, <span class="kw"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(posterior_distrib)[<span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb11-48" title="48">  sample_ind &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(sample_pos, <span class="dt">size =</span> <span class="dv">1</span>, <span class="dt">prob =</span> <span class="ot">NULL</span>)</a>
+<a class="sourceLine" id="cb11-49" title="49">  </a>
+<a class="sourceLine" id="cb11-50" title="50">  out &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(posterior_distrib[sample_ind , ])</a>
+<a class="sourceLine" id="cb11-51" title="51">  </a>
+<a class="sourceLine" id="cb11-52" title="52">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(out)</a>
+<a class="sourceLine" id="cb11-53" title="53">  </a>
+<a class="sourceLine" id="cb11-54" title="54">}</a>
+<a class="sourceLine" id="cb11-55" title="55"></a>
+<a class="sourceLine" id="cb11-56" title="56"></a>
+<a class="sourceLine" id="cb11-57" title="57"><span class="co"># Again, we can define our own functions and pass them into calls to make_ipm. This</span></a>
+<a class="sourceLine" id="cb11-58" title="58"><span class="co"># isn't strictly necessary, but can make the model code more readable/less error prone.</span></a>
+<a class="sourceLine" id="cb11-59" title="59"></a>
+<a class="sourceLine" id="cb11-60" title="60">inv_logit &lt;-<span class="st"> </span><span class="cf">function</span>(int, slope, sv1) {</a>
+<a class="sourceLine" id="cb11-61" title="61">  <span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(int <span class="op">+</span><span class="st"> </span>slope <span class="op">*</span><span class="st"> </span>sv1)))</a>
+<a class="sourceLine" id="cb11-62" title="62">}</a></code></pre></div>
+<p>We now have parameter estimates. Time to build the IPM!</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">param_resamp_model &lt;-<span class="st"> </span><span class="kw"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_stoch_param'</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb12-3" title="3">    <span class="dt">name    =</span> <span class="st">'P'</span>,</a>
+<a class="sourceLine" id="cb12-4" title="4">    <span class="dt">formula =</span> s <span class="op">*</span><span class="st"> </span>g,</a>
+<a class="sourceLine" id="cb12-5" title="5">    <span class="dt">family  =</span> <span class="st">'CC'</span>,</a>
+<a class="sourceLine" id="cb12-6" title="6">    </a>
+<a class="sourceLine" id="cb12-7" title="7">    <span class="co"># Parameters created by define_env_state() can be referenced by name just like</span></a>
+<a class="sourceLine" id="cb12-8" title="8">    <span class="co"># any other parameter in the model.</span></a>
+<a class="sourceLine" id="cb12-9" title="9">    </a>
+<a class="sourceLine" id="cb12-10" title="10">    <span class="dt">g_mu      =</span> g_int <span class="op">+</span><span class="st"> </span>g_slope <span class="op">*</span><span class="st"> </span>surf_area_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb12-11" title="11">    <span class="dt">s         =</span> <span class="kw">inv_logit</span>(s_int, s_slope, surf_area_<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb12-12" title="12">    <span class="dt">g         =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(surf_area_<span class="dv">2</span>, g_mu, g_sd),</a>
+<a class="sourceLine" id="cb12-13" title="13">    <span class="dt">data_list =</span> data_list,</a>
+<a class="sourceLine" id="cb12-14" title="14">    <span class="dt">states    =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'surf_area'</span>)),</a>
+<a class="sourceLine" id="cb12-15" title="15">    </a>
+<a class="sourceLine" id="cb12-16" title="16">    <span class="co"># In this case, we do not specify hier_effs as the kernels don't vary discretely,</span></a>
+<a class="sourceLine" id="cb12-17" title="17">    <span class="co"># but in a continuous manner.</span></a>
+<a class="sourceLine" id="cb12-18" title="18">    </a>
+<a class="sourceLine" id="cb12-19" title="19">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb12-20" title="20">    <span class="dt">evict_cor     =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb12-21" title="21">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)</a>
+<a class="sourceLine" id="cb12-22" title="22">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-23" title="23"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb12-24" title="24">    <span class="dt">name          =</span> <span class="st">'F'</span>,</a>
+<a class="sourceLine" id="cb12-25" title="25">    <span class="dt">formula       =</span> f_r <span class="op">*</span><span class="st"> </span>f_s <span class="op">*</span><span class="st"> </span>f_d,</a>
+<a class="sourceLine" id="cb12-26" title="26">    <span class="dt">family        =</span> <span class="st">'CC'</span>,</a>
+<a class="sourceLine" id="cb12-27" title="27">    <span class="dt">f_r           =</span> <span class="kw">inv_logit</span>(f_r_int, f_r_slope, surf_area_<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb12-28" title="28">    <span class="dt">f_s           =</span> <span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(f_s_int <span class="op">+</span><span class="st"> </span>f_s_slope <span class="op">*</span><span class="st"> </span>surf_area_<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb12-29" title="29">    <span class="dt">f_d           =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(surf_area_<span class="dv">2</span>, f_d_mu, f_d_sd),</a>
+<a class="sourceLine" id="cb12-30" title="30">    <span class="dt">data_list     =</span> data_list,</a>
+<a class="sourceLine" id="cb12-31" title="31">    <span class="dt">states        =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'surf_area'</span>)),</a>
+<a class="sourceLine" id="cb12-32" title="32">    <span class="dt">has_hier_effs =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb12-33" title="33">    <span class="dt">evict_cor     =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb12-34" title="34">    <span class="dt">evict_fun     =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)</a>
+<a class="sourceLine" id="cb12-35" title="35">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-36" title="36"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_k</a></span>(</a>
+<a class="sourceLine" id="cb12-37" title="37">    <span class="dt">name =</span> <span class="st">'K'</span>,</a>
+<a class="sourceLine" id="cb12-38" title="38">    </a>
+<a class="sourceLine" id="cb12-39" title="39">    <span class="co"># Note that here, we specify both the form of the iteration kernel and</span></a>
+<a class="sourceLine" id="cb12-40" title="40">    <span class="co"># the iteration procedure. The commented out form directly beneath uses</span></a>
+<a class="sourceLine" id="cb12-41" title="41">    <span class="co"># right_mult(), a helper function for more complicated expressions. It is </span></a>
+<a class="sourceLine" id="cb12-42" title="42">    <span class="co"># equivalent to the line above it.</span></a>
+<a class="sourceLine" id="cb12-43" title="43">    </a>
+<a class="sourceLine" id="cb12-44" title="44">    <span class="dt">K               =</span> P <span class="op">+</span><span class="st"> </span>F,</a>
+<a class="sourceLine" id="cb12-45" title="45">    <span class="dt">n_surf_area_t_1 =</span> K <span class="op">%*%</span><span class="st"> </span>n_surf_area_t,</a>
+<a class="sourceLine" id="cb12-46" title="46">    <span class="co"># n_surf_area_t_1 = right_mult(K, n_surf_area_t),</span></a>
+<a class="sourceLine" id="cb12-47" title="47">    <span class="dt">family          =</span> <span class="st">'IPM'</span>,</a>
+<a class="sourceLine" id="cb12-48" title="48">    <span class="dt">data_list       =</span> data_list,</a>
+<a class="sourceLine" id="cb12-49" title="49">    <span class="dt">states          =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'surf_area'</span>)),</a>
+<a class="sourceLine" id="cb12-50" title="50">    <span class="dt">has_hier_effs   =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb12-51" title="51">    <span class="dt">evict_cor          =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb12-52" title="52">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-53" title="53"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_impl</a></span>(</a>
+<a class="sourceLine" id="cb12-54" title="54">    <span class="kw"><a href="../reference/define_star.html">make_impl_args_list</a></span>(</a>
+<a class="sourceLine" id="cb12-55" title="55">      <span class="dt">kernel_names =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"P"</span>, <span class="st">"F"</span>, <span class="st">"K"</span>),</a>
+<a class="sourceLine" id="cb12-56" title="56">      <span class="dt">int_rule     =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">'midpoint'</span>, <span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb12-57" title="57">      <span class="dt">dom_start    =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">'surf_area'</span>,<span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb12-58" title="58">      <span class="dt">dom_end      =</span> <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">'surf_area'</span>, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb12-59" title="59">    )</a>
+<a class="sourceLine" id="cb12-60" title="60">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-61" title="61"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_domains</a></span>(<span class="dt">surf_area =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">100</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-62" title="62"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_env_state</a></span>(</a>
+<a class="sourceLine" id="cb12-63" title="63">    <span class="dt">env_params =</span> <span class="kw">posterior_sample</span>(posterior_distrib),</a>
+<a class="sourceLine" id="cb12-64" title="64">    <span class="dt">data_list =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb12-65" title="65">      <span class="dt">posterior_distrib =</span> posterior_distribution</a>
+<a class="sourceLine" id="cb12-66" title="66">    )</a>
+<a class="sourceLine" id="cb12-67" title="67">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-68" title="68"><span class="st">  </span><span class="kw"><a href="../reference/define_star.html">define_pop_state</a></span>(</a>
+<a class="sourceLine" id="cb12-69" title="69">    <span class="dt">pop_vectors =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb12-70" title="70">      <span class="dt">n_surf_area_t =</span> init_pop_vec</a>
+<a class="sourceLine" id="cb12-71" title="71">    ),</a>
+<a class="sourceLine" id="cb12-72" title="72">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-73" title="73"><span class="st">  </span><span class="kw"><a href="../reference/make_ipm.html">make_ipm</a></span>(<span class="dt">usr_funs   =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">inv_logit        =</span> inv_logit,</a>
+<a class="sourceLine" id="cb12-74" title="74">                             <span class="dt">posterior_sample =</span> posterior_sample),</a>
+<a class="sourceLine" id="cb12-75" title="75">           <span class="dt">iterate    =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb12-76" title="76">           <span class="dt">iterations =</span> <span class="dv">10</span>)</a></code></pre></div>
+</div>
+</div>
+<div id="general-ipms" class="section level2">
+<h2 class="hasAnchor">
+<a href="#general-ipms" class="anchor"></a>General IPMs</h2>
+<p>An article on these is available on the <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">website</a> and from an R session:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/vignette.html">vignette</a></span>(<span class="st">'General IPMs'</span>, <span class="st">'ipmr'</span>)</a></code></pre></div>
 </div>
   </div>
 
@@ -893,7 +1005,8 @@
       <li><a href="#specifying-a-simple-deterministic-ipm-without-density-dependence">Specifying a simple deterministic IPM without density dependence</a></li>
       <li><a href="#implement-the-ipm">Implement the IPM</a></li>
       <li><a href="#defining-more-complicated-models">Defining more complicated models</a></li>
-      <li><a href="#working-with-parameter-distributions">Working with parameter distributions</a></li>
+      <li><a href="#simple-ipms-for-continuously-varying-environments">Simple IPMs for continuously varying environments</a></li>
+      <li><a href="#general-ipms">General IPMs</a></li>
       </ul>
 </div>
       </div>

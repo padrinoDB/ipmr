@@ -7,7 +7,7 @@ output:
     toc: yes
     toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{general-ipms}
+  %\VignetteIndexEntry{General IPMs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -188,24 +188,10 @@ general_ipm <- init_ipm("general_di_det") %>%
 lambda(general_ipm)[100]
 
 # If we are worried about whether or not the model converged to stable
-# dynamics, we can call lambda with type_lambda = 'all' and examine the final
-# iterations to make sure it has. The snippet below prints lambda from the 
-# the last 10 iterations of the model
+# dynamics, we can use the exported utility is_conv_to_asymptotic. The default
+# tolerance for convergence is 1e-10, but can be changed with the 'tol' argument.
 
-lambdas <- lambda(general_ipm, type_lambda = 'all')
-
-lambda_ind <- seq((length(lambdas) - 10), length(lambdas), by = 1)
-
-last_10 <- lambdas[lambda_ind]
-
-# If it's converged, then this should return TRUE
-
-isTRUE(
-  all.equal(
-    range(last_10)[1], range(last_10)[2]
-  )
-)
-
+is_conv_to_asymptotic(general_ipm, tol = 1e-10)
 
 
 ```

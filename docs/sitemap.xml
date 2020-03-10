@@ -4,13 +4,13 @@
     <loc>https://levisc8.github.io/ipmr/index.html</loc>
   </url>
   <url>
+    <loc>https://levisc8.github.io/ipmr/reference/check_convergence.html</loc>
+  </url>
+  <url>
     <loc>https://levisc8.github.io/ipmr/reference/define_star.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/eigenvectors.html</loc>
-  </url>
-  <url>
-    <loc>https://levisc8.github.io/ipmr/reference/elasticity.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/eviction.html</loc>
@@ -49,12 +49,6 @@
     <loc>https://levisc8.github.io/ipmr/reference/print_star.html</loc>
   </url>
   <url>
-    <loc>https://levisc8.github.io/ipmr/reference/qsd_converge.html</loc>
-  </url>
-  <url>
-    <loc>https://levisc8.github.io/ipmr/reference/sensitivity.html</loc>
-  </url>
-  <url>
     <loc>https://levisc8.github.io/ipmr/reference/sim_di_det.html</loc>
   </url>
   <url>
@@ -68,6 +62,9 @@
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/articles/generic-funs.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/articles/generic-progress.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/articles/hierarchical-notation.html</loc>

@@ -98,6 +98,9 @@
       <a href="../articles/generic-funs.html">List of Generic and Helper Functions in ipmr</a>
     </li>
     <li>
+      <a href="../articles/generic-progress.html">Generic Progress</a>
+    </li>
+    <li>
       <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
     </li>
     <li>
@@ -144,11 +147,7 @@
 
 <span class='fu'>define_pop_state</span>(<span class='no'>proto_ipm</span>, <span class='no'>...</span>, <span class='kw'>pop_vectors</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>())
 
-<span class='fu'>define_state_vars</span>(<span class='no'>proto_ipm</span>, <span class='no'>...</span>)
-
-<span class='fu'>define_env_state</span>(<span class='no'>proto_ipm</span>, <span class='no'>...</span>, <span class='no'>data_list</span>)
-
-<span class='fu'>define_hier_effs</span>(<span class='no'>proto_ipm</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>define_env_state</span>(<span class='no'>proto_ipm</span>, <span class='no'>...</span>, <span class='no'>data_list</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -205,7 +204,7 @@ be passed as a named list here.</p></td>
     <tr>
       <th>data_list</th>
       <td><p>A list of named values that correspond to constants in the formula.
-You do not need to specify vectors corresponding to the domains here.</p></td>
+This behaves in the same way as the <code>data_list</code> argument to <code>define_kernel</code>.</p></td>
     </tr>
     </table>
 
