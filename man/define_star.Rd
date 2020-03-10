@@ -6,9 +6,7 @@
 \alias{make_impl_args_list}
 \alias{define_domains}
 \alias{define_pop_state}
-\alias{define_state_vars}
 \alias{define_env_state}
-\alias{define_hier_effs}
 \title{Helpers for IPM construction}
 \usage{
 define_impl(proto_ipm, kernel_impl_list)
@@ -19,11 +17,7 @@ define_domains(proto_ipm, ...)
 
 define_pop_state(proto_ipm, ..., pop_vectors = list())
 
-define_state_vars(proto_ipm, ...)
-
 define_env_state(proto_ipm, ..., data_list)
-
-define_hier_effs(proto_ipm, ...)
 }
 \arguments{
 \item{proto_ipm}{The name of object you wish to append the new kernel to.}
@@ -60,7 +54,7 @@ not defined by a function passed to \code{...}), then they can
 be passed as a named list here.}
 
 \item{data_list}{A list of named values that correspond to constants in the formula.
-You do not need to specify vectors corresponding to the domains here.}
+This behaves in the same way as the \code{data_list} argument to \code{define_kernel}.}
 }
 \value{
 All \code{define_*} functions return a proto_ipm. \code{make_impl_args_list}

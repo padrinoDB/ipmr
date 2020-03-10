@@ -15,3 +15,4 @@
 ^index\.md$
 ^appveyor\.yml$
 ^bug_reports/*$
+^vignettes/generic-progress\.Rmd$

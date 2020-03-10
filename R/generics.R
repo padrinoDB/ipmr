@@ -139,7 +139,7 @@ print.simple_di_det_ipm <- function(x,
 
     if(comp_method == 'pop_size' &&
        check_conv &&
-       !is_conv_to_asymptotic(lambdas)) {
+       ! .is_conv_to_asymptotic(lambdas)) {
 
       # Captures the name of the model that the user gave rather than
       # just print "x isn't converged"
@@ -297,7 +297,7 @@ print.general_di_det_ipm <- function(x,
 
     }
 
-    if(check_conv && !is_conv_to_asymptotic(all_lams)) {
+    if(check_conv && ! .is_conv_to_asymptotic(all_lams)) {
 
       # Captures the name of the model that the user gave rather than
       # just print "x isn't converged"
@@ -862,7 +862,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
     # get index for population vector of final iteration
     final_it <- dim(ipm$pop_state[[1]])[2]
 
-    if(is_conv_to_asymptotic(ipm$pop_state[[1]])) {
+    if(.is_conv_to_asymptotic(ipm$pop_state[[1]])) {
 
       out    <- ipm$pop_state[[1]][ , final_it]
       out_nm <- paste(pop_nm, 'w', sep = "_")
@@ -903,7 +903,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
         make_ipm(iterate    = TRUE,
                  iterations = n_iterations)
 
-      if(is_conv_to_asymptotic(test_conv$pop_state[[1]])) {
+      if(.is_conv_to_asymptotic(test_conv$pop_state[[1]])) {
 
         final_it <- dim(test_conv$pop_state[[1]])[2]
 
@@ -982,14 +982,14 @@ right_ev.simple_di_det_ipm <- function(ipm,
     # vector drawn from a random uniform distribution
 
     len_pop_state <- dim(ipm$iterators[[1]])[1]
-    init_pop      <- runif(len_pop_state)
+    init_pop      <- stats::runif(len_pop_state)
 
     test_conv     <- ipm$proto_ipm %>%
       define_pop_state(!! pop_states[1] := init_pop) %>%
       make_ipm(iterate = TRUE,
                iterations = n_iterations)
 
-    if(is_conv_to_asymptotic(test_conv$pop_state[[1]])) {
+    if(.is_conv_to_asymptotic(test_conv$pop_state[[1]])) {
 
       out    <- test_conv$pop_state[[1]][ , (n_iterations + 1)]
       out_nm <- paste(pop_nm, 'w', sep = "_")
@@ -1038,7 +1038,7 @@ right_ev.general_di_det_ipm <- function(ipm,
 
   final_it  <- dim(ipm$pop_state[[1]])[2]
 
-  if(is_conv_to_asymptotic(ipm$pop_state)) {
+  if(.is_conv_to_asymptotic(ipm$pop_state)) {
 
     out <- .extract_conv_ev_general(ipm$pop_state)
 
@@ -1074,7 +1074,7 @@ right_ev.general_di_det_ipm <- function(ipm,
       make_ipm(iterate    = TRUE,
                iterations = n_iterations)
 
-    if(is_conv_to_asymptotic(test_conv$pop_state)) {
+    if(.is_conv_to_asymptotic(test_conv$pop_state)) {
 
       out <- .extract_conv_ev_general(test_conv$pop_state)
 
@@ -1135,6 +1135,7 @@ left_ev <- function(ipm, ...) {
 
 #' @export
 #' @rdname eigenvectors
+#' @importFrom stats runif
 
 left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
 
@@ -1175,7 +1176,7 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
 
     }
 
-    if(is_conv_to_asymptotic(temp_pop_state)) {
+    if(.is_conv_to_asymptotic(temp_pop_state)) {
 
       out <- temp_pop_state[ , (n_iterations + 1)]
       out_nm <- paste(pop_nm, 'v', sep = "_")
@@ -1229,7 +1230,7 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
                              nrow = len_pop_state,
                              ncol = (n_iterations + 1))
 
-    temp_pop_state[ , 1] <- runif(len_pop_state)
+    temp_pop_state[ , 1] <- stats::runif(len_pop_state)
 
     for(i in seq_len(n_iterations)) {
 
@@ -1237,7 +1238,7 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
 
     }
 
-    if(is_conv_to_asymptotic(temp_pop_state)) {
+    if(.is_conv_to_asymptotic(temp_pop_state)) {
 
       out    <- temp_pop_state[ , (n_iterations + 1)]
       out_nm <- paste(pop_nm, 'v', sep = "_")
@@ -1354,7 +1355,7 @@ left_ev.general_di_det_ipm <- function(ipm,
   # Convert output back to ipmr style list. I *really* hate this mega-matrix
   # method, but genuinely have no idea how else to solve this.
 
-  if(is_conv_to_asymptotic(pop_holder)) {
+  if(.is_conv_to_asymptotic(pop_holder)) {
 
     # Convert *back* to standard ipmr pop_state format - so dumb. Get the final
     # iteration and convert it back to a pop_state list

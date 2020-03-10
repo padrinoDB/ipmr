@@ -175,11 +175,11 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
                        gamma_nn     *
                        d_ln_leaf_l,
 
-    sig_n        = inv_logit(env_params$nr_s_z_int, env_params$nr_s_z_b, ln_leaf_l_1),
+    sig_n        = inv_logit(nr_s_z_int, nr_s_z_b, ln_leaf_l_1),
     gamma_nn     = dnorm(ln_leaf_l_2, nr_nr_mu, nr_nr_sd),
-    nr_nr_mu     = env_params$nr_nr_int + env_params$nr_nr_b * ln_leaf_l_1,
+    nr_nr_mu     = nr_nr_int + nr_nr_b * ln_leaf_l_1,
     mu_n         = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
-    beta_n       = inv_logit(env_params$nr_f_z_int, env_params$nr_f_z_b, ln_leaf_l_1),
+    beta_n       = inv_logit(nr_f_z_int, nr_f_z_b, ln_leaf_l_1),
 
     data_list        = fixed_params,
     states           = list(c('ln_leaf_l')),
@@ -202,10 +202,10 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
                       )            *
                         d_sqrt_area,
 
-    phi           = pois(env_params$f_s_int, env_params$f_s_slope, sqrt_area_1),
-    nu            = env_params$sdl_es_r,
-    gamma_sr      = dnorm(ln_leaf_l_2, env_params$sdl_z_int, sdl_z_sd),
-    sig_r         = inv_logit(env_params$ra_s_z_int, ra_s_z_b, sqrt_area_1),
+    phi           = pois(f_s_int, f_s_slope, sqrt_area_1),
+    nu            = sdl_es_r,
+    gamma_sr      = dnorm(ln_leaf_l_2, sdl_z_int, sdl_z_sd),
+    sig_r         = inv_logit(ra_s_z_int, ra_s_z_b, sqrt_area_1),
     mu_r          = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
     gamma_nr      = dnorm(ln_leaf_l_2, mu_ra_nr, ra_n_z_sd),
     mu_ra_nr      = ra_n_z_int + ra_n_z_b * sqrt_area_1,
@@ -244,12 +244,12 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
                        tau           *
                        d_ln_leaf_l,
 
-    sig_n            = inv_logit(env_params$nr_s_z_int, env_params$nr_s_z_b, ln_leaf_l_1),
+    sig_n            = inv_logit(nr_s_z_int, nr_s_z_b, ln_leaf_l_1),
     mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
-    beta_n           = inv_logit(env_params$nr_f_z_int, env_params$nr_f_z_b, ln_leaf_l_1),
+    beta_n           = inv_logit(nr_f_z_int, nr_f_z_b, ln_leaf_l_1),
     gamma_rn         = dnorm(sqrt_area_2, mu_nr_ra, nr_ra_sd),
-    mu_nr_ra         = env_params$nr_ra_int + nr_ra_b * ln_leaf_l_1,
-    tau              = inv_logit(env_params$tau_int, tau_b, ln_leaf_l_1),
+    mu_nr_ra         = nr_ra_int + nr_ra_b * ln_leaf_l_1,
+    tau              = inv_logit(tau_int, tau_b, ln_leaf_l_1),
 
     data_list        = fixed_params,
     states           = list(c('sqrt_area', 'ln_leaf_l')),
@@ -263,7 +263,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     name             = 'k_xd',
     family           = 'CD',
     formula          = sig_n * mu_n * d_ln_leaf_l,
-    sig_n            = inv_logit(env_params$nr_s_z_int, env_params$nr_s_z_b, ln_leaf_l_1),
+    sig_n            = inv_logit(nr_s_z_int, nr_s_z_b, ln_leaf_l_1),
     mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
     data_list        = fixed_params,
     states           = list(c('ln_leaf_l')),
@@ -274,7 +274,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     name             = 'k_zd',
     family           = 'CD',
     formula          = sig_r * mu_r * d_sqrt_area,
-    sig_r            = inv_logit(env_params$ra_s_z_int, ra_s_z_b, sqrt_area_1),
+    sig_r            = inv_logit(ra_s_z_int, ra_s_z_b, sqrt_area_1),
     mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
     data_list        = fixed_params,
     states           = list(c('sqrt_area')),

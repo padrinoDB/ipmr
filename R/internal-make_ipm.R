@@ -249,17 +249,40 @@
 
 #' @noRd
 # makes sure the expressions for each stochastic parameter are evaluated
-# only one time per iteration of the whole model
+# only one time per iteration of the whole model. Creates data in 2 formats:
+#
+# 1. Individual values of each parameter that are bound to a correspoding symbol
+# in the master environment. This means that users can reference each variable
+# by NAME without using left hand side of the env_state expression. For example
+# in a vital rate expression, env_params$g_r_yr becomes g_r_yr, no env_params$.
+#
+# 2. a list named by the left hand side of the env_state expression that contains
+# all of the values it creates, also named. This is so that .update_env_output
+# can grab that list, unlist it, and stick it into a matrix. Matching all of those
+# things by names provided by the user would probably get a bit more convoluted
+# and be error prone.
 
 .bind_env_exprs <- function(master_env, env_funs) {
 
   nms <- lapply(env_funs, names) %>% unlist()
 
-  for(i in seq_len(length(nms))) {
+  for(i in seq_along(nms)) {
+
+    # This does the binding so that values are accessible by the names
+    # the user gives them.
+
+    temp <- rlang::eval_tidy(env_funs[[1]][[i]])
+
+    rlang::env_bind(master_env, !!! temp)
+
+    # This creates a list containing the same values so that .update_env_output
+    # can find them to store the env_seq data to return to the user.
 
     ass_nm <- nms[i]
 
-    assign(ass_nm, rlang::eval_tidy(env_funs[[i]][[1]]), envir = master_env)
+    env_param_list <- rlang::list2(!! ass_nm := temp)
+
+    assign(ass_nm, env_param_list, envir = master_env)
 
   }
 
@@ -847,21 +870,6 @@
        call. = FALSE)
 }
 
-#' @importFrom stats runif
-#' @noRd
-
-.make_internal_seq <- function(kernels, iterations) {
-
-  n_kerns <- length(kernels)
-
-  out     <- sample.int(n = n_kerns,
-                        size = iterations,
-                        replace = TRUE)
-
-  return(out)
-
-}
-
 #' @noRd
 
 .make_usr_seq <- function(kernels, kernel_seq, iterations) {
@@ -976,10 +984,24 @@
 
 
   if(!all(is.na(env_state))) {
-    if(rlang::is_list(env_state)) {
-      env_state <- .flatten_to_depth(env_state, 1)
 
-      to_bind <- .drop_duplicated_names_and_splice(env_state)
+    if(rlang::is_list(env_state)) {
+
+      # Heuristic check to see if we're binding scalars or if we need to
+      # pass, say a data frame or something.
+
+      len_test <- all(vapply(env_state, function(x) length(x) == 1, logical(1L)))
+
+      if(all(len_test)) {
+
+        env_state <- .flatten_to_depth(env_state, 1)
+
+        to_bind <- .drop_duplicated_names_and_splice(env_state)
+
+      } else {
+        to_bind <- env_state
+      }
+
 
       rlang::env_bind(env_to_bind,
                       !!! to_bind)

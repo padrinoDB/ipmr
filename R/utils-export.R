@@ -129,18 +129,9 @@ define_pop_state <- function(proto_ipm, ..., pop_vectors = list()) {
 
 }
 
-#' @rdname define_star
-#' @inheritParams define_pop_state
-#' @export
-
-define_state_vars <- function(proto_ipm, ...) {
-
-  # DEFINE ME
-}
-
 #' @inheritParams define_pop_state
 #' @param data_list A list of named values that correspond to constants in the formula.
-#' You do not need to specify vectors corresponding to the domains here.
+#' This behaves in the same way as the \code{data_list} argument to \code{define_kernel}.
 #' @rdname define_star
 #' @export
 
@@ -154,16 +145,6 @@ define_env_state <- function(proto_ipm, ..., data_list) {
   proto_ipm$env_state <- list(out)
 
   return(proto_ipm)
-}
-
-
-#' @rdname define_star
-#' @inheritParams define_pop_state
-#' @export
-
-define_hier_effs <- function(proto_ipm, ...) {
-
-  # DEFINE ME
 }
 
 

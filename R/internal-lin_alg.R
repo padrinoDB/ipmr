@@ -390,7 +390,7 @@ is_square <- function(x) {
 # GENERAL_*_ipm: pop_state is a list with multiple matrices. this function is
 # called on ipm$pop_state, and the list is passed to the code in the second if()
 
-is_conv_to_asymptotic <- function(x, tol = 1e-10) {
+.is_conv_to_asymptotic <- function(x, tol = 1e-10) {
 
   if(is.matrix(x) && dim(x)[1] > 1) {
 
@@ -441,5 +441,32 @@ is_conv_to_asymptotic <- function(x, tol = 1e-10) {
       )
     )
   )
+
+}
+
+
+#' @rdname check_convergence
+#' @title Check for model convergence to asymptotic dynamics
+#'
+#' @param ipm An object returned by \code{make_ipm()}.
+#' @param tol The tolerance for convergence. Convergence is computed as the
+#' difference in sums for the population state vectors at time \emph{t} and \emph{t-1}.
+#'
+#' @return A logical
+#' @export
+#'
+
+is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
+
+  pop_state_test <- vapply(ipm$pop_state, function(x) ! all(is.na(x)), logical(1L))
+
+  if(! any(pop_state_test)) {
+
+    stop("pop_state in IPM contains NAs - cannot check for convergence!")
+  }
+
+  out <- .is_conv_to_asymptotic(ipm$pop_state, tol = tol)
+
+  return(out)
 
 }

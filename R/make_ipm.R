@@ -125,7 +125,7 @@ make_ipm.simple_di_det <- function(proto_ipm,
   # Initialize the master_environment so these values can all be found at
   # evaluation time
 
-  if(is.null(domain_list)){
+  if(is.null(domain_list)) {
     master_env       <- .make_master_env(others$domain, usr_funs)
   } else {
     master_env       <- .make_master_env(domain_list, usr_funs)

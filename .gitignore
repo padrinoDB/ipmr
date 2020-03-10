@@ -12,3 +12,5 @@ paper/ipmr_paper_outline.html
 *.xlsx
 paper/workshop-feedback.Rmd
 bug_reports/*
+paper/generics_progress.csv
+paper/generic_progress.csv
