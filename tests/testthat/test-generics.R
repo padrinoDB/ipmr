@@ -445,14 +445,15 @@ sim_di_stoch_param <- init_ipm('simple_di_stoch_param') %>%
 test_that('print.simple_di_stoch_param returns correctly', {
 
   p <- capture_output(print_str <- print(sim_di_stoch_param,
-                                         comp_method = 'eigen'))
+                                         comp_method = 'pop_size'))
 
   expect_s3_class(print_str,
                   'simple_di_stoch_param_ipm')
 
   print_msg <- capture_output_lines(
     print(sim_di_stoch_param,
-          comp_method = 'eigen')
+          comp_method = 'eigen',
+          type_lambda = 'all')
   )
 
   expect_true(

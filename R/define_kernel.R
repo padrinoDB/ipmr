@@ -1,15 +1,13 @@
 #' @title Functions to initialize and define IPM kernels
 #' @rdname kernel-definitions
 #'
-#' @description Adds a new kernel to the \code{proto_ipm} structure. Different
-#' classes of IPMs may have many or only a few kernels. Each one requires its
-#' own call to this function, though there are some exceptions, namely for kernels
-#' derived from hierarchical models (e.g. vital rate models fit across plots and years).
-#' See Details for more info
+#' @description Adds a new kernel to the \code{proto_ipm} structure.
 #'
 #' @param proto_ipm The name of object you wish to append the new kernel to.
-#' @param name The name of the new kernel - can be anything as long as it is
-#' unique to the model.
+#' @param name The name of the new kernel. There are only two rules: 1. For
+#' \code{define_k}, the name must start with \code{"K"} or \code{"k"}.
+#' 2. For \code{define_kernel}, the name must start with any letter but \code{"K"} or
+#' \code{"k"}.
 #' @param formula A bare expression specifying the form of the kernel. See below
 #' for examples
 #' @param family The type of kernel. Options are \code{"CC"} for continuous to continuous
@@ -48,8 +46,16 @@
 #' One can also specify \code{usr_funs} function that performs the correction
 #' during the numerical implementation of the model itself. In that case,
 #' set \code{evict_cor} to \code{FALSE}.
+#'}
 #'
-#' @section \code{define_k}:
+#' \details{Different classes of IPMs may have many or only a few kernels. Each
+#' one requires its own call to this function, though there are some exceptions,
+#' namely for kernels derived from hierarchical models (e.g. vital rate models
+#' fit across plots and years). \code{remove_k} is a helper for re-building models
+#' but with a different \code{K} kernel.
+#'}
+#'
+#' \section{\code{define_k}{
 #'
 #' The preferred method of defining a \code{K} kernel is to use the left
 #' hand side of the \code{...} to reference the population vectors that the right
@@ -60,12 +66,20 @@
 #' calculations of deterministic population growth rate). In those cases, the
 #' \code{...} can contain something like \code{K = P + F}. In this case, the left
 #' hand side of the expression should match the \code{name} argument to \code{define_k}.
+#' }
 #'
-#' @section \code{define_kernel}:
+#' \section {\code{define_kernel}}{
 #'
-#' Describe vital rate expression syntax - include suffix expansion of hier_effs
+#' \code{define_kernel} generates most of the information needed to create an IPM
+#' kernel. There are a few requirements - \code{name}, \code{family}, and
+#' \code{formula} must not be empty. The \code{formula} should be an expression
+#' for how vital rates produce a kernel (e.g. \code{formula = S * G}). The
+#' \code{...} should be a set of named expressions that correspond to vital rate
+#' expressions (e.g. \code{G = dnorm(size_2, mean_size, sd_size)}). See the vignettes
+#' for more information on how to get started.
+#' }
 #'
-#' @return All functions described here return a \code{proto_ipm}.
+#' @return All functions described here return a  \code{proto_ipm}.
 #'
 #' @importFrom purrr map_chr map
 #' @importFrom rlang := list2 enquo enquos parse_expr parse_exprs quo_text
@@ -238,6 +252,28 @@ define_k <- function(proto_ipm,
   }
 
   invisible(proto_ipm)
+
+}
+
+#' @rdname kernel-definitions
+#' @export
+
+remove_k <- function(proto_ipm) {
+
+  # Using substr() %>% grepl() to avoid a case where P_sink or something
+  # flags a P kernel for removal. kernel_ids for Ks must start with K | k,
+  # so just searching the first characters *should* be safer. Will fail if
+  # for some reason, the beginning of another kernel's name is also a K.
+
+  K_test   <- vapply(proto_ipm$kernel_id,
+                     function(x) substr(x, 1, 1),
+                     character(1L))
+
+  keep_ind <- !grepl('K|k', K_test)
+
+  out      <- proto_ipm[keep_ind, ]
+
+  return(out)
 
 }
 

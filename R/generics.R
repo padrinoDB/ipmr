@@ -498,7 +498,7 @@ lambda.simple_di_stoch_kern_ipm <- function(ipm,
   return(
     switch(type_lambda,
            'all'        = temp,
-           'stochastic' = .geom_mean(log(temp)))
+           'stochastic' = mean(log(temp)))
   )
 }
 
@@ -518,7 +518,7 @@ lambda.simple_di_stoch_param_ipm <- function(ipm,
   return(
     switch(type_lambda,
            'all'        = temp,
-           'stochastic' = .geom_mean(log(temp)))
+           'stochastic' = mean(log(temp)))
   )
 
 }
@@ -533,7 +533,7 @@ lambda.general_di_det_ipm <- function(ipm, type_lambda = 'all', ...) {
   return(
     switch(type_lambda,
            'all'        = temp,
-           'stochastic' = .geom_mean(log(temp)))
+           'stochastic' = mean(log(temp)))
   )
 }
 
@@ -550,7 +550,7 @@ lambda.general_di_stoch_kern_ipm <- function(ipm,
   return(
     switch(type_lambda,
            'all'        = temp,
-           'stochastic' = .geom_mean(log(temp)))
+           'stochastic' = mean(log(temp)))
   )
 }
 
@@ -566,7 +566,7 @@ lambda.general_di_stoch_param_ipm <- function(ipm,
   return(
     switch(type_lambda,
            'all'        = temp,
-           'stochastic' = .geom_mean(log(temp)))
+           'stochastic' = mean(log(temp)))
   )
 
 }
