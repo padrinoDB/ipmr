@@ -2155,4 +2155,33 @@ test_that('format_mega_mat works as advertize', {
 
   expect_equal(disc,
                test_mat[1, 2:501])
+
+
+})
+
+test_that('format_mega_matrix can handle character vectors', {
+
+  x <- matrix(rnorm(25), ncol = 5)
+  y <- matrix(rnorm(25), ncol = 5)
+  z <- matrix(runif(25), ncol = 5)
+
+  target <- rbind(
+    cbind(x, y),
+    cbind(z, matrix(0, nrow = 5, ncol = 5))
+  )
+
+  ipm <- list(sub_kernels = list(x = x, y = y, z = z))
+
+
+  sym_mat <- format_mega_matrix(ipm, mega_mat = c(x , y , z , 0))
+
+  # First, make sure we've fooled the ipm argument
+  expect_equal(sym_mat, target)
+
+  # now, try with a character vector
+  vec_text <- 'c(x , y, z, 0)'
+
+  test_mat <- format_mega_matrix(ipm, vec_text)
+
+  expect_equal(sym_mat, test_mat)
 })
