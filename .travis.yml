@@ -29,8 +29,7 @@ jobs:
   exclude:
   - os: osx
     r: devel
-  - if: branch != master && os = osx
-  - if: branch != master && r != release
+  - if: branch != master && (os = osx || r != release)
 
 
 after_success:
