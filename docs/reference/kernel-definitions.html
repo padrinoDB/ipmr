@@ -36,11 +36,7 @@
 
 
 <meta property="og:title" content="Functions to initialize and define IPM kernels — define_kernel" />
-<meta property="og:description" content="Adds a new kernel to the proto_ipm structure. Different
-classes of IPMs may have many or only a few kernels. Each one requires its
-own call to this function, though there are some exceptions, namely for kernels
-derived from hierarchical models (e.g. vital rate models fit across plots and years).
-See Details for more info" />
+<meta property="og:description" content="Adds a new kernel to the proto_ipm structure." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -140,11 +136,7 @@ See Details for more info" />
     </div>
 
     <div class="ref-description">
-    <p>Adds a new kernel to the <code>proto_ipm</code> structure. Different
-classes of IPMs may have many or only a few kernels. Each one requires its
-own call to this function, though there are some exceptions, namely for kernels
-derived from hierarchical models (e.g. vital rate models fit across plots and years).
-See Details for more info</p>
+    <p>Adds a new kernel to the <code>proto_ipm</code> structure.</p>
     </div>
 
     <pre class="usage"><span class='fu'>define_kernel</span>(
@@ -172,7 +164,9 @@ See Details for more info</p>
   <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
   <span class='kw'>evict_cor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+)
+
+<span class='fu'>remove_k</span>(<span class='no'>proto_ipm</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -183,8 +177,10 @@ See Details for more info</p>
     </tr>
     <tr>
       <th>name</th>
-      <td><p>The name of the new kernel - can be anything as long as it is
-unique to the model.</p></td>
+      <td><p>The name of the new kernel. There are only two rules: 1. For
+<code>define_k</code>, the name must start with <code>"K"</code> or <code>"k"</code>.
+2. For <code>define_kernel</code>, the name must start with any letter but <code>"K"</code> or
+<code>"k"</code>.</p></td>
     </tr>
     <tr>
       <th>formula</th>
@@ -255,27 +251,7 @@ set <code>evict_cor</code> to <code>FALSE</code>.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>All functions described here return a <code>proto_ipm</code>.</p>
-    <h2 class="hasAnchor" id="define-k"><a class="anchor" href="#define-k"></a><code>define_k</code></h2>
-
-    
-
-
-<p>The preferred method of defining a <code>K</code> kernel is to use the left
-hand side of the <code>...</code> to reference the population vectors that the right
-hand side creates (e.g. <code>n_T_1 = (P + F) %*% n_T</code>). This enables powerful
-iteration-based methods to work properly. On the other hand, these iteration
-based methods can be quite time consuming, and many applications only require
-an iteration matrix while not necessarily requiring the population vectors (e.g.
-calculations of deterministic population growth rate). In those cases, the
-<code>...</code> can contain something like <code>K = P + F</code>. In this case, the left
-hand side of the expression should match the <code>name</code> argument to <code>define_k</code>.</p>
-    <h2 class="hasAnchor" id="define-kernel"><a class="anchor" href="#define-kernel"></a><code>define_kernel</code></h2>
-
-    
-
-
-<p>Describe vital rate expression syntax - include suffix expansion of hier_effs</p>
+    <p>All functions described here return a  <code>proto_ipm</code>.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -283,8 +259,6 @@ hand side of the expression should match the <code>name</code> argument to <code
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#define-k"><code>define_k</code></a></li>
-      <li><a href="#define-kernel"><code>define_kernel</code></a></li>
     </ul>
 
   </div>

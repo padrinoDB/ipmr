@@ -151,7 +151,8 @@
     <tr>
       <th>mega_mat</th>
       <td><p>A vector with symbols and/or 0s representing the matrix blocks.
-They should be specified in ROW MAJOR order! See examples.</p></td>
+They should be specified in ROW MAJOR order! Can also be a character
+string specifying the call. See examples.</p></td>
     </tr>
     <tr>
       <th>presets</th>
@@ -169,7 +170,11 @@ not implemented</p></td>
 
 <span class='no'>big_k</span> <span class='kw'>&lt;-</span> <span class='fu'>format_mega_matrix</span>(<span class='no'>gen_di_det_ex</span>,
                             <span class='kw'>mega_mat</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='no'>go_discrete</span>,
-                                         <span class='no'>leave_discrete</span>, <span class='no'>P</span>))</div></pre>
+                                         <span class='no'>leave_discrete</span>, <span class='no'>P</span>))
+
+<span class='no'>char_call</span> <span class='kw'>&lt;-</span> <span class='st'>"c(0, go_discrete, leave_discrete, P)"</span>
+
+<span class='no'>big_k</span> <span class='kw'>&lt;-</span> <span class='fu'>format_mega_matrix</span>(<span class='no'>gen_di_det_ex</span>, <span class='kw'>mega_mat</span> <span class='kw'>=</span> <span class='no'>char_call</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
