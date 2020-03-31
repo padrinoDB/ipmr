@@ -34,5 +34,4 @@ jobs:
 
 
 after_success:
-  - if: r = release
-    Rscript -e 'covr::codecov()'
+  - Rscript -e 'covr::codecov()'
