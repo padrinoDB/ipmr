@@ -29,8 +29,10 @@ jobs:
   exclude:
   - os: osx
     r: devel
-  - if: branch != master && (os = osx || (os = linux && r IN (oldrel, devel)))
+  - if: branch != master && os = osx
+  - if: branch != master && os = linux && r != release
 
 
 after_success:
-  - Rscript -e 'covr::codecov()'
+  - if: r = release
+    Rscript -e 'covr::codecov()'
