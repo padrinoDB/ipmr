@@ -318,7 +318,8 @@ test_that('eigenvectors and values are correct', {
 # Test whether .iterate kerns does what it should
 kern_seq <- sample(1:5, 50, replace = TRUE)
 
-proto <- monocarp_sys$proto_ipm[!grepl('K', monocarp_sys$proto_ipm$kernel_id), ]
+proto <- monocarp_sys$proto_ipm %>%
+  remove_k()
 
 init_pop_vec <- runif(100)
 

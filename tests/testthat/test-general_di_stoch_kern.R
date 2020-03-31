@@ -286,7 +286,7 @@ tau <- function(z_1, params) {
 
 # eq 1a
 
-k_xx <- function(x_2, x_1, params) {
+PF_xx <- function(x_2, x_1, params) {
 
   d_x <- x_1[2] - x_1[1]
   L_x <- 0.234 # size bounds for eviction correction
@@ -302,7 +302,7 @@ k_xx <- function(x_2, x_1, params) {
 
 # eq 1b + eq 1d
 
-k_zx <- function(x_2, z_2, x_1, z_1, params){
+PF_zx <- function(x_2, z_2, x_1, z_1, params){
 
   d_z <- z_1[2] - z_1[1]
   L_x <- 0.234 # size bounds for eviction correction
@@ -327,7 +327,7 @@ k_zx <- function(x_2, z_2, x_1, z_1, params){
 }
 
 # eq 1c
-k_dx <- function(x_2, x_1, params) {
+PF_dx <- function(x_2, x_1, params) {
 
   d_x <- x_1[2] - x_1[1]
   L_x <- 0.234 # size bounds for eviction correction
@@ -341,7 +341,7 @@ k_dx <- function(x_2, x_1, params) {
 
 # eq 2
 
-k_xz <- function(x_2, z_2, x_1, z_1, params) {
+PF_xz <- function(x_2, z_2, x_1, z_1, params) {
 
   d_x <- x_1[2] - x_1[1]
   L_z <- 0.567
@@ -358,7 +358,7 @@ k_xz <- function(x_2, z_2, x_1, z_1, params) {
 
 # eq 3a
 
-k_xd <- function(x_1, params) {
+PF_xd <- function(x_1, params) {
 
   d_x <- x_1[2] - x_1[1]
 
@@ -371,7 +371,7 @@ k_xd <- function(x_1, params) {
 
 # eq 3b
 
-k_zd <- function(z_1, params) {
+PF_zd <- function(z_1, params) {
 
   d_z <- z_1[2] - z_1[1]
 
@@ -487,11 +487,11 @@ for(i in seq_along(models)) {
   # object in case we need to debug later.
 
   kernels <- list(
-    kern_xx = k_xx(all_mesh_p$x_2,
+    kern_xx = PF_xx(all_mesh_p$x_2,
                    all_mesh_p$x_1,
                    site_params) %>%
       matrix(nrow = 50, ncol = 50, byrow = TRUE),
-    kern_zx = k_zx(all_mesh_p$x_2,
+    kern_zx = PF_zx(all_mesh_p$x_2,
                    all_mesh_p$z_2,
                    all_mesh_p$x_1,
                    all_mesh_p$z_1,
@@ -500,11 +500,11 @@ for(i in seq_along(models)) {
 
     # This requires the subsetting because we only want a single
     # column vector (e.g. the first entry of each row).
-    kern_dx = k_dx(all_mesh_p$x_2,
+    kern_dx = PF_dx(all_mesh_p$x_2,
                    all_mesh_p$x_1,
                    site_params)[seq(1, 2500, by = 50)] %>%
       matrix(nrow = 50, ncol = 1, byrow = TRUE),
-    kern_xz = k_xz(all_mesh_p$x_2,
+    kern_xz = PF_xz(all_mesh_p$x_2,
                    all_mesh_p$z_2,
                    all_mesh_p$x_1,
                    all_mesh_p$z_1,
@@ -513,10 +513,10 @@ for(i in seq_along(models)) {
 
     # These are simpler to subset because we just want the first row of the
     # matrix.
-    kern_xd = k_xd(all_mesh_p$x_1,
+    kern_xd = PF_xd(all_mesh_p$x_1,
                    site_params)[1:50] %>%
       matrix(nrow = 1, ncol = 50, byrow = TRUE),
-    kern_zd = k_zd(all_mesh_p$z_1,
+    kern_zd = PF_zd(all_mesh_p$z_1,
                    site_params)[1:50]  %>%
       matrix(nrow = 1, ncol = 50, byrow = TRUE)
 
@@ -563,7 +563,7 @@ actual_lambdas <- vapply(pop_holders,
 
 gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
   define_kernel(
-    name             = 'k_xx_site',
+    name             = 'PF_xx_site',
     family           = "CC",
     formula          = sig_n_site          *
       (1 - mu_n_site)   *
@@ -586,7 +586,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
                                                'gamma_nn_site')
   ) %>%
   define_kernel(
-    name             = 'k_zx_site',
+    name             = 'PF_zx_site',
     family           = 'CC',
 
     formula          = (
@@ -617,7 +617,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
                                           'gamma_sr_site'))
   ) %>%
   define_kernel(
-    name = 'k_dx_site',
+    name = 'PF_dx_site',
     family = 'DC',
 
     formula = gamma_nd_site * d_ln_leaf_l,
@@ -633,7 +633,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
                                         'gamma_nd_site')
   ) %>%
   define_kernel(
-    name             = 'k_xz_site',
+    name             = 'PF_xz_site',
     family           = 'CC',
     formula          = sig_n_site         *
                        (1 - mu_n_site)    *
@@ -659,7 +659,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
 
   ) %>%
   define_kernel(
-    name             = 'k_xd_site',
+    name             = 'PF_xd_site',
     family           = 'CD',
     formula          = sig_n_site * mu_n_site * d_ln_leaf_l,
     sig_n_site       = inv_logit(nr_s_z_int_site, nr_s_z_b_site, ln_leaf_l_1),
@@ -671,7 +671,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
     evict_cor        = FALSE
   ) %>%
   define_kernel(
-    name             = 'k_zd_site',
+    name             = 'PF_zd_site',
     family           = 'CD',
     formula          = sig_r_site * mu_r_site * d_sqrt_area,
     sig_r_site        = inv_logit(ra_s_z_int_site, ra_s_z_b_site, sqrt_area_1),
@@ -684,12 +684,12 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
   ) %>%
   define_k(
     name = 'K_site',
-    n_ln_leaf_l_site_t_1 = k_xx_site %*% n_ln_leaf_l_site_t +
-      k_zx_site %*% n_sqrt_area_site_t +
-      k_dx_site %*% n_d_site_t,
-    n_sqrt_area_site_t_1 = k_xz_site %*% n_ln_leaf_l_site_t,
-    n_d_site_t_1 =         k_xd_site %*% n_ln_leaf_l_site_t +
-      k_zd_site %*% n_sqrt_area_site_t,
+    n_ln_leaf_l_site_t_1 = PF_xx_site %*% n_ln_leaf_l_site_t +
+      PF_zx_site %*% n_sqrt_area_site_t +
+      PF_dx_site %*% n_d_site_t,
+    n_sqrt_area_site_t_1 = PF_xz_site %*% n_ln_leaf_l_site_t,
+    n_d_site_t_1 =         PF_xd_site %*% n_ln_leaf_l_site_t +
+      PF_zd_site %*% n_sqrt_area_site_t,
     family = 'IPM',
     data_list = full_data_list,
     states    = list(c('sqrt_area', 'ln_leaf_l')),
@@ -698,7 +698,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
   ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c(paste('k_',
+      kernel_names = c(paste('PF_',
                              c('xx',
                                'zx', 'dx', 'xz', 'xd', 'zd'),
                              '_site',
@@ -784,7 +784,7 @@ test_that('ipmr version matches simulation', {
 
     kern_tests[ind] <- compare_kernels('gen_di_stoch_kern',
                                        'models',
-                                       nms_ipmr = paste('k_',
+                                       nms_ipmr = paste('PF_',
                                                         paste(kern_suffs,
                                                               hier_effs$site[i],
                                                               sep = "_"),
@@ -858,18 +858,18 @@ stoch_mod_hand <- list(pop_state = pop_holder_stoch)
 
 # ipmr_version
 
-temp_proto <- gen_di_stoch_kern$proto_ipm[!grepl('K_site',
-                                                 gen_di_stoch_kern$proto_ipm$kernel_id), ]
+temp_proto <- gen_di_stoch_kern$proto_ipm %>%
+  remove_k()
 
 stoch_mod_ipmr <- temp_proto %>%
   define_k(
     name = 'K_site',
-    n_ln_leaf_l_t_1 = k_xx_site %*% n_ln_leaf_l_t +
-                      k_zx_site %*% n_sqrt_area_t +
-                      k_dx_site %*% n_d_t,
-    n_sqrt_area_t_1 = k_xz_site %*% n_ln_leaf_l_t,
-    n_d_t_1         = k_xd_site %*% n_ln_leaf_l_t +
-                      k_zd_site %*% n_sqrt_area_t,
+    n_ln_leaf_l_t_1 = PF_xx_site %*% n_ln_leaf_l_t +
+                      PF_zx_site %*% n_sqrt_area_t +
+                      PF_dx_site %*% n_d_t,
+    n_sqrt_area_t_1 = PF_xz_site %*% n_ln_leaf_l_t,
+    n_d_t_1         = PF_xd_site %*% n_ln_leaf_l_t +
+                      PF_zd_site %*% n_sqrt_area_t,
     family = 'IPM',
     data_list = full_data_list,
     states    = list(c('sqrt_area', 'ln_leaf_l')),
@@ -878,7 +878,7 @@ stoch_mod_ipmr <- temp_proto %>%
   ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c(paste('k_',
+      kernel_names = c(paste('PF_',
                              c('xx',
                                'zx', 'dx', 'xz', 'xd', 'zd'),
                              '_site',
@@ -972,12 +972,12 @@ test_that('general stochastic simulations match hand generated ones', {
 test_that('evict_fun warnings are correctly generated', {
 
   test_evict_fun <-
-    gen_di_stoch_kern$proto_ipm[!grepl('k_zx_site', gen_di_stoch_kern$proto_ipm$kernel_id), ]
+    gen_di_stoch_kern$proto_ipm[!grepl('PF_zx_site', gen_di_stoch_kern$proto_ipm$kernel_id), ]
 
   wrngs <- capture_warnings(
     test_evict_fun_warning <- test_evict_fun %>%
       define_kernel(
-        name             = 'k_zx_site',
+        name             = 'PF_zx_site',
         family           = 'CC',
 
         formula          = (
@@ -1010,13 +1010,13 @@ test_that('evict_fun warnings are correctly generated', {
       define_impl(
         make_impl_args_list(
           kernel_names = c(
-            'k_xx_site',
-            'k_dx_site',
-            'k_xz_site',
-            'k_xd_site',
-            'k_zd_site',
+            'PF_xx_site',
+            'PF_dx_site',
+            'PF_xz_site',
+            'PF_xd_site',
+            'PF_zd_site',
             'K_site',
-            'k_zx_site'
+            'PF_zx_site'
           ),
           int_rule     = rep('midpoint', 7),
           dom_start    = c('ln_leaf_l',

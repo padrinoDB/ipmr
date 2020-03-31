@@ -23,7 +23,7 @@ IPMs are flexible models that rely on raw data to drive their functional form. R
 ```
 
 
-2. To date, there has been only one serious effort to implement an R package to assist with integral projection modeling: `IPMpack` (Metcalf et al. XXXX). `IPMpack` was a major leap forward in allowing users to go from raw data to a set of iteration kernels in a matter of a few lines of code. Indeed, a number of the authors of `ipmr` have used it to great effect on their own data, as well as in teaching how to fit IPMs to students and mentees. Unfortunately, `IPMpack` is not a fully generalized set of tools, and there are certain types of models that it struggles or outright fails to implement. For example:
+2. To date, there has been only one serious effort to implement an R package to assist with integral projection modeling: `IPMpack` (Metcalf et al. XXXX). `IPMpack` was a major leap forward in allowing users to go from raw data to a set of iteration kernels in a matter of a few lines of code. Indeed, a number of the authors of `ipmr` have used it to great effect on their own data, as well as in teaching how to fit IPMs to students and mentees. Unfortunately, `IPMpack` is not a fully generalized set of tools, and there are certain types of models that it struggles or outright fails to implement. Furthermore, as of March 2020, it is no longer available from CRAN, and thus requires some effort for users to install. For example:
     
     + The interface for general IPMs (sensu Ellner, Rees & Childs 2016) is quite clunky, and requires detailed knowledge of the internal class structure to implement, for example, an age x size IPM.
     
@@ -47,7 +47,7 @@ All of the above points are basically just critiques of using OOP to try to tack
 
 ## What makes us different??
 
-`ipmr` is a lower-level framework that uses mathematical expressions, rather than model objects, to generate iteration kernels. Importantly, it does not try to abstract away the actual vital rate model fitting process - we feel that is a substantially different question (e.g. how to model vital rates is a statistical question, not a model implementation one) that is best left to the user. This also means that users are free to specify vital rate models of *any* functional form. 
+`ipmr` is a lower-level framework that uses mathematical and/or _R_ expressions, rather than model objects, to generate iteration kernels. Importantly, it does not try to abstract away the actual vital rate model fitting process - we feel that is a substantially different question (e.g. how to model vital rates is a statistical question, not a model implementation one) that is best left to the user. This also means that users are free to specify vital rate models of *any* functional form. 
 
 `ipmr` is largely powered by `rlang` (Henry & Wickham 2019) and works by building up expressions that reference each other at higher and higher levels in the model hierarchy. `ipmr` is relatively dependency-free, requiring only `rlang`, `purrr`, and `magrittr` (in addition to a few of the packages included in the base R distribution e.g. `graphics`, `utils`). 
 
@@ -66,17 +66,18 @@ grViz("digraph flowchart {
       tab4[label = '@@4']
       tab5[label = '@@5']
       tab6[label = '@@6']
+      tab1[label = '@@7']
       
-      tab1 -> tab2 -> tab3 -> tab4 -> tab5 -> tab6;
+      tab1 -> tab2 -> tab3 -> tab4 -> tab5 -> tab6 -> tab7;
       }
       
-      
-      [1]: 'Fit vital rate models using other packages (e.g. lme4, nlme, mgcv)'
-      [2]: 'Move coefficients or model objects into a named list'
-      [3]: 'Decide whether the model is stochastic or deterministic and init_ipm() using the appropriate class'
-      [4]: 'Build expressions for the individual kernels (e.g. P = s_g_mult(s, g)). When models are implemented from hierarchical vital rate models, take advantage of built-in suffix recognition in ipmr!'
-      [5]: 'Build expressions for the individual vital rates using mathematical syntax, R functions, or some combination thereof (e.g. s = inv_logit(s_int, s_slope, sv_1))' 
-      [6]: 'Generate an implementation argument list, define domains, and make_ipm()'
+      [1]: 'Collect data in the field'
+      [2]: 'Fit vital rate models using other packages (e.g. lme4, nlme, mgcv, brms)'
+      [3]: 'Move coefficients or model objects into a named list'
+      [4]: 'Decide whether the model is stochastic or deterministic and init_ipm() using the appropriate class'
+      [5]: 'Build expressions for the individual kernels (e.g. P = s_g_mult(s, g)). When models are implemented from hierarchical vital rate models, take advantage of built-in suffix recognition in ipmr!'
+      [6]: 'Build expressions for the individual vital rates using mathematical syntax, R functions, or some combination thereof (e.g. s = inv_logit(s_int, s_slope, sv_1))' 
+      [7]: 'Generate an implementation argument list, define domains, and make_ipm()'
       
       ")
 
@@ -101,7 +102,8 @@ knitr::kable(
     "Model continuously varying environments",                   "X",       "Sort of",
     "Multiple continuous state variables",                       "X",       "No",
     "Density dependent models",                                  "In prep", "No",
-    "Common underlying data structure for all models",           "X",       "No"
+    "Common underlying data structure for all models",           "X",       "No",
+    "Available on CRAN",                                         "X",       "No"
     
   ),
   format = 'html',
@@ -115,13 +117,11 @@ knitr::kable(
 
 ```
 
-
-
-At the core of `ipmr` is the `proto_ipm` data structure. It is a data frame containing all the information necessary to implement each sub-kernel, as well as the information needed to 
+At the core of `ipmr` is the `proto_ipm` data structure. It is a data frame containing all the information necessary to implement each sub-kernel, as well as the information needed to the full model. It specifies model ID's, kernel IDs, 
 
 Introduce the `proto_ipm` data structure - becomes a key point in the discussion and sets up the idea of the common link between user- and database-specified IPMs.
 
-4. Highlight flexibility - Table 2 w/ classes, descriptions RESERVED WORDS!!!!!!!.
+4. Highlight flexibility - Table 2 w/ classes, descriptions!!!!!!!.
 
 
 ```{r table 2 }
@@ -149,7 +149,7 @@ knitr::kable(
   ),
   format = 'html',
   escape = FALSE,
-  caption = "Table 1: Comparison of ipmr and IPMpack features."
+  caption = "Table 2: Implemented methods for make_ipm()."
 ) %>%
   column_spec(1, border_left = TRUE) %>%
   column_spec(2, border_left =  TRUE, border_right = TRUE) %>%
@@ -161,11 +161,13 @@ knitr::kable(
 
 ## Examples 
 
-5. Case study - implement a `simple_di_det` and `general_dd_stoch_kern` to illustrate the different ways that it can be used to implement IPMs
+5. Case study - implement a `simple_di_det` and `general_dd_stoch_kern` to illustrate the different ways that it can be used to implement IPMs.
 
     + Focus here on commonality of code structure - the general example *shouldn't* include much more than the simple one.
     
-    + make sure to demonstrate as many of the ancillary functions as possible (e.g. `define_*`) and key differences between `define_kernel` and `define_k`
+    + make sure to demonstrate all `define_*` functions and key differences between `define_kernel` and `define_k`, but do not introduce all of the helpers here - save those for a vignette or something.
+    
+    + emphasize completeness of documentation - every function has help pages, examples in a vignette, and almost all are unit tested (this should change to ALL EXPORTED FUNCTIONS before publication)
     
 ```{r Figure 3, eval = FALSE}
 
@@ -309,9 +311,13 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
 
     + the `proto_ipm` provides a natural intermediate data structure for user- and database-specified IPMs
     
+        - Users could even just export their proto IPM and email to database curators, or provide it in the supplementary materials, thus reducing the logistical overhead of migrating information from publication to, say, PADRINO.
+    
     + viable mechanism for reproducing published IPMs without relying on raw data and associated code
     
     + provides a framework for generating user-specified ones that emphasizes the math over the code
+    
+        - Should eventually become the standard for teaching, as it doesn't abstract away the mathematical underpinnings of the models. It does keep you from screwing up the implementation though.
     
     + 
     
@@ -331,5 +337,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
 6. Caswell 2001
 
 7. Ramula, Rees & Buckley 2009: Integral projection models perform better for small demographic data sets than matrix population models: a case study of two perennial herbs
+
+8. Compagnoni et al 2020 (hopefully). Plant review, uses ipmr and PADRINO to rebuild selected kernels for re-analysis.
 
 

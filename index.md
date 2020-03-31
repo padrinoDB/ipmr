@@ -73,7 +73,7 @@ position.
   - Position 4: `"kern"`/`"param"`
     
       - A. **kern**: This describes an IPM with discretely varying
-        parameters such that there values are known before the model is
+        parameters such that their values are known before the model is
         specified. This is usually the case with models that estimate
         random year/site effects and for which defining a multivariate
         joint distribution to sample parameters from is not

@@ -10,7 +10,8 @@ format_mega_matrix(ipm, mega_mat, presets = NULL)
 \item{ipm}{Output from \code{make_ipm}.}
 
 \item{mega_mat}{A vector with symbols and/or 0s representing the matrix blocks.
-They should be specified in ROW MAJOR order! See examples.}
+They should be specified in ROW MAJOR order! Can also be a character
+string specifying the call. See examples.}
 
 \item{presets}{Either empty or one of 'age-size' or 'hier_effs'. Currently
 not implemented}
@@ -27,6 +28,10 @@ data(gen_di_det_ex)
 big_k <- format_mega_matrix(gen_di_det_ex,
                             mega_mat = c(0, go_discrete,
                                          leave_discrete, P))
+
+char_call <- "c(0, go_discrete, leave_discrete, P)"
+
+big_k <- format_mega_matrix(gen_di_det_ex, mega_mat = char_call)
 
 
 

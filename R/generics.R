@@ -498,7 +498,7 @@ lambda.simple_di_stoch_kern_ipm <- function(ipm,
   return(
     switch(type_lambda,
            'all'        = temp,
-           'stochastic' = .geom_mean(log(temp)))
+           'stochastic' = mean(log(temp)))
   )
 }
 
@@ -518,7 +518,7 @@ lambda.simple_di_stoch_param_ipm <- function(ipm,
   return(
     switch(type_lambda,
            'all'        = temp,
-           'stochastic' = .geom_mean(log(temp)))
+           'stochastic' = mean(log(temp)))
   )
 
 }
@@ -533,7 +533,7 @@ lambda.general_di_det_ipm <- function(ipm, type_lambda = 'all', ...) {
   return(
     switch(type_lambda,
            'all'        = temp,
-           'stochastic' = .geom_mean(log(temp)))
+           'stochastic' = mean(log(temp)))
   )
 }
 
@@ -550,7 +550,7 @@ lambda.general_di_stoch_kern_ipm <- function(ipm,
   return(
     switch(type_lambda,
            'all'        = temp,
-           'stochastic' = .geom_mean(log(temp)))
+           'stochastic' = mean(log(temp)))
   )
 }
 
@@ -566,7 +566,7 @@ lambda.general_di_stoch_param_ipm <- function(ipm,
   return(
     switch(type_lambda,
            'all'        = temp,
-           'stochastic' = .geom_mean(log(temp)))
+           'stochastic' = mean(log(temp)))
   )
 
 }
@@ -1294,7 +1294,7 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
 #' \code{mega_mat} fits the pieces of the model together to create a
 #' a transpose of the model to iterate with. Kernel names/0s should be supplied
 #' in ROW MAJOR order (think \code{byrow = TRUE}. \code{ipmr} supplies
-#' a helper function for large models \code{format_mega_mat}
+#' a helper function for large models \code{format_mega_matrix}
 #' to help with age-size models or ones with a lot of hierarchical effects.
 #'
 #' @examples

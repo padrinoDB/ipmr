@@ -132,7 +132,7 @@ make_ipm.simple_di_det <- function(proto_ipm,
     proto_ipm$domain <- I(list(domain_list))
   }
 
-  temp       <- .prep_di_output(others, k_row, proto_ipm, iterations)
+  temp           <- .prep_di_output(others, k_row, proto_ipm, iterations)
 
   master_env     <- .add_pop_state_to_master_env(temp$pop_state, master_env)
 

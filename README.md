@@ -74,7 +74,7 @@ position.
   - Position 4: `"kern"`/`"param"`
 
   - A. **kern**: This describes an IPM with discretely varying
-    parameters such that there values are known before the model is
+    parameters such that their values are known before the model is
     specified. This is usually the case with models that estimate random
     year/site effects and for which defining a multivariate joint
     distribution to sample parameters from is not desirable/needed.
@@ -84,15 +84,15 @@ position.
     reconstruction for every single iteration.
 
   - B. **param**: This describes an IPM with parameters that are
-    re-sampled from some distribution at each iteration of the model
-    (usually a multivariate joint distribution). This can be a
-    multivariate normal defined by covarying slopes and intercepts, or
-    posterior distribution from a Bayesian model. All that is required
-    is that the parameters for the distribution are specified and that
-    the function that generates the parameters at each iteration returns
-    named lists that correspond to the parameter names in the model.
-    Jump down to the `"simple_di_stoch_param"` example for some
-    inspiration in writing those.
+    re-sampled from some distribution at each iteration of the model.
+    For example, this can be a multivariate normal defined by covarying
+    slopes and intercepts, or posterior distribution(s) from a Bayesian
+    model. All that is required is that the parameters/values for the
+    distribution are specified and that the function that generates the
+    parameters at each iteration returns named lists that correspond to
+    the parameter names in the model. These are covered in greater depth
+    in towards the end of [this
+    article](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
 
 With the type of model selected, the `model_class` becomes a string and
 the call to `init_ipm` is composed like so: `init_ipm(model_class =
@@ -156,7 +156,7 @@ The `general_*` versions of these are also ready, and an introduction to
 them is available
 [here](https://levisc8.github.io/ipmr/articles/general-ipms.html).
 However, expect changes as more complicated methods are implemented\!
-See below for an example of how to implement an IPM in this framework.
+Below is an example implementing a `simple_di_det` IPM.
 
 Next on the to-do list is to write generic functions for `lambda`,
 `right_ev` (right eigenvector), `left_ev` (left eigenvector), and
@@ -166,7 +166,7 @@ implemented `ipm` objects).
 ## Examples for implemented IPM types
 
 Here is a simple model implemented with `ipmr`. It will use the
-following set of linear models:
+following set of vital rate models:
 
 1.  Survival (`s`): a generalized linear model w/ a logit link.
     
@@ -231,14 +231,13 @@ my_simple_ipm <- init_ipm('simple_di_det') %>%
     formula   = s * g,
     
     # A named set of expressions for the vital rates it includes. 
-    # note the use of user-specified functions here. Additionally, each 
-    # state variable has a stateVariable_1 and stateVariable_2 internally defined
-    # for the domain associated with it. Use these to distinguish between 
+    # Each state variable has a stateVariable_1 and stateVariable_2 internally
+    # defined for the domain associated with it. Use these to distinguish between 
     # size/weight/etc at time t vs size/weight/etc at time t+1
     
     # Perform the inverse logit transformation to get survival probabilities
     # from your model. For examples on using predict(my_surv_mod,...),
-    # see below.
+    # see the articles at https://levisc8.github.io/ipmr.
     
     s         = 1 / (1 + exp(-(s_int + s_slope * dbh_1))), 
     
@@ -311,15 +310,18 @@ my_simple_ipm <- init_ipm('simple_di_det') %>%
            
            data_list = list(),
            states    = list(c('dbh')),
+           
            # We've already corrected eviction in the sub-kernels, so there's no
            # need to do that here
+           
            evict     = FALSE
   ) %>%
+  
   # Next, we have to define the implementation details for the model. 
   # We need to tell ipmr how each kernel is integrated, what domain
   # it starts on (i.e. the size/weight/etc from above), and what domain
   # it ends on. In simple_* models, dom_start and dom_end will always be the same,
-  # because we only have a single continuous state variable. General_*
+  # because we only have a single continuous state variable. general_*
   # models will be more complicated.
   
   define_impl(
@@ -353,5 +355,5 @@ Examples of more complicated models are included in the vignettes,
 accesible either using `browseVignettes('ipmr')` or by visiting the
 Articles tab on [project’s webpage](https://levisc8.github.io/ipmr/).
 Please file all bug reports in the Issues tab of this repository or
-contact me via \[email\]<levisc8@@gmail.com> with a reproducible
+contact me via [email](mailto:levisc8@gmail.com) with a reproducible
 example.
