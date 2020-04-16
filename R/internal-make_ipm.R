@@ -365,6 +365,7 @@
 
 .update_param_simple_output <- function(sub_kernels,
                                         ipm_system,
+                                        pop_state,
                                         data_envs = NA_character_,
                                         master_env,
                                         output,
@@ -382,12 +383,7 @@
 
   # Determine who's a kernel and who's a pop_vector!
 
-  ipm_system <- .flatten_to_depth(ipm_system, 1)
-
-  kern_ind   <- lapply(ipm_system, function(x) dim(x)[2] != 1) %>%
-    unlist()
-
-  iterator   <- ipm_system[kern_ind]
+  iterator   <- list(ipm_system$iterator)
 
   # make names a bit prettier to help distinguish between iterations
 
@@ -395,19 +391,13 @@
                               current_iteration,
                               sep = "_")
 
-  names(iterator)    <- paste(names(iterator), current_iteration, sep = "_")
+  names(iterator)    <- paste('K', current_iteration, sep = "_")
 
   output$sub_kernels <- purrr::splice(output$sub_kernels, sub_kernels)
   output$iterators   <- purrr::splice(output$iterators, iterator)
 
-  ps_ind             <- lapply(ipm_system, function(x) dim(x)[2] == 1) %>%
-    unlist()
 
-  if(sum(ps_ind) > 0){
-    output$pop_state <- .update_pop_state(output$pop_state,
-                                          ipm_system[ps_ind],
-                                          current_iteration)
-  }
+  output$pop_state   <- pop_state
 
 
   return(output)

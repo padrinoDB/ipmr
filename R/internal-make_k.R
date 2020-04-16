@@ -113,11 +113,24 @@
 
     temp               <- rlang::env_get_list(kern_env, nms = pull_name)
 
-    k_list[[i]]        <- temp
+    k_list[[i]]        <- temp %>%
+      .flatten_to_depth(1L)
 
-    names(k_list[[i]]) <- pull_name
+    # set up dummy names, then use the square test to figure out who's
+    # the iteration kernel and who's the pop vector. This only works
+    # for simple IPMs (e.g. 1 state, iterator MUST be a square), but
+    # then again, it only needs to work for them
+
+    names(k_list[[i]])      <- rep('placeholder', length(k_list))
+
+    k_ind <- vapply(temp, function(x) dim(x)[1] == dim(x)[2], logical(1L))
+
+    names(k_list[[i]])[k_ind]  <- 'iterators'
+    names(k_list[[i]])[!k_ind] <- pull_name[!k_ind]
 
   }
+
+  k_list <- .flatten_to_depth(k_list, 1L)
 
   return(k_list)
 

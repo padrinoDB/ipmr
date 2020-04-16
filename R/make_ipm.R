@@ -367,12 +367,12 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
   master_env <- .bind_all_constants(env_state   = others$env_state[[1]]$constants,
                                     env_to_bind = master_env)
 
-  out        <- .prep_di_output(others, k_row, proto_ipm, iterations)
+  temp        <- .prep_di_output(others, k_row, proto_ipm, iterations)
 
   # initialize the pop_state vectors in master_env so they can be found
   # at evaluation time
 
-  master_env <- .add_pop_state_to_master_env(out$pop_state,
+  master_env <- .add_pop_state_to_master_env(temp$pop_state,
                                              master_env)
 
   # list to hold the possibly returned evaluation environments
@@ -397,30 +397,48 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                       sub_kernels,
                                       master_env)
 
+    pop_state   <- .iterate_kerns_simple(iterators = sys_i$iterators,
+                                         sub_kernels,
+                                         iterations = 1L,
+                                         current_iteration = i,
+                                         kern_seq = NULL,
+                                         temp$pop_state,
+                                         master_env,
+                                         proto_ipm,
+                                         k_row)
+
+
     if(return_all) {
 
-      env_ret <- sys$data_envs
+      env_list <- c(sys$data_envs, env_list)
 
     } else {
 
-      env_ret <- NA_character_
+      env_list <- NA_character_
 
     }
-    out         <- .update_param_simple_output(sub_kernels,
-                                               sys_i,
-                                               env_ret,
-                                               master_env,
-                                               out,
-                                               iterations,
-                                               i)
 
-    # turn current pop_state_t_1 into pop_state_t in master_env so next computation
-    # can occur
-    master_env <- .update_master_env(out$pop_state,
-                                     master_env,
-                                     i)
+    temp <- .update_param_simple_output(
+      sub_kernels,
+      sys_i,
+      pop_state,
+      env_list,
+      master_env,
+      temp,
+      iterations,
+      i
+    )
 
   }
+
+  out <- list(
+    iterators   = temp$iterators,
+    sub_kernels = temp$sub_kernels,
+    env_list    = temp$sub_kernel_envs,
+    env_seq     = temp$env_seq,
+    pop_state   = temp$pop_state,
+    proto_ipm   = proto_ipm
+  )
 
   out$iterators   <- set_ipmr_classes(out$iterators)
   out$sub_kernels <- set_ipmr_classes(out$sub_kernels)
@@ -428,7 +446,7 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
   attr(out$proto_ipm, 'implemented') <- TRUE
   class(out) <- c('simple_di_stoch_param_ipm', 'list')
 
-  if(return_all) out$data_envs <- purrr::splice(env_list, out$data_envs)
+  if(return_all) out$data_envs <- env_list
 
   return(out)
 
