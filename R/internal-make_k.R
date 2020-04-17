@@ -201,17 +201,16 @@
       pop_state <- .flatten_to_depth(pop_state, 1)
     }
 
+    # We don't want to add lambda to the master env. I don't think
+    # it'd cause any problems, as I don't we don't have any other objects
+    # referencing that value further downstream. This is a safety precaution.
+
+    pop_state <- pop_state[names(pop_state != 'lambda')]
+
     # Turn pop_states for continuous vars into column vectors. discrete
     # vars get a 1x1 matrix
 
     for(i in seq_along(pop_state)) {
-
-      # Check for quosures. At this point, they really shouldn't be there,
-      # more of a sanity check than anything else.
-
-      if(rlang::is_quosure(pop_state[[i]]) || rlang::is_quosures(pop_state[[i]])) {
-        pop_state[[i]] <- rlang::eval_tidy(pop_state[[i]])
-      }
 
       # We have our matrix. Next, we need to create the n_*t helper variable.
       # This is always initialized as the first column of the size x time population

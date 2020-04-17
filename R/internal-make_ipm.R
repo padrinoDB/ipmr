@@ -15,7 +15,7 @@
 
     param_tree <- proto$params[[i]]
 
-    kern_env         <- .generate_kernel_env(param_tree$params,
+    kern_env         <- .make_kernel_env(param_tree$params,
                                              master_env,
                                              param_tree)
 
@@ -113,9 +113,9 @@
 
     param_tree <- proto$params[[i]]
 
-    kern_env         <- .generate_kernel_env(param_tree$params,
-                                             master_env,
-                                             param_tree)
+    kern_env         <- .make_kernel_env(param_tree$params,
+                                         master_env,
+                                         param_tree)
 
     kern_text        <- .append_dz_to_kern_form(param_tree$formula,
                                                 proto,
@@ -292,17 +292,17 @@
 
 #' @noRd
 
-.prep_di_output <- function(others, k_row, proto_ipm, iterations) {
+.prep_di_output <- function(others, k_row, proto_ipm, iterations, normal) {
 
+  # all placeholders.
   out <- list(iterators   = list(),
               sub_kernels = list(),
               env_list    = list(),
-              env_seq     = NA_real_, # placeholder
+              env_seq     = NA_real_,
               pop_state   = NA_real_,
               proto_ipm   = proto_ipm)
 
-
-  out$pop_state <- .init_pop_state_list(others, iterations)
+  out$pop_state <- .init_pop_state_list(others, iterations, normal)
 
   return(out)
 }
@@ -310,7 +310,8 @@
 #' @noRd
 
 .init_pop_state_list <- function(others,
-                                 iterations) {
+                                 iterations,
+                                 normal) {
 
   # Flatten and drop duplicates. Duplication is likely to occur in simple_*
   # ipms because every kernel will have the same population state associated
@@ -322,7 +323,9 @@
   pop_state <- pop_state[!duplicated(names(pop_state))]
 
   out <- list()
+
   # If pop_vec is specified, then initialize an array to hold the output
+
   if(!rlang::is_empty(pop_state)){
     if(rlang::is_list(pop_state)) {
 
@@ -344,7 +347,8 @@
         # work without some awful if{...}else{} sequence. Right now, this will
         # only work for distinct continuous state vars
 
-        pop_out            <- array(NA_real_, dim = c(dim_pop_out, iterations + 1))
+        pop_out            <- array(NA_real_, dim = c(dim_pop_out,
+                                                      iterations + 1))
 
 
 
@@ -358,7 +362,64 @@
     }
   }
 
+  # Rescale population vector to 1 if requested.
+
+  if(normal) {
+
+    out <- .norm_pop_size(out, time_step = 1L)
+
+  }
+
+  out$lambda <- matrix(NA_real_, nrow = 1, ncol = iterations + 1)
+
   return(out)
+}
+
+.pop_size <- function(pop, time_step) {
+
+  # Remove lambda slot - this shouldn't be counted or scaled!
+
+  pop <- pop[names(pop) != 'lambda']
+
+  temp <- vapply(pop,
+                 function(x, time_step) sum(x[ , time_step]),
+                 numeric(1L),
+                 time_step = time_step)
+
+  out <- Reduce('+', temp, init = 0)
+
+  return(out)
+
+}
+
+#' @noRd
+
+.norm_pop_size <- function(pop_list, time_step) {
+
+  # compute total population size and re-scale population vectors
+  # by that. Do not re-scale lambda. .pop_size knows to remove this
+  # column, so no need to worry about that in step 1.
+
+  tot_size <- .pop_size(pop_list, time_step)
+  lams     <- pop_list[['lambda']]
+  pop      <- pop_list[names(pop_list) != 'lambda']
+
+  out <- lapply(
+    pop,
+    function(x, pop_size, time_step) {
+
+      x[ , time_step] <- x[ , time_step] / pop_size
+      return(x)
+
+    },
+    pop_size = tot_size,
+    time_step = time_step
+  )
+
+  # instert lambdas back into the pop_state object
+  out$lambda <- lams
+  return(out)
+
 }
 
 #' @noRd
@@ -438,12 +499,7 @@
   ps_ind             <- lapply(ipm_system, function(x) dim(x)[2] == 1) %>%
     unlist()
 
-  if(sum(ps_ind) > 0){
-    output$pop_state <- .update_pop_state(output$pop_state,
-                                          ipm_system[ps_ind],
-                                          current_iteration)
-  }
-
+  output$pop_state   <- pop_state
 
   return(output)
 
@@ -544,49 +600,13 @@
   return(output)
 }
 
-#' @noRd
-
-.update_pop_state <- function(pop_history, pop_out_t_1, iteration) {
-
-
-
-  if(is.list(pop_history)) {
-    for(i in seq_along(pop_history)) {
-
-      pop_history[[i]][ , (iteration + 1)] <- pop_out_t_1[[i]]
-
-    }
-
-  } else if(is.matrix(pop_history)) {
-
-    pop_history[ , (iteration + 1)]        <- pop_out_t_1
-
-  }
-
-  return(pop_history)
-
-}
-
-#' @noRd
-
-.update_master_env <- function(pop_state, master_env, iteration) {
-
-  for(i in seq_along(pop_state)) {
-    nm <- paste0(names(pop_state), '_t', sep = "")
-    nm <- gsub('^n_', 'pop_state_', nm)
-
-    assign(nm, pop_state[[i]][, (iteration + 1)], master_env)
-  }
-
-  return(master_env)
-}
 
 #' @noRd
 # Generates evaluation environment for a sub-kernel. Assumes that all parameters
 # name/value pairs have been generated. Inherits from master_env so that it can
 # access domains, stochastic parameters, and population states.
 
-.generate_kernel_env <- function(parameters,
+.make_kernel_env <- function(parameters,
                                  master_env,
                                  param_tree) {
 
@@ -614,7 +634,7 @@
   # expression rather than the expression itself!
 
   vr_forms <- lapply(text, function(x) rlang::parse_exprs(x)) %>%
-    purrr::flatten()
+    .flatten_to_depth(1L)
 
   # convert to quosures and set the environment for evaluation
 
@@ -1016,7 +1036,8 @@
                                   pop_state,
                                   master_env,
                                   proto_ipm,
-                                  k_row) {
+                                  k_row,
+                                  normal) {
 
   if(rlang::is_quosure(pop_state)) {
     pop_state <- rlang::eval_tidy(pop_state)
@@ -1093,6 +1114,38 @@
 
     pop_list_t_1        <- pop_list_t_1[names(pop_state)]
 
+    # Drop the NA entry created by the lambda slot.
+
+    pop_list_t_1        <- pop_list_t_1[!is.na(names(pop_list_t_1))]
+
+    # Next, compute population sizes and time step growth rates.
+    # this is required because if normalize_pop_size = TRUE,
+    # there isn't any way to compute growth rates at each
+    # time step after the fact
+
+    pop_size_t_1 <- vapply(
+      pop_list_t_1,
+      function(x) sum(x),
+      numeric(1L)
+    ) %>%
+      Reduce(f = '+', x = ., init = 0)
+
+    pop_size_t <- .pop_size(pop_state, iteration_ind)
+
+    if(normal) {
+
+      pop_list_t_1 <- lapply(pop_list_t_1,
+                              function(x, pop_size) {
+                                x / pop_size
+                              },
+                              pop_size = pop_size_t_1)
+
+    }
+
+    pop_list_t_1$lambda <- pop_size_t_1 / pop_size_t
+
+    pop_list_t_1 <- pop_list_t_1[names(pop_state)]
+
     pop_state           <- purrr::map2(.x = pop_state,
                                        .y = pop_list_t_1,
                                        .f = function(.x, .y, iteration) {
@@ -1128,19 +1181,10 @@
                                    current_iteration,
                                    kern_seq,
                                    pop_state,
-                                   master_env) {
+                                   master_env,
+                                   normal) {
 
-  # If it's an expression, make sure it's evaluated.
-  # It can only be an expression or a numeric vector/matrix, otherwise
-  # we get an error earlier on, so there shouldn't be an "else". This should
-  # almost never be triggered though, as .init_pop_state_list *should* be
-  # generating matrices/vectors before hand.
-
-  if(rlang::is_quosures(pop_state) || rlang::is_quosure(pop_state)) {
-    pop_state <- lapply(pop_state, rlang::eval_tidy)
-  }
-
-  for(i in seq_len(iterations)) {
+ for(i in seq_len(iterations)) {
 
     # stoch_param uses iterate_kerns with "iterations = 1" and a loop
     # in the outer layer, whereas stoch_kern uses this loop for iterating
@@ -1191,9 +1235,41 @@
 
     pop_list_t_1        <- pop_list_t_1[names(pop_state)]
 
-    pop_state           <- purrr::map2(.x        = pop_state,
-                                       .y        = pop_list_t_1,
-                                       .f        = function(.x, .y, iteration) {
+    # Drop the NA entry created by the lambda slot.
+
+    pop_list_t_1        <- pop_list_t_1[!is.na(names(pop_list_t_1))]
+
+    # Next, compute population sizes and time step growth rates.
+    # this is required because if normalize_pop_size = TRUE,
+    # there isn't any way to compute growth rates at each
+    # time step after the fact
+
+    pop_size_t_1 <- vapply(
+      pop_list_t_1,
+      function(x) sum(x),
+      numeric(1L)
+    ) %>%
+      Reduce(f = '+', x = ., init = 0)
+
+    pop_size_t <- .pop_size(pop_state, iteration_ind)
+
+    if(normal) {
+
+      pop_list_t_1 <- lapply(pop_list_t_1,
+                             function(x, pop_size) {
+                               x / pop_size
+                             },
+                             pop_size = pop_size_t_1)
+
+    }
+
+    pop_list_t_1$lambda <- pop_size_t_1 / pop_size_t
+
+    pop_list_t_1 <- pop_list_t_1[names(pop_state)]
+
+    pop_state           <- purrr::map2(.x = pop_state,
+                                       .y = pop_list_t_1,
+                                       .f = function(.x, .y, iteration) {
 
                                          .x[ , (iteration + 1)] <- .y
 

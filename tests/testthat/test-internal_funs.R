@@ -125,12 +125,14 @@ test_that('exported is_conv_to_asymptotic works as well', {
     ) %>%
     make_ipm(iterations = 100,
              usr_funs = list(inv_logit   = inv_logit,
-                             inv_logit_2 = inv_logit_2))
+                             inv_logit_2 = inv_logit_2),
+             normalize_pop_size = FALSE)
 
   expect_true(is_conv_to_asymptotic(general_ipm))
 
   few_iterates <- general_ipm$proto_ipm %>%
-    make_ipm(iterations = 3)
+    make_ipm(iterations = 3,
+             normalize_pop_size = FALSE)
 
   expect_false(is_conv_to_asymptotic(few_iterates))
 
@@ -197,7 +199,7 @@ test_that('exported is_conv_to_asymptotic works as well', {
     define_domains(
       dbh = c(1, 30, 200)
     ) %>%
-    make_ipm()
+    make_ipm(normalize_pop_size = FALSE)
 
   expect_error(is_conv_to_asymptotic(my_ipm),
                regexp = 'pop_state in IPM contains NAs - cannot check for convergence!')

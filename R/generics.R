@@ -851,6 +851,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
                                        ...) {
 
   mod_nm <- deparse(substitute(ipm))
+
   # Identify state variable name
 
   pop_nm <- .get_pop_nm_simple(ipm)
@@ -862,7 +863,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
     # get index for population vector of final iteration
     final_it <- dim(ipm$pop_state[[1]])[2]
 
-    if(.is_conv_to_asymptotic(ipm$pop_state[[1]])) {
+    if(is_conv_to_asymptotic(ipm)) {
 
       out    <- ipm$pop_state[[1]][ , final_it]
       out_nm <- paste(pop_nm, 'w', sep = "_")
@@ -903,7 +904,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
         make_ipm(iterate    = TRUE,
                  iterations = n_iterations)
 
-      if(.is_conv_to_asymptotic(test_conv$pop_state[[1]])) {
+      if(is_conv_to_asymptotic(test_conv)) {
 
         final_it <- dim(test_conv$pop_state[[1]])[2]
 
@@ -989,7 +990,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
       make_ipm(iterate = TRUE,
                iterations = n_iterations)
 
-    if(.is_conv_to_asymptotic(test_conv$pop_state[[1]])) {
+    if(is_conv_to_asymptotic(test_conv)) {
 
       out    <- test_conv$pop_state[[1]][ , (n_iterations + 1)]
       out_nm <- paste(pop_nm, 'w', sep = "_")
@@ -1038,7 +1039,7 @@ right_ev.general_di_det_ipm <- function(ipm,
 
   final_it  <- dim(ipm$pop_state[[1]])[2]
 
-  if(.is_conv_to_asymptotic(ipm$pop_state)) {
+  if(is_conv_to_asymptotic(ipm)) {
 
     out <- .extract_conv_ev_general(ipm$pop_state)
 
@@ -1061,7 +1062,9 @@ right_ev.general_di_det_ipm <- function(ipm,
       )
     )
 
-    init_pop_vec        <- lapply(ipm$pop_state,
+    use_pop_state       <- ipm$pop_state[names(ipm$pop_state) != 'lambda']
+
+    init_pop_vec        <- lapply(use_pop_state,
                                   function(x, final_it) x[ , final_it],
                                   final_it = final_it)
 
@@ -1074,7 +1077,7 @@ right_ev.general_di_det_ipm <- function(ipm,
       make_ipm(iterate    = TRUE,
                iterations = n_iterations)
 
-    if(.is_conv_to_asymptotic(test_conv$pop_state)) {
+    if(is_conv_to_asymptotic(test_conv)) {
 
       out <- .extract_conv_ev_general(test_conv$pop_state)
 
@@ -1366,7 +1369,7 @@ left_ev.general_di_det_ipm <- function(ipm,
 
       pop_holder <- .mega_vec_to_list(mega_vec,
                                       use_pop,
-                                      ipm$pop_state)
+                                      ipm$pop_state[names(ipm$pop_state != 'lambda')])
 
       # I'm foolish and wrote .extract_conv_ev in a way that isn't compatible with
       # the pop_holder format here, so we perform the standardization by hand

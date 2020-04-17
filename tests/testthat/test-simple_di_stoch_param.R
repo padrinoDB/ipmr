@@ -148,7 +148,8 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit,
                            mvt_wrapper = mvt_wrapper),
            iterate = TRUE,
-           iterations = 10)
+           iterations = 10,
+           normalize_pop_size = FALSE)
 
 pop_state_ipmr <- test_stoch_param$pop_state$pop_state_surf_area
 lambda_ipmr <- lambda(test_stoch_param,

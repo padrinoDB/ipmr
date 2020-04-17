@@ -299,7 +299,8 @@ ipmr_cr <- init_ipm("general_di_det") %>%
   make_ipm(iterations = 100,
            usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_2 = inv_logit_2),
-           return_all = TRUE)
+           return_all = TRUE,
+           normalize_pop_size = FALSE)
 
 
 ipmr_lam_cr <- lambda(ipmr_cr,
@@ -410,7 +411,8 @@ test_that("kernel definition order doesn't matter", {
     make_ipm(iterations = 100,
              usr_funs = list(inv_logit   = inv_logit,
                              inv_logit_2 = inv_logit_2),
-             return_all = TRUE)
+             return_all = TRUE,
+             normalize_pop_size = FALSE)
 
   test_lam_cr <- lambda(test_order,
                         type_lambda = 'all')

@@ -19,7 +19,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   ...,
   domain_list = NULL,
   iterate = FALSE,
-  iterations = 50
+  iterations = 50,
+  normalize_pop_size = TRUE
 )
 
 \method{make_ipm}{simple_di_stoch_kern}(
@@ -30,6 +31,7 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   domain_list = NULL,
   iterate = FALSE,
   iterations = 50,
+  normalize_pop_size = TRUE,
   kernel_seq = NULL
 )
 
@@ -40,7 +42,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   ...,
   domain_list = NULL,
   iterate = TRUE,
-  iterations = 50
+  iterations = 50,
+  normalize_pop_size = TRUE
 )
 
 \method{make_ipm}{general_di_det}(
@@ -50,7 +53,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   ...,
   domain_list = NULL,
   iterate = TRUE,
-  iterations = 50
+  iterations = 50,
+  normalize_pop_size = TRUE
 )
 
 \method{make_ipm}{general_di_stoch_kern}(
@@ -61,7 +65,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   domain_list = NULL,
   iterate = TRUE,
   iterations = 50,
-  kernel_seq = NULL
+  kernel_seq = NULL,
+  normalize_pop_size = TRUE
 )
 
 \method{make_ipm}{general_di_stoch_param}(
@@ -71,7 +76,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   ...,
   domain_list = NULL,
   iterate = TRUE,
-  iterations = 50
+  iterations = 50,
+  normalize_pop_size = TRUE
 )
 }
 \arguments{
@@ -99,6 +105,10 @@ be \code{TRUE}.}
 
 \item{iterations}{If \code{iterate} is \code{TRUE}, then the number of iterations
 to simulate.}
+
+\item{normalize_pop_size}{A logical indicating whether to re-scale the population
+vector to sum before each iteration. Default is \code{TRUE} for \code{*_di_*}
+methods and \code{FALSE} for \code{*_dd_*} methods.}
 
 \item{kernel_seq}{The sequence of kernels to use during the iterations.
 This can either be a vector of integers corresponding to kernel names (e.g.

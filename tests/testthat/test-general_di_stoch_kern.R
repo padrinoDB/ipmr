@@ -738,7 +738,8 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
       inv_logit = inv_logit,
       pois      = pois
     ),
-    iterations = 100
+    iterations = 100,
+    normalize_pop_size = FALSE
   )
 
 # need to rethink how output is generated - no reason I shouldn't be able to
@@ -911,11 +912,14 @@ stoch_mod_ipmr <- temp_proto %>%
       pois      = pois
     ),
     iterations = 100,
-    kernel_seq = usr_seq
+    kernel_seq = usr_seq,
+    normalize_pop_size = FALSE
   )
 
 
 pop_ipmr    <- stoch_mod_ipmr$pop_state
+pop_ipmr    <- pop_ipmr[names(pop_ipmr) != 'lambda']
+
 all_lambdas <- list(
   hand = numeric(100L),
   ipmr = numeric(100L)
@@ -1052,7 +1056,8 @@ test_that('evict_fun warnings are correctly generated', {
           inv_logit = inv_logit,
           pois      = pois
         ),
-        iterations = 100
+        iterations = 100,
+        normalize_pop_size = FALSE
       )
     )
 

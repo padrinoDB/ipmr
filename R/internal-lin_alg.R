@@ -11,6 +11,7 @@
 
 .extract_conv_ev_general <- function(pop_state) {
 
+  pop_state <- pop_state[names(pop_state) != 'lambda']
   final_it <- dim(pop_state[[1]])[2]
 
   temp     <- lapply(pop_state,
@@ -305,11 +306,22 @@
 # vec = numeric vector
 
 .geom_mean <- function(vec) {
-  n   <- length(vec)
 
-  out <- prod(vec)
+  if(any(vec <= 0)) {
 
-  return(out ^ (1/n))
+    warning('vector contains values less than 0, returning "NA".', call. = FALSE)
+    return(NA_real_)
+
+  }
+  if(any(is.na(vec))) {
+
+    warning('Vector contains NAs. They will be removed.', call. = FALSE)
+    vec <- vec[!is.na(vec)]
+
+  }
+
+  exp(mean(log(vec)))
+
 }
 
 #' @noRd
@@ -317,6 +329,18 @@
 .lambda_pop_size <- function(x, all_lambdas = TRUE) {
 
   pops  <- x$pop_state
+
+  if(!all(is.na(pops$lambda))) {
+
+    out <- pops$lambda
+    if(!all_lambdas) {
+      out <- out[length(out)]
+    }
+
+    return(out)
+
+  }
+
   n_its <- dim(pops[[1]])[2]
   temp  <- numeric(n_its - 1)
 
@@ -465,7 +489,23 @@ is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
     stop("pop_state in IPM contains NAs - cannot check for convergence!")
   }
 
-  out <- .is_conv_to_asymptotic(ipm$pop_state, tol = tol)
+  # If lambda exists, we can just use that and exit early. otherwise, drop
+  # lambda entry and proceed with the population state vectors
+
+  if(!all(is.na(ipm$pop_state$lambda))) {
+    pop_state <- as.vector(ipm$pop_state$lambda)
+    end   <- length(pop_state)
+    start <- end - 1
+
+    return(isTRUE(all.equal(pop_state[start], pop_state[end])))
+
+  } else {
+
+    pop_state <- ipm$pop_state[names(ipm$pop_state) != 'lambda']
+
+  }
+
+  out <- .is_conv_to_asymptotic(pop_state, tol = tol)
 
   return(out)
 

@@ -345,7 +345,8 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
       pois        = pois,
       mvt_wrapper = mvt_wrapper
     ),
-    iterations = 100
+    iterations = 100,
+    normalize_pop_size = FALSE
   )
 
 

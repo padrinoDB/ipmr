@@ -119,7 +119,8 @@ x <- init_ipm('simple_di_det') %>%
            evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
-  make_ipm(usr_funs = list(inv_logit = inv_logit))
+  make_ipm(usr_funs = list(inv_logit = inv_logit),
+           normalize_pop_size = FALSE)
 
 K_ipmr <- x$iterators$K
 
@@ -155,7 +156,8 @@ test_that('define_impl() can handle mismatched argument lengths', {
         )
       ) %>%
       define_domains(dbh = c(0, 50, 100)) %>%
-      make_ipm(usr_funs = list(inv_logit = inv_logit)),
+      make_ipm(usr_funs = list(inv_logit = inv_logit),
+               normalize_pop_size = FALSE),
 
     regexp = "Assuming that all kernels are implemented with the same 'int_rule'."
 
@@ -172,7 +174,8 @@ test_that('define_impl() can handle mismatched argument lengths', {
         )
       ) %>%
       define_domains(dbh = c(0, 50, 100)) %>%
-      make_ipm(usr_funs = list(inv_logit = inv_logit)),
+      make_ipm(usr_funs = list(inv_logit = inv_logit),
+               normalize_pop_size = FALSE),
 
     regexp = "Assuming that all kernels are implemented with the same 'dom_end'."
 
@@ -189,7 +192,8 @@ test_that('define_impl() can handle mismatched argument lengths', {
         )
       ) %>%
       define_domains(dbh = c(0, 50, 100)) %>%
-      make_ipm(usr_funs = list(inv_logit = inv_logit)),
+      make_ipm(usr_funs = list(inv_logit = inv_logit),
+               normalize_pop_size = FALSE),
 
     regexp = "Assuming that all kernels are implemented with the same 'dom_start'."
 
@@ -243,7 +247,8 @@ test_that("order of kernel_definition doesn't matter", {
         dom_end   = rep('dbh', 3)
       )) %>%
     define_domains(dbh = c(0, 50, 100)) %>%
-    make_ipm(usr_funs = list(inv_logit = inv_logit))
+    make_ipm(usr_funs = list(inv_logit = inv_logit),
+             normalize_pop_size = FALSE)
 
   lambda_out_of_order <- Re(eigen(y$iterators$K)$values[1])
 
@@ -289,7 +294,8 @@ test_that("order of kernel_definition doesn't matter", {
       )
     ) %>%
     define_domains(dbh = c(0, 50, 100)) %>%
-    make_ipm(usr_funs = list(inv_logit = inv_logit))
+    make_ipm(usr_funs = list(inv_logit = inv_logit),
+             normalize_pop_size = FALSE)
 
   lambda_out_of_order_2 <- Re(eigen(y$iterators$K)$values[1])
 
@@ -339,7 +345,8 @@ test_that('iteration methods work the same as eigenvalue methods', {
     define_domains(dbh = c(0, 50, 100)) %>%
     make_ipm(usr_funs = list(inv_logit = inv_logit),
              iterate = TRUE,
-             iterations = 100)
+             iterations = 100,
+             normalize_pop_size = FALSE)
 
   lambda_it <- lambda(it, comp_method = 'pop_size')
   lambda_eig <- lambda(it, comp_method = 'eigen')

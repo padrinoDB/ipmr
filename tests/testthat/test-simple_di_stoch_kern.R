@@ -291,7 +291,8 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
   define_domains(ht = c(0.2, 40, 100)) %>%
   make_ipm(usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_r = inv_logit_r,
-                           pois_r      = pois_r))
+                           pois_r      = pois_r),
+           normalize_pop_size = FALSE)
 
 
 
@@ -342,9 +343,10 @@ iterated_sys <- proto %>%
                            pois_r = pois_r),
            kernel_seq = kern_seq,
            iterate = TRUE,
-           iterations = 50)
+           iterations = 50,
+           normalize_pop_size = FALSE)
 
-ipmr_pop_state <- iterated_sys$pop_state$pop_state
+ipmr_pop_state <- iterated_sys$pop_state$pop_state_ht
 
 pop_holder <- array(NA_real_, dim = c(100, 51))
 
@@ -372,6 +374,7 @@ lambda_generic_lambdas <- lambda(iterated_sys,
                                  type_lambda = 'all')
 
 test_that('.iterate_kerns is acting correctly', {
+
   expect_equal(pop_size_lambdas, pop_size_lambdas_ipmr, tolerance = 1e-10)
   expect_equal(pop_sizes_test, pop_sizes_ipmr, tolerance = 1e-10)
 
@@ -447,7 +450,8 @@ test_that("order of kernel definition doesn't matter", {
     define_domains(ht = c(0.2, 40, 100)) %>%
     make_ipm(usr_funs = list(inv_logit   = inv_logit,
                              inv_logit_r = inv_logit_r,
-                             pois_r      = pois_r))
+                             pois_r      = pois_r),
+             normalize_pop_size = FALSE)
 
   lambdas_test <- vapply(test_order_1$iterators,
                          function(x) Re(eigen(x)$values[1]),
@@ -524,7 +528,8 @@ test_that("return_all gets all of the environments back", {
     make_ipm(usr_funs = list(inv_logit   = inv_logit,
                              inv_logit_r = inv_logit_r,
                              pois_r      = pois_r),
-             return_all = TRUE)
+             return_all = TRUE,
+             normalize_pop_size = FALSE)
 
   env_list_nms <- c('master_env', c(paste('F', 1:5, sep = '_'),
                                     paste("P", 1:5, sep = "_")))
