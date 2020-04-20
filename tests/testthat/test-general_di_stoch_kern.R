@@ -1067,3 +1067,248 @@ test_that('evict_fun warnings are correctly generated', {
   expect_equal(wrngs[1], test_text)
 
 })
+
+
+test_that('normalize pop vec works', {
+
+  usr_seq <- sample(hier_effs$site, size = 100, replace = TRUE)
+
+  gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
+    define_kernel(
+      name             = 'PF_xx_site',
+      family           = "CC",
+      formula          = sig_n_site          *
+        (1 - mu_n_site)   *
+        (1 - beta_n_site) *
+        gamma_nn_site     *
+        d_ln_leaf_l,
+
+      sig_n_site        = inv_logit(nr_s_z_int_site, nr_s_z_b_site, ln_leaf_l_1),
+      gamma_nn_site     = dnorm(ln_leaf_l_2, nr_nr_mu_site, nr_nr_sd_site),
+      nr_nr_mu_site     = nr_nr_int_site + nr_nr_b_site * ln_leaf_l_1,
+      mu_n_site         = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
+      beta_n_site       = inv_logit(nr_f_z_int_site, nr_f_z_b_site, ln_leaf_l_1),
+
+      data_list        = full_data_list,
+      states           = list(c('ln_leaf_l')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_effs,
+      evict_cor        =  TRUE,
+      evict_fun        = truncated_distributions('norm',
+                                                 'gamma_nn_site')
+    ) %>%
+    define_kernel(
+      name             = 'PF_zx_site',
+      family           = 'CC',
+
+      formula          = (
+        phi_site        *
+          nu_site         *
+          gamma_sr_site   +
+          sig_r_site      *
+          (1 - mu_r_site) *
+          gamma_nr_site
+      )                *
+        d_sqrt_area,
+
+      phi_site      = pois(f_s_int_site, f_s_slope_site, sqrt_area_1),
+      nu_site       = sdl_es_r_site,
+      gamma_sr_site = dnorm(ln_leaf_l_2, sdl_z_int_site, sdl_z_sd_site),
+      sig_r_site    = inv_logit(ra_s_z_int_site, ra_s_z_b_site, sqrt_area_1),
+      mu_r_site     = inv_logit(ra_d_z_int_site, ra_d_z_b_site, sqrt_area_1),
+      gamma_nr_site = dnorm(ln_leaf_l_2, mu_ra_nr_site, ra_n_z_sd_site),
+      mu_ra_nr_site = ra_n_z_int_site + ra_n_z_b_site * sqrt_area_1,
+
+      data_list    = full_data_list,
+      states       = list(c('sqrt_area', 'ln_leaf_l')),
+      has_hier_effs = TRUE,
+      levels_hier_effs = hier_effs,
+      evict_cor = TRUE,
+      evict_fun = truncated_distributions(c('norm', 'norm'),
+                                          c('gamma_nr_site',
+                                            'gamma_sr_site'))
+    ) %>%
+    define_kernel(
+      name = 'PF_dx_site',
+      family = 'DC',
+
+      formula = gamma_nd_site * d_ln_leaf_l,
+
+      gamma_nd_site = dnorm(ln_leaf_l_2, dc_nr_int_site, dc_nr_sd_site),
+
+      data_list = full_data_list,
+      states = list(c('ln_leaf_l')),
+      has_hier_effs = TRUE,
+      levels_hier_effs = hier_effs,
+      evict_cor = TRUE,
+      evict_fun = truncated_distributions('norm',
+                                          'gamma_nd_site')
+    ) %>%
+    define_kernel(
+      name             = 'PF_xz_site',
+      family           = 'CC',
+      formula          = sig_n_site         *
+        (1 - mu_n_site)    *
+        beta_n_site       *
+        gamma_rn_site     *
+        tau               *
+        d_ln_leaf_l,
+
+      sig_n_site        = inv_logit(nr_s_z_int_site, nr_s_z_b_site, ln_leaf_l_1),
+      mu_n_site         = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
+      beta_n_site       = inv_logit(nr_f_z_int_site, nr_f_z_b_site, ln_leaf_l_1),
+      gamma_rn_site     = dnorm(sqrt_area_2, mu_nr_ra_site, nr_ra_sd_site),
+      mu_nr_ra_site     = nr_ra_int_site + nr_ra_b_site * ln_leaf_l_1,
+      tau               = inv_logit(tau_int_site, tau_b_site, ln_leaf_l_1),
+
+      data_list        = full_data_list,
+      states           = list(c('sqrt_area', 'ln_leaf_l')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_effs,
+      evict_cor        = TRUE,
+      evict_fun        = truncated_distributions('norm',
+                                                 'gamma_rn_site')
+
+    ) %>%
+    define_kernel(
+      name             = 'PF_xd_site',
+      family           = 'CD',
+      formula          = sig_n_site * mu_n_site * d_ln_leaf_l,
+      sig_n_site       = inv_logit(nr_s_z_int_site, nr_s_z_b_site, ln_leaf_l_1),
+      mu_n_site        = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
+      data_list        = full_data_list,
+      states           = list(c('ln_leaf_l')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_effs,
+      evict_cor        = FALSE
+    ) %>%
+    define_kernel(
+      name             = 'PF_zd_site',
+      family           = 'CD',
+      formula          = sig_r_site * mu_r_site * d_sqrt_area,
+      sig_r_site        = inv_logit(ra_s_z_int_site, ra_s_z_b_site, sqrt_area_1),
+      mu_r_site         = inv_logit(ra_d_z_int_site, ra_d_z_b_site, sqrt_area_1),
+      data_list        = full_data_list,
+      states           = list(c('sqrt_area')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_effs,
+      evict_cor        = FALSE
+    ) %>%
+    define_k(
+      name = 'K_site',
+      n_ln_leaf_l_t_1 = PF_xx_site %*% n_ln_leaf_l_t +
+        PF_zx_site %*% n_sqrt_area_t +
+        PF_dx_site %*% n_d_t,
+      n_sqrt_area_t_1 = PF_xz_site %*% n_ln_leaf_l_t,
+      n_d_t_1 =         PF_xd_site %*% n_ln_leaf_l_t +
+        PF_zd_site %*% n_sqrt_area_t,
+      family = 'IPM',
+      data_list = full_data_list,
+      states    = list(c('sqrt_area', 'ln_leaf_l')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_effs
+    ) %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c(paste('PF_',
+                               c('xx',
+                                 'zx', 'dx', 'xz', 'xd', 'zd'),
+                               '_site',
+                               sep = ""),
+                         'K_site'),
+        int_rule     = rep('midpoint', 7),
+        dom_start    = c('ln_leaf_l',
+                         'sqrt_area',
+                         NA_character_,
+                         'ln_leaf_l',
+                         'ln_leaf_l',
+                         'sqrt_area',
+                         NA_character_),
+        dom_end      = c('ln_leaf_l',
+                         'ln_leaf_l',
+                         'ln_leaf_l',
+                         'sqrt_area',
+                         NA_character_,
+                         NA_character_,
+                         NA_character_)
+      )
+    ) %>%
+    define_domains(
+      sqrt_area = c(0.63 * 0.9, 3.87 * 1.1, 50),
+      ln_leaf_l = c(0.26 * 0.9, 2.70 * 1.1, 50)
+    ) %>%
+    define_pop_state(
+      pop_vectors = list(
+        n_ln_leaf_l = init_pop_vec$ln_leaf_l,
+        n_sqrt_area = init_pop_vec$sqrt_area,
+        n_d         = 10
+      )
+    ) %>%
+    make_ipm(
+      return_all = TRUE,
+      usr_funs   = list(
+        inv_logit = inv_logit,
+        pois      = pois
+      ),
+      iterations = 100,
+      normalize_pop_size = TRUE,
+      kernel_seq = usr_seq
+    )
+
+
+  lambdas_ipmr <- lambda(gen_di_stoch_kern,
+                         comp_method = 'pop_size',
+                         type_lambda = 'all')
+
+  pop_holder <- list(n_leaf_l = array(NA_real_, dim = c(50, 101)),
+                     n_sqt_ar = array(NA_real_, dim = c(50, 101)),
+                     n_d      = array(NA_real_, dim = c(1, 101)))
+
+  tot_size <- Reduce('sum', init_pop_vec, init = 10)
+
+  pop_holder[[1]][ , 1] <- init_pop_vec$ln_leaf_l / tot_size
+  pop_holder[[2]][ , 1] <- init_pop_vec$sqrt_area / tot_size
+  pop_holder[[3]][ , 1] <- 10 / tot_size
+
+  lambdas_hand <- numeric(100L)
+
+  for(i in seq_len(100)) {
+
+    selector <- gen_di_stoch_kern$env_seq[i]
+    kerns    <- models[[selector]]
+
+    temp_n_ln_t_1 <- kerns$kern_xx %*% pop_holder[[1]][ , i] +
+                     kerns$kern_zx %*% pop_holder[[2]][ , i] +
+                     kerns$kern_dx %*% pop_holder[[3]][ , i]
+
+    temp_n_sq_t_1 <- kerns$kern_xz %*% pop_holder[[1]][ , i]
+
+    temp_n_do_t_1 <- kerns$kern_xd %*% pop_holder[[1]][ , i] +
+                     kerns$kern_zd %*% pop_holder[[2]][ , i]
+
+    tot_size <- Reduce('sum',
+                       c(temp_n_sq_t_1, temp_n_do_t_1, temp_n_ln_t_1),
+                       init = 0)
+
+    lambdas_hand[i] <- tot_size
+
+    pop_holder[[1]][ , (i + 1)] <- temp_n_ln_t_1 / tot_size
+    pop_holder[[2]][ , (i + 1)] <- temp_n_sq_t_1 / tot_size
+    pop_holder[[3]][ , (i + 1)] <- temp_n_do_t_1 / tot_size
+
+  }
+
+  expect_equal(lambdas_ipmr, lambdas_hand, tolerance = 1e-10)
+
+  pop_sizes_ipmr <- lapply(gen_di_stoch_kern$pop_state[1:3],
+                           function(x) colSums(x)) %>%
+    lapply(X = 1:101,
+           function(x, sizes) {
+             sum(sizes[[1]][x], sizes[[2]][x], sizes[[3]][x])
+           },
+           sizes = .) %>%
+    unlist()
+
+  expect_equal(pop_sizes_ipmr, rep(1, 101), tolerance = 1e-15)
+
+})

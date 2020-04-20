@@ -470,6 +470,7 @@
 
 .update_param_dd_output <- function(sub_kernels,
                                     ipm_system,
+                                    pop_state,
                                     data_envs = NA_character_,
                                     master_env,
                                     output,
