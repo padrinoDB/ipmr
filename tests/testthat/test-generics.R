@@ -67,7 +67,8 @@ sim_di_det_1 <- init_ipm('simple_di_det') %>%
            evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
-  make_ipm(usr_funs = list(inv_logit = inv_logit))
+  make_ipm(usr_funs = list(inv_logit = inv_logit),
+           normalize_pop_size = FALSE)
 
 
 sim_di_det_2 <- init_ipm('simple_di_det') %>%
@@ -107,7 +108,8 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
   define_pop_state(n_dbh_t = runif(100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit),
            iterate = TRUE,
-           iterations = 100)
+           iterations = 100,
+           normalize_pop_size = FALSE)
 
 
 sim_di_det_3 <- init_ipm('simple_di_det') %>%
@@ -147,7 +149,8 @@ sim_di_det_3 <- init_ipm('simple_di_det') %>%
   define_pop_state(n_dbh_t = runif(100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit),
            iterate = TRUE,
-           iterations = 5)
+           iterations = 5,
+           normalize_pop_size = FALSE)
 
 test_that('print.simple_di_det returns correctly', {
 
@@ -304,7 +307,8 @@ sim_di_stoch_kern <- init_ipm('simple_di_stoch_kern') %>%
   define_domains(ht = c(0.2, 40, 100)) %>%
   make_ipm(usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_r = inv_logit_r,
-                           pois_r      = pois_r))
+                           pois_r      = pois_r),
+           normalize_pop_size = FALSE)
 
 
 test_that('print.simple_di_stoch_kern returns correctly', {
@@ -439,7 +443,8 @@ sim_di_stoch_param <- init_ipm('simple_di_stoch_param') %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit,
                            mvt_wrapper = mvt_wrapper),
            iterate = TRUE,
-           iterations = 3)
+           iterations = 3,
+           normalize_pop_size = FALSE)
 
 
 test_that('print.simple_di_stoch_param returns correctly', {
@@ -592,7 +597,8 @@ gen_di_det_1 <- init_ipm("general_di_det") %>%
   ) %>%
   make_ipm(iterations = 100,
            usr_funs = list(inv_logit   = inv_logit,
-                           inv_logit_2 = inv_logit_2))
+                           inv_logit_2 = inv_logit_2),
+           normalize_pop_size = FALSE)
 
 # Test unconverged warnings
 
@@ -668,7 +674,8 @@ gen_di_det_2 <- init_ipm("general_di_det") %>%
   ) %>%
   make_ipm(iterations = 10,
            usr_funs = list(inv_logit   = inv_logit,
-                           inv_logit_2 = inv_logit_2))
+                           inv_logit_2 = inv_logit_2),
+           normalize_pop_size = FALSE)
 
 test_that('print.general_di_det returns correctly', {
 
@@ -1041,7 +1048,8 @@ gen_di_stoch_kern_1 <- init_ipm('general_di_stoch_kern') %>%
       inv_logit = inv_logit,
       pois      = pois
     ),
-    iterations = 100
+    iterations = 100,
+    normalize_pop_size = FALSE
   )
 
 test_that('print.general_di_stoch_kern works', {
@@ -1405,7 +1413,8 @@ gen_di_stoch_param_1 <- init_ipm('general_di_stoch_param') %>%
       pois        = pois,
       mvt_wrapper = mvt_wrapper
     ),
-    iterations = 100
+    iterations = 100,
+    normalize_pop_size = FALSE
   )
 
 test_that('print.general_di_stoch_param works', {
@@ -1553,7 +1562,8 @@ sim_di_det_1 <- init_ipm('simple_di_det') %>%
            evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
-  make_ipm(usr_funs = list(inv_logit = inv_logit))
+  make_ipm(usr_funs = list(inv_logit = inv_logit),
+           normalize_pop_size = FALSE)
 
 target <- Re(eigen(sim_di_det_1$iterators$K)$vectors[ , 1])
 target <- target / sum(target)
@@ -1608,7 +1618,8 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
   define_pop_state(n_dbh_t = runif(100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit),
            iterate = TRUE,
-           iterations = 200)
+           iterations = 200,
+           normalize_pop_size = FALSE)
 
 sim_di_det_3 <- init_ipm('simple_di_det') %>%
   define_kernel("P",
@@ -1647,7 +1658,8 @@ sim_di_det_3 <- init_ipm('simple_di_det') %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit),
            iterate = TRUE,
-           iterations = 5)
+           iterations = 5,
+           normalize_pop_size = FALSE)
 
 test_that('right_ev can handle iterated models', {
 
@@ -1886,7 +1898,8 @@ gen_di_det_1 <- init_ipm("general_di_det") %>%
   ) %>%
   make_ipm(iterations = 100,
            usr_funs = list(inv_logit   = inv_logit,
-                           inv_logit_2 = inv_logit_2))
+                           inv_logit_2 = inv_logit_2),
+           normalize_pop_size = FALSE)
 
 mega_k <- rbind(
   cbind(gen_di_det_1$sub_kernels$stay_discrete,
@@ -1980,7 +1993,8 @@ gen_di_det_2 <- init_ipm("general_di_det") %>%
   ) %>%
   make_ipm(iterations = 5,
            usr_funs = list(inv_logit   = inv_logit,
-                           inv_logit_2 = inv_logit_2))
+                           inv_logit_2 = inv_logit_2),
+           normalize_pop_size = FALSE)
 
 
 

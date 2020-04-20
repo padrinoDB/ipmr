@@ -291,7 +291,8 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
   define_domains(ht = c(0.2, 40, 100)) %>%
   make_ipm(usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_r = inv_logit_r,
-                           pois_r      = pois_r))
+                           pois_r      = pois_r),
+           normalize_pop_size = FALSE)
 
 
 
@@ -342,9 +343,10 @@ iterated_sys <- proto %>%
                            pois_r = pois_r),
            kernel_seq = kern_seq,
            iterate = TRUE,
-           iterations = 50)
+           iterations = 50,
+           normalize_pop_size = FALSE)
 
-ipmr_pop_state <- iterated_sys$pop_state$pop_state
+ipmr_pop_state <- iterated_sys$pop_state$pop_state_ht
 
 pop_holder <- array(NA_real_, dim = c(100, 51))
 
@@ -372,6 +374,7 @@ lambda_generic_lambdas <- lambda(iterated_sys,
                                  type_lambda = 'all')
 
 test_that('.iterate_kerns is acting correctly', {
+
   expect_equal(pop_size_lambdas, pop_size_lambdas_ipmr, tolerance = 1e-10)
   expect_equal(pop_sizes_test, pop_sizes_ipmr, tolerance = 1e-10)
 
@@ -447,7 +450,8 @@ test_that("order of kernel definition doesn't matter", {
     define_domains(ht = c(0.2, 40, 100)) %>%
     make_ipm(usr_funs = list(inv_logit   = inv_logit,
                              inv_logit_r = inv_logit_r,
-                             pois_r      = pois_r))
+                             pois_r      = pois_r),
+             normalize_pop_size = FALSE)
 
   lambdas_test <- vapply(test_order_1$iterators,
                          function(x) Re(eigen(x)$values[1]),
@@ -524,7 +528,8 @@ test_that("return_all gets all of the environments back", {
     make_ipm(usr_funs = list(inv_logit   = inv_logit,
                              inv_logit_r = inv_logit_r,
                              pois_r      = pois_r),
-             return_all = TRUE)
+             return_all = TRUE,
+             normalize_pop_size = FALSE)
 
   env_list_nms <- c('master_env', c(paste('F', 1:5, sep = '_'),
                                     paste("P", 1:5, sep = "_")))
@@ -532,3 +537,100 @@ test_that("return_all gets all of the environments back", {
   expect_equal(names(test_order_1$env_list), env_list_nms)
 })
 
+
+test_that('normalizing pop vector gets same lambdas as before', {
+
+  init_pop <- runif(100)
+  usr_seq  <- sample(1:5, size = 100, replace = TRUE)
+
+  test_norm_1 <- init_ipm('simple_di_stoch_kern') %>%
+    define_kernel(
+      name             = "F_yr",
+      formula          = f_r * f_s_yr * f_d,
+      family           = "CC",
+      f_r              = inv_logit(ht_1, f_r_int, f_r_slope),
+      f_s_yr           = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr),
+      f_d              = dnorm(ht_2, mu_fd, sd_fd),
+      data_list        = params,
+      states           = list(c('ht')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_levels,
+      evict_cor        = TRUE,
+      evict_fun        = truncated_distributions('norm', 'f_d')
+    ) %>%
+    define_kernel(
+      name             = 'P_yr',
+      formula          = s_g_mult(s_yr, g_yr) ,
+      family           = "CC",
+      s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
+        (1 - inv_logit(ht_1, f_r_int, f_r_slope)),
+      g_yr             = dnorm(ht_2, mu_g_yr, sd_g),
+      mu_g_yr          = g_int + g_slope * ht_1 + g_r_yr,
+      data_list        = params,
+      states           = list(c('ht')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_levels,
+      evict_cor        = TRUE,
+      evict_fun        = truncated_distributions('norm', 'g_yr')
+    ) %>%
+    define_k(
+      name             = 'K_yr',
+      K_yr             = P_yr + F_yr,
+      n_ht_t_1         = K_yr %*% n_ht_t,
+      family           = "IPM",
+      data_list        = params,
+      states           = list(c("ht")),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_levels
+    ) %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c("F_yr", "P_yr", "K_yr"),
+        int_rule     = rep("midpoint", 3),
+        dom_start    = rep("ht", 3),
+        dom_end      = rep("ht", 3)
+      )
+    ) %>%
+    define_domains(
+      ht = c(0.2, 40, 100)
+    ) %>%
+    define_pop_state(
+      n_ht = init_pop
+    ) %>%
+    make_ipm(usr_funs = list(inv_logit   = inv_logit,
+                             inv_logit_r = inv_logit_r,
+                             pois_r      = pois_r),
+             normalize_pop_size = TRUE,
+             iterate = TRUE,
+             iterations = 100,
+             kernel_seq = usr_seq)
+
+  lambdas_test <- lambda(test_norm_1, comp_method = 'pop_size', type_lambda = 'all')
+
+  pop_holder       <- array(NA_real_, dim = c(100, 101))
+  pop_holder[ , 1] <- init_pop / sum(init_pop)
+  lambdas_hand     <- numeric(100L)
+
+  for(i in seq_len(100)) {
+
+    k_selector <- as.integer(usr_seq[i])
+    use_k      <- sys[[k_selector]]
+
+    n_t_1      <- use_k %*% pop_holder[ , i]
+
+    # Store lambda, normalize pop vec and stick into holder
+
+    lambdas_hand[i] <- sum(n_t_1)
+
+    pop_holder[ , (i + 1)] <- n_t_1 / sum(n_t_1)
+
+  }
+
+  expect_equal(lambdas_hand, lambdas_test, tolerance = 1e-10)
+  expect_equal(pop_holder, test_norm_1$pop_state$pop_state_ht)
+
+  pop_sizes <- colSums(test_norm_1$pop_state$pop_state_ht)
+
+  expect_equal(pop_sizes, rep(1, 101), tolerance = 1e-15)
+
+})

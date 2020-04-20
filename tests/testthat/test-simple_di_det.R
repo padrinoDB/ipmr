@@ -119,7 +119,8 @@ x <- init_ipm('simple_di_det') %>%
            evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
-  make_ipm(usr_funs = list(inv_logit = inv_logit))
+  make_ipm(usr_funs = list(inv_logit = inv_logit),
+           normalize_pop_size = FALSE)
 
 K_ipmr <- x$iterators$K
 
@@ -155,7 +156,8 @@ test_that('define_impl() can handle mismatched argument lengths', {
         )
       ) %>%
       define_domains(dbh = c(0, 50, 100)) %>%
-      make_ipm(usr_funs = list(inv_logit = inv_logit)),
+      make_ipm(usr_funs = list(inv_logit = inv_logit),
+               normalize_pop_size = FALSE),
 
     regexp = "Assuming that all kernels are implemented with the same 'int_rule'."
 
@@ -172,7 +174,8 @@ test_that('define_impl() can handle mismatched argument lengths', {
         )
       ) %>%
       define_domains(dbh = c(0, 50, 100)) %>%
-      make_ipm(usr_funs = list(inv_logit = inv_logit)),
+      make_ipm(usr_funs = list(inv_logit = inv_logit),
+               normalize_pop_size = FALSE),
 
     regexp = "Assuming that all kernels are implemented with the same 'dom_end'."
 
@@ -189,7 +192,8 @@ test_that('define_impl() can handle mismatched argument lengths', {
         )
       ) %>%
       define_domains(dbh = c(0, 50, 100)) %>%
-      make_ipm(usr_funs = list(inv_logit = inv_logit)),
+      make_ipm(usr_funs = list(inv_logit = inv_logit),
+               normalize_pop_size = FALSE),
 
     regexp = "Assuming that all kernels are implemented with the same 'dom_start'."
 
@@ -243,7 +247,8 @@ test_that("order of kernel_definition doesn't matter", {
         dom_end   = rep('dbh', 3)
       )) %>%
     define_domains(dbh = c(0, 50, 100)) %>%
-    make_ipm(usr_funs = list(inv_logit = inv_logit))
+    make_ipm(usr_funs = list(inv_logit = inv_logit),
+             normalize_pop_size = FALSE)
 
   lambda_out_of_order <- Re(eigen(y$iterators$K)$values[1])
 
@@ -289,7 +294,8 @@ test_that("order of kernel_definition doesn't matter", {
       )
     ) %>%
     define_domains(dbh = c(0, 50, 100)) %>%
-    make_ipm(usr_funs = list(inv_logit = inv_logit))
+    make_ipm(usr_funs = list(inv_logit = inv_logit),
+             normalize_pop_size = FALSE)
 
   lambda_out_of_order_2 <- Re(eigen(y$iterators$K)$values[1])
 
@@ -339,7 +345,8 @@ test_that('iteration methods work the same as eigenvalue methods', {
     define_domains(dbh = c(0, 50, 100)) %>%
     make_ipm(usr_funs = list(inv_logit = inv_logit),
              iterate = TRUE,
-             iterations = 100)
+             iterations = 100,
+             normalize_pop_size = FALSE)
 
   lambda_it <- lambda(it, comp_method = 'pop_size')
   lambda_eig <- lambda(it, comp_method = 'eigen')
@@ -350,5 +357,61 @@ test_that('iteration methods work the same as eigenvalue methods', {
   expect_equal(conv_lamb, lambda_ipmr)
   expect_equal(conv_lamb, lambda_eig)
 
+
+})
+
+
+test_that('normalizing pop vector produces same lambdas as eigen methods', {
+
+  it <- init_ipm('simple_di_det') %>%
+    define_kernel("P",
+                  formula = s_g_mult(s, g),
+                  family = "CC",
+                  s = inv_logit(s_int, s_slope, dbh_1),
+                  g = dnorm(dbh_2, mu_g, sd_g),
+                  mu_g = g_int + g_slope * dbh_1,
+                  data_list = data_list,
+                  states = states,
+                  evict_cor = TRUE,
+                  evict_fun = truncated_distributions('norm',
+                                                      'g')
+    ) %>%
+    define_kernel('F',
+                  formula = f_r * f_s * f_d,
+                  family = 'CC',
+                  f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
+                  f_s = exp(f_s_int + f_s_slope * dbh_1),
+                  f_d = dnorm(dbh_2, mu_fd, sd_fd),
+                  data_list = data_list,
+                  states = states,
+                  evict_cor = TRUE,
+                  evict_fun = truncated_distributions('norm',
+                                                      'f_d')
+    ) %>%
+    define_k('K',
+             K = P + F,
+             n_dbh_t_1 = K %*% n_dbh_t,
+             family = 'IPM',
+             data_list = list(),
+             states = states,
+             evict_cor = FALSE) %>%
+    define_impl(impl_args) %>%
+    define_pop_state(
+      n_dbh = runif(100)
+    ) %>%
+    define_domains(dbh = c(0, 50, 100)) %>%
+    make_ipm(usr_funs = list(inv_logit = inv_logit),
+             iterate = TRUE,
+             iterations = 100,
+             normalize_pop_size = TRUE)
+
+  lambda_it <- lambda(it, comp_method = 'pop_size')
+  lambda_eig <- lambda(it, comp_method = 'eigen')
+  names(lambda_eig) <- NULL
+
+  conv_lamb <- lambda_it[100]
+
+  expect_equal(conv_lamb, lambda_ipmr)
+  expect_equal(conv_lamb, lambda_eig)
 
 })

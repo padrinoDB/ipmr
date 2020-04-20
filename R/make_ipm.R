@@ -24,6 +24,9 @@
 #' be \code{TRUE}.
 #' @param iterations If \code{iterate} is \code{TRUE}, then the number of iterations
 #' to simulate.
+#' @param normalize_pop_size A logical indicating whether to re-scale the population
+#' vector to sum before each iteration. Default is \code{TRUE} for \code{*_di_*}
+#' methods and \code{FALSE} for \code{*_dd_*} methods.
 #' @param kernel_seq The sequence of kernels to use during the iterations.
 #' This can either be a vector of integers corresponding to kernel names (e.g.
 #' kernels for different years - \code{2011:2018}),
@@ -95,7 +98,8 @@ make_ipm.simple_di_det <- function(proto_ipm,
                                    ...,
                                    domain_list = NULL,
                                    iterate = FALSE,
-                                   iterations = 50
+                                   iterations = 50,
+                                   normalize_pop_size = TRUE
 ) {
 
   # Figure out if we're dealing with a new model or an old one that is
@@ -132,9 +136,12 @@ make_ipm.simple_di_det <- function(proto_ipm,
     proto_ipm$domain <- I(list(domain_list))
   }
 
-  temp           <- .prep_di_output(others, k_row, proto_ipm, iterations)
+  temp           <- .prep_di_output(others, k_row,
+                                    proto_ipm, iterations,
+                                    normalize_pop_size)
 
-  master_env     <- .add_pop_state_to_master_env(temp$pop_state, master_env)
+  master_env     <- .add_pop_state_to_master_env(temp$pop_state,
+                                                 master_env)
 
   # construct the kernels from their function defintions
   env_list      <- list(master_env = master_env)
@@ -166,7 +173,15 @@ make_ipm.simple_di_det <- function(proto_ipm,
                                        temp$pop_state,
                                        master_env,
                                        proto_ipm,
-                                       k_row)
+                                       k_row,
+                                       normalize_pop_size)
+
+    # In order to operate properly, we had to insert an extra entry in
+    # lambda to make sure it had the same length as pop_state (it'll always be
+    # one fewer in reality though). The first entry is ALWAYS NA, but that doesn't
+    # seem user friendly (ipmr-internal friend either, tbh)
+
+    pop_state$lambda <- pop_state$lambda[-1]
 
   }
 
@@ -214,6 +229,7 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
                                           domain_list = NULL,
                                           iterate     = FALSE,
                                           iterations  = 50,
+                                          normalize_pop_size = TRUE,
                                           kernel_seq  = NULL) {
 
   # Work out whether to append usr_funs to proto or to restore them from prior
@@ -249,7 +265,9 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
     master_env <- .make_master_env(domain_list, usr_funs)
   }
 
-  temp       <- .prep_di_output(others, k_row, proto_ipm, iterations)
+  temp       <- .prep_di_output(others, k_row,
+                                proto_ipm, iterations,
+                                normalize_pop_size)
 
   master_env <- .add_pop_state_to_master_env(temp$pop_state, master_env)
 
@@ -286,7 +304,15 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
                                             temp$pop_state,
                                             master_env,
                                             proto_ipm,
-                                            k_row)
+                                            k_row,
+                                            normalize_pop_size)
+
+    # In order to operate properly, we had to insert an extra entry in
+    # lambda to make sure it had the same length as pop_state (it'll always be
+    # one fewer in reality though). The first entry is ALWAYS NA, but that doesn't
+    # seem user friendly (ipmr-internal friend either, tbh)
+
+    pop_state$lambda <- pop_state$lambda[-1]
 
   } else {
 
@@ -328,7 +354,8 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                            ...,
                                            domain_list = NULL,
                                            iterate     = TRUE,
-                                           iterations  = 50) {
+                                           iterations  = 50,
+                                           normalize_pop_size = TRUE) {
 
   # Work out whether to append usr_funs to proto or to restore them from prior
   # implemenation. Logic is documented in make_ipm.simple_di_det()
@@ -367,12 +394,13 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
   master_env <- .bind_all_constants(env_state   = others$env_state[[1]]$constants,
                                     env_to_bind = master_env)
 
-  out        <- .prep_di_output(others, k_row, proto_ipm, iterations)
+  temp        <- .prep_di_output(others, k_row, proto_ipm, iterations,
+                                 normalize_pop_size)
 
   # initialize the pop_state vectors in master_env so they can be found
   # at evaluation time
 
-  master_env <- .add_pop_state_to_master_env(out$pop_state,
+  master_env <- .add_pop_state_to_master_env(temp$pop_state,
                                              master_env)
 
   # list to hold the possibly returned evaluation environments
@@ -397,30 +425,51 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                       sub_kernels,
                                       master_env)
 
+    pop_state   <- .iterate_kerns_simple(iterators = sys_i$iterators,
+                                         sub_kernels,
+                                         iterations = 1L,
+                                         current_iteration = i,
+                                         kern_seq = NULL,
+                                         temp$pop_state,
+                                         master_env,
+                                         proto_ipm,
+                                         k_row,
+                                         normalize_pop_size)
+
+
     if(return_all) {
 
-      env_ret <- sys$data_envs
+      env_list <- c(sys$data_envs, env_list)
 
     } else {
 
-      env_ret <- NA_character_
+      env_list <- NA_character_
 
     }
-    out         <- .update_param_simple_output(sub_kernels,
-                                               sys_i,
-                                               env_ret,
-                                               master_env,
-                                               out,
-                                               iterations,
-                                               i)
 
-    # turn current pop_state_t_1 into pop_state_t in master_env so next computation
-    # can occur
-    master_env <- .update_master_env(out$pop_state,
-                                     master_env,
-                                     i)
+    temp <- .update_param_simple_output(
+      sub_kernels,
+      sys_i,
+      pop_state,
+      env_list,
+      master_env,
+      temp,
+      iterations,
+      i
+    )
 
   }
+
+  temp$pop_state$lambda <- temp$pop_state$lambda[-1]
+
+  out <- list(
+    iterators   = temp$iterators,
+    sub_kernels = temp$sub_kernels,
+    env_list    = temp$sub_kernel_envs,
+    env_seq     = temp$env_seq,
+    pop_state   = temp$pop_state,
+    proto_ipm   = proto_ipm
+  )
 
   out$iterators   <- set_ipmr_classes(out$iterators)
   out$sub_kernels <- set_ipmr_classes(out$sub_kernels)
@@ -428,7 +477,7 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
   attr(out$proto_ipm, 'implemented') <- TRUE
   class(out) <- c('simple_di_stoch_param_ipm', 'list')
 
-  if(return_all) out$data_envs <- purrr::splice(env_list, out$data_envs)
+  if(return_all) out$data_envs <- env_list
 
   return(out)
 
@@ -446,7 +495,8 @@ make_ipm.general_di_det <- function(proto_ipm,
                                     ...,
                                     domain_list = NULL,
                                     iterate     = TRUE,
-                                    iterations  = 50) {
+                                    iterations  = 50,
+                                    normalize_pop_size = TRUE) {
 
   # Work out whether to append usr_funs to proto or to restore them from prior
   # implemenation. Logic is documented in make_ipm.simple_di_det()
@@ -485,7 +535,8 @@ make_ipm.general_di_det <- function(proto_ipm,
                                     env_to_bind = master_env)
 
 
-  temp       <- .prep_di_output(others, k_row, proto_ipm, iterations)
+  temp       <- .prep_di_output(others, k_row, proto_ipm, iterations,
+                                normalize_pop_size)
 
   # Thus far, I think general_* methods will have to use iteration for lambdas
   # as I'm not sure I want to work out the correct cbind(rbind(...)) rules for
@@ -528,7 +579,11 @@ make_ipm.general_di_det <- function(proto_ipm,
                                         # Single set of kernels - no stochastic possible
                                         kern_seq = NULL,
                                         temp$pop_state,
-                                        master_env)
+                                        master_env,
+                                        normalize_pop_size)
+
+    pop_state$lambda <- pop_state$lambda[-1]
+
   }
 
 
@@ -576,7 +631,8 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
                                            domain_list = NULL,
                                            iterate     = TRUE,
                                            iterations  = 50,
-                                           kernel_seq  = NULL) {
+                                           kernel_seq  = NULL,
+                                           normalize_pop_size = TRUE) {
 
   # Work out whether to append usr_funs to proto or to restore them from prior
   # implemenation. Logic is documented in make_ipm.simple_di_det()
@@ -619,7 +675,8 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
                                     env_to_bind = master_env)
 
 
-  temp       <- .prep_di_output(others, k_row, proto_ipm, iterations)
+  temp       <- .prep_di_output(others, k_row, proto_ipm, iterations,
+                                normalize_pop_size)
 
   # Thus far, I think general_* methods will have to use iteration for lambdas
   # as I'm not sure I want to work out the correct cbind(rbind(...)) rules for
@@ -664,7 +721,10 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
                                         current_iteration = NA_integer_,
                                         kern_seq,
                                         temp$pop_state,
-                                        master_env)
+                                        master_env,
+                                        normalize_pop_size)
+
+    pop_state$lambda <- pop_state$lambda[-1]
   }
 
   # Final bits of housekeeping post-iteration. .prep_other_output deals specifically
@@ -710,7 +770,8 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
                                             ...,
                                             domain_list = NULL,
                                             iterate     = TRUE,
-                                            iterations  = 50) {
+                                            iterations  = 50,
+                                            normalize_pop_size = TRUE) {
 
   # Work out whether to append usr_funs to proto or to restore them from prior
   # implemenation. Logic is documented in make_ipm.simple_di_det()
@@ -749,7 +810,8 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
   master_env <- .bind_all_constants(env_state   = others$env_state[[1]]$constants,
                                     env_to_bind = master_env)
 
-  temp       <- .prep_di_output(others, k_row, proto_ipm, iterations)
+  temp       <- .prep_di_output(others, k_row, proto_ipm, iterations,
+                                normalize_pop_size)
 
   # initialize the pop_state vectors in master_env so they can be found
   # at evaluation time
@@ -795,7 +857,8 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
                                         current_iteration = i,
                                         kern_seq = NULL,
                                         temp$pop_state,
-                                        master_env)
+                                        master_env,
+                                        normalize_pop_size)
 
     if(return_all) {
 
@@ -824,6 +887,8 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
 
   }
 
+  temp$pop_state$lambda <- temp$pop_state$lambda[-1]
+
   out <- list(
     iterators   = NA_real_,
     sub_kernels = temp$sub_kernels,
@@ -850,7 +915,8 @@ make_ipm.simple_dd_det <- function(proto_ipm,
                                    ...,
                                    domain_list = NULL,
                                    iterate     = TRUE,
-                                   iterations  = 50) {
+                                   iterations  = 50,
+                                   normalize_pop_size = FALSE) {
 
   # Work out whether to append usr_funs to proto or to restore them from prior
   # implemenation. Logic is documented in make_ipm.simple_di_det()
@@ -887,7 +953,8 @@ make_ipm.simple_dd_det <- function(proto_ipm,
   # than di output, so I'm going to keep using the di function for now.
   # will change to something else
 
-  out        <- .prep_di_output(others, k_row, proto_ipm, iterations)
+  out        <- .prep_di_output(others, k_row, proto_ipm, iterations,
+                                normalize_pop_size)
   pop_state  <- out$pop_state
 
   # initialize the pop_state vectors in master_env so they can be found
@@ -941,7 +1008,8 @@ make_ipm.simple_dd_det <- function(proto_ipm,
                                        pop_state,
                                        master_env,
                                        proto_ipm,
-                                       k_row)
+                                       k_row,
+                                       normalize_pop_size)
 
     names(iterator)    <- paste(names(iterator), i, sep = "_")
     names(sub_kernels) <- paste(names(sub_kernels), i, sep = "_")

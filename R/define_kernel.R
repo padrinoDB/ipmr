@@ -46,16 +46,16 @@
 #' One can also specify \code{usr_funs} function that performs the correction
 #' during the numerical implementation of the model itself. In that case,
 #' set \code{evict_cor} to \code{FALSE}.
-#'}
 #'
-#' \details{Different classes of IPMs may have many or only a few kernels. Each
+#'
+#' @details
+#' Different classes of IPMs may have many or only a few kernels. Each
 #' one requires its own call to this function, though there are some exceptions,
 #' namely for kernels derived from hierarchical models (e.g. vital rate models
 #' fit across plots and years). \code{remove_k} is a helper for re-building models
 #' but with a different \code{K} kernel.
-#'}
 #'
-#' \section{\code{define_k}{
+#' \strong{\code{define_k}}
 #'
 #' The preferred method of defining a \code{K} kernel is to use the left
 #' hand side of the \code{...} to reference the population vectors that the right
@@ -66,9 +66,8 @@
 #' calculations of deterministic population growth rate). In those cases, the
 #' \code{...} can contain something like \code{K = P + F}. In this case, the left
 #' hand side of the expression should match the \code{name} argument to \code{define_k}.
-#' }
 #'
-#' \section {\code{define_kernel}}{
+#' \strong{\code{define_kernel}}
 #'
 #' \code{define_kernel} generates most of the information needed to create an IPM
 #' kernel. There are a few requirements - \code{name}, \code{family}, and
@@ -77,7 +76,6 @@
 #' \code{...} should be a set of named expressions that correspond to vital rate
 #' expressions (e.g. \code{G = dnorm(size_2, mean_size, sd_size)}). See the vignettes
 #' for more information on how to get started.
-#' }
 #'
 #' @return All functions described here return a  \code{proto_ipm}.
 #'
