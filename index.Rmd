@@ -13,6 +13,22 @@ output:
 
 `ipmr` is a package for implementing Integral Projection Models (IPMs) in _R_. It relies heavily on the mathematical syntax of the models, and does not try to abstract over the process of fitting vital rates. It is still very much a work in progress, and so models implemented using current code may not run in the not-so-distant future as more complicated methods are brought online and tweaks are made. Below is a brief overview of how `ipmr` classifies different model types followed by examples of how to implement those types in this framework. 
 
+## Installation
+
+`ipmr` is not yet on CRAN. You can install the development version with the snippet below:
+
+```{r eval = FALSE}
+
+if(!require('remotes', quietly = TRUE)) {
+  install.packages("remotes")
+}
+
+remotes::install_github("levisc8/ipmr")
+
+```
+
+## Package scope
+
 Note that this package **will not** help with the process of fitting vital rate models at all! That is a sufficiently different (and vast) question that we decided it was not within the scope of this project. This will only help you turn those regression models into an IPM without shooting yourself in the foot. Thus, everything that follows assumes you have parameterized those vital rate models and are now ready to begin implementing your model. 
 
 Below is a brief overview of the package and some examples of how to implement models with it.

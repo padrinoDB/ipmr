@@ -20,6 +20,21 @@ complicated methods are brought online and tweaks are made. Below is a
 brief overview of how `ipmr` classifies different model types followed
 by examples of how to implement those types in this framework.
 
+## Installation
+
+`ipmr` is not yet on CRAN. You can install the development version with
+the snippet below:
+
+``` r
+if(!require('remotes', quietly = TRUE)) {
+  install.packages("remotes")
+}
+
+remotes::install_github("levisc8/ipmr")
+```
+
+## Package scope
+
 Note that this package **will not** help with the process of fitting
 vital rate models at all\! That is a sufficiently different (and vast)
 question that we decided it was not within the scope of this project.
