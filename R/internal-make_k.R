@@ -37,8 +37,6 @@
 
     k_id       <- k_rows$kernel_id[i]
 
-    to_bind    <- .get_sub_kernels_for_k(k_id, sub_kernel_list)
-
     param_tree <- k_rows$params[[i]]
 
     # Part one of .generate_kernel env, but we don't want to bind kern_quos
@@ -48,7 +46,7 @@
                                  !!! param_tree$parameters)
 
     rlang::env_bind_lazy(kern_env,
-                         !!! to_bind,
+                         !!! sub_kernel_list,
                          .eval_env = kern_env)
 
     kern_form        <- .parse_k_formulae(param_tree$formula,
@@ -86,8 +84,6 @@
 
     k_id       <- k_rows$kernel_id[i]
 
-    to_bind    <- .get_sub_kernels_for_k(k_id, sub_kernel_list)
-
     param_tree <- k_rows$params[[i]]
 
     # Part one of .generate_kernel env, but we don't want to bind kern_quos
@@ -97,7 +93,7 @@
                                  !!! param_tree$parameters)
 
     rlang::env_bind_lazy(kern_env,
-                         !!! to_bind,
+                         !!! sub_kernel_list,
                          .eval_env = kern_env)
 
     kern_form <- .parse_k_formulae(param_tree$formula,
@@ -157,8 +153,6 @@
 
     id         <- k_row$kernel_id[i]
 
-    to_bind    <- .get_sub_kernels_for_k(id, sub_kern_list)
-
     param_tree <- k_row$params[[i]]
 
     # Part one of .generate_kernel env, but we don't want to bind kern_quos
@@ -168,7 +162,7 @@
                                  !!! param_tree$params)
 
     rlang::env_bind_lazy(kern_env,
-                         !!! to_bind,
+                         !!! sub_kern_list,
                          .eval_env = kern_env)
 
     kern_form <- .parse_k_formulae(param_tree$formula,
@@ -234,23 +228,4 @@
 
   return(master_env)
 
-}
-
-#' @noRd
-
-.get_sub_kernels_for_k <- function(k_id, sub_kernel_list) {
-
-  sk_names <- names(sub_kernel_list)
-
-  # Presuming that kernels will not have multi-part names separated by underscores,
-  # and that dropping the first part will get the suffix info for matching...
-
-  suffix <- strsplit(k_id, '_')[[1]][-1] %>%
-    paste(collapse = "_")
-
-  sk_ind <- grepl(suffix, sk_names)
-
-  out    <- sub_kernel_list[sk_ind]
-
-  return(out)
 }
