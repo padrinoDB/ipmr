@@ -117,16 +117,16 @@ a character vector corresponding to kernel names (e.g. kernels from different
 sites - \code{'a', 'b', 'c'}), a Markov chain matrix with
 transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
 If empty, the model will try to run deterministically for each unique combination
-of hierarchical variables (if any).}
+of hierarchical variables (if any, not recommended).}
 }
 \value{
 The \code{make_ipm.*} methods will always return a list of length 6
 containing the following components:
 
 \itemize{
-  \item{\strong{iterators}}{: iteration kernel(s) (if specified by \code{define_k}),
-                            otherwise contains \code{NA}.}
-  \item{\strong{sub_kernels}}{: the sub_kernels specified in \code{define_kernel}.}
+  \item{\strong{iterators}}{: iteration kernel(s) (if specified by \code{define_k})
+                            for \code{simple_*}. otherwise contains \code{NA}.}
+  \item{\strong{sub_kernels}}{: a list of sub_kernels specified in \code{define_kernel}.}
   \item{\strong{env_list}}{: a list containing the evaluation environments of
                            kernel. This will always be empty unless \code{
                            return_all} is \code{TRUE}. Mostly here for developer
@@ -135,10 +135,10 @@ containing the following components:
                              kernel indices indicating the order
                              in which kernels are to be/were resampled OR
                              a matrix with as many columns as stochastic parameters
-                             \code{n_iterations} rows.}
-  \item{\strong{pop_state}}{: population vectors stored as an instance of the
+                             and \code{n_iterations} rows.}
+  \item{\strong{pop_state}}{: population vectors
                              stored as a list of arrays. The first dimension
-                             of each array corresponds to the state variable,
+                             of each array corresponds to the state variable distribution,
                              and the second dimsension corresponds to time
                              steps.}
   \item{\strong{proto_ipm}}{: the \code{proto_ipm} object used to implement
