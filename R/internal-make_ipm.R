@@ -1065,20 +1065,26 @@
 
       if(is.character(kern_seq)) {
 
-        # Almost identical to integer kern_seq method, but need to return
-        # a character value from vapply for exact matching. Earlier version
-        # used fuzzy matching which I think is too risky.
+        kern_ind <- grepl(kern_seq[iteration_ind], names(sub_kern_list))
 
-        kern_ind <- vapply(names(sub_kern_list),
-                           function(x) strsplit(x, '_')[[1]][2],
-                           character(1L))
-        kern_ind <- which(kern_ind == kern_seq[iteration_ind])
         k_row_ind <- which(grepl(kern_seq[iteration_ind], k_row$kernel_id))
 
 
         use_kerns <- sub_kern_list[kern_ind]
         use_k     <- k_row[k_row_ind, ]
 
+        # Deals with the case where only a subset of kernels have suffixes.
+        # In that case, we need to include the ones that don't have them
+        # in the use_kerns list every single time!
+
+        if(any(!proto_ipm$has_hier_effs) && any(proto_ipm$has_hier_effs)) {
+
+          nm_ind <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+          to_add <- sub_kern_list[nm_ind]
+
+          use_kerns <- c(use_kerns, to_add)
+
+        }
       } else {
 
         kern_ind <- vapply(names(sub_kern_list),
@@ -1205,9 +1211,26 @@
 
       if(is.character(kern_seq)) {
 
-        use_kerns <- sub_kern_list[grepl(kern_seq[i], names(sub_kern_list))]
+        kern_ind <- grepl(kern_seq[iteration_ind], names(sub_kern_list))
 
-        use_k     <- k_row[grepl(kern_seq[i], k_row$kernel_id), ]
+        k_row_ind <- which(grepl(kern_seq[iteration_ind], k_row$kernel_id))
+
+
+        use_kerns <- sub_kern_list[kern_ind]
+        use_k     <- k_row[k_row_ind, ]
+
+        # Deals with the case where only a subset of kernels have suffixes.
+        # In that case, we need to include the ones that don't have them
+        # in the use_kerns list every single time!
+
+        if(any(!proto_ipm$has_hier_effs) && any(proto_ipm$has_hier_effs)) {
+
+          nm_ind <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+          to_add <- sub_kern_list[nm_ind]
+
+          use_kerns <- c(use_kerns, to_add)
+
+        }
 
       } else {
 
