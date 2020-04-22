@@ -17,3 +17,4 @@
 ^bug_reports/*$
 ^vignettes/generic-progress\.Rmd$
 ^profiling/*$
+^tests/sim_tests$
