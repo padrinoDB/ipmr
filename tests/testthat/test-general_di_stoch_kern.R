@@ -1312,3 +1312,230 @@ test_that('normalize pop vec works', {
   expect_equal(pop_sizes_ipmr, rep(1, 101), tolerance = 1e-15)
 
 })
+
+
+test_that('partially stochastic models also work', {
+
+  all_g_int   <- as.list(rnorm(5, mean = 5.781, sd = 0.9)) # as.list(t(ranef(my_growth_model)))
+  all_f_s_int <- as.list(rnorm(5, mean = 2.6204, sd = 0.3)) # as.list(t(ranef(my_seed_model)))
+
+  names(all_g_int)   <- paste("g_int_", 1:5, sep = "")
+  names(all_f_s_int) <- paste("f_s_int_", 1:5, sep = "")
+
+  constant_list <- list(
+    g_slope   = 0.988,
+    g_sd      = 20.55699,
+    s_int     = -0.352,
+    s_slope   = 0.122,
+    s_slope_2 = -0.000213,
+    f_r_int   = -11.46,
+    f_r_slope = 0.0835,
+    f_s_slope = 0.01256,
+    f_d_mu    = 5.6655,
+    f_d_sd    = 2.0734,
+    e_p       = 0.15,
+    g_i       = 0.5067
+  )
+
+  all_params <- c(constant_list, all_g_int, all_f_s_int)
+
+  data_list_cr <- list(
+    g_int     = 7.229,
+    g_slope   = 0.988,
+    g_sd      = 21.72262,
+    s_int     = 0.0209,
+    s_slope   = 0.0831,
+    s_slope_2 = -0.00012999,
+    f_r_int   = -11.46,
+    f_r_slope = 0.0835,
+    f_s_int   = 2.6204,
+    f_s_slope = 0.01256,
+    f_d_mu    = 5.6655,
+    f_d_sd    = 2.0734,
+    e_p       = 0.15,
+    g_i       = 0.5067
+  )
+
+  L <- 1.02
+  U <- 624
+  n <- 500
+
+  set.seed(2312)
+
+  init_pop_vec   <- runif(500)
+  init_seed_bank <- 20
+
+  inv_logit <- function(int, slope, sv) {
+    1/(1 + exp(-(int + slope * sv)))
+  }
+
+  inv_logit_2 <- function(int, slope, slope_2, sv) {
+    1/(1 + exp(-(int + slope * sv + slope_2 * sv ^ 2)))
+  }
+
+
+  general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
+    define_kernel(
+      name             = "P_year",
+      formula          = s * g_year * d_ht,
+      family           = "CC",
+      g_year           = dnorm(ht_2, g_mu_year, g_sd),
+      g_mu_year        = g_int_year + g_slope * ht_1,
+      s                = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
+      data_list        = all_params,
+      states           = list(c('ht')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = list(year = 1:5),
+      evict_cor        = TRUE,
+      evict_fun        = truncated_distributions('norm',
+                                                 'g_year')
+    ) %>%
+    define_kernel(
+      name          = "go_discrete_year",
+      formula       = f_r * f_s_year * g_i,
+      family        = 'CD',
+      f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
+      f_s_year      = exp(f_s_int_year + f_s_slope * ht_1),
+      data_list     = all_params,
+      states        = list(c('ht')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = list(year = 1:5)
+    ) %>%
+    define_kernel(
+      name    = 'stay_discrete',
+      formula = 0,
+      family  = "DD",
+      states  = list(c('ht')),
+      has_hier_effs = FALSE,
+      evict_cor = FALSE
+    ) %>%
+    define_kernel(
+      name          = 'leave_discrete',
+      formula       = e_p * f_d * d_ht,
+      f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
+      family        = 'DC',
+      data_list     = all_params,
+      states        = list(c('ht')),
+      has_hier_effs = FALSE,
+      evict_cor     = TRUE,
+      evict_fun     = truncated_distributions('norm',
+                                              'f_d')
+    ) %>%
+    define_k(
+      name          = "K_year",
+      family        = "IPM",
+      n_b_t_1       = stay_discrete %*% n_b_t  + go_discrete_year %*% n_ht_t,
+      n_ht_t_1      = leave_discrete %*% n_b_t + P_year %*% n_ht_t,
+      data_list     = all_params,
+      states        = list(c('ht')),
+      has_hier_effs = TRUE,
+      levels_hier_effs = list(year = 1:5)
+    ) %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c("P_year", "go_discrete_year", "stay_discrete", "leave_discrete", "K"),
+        int_rule     = c(rep("midpoint", 5)),
+        dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
+        dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+      )
+    ) %>%
+    define_domains(
+      ht = c(L, U, n)
+    ) %>%
+    define_pop_state(
+      n_ht = init_pop_vec,
+      n_b  = init_seed_bank
+    ) %>%
+    make_ipm(iterations = 3,
+             kernel_seq = sample(1:5, size = 3, replace = TRUE),
+             usr_funs = list(inv_logit   = inv_logit,
+                             inv_logit_2 = inv_logit_2),
+             return_all = TRUE)
+
+  states <- list(c('ht'))
+
+  det_version <- init_ipm("general_di_det") %>%
+    define_kernel(
+      name          = "P",
+      formula       = s_g_mult(s, g) * d_ht,
+      family        = "CC",
+      g             = dnorm(ht_2, g_mu, g_sd),
+      g_mu          = g_int + g_slope * ht_1,
+      s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
+      data_list     = data_list_cr,
+      states        = states,
+      has_hier_effs = FALSE,
+      evict_cor     = TRUE,
+      evict_fun     = truncated_distributions('norm',
+                                              'g')
+    ) %>%
+    define_kernel(
+      name          = "go_discrete",
+      formula       = f_r * f_s * g_i,
+      family        = 'CD',
+      f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
+      f_s           = exp(f_s_int + f_s_slope * ht_1),
+      data_list     = data_list_cr,
+      states        = states,
+      has_hier_effs = FALSE
+    ) %>%
+    define_kernel(
+      name    = 'stay_discrete',
+      formula = 0,
+      family  = "DD",
+      states  = states,
+      evict_cor = FALSE
+    ) %>%
+    define_kernel(
+      name          = 'leave_discrete',
+      formula       = e_p * f_d * d_ht,
+      f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
+      family        = 'DC',
+      data_list     = data_list_cr,
+      states        = states,
+      has_hier_effs = FALSE,
+      evict_cor     = TRUE,
+      evict_fun     = truncated_distributions('norm',
+                                              'f_d')
+    ) %>%
+    define_k(
+      name     = "K",
+      family   = "IPM",
+      n_b_t_1  = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
+      n_ht_t_1 = leave_discrete %*% n_b_t + P %*% n_ht_t,
+      data_list     = data_list_cr,
+      states        = states,
+      has_hier_effs = FALSE
+    ) %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
+        int_rule     = c(rep("midpoint", 5)),
+        dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
+        dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+      )
+    ) %>%
+    define_domains(
+      ht = c(1.02, 624, 500)
+    ) %>%
+    define_pop_state(
+      pop_vectors = list(
+        n_ht = init_pop_vec,
+        n_b  = init_seed_bank
+      )
+    ) %>%
+    make_ipm(iterations = 100,
+             usr_funs = list(inv_logit   = inv_logit,
+                             inv_logit_2 = inv_logit_2),
+             return_all = TRUE)
+
+  leave_discrete_stoch <- general_stoch_kern_ipm$sub_kernels$leave_discrete
+  leave_discrete_det   <- det_version$sub_kernels$leave_discrete
+
+  # if partially hierarchical models work the way they should,
+  # then there should never be an difference between the deterministic model
+  # version of this kernel and the stochastic model version of it!
+
+  expect_equal(leave_discrete_det, leave_discrete_stoch)
+
+})
