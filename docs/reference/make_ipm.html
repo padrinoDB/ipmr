@@ -155,7 +155,8 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
   <span class='no'>...</span>,
   <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>
+  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )
 
 <span class='co'># S3 method for simple_di_stoch_kern</span>
@@ -167,6 +168,7 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
   <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )
 
@@ -178,7 +180,8 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
   <span class='no'>...</span>,
   <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>
+  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )
 
 <span class='co'># S3 method for general_di_det</span>
@@ -189,7 +192,8 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
   <span class='no'>...</span>,
   <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>
+  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )
 
 <span class='co'># S3 method for general_di_stoch_kern</span>
@@ -201,7 +205,8 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
   <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+  <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )
 
 <span class='co'># S3 method for general_di_stoch_param</span>
@@ -212,7 +217,8 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
   <span class='no'>...</span>,
   <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>
+  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -258,6 +264,12 @@ be <code>TRUE</code>.</p></td>
 to simulate.</p></td>
     </tr>
     <tr>
+      <th>normalize_pop_size</th>
+      <td><p>A logical indicating whether to re-scale the population
+vector to sum before each iteration. Default is <code>TRUE</code> for <code>*_di_*</code>
+methods and <code>FALSE</code> for <code>*_dd_*</code> methods.</p></td>
+    </tr>
+    <tr>
       <th>kernel_seq</th>
       <td><p>The sequence of kernels to use during the iterations.
 This can either be a vector of integers corresponding to kernel names (e.g.
@@ -266,7 +278,7 @@ a character vector corresponding to kernel names (e.g. kernels from different
 sites - <code>'a', 'b', 'c'</code>), a Markov chain matrix with
 transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
 If empty, the model will try to run deterministically for each unique combination
-of hierarchical variables (if any).</p></td>
+of hierarchical variables (if any, not recommended).</p></td>
     </tr>
     </table>
 
@@ -275,9 +287,9 @@ of hierarchical variables (if any).</p></td>
     <p>The <code>make_ipm.*</code> methods will always return a list of length 6
 containing the following components:</p>
 <ul>
-<li><p><strong>iterators</strong>: iteration kernel(s) (if specified by <code>define_k</code>),
-                            otherwise contains <code>NA</code>.</p></li>
-<li><p><strong>sub_kernels</strong>: the sub_kernels specified in <code>define_kernel</code>.</p></li>
+<li><p><strong>iterators</strong>: iteration kernel(s) (if specified by <code>define_k</code>)
+                            for <code>simple_*</code>. otherwise contains <code>NA</code>.</p></li>
+<li><p><strong>sub_kernels</strong>: a list of sub_kernels specified in <code>define_kernel</code>.</p></li>
 <li><p><strong>env_list</strong>: a list containing the evaluation environments of
                            kernel. This will always be empty unless <code>
                            return_all</code> is <code>TRUE</code>. Mostly here for developer
@@ -286,10 +298,10 @@ containing the following components:</p>
                              kernel indices indicating the order
                              in which kernels are to be/were resampled OR
                              a matrix with as many columns as stochastic parameters
-                             <code>n_iterations</code> rows.</p></li>
-<li><p><strong>pop_state</strong>: population vectors stored as an instance of the
+                             and <code>n_iterations</code> rows.</p></li>
+<li><p><strong>pop_state</strong>: population vectors
                              stored as a list of arrays. The first dimension
-                             of each array corresponds to the state variable,
+                             of each array corresponds to the state variable distribution,
                              and the second dimsension corresponds to time
                              steps.</p></li>
 <li><p><strong>proto_ipm</strong>: the <code>proto_ipm</code> object used to implement

@@ -252,6 +252,31 @@ set <code>evict_cor</code> to <code>FALSE</code>.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>All functions described here return a  <code>proto_ipm</code>.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Different classes of IPMs may have many or only a few kernels. Each
+one requires its own call to this function, though there are some exceptions,
+namely for kernels derived from hierarchical models (e.g. vital rate models
+fit across plots and years). <code>remove_k</code> is a helper for re-building models
+but with a different <code>K</code> kernel.</p>
+<p><strong><code>define_k</code></strong></p>
+<p>The preferred method of defining a <code>K</code> kernel is to use the left
+hand side of the <code>...</code> to reference the population vectors that the right
+hand side creates (e.g. <code>n_T_1 = (P + F) %*% n_T</code>). This enables powerful
+iteration-based methods to work properly. On the other hand, these iteration
+based methods can be quite time consuming, and many applications only require
+an iteration matrix while not necessarily requiring the population vectors (e.g.
+calculations of deterministic population growth rate). In those cases, the
+<code>...</code> can contain something like <code>K = P + F</code>. In this case, the left
+hand side of the expression should match the <code>name</code> argument to <code>define_k</code>.</p>
+<p><strong><code>define_kernel</code></strong></p>
+<p><code>define_kernel</code> generates most of the information needed to create an IPM
+kernel. There are a few requirements - <code>name</code>, <code>family</code>, and
+<code>formula</code> must not be empty. The <code>formula</code> should be an expression
+for how vital rates produce a kernel (e.g. <code>formula = S * G</code>). The
+<code>...</code> should be a set of named expressions that correspond to vital rate
+expressions (e.g. <code>G = dnorm(size_2, mean_size, sd_size)</code>). See the vignettes
+for more information on how to get started.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -259,6 +284,7 @@ set <code>evict_cor</code> to <code>FALSE</code>.</p></td>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
     </ul>
 
   </div>

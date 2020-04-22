@@ -805,15 +805,15 @@ stoch_lambda <- lambda(my_iterated_ipm, comp_method = 'pop_size', type = 'stocha
 
 ```
 
-100 iterations is probably not enough to estimate stochastic growth rates ($\lambda_s$), but the computations can take some time with a lot of iterations, and is probably not practical for demonstration purposes. 
+100 iterations is not enough to estimate stochastic growth rates ($\lambda_s$), but the computations can take some time with a lot of iterations, and are not practical for demonstration purposes. 
 
 ## Simple IPMs for continuously varying environments 
 
 In some cases, it is not desirable to work with single estimates of a random variable, and we prefer to work with the distributions they come from. Quantifying uncertainty is a critical part of demography. Additionally, environmental variables like climate may be random with reasonably well known distributions. A stochastic simulation can incorporate information to help us understand the consequences. 
 
-Unfortunately, this also means that we can't obtain a set of kernels without iterating the model at least once, because we have to sample from the parameter distributions at least once (well, technically, we can, but this is probably not the desired behavior). This is where the `*_stoch_param` methods come in handy. `*_stoch_param` methods are slightly less computationally efficient than their `*_stoch_kern*` counterparts because they must rebuild the iteration kernel for every single iteration. However, they are fantastic tools for propagating uncertainty in parameter estimates throughout the model. 
+Unfortunately, this also means that we can't obtain a set of kernels without iterating the model at least once, because we have to sample from the parameter distributions at least once (well, technically, we can, but this is probably not the desired behavior). This is where the `*_stoch_param` methods come in handy. `*_stoch_param` methods are slightly less computationally efficient than their `*_stoch_kern*` counterparts because they must rebuild the iteration kernel for every single iteration. However, they are fantastic tools for exploring uncertainty and/or random variation. 
 
-Below is an example that demonstrates how to work with posterior distributions from Bayesian models. `ipmr` is careful to only evaluate each function in `define_env_state()` once per iteration, so you can use multivariate joint distributions correctly.
+Below is an example that demonstrates how to work with posterior distributions from Bayesian models. This far from the only use case for this type of model, but will hopefully demonstrate how to incorporate parameter distributions into an IPM. `ipmr` is careful to only evaluate each expression in `define_env_state()` once per iteration, so you can safely work with multivariate distributions using very little additional code.
 
 Equivalent code is demonstrated in the comments, but switches to a Bayesian model for growth and survival, specifically [`brms`](https://paul-buerkner.github.io/brms/). The parameters for the growth and survival functions will be sampled from posterior distributions one time per iteration, and an example of a function to pass to `define_env_state()` is included in the first chunk below. 
 
@@ -833,7 +833,7 @@ Stochastic simulations require specification of the initial conditions. `ipmr` a
 
 **or**
 
-2. a named list of pre-generated population vectors in the `pop_vectors` argument 
+2. a named list of pre-generated population vectors in the `pop_vectors` argument. This format is useful for programming with population vectors that are computed elsewhere. 
 
     - example: `define_pop_state(pop_vectors = list(n_dbh = init_dbh_vector))`, where `init_dbh_vector` is generated somewhere earlier in the script.
 
@@ -843,9 +843,14 @@ In `define_pop_state()`, populations should be defined as `n_<insertStateVariabl
 
 `define_env_state()` takes a named set of expressions in the `...` and then a data list, much like how `define_kernel()`/`define_k()` take them. The values created need to be in a list that has names corresponding to the parameter names in the vital rate expressions. In this example, they are called `s_int`, `s_slope`, `g_int`, `g_slope`, and `g_sd`. The `data_list` in  for this section should contain any variables used in the function you define (in this example, `posterior_distribs`). You can reference them in the vital rate expressions in each kernel definition as if they were in the `data_list` of `define_kernel/define_k()`. 
 
-### The model
+### Vital rate models
 
-The first chunk below initializes the parameters, population vector, and functions that the model uses. It takes the place of the usual vital rate model fitting process. The vital rate functions and models for this example are as follows:
+The first chunk below initializes the parameters and functions that the model uses. It takes the place of the usual vital rate model fitting process. 
+
+
+This example uses two Bayesian models for survival and growth and a single function to sample them to illustrate how to use continuously varying parameter distributions in `ipmr`. This only uses two models and one function to limit the the complexity of the example - there is no upper limit on the number of parameters or functions you can use in your own models. 
+
+The vital rate functions are described here:
 
 1. survival (`s`): a Bayesian logistic regression. 
 
@@ -867,6 +872,8 @@ The first chunk below initializes the parameters, population vector, and functio
 
     - example code: mean (`f_d_mu`) `mean(my_recruit_data$size_2, na.rm = TRUE)` and standard deviation (`f_d_sd`) `sd(my_recruit_data$size_2, na.rm = TRUE)`
     
+
+And the the parameter values are given here:
     
 ```{r eval = FALSE}
 
@@ -874,12 +881,12 @@ library(ipmr)
 
 # Define the fixed parameters in a list
 
-data_list <- list(f_r_int   = 0.3,
-                  f_r_slope = 0.03,
-                  f_s_int   = 0.4,
-                  f_s_slope = 0.001,
-                  f_d_mu    = 1.1,
-                  f_d_sd    = 0.1)
+constant_params <- list(f_r_int   = 0.3,
+                        f_r_slope = 0.03,
+                        f_s_int   = 0.4,
+                        f_s_slope = 0.001,
+                        f_d_mu    = 1.1,
+                        f_d_sd    = 0.1)
 
 # Simulate some random parameters to define the multivariate distribution
 # to sample from. In user specified models, this might be replaced by
@@ -905,18 +912,15 @@ names(posterior_distribution) <- c(
   'g_sd'
 )
 
-# Specify an initial population vector. This can also be done in the call to
-# define_pop_state
-
-init_pop_vec <- runif(100)
-
 # We define a wrapper function that samples from a data frame containing the
 # joint posterior distribution of each parameter. In this case, all posterior
-# samples are weighted as equally probable for the sake of simplicity. 
+# samples are weighted as equally probable for the sake of simplicity. One could
+# modify this to generate more realistic probabilities.
 
 posterior_sample <- function(posterior_distrib) {
   
-  sample_pos <- seq(1, dim(posterior_distrib)[1])
+  sample_pos <- seq(1, dim(posterior_distrib)[1], by = 1)
+  
   sample_ind <- sample(sample_pos, size = 1, prob = NULL)
   
   out <- as.list(posterior_distrib[sample_ind , ])
@@ -936,10 +940,14 @@ inv_logit <- function(int, slope, sv1) {
 
 ```
 
+### The continuously varying IPM
+
 We now have parameter estimates. Time to build the IPM!
 
 
 ```{r eval = FALSE}
+
+init_pop_vec <- runif(100)
 
 param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
   define_kernel(
@@ -953,7 +961,7 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
     g_mu      = g_int + g_slope * surf_area_1,
     s         = inv_logit(s_int, s_slope, surf_area_1),
     g         = dnorm(surf_area_2, g_mu, g_sd),
-    data_list = data_list,
+    data_list = constant_params,
     states    = list(c('surf_area')),
     
     # In this case, we do not specify hier_effs as the kernels don't vary discretely,
@@ -970,7 +978,7 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
     f_r           = inv_logit(f_r_int, f_r_slope, surf_area_1),
     f_s           = exp(f_s_int + f_s_slope * surf_area_1),
     f_d           = dnorm(surf_area_2, f_d_mu, f_d_sd),
-    data_list     = data_list,
+    data_list     = constant_params,
     states        = list(c('surf_area')),
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
@@ -988,7 +996,7 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
     n_surf_area_t_1 = K %*% n_surf_area_t,
     # n_surf_area_t_1 = right_mult(K, n_surf_area_t),
     family          = 'IPM',
-    data_list       = data_list,
+    data_list       = constant_params,
     states          = list(c('surf_area')),
     has_hier_effs   = FALSE,
     evict_cor          = FALSE
@@ -1001,12 +1009,25 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
       dom_end      = rep('surf_area', 3)
     )
   ) %>%
-  define_domains(surf_area = c(0, 10, 100)) %>%
+    define_domains(surf_area = c(0, 10, 100))
+
+```
+
+The continuously varying parameters and the expressionss that generate them should be passed into `define_env_state()`. `make_ipm()` will ensure that these are evaluated only once per iteration of the model, so that you can safely work with joint distributions that generate multiple parameter estimates per draw. 
+
+The `...` part of `define_env_state()` should be expressions that generate the variables you would like to reference. In this case `env_params` is a named list that contains `s_int`, `s_slope`, `g_int`, `g_slope`, and `g_sd`. The `s_int`, `s_slope`, etc are the names that will be generated by the IPM code, and so are the names that should be referenced in the kernels' vital rate expressions, not `env_params`! You don't need to remember that you called this particular object `env_params` when you write your vital rate expressions, but it does have to be named something for the IPM code to run. 
+
+The `data_list` contains the data frame we made that contains the posterior samples from our vital rate model. In this example, the growth and survival models weren't actually fit together, so there's no statistical reason to actually combine them, it's just for simplicity.
+
+The only requirement here is that the names
+
+```{r eval = FALSE}
+
+param_resamp_model <- param_resamp_model %>%
+  
   define_env_state(
     env_params = posterior_sample(posterior_distrib),
-    data_list = list(
-      posterior_distrib = posterior_distribution
-    )
+    data_list  = list(posterior_distrib = posterior_distribution)
   ) %>%
   define_pop_state(
     pop_vectors = list(
@@ -1017,6 +1038,13 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
                              posterior_sample = posterior_sample),
            iterate    = TRUE,
            iterations = 10)
+
+lambda(param_resamp_model, comp_method = 'pop_size', type_lambda = 'all')
+
+# If you want to see the actual draws that were used at each step of the 
+# model iteration, you can access these using the output's $env_seq slot.
+
+param_resamp_model$env_seq
 
 ```
 
