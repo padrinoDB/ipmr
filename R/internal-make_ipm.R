@@ -704,6 +704,17 @@
 
   domain_list     <- domain_list[!duplicated(names(domain_list))]
 
+  # This next bit guarantees that d_1 comes before d_2 every time.
+  # testing partially hierarchical models produced a bug where d_2
+  # can occur before d_1 in the names of this list in one very specific, but
+  # potentially not-uncommon case where the first non-NA domain name in domain_list
+  # d_2
+
+  nm_order        <- sort(names(domain_list))
+  domain_list     <- domain_list[nm_order]
+
+  # Resume as before
+
   bounds          <- purrr::map(domain_list, function(x) .make_domain_seqs(x))
 
   # Create helper vars for user-facing formula writing
