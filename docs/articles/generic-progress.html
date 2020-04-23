@@ -93,7 +93,7 @@
       <h1>Generic Progress</h1>
                         <h4 class="author">Sam Levin</h4>
             
-            <h4 class="date">2020-04-22</h4>
+            <h4 class="date">2020-04-23</h4>
       
       
       <div class="hidden name"><code>generic-progress.Rmd</code></div>
@@ -106,148 +106,140 @@
 <h2 class="hasAnchor">
 <a href="#generic-implementation-progress" class="anchor"></a>Generic implementation progress</h2>
 <p>Below is a table indicating which methods are implemented for each class defined in <code>ipmr</code>. If the column has an “X” in it, that means it is ready. Some methods don’t apply to certain types (i.e. <code><a href="../reference/make_ipm.html">make_ipm()</a></code> for IPMs that have already been built).</p>
-<pre><code>## &lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
-##  &lt;thead&gt;
-## &lt;tr&gt;
-## &lt;th style="border-bottom:hidden" colspan="1"&gt;&lt;/th&gt;
-## &lt;th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="7"&gt;&lt;div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; "&gt;Function&lt;/div&gt;&lt;/th&gt;
-## &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Model &lt;/th&gt;
-##    &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; plot &lt;/th&gt;
-##    &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; print &lt;/th&gt;
-##    &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; make_ipm &lt;/th&gt;
-##    &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; lambda &lt;/th&gt;
-##    &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; format_mega_matrix &lt;/th&gt;
-##    &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; left_ev &lt;/th&gt;
-##    &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; right_ev &lt;/th&gt;
-##   &lt;/tr&gt;
-##  &lt;/thead&gt;
-## &lt;tbody&gt;
-##   &lt;tr grouplength="6"&gt;&lt;td colspan="8" style="border-bottom: 1px solid;"&gt;&lt;strong&gt;proto_ipm&lt;/strong&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;
-##    &lt;td style="text-align:left; padding-left: 2em;border-left:1px solid;border-right:1px solid;" indentlevel="1"&gt; simple_di_det &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style="text-align:left; padding-left: 2em;border-left:1px solid;border-right:1px solid;" indentlevel="1"&gt; simple_di_stoch_kern &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style="text-align:left; padding-left: 2em;border-left:1px solid;border-right:1px solid;" indentlevel="1"&gt; simple_di_stoch_param &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style="text-align:left; padding-left: 2em;border-left:1px solid;border-right:1px solid;" indentlevel="1"&gt; general_di_det &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style="text-align:left; padding-left: 2em;border-left:1px solid;border-right:1px solid;" indentlevel="1"&gt; general_di_stoch_kern &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style="text-align:left; padding-left: 2em;border-left:1px solid;border-right:1px solid;" indentlevel="1"&gt; general_di_stoch_param &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr grouplength="6"&gt;&lt;td colspan="8" style="border-bottom: 1px solid;"&gt;&lt;strong&gt;ipm&lt;/strong&gt;&lt;/td&gt;&lt;/tr&gt;
-## &lt;tr&gt;
-##    &lt;td style="text-align:left; padding-left: 2em;border-left:1px solid;border-right:1px solid;" indentlevel="1"&gt; simple_di_det &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;"&gt; X &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style="text-align:left; padding-left: 2em;border-left:1px solid;border-right:1px solid;" indentlevel="1"&gt; simple_di_stoch_kern &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style="text-align:left; padding-left: 2em;border-left:1px solid;border-right:1px solid;" indentlevel="1"&gt; simple_di_stoch_param &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style="text-align:left; padding-left: 2em;border-left:1px solid;border-right:1px solid;" indentlevel="1"&gt; general_di_det &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;"&gt; X &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style="text-align:left; padding-left: 2em;border-left:1px solid;border-right:1px solid;" indentlevel="1"&gt; general_di_stoch_kern &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
-##   &lt;/tr&gt;
-##   &lt;tr&gt;
-##    &lt;td style="text-align:left; padding-left: 2em;border-left:1px solid;border-right:1px solid;" indentlevel="1"&gt; general_di_stoch_param &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt; X &lt;/td&gt;
-##    &lt;td style="text-align:left;border-left:1px solid;border-right:1px solid;"&gt;  &lt;/td&gt;
-##    &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
-##   &lt;/tr&gt;
-## &lt;/tbody&gt;
-## &lt;/table&gt;</code></pre>
+<table class="table">
+<thead><tr class="header">
+<th align="left">Model</th>
+<th align="center">plot</th>
+<th align="center">print</th>
+<th align="center">make_ipm</th>
+<th align="center">lambda</th>
+<th align="center">format_mega_matrix</th>
+<th align="center">left_ev</th>
+<th align="center">right_ev</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">simple_di_det</td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="left">simple_di_stoch_kern</td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">simple_di_stoch_param</td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="left">general_di_det</td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">general_di_stoch_kern</td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="left">general_di_stoch_param</td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">simple_di_det</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center">X</td>
+</tr>
+<tr class="even">
+<td align="left">simple_di_stoch_kern</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">simple_di_stoch_param</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="left">general_di_det</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center">X</td>
+</tr>
+<tr class="odd">
+<td align="left">general_di_stoch_kern</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="left">general_di_stoch_param</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
 </div>
   </div>
 

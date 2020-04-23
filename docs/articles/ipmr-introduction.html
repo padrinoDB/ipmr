@@ -91,9 +91,7 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>Introduction to ipmr</h1>
-                        <h4 class="author">Sam Levin</h4>
             
-            <h4 class="date">2020-04-22</h4>
       
       
       <div class="hidden name"><code>ipmr-introduction.Rmd</code></div>
@@ -672,9 +670,9 @@
 <a class="sourceLine" id="cb8-3" title="3"></a>
 <a class="sourceLine" id="cb8-4" title="4"><span class="co"># First, we create vector of values corresponding to </span></a>
 <a class="sourceLine" id="cb8-5" title="5"></a>
-<a class="sourceLine" id="cb8-6" title="6">g_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.3</span>) <span class="co"># t(ranef(my_grow_mod)) for an lme4 output</span></a>
-<a class="sourceLine" id="cb8-7" title="7">s_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.7</span>) <span class="co"># t(ranef(my_surv_mod)) for an lme4 output</span></a>
-<a class="sourceLine" id="cb8-8" title="8">f_s_r_int &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.2</span>) <span class="co"># t(ranef(my_flower_mod)) for an lme4 output</span></a>
+<a class="sourceLine" id="cb8-6" title="6">g_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.3</span>) <span class="co"># unlist(ranef(my_grow_mod)) for an lme4 output</span></a>
+<a class="sourceLine" id="cb8-7" title="7">s_r_int   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.7</span>) <span class="co"># unlist(ranef(my_surv_mod)) for an lme4 output</span></a>
+<a class="sourceLine" id="cb8-8" title="8">f_s_r_int &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="fl">0.2</span>) <span class="co"># unlist(ranef(my_flower_mod)) for an lme4 output</span></a>
 <a class="sourceLine" id="cb8-9" title="9"></a>
 <a class="sourceLine" id="cb8-10" title="10">nms &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"r_"</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dt">sep =</span> <span class="st">""</span>)</a>
 <a class="sourceLine" id="cb8-11" title="11"></a>
@@ -861,7 +859,11 @@
 <p>Unfortunately, this also means that we can’t obtain a set of kernels without iterating the model at least once, because we have to sample from the parameter distributions at least once (well, technically, we can, but this is probably not the desired behavior). This is where the <code>*_stoch_param</code> methods come in handy. <code>*_stoch_param</code> methods are slightly less computationally efficient than their <code>*_stoch_kern*</code> counterparts because they must rebuild the iteration kernel for every single iteration. However, they are fantastic tools for exploring uncertainty and/or random variation.</p>
 <p>Below is an example that demonstrates how to work with posterior distributions from Bayesian models. This far from the only use case for this type of model, but will hopefully demonstrate how to incorporate parameter distributions into an IPM. <code>ipmr</code> is careful to only evaluate each expression in <code><a href="../reference/define_star.html">define_env_state()</a></code> once per iteration, so you can safely work with multivariate distributions using very little additional code.</p>
 <p>Equivalent code is demonstrated in the comments, but switches to a Bayesian model for growth and survival, specifically <a href="https://paul-buerkner.github.io/brms/"><code>brms</code></a>. The parameters for the growth and survival functions will be sampled from posterior distributions one time per iteration, and an example of a function to pass to <code><a href="../reference/define_star.html">define_env_state()</a></code> is included in the first chunk below.</p>
-<p>There are a multitude of ways to incorporate parameter uncertainty and/or continuous environmental variation, and that variety is beyond the scope of this vignette. If the example below is not as helpful as you’d hoped, then my suggestion would be to start reading on GLMMs <a href="https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#introduction">here</a> and continue reading on their applications to IPMs <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12405">here</a>. After that, hopefully the example below will make more sense.</p>
+<p>There are a multitude of ways to incorporate uncertainty and other sources of continuous variation into regression models and IPMs, and that variety is beyond the scope of this vignette. The following resources are excellent introductions to both and themselves contain a multitude of further readings:</p>
+<ol style="list-style-type: decimal">
+<li><p><a href="https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#introduction">wiki for GLMMs</a></p></li>
+<li><p><a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12405">Metcalf et al 2015</a>.</p></li>
+</ol>
 <div id="defining-initial-conditions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#defining-initial-conditions" class="anchor"></a>Defining initial conditions</h3>

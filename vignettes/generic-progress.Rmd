@@ -22,25 +22,9 @@ tab <- read.csv("../paper/generic_progress.csv",
   as_tibble()
 
 
-kab <- knitr::kable(tab,
-                    format = 'html',
-                    aligh = paste(c('l', rep('c', 7)), collapse = "")) %>%
-  kable_styling(
-    fixed_thead = TRUE
-    
-  ) %>%
-  add_header_above(c(' ', "Function" = 7)) %>%
-  pack_rows(
-    'proto_ipm', 1, 6
-  ) %>%
-  pack_rows(
-    'ipm', 7, 12 
-  ) %>%
-  column_spec(1:7,
-              border_left = TRUE,
-              border_right = TRUE)
-
-print(kab)
+knitr::kable(tab,
+             format = 'pandoc',
+             align = paste(c('l', rep('c', 7)), collapse = "")) #%>%
 
 
 ```

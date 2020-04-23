@@ -1,7 +1,5 @@
 ---
 title: "General IPMs"
-author: "Sam Levin"
-date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette: 
     toc: yes
@@ -337,8 +335,8 @@ library(ipmr)
 # to produce the output for the output from lmer/glmer
 # is in the comments next to each line
 
-all_g_int   <- as.list(rnorm(5, mean = 5.781, sd = 0.9)) # as.list(t(ranef(my_growth_model)))
-all_f_s_int <- as.list(rnorm(5, mean = 2.6204, sd = 0.3)) # as.list(t(ranef(my_seed_model)))
+all_g_int   <- as.list(rnorm(5, mean = 5.781, sd = 0.9)) # as.list(unlist(ranef(my_growth_model)))
+all_f_s_int <- as.list(rnorm(5, mean = 2.6204, sd = 0.3)) # as.list(unlist(ranef(my_seed_model)))
 
 
 names(all_g_int)   <- paste("g_int_", 1:5, sep = "")

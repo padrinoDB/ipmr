@@ -1,7 +1,5 @@
 ---
 title: "Introduction to ipmr"
-author: "Sam Levin"
-date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette: 
     toc: yes
@@ -603,9 +601,9 @@ We've defined a `fixed_list` that holds all of the fixed parameters in our model
 
 # First, we create vector of values corresponding to 
 
-g_r_int   <- rnorm(5, 0, 0.3) # t(ranef(my_grow_mod)) for an lme4 output
-s_r_int   <- rnorm(5, 0, 0.7) # t(ranef(my_surv_mod)) for an lme4 output
-f_s_r_int <- rnorm(5, 0, 0.2) # t(ranef(my_flower_mod)) for an lme4 output
+g_r_int   <- rnorm(5, 0, 0.3) # unlist(ranef(my_grow_mod)) for an lme4 output
+s_r_int   <- rnorm(5, 0, 0.7) # unlist(ranef(my_surv_mod)) for an lme4 output
+f_s_r_int <- rnorm(5, 0, 0.2) # unlist(ranef(my_flower_mod)) for an lme4 output
 
 nms <- paste("r_", 1:5, sep = "")
 
@@ -817,7 +815,11 @@ Below is an example that demonstrates how to work with posterior distributions f
 
 Equivalent code is demonstrated in the comments, but switches to a Bayesian model for growth and survival, specifically [`brms`](https://paul-buerkner.github.io/brms/). The parameters for the growth and survival functions will be sampled from posterior distributions one time per iteration, and an example of a function to pass to `define_env_state()` is included in the first chunk below. 
 
-There are a multitude of ways to incorporate parameter uncertainty and/or continuous environmental variation, and that variety is beyond the scope of this vignette. If the example below is not as helpful as you'd hoped, then my suggestion would be to start reading on GLMMs [here](https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#introduction) and continue reading on their applications to IPMs [here](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12405). After that, hopefully the example below will make more sense.
+There are a multitude of ways to incorporate uncertainty and other sources of continuous variation into regression models and IPMs, and that variety is beyond the scope of this vignette. The following resources are excellent introductions to both and themselves contain a multitude of further readings: 
+
+1. [wiki for GLMMs](https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#introduction) 
+
+2. [Metcalf et al 2015](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12405).
 
 ### Defining initial conditions
 

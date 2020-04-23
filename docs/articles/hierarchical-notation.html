@@ -100,10 +100,194 @@
 
     
     
-<p>This vignette describes how to write formulas using <code>ipmr</code>’s notation for hierarchical models. This can potentially save you loads of time and typing, especially when combined with the power of <code>rlang</code> and <code>purrr</code>.</p>
-<div id="need-to-write-this" class="section level2">
+<p>This vignette describes how to write formulas using <code>ipmr</code>’s notation for hierarchical models. It is meant to mirror the standard mathematical notation used to represent the models. The examples here will primarily use <a href="https://github.com/lme4/lme4/">lme4</a> and <a href="https://github.com/paul-buerkner/brms">brms</a> to illustrate how to go from vital rate models to functional forms that you can use in <code>ipmr</code>. You are of course free to use whatever model fitting software you like, but the number of different possibilities are far too great to cover in this vignette.</p>
+<div id="structure" class="section level2">
 <h2 class="hasAnchor">
-<a href="#need-to-write-this" class="anchor"></a>Need to write this</h2>
+<a href="#structure" class="anchor"></a>Structure</h2>
+<ol style="list-style-type: decimal">
+<li><p><a href="#quick">Quick start guide shows how to go from mathematical form to model formula to <code>ipmr</code> code.</a></p></li>
+<li><p><a href="#sim_di_s_k">Worked example with a simple, density independent, stochastic kernel re-sampled model.</a></p></li>
+<li><p><a href="#complicated">Worked example with a general, density independent, stochastic parameter resampled model.</a></p></li>
+</ol>
+</div>
+<div id="quick" class="section level2">
+<h2 class="hasAnchor">
+<a href="#quick" class="anchor"></a>Quick start guide</h2>
+<p>Some quick translations between mathematical notation, R model syntax, and <code>ipmr</code> style notation. In the <code>ipmr</code> column, suffixes that are appended are highlighted in <strong>bold</strong>.</p>
+<p>Suffix names are not restricted to the examples below. The only requirement is that the suffix not be named <code>"pop"</code>. This is an unfortunate side effect of the way <code>ipmr</code> handles population vectors internally - please use something like <code>"site"</code> or <code>"population"</code> instead.</p>
+<table class="table">
+<thead><tr class="header">
+<th align="left">Math</th>
+<th align="left">R</th>
+<th align="left">ipmr</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><span class="math inline">\(\mu_g^{yr} = \alpha_g + \alpha_g^{yr} * \beta_g * z + e\)</span></td>
+<td align="left"><code>size_2 ~ size_1 + (1 | year)</code></td>
+<td align="left">mu_g_<strong>yr</strong> = g_int + g_int_<strong>yr</strong> + g_slope * z</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(z' \sim Norm(\mu_g^{yr}, \sigma_g)\)</span></td>
+<td align="left"></td>
+<td align="left">g = dnorm(z_2, mu_g_<strong>yr</strong>, sd_g)</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(Logit(\mu_{s,yr}^{plot}) = \alpha_s + \alpha_{s,yr}^{plot} + \beta * z\)</span></td>
+<td align="left"><code>surv ~ size_1 + (1|year) + (1|plot)</code></td>
+<td align="left">s_<strong>pl</strong>_<strong>yr</strong> = s_int + s_int_<strong>pl</strong>_<strong>yr</strong> + s_slope * z</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">s = inv_logit(s_<strong>pl</strong>_<strong>yr</strong>)</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(log(\mu_{f_{yr}}) = \alpha_{f} + \alpha_{f_{yr}} + (\beta_f + \beta_{f_{yr}}) * z\)</span></td>
+<td align="left"><code>fec ~ size_1 + (size_1|year)</code></td>
+<td align="left">fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</strong>) * z)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="sim_di_s_k" class="section level2">
+<h2 class="hasAnchor">
+<a href="#sim_di_s_k" class="anchor"></a>Hierarchical models with a single random term</h2>
+<p>These models are pretty common in the IPM literature. They encompass cases where a single site has been sampled over many years, or a sample many sites across one transition.</p>
+<p>This example will use a hypothetical study that spans 5 transitions and has 6 consecutive censuses. To limit complexity, let’s pretend our exploratory analysis and model selection indicated the best overall models included random year-specifc intercepts for growth (<span class="math inline">\(g_{yr}\)</span>) and survival (<span class="math inline">\(s_{yr}\)</span>), but not probability of reproduction (<span class="math inline">\(f_p\)</span>), recruit production (<span class="math inline">\(f_r\)</span>), or the recruit size distribution (<span class="math inline">\(f_d\)</span>). We will work with a simple model to start (i.e. 1 continuous state variable, no discrete states). This yields the following IPM (<span class="math inline">\(z,z'\)</span> represent size/height/weight at time <span class="math inline">\(t\)</span> and <span class="math inline">\(t+1\)</span>, respectively):</p>
+<ol style="list-style-type: decimal">
+<li><p><span class="math inline">\(K_{yr}(z', z) = P_{yr}(z',z) + F(z',z)\)</span></p></li>
+<li><p><span class="math inline">\(P_{yr}(z', z) = s_{yr}(z) * g_{yr}(z',z)\)</span></p></li>
+<li><p><span class="math inline">\(F(z',z) = f_p(z) + f_r(z) + f_d(z')\)</span></p></li>
+</ol>
+<p>Note that only the <span class="math inline">\(K\)</span> and <span class="math inline">\(P\)</span> kernels get the <span class="math inline">\(yr\)</span> subscript appended to them - they are the only ones that our model selection process decided had substantial year to year variation. Thus, we can actually write the <span class="math inline">\(F\)</span> kernel the exact same way as we would in a simple IPM when we implement the model in <code>ipmr</code>.</p>
+<p>The vital rate models could be written on paper as follows:</p>
+<ol start="4" style="list-style-type: decimal">
+<li>
+<p>Growth</p>
+<ul>
+<li><p><span class="math inline">\(\mu_g = (\alpha_g + \alpha_g^{yr})+ \beta_g * z + e\)</span></p></li>
+<li><p><span class="math inline">\(z' \sim Norm(\mu_g, \sigma_g)\)</span></p></li>
+</ul>
+</li>
+<li>
+<p>Survival</p>
+<ul>
+<li><span class="math inline">\(logit(s) = (\alpha_s + \alpha_s^{yr}) + \beta_s * z + e\)</span></li>
+</ul>
+</li>
+<li>
+<p>Probability of reproducing</p>
+<ul>
+<li><span class="math inline">\(logit(f_p) = \alpha_{f_p} + \beta_{f_p} * z\)</span></li>
+</ul>
+</li>
+<li>
+<p>Recruit production</p>
+<ul>
+<li><span class="math inline">\(log(f_r) = \alpha_{f_r} + \beta_{f_r} * z\)</span></li>
+</ul>
+</li>
+<li>
+<p>Recruit size distribution</p>
+<ul>
+<li><span class="math inline">\(f_d \sim Norm(\mu_{f_d}, \sigma_{f_d})\)</span></li>
+</ul>
+</li>
+</ol>
+<p>and modelled in R as follows:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(lme4)</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ipmr)</a>
+<a class="sourceLine" id="cb1-3" title="3"></a>
+<a class="sourceLine" id="cb1-4" title="4">grow_mod &lt;-<span class="st"> </span><span class="kw">lmer</span>(size_<span class="dv">2</span> <span class="op">~</span><span class="st"> </span>size_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">|</span><span class="st"> </span>year), <span class="dt">data =</span> grow_data)</a>
+<a class="sourceLine" id="cb1-5" title="5"></a>
+<a class="sourceLine" id="cb1-6" title="6">surv_mod &lt;-<span class="st"> </span><span class="kw">glmer</span>(surv <span class="op">~</span><span class="st"> </span>size_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">|</span><span class="st"> </span>year), <span class="dt">data =</span> surv_data, <span class="dt">family =</span> binomial)</a>
+<a class="sourceLine" id="cb1-7" title="7"></a>
+<a class="sourceLine" id="cb1-8" title="8">repr_mod &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span>(repr <span class="op">~</span><span class="st"> </span>size_<span class="dv">1</span>, <span class="dt">data =</span> repr_data, <span class="dt">family =</span> binomial)</a>
+<a class="sourceLine" id="cb1-9" title="9"></a>
+<a class="sourceLine" id="cb1-10" title="10">recr_mod &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span>(recr <span class="op">~</span><span class="st"> </span>size_<span class="dv">1</span>, <span class="dt">data =</span> recr_data, <span class="dt">family =</span> poisson)</a>
+<a class="sourceLine" id="cb1-11" title="11"></a>
+<a class="sourceLine" id="cb1-12" title="12">rcsz_mu  &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(rcsz_data<span class="op">$</span>size_<span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb1-13" title="13">rcsz_sd  &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span>(rcsz_data<span class="op">$</span>size_<span class="dv">2</span>)</a></code></pre></div>
+<p>We could then extract the fixed coefficients with the <code>fixef</code> method and the conditional modes of the random effects via the <code>ranef</code> method:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">beta_gs     &lt;-<span class="st"> </span><span class="kw">fixef</span>(grow_mod)</a>
+<a class="sourceLine" id="cb2-2" title="2"></a>
+<a class="sourceLine" id="cb2-3" title="3">alpha_g_yrs &lt;-<span class="st"> </span><span class="kw">ranef</span>(grow_mod)</a>
+<a class="sourceLine" id="cb2-4" title="4"></a>
+<a class="sourceLine" id="cb2-5" title="5">beta_ss     &lt;-<span class="st"> </span><span class="kw">fixef</span>(surv_mod)</a>
+<a class="sourceLine" id="cb2-6" title="6"></a>
+<a class="sourceLine" id="cb2-7" title="7">alpha_s_yrs &lt;-<span class="st"> </span><span class="kw">ranef</span>(surv_mod)</a></code></pre></div>
+<p>The non-mixed models can use the <code>coef</code> method to extract a vector of coefficients:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">repr_coef   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span>(repr_mod)</a>
+<a class="sourceLine" id="cb3-2" title="2"></a>
+<a class="sourceLine" id="cb3-3" title="3">recr_coef   &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span>(recr_mod)</a></code></pre></div>
+<p>The next step is to transform these values into something <code>ipmr</code> can use. This must always be a <strong>named list</strong> where the names of the list components are the names used in the vital expressions or kernel formula. Transforming the <span class="math inline">\(\beta\)</span>s is easier - the output from fixef is always a named vector, so we just use <code><a href="https://rdrr.io/r/base/list.html">as.list()</a></code> and change the names to whatever we want to use. We then bundle it into one big list with all the fixed coefficients.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">g_list &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(beta_gs)</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(g_list) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"alpha_g"</span>, <span class="st">"beta_g"</span>)</a>
+<a class="sourceLine" id="cb4-3" title="3"></a>
+<a class="sourceLine" id="cb4-4" title="4">s_list &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(beta_ss)</a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(s_list) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"alpha_s"</span>, <span class="st">"beta_s"</span>)</a>
+<a class="sourceLine" id="cb4-6" title="6"></a>
+<a class="sourceLine" id="cb4-7" title="7">f_p_list &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(recr_coef)</a>
+<a class="sourceLine" id="cb4-8" title="8"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(f_p_list ) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"alpha_f_p"</span>, <span class="st">"beta_f_p"</span>)</a>
+<a class="sourceLine" id="cb4-9" title="9"></a>
+<a class="sourceLine" id="cb4-10" title="10">f_r_list &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(repr_coef)</a>
+<a class="sourceLine" id="cb4-11" title="11"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(f_r_list) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"alpha_f_r"</span>, <span class="st">"beta_f_r"</span>)</a>
+<a class="sourceLine" id="cb4-12" title="12"></a>
+<a class="sourceLine" id="cb4-13" title="13">f_d_list &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">mu_f_d =</span> rcsz_mu, <span class="dt">sigma_f_d =</span> rcsz_sd)</a>
+<a class="sourceLine" id="cb4-14" title="14"></a>
+<a class="sourceLine" id="cb4-15" title="15">all_fixed_params &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(g_list, s_list, f_p_list, f_r_list, f_d_list)</a></code></pre></div>
+<p>For the random effects, we probably need to do some a bit more processing, though this really depends on which modelling framework you use and the format of the outputs. For <code>lme4</code>, it looks like this:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">g_alpha_list &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(alpha_g_yrs))</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(g_alpha_list) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"alpha_g_"</span>, <span class="dv">2001</span><span class="op">:</span><span class="dv">2006</span>, <span class="dt">sep =</span> <span class="st">""</span>)</a>
+<a class="sourceLine" id="cb5-3" title="3"></a>
+<a class="sourceLine" id="cb5-4" title="4">s_alpha_list &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(alpha_s_yrs))</a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(s_alpha_list) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"alpha_s_"</span>, <span class="dv">2001</span><span class="op">:</span><span class="dv">2006</span>, <span class="dt">sep =</span> <span class="st">""</span>)</a></code></pre></div>
+<p>First, we strip away all of <code>lme4</code>-related attributes with <code><a href="https://rdrr.io/r/base/unlist.html">unlist()</a></code>, then convert it to the flat list format that we need. Next, we set the names Now, we can combine it with our <code>all_fixed_params</code> list and we have all of the parameters we need for the kernel functions:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">all_params &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(all_fixed_params, g_alpha_list, s_alpha_list)</a></code></pre></div>
+<p>We are now ready to begin implementing the kernels! This model will be a simple, density independent, stochastic kernel-resampled model (<code>"simple_di_stoch_kern"</code> class). The parts where the hierarchical syntax is used are highlighted by comments in the code block:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">ex_ipm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">"simple_di_stoch_kern"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="st">  </span><span class="kw">define_kerne</span>(</a>
+<a class="sourceLine" id="cb7-3" title="3">    </a>
+<a class="sourceLine" id="cb7-4" title="4">    <span class="co"># _yr is appended as a suffix with an underscore. Notice how the formula</span></a>
+<a class="sourceLine" id="cb7-5" title="5">    <span class="co"># from 2 is translated into the formula argument and the kernel name</span></a>
+<a class="sourceLine" id="cb7-6" title="6">    </a>
+<a class="sourceLine" id="cb7-7" title="7">    <span class="dt">name             =</span> <span class="st">"P_yr"</span>,</a>
+<a class="sourceLine" id="cb7-8" title="8">    <span class="dt">family           =</span> <span class="st">"CC"</span>,</a>
+<a class="sourceLine" id="cb7-9" title="9">    <span class="dt">formula          =</span> s_yr <span class="op">*</span><span class="st"> </span>g_yr,</a>
+<a class="sourceLine" id="cb7-10" title="10">    </a>
+<a class="sourceLine" id="cb7-11" title="11">    <span class="co"># We also modify each parameter name with a suffix as well.</span></a>
+<a class="sourceLine" id="cb7-12" title="12">    <span class="co"># Here, I've split out the linear predictor and the inverse logit</span></a>
+<a class="sourceLine" id="cb7-13" title="13">    <span class="co"># transformation into separate steps to avoid over cluttering</span></a>
+<a class="sourceLine" id="cb7-14" title="14">    <span class="dt">s_lin_p          =</span> alpha_s <span class="op">+</span><span class="st"> </span>alpha_s_yr <span class="op">+</span><span class="st"> </span>beta_s <span class="op">*</span><span class="st"> </span>z_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb7-15" title="15">    <span class="dt">s_yr             =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span><span class="st"> </span>s_lin_p)),</a>
+<a class="sourceLine" id="cb7-16" title="16">    </a>
+<a class="sourceLine" id="cb7-17" title="17">    <span class="co"># We do the same with growth as we did with survival and the P_yr formula</span></a>
+<a class="sourceLine" id="cb7-18" title="18">    <span class="dt">g_yr             =</span> <span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(z_<span class="dv">2</span>, mu_g_yr, sigma_g),</a>
+<a class="sourceLine" id="cb7-19" title="19">    <span class="dt">mu_g_yr          =</span> alpha_g <span class="op">+</span><span class="st"> </span>alpha_g_yr <span class="op">+</span><span class="st"> </span>beta_g <span class="op">*</span><span class="st"> </span>z_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb7-20" title="20">    </a>
+<a class="sourceLine" id="cb7-21" title="21">    <span class="dt">data_list        =</span> all_params,</a>
+<a class="sourceLine" id="cb7-22" title="22">    </a>
+<a class="sourceLine" id="cb7-23" title="23">    <span class="co"># We signal that the kernel has hierarchical effects</span></a>
+<a class="sourceLine" id="cb7-24" title="24">    <span class="dt">has_hier_effs    =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb7-25" title="25">    </a>
+<a class="sourceLine" id="cb7-26" title="26">    <span class="co"># And provide the values that each suffix can take as a named list. </span></a>
+<a class="sourceLine" id="cb7-27" title="27">    <span class="co"># The name(s) in this list MUST match the suffix used in the expressions.</span></a>
+<a class="sourceLine" id="cb7-28" title="28">    </a>
+<a class="sourceLine" id="cb7-29" title="29">    <span class="dt">levels_hier_effs =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">yr =</span> <span class="dv">2001</span><span class="op">:</span><span class="dv">2006</span>),</a>
+<a class="sourceLine" id="cb7-30" title="30">    <span class="dt">evict_cor        =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb7-31" title="31">    <span class="dt">evict_fun        =</span> <span class="kw"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g_yr"</span>)</a>
+<a class="sourceLine" id="cb7-32" title="32">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-33" title="33"><span class="st">  </span><span class="kw"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(</a>
+<a class="sourceLine" id="cb7-34" title="34">    <span class="dt">name =</span> <span class="st">"F"</span>,</a>
+<a class="sourceLine" id="cb7-35" title="35">    <span class="dt">family =</span> <span class="st">"CC"</span>,</a>
+<a class="sourceLine" id="cb7-36" title="36">    <span class="dt">formula =</span> f_p <span class="op">*</span><span class="st"> </span>f_s <span class="op">*</span><span class="st"> </span>f_d,</a>
+<a class="sourceLine" id="cb7-37" title="37">    <span class="dt">f_p_lin_p =</span> </a>
+<a class="sourceLine" id="cb7-38" title="38">  )</a></code></pre></div>
+</div>
+<div id="complicated" class="section level2">
+<h2 class="hasAnchor">
+<a href="#complicated" class="anchor"></a>Hierarchical models with discretely and continuously varying parameters</h2>
 </div>
   </div>
 
@@ -113,7 +297,10 @@
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-<li><a href="#need-to-write-this">Need to write this</a></li>
+<li><a href="#structure">Structure</a></li>
+      <li><a href="#quick">Quick start guide</a></li>
+      <li><a href="#sim_di_s_k">Hierarchical models with a single random term</a></li>
+      <li><a href="#complicated">Hierarchical models with discretely and continuously varying parameters</a></li>
       </ul>
 </div>
       </div>

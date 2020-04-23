@@ -7,6 +7,226 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This vignette describes how to write formulas using `ipmr`'s notation for hierarchical models. This can potentially save you loads of time and typing, especially when combined with the power of `rlang` and `purrr`.
+This vignette describes how to write formulas using `ipmr`'s notation for hierarchical models. It is meant to mirror the standard mathematical notation used to represent the models. The examples here will primarily use [lme4](https://github.com/lme4/lme4/) and [brms](https://github.com/paul-buerkner/brms) to illustrate how to go from vital rate models to functional forms that you can use in `ipmr`. You are of course free to use whatever model fitting software you like, but the number of different possibilities are far too great to cover in this vignette. 
 
-## Need to write this
+## Structure
+
+1. [Quick start guide shows how to go from mathematical form to model formula to `ipmr` code.](#quick)
+
+2. [Worked example with a simple, density independent, stochastic kernel re-sampled model.](#sim_di_s_k)
+
+3. [Worked example with a general, density independent, stochastic parameter resampled model.](#complicated)
+
+## Quick start guide {#quick}
+
+Some quick translations between mathematical notation, R model syntax, and `ipmr` style notation. In the `ipmr` column, suffixes that are appended are highlighted in **bold**.
+
+Suffix names are not restricted to the examples below. The only requirement is that the suffix not be named `"pop"`. This is an unfortunate side effect of the way `ipmr` handles population vectors internally - please use something like `"site"` or `"population"` instead.
+
+```{r echo = FALSE}
+knitr::kable(
+  data.frame(
+
+    Math    = c("$\\mu_g^{yr} = \\alpha_g + \\alpha_g^{yr} * \\beta_g * z + e$",
+                         "$z' \\sim Norm(\\mu_g^{yr}, \\sigma_g)$",
+                "$Logit(\\mu_{s,yr}^{plot}) = \\alpha_s + \\alpha_{s,yr}^{plot} + \\beta * z$",
+                "",
+                "$log(\\mu_{f_{yr}}) = \\alpha_{f} + \\alpha_{f_{yr}} + (\\beta_f + \\beta_{f_{yr}}) * z$"),
+    
+    
+    R = c("`size_2 ~ size_1 + (1 | year)`",
+          "",
+          "`surv ~ size_1 + (1|year) + (1|plot)`",
+          "",
+          "`fec ~ size_1 + (size_1|year)`"),
+    
+    
+    ipmr    = c("mu_g_**yr** = g_int + g_int_**yr** + g_slope * z",
+                "g = dnorm(z_2, mu_g_**yr**, sd_g)",
+                "s_**pl**_**yr** = s_int + s_int_**pl**_**yr** + s_slope * z",
+                "s = inv_logit(s_**pl**_**yr**)",
+                "fec = exp(f_int + f_int_**yr** + (f_slope + f_slope_**yr**) * z)")
+  ),
+  format = "pandoc",
+  escape = FALSE
+)
+
+
+```
+
+
+## Hierarchical models with a single random term {#sim_di_s_k}
+
+These models are pretty common in the IPM literature. They encompass cases where a single site has been sampled over many years, or a sample many sites across one transition. 
+
+This example will use a hypothetical study that spans 5 transitions and has 6 consecutive censuses. To limit complexity, let's pretend our exploratory analysis and model selection indicated the best overall models included random year-specifc intercepts for growth ($g_{yr}$) and survival ($s_{yr}$), but not probability of reproduction ($f_p$), recruit production ($f_r$), or the recruit size distribution ($f_d$). We will work with a simple model to start (i.e. 1 continuous state variable, no discrete states). This yields the following IPM ($z,z'$ represent size/height/weight at time $t$ and $t+1$, respectively):
+
+1. $K_{yr}(z', z) = P_{yr}(z',z) + F(z',z)$
+
+2. $P_{yr}(z', z) = s_{yr}(z) * g_{yr}(z',z)$
+
+3. $F(z',z) = f_p(z) + f_r(z) + f_d(z')$
+
+Note that only the $K$ and $P$ kernels get the $yr$ subscript appended to them - they are the only ones that our model selection process decided had substantial year to year variation. Thus, we can actually write the $F$ kernel the exact same way as we would in a simple IPM when we implement the model in `ipmr`.
+
+The vital rate models could be written on paper as follows:
+
+4. Growth
+
+    - $\mu_g = (\alpha_g + \alpha_g^{yr})+ \beta_g * z + e$
+
+    - $z' \sim Norm(\mu_g, \sigma_g)$
+5. Survival
+
+    - $logit(s) = (\alpha_s + \alpha_s^{yr}) + \beta_s * z + e$
+    
+6. Probability of reproducing
+
+    - $logit(f_p) = \alpha_{f_p} + \beta_{f_p} * z$
+    
+7. Recruit production
+
+    - $log(f_r) = \alpha_{f_r} + \beta_{f_r} * z$
+    
+8. Recruit size distribution
+
+    - $f_d \sim Norm(\mu_{f_d}, \sigma_{f_d})$
+
+and modelled in R as follows:
+
+```{r eval = FALSE}
+
+library(lme4)
+library(ipmr)
+
+grow_mod <- lmer(size_2 ~ size_1 + (1 | year), data = grow_data)
+
+surv_mod <- glmer(surv ~ size_1 + (1 | year), data = surv_data, family = binomial)
+
+repr_mod <- glm(repr ~ size_1, data = repr_data, family = binomial)
+
+recr_mod <- glm(recr ~ size_1, data = recr_data, family = poisson)
+
+rcsz_mu  <- mean(rcsz_data$size_2)
+rcsz_sd  <- sd(rcsz_data$size_2)
+
+```
+
+We could then extract the fixed coefficients with the `fixef` method and the conditional modes of the random effects via the `ranef` method: 
+
+```{r eval = FALSE}
+
+beta_gs     <- fixef(grow_mod)
+
+alpha_g_yrs <- ranef(grow_mod)
+
+beta_ss     <- fixef(surv_mod)
+
+alpha_s_yrs <- ranef(surv_mod)
+
+
+``` 
+
+The non-mixed models can use the `coef` method to extract a vector of coefficients:
+
+```{r eval = FALSE}
+
+repr_coef   <- coef(repr_mod)
+
+recr_coef   <- coef(recr_mod)
+
+```
+
+The next step is to transform these values into something `ipmr` can use. This must always be a **named list** where the names of the list components are the names used in the vital expressions or kernel formula. Transforming the $\beta$s is easier - the output from fixef is always a named vector, so we just use `as.list()` and change the names to whatever we want to use. We then bundle it into one big list with all the fixed coefficients.
+
+```{r eval = FALSE}
+
+g_list <- as.list(beta_gs)
+names(g_list) <- c("alpha_g", "beta_g")
+
+s_list <- as.list(beta_ss)
+names(s_list) <- c("alpha_s", "beta_s")
+
+f_p_list <- as.list(recr_coef)
+names(f_p_list ) <- c("alpha_f_p", "beta_f_p")
+
+f_r_list <- as.list(repr_coef)
+names(f_r_list) <- c("alpha_f_r", "beta_f_r")
+
+f_d_list <- list(mu_f_d = rcsz_mu, sigma_f_d = rcsz_sd)
+
+all_fixed_params <- c(g_list, s_list, f_p_list, f_r_list, f_d_list)
+
+```
+
+For the random effects, we probably need to do some a bit more processing, though this really depends on which modelling framework you use and the format of the outputs. For `lme4`, it looks like this:
+
+```{r eval = FALSE}
+
+g_alpha_list <- as.list(unlist(alpha_g_yrs))
+names(g_alpha_list) <- paste("alpha_g_", 2001:2006, sep = "")
+
+s_alpha_list <- as.list(unlist(alpha_s_yrs))
+names(s_alpha_list) <- paste("alpha_s_", 2001:2006, sep = "")
+
+```
+
+First, we strip away all of `lme4`-related attributes with `unlist()`, then convert it to the flat list format that we need. Next, we set the names Now, we can combine it with our `all_fixed_params` list and we have all of the parameters we need for the kernel functions:
+
+```{r eval = FALSE}
+
+all_params <- c(all_fixed_params, g_alpha_list, s_alpha_list)
+
+```
+
+We are now ready to begin implementing the kernels! This model will be a simple, density independent, stochastic kernel-resampled model (`"simple_di_stoch_kern"` class). The parts where the hierarchical syntax is used are highlighted by comments in the code block:
+
+
+```{r eval = FALSE}
+
+ex_ipm <- init_ipm("simple_di_stoch_kern") %>%
+  define_kerne(
+    
+    # _yr is appended as a suffix with an underscore. Notice how the formula
+    # from 2 is translated into the formula argument and the kernel name
+    
+    name             = "P_yr",
+    family           = "CC",
+    formula          = s_yr * g_yr,
+    
+    # We also modify each parameter name with a suffix as well.
+    # Here, I've split out the linear predictor and the inverse logit
+    # transformation into separate steps to avoid over cluttering
+    s_lin_p          = alpha_s + alpha_s_yr + beta_s * z_1,
+    s_yr             = 1 / (1 + exp(- s_lin_p)),
+    
+    # We do the same with growth as we did with survival and the P_yr formula
+    g_yr             = dnorm(z_2, mu_g_yr, sigma_g),
+    mu_g_yr          = alpha_g + alpha_g_yr + beta_g * z_1,
+    
+    data_list        = all_params,
+    
+    # We signal that the kernel has hierarchical effects
+    has_hier_effs    = TRUE,
+    
+    # And provide the values that each suffix can take as a named list. 
+    # The name(s) in this list MUST match the suffix used in the expressions.
+    
+    levels_hier_effs = list(yr = 2001:2006),
+    evict_cor        = TRUE,
+    evict_fun        = truncated_distributions("norm", "g_yr")
+  ) %>%
+  define_kernel(
+    name = "F",
+    family = "CC",
+    formula = f_p * f_s * f_d,
+    f_p_lin_p = 
+  )
+
+```
+
+
+
+## Hierarchical models with discretely and continuously varying parameters {#complicated}
+
+
