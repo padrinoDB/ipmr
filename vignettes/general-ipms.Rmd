@@ -30,7 +30,7 @@ Relative to how we define simple models in `ipmr`, there are now four new bits:
 
 1. We are required to `define_pop_state()` before calling `make_ipm()`. 
 
-2. Each kernel that has an integration requires that `d_statevariable` get appended to the kernel `formula`. This is equivalent to the "dz" in $\int_L^U K(z',z) n(z,t) \mathrm{dz}$. `ipmr` automatically generates this variable internally, so there is no need to define it in the `data_list` or `define_domains()`, you can just add it any of the formula(e) that you want to. We skipped this step in the simple IPMs because it gets appended internally. Unfortunately, it is decidedly less easy to infer the correct state variable to `d_z` with for general IPMs where there may be many continuous and/or discrete states.
+2. Each kernel that has an integration requires that `d_statevariable` get appended to the kernel `formula`. This is equivalent to the "dz" in $\int_L^U K(z',z) n(z,t) \mathrm{dz}$. `ipmr` automatically generates this variable internally, so there is no need to define it in the `data_list` or `define_domains()`, we can just add it any of the formula(e) that we want to. We skipped this step in the simple IPMs because it gets appended internally. Unfortunately, it is decidedly less easy to infer the correct state variable to `d_z` with for general IPMs where there may be many continuous and/or discrete states.
 
   - NOTE: if in doubt, kernels that have a probability density function (e.g. `dnorm`, `dlnorm`, `dgamma`) in one of the underlying vital rates will pretty much always require this. Kernels that don't use these density functions may or may not require them. 
 
@@ -74,7 +74,7 @@ The vital rates functions and example code to fit them are:
 
     - example code: `f_d_mu <- mean(my_recr_data$ht_2, na.rm = TRUE)` and `f_d_sd <- sd(my_rer_data$ht_2, na.rm = TRUE)`.
     
-6. germination (`g_i`) and establishment (`e_p`) are constants. The code below assumes you have your data in long format (each seed get its own row) and that successful germinations/establishments are coded as 1s, failures are 0s, and seeds you don't know the fate of for whatever reason are `NA`s.
+6. germination (`g_i`) and establishment (`e_p`) are constants. The code below assumes we have our data in long format (each seed get its own row) and that successful germinations/establishments are coded as 1s, failures are 0s, and seeds we don't know the fate of for whatever reason are `NA`s.
 
     - example code: `g_i <- mean(my_germ_data, na.rm = TRUE)` and `e_p <- mean(my_est_data, na.rm = TRUE)`
 
@@ -286,7 +286,7 @@ is_conv_to_asymptotic(general_ipm, tol = 1e-10)
 
 ```
 
-Our model is now built! We can explore the asymptotic population growth rate with the `lambda()` function, which will work on any object made my `make_ipm`. The same is true for `is_conv_to_asymptotic()`, which is a helper to function to figure out if you've set the number of `iterations` high enough to actually reach asymptotic population dynamics. 
+Our model is now built! We can explore the asymptotic population growth rate with the `lambda()` function, which will work on any object made my `make_ipm()`. The same is true for `is_conv_to_asymptotic()`, which is a helper to function to figure out if we've set the number of `iterations` high enough to actually reach asymptotic population dynamics. 
 
 
 ## General models for discretely varying environments
@@ -317,7 +317,7 @@ We'll use a variation of the model above, simulating some random intercepts for 
 
     - example code: `f_d_mu <- mean(my_recr_data$ht_2, na.rm = TRUE)` and `f_d_sd <- sd(my_rer_data$ht_2, na.rm = TRUE)`.
     
-6. germination (`g_i`) and establishment (`e_p`) are constants. The code below assumes you have your data in long format (each seed get its own row) and that successful germinations/establishments are coded as 1s, failures are 0s, and seeds you don't know the fate of for whatever reason are `NA`s.
+6. germination (`g_i`) and establishment (`e_p`) are constants. The code below assumes we have our data in long format (each seed get its own row) and that successful germinations/establishments are coded as 1s, failures are 0s, and seeds we don't know the fate of for whatever reason are `NA`s.
 
     - example code: `g_i <- mean(my_germ_data, na.rm = TRUE)` and `e_p <- mean(my_est_data, na.rm = TRUE)`
 
@@ -506,11 +506,11 @@ general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
   make_ipm(iterations = 100,
            
            # We can specify a sequence of kernels to select for the simulation.
-           # This helps others to reproduce what you did (by setting a seed first),
-           # and lets you keep track of the consequences of different selection
-           # sequences for population dynamics. Note that you will need to specify
+           # This helps others to reproduce what we did (by setting a seed first),
+           # and lets us keep track of the consequences of different selection
+           # sequences for population dynamics. Note that we will need to specify
            # a seed and generate the kernel sequence as a variable
-           # before building the IPM to make sure your output is fully reproducible!
+           # before building the IPM to make sure our output is fully reproducible!
            
            kernel_seq = sample(1:5, size = 100, replace = TRUE),
            usr_funs = list(inv_logit   = inv_logit,
@@ -530,7 +530,7 @@ We'll use a variation of the parameter resampled model from the [introduction](h
 
 The first chunk below initializes the parameters and functions that the model uses. It takes the place of the usual vital rate model fitting process. 
 
-This example uses two Bayesian models for survival and growth and a single function to sample them to illustrate how to use continuously varying parameter distributions in `ipmr`. This only uses two models and one function to limit the the complexity of the example - there is no upper limit on the number of parameters or functions you can use in your own models. 
+This example uses two Bayesian models for survival and growth and a single function to sample them to illustrate how to use continuously varying parameter distributions in `ipmr`. This only uses two models and one function to limit the the complexity of the example - there is no upper limit on the number of parameters or functions we can use in our own models. 
 
 The vital rate functions are described here:
 
@@ -587,7 +587,7 @@ posterior_distribution <- data.frame(
   g_sd      = runif(4000, 0.75, 3)
 )
 
-# set the names to the parameter names you want to use in the model. These 
+# set the names to the parameter names we want to use in the model. These 
 # are already set in this example, but outputs from brms/rstan/lme4 may not be
 # as conveniently named. 
 
@@ -782,9 +782,9 @@ summary(lambdas)
 
 
 
-## Code to construct your own mega-matrices
+## Code to construct mega-matrices
 
-Iteration is all fine and good, and can be used to get most quantities. Issues arise when we need to, say, transpose a model (e.g. to compute the left eigenvector of the full discretized model). `ipmr` doesn't define a strict order in which to define expressions in `define_k()`, providing flexibility to define these however you see fit. The cost is that, internally, `ipmr` has no idea where things should go when transposing the model. This is where `format_mega_matrix()` comes in.
+Iteration is all fine and good, and can be used to get most quantities. Issues arise when we need to, say, transpose a model (e.g. to compute the left eigenvector of the full discretized model). `ipmr` doesn't define a strict order in which to define expressions in `define_k()`, providing flexibility to define these however we see fit. The cost is that, internally, `ipmr` has no idea where things should go when transposing the model. This is where `format_mega_matrix()` comes in.
 
 `format_mega_matrix` takes an IPM object and a vector of symbols (for interactive use) or a character version of the expression (for programming) showing where each sub-kernel should go. It works in **ROW MAJOR order**. This example will use the model from the general deterministic example at the top of the article.
 
@@ -922,7 +922,7 @@ Re(eigen(mega_mat)$values[1]) - lambda(general_ipm)[100]
 
 ```
 
-Say you wanted to program with this function. Passing bare expression is difficult programatically, and how to do that is not really within the scope of this vignette (though if you're interested in learning how, [this](https://dplyr.tidyverse.org/articles/programming.html) is a good start). `format_mega_matrix` also accepts text strings in the same format as above. 
+Say we wanted to program with this function. Passing bare expression is difficult programatically, and how to do that is not really within the scope of this vignette (though if you're interested in learning how, [this](https://dplyr.tidyverse.org/articles/programming.html) is a good start). `format_mega_matrix` also accepts text strings in the same format as above. 
 
 ```{r eval = FALSE}
 

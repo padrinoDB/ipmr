@@ -9,6 +9,8 @@ vignette: >
 
 This vignette describes how to write formulas using `ipmr`'s notation for hierarchical models. It is meant to mirror the standard mathematical notation used to represent the models. The examples here will primarily use [lme4](https://github.com/lme4/lme4/) and [brms](https://github.com/paul-buerkner/brms) to illustrate how to go from vital rate models to functional forms that you can use in `ipmr`. You are of course free to use whatever model fitting software you like, but the number of different possibilities are far too great to cover in this vignette. 
 
+The notation is meant to make implementing models more concise, as it allows you to avoid re-typing/copy+pasting the same kernel formats and just substituting, for example, plot name or transition year. It works by appending suffixes to kernels, vital rates, and parameters that can take multiple values (e.g. `P` becomes `P_yr`). We then add a named list where the name corresponds to the suffix and the entries correspond to the values it can take (`list(yr = 1:5)`), set `has_hier_effs = TRUE` and pass our list to `levels_hier_effs`. 
+
 ## Structure
 
 1. [Quick start guide shows how to go from mathematical form to model formula to `ipmr` code.](#quick)
@@ -24,6 +26,11 @@ Some quick translations between mathematical notation, R model syntax, and `ipmr
 Suffix names are not restricted to the examples below. The only requirement is that the suffix not be named `"pop"`. This is an unfortunate side effect of the way `ipmr` handles population vectors internally - please use something like `"site"` or `"population"` instead.
 
 ```{r echo = FALSE}
+
+tab_legend <- "Math Formula corresponds to the mathematical notation for the model. R Formula corresponds to how one could write the model using R's model formula syntax (think `lm`, `glm`, `lmer`). ipmr shows an equivalent way to write this model in kernel formula or vital rate expression. Model Number indicates which rows are grouped together, as some models have too many terms to cleanly fit on a line, or have multiple equivalent representations."
+
+styles <- c("style='width:150%;'")
+
 knitr::kable(
   data.frame(
 
@@ -31,24 +38,31 @@ knitr::kable(
                          "$z' \\sim Norm(\\mu_g^{yr}, \\sigma_g)$",
                 "$Logit(\\mu_{s,yr}^{plot}) = \\alpha_s + \\alpha_{s,yr}^{plot} + \\beta * z$",
                 "",
+                "",
                 "$log(\\mu_{f_{yr}}) = \\alpha_{f} + \\alpha_{f_{yr}} + (\\beta_f + \\beta_{f_{yr}}) * z$"),
     
     
     R = c("`size_2 ~ size_1 + (1 | year)`",
           "",
-          "`surv ~ size_1 + (1|year) + (1|plot)`",
+          "`surv ~ size_1 + (1 | year) + (1 | plot)`",
+          "`surv ~ size_1 + (1 | year) + (1 | plot)`",
           "",
-          "`fec ~ size_1 + (size_1|year)`"),
+          "`fec ~ size_1 + (size_1 | year)`"),
     
     
-    ipmr    = c("mu_g_**yr** = g_int + g_int_**yr** + g_slope * z",
-                "g = dnorm(z_2, mu_g_**yr**, sd_g)",
-                "s_**pl**_**yr** = s_int + s_int_**pl**_**yr** + s_slope * z",
-                "s = inv_logit(s_**pl**_**yr**)",
-                "fec = exp(f_int + f_int_**yr** + (f_slope + f_slope_**yr**) * z)")
+    ipmr = c("mu_g_**yr** = g_int + g_int_**yr** + g_slope * z",
+             "g = dnorm(z_2, mu_g_**yr**, sd_g)",
+             "s_**pl**_**yr** = s_int + s_int_**pl**_**yr** + s_slope * z",
+             "s_**pl**_**yr** = s_int + s_int_**pl** + s_int_**yr** + s_slope * z",
+             "s = inv_logit(s_**pl**_**yr**)",
+             "fec = exp(f_int + f_int_**yr** + (f_slope + f_slope_**yr**) * z)"),
+    Model = c(1, 1, 2, 2, 2, 3)
   ),
-  format = "pandoc",
-  escape = FALSE
+  format    = "html",
+  escape    = FALSE,
+  col.names = c("Math Formula", "R Formula", "ipmr", "Model Number"),
+  caption   = tab_legend,
+  table.attr = styles
 )
 
 
@@ -179,13 +193,44 @@ all_params <- c(all_fixed_params, g_alpha_list, s_alpha_list)
 
 ```
 
+ 
+```{r made up parameters for testing chunk below, echo = FALSE, message = FALSE, warning = FALSE}
+
+library(ipmr)
+
+all_fixed_params <- list(
+  alpha_g   = 0.2,
+  beta_g    = 1.01,
+  sigma_g   = 0.2,
+  alpha_s   = -0.1,
+  beta_s    = 0.3,
+  alpha_f_p = -1,
+  beta_f_p  = 0.7,
+  alpha_f_r = 0.2,
+  beta_f_r  = 0.2,
+  mu_f_d    = 0.4,
+  sigma_f_d = 0.1
+)
+
+g_alpha_list <- as.list(rnorm(6)) %>%
+  setNames(
+    paste('alpha_g_', 2001:2006, sep = "")
+  )
+s_alpha_list <- as.list(rnorm(6)) %>%
+  setNames(
+    paste('alpha_s_', 2001:2006, sep = "")
+  )
+
+all_params <- c(all_fixed_params, g_alpha_list, s_alpha_list)
+
+```
 We are now ready to begin implementing the kernels! This model will be a simple, density independent, stochastic kernel-resampled model (`"simple_di_stoch_kern"` class). The parts where the hierarchical syntax is used are highlighted by comments in the code block:
 
 
 ```{r eval = FALSE}
 
 ex_ipm <- init_ipm("simple_di_stoch_kern") %>%
-  define_kerne(
+  define_kernel(
     
     # _yr is appended as a suffix with an underscore. Notice how the formula
     # from 2 is translated into the formula argument and the kernel name
@@ -197,16 +242,20 @@ ex_ipm <- init_ipm("simple_di_stoch_kern") %>%
     # We also modify each parameter name with a suffix as well.
     # Here, I've split out the linear predictor and the inverse logit
     # transformation into separate steps to avoid over cluttering
+    
     s_lin_p          = alpha_s + alpha_s_yr + beta_s * z_1,
     s_yr             = 1 / (1 + exp(- s_lin_p)),
     
     # We do the same with growth as we did with survival and the P_yr formula
+    
     g_yr             = dnorm(z_2, mu_g_yr, sigma_g),
     mu_g_yr          = alpha_g + alpha_g_yr + beta_g * z_1,
     
     data_list        = all_params,
+    states           = list(c("z")),
     
     # We signal that the kernel has hierarchical effects
+    
     has_hier_effs    = TRUE,
     
     # And provide the values that each suffix can take as a named list. 
@@ -216,17 +265,65 @@ ex_ipm <- init_ipm("simple_di_stoch_kern") %>%
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "g_yr")
   ) %>%
+  
+  # This kernel doesn't get anything special because there are no
+  # time-varying parameter values.
+  
   define_kernel(
-    name = "F",
-    family = "CC",
-    formula = f_p * f_s * f_d,
-    f_p_lin_p = 
+    name          = "F",
+    family        = "CC",
+    formula       = f_p * f_r * f_d,
+    f_p_lin_p     = alpha_f_p + beta_f_p * z_1,
+    f_p           = 1 / (1 + exp( -f_p_lin_p)),
+    f_r           = exp(alpha_f_r + beta_f_r * z_1),
+    f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
+    data_list     = all_params,
+    states        = list(c("z")),
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "f_d")
+  ) %>%
+  define_k(
+    
+    # name is modified to indicate that the K's will vary from year to year
+    
+    name             = "K_yr",
+    family           = "IPM",
+    
+    # the formulas are modified to indicate that they will also
+    # vary from year to year
+    
+    K_yr             = P_yr + F,
+    n_z_t_1          = K_yr %*% n_z_t,
+    states           = list(c("z")),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(yr = 2001:2006),
+    evict_cor        = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P_yr", "F", "K_yr"),
+      int_rule     = rep("midpoint", 3),
+      dom_start    = rep("z", 3),
+      dom_end      = rep("z", 3)
+    )
+  ) %>%
+  define_domains(
+    z = c(0.1, 10, 50)
+  ) %>%
+  define_pop_state(
+    n_z = runif(50)
+  ) %>%
+  make_ipm(
+    iterate    = TRUE,
+    iterations = 100,
+    kernel_seq = sample(2001:2006, size = 100, replace = TRUE),
+    normalize_pop_size = TRUE
   )
 
 ```
 
 
-
 ## Hierarchical models with discretely and continuously varying parameters {#complicated}
 
-
+On the way...

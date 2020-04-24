@@ -14,7 +14,7 @@ vignette: >
   
 `ipmr` is a package for implementing integral projection models of varying degrees of complexity. It uses mathematical-ish expressions to build up the iteration kernels from smaller pieces, as well as helpers to ensure that models are implemented correctly. Finally, it provides machinery for stochastic simulations. basic analyses, and model diagnostics. More complicated analysis functions are being implemented in the [irage package](https://github.com/levisc8/irage).
   
-**This package does not help with fitting regression models to demographic data!** This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a far better job helping you with that than I can. Some of the best are `lme4`, `brms`, `mgcv`, and `nlme`. `IPMpack` handles the regression modelling and IPM construction, though be forewarned, there are certain types of models that you simply cannot construct with it! 
+**This package does not help with fitting regression models to demographic data!** This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a much better job of helping you with that than I can. Some of my favorites are `lme4`, `brms`, `mgcv`, and `nlme`. `IPMpack` handles the regression modelling and IPM construction, though be forewarned, there are certain types of models that you simply cannot construct with it! 
   
 ## Types of models in `ipmr`
   
@@ -46,11 +46,11 @@ The first step of defining a model in `ipmr` is to initialize the model using `i
 
 With the type of model selected, the `model_class` becomes a string and the call to `init_ipm` is composed like so: `init_ipm(model_class = "position1_position_2_position3_position4")`. 
 
-The rest of this vignette will deal with simple, density independent IPMs. If you already know that you need a general IPM (e.g. an IPM with discrete stages, or multiple continuous state variables), hop over [here](https://levisc8.github.io/ipmr/articles/general-ipms.html) for an introduction to these.
+The rest of this vignette will deal with simple, density independent IPMs. If you already know that you need a general IPM (i.e. an IPM with discrete stages and/or multiple continuous state variables), I still strongly  recommend reading at least one complete example here before you start with  [those](https://levisc8.github.io/ipmr/articles/general-ipms.html).
 
 ## Specifying a simple deterministic IPM without density dependence
 
-This is the simplest model that `ipmr` works with. It is an IPM with a single continuous state variable, no density dependent functions, and parameters that define a single iteration kernel (as opposed to many iteration kernels). We'll walk through the steps required to implement such an IPM before getting into more complex models. If you already know that you have multiple continuous state variables and/or some discrete states, you can skip this part and head over to the [General IPMs page](https://levisc8.github.io/ipmr/articles/general-ipms.html) and get started there.
+This is the simplest model that `ipmr` works with. It is an IPM with a single continuous state variable, no density dependent functions, and parameters that define a single iteration kernel (as opposed to many iteration kernels). We'll walk through the steps required to implement such an IPM before getting into more complex models. 
 
 The vital rate functions and code that might be used to generate models corresponding to them are below. 
 
@@ -77,11 +77,19 @@ The vital rate functions and code that might be used to generate models correspo
 
 ### Defining kernels
 
-The next step is to define the actual kernels comprising the IPM. These are defined individually with calls to `define_kernel()`. 
+The first step is to decide what class of model we want to implement. We have one continuous state variable and no spatial or temporal variation to deal with, and we aren't going to deal with uncertainty (for now). Thus, we have a simple, density independent, deterministic IPM. We initialize it with `init_ipm()`.
+
 
 ``` {r eval = FALSE}
 
 my_ipm <- init_ipm('simple_di_det')
+
+
+```
+
+The next step is to define the actual kernels comprising the IPM. These are defined individually with calls to `define_kernel()`. 
+
+```{r eval = FALSE}
 
 my_ipm <- define_kernel(
   proto_ipm = my_ipm,
@@ -96,11 +104,13 @@ my_ipm <- define_kernel(
   family    = "CC",
   
   # Perform the inverse logit transformation to get the probability of survival
+  # from coefficients of the GLM
   
   s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
   
-  # Growth has two terms - the mean and the standard deviation. We model the mean 
-  # as a function of size. The standard deviation is constant.
+  # Growth has two terms with 3 parameters - the mean and the standard deviation.
+  # We model the mean as a function of size with an intercept and slope. 
+  # The standard deviation is a constant.
   
   g         = dnorm(dbh_2, g_mu, g_sd),
   g_mu      = g_int + g_slope * dbh_1,
@@ -143,11 +153,11 @@ In addition, the `data_list` argument holds the constant parameters (e.g. regres
 
 The `states` argument refers to the state variables in use. `ipmr` internally appends an `_1` and `_2` to the names in `states`, and creates variables for them that are the meshpoints for integration. These correspond to time *t* and *t+1*, and can be used in vital rate expressions to indicate which state at which time is being acted upon. 
 
-`has_hier_effs` is a logical indicating whether or not the model contains hierarchical effects. In this example, the model is a simple, deterministic one and so this is set to `FALSE`. However, `*_stoch_kern` kernels will almost always need this to be set to `TRUE`, and `*_stoch_param` models can also use them. See the next example for a demonstration of that syntax (there will also be a whole vignette at some point, just not there yet).
+`has_hier_effs` is a logical indicating whether or not the model contains hierarchical effects. In this example, the model is a simple, deterministic one and so this is set to `FALSE`. However, `*_stoch_kern` kernels will almost always need this to be set to `TRUE`, and `*_stoch_param` models can also use them. See the next example for a demonstration of that syntax (there is also a vignette with additional worked examples [here](https://levisc8.github.io/ipmr/articles/hierarchical-notation.html)).
 
-`evict_cor` refers to whether or not to correct for eviction in the kernel. If this is set to `TRUE`, then you must supply a function specifying which expressions need to be corrected. `ipmr` provides `truncated_distributions` for now, though others will eventually be implemented as well. Subsequent additions are mainly to accomadate models in PADRINO, and I suggest sticking to `truncated_distributions` for user-defined models in almost all cases.
+`evict_cor` refers to whether or not to correct for eviction in the kernel. If this is set to `TRUE`, then you must supply a function specifying which expressions need to be corrected and the correction to apply. `ipmr` provides `truncated_distributions` for now, though others will eventually be implemented as well. Subsequent additions are mainly to accomadate models in PADRINO, and I very strongly suggest sticking to `truncated_distributions` for your own models.
 
-Finally, `ipmr` is meant to be pipe-friendly, so all functions prefixed with `define_*` take a `proto_ipm` as their first argument and always return a `proto_ipm`, meaning operations can be chained together with the `%>%` operator. Note that this function is included in `ipmr`, so there is no need to load any other packages to access it (e.g. `dplyr` or `magrittr`). The first chunk below is equivalent to the chunk above.
+Finally, `ipmr` is designed to be [pipe-friendly](https://magrittr.tidyverse.org/). All functions prefixed with `define_*` take a `proto_ipm` as their first argument and always return a `proto_ipm`, meaning operations can be chained together with the `%>%` operator. This function is included in `ipmr`, so there is no need to load any other packages to access it (e.g. `dplyr` or `magrittr`). The first chunk below is equivalent to the two chunks above.
 
 
 ``` {r eval = FALSE}
@@ -158,7 +168,7 @@ Finally, `ipmr` is meant to be pipe-friendly, so all functions prefixed with `de
 my_ipm <- init_ipm('simple_di_det') %>% 
   define_kernel(
     name      = "P",
-    formula   = s_g_mult(s, g),
+    formula   =  s * g,
     family    = "CC",
     s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
     g         = dnorm(dbh_2, g_mu, g_sd),
@@ -220,7 +230,7 @@ The rest of the model definition sequence in this example will use the `%>%` ope
 my_ipm <- init_ipm('simple_di_det') %>%
   define_kernel(
     name      = "P",
-    formula   = s_g_mult(s, g),
+    formula   = s * g,
     family    = "CC",
     s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
     g         = dnorm(dbh_2, g_mu, g_sd),
@@ -300,7 +310,7 @@ impl_args <- make_impl_args_list(
 my_ipm <- init_ipm('simple_di_det') %>%
   define_kernel(
     name      = "P",
-    formula   = s_g_mult(s, g),
+    formula   = s * g,
     family    = "CC",
     s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
     g         = dnorm(dbh_2, g_mu, g_sd),
@@ -379,7 +389,7 @@ impl_args <- make_impl_args_list(
 my_ipm <- init_ipm('simple_di_det') %>%
   define_kernel(
     name      = "P",
-    formula   = s_g_mult(s, g),
+    formula   = s * g,
     family    = "CC",
     s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
     g         = dnorm(dbh_2, g_mu, g_sd),
@@ -454,7 +464,7 @@ The minimal set of information to generate a single deterministic kernel is now 
 my_ipm <- init_ipm('simple_di_det') %>%
   define_kernel(
     name      = "P",
-    formula   = s_g_mult(s, g),
+    formula   = s * g,
     family    = "CC",
     
     s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
@@ -662,7 +672,7 @@ my_funs <- list(inv_logit   = inv_logit,
 
 The only requirement for these functions is that they contain valid R code, and their return types are either numeric or integer.
 
-### Initializing the IPM
+### Implement the IPM
 
 With the functions and parameter values defined, we are now ready to begin composing the model. Each expression's syntax will look a little different from before, because we are appending a suffix corresponding to the hierarchical component of the model to each parameter/vital rate/kernel that is affected by it. In this case, we're pretending it is a year effect, denoted `_yr`, but almost any suffix will work. This can be a character or integer vector, and the list can have as many entries as required by the model (e.g. `yr` for years *and* `pl` for plots. The suffix would then become `_yr_pl`). The calls to `define_kernel` and `define_k` now have `has_hier_effs = TRUE`, and `levels_hier_effs = list(yr = 1:5)`. Otherwise, the code should look quite familiar.
 
@@ -672,8 +682,8 @@ With the functions and parameter values defined, we are now ready to begin compo
 
 my_ipm <- init_ipm('simple_di_stoch_kern') %>%
   define_kernel(
-    name             = 'P_yr',               # P because P_yr
-    formula          = s_g_mult(s_yr, g_yr), # g and s become g_yr and s_yr, respectively
+    name             = 'P_yr',         # P because P_yr
+    formula          = s_yr * g_yr,    # g and s become g_yr and s_yr, respectively
     family           = "CC",
     
     # Note the usage of the inv_logit_r, which we defined in the block above.
@@ -746,7 +756,7 @@ Syntax aside, the only real difference between the IPM definition in the first e
 
 - All other slots will look the same as in the previous `simple_di_det` example.
 
-To run an actual simulation for, say, 100 time steps, we can remove the existing `K` using the helper `remove_k()`, add a new one with `define_k()`, and reimplement the model. This requires defining an expression that relates the population state at `t+1` to the kernel and population state at `t` (done in `define_k`), defining an initial population state (done in `define_pop_state`), and running `make_ipm(iterate = TRUE, iterations = 100)`.
+To run an actual simulation for, say, 100 time steps, we can remove the existing `K` using the helper `remove_k()`, add a new one with `define_k()`, and reimplement the model. This requires defining an expression that relates the population state at `t+1` to the K kernel and population state at `t` (done in `define_k`), defining an initial population state (done in `define_pop_state`), and running `make_ipm(iterate = TRUE, iterations = 100)`.
 
 ```{r eval = FALSE}
 
@@ -755,6 +765,11 @@ my_iterated_ipm <- my_ipm$proto_ipm %>%
   define_k(
     name             = "K_yr",
     K_yr             = P_yr + F_yr,
+    
+    # n_ht_t and n_ht_t_1 are automatically created internally when 
+    # define_pop_state() is called. We do not need to create them
+    # in the data_list or anything, just to specify n_ht in define_pop_state()
+    
     n_ht_t_1         = K_yr %*% n_ht_t,
     family           = 'IPM',
     data_list        = list(),
@@ -780,11 +795,12 @@ my_iterated_ipm <- my_ipm$proto_ipm %>%
   # Initialize the population vector. This can take any expression. Note that
   # the population state has an n_ prefixed to it to indicate that it is
   # describing the population distribution function. ipmr will automatically
-  # create variables n_ht_t and n_ht_t_1 when constructing the IPM. We can
-  # use the kernel_seq argument to pass a pre-specified sequence of kernels
-  # into the function, and retrieve it later using my_iterated_ipm$env_seq.
+  # create variables n_ht_t and n_ht_t_1 when constructing the IPM.  
+  define_pop_state(n_ht = runif(100)) %>% 
   
-  define_pop_state(n_ht = runif(100)) %>%      
+  # We can use the kernel_seq argument to pass a pre-specified sequence of kernels
+  # into the function, and retrieve it later using my_iterated_ipm$env_seq.
+
   make_ipm(usr_funs   = my_funs,
            kernel_seq = sample(1:5, 100, replace = TRUE),
            iterate    = TRUE,
@@ -800,7 +816,6 @@ det_lambdas <- lambda(my_iterated_ipm, comp_method = 'pop_size', type = 'all')
 
 stoch_lambda <- lambda(my_iterated_ipm, comp_method = 'pop_size', type = 'stochastic')
 
-
 ```
 
 100 iterations is not enough to estimate stochastic growth rates ($\lambda_s$), but the computations can take some time with a lot of iterations, and are not practical for demonstration purposes. 
@@ -811,7 +826,7 @@ In some cases, it is not desirable to work with single estimates of a random var
 
 Unfortunately, this also means that we can't obtain a set of kernels without iterating the model at least once, because we have to sample from the parameter distributions at least once (well, technically, we can, but this is probably not the desired behavior). This is where the `*_stoch_param` methods come in handy. `*_stoch_param` methods are slightly less computationally efficient than their `*_stoch_kern*` counterparts because they must rebuild the iteration kernel for every single iteration. However, they are fantastic tools for exploring uncertainty and/or random variation. 
 
-Below is an example that demonstrates how to work with posterior distributions from Bayesian models. This far from the only use case for this type of model, but will hopefully demonstrate how to incorporate parameter distributions into an IPM. `ipmr` is careful to only evaluate each expression in `define_env_state()` once per iteration, so you can safely work with multivariate distributions using very little additional code.
+Below is an example that demonstrates how to work with posterior distributions from Bayesian models. This far from the only use case for this type of model, but will hopefully demonstrate how to incorporate parameter distributions into an IPM. `ipmr` is careful to only evaluate each expression in `define_env_state()` once per iteration, so we can safely work with multivariate distributions using very little additional code.
 
 Equivalent code is demonstrated in the comments, but switches to a Bayesian model for growth and survival, specifically [`brms`](https://paul-buerkner.github.io/brms/). The parameters for the growth and survival functions will be sampled from posterior distributions one time per iteration, and an example of a function to pass to `define_env_state()` is included in the first chunk below. 
 
@@ -843,12 +858,11 @@ In `define_pop_state()`, populations should be defined as `n_<insertStateVariabl
 
 #### `define_env_state()`
 
-`define_env_state()` takes a named set of expressions in the `...` and then a data list, much like how `define_kernel()`/`define_k()` take them. The values created need to be in a list that has names corresponding to the parameter names in the vital rate expressions. In this example, they are called `s_int`, `s_slope`, `g_int`, `g_slope`, and `g_sd`. The `data_list` in  for this section should contain any variables used in the function you define (in this example, `posterior_distribs`). You can reference them in the vital rate expressions in each kernel definition as if they were in the `data_list` of `define_kernel/define_k()`. 
+`define_env_state()` takes a named set of expressions in the `...` and then a data list, much like how `define_kernel()`/`define_k()` take them. The values created need to be in a list that has names corresponding to the parameter names in the vital rate expressions. In this example, they are called `s_int`, `s_slope`, `g_int`, `g_slope`, and `g_sd`. The `data_list` in this section should contain any variables used in the function we define (in this example, `posterior_distribs`). we can reference them in the vital rate expressions in each kernel definition as if they were in the `data_list` of `define_kernel/define_k()`. 
 
 ### Vital rate models
 
 The first chunk below initializes the parameters and functions that the model uses. It takes the place of the usual vital rate model fitting process. 
-
 
 This example uses two Bayesian models for survival and growth and a single function to sample them to illustrate how to use continuously varying parameter distributions in `ipmr`. This only uses two models and one function to limit the the complexity of the example - there is no upper limit on the number of parameters or functions you can use in your own models. 
 
@@ -902,7 +916,7 @@ posterior_distribution <- data.frame(
   g_sd      = runif(4000, 0.75, 3)
 )
 
-# set the names to the parameter names you want to use in the model. These 
+# set the names to the parameter names we want to use in the model. These 
 # are already set in this example, but outputs from brms/rstan/lme4 may not be
 # as conveniently named. 
 
@@ -1015,9 +1029,9 @@ param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
 
 ```
 
-The continuously varying parameters and the expressionss that generate them should be passed into `define_env_state()`. `make_ipm()` will ensure that these are evaluated only once per iteration of the model, so that you can safely work with joint distributions that generate multiple parameter estimates per draw. 
+The continuously varying parameters and the expressionss that generate them should be passed into `define_env_state()`. `make_ipm()` will ensure that these are evaluated only once per iteration of the model, so that we can safely work with joint distributions that generate multiple parameter estimates per draw. 
 
-The `...` part of `define_env_state()` should be expressions that generate the variables you would like to reference. In this case `env_params` is a named list that contains `s_int`, `s_slope`, `g_int`, `g_slope`, and `g_sd`. The `s_int`, `s_slope`, etc are the names that will be generated by the IPM code, and so are the names that should be referenced in the kernels' vital rate expressions, not `env_params`! You don't need to remember that you called this particular object `env_params` when you write your vital rate expressions, but it does have to be named something for the IPM code to run. 
+The `...` part of `define_env_state()` should be expressions that generate the variables we would like to reference. In this case `env_params` is a named list that contains `s_int`, `s_slope`, `g_int`, `g_slope`, and `g_sd`. The `s_int`, `s_slope`, etc are the names that will be generated by the IPM code, and so are the names that should be referenced in the kernels' vital rate expressions, not `env_params`! we don't need to remember that we called this particular object `env_params` when we write our vital rate expressions, but it does have to be named something for the IPM code to run. 
 
 The `data_list` contains the data frame we made that contains the posterior samples from our vital rate model. In this example, the growth and survival models weren't actually fit together, so there's no statistical reason to actually combine them, it's just for simplicity.
 
@@ -1043,8 +1057,8 @@ param_resamp_model <- param_resamp_model %>%
 
 lambda(param_resamp_model, comp_method = 'pop_size', type_lambda = 'all')
 
-# If you want to see the actual draws that were used at each step of the 
-# model iteration, you can access these using the output's $env_seq slot.
+# If we want to see the actual draws that were used at each step of the 
+# model iteration, we can access these using the output's $env_seq slot.
 
 param_resamp_model$env_seq
 
