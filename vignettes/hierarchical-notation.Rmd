@@ -36,7 +36,7 @@ knitr::kable(
 
     Math    = c("$\\mu_g^{yr} = \\alpha_g + \\alpha_g^{yr} * \\beta_g * z + e$",
                          "$z' \\sim Norm(\\mu_g^{yr}, \\sigma_g)$",
-                "$Logit(\\mu_{s,yr}^{plot}) = \\alpha_s + \\alpha_{s,yr}^{plot} + \\beta * z$",
+                "$Logit(\\mu_{s}^{plot,yr}) = \\alpha_s + \\alpha_{s}^{plot,yr} + \\beta * z$",
                 "",
                 "",
                 "$log(\\mu_{f_{yr}}) = \\alpha_{f} + \\alpha_{f_{yr}} + (\\beta_f + \\beta_{f_{yr}}) * z$"),
@@ -69,11 +69,11 @@ knitr::kable(
 ```
 
 
-## Hierarchical models with a single random term {#sim_di_s_k}
+## Hierarchical models with a single random variable {#sim_di_s_k}
 
 These models are pretty common in the IPM literature. They encompass cases where a single site has been sampled over many years, or a sample many sites across one transition. 
 
-This example will use a hypothetical study that spans 5 transitions and has 6 consecutive censuses. To limit complexity, let's pretend our exploratory analysis and model selection indicated the best overall models included random year-specifc intercepts for growth ($g_{yr}$) and survival ($s_{yr}$), but not probability of reproduction ($f_p$), recruit production ($f_r$), or the recruit size distribution ($f_d$). We will work with a simple model to start (i.e. 1 continuous state variable, no discrete states). This yields the following IPM ($z,z'$ represent size/height/weight at time $t$ and $t+1$, respectively):
+This example will use a hypothetical study that spans 5 transitions and has 6 consecutive censuses. The temporal variation will be denoted with a suffix/subscript appended to each term that it modifies ($x_{yr}$/`x_yr`). To limit complexity, let's pretend our exploratory analysis and model selection indicated the best overall models included random year-specifc intercepts for growth ($g_{yr}$) and survival ($s_{yr}$), but not probability of reproduction ($f_p$), recruit production ($f_r$), or the recruit size distribution ($f_d$). We will work with a simple model to start (i.e. 1 continuous state variable, no discrete states). This yields the following IPM ($z,z'$ represent size/height/weight at time $t$ and $t+1$, respectively):
 
 1. $K_{yr}(z', z) = P_{yr}(z',z) + F(z',z)$
 
@@ -326,4 +326,155 @@ ex_ipm <- init_ipm("simple_di_stoch_kern") %>%
 
 ## Hierarchical models with discretely and continuously varying parameters {#complicated}
 
-On the way...
+Sometimes, models will have discretely and continuously varying components as functions of different variables. For example, a study could consider multiple sites (discrete component) and temporal fluctations in environment at each site (continuous component). We'll use a hypothetical study that models demography across multiple sites as a function of size and inter-annual climate variability. 
+
+To illustrate the full flexibility of the syntax, we'll use a general model of a perennial plant species. Its seeds can either enter a seed bank or recruit immediately, producing recruits at the next time step. There is a single continuous state variable $z$/`z` that describes the time invariant component of plant demography, and a set of random environmental covariates $\theta$ that modify survival ($s_{site}$/`s_site`), growth ($g_{site}$/`g_site`), probability of reproduction ($f_{{p}_{site}}$/`f_p_site`), and seed production ($f_{{r}_{site}}$/`f_r_site`) at each time. We'll pretend that data from the recruit size distribution was pooled across sites so that the seed bank-related terms are unchanged by space and time.
+
+The seed bank will be age structured and its parameters will be time invariant. Seeds in the first year can either survive ($s_{{sb}_1}$/`s_sb1`) and recruit ($r_{{sb}_1}$), or survive and become two year old seeds. Two year old seeds can either survive ($s_{{sb}_2}$/`s_sb2`) and recruit ($r_{{sb}_2}$/`r_sb2`) or die.  
+
+The full model looks like this:
+
+1. $n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z',z, \theta)]n(z, t)\mathrm{dz} + \int_L^Us_{{sb}_1} * r_{{sb}_1} * f_d(z')n(sb_1, t)\mathrm{dz} + \int_L^Us_{{sb}_2} * r_{{sb}_2} * f_d(z')n(sb_2, t)\mathrm{dz}$
+
+2. $n(sb_1, t + 1) = \int_L^U(1-r_i) * F^{site}(z',z, \theta)n(z, t)\mathrm{dz}$
+
+3. $n(sb_2, t + 1) = s_{{sb}_1} * (1-r_{{sb}_1})$
+
+The sub kernels are: 
+
+4. $P^{site}(z',z) = s^{site}(z, \theta) * g^{site}(z',z, \theta)$
+
+5. $F^{site}(z',z, \theta) = f_{{p}}^{site}(z, \theta) * f_{r}^{site}(z, \theta) * f_d(z')$
+
+And the size/climate dependent vital rate functions:
+
+6. $logit(s^{site}) = \alpha_{s}^{site} + \beta_s^{site} * z + \theta_s$
+
+7. $g^{site} \sim Norm(\mu_g^{site}, \sigma_g^{site})$
+
+8. $\mu_g^{site} = \alpha_g^{site} + \beta_g^{site} * z + \theta_g$
+
+9. $logit(f_{p}^{site}) = \alpha_{f_p}^{site} + \beta_{f_p}^{site} * z + \theta_{f_p}$
+
+10. $log(f_{r}^{site}) = \alpha_{f_r}^{site} + \beta_{f_r}^{site} * z + \theta_{f_r}$
+
+11. $f_d \sim Norm(\mu_{f_d}, \sigma_{f_d})$
+
+Finally, $\theta$'s are drawn from independent normal distributions for each vital rate. Is this biologically reasonable? Probably not - correlations between vital rates are usually pretty important. But we've made up a plant species, we can make this work too.
+
+12. $\theta_i \sim Norm(0, \sigma_i)$
+
+Note that in this example, the random climate variables ($\theta_x$) are simply modifying the intercept. One could easily incorporate terms that modify slopes by adjusting the functional forms and adding/subtracting parameters as needed.
+
+### Simulating parameters
+
+We have to simulate some parameters for the example code to work. Ideally, model fitting using actual data would fill the space that this is taking up.
+
+We'll use 6 sites for the discrete portion of our variables.
+
+```{r eval = FALSE}
+
+library(ipmr)
+
+# Set up the sites
+
+sites <- LETTERS[1:6]
+
+# We'll add the g sigmas later - we don't want all of the other
+# vital rates to have sigmas though!
+
+pars  <- c("alpha", "beta")
+vrs   <- c("s", "g", "f_p", "f_r")
+
+vr_df <- expand.grid(pars = pars, vrs = vrs, sites = sites)
+
+vr_nms <- paste(vr_df$pars, vr_df$vrs, vr_df$sites, sep = "_")
+
+# site level parameter vector
+
+site_pars <- numeric(length(vr_nms))
+
+names(site_pars) <- vr_nms
+
+for(i in seq_along(sites)) {
+  
+  start <- i * 8 - 7
+  end   <- i * 8
+  
+  # s vars
+  
+  site_pars[start]       <- rnorm(1, mean = -5, sd = 1)
+  site_pars[(start + 1)] <- runif(1, min =  1, max = 4)
+  
+  # g vars
+  
+  site_pars[(start + 2)] <- rnorm(1, mean = 0, sd = 0.5)
+  site_pars[(start + 3)] <- runif(1, 0.85, 1.15)
+  
+  # f_p vars
+  
+  site_pars[(start + 4)] <- rnorm(1, mean = -2, sd = 0.5)
+  site_pars[(start + 5)] <- runif(1, 1, 3)
+  
+  # f_r vars
+  
+  site_pars[(end - 1)] <- rgamma(1, shape = 1)
+  site_pars[(end)]     <- runif(1, 0.001, 0.1)
+  
+}
+
+g_sigmas <- runif(6, 0.3, 0.9)
+
+names(g_sigmas) <- paste("sigma_g_", sites, sep = "")
+
+site_pars <- as.list(c(site_pars, g_sigmas))
+
+# Now, simulate the site- and time-invariant parameters for the model
+
+fixed_pars <- list(
+  r_i       = 0.6,
+  r_sb1     = 0.2,
+  r_sb2     = 0.3,
+  s_sb1     = 0.4,
+  s_sb2     = 0.1,
+  mu_f_d    = 0.7,
+  sigma_f_d = 0.2
+)
+
+all_pars <- c(fixed_pars, site_pars)
+
+```
+
+Additionally, we need to write a function that samples from the $\theta$ distributions and creates variables with the right names. This function has no parameters - it just pulls values from independent normal distributions. We could modify this to include, for example, temperature and precipitation data, or grazing intensities.
+
+```{r eval = FALSE}
+
+theta_fun <- function() {
+  
+  out <- list(
+    theta_s = rnorm(1, sd = 1)
+    theta_g = rnorm(1, sd = 1)
+    theta_f_p = rnorm(1, sd = 0.2)
+    theta_f_r = rnorm(1, sd = 2)
+  )
+  
+  return(out)
+}
+
+```
+
+### Implementing the model
+
+We've written out our model - now we can implement it! We'll use the general, density independent, stochastic parameter resampled machinery for this.
+
+
+```{r eval = FALSE}
+
+# Implement the model....
+
+
+```
+
+
+
+
