@@ -176,6 +176,8 @@ truncated_distributions <- function(fun,
 
     out <- rlang::eval_tidy(evict_fun)
 
+ } else {
+    stop("This type of 'evict_fun' is not yet implemented", call. = FALSE)
   }
 
   return(out)

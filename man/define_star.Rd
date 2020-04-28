@@ -17,7 +17,7 @@ define_domains(proto_ipm, ...)
 
 define_pop_state(proto_ipm, ..., pop_vectors = list())
 
-define_env_state(proto_ipm, ..., data_list)
+define_env_state(proto_ipm, ..., data_list = list())
 }
 \arguments{
 \item{proto_ipm}{The name of object you wish to append the new kernel to.}

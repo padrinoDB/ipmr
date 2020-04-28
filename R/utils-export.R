@@ -135,7 +135,7 @@ define_pop_state <- function(proto_ipm, ..., pop_vectors = list()) {
 #' @rdname define_star
 #' @export
 
-define_env_state <- function(proto_ipm, ..., data_list) {
+define_env_state <- function(proto_ipm, ..., data_list = list()) {
 
   env_quos            <- rlang::enquos(...)
 

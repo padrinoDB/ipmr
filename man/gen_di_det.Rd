@@ -4,7 +4,8 @@
 \name{gen_di_det_ex}
 \alias{gen_di_det_ex}
 \title{A general deterministic IPM example}
-\format{A general deterministic IPM with the following slots:
+\format{
+A general deterministic IPM with the following slots:
 \describe{
 
   \item{iterators}{Empty.}
@@ -17,7 +18,8 @@
   \code{pop_state_ht}.}
   \item{proto_ipm}{The \code{proto_ipm} used to implement the model.}
 
-}}
+}
+}
 \usage{
 gen_di_det_ex
 }

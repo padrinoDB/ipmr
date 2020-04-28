@@ -712,6 +712,7 @@
 
   nm_order        <- sort(names(domain_list))
   domain_list     <- domain_list[nm_order]
+  domain_list     <- domain_list[!is.na(names(domain_list))]
 
   # Resume as before
 

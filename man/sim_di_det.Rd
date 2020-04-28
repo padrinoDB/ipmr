@@ -4,7 +4,8 @@
 \name{sim_di_det_ex}
 \alias{sim_di_det_ex}
 \title{Simple deterministic IPM example}
-\format{A simple deterministic IPM with the following slots:
+\format{
+A simple deterministic IPM with the following slots:
 \describe{
 
   \item{iterators}{The computed iteration kernel, named \code{K}.}
@@ -14,7 +15,8 @@
   \item{pop_state}{Empty.}
   \item{proto_ipm}{The \code{proto_ipm} object used to implement the model.}
 
-}}
+}
+}
 \usage{
 sim_di_det_ex
 }
