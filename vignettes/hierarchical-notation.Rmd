@@ -336,7 +336,7 @@ The full model looks like this:
 
 1. $n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z',z, \theta)]n(z, t)\mathrm{dz} + \int_L^Us_{{sb}_1} * r_{{sb}_1} * f_d(z')n(sb_1, t)\mathrm{dz} + \int_L^Us_{{sb}_2} * r_{{sb}_2} * f_d(z')n(sb_2, t)\mathrm{dz}$
 
-2. $n(sb_1, t + 1) = \int_L^U(1-r_i) * F^{site}(z',z, \theta)n(z, t)\mathrm{dz}$
+2. $n(sb_1, t + 1) = (1-r_i) * \int_L^U [f_p^{site}(z, \theta) * f_r^{site}(z,\theta)] n(z, t)\mathrm{dz}$
 
 3. $n(sb_2, t + 1) = s_{{sb}_1} * (1-r_{{sb}_1})$
 
@@ -437,24 +437,24 @@ fixed_pars <- list(
   r_sb2     = 0.3,
   s_sb1     = 0.4,
   s_sb2     = 0.1,
-  mu_f_d    = 0.7,
-  sigma_f_d = 0.2
+  mu_f_d    = 4,
+  sigma_f_d = 0.9
 )
 
 all_pars <- c(fixed_pars, site_pars)
 
 ```
 
-Additionally, we need to write a function that samples from the $\theta$ distributions and creates variables with the right names. This function has no parameters - it just pulls values from independent normal distributions. We could modify this to include, for example, temperature and precipitation data, or grazing intensities.
+Additionally, we need to write a function that samples from the $\theta$ distributions and creates variables with the right names. This function has no parameters - it just pulls values from independent normal distributions. We could modify this to include, for example, temperature and precipitation data, or grazing intensities. 
 
 ```{r eval = FALSE}
 
 theta_fun <- function() {
   
   out <- list(
-    theta_s = rnorm(1, sd = 1)
-    theta_g = rnorm(1, sd = 1)
-    theta_f_p = rnorm(1, sd = 0.2)
+    theta_s = rnorm(1, sd = 1),
+    theta_g = rnorm(1, sd = 1),
+    theta_f_p = rnorm(1, sd = 0.2),
     theta_f_r = rnorm(1, sd = 2)
   )
   
@@ -470,8 +470,126 @@ We've written out our model - now we can implement it! We'll use the general, de
 
 ```{r eval = FALSE}
 
-# Implement the model....
-
+ex_ipm <- init_ipm("general_di_stoch_param") %>%
+  define_kernel(
+    
+    name = "P_site",
+    family = "CC",
+    
+    formula          = s_site * g_site * d_z,
+    s_site_lin       = alpha_s_site + beta_s_site * z_1 + theta_s,
+    s_site           = 1 / (1 + exp(-s_site_lin)),
+    mu_g_site        = alpha_g_site + beta_g_site * z_1 + theta_g,
+    g_site           = dnorm(z_2, mu_g_site, sigma_g_site),
+    data_list        = all_pars,
+    states           = list(c("z")),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(site = LETTERS[1:6]),
+    evict_cor        = TRUE,
+    evict_fun        = truncated_distributions("norm", "g_site")
+  ) %>%
+  define_kernel(
+    name             = "F_site",
+    family           = "CC",
+    formula          = f_p_site * f_r_site * f_d * d_z,
+    f_p_site_lin     = alpha_f_p_site + beta_f_p_site * z_1 + theta_f_p,
+    f_p_site         = 1 / (1 + exp(-f_p_site_lin)),
+    f_r_site         = exp(alpha_f_r_site + beta_f_r_site * z_1 + theta_f_p),
+    f_d              = dnorm(z_2, mu_f_d, sigma_f_d),
+    data_list        = all_pars,
+    states           = list(c("z")),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(site = LETTERS[1:6]),
+    evict_cor        = TRUE,
+    evict_fun        = truncated_distributions("norm", "f_d")
+  ) %>%
+  define_kernel(
+    name             = "go_sb_1_site",
+    family           = "CD",
+    formula          = (1 - r_i) * f_p_site * f_r_site * d_z,
+    f_p_site_lin     = alpha_f_p_site + beta_f_p_site * z_1 + theta_f_p,
+    f_p_site         = 1 / (1 + exp(-f_p_site_lin)),
+    f_r_site         = exp(alpha_f_r_site + beta_f_r_site * z_1 + theta_f_p),
+    data_list        = all_pars,
+    states           = list(c("z")),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(site = LETTERS[1:6]),
+    evict_cor        = FALSE
+  ) %>%
+  define_kernel(
+    name          = "go_sb_2",
+    family        = "DD",
+    formula       = s_sb1 * (1 - r_sb1),
+    data_list     = all_pars,
+    states        = list(c('z')),
+    has_hier_effs = FALSE,
+    evict_cor     = FALSE
+  ) %>%
+  define_kernel(
+    name          = "leave_sb_1",
+    family        = "DC",
+    formula       = s_sb1 * r_sb1 * f_d * d_z,
+    f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
+    data_list     = all_pars,
+    states        = list(c("z")),
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "f_d")
+  ) %>%
+  define_kernel(
+    name          = "leave_sb_2",
+    family        = "DC",
+    formula       = s_sb2 * r_sb2 * f_d * d_z,
+    f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
+    data_list     = all_pars,
+    states        = list(c("z")),
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "f_d")
+  ) %>%
+  define_k(
+    name             = "K_site",
+    family           = "IPM",
+    K_site           = P_site + F_site,
+    n_z_t_1          = K_site     %*% n_z_t   + 
+                       leave_sb_1 %*% n_sb1_t + 
+                       leave_sb_2 %*% n_sb2_t,
+    n_sb1_t_1        = go_sb_1_site %*% n_z_t,
+    n_sb2_t_1        = go_sb_2 %*% n_sb1_t,
+    data_list        = all_pars,
+    states           = list(c("z")),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(site = LETTERS[1:6]),
+    evict_cor        = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P_site", "F_site",
+                       "go_sb_1_site", "go_sb_2", 
+                       "leave_sb_1", "leave_sb_2",
+                       "K_site"),
+      int_rule     = rep("midpoint", 7),
+      dom_start    = c("z", "z", "z", NA_character_, NA_character_, NA_character_, "z"),
+      dom_end      = c("z", "z", NA_character_, NA_character_, "z", "z", "Z")
+    )
+  ) %>%
+  define_domains(
+    z = c(0.1, 100, 200)
+  ) %>%
+  define_pop_state(
+    n_z   = runif(200),
+    n_sb1 = 20,
+    n_sb2 = 20
+  ) %>%
+  define_env_state(
+    thetas = theta_fun()
+  ) %>%  
+  make_ipm(
+    usr_funs           = list(theta_fun = theta_fun),
+    iterations         = 200,
+    kernel_seq         = sample(LETTERS[1:6], 200, replace = TRUE),
+    normalize_pop_size = TRUE
+  )
 
 ```
 
