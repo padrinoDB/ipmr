@@ -994,12 +994,12 @@ gen_di_stoch_kern_1 <- init_ipm('general_di_stoch_kern') %>%
   ) %>%
   define_k(
     name = 'K_site',
-    n_ln_leaf_l_site_t_1 = k_xx_site %*% n_ln_leaf_l_site_t +
-      k_zx_site %*% n_sqrt_area_site_t +
-      k_dx_site %*% n_d_site_t,
-    n_sqrt_area_site_t_1 = k_xz_site %*% n_ln_leaf_l_site_t,
-    n_d_site_t_1 =         k_xd_site %*% n_ln_leaf_l_site_t +
-      k_zd_site %*% n_sqrt_area_site_t,
+    n_ln_leaf_l_t_1 = k_xx_site %*% n_ln_leaf_l_t +
+      k_zx_site %*% n_sqrt_area_t +
+      k_dx_site %*% n_d_t,
+    n_sqrt_area_t_1 = k_xz_site %*% n_ln_leaf_l_t,
+    n_d_t_1 =         k_xd_site %*% n_ln_leaf_l_t +
+      k_zd_site %*% n_sqrt_area_t,
     family = 'IPM',
     data_list = full_data_list,
     states    = list(c('sqrt_area', 'ln_leaf_l')),
@@ -1037,9 +1037,9 @@ gen_di_stoch_kern_1 <- init_ipm('general_di_stoch_kern') %>%
   ) %>%
   define_pop_state(
     pop_vectors = list(
-      n_ln_leaf_l_site = init_pop_vec$ln_leaf_l,
-      n_sqrt_area_site = init_pop_vec$sqrt_area,
-      n_d_site         = 10
+      n_ln_leaf_l = init_pop_vec$ln_leaf_l,
+      n_sqrt_area = init_pop_vec$sqrt_area,
+      n_d         = 10
     )
   ) %>%
   make_ipm(

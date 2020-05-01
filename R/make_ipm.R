@@ -229,8 +229,16 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
                                           domain_list = NULL,
                                           iterate     = FALSE,
                                           iterations  = 50,
-                                          normalize_pop_size = TRUE,
-                                          kernel_seq  = NULL) {
+                                          kernel_seq  = NULL,
+                                          normalize_pop_size = TRUE) {
+
+
+  if(iterate && (is.null(kernel_seq) || is.na(kernel_seq))) {
+
+    message("'kernel_seq' not defined. Will generate one internally")
+
+    kernel_seq <- "internal"
+  }
 
   # Work out whether to append usr_funs to proto or to restore them from prior
   # implemenation. Logic is documented in make_ipm.simple_di_det()
@@ -355,6 +363,7 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                            domain_list = NULL,
                                            iterate     = TRUE,
                                            iterations  = 50,
+                                           kernel_seq  = NULL,
                                            normalize_pop_size = TRUE) {
 
   # Work out whether to append usr_funs to proto or to restore them from prior
@@ -407,6 +416,12 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
   env_list <- list(master_env = master_env)
 
+  kern_seq <- .make_kern_seq(others,
+                             c(others$kernel_id,
+                               k_row$kernel_id),
+                             iterations,
+                             kernel_seq)
+
   for(i in seq_len(iterations)) {
 
     # Lazy variant makes sure that whatever functions that generate parameter
@@ -429,7 +444,7 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                          sub_kernels,
                                          iterations = 1L,
                                          current_iteration = i,
-                                         kern_seq = NULL,
+                                         kern_seq = kern_seq,
                                          temp$pop_state,
                                          master_env,
                                          proto_ipm,
@@ -634,6 +649,14 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
                                            kernel_seq  = NULL,
                                            normalize_pop_size = TRUE) {
 
+
+  if(iterate && (is.null(kernel_seq) || is.na(kernel_seq))) {
+
+    message("'kernel_seq' not defined. Will generate one internally")
+
+    kernel_seq <- "internal"
+  }
+
   # Work out whether to append usr_funs to proto or to restore them from prior
   # implemenation. Logic is documented in make_ipm.simple_di_det()
 
@@ -771,6 +794,7 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
                                             domain_list = NULL,
                                             iterate     = TRUE,
                                             iterations  = 50,
+                                            kernel_seq  = NULL,
                                             normalize_pop_size = TRUE) {
 
   # Work out whether to append usr_funs to proto or to restore them from prior
@@ -832,6 +856,12 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
          call. = FALSE)
   }
 
+  kern_seq <- .make_kern_seq(others,
+                             c(others$kernel_id,
+                               k_row$kernel_id),
+                             iterations,
+                             kernel_seq)
+
   for(i in seq_len(iterations)) {
 
     # Lazy variant makes sure that whatever functions that generate parameter
@@ -855,7 +885,7 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
                                         sub_kernels,
                                         iterations = 1,
                                         current_iteration = i,
-                                        kern_seq = NULL,
+                                        kern_seq = kern_seq,
                                         temp$pop_state,
                                         master_env,
                                         normalize_pop_size)

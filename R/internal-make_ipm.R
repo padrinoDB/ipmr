@@ -864,6 +864,10 @@
 
       seq_type <- 'markov_chain_mat'
 
+    } else if(length(kernel_seq) == 1 && kernel_seq == 'internal') {
+
+      seq_type <- "internal"
+
     } else {
 
       seq_type <- 'usr_specified'
@@ -878,10 +882,42 @@
                                                         iterations),
                 'usr_specified'      = .make_usr_seq(kernels,
                                                      kernel_seq,
-                                                     iterations))
+                                                     iterations),
+                'internal'           = .make_internal_seq(proto, iterations))
 
   return(out)
 
+}
+
+# Generates a random sequence from a uniform distribution. This only gets called
+# if the user doesn't specify one on their own in _stoch_kern methods
+
+.make_internal_seq <- function(proto, iterations) {
+
+  hier_effs <- proto$levels_hier_effs[proto$has_hier_effs]
+  hier_effs <- hier_effs[!duplicated(hier_effs)]
+
+  if(length(hier_effs) == 1) {
+
+    levs <- as.data.frame(unlist(hier_effs),
+                          stringsAsFactors = FALSE)
+
+  } else {
+
+    levs <- lapply(hier_effs, eval) %>%
+      expand.grid(stringsAsFactors = FALSE)
+
+  }
+
+  opts <- character(length = dim(levs)[1])
+
+  for(i in seq_len(dim(levs)[1])) {
+    opts[i] <- paste(levs[i, ], collapse = "_")
+  }
+
+  out <- sample(opts, size = iterations, replace = TRUE)
+
+  return(out)
 }
 
 .make_markov_seq <- function(proto,

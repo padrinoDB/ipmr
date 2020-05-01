@@ -1,11 +1,12 @@
-# print(search())
 context('general density independent stochastic kernel models')
 
 # Test with parameters from Aikens & Roach 2014 Population dynamics in central
 # and edge populations of a narrowly endemic plant. They only report
 # lambdas on a figure, and so I won't try to hit those perfectly.
-# Rather, just going to simulate a model using their parameters and then
+# Rather, just going to simulate the kernels using their parameters and then
 # try to recover it using ipmr.
+
+# These will get fed into a stochastic simulation afterwards.
 
 library(rlang)
 library(purrr)
@@ -167,18 +168,6 @@ full_data_list <- rename_data_list(data_list = all_params,
                                    nms       = unlist(hier_effs)) %>%
   flatten_to_depth(1)
 
-
-# Target lambdas extracted from Figure 5 using Data Thief. Not precise, but
-# probably good to within 1 or 2 decimal points
-
-target_lambdas <- c(
-  whitetop  = 1.193,
-  mt_rogers = 0.752,
-  roan      = 1.147,
-  big_bald  = 1.262,
-  bob_bald  = 1.058,
-  oak_knob  = 0.921
-)
 
 # Now, compose functions for vital rates and kernels!
 # Functions are similar between vital rates and stages, but I've split them
@@ -381,17 +370,6 @@ PF_zd <- function(z_1, params) {
 
 }
 
-# Now initialize kernel lists and population vectors
-# Use 100 iterations of each model to compute lambdas
-
-n_iterations   <- 100
-
-models         <- vector('list', length(hier_effs$site))
-names(models)  <- hier_effs$site
-
-pop_holders        <- vector('list', length(hier_effs$site))
-names(pop_holders) <- hier_effs$site
-
 # All populations will get the same initial population vector, and it's
 # just a random set of numbers in their range of possible values
 
@@ -400,38 +378,37 @@ set.seed(214512)
 init_pop_vec      <- list(ln_leaf_l = runif(domains$sqrt_area[3]),
                           sqrt_area = runif(domains$sqrt_area[3]))
 
-pop_holders <- lapply(seq_along(pop_holders),
-                      function(x, pop_holders, init_pop_vecs, iterations) {
+# Now initialize kernel lists and population vectors
+# Use 100 iterations of each model to compute lambdas
 
-                        pop_t_1 <- init_pop_vec
-                        sqrt_area <- array(NA_real_,
-                                           dim = c(length(pop_t_1$sqrt_area),
-                                                   (iterations + 1)))
-                        ln_leaf_l <- array(NA_real_,
-                                           dim = c(length(pop_t_1$ln_leaf_l),
-                                                   (iterations + 1)))
+n_iterations   <- 100
 
-                        d <- array(NA_real_, dim = c(1, (iterations + 1)))
+models         <- vector('list', length(hier_effs$site))
+names(models)  <- hier_effs$site
 
-                        sqrt_area[ , 1] <- pop_t_1$sqrt_area
-                        ln_leaf_l[ , 1] <- pop_t_1$ln_leaf_l
-                        d[ , 1]         <- 10
+pop_holder     <- list(
+  sqrt_area = array(NA_real_, dim = c(50, 101)),
+  ln_leaf_l = array(NA_real_, dim = c(50, 101)),
+  d         = array(NA_real_, dim = c(1, 101))
+)
 
-                        nm <- names(pop_holders)[x]
+pop_holder$sqrt_area[ , 1] <- init_pop_vec$sqrt_area
+pop_holder$ln_leaf_l[ , 1] <- init_pop_vec$ln_leaf_l
+pop_holder$d[ , 1]         <- 20
+pop_holder$lambda          <- array(NA_real_, dim = c(1, 101))
 
-                        pop_holders[[x]] <- rlang::list2(!! nm := list(
-                          n_sqrt_area = sqrt_area,
-                          n_ln_leaf_l = ln_leaf_l,
-                          n_d         = d
-                        ))
+tot_size <- sum(unlist(pop_holder), na.rm = TRUE)
 
-                        return(pop_holders[[x]])
-                      },
-                      pop_holders   = pop_holders,
-                      init_pop_vecs = init_pop_vec,
-                      iterations    = n_iterations) %>%
-  flatten_to_depth(2L)
+pop_holder <- lapply(
+  pop_holder,
+  function(x, size) {
 
+    x[ , 1] <- x[ , 1] / size
+
+    return(x)
+  },
+  size = tot_size
+)
 
 # Make mesh bounds and mid points. length.out = length + 1 because we are making
 # bounds. when the meshpoints are generated, the resulting length is length(bounds - 1)
@@ -459,27 +436,19 @@ all_mesh_p <- list(sqrt_area = expand.grid(z_1 = mesh_p$sqrt_area,
                                            x_2 = mesh_p$ln_leaf_l)) %>%
   flatten_to_depth(1L)
 
+k_seq <- sample(hier_effs$site, 100, replace = TRUE)
 
 # Everything is initialized. We'll loop over the populations and iterate
 # the model for each one individually, compute lambdas, and store those
 # for comparison using test_that()
 
-for(i in seq_along(models)) {
+for(i in seq_len(n_iterations)) {
 
-  pop <- names(pop_holders)[i]
+  pop <- k_seq[i]
 
-  # each parameter has 6 entries in full_data_list - 1 for each population.
-  # this generates an index to grab parameters unique to each population.
-  # populations are always in the same order for each parameter, so this grabs
-  # one for each.
+  param_name_ind <- grepl(pop, names(full_data_list))
 
-  param_ind   <- seq(i, length(full_data_list), by = 6)
-
-  site_params <- full_data_list[param_ind]
-
-  # just to make sure we haven't lost our minds
-
-  stopifnot(all(grepl(pop, names(site_params))))
+  site_params <- full_data_list[param_name_ind]
 
   # Next, use each kernel function to generate a (discretized!) vector.
   # transform these into iteration matrices, and then iterate using a loop over
@@ -522,41 +491,34 @@ for(i in seq_along(models)) {
 
   )
 
-  temp_pop <- pop_holders[pop]
 
-  for(j in seq_len(n_iterations)) {
+  # These are the full kernel equations from pages 1853-1854.
 
-    # These are the full kernel equations from pages 1853-1854.
+  x_t_1 <- kernels$kern_xx %*% pop_holder$ln_leaf_l[ , i] +
+    kernels$kern_zx %*% pop_holder$sqrt_area[ , i] +
+    kernels$kern_dx %*% pop_holder$d[ , i]
 
-    x_t_1 <- kernels$kern_xx %*% temp_pop[[1]]$n_ln_leaf_l[ , j] +
-      kernels$kern_zx %*% temp_pop[[1]]$n_sqrt_area[ , j] +
-      kernels$kern_dx %*% temp_pop[[1]]$n_d[j]
+  z_t_1 <- kernels$kern_xz %*% pop_holder$ln_leaf_l[ , i]
 
-    z_t_1 <- kernels$kern_xz %*% temp_pop[[1]]$n_ln_leaf_l[ , j]
+  d_t_1 <- kernels$kern_xd %*% pop_holder$ln_leaf_l[ , i] +
+    kernels$kern_zd %*% pop_holder$sqrt_area[ , i]
 
-    d_t_1 <- kernels$kern_xd %*% temp_pop[[1]]$n_ln_leaf_l[ , j] +
-      kernels$kern_zd %*% temp_pop[[1]]$n_sqrt_area[ , j]
+  tot_size <- lambda <- sum(x_t_1, z_t_1, d_t_1)
 
-    temp_pop[[1]]$n_ln_leaf_l[ , (j + 1)] <- x_t_1
-    temp_pop[[1]]$n_sqrt_area[ , (j + 1)] <- z_t_1
-    temp_pop[[1]]$n_d[ , (j + 1)]         <- d_t_1
+  pop_holder$ln_leaf_l[ , (i + 1)] <- x_t_1 / tot_size
+  pop_holder$sqrt_area[ , (i + 1)] <- z_t_1 / tot_size
+  pop_holder$d[ , (i + 1)]         <- d_t_1 / tot_size
 
+  pop_holder$lambda[ (i + 1) ]       <- lambda
+
+  # Store the kernels for subsequent kernel comparisons
+
+  if(rlang::is_empty(models[[pop]])) {
+    models[[pop]] <- kernels
   }
-
-  # Some house keeping so we can use ipmr convenience functions to compute
-  # lambda for populations which have converged to stable growth/decline
-
-  temp_pop <- list(pop_state = flatten_to_depth(temp_pop, 1))
-
-  pop_holders[[i]] <- temp_pop
-  models[pop]      <- list(flatten_to_depth(kernels, 1))
-
 }
 
-actual_lambdas <- vapply(pop_holders,
-                         function(x) ipmr:::.lambda_pop_size(x,
-                                                             all_lambdas = FALSE),
-                         numeric(1L))
+actual_lambdas <- pop_holder$lambda[ , -1]
 
 # And now, for the ipmr version.
 
@@ -684,12 +646,12 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
   ) %>%
   define_k(
     name = 'K_site',
-    n_ln_leaf_l_site_t_1 = PF_xx_site %*% n_ln_leaf_l_site_t +
-      PF_zx_site %*% n_sqrt_area_site_t +
-      PF_dx_site %*% n_d_site_t,
-    n_sqrt_area_site_t_1 = PF_xz_site %*% n_ln_leaf_l_site_t,
-    n_d_site_t_1 =         PF_xd_site %*% n_ln_leaf_l_site_t +
-      PF_zd_site %*% n_sqrt_area_site_t,
+    n_ln_leaf_l_t_1 = PF_xx_site %*% n_ln_leaf_l_t +
+      PF_zx_site %*% n_sqrt_area_t +
+      PF_dx_site %*% n_d_t,
+    n_sqrt_area_t_1 = PF_xz_site %*% n_ln_leaf_l_t,
+    n_d_t_1 =         PF_xd_site %*% n_ln_leaf_l_t +
+      PF_zd_site %*% n_sqrt_area_t,
     family = 'IPM',
     data_list = full_data_list,
     states    = list(c('sqrt_area', 'ln_leaf_l')),
@@ -727,9 +689,9 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
   ) %>%
   define_pop_state(
     pop_vectors = list(
-      n_ln_leaf_l_site = init_pop_vec$ln_leaf_l,
-      n_sqrt_area_site = init_pop_vec$sqrt_area,
-      n_d_site         = 10
+      n_ln_leaf_l = init_pop_vec$ln_leaf_l,
+      n_sqrt_area = init_pop_vec$sqrt_area,
+      n_d         = 20
     )
   ) %>%
   make_ipm(
@@ -739,25 +701,16 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
       pois      = pois
     ),
     iterations = 100,
-    normalize_pop_size = FALSE
+    normalize_pop_size = TRUE,
+    kernel_seq = k_seq
   )
 
 # need to rethink how output is generated - no reason I shouldn't be able to
 # plug model object straight into lambda generic!
 
-ipmr_pop_sizes <- list(
-  whitetop  = list(pop_state = gen_di_stoch_kern$pop_state[1:3]),
-  mt_rogers = list(pop_state = gen_di_stoch_kern$pop_state[4:6]),
-  roan      = list(pop_state = gen_di_stoch_kern$pop_state[7:9]),
-  big_bald  = list(pop_state = gen_di_stoch_kern$pop_state[10:12]),
-  bob_bald  = list(pop_state = gen_di_stoch_kern$pop_state[13:15]),
-  oak_knob  = list(pop_state = gen_di_stoch_kern$pop_state[16:18])
-)
-
-ipmr_lambdas <- vapply(ipmr_pop_sizes,
-                       function(x) ipmr:::.lambda_pop_size(x,
-                                                           all_lambdas = FALSE),
-                       numeric(1L))
+ipmr_lambdas <- lambda(gen_di_stoch_kern,
+                       comp_method = 'pop_size',
+                       type_lambda = "all")
 
 test_that('ipmr version matches simulation', {
 
@@ -765,11 +718,11 @@ test_that('ipmr version matches simulation', {
 
   # Standardized right eigenvectors
 
-  ipmr_w <- ipmr_pop_sizes$whitetop$pop_state$pop_state_ln_leaf_l_whitetop[ , 101] /
-    sum(ipmr_pop_sizes$whitetop$pop_state$pop_state_ln_leaf_l_whitetop[ , 101])
+  ipmr_w <- gen_di_stoch_kern$pop_state$pop_state_ln_leaf_l[ , 101] /
+    sum(gen_di_stoch_kern$pop_state$pop_state_ln_leaf_l[ , 101])
 
-  hand_w <- pop_holders$whitetop$pop_state$n_ln_leaf_l[ , 101] /
-    sum(pop_holders$whitetop$pop_state$n_ln_leaf_l [ , 101])
+  hand_w <- pop_holder$ln_leaf_l[ , 101] /
+    sum(pop_holder$ln_leaf_l[ , 101])
 
   expect_equal(ipmr_w, hand_w, tol = 1e-10)
 
@@ -968,7 +921,7 @@ for(i in seq_len(n_iterations)) {
 
 test_that('general stochastic simulations match hand generated ones', {
 
-  expect_equal(all_lambdas$hand, all_lambdas$ipmr, tol = 1e-4)
+  expect_equal(all_lambdas$hand, all_lambdas$ipmr, tol = 1e-7)
 
 })
 
@@ -1045,9 +998,9 @@ test_that('evict_fun warnings are correctly generated', {
       ) %>%
       define_pop_state(
         pop_vectors = list(
-          n_ln_leaf_l_site = init_pop_vec$ln_leaf_l,
-          n_sqrt_area_site = init_pop_vec$sqrt_area,
-          n_d_site         = 10
+          n_ln_leaf_l = init_pop_vec$ln_leaf_l,
+          n_sqrt_area = init_pop_vec$sqrt_area,
+          n_d         = 10
         )
       ) %>%
       make_ipm(
