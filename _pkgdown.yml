@@ -7,3 +7,24 @@ authors:
 template:
   params:
     bootswatch: yeti
+articles:
+- title: Introduction to ipmr
+  navbar: Introduction to ipmr
+  contents:
+  - ipmr-introduction
+  - general-ipms
+  - hierarchical-notation
+
+- title: Generic Functions
+  navbar: Generic Functions
+  contents:
+  - generic-funs
+  - generic-progress
+- title: proto_ipm Overview
+  navbar: proto_ipm Overview
+  contents:
+  - proto-ipms
+- title: ipmr Checks
+  navbar: ipmr Checks
+  contents:
+  - sanity-checks

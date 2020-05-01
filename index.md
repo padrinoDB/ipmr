@@ -55,8 +55,7 @@ have already been estimated) is to initialize the model using
 for subsequent analyses and helps make sure the kernels are correctly
 implemented from the underlying vital rates. `model_class` should be a
 character string with at least 3 (but possibly 4) entries separated by
-underscores (`_`). Below, the are the possible entries for each
-position.
+underscores (`_`). The possible entries for each position are:
 
   - Position 1: `"simple"`/`"general"`
     
@@ -165,8 +164,10 @@ The following possibilities are currently or will become available in
 Simple density-independent deterministic, simple kernel-resampled
 stochastic, and simple parameter resampled stochastic models
 (`simple_di_det`, `simple_di_stoch_kern`, `simple_di_stoch_param`) are
-now functional. The `general_*` versions of these are also ready, and an
-introduction to them is available
+now functional, and are introduced in detail
+[here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
+The `general_*` versions of these are also ready, and an introduction to
+them is available
 [here](https://levisc8.github.io/ipmr/articles/general-ipms.html).
 However, expect changes as more complicated methods are implemented\!
 See below for an example of how to implement an IPM in this framework.

@@ -35,7 +35,7 @@ Below is a brief overview of the package and some examples of how to implement m
 
 ## Model classes
 
-The first step of defining a model in `ipmr` (assuming all parameters have already been estimated) is to initialize the model using `init_ipm()`. This function takes a single argument: `model_class`. The `model_class` defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. `model_class` should be a character string with at least 3 (but possibly 4) entries separated by underscores (`_`). Below, the are the possible entries for each position.
+The first step of defining a model in `ipmr` (assuming all parameters have already been estimated) is to initialize the model using `init_ipm()`. This function takes a single argument: `model_class`. The `model_class` defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. `model_class` should be a character string with at least 3 (but possibly 4) entries separated by underscores (`_`). The possible entries for each position are:
 
 
 - Position 1: `"simple"`/`"general"`
@@ -99,7 +99,7 @@ General, density dependent models: **Please be patient**
 
 12. `"general_dd_stoch_param"`
 
-Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (`simple_di_det`, `simple_di_stoch_kern`, `simple_di_stoch_param`) are now functional. The `general_*` versions of these are also ready, and an introduction to them is available [here](https://levisc8.github.io/ipmr/articles/general-ipms.html). However, expect changes as more complicated methods are implemented! See below for an example of how to implement an IPM in this framework.
+Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (`simple_di_det`, `simple_di_stoch_kern`, `simple_di_stoch_param`) are now functional, and are introduced in detail [here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html). The `general_*` versions of these are also ready, and an introduction to them is available [here](https://levisc8.github.io/ipmr/articles/general-ipms.html). However, expect changes as more complicated methods are implemented! See below for an example of how to implement an IPM in this framework.
 
 ## Examples for simple IPM classes
 
@@ -108,18 +108,22 @@ Here is a simple model implemented with `ipmr`. It will use the following set of
 1. Survival (`s`): a generalized linear model w/ a logit link.
 
     - Example model formula: `glm(surv ~ size_1, data = my_surv_data, family = binomial())`
+    
 
 2. Growth (`g`): a linear model with a Normal error distribution.
 
     - Example model formula: `lm(size_2 ~ size_1, data = my_grow_data)`
+    
 
 3. Pr(flowering) (`f_r`): a generalized linear model w/ a logit link.
 
     - Example model formula: `glm(flower ~ size_1, data = my_repro_data, family = binomial())`
+    
 
 4. Seed production (`f_s`): a generalized linear model w/ log link.
 
     - Example model formula: `glm(seeds ~ size_1, data = my_flower_data, family = poisson())`
+    
 
 5. Recruit size distribution (`f_d`): a normal distribution w parameters `mu_fd` (mean) and `sd_fd` (standard deviation).
 
