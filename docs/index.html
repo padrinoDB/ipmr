@@ -127,7 +127,7 @@
 <div id="model-classes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#model-classes" class="anchor"></a>Model classes</h2>
-<p>The first step of defining a model in <code>ipmr</code> (assuming all parameters have already been estimated) is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function takes a single argument: <code>model_class</code>. The <code>model_class</code> defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. <code>model_class</code> should be a character string with at least 3 (but possibly 4) entries separated by underscores (<code>_</code>). Below, the are the possible entries for each position.</p>
+<p>The first step of defining a model in <code>ipmr</code> (assuming all parameters have already been estimated) is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function takes a single argument: <code>model_class</code>. The <code>model_class</code> defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. <code>model_class</code> should be a character string with at least 3 (but possibly 4) entries separated by underscores (<code>_</code>). The possible entries for each position are:</p>
 <ul>
 <li>
 <p>Position 1: <code>"simple"</code>/<code>"general"</code></p>
@@ -196,7 +196,7 @@
 <li><p><code>"general_dd_stoch_kern"</code></p></li>
 <li><p><code>"general_dd_stoch_param"</code></p></li>
 </ol>
-<p>Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (<code>simple_di_det</code>, <code>simple_di_stoch_kern</code>, <code>simple_di_stoch_param</code>) are now functional. The <code>general_*</code> versions of these are also ready, and an introduction to them is available <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">here</a>. However, expect changes as more complicated methods are implemented! See below for an example of how to implement an IPM in this framework.</p>
+<p>Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (<code>simple_di_det</code>, <code>simple_di_stoch_kern</code>, <code>simple_di_stoch_param</code>) are now functional, and are introduced in detail <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">here</a>. The <code>general_*</code> versions of these are also ready, and an introduction to them is available <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">here</a>. However, expect changes as more complicated methods are implemented! See below for an example of how to implement an IPM in this framework.</p>
 </div>
 <div id="examples-for-simple-ipm-classes" class="section level2">
 <h2 class="hasAnchor">

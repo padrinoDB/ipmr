@@ -31,8 +31,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   domain_list = NULL,
   iterate = FALSE,
   iterations = 50,
-  normalize_pop_size = TRUE,
-  kernel_seq = NULL
+  kernel_seq = NULL,
+  normalize_pop_size = TRUE
 )
 
 \method{make_ipm}{simple_di_stoch_param}(
@@ -43,6 +43,7 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   domain_list = NULL,
   iterate = TRUE,
   iterations = 50,
+  kernel_seq = NULL,
   normalize_pop_size = TRUE
 )
 
@@ -77,6 +78,7 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   domain_list = NULL,
   iterate = TRUE,
   iterations = 50,
+  kernel_seq = NULL,
   normalize_pop_size = TRUE
 )
 }
@@ -110,14 +112,16 @@ to simulate.}
 vector to sum before each iteration. Default is \code{TRUE} for \code{*_di_*}
 methods and \code{FALSE} for \code{*_dd_*} methods.}
 
-\item{kernel_seq}{The sequence of kernels to use during the iterations.
+\item{kernel_seq}{For \code{*_stoch_kern} methods, the sequence of kernels
+to use during the simulation process. It should have the same number of entries
+as the number of \code{iterations}.
 This can either be a vector of integers corresponding to kernel names (e.g.
 kernels for different years - \code{2011:2018}),
 a character vector corresponding to kernel names (e.g. kernels from different
 sites - \code{'a', 'b', 'c'}), a Markov chain matrix with
 transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
-If empty, the model will try to run deterministically for each unique combination
-of hierarchical variables (if any, not recommended).}
+If it is empty, \code{make_ipm} will try to generate a sequence internally using
+a random selection of the \code{levels_hier_effs} defined in \code{define_kernel}.}
 }
 \value{
 The \code{make_ipm.*} methods will always return a list of length 6
@@ -131,7 +135,7 @@ containing the following components:
                            kernel. This will always be empty unless \code{
                            return_all} is \code{TRUE}. Mostly here for developer
                            debugging.}
-  \item{\strong{env_seq}}{: a matrix with dimension \code{n_iterations} X 1 of
+  \item{\strong{env_seq}}{: a matrix with dimension \code{iterations} X 1 of
                              kernel indices indicating the order
                              in which kernels are to be/were resampled OR
                              a matrix with as many columns as stochastic parameters

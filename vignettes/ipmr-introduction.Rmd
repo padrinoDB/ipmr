@@ -325,7 +325,7 @@ my_ipm <- init_ipm('simple_di_det') %>%
     ),
     states        = list(c('dbh')),
     has_hier_effs = FALSE,
-    evict_cor        = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>% 
   define_kernel(
@@ -579,11 +579,12 @@ The vital rate models are as follows:
 
 The vital rates here are not conditional on each other as they come from separate models. For models where parameters come from a joint distribution (e.g. regressions with multiple responses, Bayesian multi-level models), `*_stoch_param` methods are usually more appropriate.
 
-We will use the `purrr` package to make the first bit of code a bit more concise. This chunk takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of `coef(some_vital_rate_model`)).
+The chunk below takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of `coef(some_vital_rate_model`)).
 
 
 ```{r eval = FALSE}
-library(purrr)
+
+library(ipmr)
 
 # Define some fixed parameters
 
@@ -628,18 +629,17 @@ g_params   <- as.list(g_r_int)
 s_params   <- as.list(s_r_int)
 f_s_params <- as.list(f_s_r_int)
 
-# purrr::splice combines each separate list into one without creating any 
-# additional depth to it. This keeps things a bit tidier.
+# add them all together using c()
 
-all_params_list <- purrr::splice(fixed_list, g_params, s_params, f_s_params)
+all_params_list <- c(fixed_list, g_params, s_params, f_s_params)
 
 ```
 
-We've now created a list where each entry is named and contains a single parameter value. This is now ready for use in `define_kernel()`
+We've created a list where each entry is named and contains a single parameter value. This is now ready for use in `define_kernel()`
 
 ### Defining custom functions to pass to the building process
 
-We now have some parameter values. In the next step, we'll compose some helper functions to make the vital rate expressions inside of `define_kernel()` a bit more concise and expressive. These are passed in a list to the `usr_funs` argument of `make_ipm()`.
+We have our parameter values. In the next step, we'll compose some helper functions to make the vital rate expressions inside of `define_kernel()` a bit more concise and expressive. These are passed in a list to the `usr_funs` argument of `make_ipm()`.
 
 ```{r eval = FALSE}
 
@@ -674,7 +674,7 @@ The only requirement for these functions is that they contain valid R code, and 
 
 ### Implement the IPM
 
-With the functions and parameter values defined, we are now ready to begin composing the model. Each expression's syntax will look a little different from before, because we are appending a suffix corresponding to the hierarchical component of the model to each parameter/vital rate/kernel that is affected by it. In this case, we're pretending it is a year effect, denoted `_yr`, but almost any suffix will work. This can be a character or integer vector, and the list can have as many entries as required by the model (e.g. `yr` for years *and* `pl` for plots. The suffix would then become `_yr_pl`). The calls to `define_kernel` and `define_k` now have `has_hier_effs = TRUE`, and `levels_hier_effs = list(yr = 1:5)`. Otherwise, the code should look quite familiar.
+With the functions and parameter values defined, we are now ready to begin composing the model. Each expression's syntax will look a little different from before, because we are appending a suffix corresponding to the hierarchical component of the model to each parameter/vital rate/kernel that is affected by it. In this case, we're pretending it is a year effect, denoted `_yr`, but almost any suffix will work. This can be a character or integer vector, and the list can have as many entries as required by the model (e.g. `yr` for years *and* `pl` for plots. The suffix could then become `_yr_pl` or `_pl_yr`. order doesn't matter here). The calls to `define_kernel` and `define_k` now have `has_hier_effs = TRUE`, and `levels_hier_effs = list(yr = 1:5)`. Otherwise, the code should look quite familiar.
 
 **NOTE:** Because of the way `ipmr` handles population vectors internally, **the only suffix that isn't allowed is `_pop`**. This is unfortunate, but can be worked around. Please use `_site` or `_popul` or something instead. Sorry!
 
@@ -796,10 +796,11 @@ my_iterated_ipm <- my_ipm$proto_ipm %>%
   # the population state has an n_ prefixed to it to indicate that it is
   # describing the population distribution function. ipmr will automatically
   # create variables n_ht_t and n_ht_t_1 when constructing the IPM.  
+  
   define_pop_state(n_ht = runif(100)) %>% 
   
-  # We can use the kernel_seq argument to pass a pre-specified sequence of kernels
-  # into the function, and retrieve it later using my_iterated_ipm$env_seq.
+  # We use the kernel_seq argument to pass a pre-specified sequence of kernels
+  # into the function, and retrieve it later using my_iterated_ipm$env_seq
 
   make_ipm(usr_funs   = my_funs,
            kernel_seq = sample(1:5, 100, replace = TRUE),
@@ -819,6 +820,72 @@ stoch_lambda <- lambda(my_iterated_ipm, comp_method = 'pop_size', type = 'stocha
 ```
 
 100 iterations is not enough to estimate stochastic growth rates ($\lambda_s$), but the computations can take some time with a lot of iterations, and are not practical for demonstration purposes. 
+
+### Deterministic simulations with hierarchical models
+
+Say we have multiple sites sampled in the same year, but are only interested in their asymptotic dynamics (perhaps to compare fitness across space). We can use almost the exact same code as above - we switch the `model_class` argument of `init_ipm()` back to `simple_di_det` and set `make_ipm(iterate = FALSE)`. 
+
+```{r eval = FALSE}
+
+my_ipm <- init_ipm('simple_di_det') %>%
+  
+  define_kernel(
+    name             = 'P_yr',         
+    formula          = s_yr * g_yr,   
+    family           = "CC",
+    
+    s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr), 
+    g_yr             = dnorm(ht_2, mean = mu_g_yr, sd = sd_g),
+    mu_g_yr          = g_int + g_slope * ht_1 + g_r_yr,
+    
+    data_list        = all_params_list,
+    states           = list(c('ht')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(yr = 1:5),
+    evict_cor        = TRUE,
+    evict_fun        = truncated_distributions("norm", "g_yr")
+    
+  ) %>%
+  define_kernel(
+    name             = "F_yr",             
+    formula          = f_r * f_s_yr * f_d,
+    family           = "CC",
+    f_r              = inv_logit(ht_1, f_r_int, f_r_slope),
+    f_s_yr           = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr),
+    f_d              = dnorm(ht_2, mean = mu_fd, sd = sd_fd),
+    data_list        = all_params_list,
+    states           = list(c('ht')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(yr = 1:5),
+    evict_cor        = TRUE,
+    evict_fun        = truncated_distributions("norm", "f_d")
+  ) %>%
+  define_k(
+    name             = 'K_yr',
+    K_yr             = P_yr + F_yr,
+    family           = "IPM",
+    data_list        = list(),
+    states           = list(c("ht")),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(yr = 1:5),
+    evict_cor        = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("K_yr", "P_yr", "F_yr"),
+      int_rule     = rep("midpoint", 3),
+      dom_start    = rep("ht", 3),
+      dom_end      = rep("ht", 3)
+    )
+  ) %>%
+  define_domains(ht = c(0.2, 40, 100)) %>%
+  make_ipm(usr_funs = my_funs,
+           iterate  = FALSE)
+  
+  lambda(my_ipm, comp_method = 'eigen', type_lambda = "all")
+  
+
+```
 
 ## Simple IPMs for continuously varying environments 
 

@@ -324,17 +324,19 @@ ex_ipm <- init_ipm("simple_di_stoch_kern") %>%
 ```
 
 
-## Hierarchical models with discretely and continuously varying parameters {#complicated}
+## Hierarchical Bayesian models {#complicated}
 
-Sometimes, models will have discretely and continuously varying components as functions of different variables. For example, a study could consider multiple sites (discrete component) and temporal fluctations in environment at each site (continuous component). We'll use a hypothetical study that models demography across multiple sites as a function of size and inter-annual climate variability. 
+Sometimes, models will have discretely and continuously varying components as functions of different variables. For example, a study could consider multiple sites (discrete component) and temporal fluctations in environment at each site (continuous component). Nearly all hierachical Bayesian models will fall into this category as well, as intercepts for discrete hierarchical variables like year and site will be continuously distributed random variables. 
 
-To illustrate the full flexibility of the syntax, we'll use a general model of a perennial plant species. Its seeds can either enter a seed bank or recruit immediately, producing recruits at the next time step. There is a single continuous state variable $z$/`z` that describes the time invariant component of plant demography, and a set of random environmental covariates $\theta$ that modify survival ($s_{site}$/`s_site`), growth ($g_{site}$/`g_site`), probability of reproduction ($f_{{p}_{site}}$/`f_p_site`), and seed production ($f_{{r}_{site}}$/`f_r_site`) at each time. We'll pretend that data from the recruit size distribution was pooled across sites so that the seed bank-related terms are unchanged by space and time.
+In these cases, the hierarchical syntax can save a considerable amount of repitition when implementing a model arising from either copy + pasting code and changing variable names to match sites/years, or from wrapping everything in a `for` loop. We'll use a hypothetical study that models demography in a Bayesian framework across multiple sites to illustrate this. 
 
-The seed bank will be age structured and its parameters will be time invariant. Seeds in the first year can either survive ($s_{{sb}_1}$/`s_sb1`) and recruit ($r_{{sb}_1}$), or survive and become two year old seeds. Two year old seeds can either survive ($s_{{sb}_2}$/`s_sb2`) and recruit ($r_{{sb}_2}$/`r_sb2`) or die.  
+We'll implement a general IPM of a perennial plant species. Our data will come from 6 sites, `"A"` - `"F"`, and the vital rate parameters for the plants will vary across each one. Its seeds can either enter a seed bank or recruit immediately, producing recruits at the next time step. We'll pretend that data from the recruit size distribution was pooled across sites so that the seed bank-related terms are unchanged by space. The seed bank will be age structured and its parameters will be space- and time-invariant. Seeds in the first year can either survive ($s_{{sb}_1}$/`s_sb1`) and recruit ($r_{{sb}_1}$), or survive and become two year old seeds. Two year old seeds can either survive ($s_{{sb}_2}$/`s_sb2`) and recruit ($r_{{sb}_2}$/`r_sb2`) or die.  
 
-The full model looks like this:
+The vital rate information fed into our hypothetical hierarchical Bayesian model are ($s_{site}$/`s_site`), growth ($g_{site}$/`g_site`), probability of reproduction ($f_{{p}_{site}}$/`f_p_site`), and seed production ($f_{{r}_{site}}$/`f_r_site`). This produces a posterior distribution, $\theta$, which contains intercepts ($\alpha$) and slopes ($\beta$) for each continuously varying vital rate. 
 
-1. $n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z',z, \theta)]n(z, t)\mathrm{dz} + \int_L^Us_{{sb}_1} * r_{{sb}_1} * f_d(z')n(sb_1, t)\mathrm{dz} + \int_L^Us_{{sb}_2} * r_{{sb}_2} * f_d(z')n(sb_2, t)\mathrm{dz}$
+The full IPM looks like this:
+
+1. $n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n(z, t)\mathrm{dz} + \int_L^Us_{{sb}_1} * r_{{sb}_1} * f_d(z')n(sb_1, t)\mathrm{dz} + \int_L^Us_{{sb}_2} * r_{{sb}_2} * f_d(z')n(sb_2, t)\mathrm{dz}$
 
 2. $n(sb_1, t + 1) = (1-r_i) * \int_L^U [f_p^{site}(z, \theta) * f_r^{site}(z,\theta)] n(z, t)\mathrm{dz}$
 
@@ -348,90 +350,105 @@ The sub kernels are:
 
 And the size/climate dependent vital rate functions:
 
-6. $logit(s^{site}) = \alpha_{s}^{site} + \beta_s^{site} * z + \theta_s$
+6. $logit(s^{site}) = \alpha_{s}^{site} + \beta_s^{site} * z$
 
 7. $g^{site} \sim Norm(\mu_g^{site}, \sigma_g^{site})$
 
-8. $\mu_g^{site} = \alpha_g^{site} + \beta_g^{site} * z + \theta_g$
+8. $\mu_g^{site} = \alpha_g^{site} + \beta_g^{site} * z$
 
-9. $logit(f_{p}^{site}) = \alpha_{f_p}^{site} + \beta_{f_p}^{site} * z + \theta_{f_p}$
+9. $logit(f_{p}^{site}) = \alpha_{f_p}^{site} + \beta_{f_p}^{site} * z$
 
-10. $log(f_{r}^{site}) = \alpha_{f_r}^{site} + \beta_{f_r}^{site} * z + \theta_{f_r}$
+10. $log(f_{r}^{site}) = \alpha_{f_r}^{site} + \beta_{f_r}^{site} * z$
 
 11. $f_d \sim Norm(\mu_{f_d}, \sigma_{f_d})$
 
-Finally, $\theta$'s are drawn from independent normal distributions for each vital rate. Is this biologically reasonable? Probably not - correlations between vital rates are usually pretty important. But we've made up a plant species, we can make this work too.
-
-12. $\theta_i \sim Norm(0, \sigma_i)$
-
-Note that in this example, the random climate variables ($\theta_x$) are simply modifying the intercept. One could easily incorporate terms that modify slopes by adjusting the functional forms and adding/subtracting parameters as needed.
-
 ### Simulating parameters
 
-We have to simulate some parameters for the example code to work. Ideally, model fitting using actual data would fill the space that this is taking up.
+We have to simulate a posterior distribution for the example code to work. Normally, model fitting using actual data would fill the space that this is taking up.
 
-We'll use 6 sites for the discrete portion of our variables.
+We'll use 6 sites for the discrete portion of our variables. There's some initial set up for each one, and then we simulate a posterior distribution using various random number generators.
 
 ```{r eval = FALSE}
 
 library(ipmr)
 
-# Set up the sites
+set.seed(51)
+
+# Set up the sites, and the parameters
 
 sites <- LETTERS[1:6]
-
-# We'll add the g sigmas later - we don't want all of the other
-# vital rates to have sigmas though!
-
 pars  <- c("alpha", "beta")
 vrs   <- c("s", "g", "f_p", "f_r")
 
-vr_df <- expand.grid(pars = pars, vrs = vrs, sites = sites)
+# Generate names for all unique parameters
+all_ran_pars <- expand.grid(pars = pars, vrs = vrs, sites = sites)
 
-vr_nms <- paste(vr_df$pars, vr_df$vrs, vr_df$sites, sep = "_")
+all_ran_nms <- paste(all_ran_pars$pars, 
+                     all_ran_pars$vrs,
+                     all_ran_pars$sites, 
+                     sep = "_")
 
-# site level parameter vector
+all_ran_nms <- c(all_ran_nms, paste('sigma_g_', sites, sep = ""))
 
-site_pars <- numeric(length(vr_nms))
+# This loop will generate the "posterior samples" for the model. 
 
-names(site_pars) <- vr_nms
+post_distrib <- vector(mode = "list", length = length(all_ran_nms))
+post_distrib <- lapply(post_distrib,
+                       function(x, ll) {
+                         out <- numeric(ll)
+                         return(out)
+                       },
+                       ll = 4000)
 
 for(i in seq_along(sites)) {
   
   start <- i * 8 - 7
   end   <- i * 8
   
-  # s vars
+  # index for the g_sigma parameter because it was tacked on at the end
+  # to avoid expand.grid'ing a sigma into every site X vital rate combination
   
-  site_pars[start]       <- rnorm(1, mean = -5, sd = 1)
-  site_pars[(start + 1)] <- runif(1, min =  1, max = 4)
+  g_sig_ind <- length(all_ran_nms) - 6 + i
   
-  # g vars
+  # draws for s function parameters
   
-  site_pars[(start + 2)] <- rnorm(1, mean = 0, sd = 0.5)
-  site_pars[(start + 3)] <- runif(1, 0.85, 1.15)
+  s_int <- rnorm(4000, mean = -9, sd = 1)
+  s_slo <- runif(4000, min = 1, max = 2.5)
   
-  # f_p vars
+  # draws for g function parameters
   
-  site_pars[(start + 4)] <- rnorm(1, mean = -2, sd = 0.5)
-  site_pars[(start + 5)] <- runif(1, 1, 3)
+  g_int <- rnorm(4000, mean = 0, sd = 0.3)
+  g_slo <- runif(4000, 0.85, 1.15)
+  g_sig <- runif(4000, 0.2, 1.5)
   
-  # f_r vars
+  # draws for f_p function parameters
   
-  site_pars[(end - 1)] <- rgamma(1, shape = 1)
-  site_pars[(end)]     <- runif(1, 0.001, 0.1)
+  f_p_int <- rnorm(4000, mean = -2, sd = 0.3)
+  f_p_slo <- runif(4000, 1, 1.9)
   
-}
+  # draws for f_r function parameters
+  
+  f_r_int <- rgamma(4000, shape = 1)
+  f_r_slo <- runif(4000, 0.001, 0.1)
+  
+  
+  post_distrib[[start]] <- s_int
+  post_distrib[[(start + 1)]] <- s_slo
+  post_distrib[[(start + 2)]] <- g_int
+  post_distrib[[(start + 3)]] <- g_slo
+  post_distrib[[(start + 4)]] <- f_p_int
+  post_distrib[[(start + 5)]] <- f_p_slo
+  post_distrib[[(start + 6)]] <- f_r_int
+  post_distrib[[(start + 7)]] <- f_r_slo
+  post_distrib[[g_sig_ind]]   <- g_sig
+  
+ }
 
-g_sigmas <- runif(6, 0.3, 0.9)
 
-names(g_sigmas) <- paste("sigma_g_", sites, sep = "")
+names(post_distrib) <- all_ran_nms
+post_distrib        <- as.data.frame(post_distrib)
 
-site_pars <- as.list(c(site_pars, g_sigmas))
-
-# Now, simulate the site- and time-invariant parameters for the model
-
-fixed_pars <- list(
+all_pars <- list(
   r_i       = 0.6,
   r_sb1     = 0.2,
   r_sb2     = 0.3,
@@ -441,24 +458,26 @@ fixed_pars <- list(
   sigma_f_d = 0.9
 )
 
-all_pars <- c(fixed_pars, site_pars)
 
 ```
 
-Additionally, we need to write a function that samples from the $\theta$ distributions and creates variables with the right names. This function has no parameters - it just pulls values from independent normal distributions. We could modify this to include, for example, temperature and precipitation data, or grazing intensities. 
+Additionally, we need to write a function that samples from the posterior distributions and creates variables with the right names.  
 
 ```{r eval = FALSE}
 
-theta_fun <- function() {
+post_fun <- function(post_distrib) {
   
-  out <- list(
-    theta_s = rnorm(1, sd = 1),
-    theta_g = rnorm(1, sd = 1),
-    theta_f_p = rnorm(1, sd = 0.2),
-    theta_f_r = rnorm(1, sd = 2)
-  )
+  post_size  <- dim(post_distrib)[1]
+  
+  sample_ind <- sample(seq_len(post_size),
+                       size = 1)
+  
+  out        <- as.list(post_distrib[sample_ind, ])
+  
+  names(out) <- names(post_distrib)
   
   return(out)
+  
 }
 
 ```
@@ -476,10 +495,12 @@ ex_ipm <- init_ipm("general_di_stoch_param") %>%
     name = "P_site",
     family = "CC",
     
+    # site is appended so that we don't have to write out s_a, s_b, etc.
+    
     formula          = s_site * g_site * d_z,
-    s_site_lin       = alpha_s_site + beta_s_site * z_1 + theta_s,
+    s_site_lin       = alpha_s_site + beta_s_site * z_1,
     s_site           = 1 / (1 + exp(-s_site_lin)),
-    mu_g_site        = alpha_g_site + beta_g_site * z_1 + theta_g,
+    mu_g_site        = alpha_g_site + beta_g_site * z_1,
     g_site           = dnorm(z_2, mu_g_site, sigma_g_site),
     data_list        = all_pars,
     states           = list(c("z")),
@@ -492,105 +513,105 @@ ex_ipm <- init_ipm("general_di_stoch_param") %>%
     name             = "F_site",
     family           = "CC",
     formula          = f_p_site * f_r_site * f_d * d_z,
-    f_p_site_lin     = alpha_f_p_site + beta_f_p_site * z_1 + theta_f_p,
+    f_p_site_lin     = alpha_f_p_site + beta_f_p_site * z_1,
     f_p_site         = 1 / (1 + exp(-f_p_site_lin)),
-    f_r_site         = exp(alpha_f_r_site + beta_f_r_site * z_1 + theta_f_p),
-    f_d              = dnorm(z_2, mu_f_d, sigma_f_d),
-    data_list        = all_pars,
-    states           = list(c("z")),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(site = LETTERS[1:6]),
-    evict_cor        = TRUE,
-    evict_fun        = truncated_distributions("norm", "f_d")
-  ) %>%
-  define_kernel(
-    name             = "go_sb_1_site",
-    family           = "CD",
-    formula          = (1 - r_i) * f_p_site * f_r_site * d_z,
-    f_p_site_lin     = alpha_f_p_site + beta_f_p_site * z_1 + theta_f_p,
-    f_p_site         = 1 / (1 + exp(-f_p_site_lin)),
-    f_r_site         = exp(alpha_f_r_site + beta_f_r_site * z_1 + theta_f_p),
-    data_list        = all_pars,
-    states           = list(c("z")),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(site = LETTERS[1:6]),
-    evict_cor        = FALSE
-  ) %>%
-  define_kernel(
-    name          = "go_sb_2",
-    family        = "DD",
-    formula       = s_sb1 * (1 - r_sb1),
-    data_list     = all_pars,
-    states        = list(c('z')),
-    has_hier_effs = FALSE,
-    evict_cor     = FALSE
-  ) %>%
-  define_kernel(
-    name          = "leave_sb_1",
-    family        = "DC",
-    formula       = s_sb1 * r_sb1 * f_d * d_z,
-    f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
-    data_list     = all_pars,
-    states        = list(c("z")),
-    has_hier_effs = FALSE,
-    evict_cor     = TRUE,
-    evict_fun     = truncated_distributions("norm", "f_d")
-  ) %>%
-  define_kernel(
-    name          = "leave_sb_2",
-    family        = "DC",
-    formula       = s_sb2 * r_sb2 * f_d * d_z,
-    f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
-    data_list     = all_pars,
-    states        = list(c("z")),
-    has_hier_effs = FALSE,
-    evict_cor     = TRUE,
-    evict_fun     = truncated_distributions("norm", "f_d")
-  ) %>%
-  define_k(
-    name             = "K_site",
-    family           = "IPM",
-    K_site           = P_site + F_site,
-    n_z_t_1          = K_site     %*% n_z_t   + 
-                       leave_sb_1 %*% n_sb1_t + 
-                       leave_sb_2 %*% n_sb2_t,
-    n_sb1_t_1        = go_sb_1_site %*% n_z_t,
-    n_sb2_t_1        = go_sb_2 %*% n_sb1_t,
-    data_list        = all_pars,
-    states           = list(c("z")),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(site = LETTERS[1:6]),
-    evict_cor        = FALSE
-  ) %>%
-  define_impl(
-    make_impl_args_list(
-      kernel_names = c("P_site", "F_site",
-                       "go_sb_1_site", "go_sb_2", 
-                       "leave_sb_1", "leave_sb_2",
-                       "K_site"),
-      int_rule     = rep("midpoint", 7),
-      dom_start    = c("z", "z", "z", NA_character_, NA_character_, NA_character_, "z"),
-      dom_end      = c("z", "z", NA_character_, NA_character_, "z", "z", "Z")
-    )
-  ) %>%
-  define_domains(
-    z = c(0.1, 100, 200)
-  ) %>%
-  define_pop_state(
-    n_z   = runif(200),
-    n_sb1 = 20,
-    n_sb2 = 20
-  ) %>%
-  define_env_state(
-    thetas = theta_fun()
-  ) %>%  
-  make_ipm(
-    usr_funs           = list(theta_fun = theta_fun),
-    iterations         = 200,
-    kernel_seq         = sample(LETTERS[1:6], 200, replace = TRUE),
-    normalize_pop_size = TRUE
-  )
-
+    f_r_site         = exp(alpha_f_r_site + beta_f_r_site * z_1),
+                           f_d              = dnorm(z_2, mu_f_d, sigma_f_d),
+                           data_list        = all_pars,
+                           states           = list(c("z")),
+                           has_hier_effs    = TRUE,
+                           levels_hier_effs = list(site = LETTERS[1:6]),
+                           evict_cor        = TRUE,
+                           evict_fun        = truncated_distributions("norm", "f_d")
+    ) %>%
+      define_kernel(
+        name             = "go_sb_1_site",
+        family           = "CD",
+        formula          = (1 - r_i) * f_p_site * f_r_site * d_z,
+        f_p_site_lin     = alpha_f_p_site + beta_f_p_site * z_1,
+        f_p_site         = 1 / (1 + exp(-f_p_site_lin)),
+        f_r_site         = exp(alpha_f_r_site + beta_f_r_site * z_1),
+        data_list        = all_pars,
+        states           = list(c("z")),
+        has_hier_effs    = TRUE,
+        levels_hier_effs = list(site = LETTERS[1:6]),
+        evict_cor        = FALSE
+      ) %>%
+      define_kernel(
+        name          = "go_sb_2",
+        family        = "DD",
+        formula       = s_sb1 * (1 - r_sb1),
+        data_list     = all_pars,
+        states        = list(c('z')),
+        has_hier_effs = FALSE,
+        evict_cor     = FALSE
+      ) %>%
+      define_kernel(
+        name          = "leave_sb_1",
+        family        = "DC",
+        formula       = s_sb1 * r_sb1 * f_d * d_z,
+        f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
+        data_list     = all_pars,
+        states        = list(c("z")),
+        has_hier_effs = FALSE,
+        evict_cor     = TRUE,
+        evict_fun     = truncated_distributions("norm", "f_d")
+      ) %>%
+      define_kernel(
+        name          = "leave_sb_2",
+        family        = "DC",
+        formula       = s_sb2 * r_sb2 * f_d * d_z,
+        f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
+        data_list     = all_pars,
+        states        = list(c("z")),
+        has_hier_effs = FALSE,
+        evict_cor     = TRUE,
+        evict_fun     = truncated_distributions("norm", "f_d")
+      ) %>%
+      define_k(
+        name             = "K_site",
+        family           = "IPM",
+        K_site           = P_site + F_site,
+        n_z_t_1          = K_site     %*% n_z_t   + 
+          leave_sb_1 %*% n_sb1_t + 
+          leave_sb_2 %*% n_sb2_t,
+        n_sb1_t_1        = go_sb_1_site %*% n_z_t,
+        n_sb2_t_1        = go_sb_2 %*% n_sb1_t,
+        data_list        = all_pars,
+        states           = list(c("z")),
+        has_hier_effs    = TRUE,
+        levels_hier_effs = list(site = LETTERS[1:6]),
+        evict_cor        = FALSE
+      ) %>%
+      define_impl(
+        make_impl_args_list(
+          kernel_names = c("P_site", "F_site",
+                           "go_sb_1_site", "go_sb_2", 
+                           "leave_sb_1", "leave_sb_2",
+                           "K_site"),
+          int_rule     = rep("midpoint", 7),
+          dom_start    = c("z", "z", "z", NA_character_, NA_character_, NA_character_, "z"),
+          dom_end      = c("z", "z", NA_character_, NA_character_, "z", "z", "Z")
+        )
+      ) %>%
+      define_domains(
+        z = c(0.1, 100, 200)
+      ) %>%
+      define_pop_state(
+        n_z   = runif(200),
+        n_sb1 = 20,
+        n_sb2 = 20
+      ) %>%
+      define_env_state(
+        draws    = post_fun(posterior),
+        data_list = list(posterior = post_distrib)
+      ) %>%  
+      make_ipm(
+        usr_funs           = list(post_fun = post_fun),
+        iterations         = 20,
+        kernel_seq         = sample(LETTERS[1:6], 20, replace = TRUE),
+        normalize_pop_size = TRUE
+      )
 ```
 
 

@@ -407,7 +407,7 @@
     ),
     <span class="kw">states</span>        <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),
     <span class="kw">has_hier_effs</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
-    <span class="kw">evict_cor</span>        <span class="kw">=</span> <span class="fl">TRUE</span>,
+    <span class="kw">evict_cor</span>     <span class="kw">=</span> <span class="fl">TRUE</span>,
     <span class="kw">evict_fun</span>     <span class="kw">=</span> <span class="fu"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g"</span>)
   ) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
@@ -656,8 +656,8 @@
 <li><p>recruit size distribution (<code>f_d</code>): A normal distribution with two constant parameters, the mean (<code>mu_fd</code>) and standard deviation (<code>sd_fd</code>).</p></li>
 </ol>
 <p>The vital rates here are not conditional on each other as they come from separate models. For models where parameters come from a joint distribution (e.g. regressions with multiple responses, Bayesian multi-level models), <code>*_stoch_param</code> methods are usually more appropriate.</p>
-<p>We will use the <code>purrr</code> package to make the first bit of code a bit more concise. This chunk takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of <code>coef(some_vital_rate_model</code>)).</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">purrr</span>)
+<p>The chunk below takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of <code>coef(some_vital_rate_model</code>)).</p>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ipmr</span>)
 
 <span class="co"># Define some fixed parameters</span>
 
@@ -697,16 +697,15 @@
 <span class="no">s_params</span>   <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="no">s_r_int</span>)
 <span class="no">f_s_params</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="no">f_s_r_int</span>)
 
-<span class="co"># purrr::splice combines each separate list into one without creating any </span>
-<span class="co"># additional depth to it. This keeps things a bit tidier.</span>
+<span class="co"># add them all together using c()</span>
 
-<span class="no">all_params_list</span> <span class="kw">&lt;-</span> <span class="kw pkg">purrr</span><span class="kw ns">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/splice.html">splice</a></span>(<span class="no">fixed_list</span>, <span class="no">g_params</span>, <span class="no">s_params</span>, <span class="no">f_s_params</span>)</pre></body></html></div>
-<p>We’ve now created a list where each entry is named and contains a single parameter value. This is now ready for use in <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code></p>
+<span class="no">all_params_list</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">fixed_list</span>, <span class="no">g_params</span>, <span class="no">s_params</span>, <span class="no">f_s_params</span>)</pre></body></html></div>
+<p>We’ve created a list where each entry is named and contains a single parameter value. This is now ready for use in <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code></p>
 </div>
 <div id="defining-custom-functions-to-pass-to-the-building-process" class="section level3">
 <h3 class="hasAnchor">
 <a href="#defining-custom-functions-to-pass-to-the-building-process" class="anchor"></a>Defining custom functions to pass to the building process</h3>
-<p>We now have some parameter values. In the next step, we’ll compose some helper functions to make the vital rate expressions inside of <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code> a bit more concise and expressive. These are passed in a list to the <code>usr_funs</code> argument of <code><a href="../reference/make_ipm.html">make_ipm()</a></code>.</p>
+<p>We have our parameter values. In the next step, we’ll compose some helper functions to make the vital rate expressions inside of <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code> a bit more concise and expressive. These are passed in a list to the <code>usr_funs</code> argument of <code><a href="../reference/make_ipm.html">make_ipm()</a></code>.</p>
 <div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">inv_logit</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">sv</span>, <span class="no">int</span>, <span class="no">slope</span>) {
   <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(
     <span class="fl">1</span>/(<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(-(<span class="no">int</span> + <span class="no">slope</span> * <span class="no">sv</span>)))
@@ -737,7 +736,7 @@
 <div id="implement-the-ipm-1" class="section level3">
 <h3 class="hasAnchor">
 <a href="#implement-the-ipm-1" class="anchor"></a>Implement the IPM</h3>
-<p>With the functions and parameter values defined, we are now ready to begin composing the model. Each expression’s syntax will look a little different from before, because we are appending a suffix corresponding to the hierarchical component of the model to each parameter/vital rate/kernel that is affected by it. In this case, we’re pretending it is a year effect, denoted <code>_yr</code>, but almost any suffix will work. This can be a character or integer vector, and the list can have as many entries as required by the model (e.g. <code>yr</code> for years <em>and</em> <code>pl</code> for plots. The suffix would then become <code>_yr_pl</code>). The calls to <code>define_kernel</code> and <code>define_k</code> now have <code>has_hier_effs = TRUE</code>, and <code>levels_hier_effs = list(yr = 1:5)</code>. Otherwise, the code should look quite familiar.</p>
+<p>With the functions and parameter values defined, we are now ready to begin composing the model. Each expression’s syntax will look a little different from before, because we are appending a suffix corresponding to the hierarchical component of the model to each parameter/vital rate/kernel that is affected by it. In this case, we’re pretending it is a year effect, denoted <code>_yr</code>, but almost any suffix will work. This can be a character or integer vector, and the list can have as many entries as required by the model (e.g. <code>yr</code> for years <em>and</em> <code>pl</code> for plots. The suffix could then become <code>_yr_pl</code> or <code>_pl_yr</code>. order doesn’t matter here). The calls to <code>define_kernel</code> and <code>define_k</code> now have <code>has_hier_effs = TRUE</code>, and <code>levels_hier_effs = list(yr = 1:5)</code>. Otherwise, the code should look quite familiar.</p>
 <p><strong>NOTE:</strong> Because of the way <code>ipmr</code> handles population vectors internally, <strong>the only suffix that isn’t allowed is <code>_pop</code></strong>. This is unfortunate, but can be worked around. Please use <code>_site</code> or <code>_popul</code> or something instead. Sorry!</p>
 <div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="no">my_ipm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_stoch_kern'</span>) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
@@ -848,8 +847,8 @@
   <span class="co"># create variables n_ht_t and n_ht_t_1 when constructing the IPM.  </span>
   <span class="fu"><a href="../reference/define_star.html">define_pop_state</a></span>(<span class="kw">n_ht</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">100</span>)) <span class="kw">%&gt;%</span>
 
-  <span class="co"># We can use the kernel_seq argument to pass a pre-specified sequence of kernels</span>
-  <span class="co"># into the function, and retrieve it later using my_iterated_ipm$env_seq.</span>
+  <span class="co"># We use the kernel_seq argument to pass a pre-specified sequence of kernels</span>
+  <span class="co"># into the function, and retrieve it later using my_iterated_ipm$env_seq</span>
 
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>(<span class="kw">usr_funs</span>   <span class="kw">=</span> <span class="no">my_funs</span>,
            <span class="kw">kernel_seq</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="fl">1</span>:<span class="fl">5</span>, <span class="fl">100</span>, <span class="kw">replace</span> <span class="kw">=</span> <span class="fl">TRUE</span>),
