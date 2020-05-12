@@ -1088,6 +1088,7 @@
                                   k_row,
                                   normal) {
 
+
   if(rlang::is_quosure(pop_state)) {
     pop_state <- rlang::eval_tidy(pop_state)
   }
@@ -1199,7 +1200,7 @@
 
     pop_list_t_1$lambda <- pop_size_t_1 / pop_size_t
 
-    pop_list_t_1 <- pop_list_t_1[names(pop_state)]
+    pop_list_t_1        <- pop_list_t_1[names(pop_state)]
 
     pop_state           <- purrr::map2(.x = pop_state,
                                        .y = pop_list_t_1,

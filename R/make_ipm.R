@@ -27,14 +27,17 @@
 #' @param normalize_pop_size A logical indicating whether to re-scale the population
 #' vector to sum before each iteration. Default is \code{TRUE} for \code{*_di_*}
 #' methods and \code{FALSE} for \code{*_dd_*} methods.
-#' @param kernel_seq The sequence of kernels to use during the iterations.
+#' @param kernel_seq For \code{*_stoch_kern} methods, the sequence of kernels
+#' to use during the simulation process. It should have the same number of entries
+#' as the number of \code{iterations}.
 #' This can either be a vector of integers corresponding to kernel names (e.g.
 #' kernels for different years - \code{2011:2018}),
 #' a character vector corresponding to kernel names (e.g. kernels from different
 #' sites - \code{'a', 'b', 'c'}), a Markov chain matrix with
 #' transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
-#' If empty, the model will try to run deterministically for each unique combination
-#' of hierarchical variables (if any, not recommended).
+#' If it is empty, \code{make_ipm} will try to generate a sequence internally using
+#' a random selection of the \code{levels_hier_effs} defined in \code{define_kernel}.
+#'
 #'
 #' @return
 #'  The \code{make_ipm.*} methods will always return a list of length 6
@@ -48,7 +51,7 @@
 #'                            kernel. This will always be empty unless \code{
 #'                            return_all} is \code{TRUE}. Mostly here for developer
 #'                            debugging.}
-#'   \item{\strong{env_seq}}{: a matrix with dimension \code{n_iterations} X 1 of
+#'   \item{\strong{env_seq}}{: a matrix with dimension \code{iterations} X 1 of
 #'                              kernel indices indicating the order
 #'                              in which kernels are to be/were resampled OR
 #'                              a matrix with as many columns as stochastic parameters
@@ -304,16 +307,15 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 
   if(iterate) {
 
-    pop_state      <- .iterate_kerns_simple(iterators,
-                                            sub_kern_list,
-                                            iterations,
-                                            current_iteration = NA_integer_,
-                                            kern_seq,
-                                            temp$pop_state,
-                                            master_env,
-                                            proto_ipm,
-                                            k_row,
-                                            normalize_pop_size)
+    pop_state      <- .iterate_kerns(proto_ipm,
+                                     iterators,
+                                     sub_kern_list,
+                                     iterations,
+                                     kern_seq,
+                                     temp$pop_state,
+                                     master_env,
+                                     k_row,
+                                     normalize_pop_size)
 
     # In order to operate properly, we had to insert an extra entry in
     # lambda to make sure it had the same length as pop_state (it'll always be
@@ -440,16 +442,15 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                       sub_kernels,
                                       master_env)
 
-    pop_state   <- .iterate_kerns_simple(iterators = sys_i$iterators,
-                                         sub_kernels,
-                                         iterations = 1L,
-                                         current_iteration = i,
-                                         kern_seq = kern_seq,
-                                         temp$pop_state,
-                                         master_env,
-                                         proto_ipm,
-                                         k_row,
-                                         normalize_pop_size)
+    pop_state   <- .iterate_kerns(proto_ipm,
+                                  iterators = sys_i$iterators,
+                                  sub_kernels,
+                                  current_iteration = i,
+                                  kern_seq = kern_seq,
+                                  temp$pop_state,
+                                  master_env,
+                                  k_row,
+                                  normalize_pop_size)
 
 
     if(return_all) {
@@ -591,7 +592,6 @@ make_ipm.general_di_det <- function(proto_ipm,
                                         sub_kern_list,
                                         iterations,
                                         current_iteration = NA_integer_,
-                                        # Single set of kernels - no stochastic possible
                                         kern_seq = NULL,
                                         temp$pop_state,
                                         master_env,
@@ -737,15 +737,14 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
                                 iterations,
                                 kernel_seq)
 
-    pop_state <- .iterate_kerns_general(k_row,
-                                        proto_ipm,
-                                        sub_kern_list,
-                                        iterations,
-                                        current_iteration = NA_integer_,
-                                        kern_seq,
-                                        temp$pop_state,
-                                        master_env,
-                                        normalize_pop_size)
+    pop_state <- .iterate_kerns(proto_ipm,
+                                k_row,
+                                sub_kern_list,
+                                iterations,
+                                kern_seq,
+                                temp$pop_state,
+                                master_env,
+                                normalize_pop_size)
 
     pop_state$lambda <- pop_state$lambda[-1]
   }
@@ -880,15 +879,14 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
     # because the environmental parameters are generated on the fly by the
     # user defined function
 
-    pop_state <- .iterate_kerns_general(k_row,
-                                        proto_ipm,
-                                        sub_kernels,
-                                        iterations = 1,
-                                        current_iteration = i,
-                                        kern_seq = kern_seq,
-                                        temp$pop_state,
-                                        master_env,
-                                        normalize_pop_size)
+    pop_state <- .iterate_kerns(proto_ipm,
+                                k_row,
+                                sub_kernels,
+                                current_iteration = i,
+                                kern_seq = kern_seq,
+                                temp$pop_state,
+                                master_env,
+                                normalize_pop_size)
 
     if(return_all) {
 
