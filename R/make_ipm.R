@@ -168,24 +168,16 @@ make_ipm.simple_di_det <- function(proto_ipm,
 
   if(iterate) {
 
-    pop_state <- .iterate_kerns_simple(iterators,
-                                       sub_kern_list,
-                                       iterations,
-                                       current_iteration = NA_integer_,
-                                       kern_seq = NULL,
-                                       temp$pop_state,
-                                       master_env,
-                                       proto_ipm,
-                                       k_row,
-                                       normalize_pop_size)
+    # .iterate_model is internal generic - see internal-model_iteration.R
 
-    # In order to operate properly, we had to insert an extra entry in
-    # lambda to make sure it had the same length as pop_state (it'll always be
-    # one fewer in reality though). The first entry is ALWAYS NA, but that doesn't
-    # seem user friendly (ipmr-internal friend either, tbh)
-
-    pop_state$lambda <- pop_state$lambda[-1]
-
+    pop_state <- .iterate_model(proto_ipm,
+                                iterators,
+                                sub_kern_list,
+                                iterations,
+                                temp$pop_state,
+                                master_env,
+                                k_row,
+                                normalize_pop_size)
   }
 
 
@@ -236,7 +228,7 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
                                           normalize_pop_size = TRUE) {
 
 
-  if(iterate && (is.null(kernel_seq) || is.na(kernel_seq))) {
+  if(iterate && all(is.null(kernel_seq) | is.na(kernel_seq))) {
 
     message("'kernel_seq' not defined. Will generate one internally")
 
@@ -307,7 +299,9 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 
   if(iterate) {
 
-    pop_state      <- .iterate_kerns(proto_ipm,
+    # .iterate_model is internal generic - see internal-model_iteration.R
+
+    pop_state      <- .iterate_model(proto_ipm,
                                      iterators,
                                      sub_kern_list,
                                      iterations,
@@ -442,7 +436,9 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                       sub_kernels,
                                       master_env)
 
-    pop_state   <- .iterate_kerns(proto_ipm,
+    # .iterate_model is internal generic - see internal-model_iteration.R
+
+    pop_state   <- .iterate_model(proto_ipm,
                                   iterators = sys_i$iterators,
                                   sub_kernels,
                                   current_iteration = i,
@@ -585,19 +581,14 @@ make_ipm.general_di_det <- function(proto_ipm,
 
   if(iterate) {
 
-    kern_seq  <- rep(1, iterations)
+    pop_state <- .iterate_model(proto_ipm,
+                                k_row,
+                                sub_kern_list,
+                                iterations,
+                                temp$pop_state,
+                                master_env,
+                                normalize_pop_size)
 
-    pop_state <- .iterate_kerns_general(k_row,
-                                        proto_ipm,
-                                        sub_kern_list,
-                                        iterations,
-                                        current_iteration = NA_integer_,
-                                        kern_seq = NULL,
-                                        temp$pop_state,
-                                        master_env,
-                                        normalize_pop_size)
-
-    pop_state$lambda <- pop_state$lambda[-1]
 
   }
 
@@ -610,7 +601,7 @@ make_ipm.general_di_det <- function(proto_ipm,
 
 
   temp_other_out <- .prep_other_output(env_list,
-                                       kern_seq,
+                                       kern_seq = NA_integer_,
                                        pop_state,
                                        return_all,
                                        iterate)
@@ -650,7 +641,7 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
                                            normalize_pop_size = TRUE) {
 
 
-  if(iterate && (is.null(kernel_seq) || is.na(kernel_seq))) {
+  if(iterate && all(is.null(kernel_seq) | is.na(kernel_seq))) {
 
     message("'kernel_seq' not defined. Will generate one internally")
 
@@ -737,7 +728,7 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
                                 iterations,
                                 kernel_seq)
 
-    pop_state <- .iterate_kerns(proto_ipm,
+    pop_state <- .iterate_model(proto_ipm,
                                 k_row,
                                 sub_kern_list,
                                 iterations,
@@ -879,7 +870,7 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
     # because the environmental parameters are generated on the fly by the
     # user defined function
 
-    pop_state <- .iterate_kerns(proto_ipm,
+    pop_state <- .iterate_model(proto_ipm,
                                 k_row,
                                 sub_kernels,
                                 current_iteration = i,

@@ -39,12 +39,12 @@
 
 .expand_hier_effs <- function(rows, levels) {
 
-  # Place holder, this will ultimate get rbind'ed
+  # Place holder, this will ultimately get rbind'ed
   new_proto <- rows[0, ]
 
   for(i in seq_len(dim(rows)[1])) {
 
-    # Unadulterated garbage, but it works. Creates a row for every level/comibnation
+    # Pure garbage, but it works. Creates a row for every level/comibnation
     # of levels, next we substitute in everything
 
     temp      <- .expand_proto(rows, levels, i)
@@ -179,5 +179,30 @@
           replicate(dim(levels)[1],
                     rows[i, ],
                     simplify = FALSE))
+
+}
+
+.make_hier_levels <- function(hier_effs) {
+
+  if(length(hier_effs) == 1) {
+
+    levs <- as.data.frame(unlist(hier_effs),
+                          stringsAsFactors = FALSE)
+
+  } else {
+
+    levs <- lapply(hier_effs, eval) %>%
+      expand.grid(stringsAsFactors = FALSE)
+
+  }
+
+  out <- character(length = dim(levs)[1])
+
+  for(i in seq_along(out)) {
+
+    out[i] <- paste(levs[i, ], collapse = "_")
+  }
+
+  return(out)
 
 }

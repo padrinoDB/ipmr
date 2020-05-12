@@ -415,3 +415,218 @@ test_that('normalizing pop vector produces same lambdas as eigen methods', {
   expect_equal(conv_lamb, lambda_eig)
 
 })
+
+
+context("iterating deterministic hierarchical models")
+
+fixed_list <- list(s_int = 2.2,
+                   s_slope = 0.25,
+                   g_int = 0.2,
+                   g_slope = 1.02,
+                   sd_g = 0.7,
+                   f_r_int = 0.003,
+                   f_r_slope = 0.015,
+                   f_s_int = 1.3,
+                   f_s_slope = 0.075,
+                   mu_fd = 2,
+                   sd_fd = 0.3)
+
+s_r_ints <- rnorm(5, -2.2, sd = 1) %>%
+  as.list()
+
+g_r_ints <- rnorm(5, - 0.2, 1) %>%
+  as.list
+
+names(s_r_ints) <- paste('s_r_', 1:5, sep = "")
+names(g_r_ints) <- paste('g_r_', 1:5, sep = "")
+
+data_list <- c(fixed_list, s_r_ints, g_r_ints)
+
+s <- function(sv1, params, r_params) {
+  1/(1 + exp(-(params[1] + params[2] * sv1 + r_params)))
+}
+
+
+g <- function(sv1, sv2, params, r_params, L, U) {
+  mu <- params[1] + params[2] * sv1 + r_params
+  ev <- (pnorm(U, mu, params[3]) - pnorm(L, mu, params[3]))
+  dnorm(sv2, mean = mu, sd = params[3]) / ev
+}
+
+f_r <- function(sv1, params) {
+  1/(1 + exp(-(params[1] + params[2] * sv1)))
+}
+
+f_s <- function(sv1, params) {
+  exp(params[1] + params[2] * sv1)
+}
+
+f_d <- function(sv2, params) {
+  dnorm(sv2, mean = params[1], sd = params[2])
+}
+
+fec <- function(sv1, sv2, params, L, U) {
+  ev <- (pnorm(U, params[5], params[6]) - pnorm(L, params[5], params[6]))
+  f_r(sv1, params[1:2]) * f_s(sv1, params[3:4]) * (f_d(sv2, params[5:6] / ev))
+}
+
+b <- seq(0, 50, length.out = 101)
+d1 <- (b[2:101] + b[1:100]) * 0.5
+h <- d1[3] - d1[2]
+
+domains <- expand.grid(list(d2 = d1, d1 = d1))
+
+G_1 <- g(domains$d2,
+         domains$d1,
+         params = c(data_list$g_int,
+                    data_list$g_slope,
+                    data_list$sd_g),
+         r_params = data_list$g_r_1,
+         L = 0,
+         U = 50)
+G_5 <- g(domains$d2,
+         domains$d1,
+         params = c(data_list$g_int,
+                    data_list$g_slope,
+                    data_list$sd_g),
+         r_params = data_list$g_r_5,
+         L = 0,
+         U = 50)
+G_2 <- g(domains$d2,
+         domains$d1,
+         params = c(data_list$g_int,
+                    data_list$g_slope,
+                    data_list$sd_g),
+         r_params = data_list$g_r_2,
+         L = 0,
+         U = 50)
+G_3 <- g(domains$d2,
+         domains$d1,
+         params = c(data_list$g_int,
+                    data_list$g_slope,
+                    data_list$sd_g),
+         r_params = data_list$g_r_3,
+         L = 0,
+         U = 50)
+G_4 <- g(domains$d2,
+         domains$d1,
+         params = c(data_list$g_int,
+                    data_list$g_slope,
+                    data_list$sd_g),
+         r_params = data_list$g_r_4,
+         L = 0,
+         U = 50)
+
+
+S_1 <- s(d1, c(data_list$s_int, data_list$s_slope), data_list$s_r_1)
+S_2 <- s(d1, c(data_list$s_int, data_list$s_slope), data_list$s_r_2)
+S_3 <- s(d1, c(data_list$s_int, data_list$s_slope), data_list$s_r_3)
+S_4 <- s(d1, c(data_list$s_int, data_list$s_slope), data_list$s_r_4)
+S_5 <- s(d1, c(data_list$s_int, data_list$s_slope), data_list$s_r_5)
+
+P_1 <- h * S_1 * G_1
+P_2 <- h * S_2 * G_2
+P_3 <- h * S_3 * G_3
+P_4 <- h * S_4 * G_4
+P_5 <- h * S_5 * G_5
+
+Fm <- h * fec(domains$d2,
+              domains$d1,
+              params = unlist(data_list[6:11]),
+              L = 0, U = 50)
+
+K_1 <- P_1 + Fm
+K_2 <- P_2 + Fm
+K_3 <- P_3 + Fm
+K_4 <- P_4 + Fm
+K_5 <- P_5 + Fm
+
+K_1 <- matrix(K_1, nrow = 100, ncol = 100, byrow = TRUE)
+K_2 <- matrix(K_2, nrow = 100, ncol = 100, byrow = TRUE)
+K_3 <- matrix(K_3, nrow = 100, ncol = 100, byrow = TRUE)
+K_4 <- matrix(K_4, nrow = 100, ncol = 100, byrow = TRUE)
+K_5 <- matrix(K_5, nrow = 100, ncol = 100, byrow = TRUE)
+
+lambda_hand_1 <- Re(eigen(K_1)$values[1])
+lambda_hand_2 <- Re(eigen(K_2)$values[1])
+lambda_hand_3 <- Re(eigen(K_3)$values[1])
+lambda_hand_4 <- Re(eigen(K_4)$values[1])
+lambda_hand_5 <- Re(eigen(K_5)$values[1])
+
+lambdas_hand <- c(lambda_hand_1, lambda_hand_2, lambda_hand_3,
+                  lambda_hand_4, lambda_hand_5)
+
+names(lambdas_hand) <- paste("K_", 1:5, sep = "")
+
+states <- list(c("dbh"))
+
+impl_args <-  make_impl_args_list(c('P_yr', 'F', 'K_yr'),
+                                  int_rule = rep('midpoint', 3),
+                                  dom_start = rep('dbh', 3),
+                                  dom_end = rep('dbh', 3))
+
+inv_logit <- function(int, slope, sv) {
+
+  1 / (1 + exp(-(int + slope * sv)))
+}
+
+hier_mod <- init_ipm('simple_di_det') %>%
+  define_kernel("P_yr",
+                formula = s_yr * g_yr,
+                family = "CC",
+                s_yr = inv_logit(s_int + s_r_yr, s_slope, dbh_1),
+                g_yr = dnorm(dbh_2, mu_g_yr, sd_g),
+                mu_g_yr = g_int + g_r_yr + g_slope * dbh_1,
+                data_list = data_list,
+                states = states,
+                has_hier_effs = TRUE,
+                levels_hier_effs = list(yr = 1:5),
+                evict_cor = TRUE,
+                evict_fun = truncated_distributions('norm',
+                                                    'g_yr')
+  ) %>%
+  define_kernel('F',
+                formula = f_r * f_s * f_d,
+                family = 'CC',
+                f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
+                f_s = exp(f_s_int + f_s_slope * dbh_1),
+                f_d = dnorm(dbh_2, mu_fd, sd_fd),
+                data_list = data_list,
+                states = states,
+                evict_cor = TRUE,
+                evict_fun = truncated_distributions('norm',
+                                                    'f_d')
+  ) %>%
+  define_k('K_yr',
+           K_yr = P_yr + F,
+           n_dbh_yr_t_1 = K_yr %*% n_dbh_yr_t,
+           family = 'IPM',
+           data_list = list(),
+           states = states,
+           has_hier_effs = TRUE,
+           levels_hier_effs = list(yr = 1:5),
+           evict_cor = FALSE) %>%
+  define_impl(impl_args) %>%
+  define_pop_state(
+    n_dbh_yr = runif(100)
+  ) %>%
+  define_domains(dbh = c(0, 50, 100)) %>%
+  make_ipm(usr_funs = list(inv_logit = inv_logit),
+           iterate = TRUE,
+           iterations = 100,
+           normalize_pop_size = FALSE)
+
+lambdas_ipmr_eigen <- lambda(hier_mod, comp_method = 'eigen')
+lambdas_ipmr_pop   <- vapply(hier_mod$pop_state[grepl("lambda", names(hier_mod$pop_state))],
+                             function(x) x[ , 100],
+                             numeric(1L))
+
+names(lambdas_ipmr_pop) <- paste("K_", 1:5, sep = "")
+
+test_that('hierarchical deterministic simulations work', {
+
+  expect_equal(lambdas_ipmr_eigen, lambdas_hand, tol = 1e-10)
+  expect_equal(lambdas_ipmr_pop, lambdas_hand, tol = 1e-10)
+
+})
+

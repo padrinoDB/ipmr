@@ -230,7 +230,7 @@ inv_logit_2 <- function(int, slope, slope_2, sv) {
 ipmr_cr <- init_ipm("general_di_det") %>%
   define_kernel(
     name          = "P",
-    formula       = s_g_mult(s, g) * d_ht,
+    formula       = s * g * d_ht,
     family        = "CC",
     g             = dnorm(ht_2, g_mu, g_sd),
     g_mu          = g_int + g_slope * ht_1,
@@ -305,7 +305,8 @@ ipmr_cr <- init_ipm("general_di_det") %>%
 
 
 ipmr_lam_cr <- lambda(ipmr_cr,
-                      type_lambda = 'all')
+                      type_lambda = 'all') %>%
+  as.vector()
 
 
 test_that('ipmr version matches hand version', {
@@ -371,7 +372,7 @@ test_that("kernel definition order doesn't matter", {
     ) %>%
     define_kernel(
       name          = "P",
-      formula       = s_g_mult(s, g) * d_ht,
+      formula       = s * g * d_ht,
       family        = "CC",
       g             = dnorm(ht_2, g_mu, g_sd),
       g_mu          = g_int + g_slope * ht_1,
@@ -416,7 +417,8 @@ test_that("kernel definition order doesn't matter", {
              normalize_pop_size = FALSE)
 
   test_lam_cr <- lambda(test_order,
-                        type_lambda = 'all')
+                        type_lambda = 'all') %>%
+    as.vector()
 
   expect_equal(ipmr_lam_cr, test_lam_cr)
 
@@ -429,7 +431,7 @@ test_that('normalize pop vec works the right way', {
   ipmr_cr <- init_ipm("general_di_det") %>%
     define_kernel(
       name          = "P",
-      formula       = s_g_mult(s, g) * d_ht,
+      formula       = s * g * d_ht,
       family        = "CC",
       g             = dnorm(ht_2, g_mu, g_sd),
       g_mu          = g_int + g_slope * ht_1,
@@ -504,7 +506,8 @@ test_that('normalize pop vec works the right way', {
 
 
   norm_lam_ipmr <- lambda(ipmr_cr,
-                           type_lambda = 'all')
+                           type_lambda = 'all') %>%
+    as.vector()
 
   expect_equal(norm_lam_ipmr, ipmr_lam_cr)
 
@@ -522,3 +525,252 @@ test_that('normalize pop vec works the right way', {
   expect_equal(pop_sizes, rep(1, 101), tolerance = 1e-15)
 
 })
+
+
+context("iterating general hierarchical deterministic models")
+
+s_x <- function(int, int_r, slope1, slope2, sv1) {
+  1/(1 + exp(-(int + int_r + slope1 * sv1 + slope2 * sv1^2)))
+}
+
+f_r_x <- function(int, slope1,  sv1) {
+  1/(1 + exp(-(int + slope1 * sv1)))
+}
+
+
+g_x <- function(sv2, sv1, int, int_r, slope, gsd, L, U) {
+  mu <- int + int_r + slope * sv1
+  ev <- pnorm(U, mu, gsd) - pnorm(L, mu, gsd)
+  out <- dnorm(sv2, mean = mu, sd = gsd) / ev
+
+  return(out)
+}
+
+g_ints <- rnorm(3) %>% as.list()
+s_ints <- rnorm(3) %>% as.list()
+
+names(g_ints) <- paste("g_int_", 1:3, sep = "")
+names(s_ints) <- paste("s_int_", 1:3, sep = "")
+
+data_list_control <- c(data_list_control, g_ints, s_ints)
+
+L <- 1.02
+U <- 624
+n <- 500
+
+b        <- seq(L, U, length.out = n + 1)
+d1 <- d2 <- (b[2:(n + 1)] + b[1:n]) * 0.5
+h        <- d1[3] - d1[2]
+
+domains <- expand.grid(list(d2 = d1, d1 = d1))
+
+G_1 <- h * g_x(domains$d1, domains$d2,
+             int   = data_list_control$g_int,
+             slope = data_list_control$g_slope,
+             gsd   = data_list_control$g_sd,
+             int_r = data_list_control$g_int_1,
+             L = L,
+             U = U)
+
+G_2 <- h * g_x(domains$d1, domains$d2,
+             int   = data_list_control$g_int,
+             slope = data_list_control$g_slope,
+             gsd   = data_list_control$g_sd,
+             int_r = data_list_control$g_int_2,
+             L = L,
+             U = U)
+
+G_3 <- h * g_x(domains$d1, domains$d2,
+               int   = data_list_control$g_int,
+               slope = data_list_control$g_slope,
+               gsd   = data_list_control$g_sd,
+               int_r = data_list_control$g_int_3,
+               L = L,
+               U = U)
+
+s_1 <- s_x(data_list_control$s_int,
+           data_list_control$s_int_1,
+           data_list_control$s_slope,
+           data_list_control$s_slope_2,
+           d1)
+
+s_2 <- s_x(data_list_control$s_int,
+           data_list_control$s_int_2,
+           data_list_control$s_slope,
+           data_list_control$s_slope_2,
+           d1)
+
+s_3 <- s_x(data_list_control$s_int,
+           data_list_control$s_int_3,
+           data_list_control$s_slope,
+           data_list_control$s_slope_2,
+           d1)
+
+P_1 <- (s_1 * G_1) %>%
+  matrix(nrow = n, ncol = n, byrow = TRUE)
+P_2 <- (s_2 * G_2) %>%
+  matrix(nrow = n, ncol = n, byrow = TRUE)
+P_3 <- (s_3 * G_3) %>%
+  matrix(nrow = n, ncol = n, byrow = TRUE)
+
+cd_co <- f_r_x(data_list_control$f_r_int,
+               data_list_control$f_r_slope,
+               d1) *
+  exp(data_list_control$f_s_int + data_list_control$f_s_slope * d1) *
+  data_list_control$g_i %>%
+  matrix(ncol = n,
+         nrow = 1)
+
+dc_co <- (dnorm(d2, mean = data_list_control$f_d_mu, sd = data_list_control$f_d_sd) /
+            (pnorm(U,
+                   data_list_control$f_d_mu,
+                   data_list_control$f_d_sd) - pnorm(L,
+                                                     data_list_control$f_d_mu,
+                                                     data_list_control$f_d_sd))) *
+  data_list_control$e_p *
+  h %>%
+  matrix(nrow = n, ncol = 1)
+
+dd_co <- 0
+
+K_co_1 <- rbind(
+  cbind(dd_co, cd_co),
+  cbind(dc_co, P_1)
+)
+K_co_2 <- rbind(
+  cbind(dd_co, cd_co),
+  cbind(dc_co, P_2)
+)
+K_co_3 <- rbind(
+  cbind(dd_co, cd_co),
+  cbind(dc_co, P_3)
+)
+
+eigs_1 <- eigen(K_co_1)
+eigs_2 <- eigen(K_co_2)
+eigs_3 <- eigen(K_co_3)
+
+lambdas_hand <- c(lambda_1 = Re(eigs_1$values[1]),
+                  lambda_2 = Re(eigs_2$values[1]),
+                  lambda_3 = Re(eigs_3$values[1]))
+
+ws_hand      <- cbind(
+  w_1 = Re(eigs_1$vectors[ , 1]),
+  w_2 = Re(eigs_2$vectors[ , 1]),
+  w_3 = Re(eigs_3$vectors[ , 1])
+)
+
+ws_hand <- apply(ws_hand, 2, function(x) x / sum(x))
+
+# ipmr definition
+
+
+ipmr_control <- init_ipm("general_di_det") %>%
+  define_kernel(
+    name             = "P_site",
+    formula          = s_site * g_site * d_ht,
+    family           = "CC",
+    g_site           = dnorm(ht_2, g_mu_site, g_sd),
+    g_mu_site        = g_int + g_int_site + g_slope * ht_1,
+    s_site           = inv_logit_2(s_int + s_int_site, s_slope, s_slope_2, ht_1),
+    data_list        = data_list_control,
+    states           = states,
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(site = 1:3),
+    evict_cor        = TRUE,
+    evict_fun        = truncated_distributions('norm',
+                                               'g_site')
+  ) %>%
+  define_kernel(
+    name          = "go_discrete",
+    formula       = f_r * f_s * g_i,
+    family        = 'CD',
+    f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
+    f_s           = exp(f_s_int + f_s_slope * ht_1),
+    data_list     = data_list_control,
+    states        = states,
+    has_hier_effs = FALSE
+  ) %>%
+  define_kernel(
+    name    = 'stay_discrete',
+    formula = 0,
+    family  = "DD",
+    states  = states,
+    evict_cor = FALSE
+  ) %>%
+  define_kernel(
+    name          = 'leave_discrete',
+    formula       = e_p * f_d * d_ht,
+    f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
+    family        = 'DC',
+    data_list     = data_list_control,
+    states        = states,
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions('norm',
+                                            'f_d')
+  ) %>%
+  define_k(
+    name             = "K_site",
+    family           = "IPM",
+    n_b_site_t_1     = stay_discrete %*% n_b_site_t  + go_discrete %*% n_ht_site_t,
+    n_ht_site_t_1    = leave_discrete %*% n_b_site_t + P_site %*% n_ht_site_t,
+    data_list        = data_list_control,
+    states           = states,
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(site = 1:3)
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P_site", "go_discrete", "stay_discrete", "leave_discrete", "K_site"),
+      int_rule     = c(rep("midpoint", 5)),
+      dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
+      dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+    )
+  ) %>%
+  define_domains(
+    ht = c(1.02, 624, 500)
+  ) %>%
+  define_pop_state(
+    pop_vectors = list(
+      n_ht_site = init_pop_vec,
+      n_b_site  = init_b
+    )
+  ) %>%
+  make_ipm(iterations = 200,
+           usr_funs = list(inv_logit   = inv_logit,
+                           inv_logit_2 = inv_logit_2),
+           return_all = TRUE,
+           normalize_pop_size = TRUE)
+
+lambdas_ipmr <- vapply(ipmr_control$pop_state[grepl("lambda", names(ipmr_control$pop_state))],
+                      function(x) x[ , 200],
+                      numeric(1L))
+
+ws <- list()
+
+ipmr_control$pop_state <- ipmr_control$pop_state[-c(1:2)]
+
+for(i in seq_len(3)) {
+
+
+  ind <- c(i * 2 - 1, i * 2)
+
+  pop <- do.call("rbind", ipmr_control$pop_state[rev(ind)])
+
+  ws[[i]] <- pop[ , 200]
+
+}
+
+ws <- do.call("cbind", ws) %>%
+  setNames(paste("w_", 1:3, sep = ""))
+
+test_that("hierarchical models get the same answers as hand generated models", {
+
+  expect_equal(lambdas_ipmr, lambdas_hand, tol = 1e-10)
+  expect_equal(ws[ , 1], ws_hand[ , 1], tol = 1e-10)
+  expect_equal(ws[ , 2], ws_hand[ , 2], tol = 1e-10)
+  expect_equal(ws[ , 3], ws_hand[ , 3], tol = 1e-10)
+
+})
+

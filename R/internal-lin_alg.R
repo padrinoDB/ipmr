@@ -492,16 +492,25 @@ is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
   # If lambda exists, we can just use that and exit early. otherwise, drop
   # lambda entry and proceed with the population state vectors
 
-  if(!all(is.na(ipm$pop_state$lambda))) {
-    pop_state <- as.vector(ipm$pop_state$lambda)
-    end   <- length(pop_state)
-    start <- end - 1
+  lambdas <- ipm$pop_state[grepl("lambda", names(ipm$pop_state))]
 
-    return(isTRUE(all.equal(pop_state[start], pop_state[end])))
+  if(!all(is.na(unlist(lambdas)))) {
+
+    convs <- vapply(lambdas, function(x) {
+
+      end <- length(x)
+      start <- end - 1
+
+      isTRUE(all.equal(x[start], x[end]))
+
+    },
+    logical(1L))
+
+    return(convs)
 
   } else {
 
-    pop_state <- ipm$pop_state[names(ipm$pop_state) != 'lambda']
+    pop_state <- ipm$pop_state[!grepl("lambda", names(ipm$pop_state))]
 
   }
 
