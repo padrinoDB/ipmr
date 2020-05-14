@@ -416,10 +416,13 @@ is_square <- function(x) {
 
 .is_conv_to_asymptotic <- function(x, tol = 1e-10) {
 
-  if(is.matrix(x) && dim(x)[1] > 1) {
+  if(is.matrix(x)) {
 
-    # Standardize columns first
-    x <- apply(x, 2, FUN = function(y) y / sum(y))
+    # Standardize columns first if we're deatling w/ population vector (dim(x)[1] > 1)
+
+    if(dim(x)[1] > 1){
+      x <- apply(x, 2, FUN = function(y) y / sum(y))
+    }
 
     n_col     <- end_ind <- dim(x)[2]
     start_ind <- n_col - 1
