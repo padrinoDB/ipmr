@@ -553,9 +553,205 @@ In this example, there are no additional arguments that need to be passed to `ma
 
 In the example above, we created a model with a single, deterministic kernel defined by a single state variable. Next, we'll go through an example showing how to build kernels that are constructed from discretely varying parameter estimates.
 
+### Deterministic simulations with hierarchical models
+
+Say we have multiple sites sampled in the same year, but are only interested in their asymptotic dynamics (perhaps to compare fitness across space). `ipmr` uses a syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the example above. 
+
+The general idea is to append a suffix to each variable that is modified, and supply a list of values that the suffix can actually take in the `levels_hier_effs` slot of `define_kernel()`. There is an entire vignette dedicated to translating math to R code to the `ipmr` syntax [here](https://levisc8.github.io/ipmr/articles/hierarchical-notation.html).
+
+For this example, we'll use the following vital rate models: 
+
+1. survival (`s_site`): a logistic regression with a random site intercept (`s_r_site`). 
+
+    - Example model formula: `glmer(surv ~ size_1 + (1 | site), data = my_surv_data, family = binomial()))`
+
+2. growth (`g_site`): A linear regression random site intercept (`g_r_site`).
+
+    - Example model formula: `lmer(size_2 ~ size_1 + (1 | site), data = my_grow_data, family = gaussian()))`
+
+3. pr(flowering) (`p_r`): A logistic regression. This has no random site effect.
+
+    - Example model formula: `glm(flower ~ size_1 , data = my_surv_data, family = binomial()))`
+
+4. seed production (`f_s_site`): A poisson regression with a random site intercept (`f_s_r_site`)
+
+    - Example model formula: `glmer(seed_num ~ size_1 + (1 | site), data = my_surv_data, family = poisson()))`
+    
+5. recruit size distribution (`f_d`): A normal distribution with two constant parameters, the mean (`mu_fd`) and standard deviation (`sd_fd`).
+
+The vital rates here are not conditional on each other as they come from separate models. For models where parameters come from a joint distribution (e.g. regressions with multiple responses, Bayesian multi-level models), `*_stoch_param` methods are usually more appropriate.
+
+The chunk below takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of `coef(some_vital_rate_model`)).
+
+
+```{r eval = FALSE}
+
+library(ipmr)
+
+# Define some fixed parameters
+
+fixed_list <- list(
+  s_int     = 1.03,   # fixef(my_surv_mod)[1] - uses fixef because we now have a model with random effects
+  s_slope   = 2.2,    # fixef(my_surv_mod)[2]
+  g_int     = 3.7,    # fixef(my_grow_mod)[1]
+  g_slope   = 0.92,   # fixef(my_grow_mod)[2]
+  sd_g      = 0.9,    # sd(resid(my_grow_mod))
+  f_r_int   = 0.09,   # coef(my_repro_mod)[1] - uses coef because there are no random effects in this model
+  f_r_slope = 0.05,   # coef(my_repro_mod)[2]
+  f_s_int   = 0.1,    # fixef(my_flower_mod)[1]
+  f_s_slope = 0.005,  # fixef(my_flower_mod)[2]
+  mu_fd     = 9,      # mean(my_recr_data$size_2, na.rm = TRUE)
+  sd_fd     = 2       # sd(my_recr_data$size_2, na.rm = TRUE)
+)
+
+``` 
+
+We've defined a `fixed_list` that holds all of the fixed parameters in our model. Next, we'll make up some random site specific intercepts, and add those to the `fixed_list`, naming it `all_params_list`. You don't necessarily need to rename anything, this is just for disambiguation.
+
+```{r eval = FALSE}
+
+# Now, simulate some random intercepts for growth (g_), survival (s_), 
+# and offspring production (f_s_). This part is for the purpose of the example.
+
+# First, we create vector of values that each random component can take.
+
+g_r_int   <- rnorm(5, 0, 0.3) # unlist(ranef(my_grow_mod)) for an lme4 output
+s_r_int   <- rnorm(5, 0, 0.7) # unlist(ranef(my_surv_mod)) for an lme4 output
+f_s_r_int <- rnorm(5, 0, 0.2) # unlist(ranef(my_flower_mod)) for an lme4 output
+
+nms <- paste("r_", 1:5, sep = "")
+
+names(g_r_int)   <- paste('g_', nms, sep = "")
+names(s_r_int)   <- paste('s_', nms, sep = "")
+names(f_s_r_int) <- paste('f_s_', nms, sep = "")
+
+# Each set of parameters is converted to a named list. The names should match
+# the variables referenced in each define_kernel()/define_k() call.
+
+g_params   <- as.list(g_r_int)
+s_params   <- as.list(s_r_int)
+f_s_params <- as.list(f_s_r_int)
+
+# add them all together using c()
+
+all_params_list <- c(fixed_list, g_params, s_params, f_s_params)
+
+```
+
+We've created a list where each entry is named and contains a single parameter value. This is now ready for use in `define_kernel()`
+
+```{r eval = FALSE}
+
+my_ipm <- init_ipm('simple_di_det') %>%
+  define_kernel(
+    
+    # Our P kernels will vary from site to site, so we append the "_site" suffix
+    # to them.
+    
+    name             = 'P_site',  
+    
+    # Similarly, our survival and growth functions will vary from site to site
+    # so these are also modified
+    
+    formula          = s_site * g_site,   
+    family           = "CC",
+    
+    # The linear predictor for the survival function can be split out
+    # into its own expression as well. This might help keep track of things.
+    s_lin_site       = s_int + s_r_site + s_slope * ht_1,
+    s_site           = 1 / (1 + exp(-s_lin_site)),
+    
+    # Again, we modify the vital rate expression to include "_site".
+    
+    g_site           = dnorm(ht_2, mean = mu_g_site, sd = sd_g),
+    mu_g_site        = g_int + g_slope * ht_1 + g_r_site,
+    
+    data_list        = all_params_list,
+    states           = list(c('ht')),
+    
+    # Here, we tell ipmr that the model has some hierarchical variable, and 
+    # provide a list describing the values it can take. The values in 
+    # levels_hier_effs are substituted for "site" everywhere in the model, except
+    # for the data list. This is why we had to make sure that the names there
+    # matched the levels we supply here.
+    
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(site = 1:5),
+    
+    # We must also modify the variables in the eviction function
+    
+    evict_cor        = TRUE,
+    evict_fun        = truncated_distributions("norm", "g_site")
+    
+  ) %>%
+  define_kernel(
+    
+    # The F kernel also varies from site to site
+    
+    name             = "F_site",             
+    formula          = f_r * f_s_site * f_d,
+    family           = "CC",
+    
+    # In this example, we didn't include a site level effect for probability
+    # of flowering, only seed production. Thus, this expression is NOT modified.
+    
+    f_r_lin          = f_r_int + f_r_slope * ht_1,
+    f_r              = 1 / (1 + exp(- f_r_lin)),
+    
+    # We modify the seed production expression with the site effect
+    
+    f_s_site         = exp(f_s_int + f_s_r_site + f_s_slope * ht_1),
+    f_d              = dnorm(ht_2, mean = mu_fd, sd = sd_fd),
+    data_list        = all_params_list,
+    states           = list(c('ht')),
+    
+    # As for the P kernel, we specify the levels the hierarchical variable
+    # can take, and modify the eviction function.
+    
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(site = 1:5),
+    evict_cor        = TRUE,
+    evict_fun        = truncated_distributions("norm", "f_d")
+  ) %>%
+  define_k(
+    
+    # We also modify the K expressions. 
+    
+    name             = 'K_site',
+    K_site           = P_site + F_site,
+    family           = "IPM",
+    data_list        = list(),
+    states           = list(c("ht")),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(site = 1:5),
+    evict_cor        = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      
+      # The impl_args are also modified with the suffix
+      
+      kernel_names = c("K_site", "P_site", "F_site"),
+      int_rule     = rep("midpoint", 3),
+      dom_start    = rep("ht", 3),
+      dom_end      = rep("ht", 3)
+    )
+  ) %>%
+  define_domains(ht = c(0.2, 40, 100)) %>%
+  make_ipm(iterate  = FALSE)
+  
+  lambda(my_ipm, comp_method = 'eigen', type_lambda = "all")
+  
+
+```
+
+Aside from appending `_site` to a number of variables, the code is pretty much the same as the first example. 
+
 ### Defining a simple IPM in a discretely varying environment
 
-`ipmr` uses a syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the example above. The first type of model will be a stochastic, kernel-resampled simulation (`"simple_di_stoch_kern"`). 
+In the example above, we first created a model with a single, deterministic kernel defined by a single state variable. Then we modeled multiple sites with deterministic kernels that varied from site to site. Next, we'll go through an example showing how to build kernels that are constructed from discretely varying parameter estimates.
+
+The example below is the same as the last example, except that this time, we'll run a simulation by randomly choosing a site's kernel at each iteration, rather than just building them for every site. Note that this will require us to specify a population vector before running the model. Along the way, we'll also learn how to pass custom functions to the model.
 
 The vital rate models are as follows:
 
@@ -820,72 +1016,6 @@ stoch_lambda <- lambda(my_iterated_ipm, comp_method = 'pop_size', type = 'stocha
 ```
 
 100 iterations is not enough to estimate stochastic growth rates ($\lambda_s$), but the computations can take some time with a lot of iterations, and are not practical for demonstration purposes. 
-
-### Deterministic simulations with hierarchical models
-
-Say we have multiple sites sampled in the same year, but are only interested in their asymptotic dynamics (perhaps to compare fitness across space). We can use almost the exact same code as above - we switch the `model_class` argument of `init_ipm()` back to `simple_di_det` and set `make_ipm(iterate = FALSE)`. 
-
-```{r eval = FALSE}
-
-my_ipm <- init_ipm('simple_di_det') %>%
-  
-  define_kernel(
-    name             = 'P_yr',         
-    formula          = s_yr * g_yr,   
-    family           = "CC",
-    
-    s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr), 
-    g_yr             = dnorm(ht_2, mean = mu_g_yr, sd = sd_g),
-    mu_g_yr          = g_int + g_slope * ht_1 + g_r_yr,
-    
-    data_list        = all_params_list,
-    states           = list(c('ht')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(yr = 1:5),
-    evict_cor        = TRUE,
-    evict_fun        = truncated_distributions("norm", "g_yr")
-    
-  ) %>%
-  define_kernel(
-    name             = "F_yr",             
-    formula          = f_r * f_s_yr * f_d,
-    family           = "CC",
-    f_r              = inv_logit(ht_1, f_r_int, f_r_slope),
-    f_s_yr           = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr),
-    f_d              = dnorm(ht_2, mean = mu_fd, sd = sd_fd),
-    data_list        = all_params_list,
-    states           = list(c('ht')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(yr = 1:5),
-    evict_cor        = TRUE,
-    evict_fun        = truncated_distributions("norm", "f_d")
-  ) %>%
-  define_k(
-    name             = 'K_yr',
-    K_yr             = P_yr + F_yr,
-    family           = "IPM",
-    data_list        = list(),
-    states           = list(c("ht")),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(yr = 1:5),
-    evict_cor        = FALSE
-  ) %>%
-  define_impl(
-    make_impl_args_list(
-      kernel_names = c("K_yr", "P_yr", "F_yr"),
-      int_rule     = rep("midpoint", 3),
-      dom_start    = rep("ht", 3),
-      dom_end      = rep("ht", 3)
-    )
-  ) %>%
-  define_domains(ht = c(0.2, 40, 100)) %>%
-  make_ipm(usr_funs = my_funs,
-           iterate  = FALSE)
-  
-  lambda(my_ipm, comp_method = 'eigen', type_lambda = "all")
-  
-
-```
 
 ## Simple IPMs for continuously varying environments 
 
