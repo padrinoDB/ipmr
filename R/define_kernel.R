@@ -120,7 +120,10 @@ define_kernel <- function(proto_ipm,
   names(vr_text) <- names(vr_quos)
 
   # Param_tree should always contain these four entries, regardless of class.
-  # pop_states and env_states get defined separately.
+  # pop_states and env_states get defined separately. .protect_model detects
+  # model objects and keeps them from getting flattened beyond
+
+  data_list <- lapply(data_list, .protect_model)
 
   param_tree <- list(formula = form_text,
                      family = family,

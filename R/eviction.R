@@ -97,6 +97,7 @@ truncated_distributions <- function(fun,
 .insert_final_form <- function(param, final_form, proto) {
 
   ind <- which(names(proto$params[[1]]$vr_text) == param)
+
   proto$params[[1]]$vr_text[ind] <- final_form
 
   return(proto)
@@ -106,21 +107,19 @@ truncated_distributions <- function(fun,
 
 .get_bounds_from_proto <- function(param, proto) {
 
-  # browser()
-  # Get parameter function form
-  param_form <- .get_param_form(param, proto)
+  # Get state variable and the names corresponding to its bounds
 
-  # Next, infer the state variable and construct the L, U
-
-  svs <- unique(unlist(proto$state_var))
+  svs <- lapply(proto$domain, function(x) names(x)) %>%
+    unlist() %>%
+    unique()
 
   sv_ind <- vapply(svs,
-                   FUN = function(x) grepl(x, param_form),
-                   logical(1))
+                   function(x) grepl("_2", x),
+                   logical(1L))
 
-  sv <- svs[sv_ind]
+  sv     <- svs[sv_ind]
 
-  out <- paste(c("L", "U"), sv, '2', sep = "_")
+  out    <- paste(c("L", "U"), sv, sep = "_")
 
   return(out)
 
@@ -143,7 +142,9 @@ truncated_distributions <- function(fun,
     param_form <- all_params[ind]
 
   }
+
   return(param_form)
+
 }
 
 #' @noRd

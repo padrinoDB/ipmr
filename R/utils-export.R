@@ -147,6 +147,51 @@ define_env_state <- function(proto_ipm, ..., data_list = list()) {
   return(proto_ipm)
 }
 
+#' @title Predict methods in ipmr
+#' @rdname predict_methods
+#'
+#' @description This function is used when a \code{predict} method is incorporated
+#' into the vital rate expressions of a kernel. Generally, ipmr can handle this
+#' without any additional user effort, but some model classes will fail (often
+#' with an obscure error message that really needs some updating).
+#' When this happens, \code{use_vr_model} can ensure that model object is
+#' correctly represented in the \code{data_list}.
+#'
+#' @param model A fitted model representing a vital rate. Primarily used to avoid
+#' writing the mathematical expression for a vital rate, and using a \code{predict()}
+#' method instead.
+#'
+#' @return A model object with a \code{"flat_protect"} attribute.
+#'
+#' @details ipmr usually recognizes model objects passed into the \code{data_list} argument
+#' automatically. Unfortunately, sometimes it'll miss one, and the user will need
+#' to manually protect it from the standard build process. This function
+#' provides a wrapper around that process.
+#'
+#' Wrap a model object in \code{use_vr_model} when building the \code{data_list}
+#' to pass to \code{define_kernel}.
+#'
+#' @examples
+#'
+#' \dontrun{
+#' data_list <- list(
+#'   grow_mod = use_vr_model(grow_mod),
+#'   surv_mod = use_vr_model(surv_mod),
+#'   recruit_mean = 20,
+#'   recruit_sd   = 5
+#' )
+#'}
+#' @export
+
+use_vr_model <- function(model) {
+
+
+  attr(model, "flat_protect") <- TRUE
+
+  return(model)
+
+}
+
 
 #' @rdname fun-mult-helpers
 #'
@@ -155,6 +200,7 @@ define_env_state <- function(proto_ipm, ..., data_list = list()) {
 #' \code{define_k}.
 #'
 #' @export
+
 right_mult <- function(...) {
 
   to_mult <- list(...)

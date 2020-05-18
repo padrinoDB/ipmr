@@ -14,7 +14,7 @@ vignette: >
   
 `ipmr` is a package for implementing integral projection models of varying degrees of complexity. It uses mathematical-ish expressions to build up the iteration kernels from smaller pieces, as well as helpers to ensure that models are implemented correctly. Finally, it provides machinery for stochastic simulations. basic analyses, and model diagnostics. More complicated analysis functions are being implemented in the [irage package](https://github.com/levisc8/irage).
   
-**This package does not help with fitting regression models to demographic data!** This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a much better job of helping you with that than I can. Some of my favorites are `lme4`, `brms`, `mgcv`, and `nlme`. `IPMpack` handles the regression modelling and IPM construction, though be forewarned, there are certain types of models that you simply cannot construct with it! 
+**This package does not help with fitting regression models to demographic data!** This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a much better job of helping you with that than I can. Some of my favorites are `lme4`, `brms`, `mgcv`, and `nlme`. `IPMpack` handles the regression modelling and IPM construction, though be forewarned, there are certain types of models that you simply cannot construct with it! `IPMpack` is no longer on CRAN, but can be installed from the `MetaCRAN/IPMpack` [Github page](https://github.com/cran/IPMpack) or running `devtools::install_github("CRAN/IPMpack")`.
   
 ## Types of models in `ipmr`
   
@@ -549,6 +549,246 @@ In this example, there are no additional arguments that need to be passed to `ma
 
 `lambda`, `left_ev`, and `right_ev` are generic functions corresponding to the dominant eigenvalue, dominant left eigenvector, and dominant right eigenvector respectively. `lambda` is available for all classes of IPMs, while `left/right_ev` is available for all deterministic IPMs. Stochastic equivalents of the latter will be implemented eventually. 
 
+### Using `predict()` methods in vital rate expressions
+
+In some cases, we might not want to write out the mathematical expression for the vital rate. Depending on the package we used to fit our vital rate model, we may be able to use `predict()` to generate predictions from it for our model. 
+
+We'll go through a quick example of how to incorporate these expressions into the model building process using a data set for *Carpobrotus edulis*, an invasive succulent.
+
+First, we'll load in the example data set and fit some simple vital rate models.
+
+1. `log_size`/`log_size_next` are log transformed surface areas in $\mathrm{m}^2$. This will be the state variable for the model, and is abbreviated `"sa"` in the  model implementation code below.
+
+2. `repro` indicates whether or not a plant flowered and is either 0 or 1
+
+3. `flower_n` indicates the number of flowers a reproductive plant made, so is either a positive integer or `NA`.
+
+
+```{r eval = FALSE}
+
+library(ipmr)
+
+data(iceplant_ex)
+
+# growth model
+
+grow_mod <- lm(log_size_next ~ log_size, data = iceplant_ex)
+grow_sd  <- sd(resid(grow_mod))
+
+
+# survival model
+
+surv_mod <- glm(survival ~ log_size, data = iceplant_ex, family = binomial())
+
+# Pr(flowering) model
+
+repr_mod <- glm(repro ~ log_size, data = iceplant_ex, family = binomial())
+
+# Number of flowers per plant model
+
+seed_mod <- glm(flower_n ~ log_size, data = iceplant_ex, family = poisson())
+
+# New recruits have no size(t), but do have size(t + 1)
+
+recr_data <- subset(iceplant_ex, is.na(log_size))
+
+recr_mu  <- mean(recr_data$log_size_next)
+recr_sd  <- sd(recr_data$log_size_next)
+
+# This data set doesn't include information on germination and establishment.
+# Thus, we'll compute the realized recruitment parameter as the number
+# of observed recruits divided by the number of flowers produced in the prior
+# year. 
+
+recr_n   <- length(recr_data$log_size_next)
+
+flow_n   <- sum(iceplant_ex$flower_n, na.rm = TRUE)
+
+# Now, we bundle everything into a list as we did before. We can
+# pass the model objects directly into the list, and do not need to extract
+# coefficients. 
+
+params <- list(recr_mu = recr_mu,
+               recr_sd = recr_sd,
+               grow_sd = grow_sd,
+               surv_mod = surv_mod,
+               grow_mod = grow_mod,
+               repr_mod = repr_mod,
+               seed_mod = seed_mod,
+               recr_n   = recr_n,
+               flow_n   = flow_n)
+
+# The lower and upper bounds for integration. Adding 20% on either end to minimize
+# eviction
+
+L <- min(c(iceplant_ex$log_size, iceplant_ex$log_size_next), na.rm = TRUE) * 0.8
+U <- max(c(iceplant_ex$log_size, iceplant_ex$log_size_next), na.rm = TRUE) * 1.2
+
+```
+
+We now have everything we need to get started. We use almost the same code as above to implement the model, but substitute `predict()` in for the mathematical form of the vital rate expressions. When we do this, we have to make sure that the names of the `newdata` argument in `predict` match the names in our model formula, and that the values we put into it are the names of the state variables in our model. 
+
+```{r eval = FALSE}
+
+pred_ipm <- init_ipm("simple_di_det") %>%
+  define_kernel(
+    name          = "P",
+    family        = "CC",
+    formula       = s * g,
+    
+    # Instead of the inverse logit transformation, we use predict() here.
+    # We have to be sure that the "newdata" argument of predict is correctly specified.
+    # This means matching the names used in the model itself (log_size) to the names
+    # we give the domains. In this case, we use "sa" (short for surface area) as
+    # the new data to generate predictions for.
+    
+    s             = predict(surv_mod, 
+                            newdata = data.frame(log_size = sa_1), 
+                            type = 'response'),
+    g_mu          = predict(grow_mod, 
+                            newdata = data.frame(log_size = sa_1),
+                            type = 'response'),
+    
+    # We specify the rest of the kernel the same way.
+    
+    g             = dnorm(sa_2, g_mu, grow_sd),
+    states        = list(c("sa")),
+    data_list     = params,
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "g")
+  ) %>%
+  define_kernel(
+    name          = "F",
+    family        = "CC",
+    formula       = f_p * f_s * f_d * f_r,
+    
+    # As above, we use predict(model_object). We make sure the names of the "newdata"
+    
+    f_p           = predict(repr_mod,
+                            newdata = data.frame(log_size = sa_1),
+                            type = 'response'),
+    f_s           = predict(seed_mod, 
+                            newdata = data.frame(log_size = sa_1), 
+                            type = 'response'),
+    f_r           = recr_n / flow_n,
+    f_d           = dnorm(sa_2, recr_mu, recr_sd),
+    states        = list(c("sa")),
+    data_list     = params,
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "f_d")
+  ) %>%
+  define_k(
+    name          = "K",
+    family        = "IPM",
+    K             = P + F,
+    states        = list(c("sa")),
+    data_list     = list(),
+    has_hier_effs = FALSE,
+    evict_cor     = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P", "F", "K"),
+      int_rule     = rep('midpoint', 3),
+      dom_start    = rep("sa", 3),
+      dom_end      = rep("sa", 3)
+    )
+  ) %>%
+  define_domains(
+    sa = c(L,
+           U,
+           100)
+  ) %>%
+  make_ipm(iterate = FALSE)
+
+```
+
+
+`make_ipm()` can handle most types of widely used model classes (e.g. `lm`, `glm`, `lme4`, `brms`, `nlme`, `stanfit`, `betareg`). The list of method available in `ipmr` is not exhaustive though, and sometimes there will be errors as a result. 
+
+If `predict` method exists, but you get errors along the lines of `Element <some number> of `.x` must be a vector, not a call`, this usually means that `ipmr` isn't aware of the class of model you're trying to use. We can get around this by wrapping those model objects in `use_vr_model()`.
+
+Say our growth model isn't recognized by `ipmr`. We try to `make_ipm()`, and get our obscure error message about `.x`. The snippet below shows how to rectify this. We wrap our model objects in `use_vr_model()` when creating the `data_list`, and then re-run it with the exact same code as above. 
+
+```{r eval = FALSE}
+
+params <- list(recr_mu = recr_mu,
+               recr_sd = recr_sd,
+               grow_sd = grow_sd,
+               surv_mod = use_vr_model(surv_mod),
+               grow_mod = use_vr_model(grow_mod),
+               repr_mod = use_vr_model(repr_mod),
+               seed_mod = use_vr_model(seed_mod),
+               recr_n   = recr_n,
+               flow_n   = flow_n)
+
+
+pred_ipm <- init_ipm("simple_di_det") %>%
+  define_kernel(
+    name          = "P",
+    family        = "CC",
+    formula       = s * g,
+    s             = predict(surv_mod, 
+                            newdata = data.frame(log_size = sa_1), 
+                            type = 'response'),
+    g_mu          = predict(grow_mod, 
+                            newdata = data.frame(log_size = sa_1),
+                            type = 'response'),
+    g             = dnorm(sa_2, g_mu, grow_sd),
+    states        = list(c("sa")),
+    data_list     = params,
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "g")
+  ) %>%
+  define_kernel(
+    name          = "F",
+    family        = "CC",
+    formula       = f_p * f_s * f_d * f_r,
+    f_p           = predict(repr_mod,
+                            newdata = data.frame(log_size = sa_1),
+                            type = 'response'),
+    f_s           = predict(seed_mod, 
+                            newdata = data.frame(log_size = sa_1), 
+                            type = 'response'),
+    f_r           = recr_n / flow_n,
+    f_d           = dnorm(sa_2, recr_mu, recr_sd),
+    states        = list(c("sa")),
+    data_list     = params,
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "f_d")
+  ) %>%
+  define_k(
+    name          = "K",
+    family        = "IPM",
+    K             = P + F,
+    states        = list(c("sa")),
+    data_list     = list(),
+    has_hier_effs = FALSE,
+    evict_cor     = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P", "F", "K"),
+      int_rule     = rep('midpoint', 3),
+      dom_start    = rep("sa", 3),
+      dom_end      = rep("sa", 3)
+    )
+  ) %>%
+  define_domains(
+    sa = c(L,
+           U,
+           100)
+  ) %>%
+  make_ipm(iterate = FALSE)
+
+```
+
+Additionally, please create an issue [here](https://github.com/levisc8/ipmr/issues) describing the model class you're trying to work with so it can be added to future versions. 
+ 
 ## Defining more complicated models
 
 In the example above, we created a model with a single, deterministic kernel defined by a single state variable. Next, we'll go through an example showing how to build kernels that are constructed from discretely varying parameter estimates.

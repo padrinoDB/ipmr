@@ -5,6 +5,8 @@
   UseMethod('.iterate_model')
 }
 
+#' @noRd
+#' @importFrom purrr map2
 
 .iterate_model.simple_di_det <- function(proto_ipm,
                                          iterators,
@@ -28,7 +30,7 @@
 
     pop_state$lambda <- NULL
 
-    lambdas    <- vector('list', length = length(levs))
+    lambdas        <- vector('list', length = length(levs))
     names(lambdas) <- lambda_nms
 
     lambdas <- lapply(lambdas,
@@ -42,19 +44,19 @@
 
     for(i in seq_along(levs)) {
 
-      use_lev <- levs[i]
+      use_lev   <- levs[i]
 
       use_kerns <- sub_kern_list[grepl(use_lev, names(sub_kern_list))]
 
       if(!all(proto_ipm$has_hier_effs)) {
 
-        append <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+        append    <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
         use_kerns <- c(use_kerns, sub_kern_list[append])
 
       }
 
-      use_pop   <- pop_state[grepl(use_lev, names(pop_state))]
-      use_k     <- k_row[grepl(use_lev, k_row$kernel_id), ]
+      use_pop <- pop_state[grepl(use_lev, names(pop_state))]
+      use_k   <- k_row[grepl(use_lev, k_row$kernel_id), ]
 
       for(j in seq_len(iterations)) {
 
@@ -985,4 +987,8 @@
 
 }
 
+
+.iterate_model.simple_dd_det <- function() {
+
+}
 

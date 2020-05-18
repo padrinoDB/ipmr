@@ -265,17 +265,21 @@ print.general_di_det_ipm <- function(x,
 
   pretty_cls <- .pretty_class(class(x)[1])
 
+  pops <- x$pop_state[!grepl("lambda", names(x$pop_state))]
+
   msg <- paste0('A ',
                 pretty_cls,
                 ' IPM with ',
                 length(x$sub_kernels),
                 ' sub-kernel(s) and ',
-                length(x$pop_state),
+                length(pops),
                 ' population vectors defined.', sep = "")
 
   if(comp_lambda) {
 
-    all_lams <- lambda(x, comp_method = 'pop_size', type_lambda = type_lambda)
+    all_lams <- lambda(x,
+                       comp_method = 'pop_size',
+                       type_lambda = type_lambda)
 
     if(!all_lambdas) {
 
@@ -444,9 +448,11 @@ print.general_di_stoch_param_ipm <- function(x,
 #' @param ipm An object returned by \code{make_ipm()}.
 #' @param comp_method Either \code{"eigen"} or \code{"pop_size"}. \code{"eigen"}
 #' is only possible for \code{"simple_*"} methods.
-#' @param type_lambda Either \code{'all'} or \code{'stochastic'}. \code{'all'}
+#' @param type_lambda Either \code{'all'}, \code{'last'},
+#'  or \code{'stochastic'}. \code{'all'}
 #' returns a vector of lambda values for each time step of the simulation (equal
 #' in length to the \code{iterations} argument of \code{make_ipm()}).
+#' \code{'last'} returns the lambda value for the final timestep.
 #' \code{'stochastic'} returns a single value which is the geometric mean
 #' of log-per-capita growth rate from each time step.
 #' @param ... other arguments passed to methods.
@@ -472,12 +478,15 @@ lambda <- function(ipm, ...) {
 
 lambda.simple_di_det_ipm <- function(ipm,
                                      comp_method = c("eigen", "pop_size"),
-                                     type_lambda = 'all',
+                                     type_lambda = 'last',
                                      ...) {
 
+  all_lams <- switch(type_lambda,
+                     "all"  = TRUE,
+                     'last' = FALSE)
   switch(comp_method,
          'eigen'    = .lambda_eigen(ipm),
-         'pop_size' = .lambda_pop_size(ipm, all_lambdas = TRUE))
+         'pop_size' = .lambda_pop_size(ipm, all_lambdas = all_lams))
 
 }
 
@@ -488,6 +497,7 @@ lambda.simple_di_stoch_kern_ipm <- function(ipm,
                                             comp_method = c("eigen",
                                                             "pop_size"),
                                             type_lambda = c('all',
+                                                            'last',
                                                             'stochastic'),
                                             ...) {
 
@@ -498,6 +508,7 @@ lambda.simple_di_stoch_kern_ipm <- function(ipm,
   return(
     switch(type_lambda,
            'all'        = temp,
+           'last'       = temp[dim(temp)[1], ],
            'stochastic' = mean(log(temp)))
   )
 }
@@ -508,6 +519,7 @@ lambda.simple_di_stoch_kern_ipm <- function(ipm,
 lambda.simple_di_stoch_param_ipm <- function(ipm,
                                              comp_method = c("eigen", "pop_size"),
                                              type_lambda = c('all',
+                                                             'last',
                                                              'stochastic'),
                                              ...) {
 
@@ -518,6 +530,7 @@ lambda.simple_di_stoch_param_ipm <- function(ipm,
   return(
     switch(type_lambda,
            'all'        = temp,
+           'last'       = temp[dim(temp)[1], ],
            'stochastic' = mean(log(temp)))
   )
 
@@ -526,14 +539,20 @@ lambda.simple_di_stoch_param_ipm <- function(ipm,
 #' @rdname lambda
 #' @export
 
-lambda.general_di_det_ipm <- function(ipm, type_lambda = 'all', ...) {
+lambda.general_di_det_ipm <- function(ipm, type_lambda = 'last', ...) {
 
-  temp <- .lambda_pop_size(ipm, all_lambdas = TRUE)
+
+  all_lams <- switch(type_lambda,
+                     'all' = TRUE,
+                     'stochastic' = TRUE,
+                     'last' = FALSE)
+
+  temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
 
   return(
     switch(type_lambda,
            'all'        = temp,
-           'stochastic' = mean(log(temp)))
+           'last'       = temp[dim(temp)[1], ])
   )
 }
 
@@ -543,13 +562,21 @@ lambda.general_di_det_ipm <- function(ipm, type_lambda = 'all', ...) {
 
 lambda.general_di_stoch_kern_ipm <- function(ipm,
                                              ...,
-                                             type_lambda = c('all', 'stochastic')) {
+                                             type_lambda = c('all',
+                                                             'last',
+                                                             'stochastic')) {
 
-  temp <- .lambda_pop_size(ipm, all_lambdas = TRUE)
+  all_lams <- switch(type_lambda,
+                     'all' = TRUE,
+                     'stochastic' = TRUE,
+                     'last' = FALSE)
+
+  temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
 
   return(
     switch(type_lambda,
            'all'        = temp,
+           'last'       = temp,
            'stochastic' = mean(log(temp)))
   )
 }
@@ -559,13 +586,22 @@ lambda.general_di_stoch_kern_ipm <- function(ipm,
 
 lambda.general_di_stoch_param_ipm <- function(ipm,
                                               ...,
-                                              type_lambda = c('all', 'stochastic')) {
+                                              type_lambda = c('all',
+                                                              'last',
+                                                              'stochastic')) {
 
-  temp <- .lambda_pop_size(ipm, all_lambdas = TRUE)
+
+  all_lams <- switch(type_lambda,
+                     'all' = TRUE,
+                     'stochastic' = TRUE,
+                     'last' = FALSE)
+
+  temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
 
   return(
     switch(type_lambda,
            'all'        = temp,
+           'last'       = temp,
            'stochastic' = mean(log(temp)))
   )
 

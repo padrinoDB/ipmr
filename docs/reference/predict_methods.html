@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute the per-capita growth rate for an IPM object — lambda • ipmr</title>
+<title>Predict methods in ipmr — use_vr_model • ipmr</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,13 @@
 
 
 
-<meta property="og:title" content="Compute the per-capita growth rate for an IPM object — lambda" />
-<meta property="og:description" content="Compute the per-capita growth rate for an IPM object" />
+<meta property="og:title" content="Predict methods in ipmr — use_vr_model" />
+<meta property="og:description" content="This function is used when a predict method is incorporated
+into the vital rate expressions of a kernel. Generally, ipmr can handle this
+without any additional user effort, but some model classes will fail (often
+with an obscure error message that really needs some updating).
+When this happens, use_vr_model can ensure that model object is
+correctly represented in the data_list." />
 
 
 
@@ -141,85 +146,55 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute the per-capita growth rate for an IPM object</h1>
+    <h1>Predict methods in ipmr</h1>
     
-    <div class="hidden name"><code>lambda.Rd</code></div>
+    <div class="hidden name"><code>predict_methods.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compute the per-capita growth rate for an IPM object</p>
+    <p>This function is used when a <code>predict</code> method is incorporated
+into the vital rate expressions of a kernel. Generally, ipmr can handle this
+without any additional user effort, but some model classes will fail (often
+with an obscure error message that really needs some updating).
+When this happens, <code>use_vr_model</code> can ensure that model object is
+correctly represented in the <code>data_list</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>)
-
-<span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>), <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"last"</span>, <span class='no'>...</span>)
-
-<span class='co'># S3 method for simple_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span>(
-  <span class='no'>ipm</span>,
-  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>),
-  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>),
-  <span class='no'>...</span>
-)
-
-<span class='co'># S3 method for simple_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span>(
-  <span class='no'>ipm</span>,
-  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>),
-  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>),
-  <span class='no'>...</span>
-)
-
-<span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"last"</span>, <span class='no'>...</span>)
-
-<span class='co'># S3 method for general_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>))
-
-<span class='co'># S3 method for general_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>))</pre>
+    <pre class="usage"><span class='fu'>use_vr_model</span>(<span class='no'>model</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>ipm</th>
-      <td><p>An object returned by <code><a href='make_ipm.html'>make_ipm()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>other arguments passed to methods.</p></td>
-    </tr>
-    <tr>
-      <th>comp_method</th>
-      <td><p>Either <code>"eigen"</code> or <code>"pop_size"</code>. <code>"eigen"</code>
-is only possible for <code>"simple_*"</code> methods.</p></td>
-    </tr>
-    <tr>
-      <th>type_lambda</th>
-      <td><p>Either <code>'all'</code>, <code>'last'</code>,
- or <code>'stochastic'</code>. <code>'all'</code>
-returns a vector of lambda values for each time step of the simulation (equal
-in length to the <code>iterations</code> argument of <code><a href='make_ipm.html'>make_ipm()</a></code>).
-<code>'last'</code> returns the lambda value for the final timestep.
-<code>'stochastic'</code> returns a single value which is the geometric mean
-of log-per-capita growth rate from each time step.</p></td>
+      <th>model</th>
+      <td><p>A fitted model representing a vital rate. Primarily used to avoid
+writing the mathematical expression for a vital rate, and using a <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>
+method instead.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A single numeric vector or single value.</p>
+    <p>A model object with a <code>"flat_protect"</code> attribute.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>There are two possible methods for computing <code>lambda</code> and these
-are controlled by the <code>comp_method</code> argument. Possible values are
-<code>"eigen"</code> and <code>"pop_size"</code>. The first computes the dominant
-eigenvalue of all entries in <code>ipm$iterators</code> slot of the <code>*_ipm</code>
-object. Since iteration kernels aren't generated for <code>general_*</code> methods,
-<code>"pop_size"</code> is the only possible option for those objects.</p>
+    <p>ipmr usually recognizes model objects passed into the <code>data_list</code> argument
+automatically. Unfortunately, sometimes it'll miss one, and the user will need
+to manually protect it from the standard build process. This function
+provides a wrapper around that process.</p>
+<p>Wrap a model object in <code>use_vr_model</code> when building the <code>data_list</code>
+to pass to <code>define_kernel</code>.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='no'>data_list</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
+  <span class='kw'>grow_mod</span> <span class='kw'>=</span> <span class='fu'>use_vr_model</span>(<span class='no'>grow_mod</span>),
+  <span class='kw'>surv_mod</span> <span class='kw'>=</span> <span class='fu'>use_vr_model</span>(<span class='no'>surv_mod</span>),
+  <span class='kw'>recruit_mean</span> <span class='kw'>=</span> <span class='fl'>20</span>,
+  <span class='kw'>recruit_sd</span>   <span class='kw'>=</span> <span class='fl'>5</span>
+)
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

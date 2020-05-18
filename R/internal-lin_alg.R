@@ -328,21 +328,46 @@
 
 .lambda_pop_size <- function(x, all_lambdas = TRUE) {
 
-  pops  <- x$pop_state
+  pops    <- x$pop_state
+  lam_ind <- grepl("lambda", names(pops))
 
-  if(!all(is.na(pops$lambda))) {
+  if(sum(lam_ind) > 1) {
 
-    out <- pops$lambda
+    lams <- pops[lam_ind]
+
+  } else {
+
+    # Don't drop the list
+    lams <- list(lambda = pops$lambda)
+
+  }
+
+  if(!all(is.na(unlist(lams)))) {
+
+    out <- do.call('rbind', lams) %>%
+      t()
+
     if(!all_lambdas) {
-      out <- out[length(out)]
+
+      n_its <- dim(out)[1]
+
+      out <- out[n_its, ]
     }
+
+    names(out) <- names(lams)
 
     return(out)
 
   }
 
+  # I don't think this can ever happen - if a model is iterated, it will now
+  # always have a lambda slot. If it is not, then lambda_pop_size makes no sense
+  # either.
+
   n_its <- dim(pops[[1]])[2]
   temp  <- numeric(n_its - 1)
+
+  pops <- pops[!lam_ind]
 
   for(i in seq(2, n_its, 1)) {
 

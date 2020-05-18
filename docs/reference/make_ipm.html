@@ -179,8 +179,8 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
   <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+  <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )
 
 <span class='co'># S3 method for simple_di_stoch_param</span>
@@ -192,6 +192,7 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
   <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )
 
@@ -229,6 +230,7 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
   <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )</pre>
 
@@ -282,14 +284,16 @@ methods and <code>FALSE</code> for <code>*_dd_*</code> methods.</p></td>
     </tr>
     <tr>
       <th>kernel_seq</th>
-      <td><p>The sequence of kernels to use during the iterations.
+      <td><p>For <code>*_stoch_kern</code> methods, the sequence of kernels
+to use during the simulation process. It should have the same number of entries
+as the number of <code>iterations</code>.
 This can either be a vector of integers corresponding to kernel names (e.g.
 kernels for different years - <code>2011:2018</code>),
 a character vector corresponding to kernel names (e.g. kernels from different
 sites - <code>'a', 'b', 'c'</code>), a Markov chain matrix with
 transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
-If empty, the model will try to run deterministically for each unique combination
-of hierarchical variables (if any, not recommended).</p></td>
+If it is empty, <code>make_ipm</code> will try to generate a sequence internally using
+a random selection of the <code>levels_hier_effs</code> defined in <code>define_kernel</code>.</p></td>
     </tr>
     </table>
 
@@ -305,7 +309,7 @@ containing the following components:</p>
                            kernel. This will always be empty unless <code>
                            return_all</code> is <code>TRUE</code>. Mostly here for developer
                            debugging.</p></li>
-<li><p><strong>env_seq</strong>: a matrix with dimension <code>n_iterations</code> X 1 of
+<li><p><strong>env_seq</strong>: a matrix with dimension <code>iterations</code> X 1 of
                              kernel indices indicating the order
                              in which kernels are to be/were resampled OR
                              a matrix with as many columns as stochastic parameters

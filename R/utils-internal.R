@@ -3,24 +3,57 @@
 #' @noRd
 
 .flatten_to_depth <- function(to_flatten, depth) {
+
+  protected <- lapply(to_flatten,
+                      function(x) isTRUE(attr(x, "flat_protect"))) %>%
+    unlist()
+
+  if(any(protected)) {
+
+    keep <- to_flatten[protected]
+
+    to_flatten <- to_flatten[! protected]
+
+  } else {
+
+    # Make sure "keep" exists, but append nothing
+
+    keep <- NULL
+
+  }
+
   if(rlang::is_empty(to_flatten) |
-     !rlang::is_list(to_flatten)) {
-    return(to_flatten)
+     ! rlang::is_list(to_flatten)) {
+
+    return(c(to_flatten, keep))
+
   }
 
   if(.depth(to_flatten) == depth) {
-    return(to_flatten)
+
+    return(c(to_flatten, keep))
+
   } else {
+
     to_flatten <- purrr::flatten(to_flatten)
+
+    to_flatten <- c(to_flatten, keep)
+
     .flatten_to_depth(to_flatten, depth)
+
   }
 }
 
 # Finds depth of current list
+#' @noRd
 
 .depth <- function(l, start = 0) {
-  if(!is.list(l)) {
+
+  if(!is.list(l) |
+     isTRUE(attr(l, "flat_protect"))) {
+
     return(start)
+
   } else {
     max(
       unlist(
@@ -28,6 +61,63 @@
       )
     )
   }
+}
+
+
+#' @noRd
+
+# Protects model objects from getting flattened. This is useful for user-specified
+# models where they use a `predict()` method and pass the model object into
+# the data list slot.
+
+.protect_model <- function(obj) {
+
+  # If the user has already defined this via use_vr_model, then
+  # we don't want to do anything to it
+
+  if(!is.null(attr(obj, "flat_protect"))) {
+    return(obj)
+  }
+
+  supported_models <- .supported_models()
+
+  if(inherits(obj, supported_models)) {
+
+    attr(obj, "flat_protect") <- TRUE
+
+  } else {
+
+    attr(obj, "flat_protect") <- FALSE
+
+  }
+
+  return(obj)
+
+}
+
+#' @noRd
+# vector of model classes that ipmr will allow to be used in predict() expressions.
+# I actually don't think some of these even have predict methods, but just being
+# safe.
+
+.supported_models <- function() {
+
+  c("lm",
+    "glm",
+    "gam",
+    "gls",
+    "lme",
+    "betareg",
+    "biglm",
+    "glmnet",
+    "gamlss",
+    "nls",
+    "MCMCglmm",
+    "rjags",
+    "merMod",
+    "brmsfit",
+    "stanfit")
+
 }
 
 #' @noRd

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute the per-capita growth rate for an IPM object — lambda • ipmr</title>
+<title>Raw demographic data to construct an example IPM — iceplant_ex • ipmr</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Compute the per-capita growth rate for an IPM object — lambda" />
-<meta property="og:description" content="Compute the per-capita growth rate for an IPM object" />
+<meta property="og:title" content="Raw demographic data to construct an example IPM — iceplant_ex" />
+<meta property="og:description" content="Raw demographic data to construct an example IPM" />
 
 
 
@@ -141,84 +141,36 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute the per-capita growth rate for an IPM object</h1>
+    <h1>Raw demographic data to construct an example IPM</h1>
     
-    <div class="hidden name"><code>lambda.Rd</code></div>
+    <div class="hidden name"><code>raw_data_ex.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compute the per-capita growth rate for an IPM object</p>
+    <p>Raw demographic data to construct an example IPM</p>
     </div>
 
-    <pre class="usage"><span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='no'>iceplant_ex</span></pre>
 
-<span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>), <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"last"</span>, <span class='no'>...</span>)
 
-<span class='co'># S3 method for simple_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span>(
-  <span class='no'>ipm</span>,
-  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>),
-  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>),
-  <span class='no'>...</span>
-)
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-<span class='co'># S3 method for simple_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span>(
-  <span class='no'>ipm</span>,
-  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>),
-  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>),
-  <span class='no'>...</span>
-)
+    <p>288 observations of 10 variables</p><dl'>
 
-<span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"last"</span>, <span class='no'>...</span>)
+  <dt>id</dt><dd><p>Individual identification number</p></dd>
+  <dt>size</dt><dd><p>Surface area in square meters of each individual at time <em>t</em>.</p></dd>
+  <dt>flower_n</dt><dd><p>If the plant is reproductive, the number of flowers it made.</p></dd>
+  <dt>log_size</dt><dd><p>Log transformed <code>size</code>.</p></dd>
+  <dt>repro</dt><dd><p>Either 0 or 1 to indicate whether the plant is reproductive.</p></dd>
+  <dt>size_next</dt><dd><p>Surface area in square meters of each individual at time <em>t + 1</em>.</p></dd>
+  <dt>flower_n_next</dt><dd><p>If the plant is reproductive at <em>t + 1</em>, the nubmer of
+  flowers it made.</p></dd>
+  <dt>survival</dt><dd><p>Either 0 or 1 to indicate whether a plant at <em>t</em> survives to <em>t + 1</em>.</p></dd>
+  <dt>log_size_next</dt><dd><p>Log transformed <code>size_next</code>.</p></dd>
+  <dt>repro_next</dt><dd><p>Either 0 or 1 to indicate whether a plant is reproductive at <em>t + 1</em>.</p></dd>
 
-<span class='co'># S3 method for general_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>))
+</dl>
 
-<span class='co'># S3 method for general_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>))</pre>
-
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>ipm</th>
-      <td><p>An object returned by <code><a href='make_ipm.html'>make_ipm()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>other arguments passed to methods.</p></td>
-    </tr>
-    <tr>
-      <th>comp_method</th>
-      <td><p>Either <code>"eigen"</code> or <code>"pop_size"</code>. <code>"eigen"</code>
-is only possible for <code>"simple_*"</code> methods.</p></td>
-    </tr>
-    <tr>
-      <th>type_lambda</th>
-      <td><p>Either <code>'all'</code>, <code>'last'</code>,
- or <code>'stochastic'</code>. <code>'all'</code>
-returns a vector of lambda values for each time step of the simulation (equal
-in length to the <code>iterations</code> argument of <code><a href='make_ipm.html'>make_ipm()</a></code>).
-<code>'last'</code> returns the lambda value for the final timestep.
-<code>'stochastic'</code> returns a single value which is the geometric mean
-of log-per-capita growth rate from each time step.</p></td>
-    </tr>
-    </table>
-
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A single numeric vector or single value.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>There are two possible methods for computing <code>lambda</code> and these
-are controlled by the <code>comp_method</code> argument. Possible values are
-<code>"eigen"</code> and <code>"pop_size"</code>. The first computes the dominant
-eigenvalue of all entries in <code>ipm$iterators</code> slot of the <code>*_ipm</code>
-object. Since iteration kernels aren't generated for <code>general_*</code> methods,
-<code>"pop_size"</code> is the only possible option for those objects.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

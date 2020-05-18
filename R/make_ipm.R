@@ -147,6 +147,7 @@ make_ipm.simple_di_det <- function(proto_ipm,
                                                  master_env)
 
   # construct the kernels from their function defintions
+
   env_list      <- list(master_env = master_env)
 
   all_sub_kerns <- .make_sub_kernel_simple(others,
@@ -1019,16 +1020,16 @@ make_ipm.simple_dd_det <- function(proto_ipm,
     # Use iterate_kerns_simple with iterations = 1. We have to rebuild kernels
     # each time so don't want to pass more than that
 
-    pop_state <- .iterate_kerns_simple(iterator,
-                                       sub_kernels,
-                                       iterations = 1,
-                                       current_iteration = i,
-                                       kern_seq = NULL,
-                                       pop_state,
-                                       master_env,
-                                       proto_ipm,
-                                       k_row,
-                                       normalize_pop_size)
+    pop_state <- .iterate_model(proto_ipm,
+                                iterator,
+                                sub_kernels,
+                                iterations = 1,
+                                current_iteration = i,
+                                kern_seq = NULL,
+                                pop_state,
+                                master_env,
+                                k_row,
+                                normalize_pop_size)
 
     names(iterator)    <- paste(names(iterator), i, sep = "_")
     names(sub_kernels) <- paste(names(sub_kernels), i, sep = "_")
