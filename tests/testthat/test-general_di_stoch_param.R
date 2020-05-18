@@ -351,8 +351,9 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
 
 
 # Store for comparison!
-ipmr_lambdas <- ipmr:::.lambda_pop_size(gen_di_stoch_param,
-                                              all_lambdas = TRUE)
+ipmr_lambdas <- lambda(gen_di_stoch_param,
+                       type_lambda = 'all') %>%
+  as.vector()
 
 # Now, get the sequence of environmental parameters. These will get inserted into
 # the test case to make sure we're recapturing the population dynamics
@@ -920,7 +921,8 @@ test_that('normalize_pop_vec works', {
     )
 
   lambdas_ipmr_norm <- lambda(gen_di_stoch_param,
-                              type_lambda = 'all')
+                              type_lambda = 'all') %>%
+    as.vector()
 
 
   param_seq <- gen_di_stoch_param$env_seq

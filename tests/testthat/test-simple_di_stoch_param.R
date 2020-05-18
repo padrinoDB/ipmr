@@ -154,7 +154,8 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
 pop_state_ipmr <- test_stoch_param$pop_state$pop_state_surf_area
 lambda_ipmr <- lambda(test_stoch_param,
                       comp_method = 'pop_size',
-                      type_lambda = 'all')
+                      type_lambda = 'all') %>%
+  as.vector()
 
 # Now, use the env_seq to plug into this loop for each iteration and see if
 # lambdas are identical. If not, then find a bridge and jump
@@ -339,7 +340,8 @@ test_that('normalize pop_vectors works as it should', {
 
   lambdas_norm <- lambda(test_stoch_param,
                          comp_method = 'pop_size',
-                         type_lambda = 'all')
+                         type_lambda = 'all') %>%
+    as.vector()
 
   pop_holder       <- array(NA_real_, dim = c(100, 11))
   pop_holder[ , 1] <- init_pop_vec / sum(init_pop_vec)

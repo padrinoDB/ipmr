@@ -351,11 +351,11 @@ test_that('iteration methods work the same as eigenvalue methods', {
   lambda_it <- lambda(it, comp_method = 'pop_size')
   lambda_eig <- lambda(it, comp_method = 'eigen')
   names(lambda_eig) <- NULL
+  names(lambda_it)  <- NULL
 
-  conv_lamb <- lambda_it[100]
 
-  expect_equal(conv_lamb, lambda_ipmr)
-  expect_equal(conv_lamb, lambda_eig)
+  expect_equal(lambda_it, lambda_ipmr)
+  expect_equal(lambda_it, lambda_eig)
 
 
 })
@@ -405,11 +405,12 @@ test_that('normalizing pop vector produces same lambdas as eigen methods', {
              iterations = 100,
              normalize_pop_size = TRUE)
 
-  lambda_it <- lambda(it, comp_method = 'pop_size')
+  lambda_it <- lambda(it, type_lambda = 'last', comp_method = 'pop_size')
   lambda_eig <- lambda(it, comp_method = 'eigen')
   names(lambda_eig) <- NULL
+  names(lambda_it)  <- NULL
 
-  conv_lamb <- lambda_it[100]
+  conv_lamb <- lambda_it
 
   expect_equal(conv_lamb, lambda_ipmr)
   expect_equal(conv_lamb, lambda_eig)
@@ -617,9 +618,7 @@ hier_mod <- init_ipm('simple_di_det') %>%
            normalize_pop_size = FALSE)
 
 lambdas_ipmr_eigen <- lambda(hier_mod, comp_method = 'eigen')
-lambdas_ipmr_pop   <- vapply(hier_mod$pop_state[grepl("lambda", names(hier_mod$pop_state))],
-                             function(x) x[ , 100],
-                             numeric(1L))
+lambdas_ipmr_pop   <- lambda(hier_mod, comp_method = 'pop_size')
 
 names(lambdas_ipmr_pop) <- paste("K_", 1:5, sep = "")
 

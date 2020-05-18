@@ -12,27 +12,27 @@
 \usage{
 lambda(ipm, ...)
 
-\method{lambda}{simple_di_det_ipm}(ipm, comp_method = c("eigen", "pop_size"), type_lambda = "all", ...)
+\method{lambda}{simple_di_det_ipm}(ipm, comp_method = c("eigen", "pop_size"), type_lambda = "last", ...)
 
 \method{lambda}{simple_di_stoch_kern_ipm}(
   ipm,
   comp_method = c("eigen", "pop_size"),
-  type_lambda = c("all", "stochastic"),
+  type_lambda = c("all", "last", "stochastic"),
   ...
 )
 
 \method{lambda}{simple_di_stoch_param_ipm}(
   ipm,
   comp_method = c("eigen", "pop_size"),
-  type_lambda = c("all", "stochastic"),
+  type_lambda = c("all", "last", "stochastic"),
   ...
 )
 
-\method{lambda}{general_di_det_ipm}(ipm, type_lambda = "all", ...)
+\method{lambda}{general_di_det_ipm}(ipm, type_lambda = "last", ...)
 
-\method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., type_lambda = c("all", "stochastic"))
+\method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., type_lambda = c("all", "last", "stochastic"))
 
-\method{lambda}{general_di_stoch_param_ipm}(ipm, ..., type_lambda = c("all", "stochastic"))
+\method{lambda}{general_di_stoch_param_ipm}(ipm, ..., type_lambda = c("all", "last", "stochastic"))
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
@@ -42,9 +42,11 @@ lambda(ipm, ...)
 \item{comp_method}{Either \code{"eigen"} or \code{"pop_size"}. \code{"eigen"}
 is only possible for \code{"simple_*"} methods.}
 
-\item{type_lambda}{Either \code{'all'} or \code{'stochastic'}. \code{'all'}
+\item{type_lambda}{Either \code{'all'}, \code{'last'},
+ or \code{'stochastic'}. \code{'all'}
 returns a vector of lambda values for each time step of the simulation (equal
 in length to the \code{iterations} argument of \code{make_ipm()}).
+\code{'last'} returns the lambda value for the final timestep.
 \code{'stochastic'} returns a single value which is the geometric mean
 of log-per-capita growth rate from each time step.}
 }

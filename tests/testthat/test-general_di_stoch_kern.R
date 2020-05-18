@@ -710,7 +710,8 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
 
 ipmr_lambdas <- lambda(gen_di_stoch_kern,
                        comp_method = 'pop_size',
-                       type_lambda = "all")
+                       type_lambda = "all") %>%
+  as.vector()
 
 test_that('ipmr version matches simulation', {
 
@@ -1211,7 +1212,8 @@ test_that('normalize pop vec works', {
 
   lambdas_ipmr <- lambda(gen_di_stoch_kern,
                          comp_method = 'pop_size',
-                         type_lambda = 'all')
+                         type_lambda = 'all') %>%
+    as.vector()
 
   pop_holder <- list(n_leaf_l = array(NA_real_, dim = c(50, 101)),
                      n_sqt_ar = array(NA_real_, dim = c(50, 101)),

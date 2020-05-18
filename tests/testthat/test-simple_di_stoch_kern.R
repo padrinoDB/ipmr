@@ -605,7 +605,8 @@ test_that('normalizing pop vector gets same lambdas as before', {
              iterations = 100,
              kernel_seq = usr_seq)
 
-  lambdas_test <- lambda(test_norm_1, comp_method = 'pop_size', type_lambda = 'all')
+  lambdas_test <- lambda(test_norm_1, comp_method = 'pop_size', type_lambda = 'all') %>%
+    as.vector()
 
   pop_holder       <- array(NA_real_, dim = c(100, 101))
   pop_holder[ , 1] <- init_pop / sum(init_pop)
