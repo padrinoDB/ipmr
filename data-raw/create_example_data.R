@@ -1,5 +1,7 @@
 # Create a simple deterministic IPM
 
+devtools::load_all()
+
 data_list = list(s_int = 2.2,
                  s_slope = 0.25,
                  g_int = 0.2,
@@ -180,4 +182,13 @@ gen_di_det_ex <- init_ipm("general_di_det") %>%
   make_ipm(iterations = 100,
            usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_2 = inv_logit_2))
+
+
+usethis::use_data(sim_di_det_ex, overwrite = TRUE)
+usethis::use_data(gen_di_det_ex, overwrite = TRUE)
+
+iceplant_ex <- read.csv("data-raw/iceplant_ex.csv",
+                        stringsAsFactors = FALSE)
+
+usethis::use_data(iceplant_ex, overwrite = TRUE)
 
