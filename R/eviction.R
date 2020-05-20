@@ -8,7 +8,8 @@
 #' @param fun The cumulative density function to use. For example, could be
 #' \code{"norm"} to correct a Gaussian density function, or \code{"lnorm"} to
 #' correct a log-normal density function.
-#' @param param The parameter/vital rate being modified
+#' @param param The parameter/vital rate being modified. If this is a vector, the
+#' distribution specified in \code{fun} will be recycled.
 #' @param L Optionally, the name of the lower bound of the domain. Otherwise,
 #' the function will try to find the \code{param} inside of the \code{proto_ipm}
 #' object under construction and use that to infer the domain of the function.
@@ -17,7 +18,8 @@
 #' object under construction and use that to infer the domain of the function.
 #' @param ... Only used for internal modification - do not use!
 #'
-#' @return A matrix of the same dimension as the input.
+#' @return A modified function call with that re-scales the probability density
+#' function based on the cumulative density function.
 #'
 #' @references
 #' Williams JL, Miller TEX & Ellner SP, (2012). Avoiding unintentional eviction

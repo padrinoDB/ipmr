@@ -11,7 +11,8 @@ truncated_distributions(fun, param, L = NA, U = NA, ...)
 \code{"norm"} to correct a Gaussian density function, or \code{"lnorm"} to
 correct a log-normal density function.}
 
-\item{param}{The parameter/vital rate being modified}
+\item{param}{The parameter/vital rate being modified. If this is a vector, the
+distribution specified in \code{fun} will be recycled.}
 
 \item{L}{Optionally, the name of the lower bound of the domain. Otherwise,
 the function will try to find the \code{param} inside of the \code{proto_ipm}
@@ -24,7 +25,8 @@ object under construction and use that to infer the domain of the function.}
 \item{...}{Only used for internal modification - do not use!}
 }
 \value{
-A matrix of the same dimension as the input.
+A modified function call with that re-scales the probability density
+function based on the cumulative density function.
 }
 \description{
 Various helpers to correct for unintentional eviction (Williams
