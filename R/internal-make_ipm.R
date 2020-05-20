@@ -575,12 +575,17 @@
 
   if(current_iteration == 1) {
 
+    env_var_nms <- names(env_temp) %>%
+      strsplit('\\.') %>%
+      vapply(function(x) x[length(x)], character(1L))
+
+
     output$env_seq <- matrix(NA_real_,
                              nrow = tot_iterations,
                              ncol = length(env_temp),
                              byrow = TRUE,
                              dimnames = list(c(NULL),
-                                             c(names(env_temp))))
+                                             c(env_var_nms)))
 
   }
 
@@ -880,7 +885,8 @@
                                                         kernels,
                                                         kernel_seq,
                                                         iterations),
-                'usr_specified'      = .make_usr_seq(kernels,
+                'usr_specified'      = .make_usr_seq(proto,
+                                                     kernels,
                                                      kernel_seq,
                                                      iterations),
                 'internal'           = .make_internal_seq(proto, iterations))
@@ -915,7 +921,7 @@
 
 #' @noRd
 
-.make_usr_seq <- function(kernels, kernel_seq, iterations) {
+.make_usr_seq <- function(proto, kernels, kernel_seq, iterations) {
 
   if(is.integer(kernel_seq)) {
 
@@ -927,9 +933,11 @@
 
   nms_test <- logical(length(unique(kernel_seq)))
 
+  pos_ids  <- proto[proto$has_hier_effs, ]
+
   for(i in seq_along(unique(kernel_seq))) {
 
-    nms_test[i] <- any(grepl(kernel_seq[i], names(kernels)))
+    nms_test[i] <- any(grepl(kernel_seq[i], pos_ids))
 
   }
 

@@ -890,8 +890,7 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
 
     }
 
-    # Variant that doesn't require an "iterator" slot. also skips a few
-    # steps that are now handled by .iterate_kerns_general. See comment below.
+    # Variant that doesn't require an "iterator" slot
 
     temp         <- .update_param_general_output(sub_kernels,
                                                  pop_state,
@@ -901,9 +900,14 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
                                                  iterations,
                                                  i)
 
-    # Differs from update pop_sate here because master_env is modified
-    # in .iterate_kerns_general. Thus, once we've updated the sub_kernel and
-    # env_* slots, we're done!
+  }
+
+  temp$env_seq <- data.frame(temp$env_seq, stringsAsFactors = FALSE)
+
+  if(!is.null(kern_seq)) {
+
+    temp$env_seq <- cbind(temp$env_seq,
+                          kernel_seq = kern_seq)
 
   }
 
