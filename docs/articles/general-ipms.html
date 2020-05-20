@@ -118,7 +118,6 @@
 <h2 class="hasAnchor">
 <a href="#a-general-density-independent-deterministic-ipm" class="anchor"></a>A general, density independent, deterministic IPM</h2>
 <p>We’ll start with the least complicated of the general IPMs and build progressively from there. If you’ve already covered the <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">Intro to ipmr</a>, then most of this will look pretty familiar. If not, it is probably best to at least skim the first few sections before proceeding here.</p>
-<p>We’ll use</p>
 <div id="key-differences-between-simple-and-general-ipms-" class="section level3">
 <h3 class="hasAnchor">
 <a href="#key-differences-between-simple-and-general-ipms-" class="anchor"></a>Key differences between simple and general IPMs.</h3>
@@ -126,19 +125,14 @@
 <p>Relative to how we define simple models in <code>ipmr</code>, there are now four new bits:</p>
 <ol style="list-style-type: decimal">
 <li><p>We are required to <code><a href="../reference/define_star.html">define_pop_state()</a></code> before calling <code><a href="../reference/make_ipm.html">make_ipm()</a></code>.</p></li>
-<li><p>Each kernel that has an integration requires that <code>d_statevariable</code> get appended to the kernel <code>formula</code>. This is equivalent to the “dz” in <span class="math inline">\(\int_L^U K(z',z) n(z,t) \mathrm{dz}\)</span>. <code>ipmr</code> automatically generates this variable internally, so there is no need to define it in the <code>data_list</code> or <code><a href="../reference/define_star.html">define_domains()</a></code>, we can just add it any of the formula(e) that we want to. We skipped this step in the simple IPMs because it gets appended internally. Unfortunately, it is decidedly less easy to infer the correct state variable to <code>d_z</code> with for general IPMs where there may be many continuous and/or discrete states.</p></li>
-</ol>
-<ul>
-<li>NOTE: if in doubt, kernels that have a probability density function (e.g. <code>dnorm</code>, <code>dlnorm</code>, <code>dgamma</code>) in one of the underlying vital rates will pretty much always require this. Kernels that don’t use these density functions may or may not require them.</li>
-</ul>
-<ol start="3" style="list-style-type: decimal">
+<li><p>Each kernel that has an integration requires that <code>d_statevariable</code> get appended to the kernel <code>formula</code>. This is equivalent to the “dz” in <span class="math inline">\(\int_L^U K(z',z) n(z,t) \mathrm{dz}\)</span>. <code>ipmr</code> automatically generates this variable internally, so there is no need to define it in the <code>data_list</code> or <code><a href="../reference/define_star.html">define_domains()</a></code>, we can just add it any of the formula(s) that we want to. We skipped this step in the simple IPMs because it gets appended automatically. Unfortunately, it is decidedly less easy to infer the correct state variable to <code>d_z</code> with for general IPMs where there may be many continuous and/or discrete states.</p></li>
 <li><p>We don’t necessarily define a formula for <span class="math inline">\(K(z',z)\)</span> as we did in the simple IPMs. This is due to the point above about using iteration based methods for computing. Instead, we define how the kernels manipulate different population states at time <span class="math inline">\(t\)</span> to produce new states at time <span class="math inline">\(t+1\)</span>.</p></li>
-<li><p>The implmentation arguments list can now have <code>NA</code>s in the <code>dom_start</code> and <code>dom_end</code> slots. This is demonstrated in a separate chunk below.</p></li>
+<li><p>The implementation arguments list can now have <code>NA</code>s in the <code>dom_start</code> and <code>dom_end</code> slots. This is demonstrated in a separate chunk below.</p></li>
 </ol>
 <p>This example will use a single discrete stage (seed bank, abbreviated <code>b</code>) and a single continuous state (height, abbreviated <code>ht</code>). Reproduction is time-lagged so all seeds must enter the seed bank. They can either germinate in the next year, or they can die (so <code>stay_discrete</code> = 0). Thus, the full model takes the following form:</p>
 <ol style="list-style-type: decimal">
 <li><p><span class="math inline">\(n(z', t + 1) = \int_L^U P(z', z) n(z,t)d\mathrm{z} + b(t) * \int_L^U leave\_discrete(z') \mathrm{dz'}\)</span></p></li>
-<li><p><span class="math inline">\(b(t + 1) = go\_discrete(z) + stay\_discrete\)</span></p></li>
+<li><p><span class="math inline">\(b(t + 1) = \int_L^Ugo\_discrete(z) n(z,t)d\mathrm{z}+ stay\_discrete\)</span></p></li>
 <li><p><span class="math inline">\(P(z',z) = s * g\)</span></p></li>
 <li><p><span class="math inline">\(go\_discrete(z) = f_s * f_r * g_i\)</span></p></li>
 <li><p><span class="math inline">\(leave\_discrete(z') = e_p * \int_L^Uf_d(z') \mathrm{dz}\)</span></p></li>
@@ -147,9 +141,9 @@
 <p>The vital rates functions and example code to fit them are:</p>
 <ol style="list-style-type: decimal">
 <li>
-<p>survival (<code>s</code>): A logistic regression</p>
+<p>survival (<code>s</code>): A logistic regression with a squared term</p>
 <ul>
-<li>Example code: <code><a href="https://rdrr.io/r/stats/glm.html">glm(surv ~ ht_1, data = my_surv_data, family = binomial())</a></code>
+<li>Example code: <code><a href="https://rdrr.io/r/stats/glm.html">glm(surv ~ ht_1 + I(ht_1)^2, data = my_surv_data, family = binomial())</a></code>
 </li>
 </ul>
 </li>
@@ -264,7 +258,7 @@
   ) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
     <span class="kw">name</span>          <span class="kw">=</span> <span class="st">"go_discrete"</span>,
-    <span class="kw">formula</span>       <span class="kw">=</span> <span class="no">f_r</span> * <span class="no">f_s</span> * <span class="no">g_i</span>,
+    <span class="kw">formula</span>       <span class="kw">=</span> <span class="no">f_r</span> * <span class="no">f_s</span> * <span class="no">g_i</span> * <span class="no">d_ht</span>,
 
     <span class="co"># Note that now, family = "CD" becuase it denotes a continuous -&gt; discrete transition</span>
 
@@ -607,38 +601,38 @@
 <div id="general-models-with-continuously-varying-environments" class="section level2">
 <h2 class="hasAnchor">
 <a href="#general-models-with-continuously-varying-environments" class="anchor"></a>General models with continuously varying environments</h2>
-<p>We can also use continuously varying parameters to construct general IPMs. These are usually the result of multivariate and/or mixed effects models where joint parameter distributions are modeled, or environmental variation is included by sampling from environmental state distributions and using draws in vital rate expressions. Most Bayesian vital rate models would fall into this category as well. <code>ipmr</code> handles these using <code><a href="../reference/define_star.html">define_env_state()</a></code>, which can take both functions and data and generate draws from distributions during each iteration of the model.</p>
+<p>We can also use continuously varying parameters to construct general IPMs. These are usually the result of multivariate and/or mixed effects models where joint parameter distributions are modeled, or some environmental variation is included in the vital rate models. <code>ipmr</code> handles these using <code><a href="../reference/define_star.html">define_env_state()</a></code>, which can take both functions and data and generate draws from distributions during each iteration of the model.</p>
 <p>We’ll use a variation of the parameter resampled model from the <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">introduction</a> vignette that will now include a discrete stage.</p>
 <div id="vital-rate-models" class="section level3">
 <h3 class="hasAnchor">
 <a href="#vital-rate-models" class="anchor"></a>Vital rate models</h3>
 <p>The first chunk below initializes the parameters and functions that the model uses. It takes the place of the usual vital rate model fitting process.</p>
-<p>This example uses two Bayesian models for survival and growth and a single function to sample them to illustrate how to use continuously varying parameter distributions in <code>ipmr</code>. This only uses two models and one function to limit the the complexity of the example - there is no upper limit on the number of parameters or functions we can use in our own models.</p>
+<p>This example uses survival and growth that include environmental covariates. We create a single function to sample the covariates to illustrate how to use continuously varying parameter distributions in <code>ipmr</code>. This only uses two models and one function to limit the the complexity of the example - there is no upper limit on the number of parameters or functions we can use in our own models.</p>
 <p>The vital rate functions are described here:</p>
 <ol style="list-style-type: decimal">
 <li>
-<p>survival (<code>s</code>): a Bayesian logistic regression.</p>
+<p>survival (<code>s</code>): a logistic regression.</p>
 <ul>
-<li>example model formula: <code>brm(survival ~ size_1, data = my_surv_data, family = bernoulli(), chains = 4,iter = 2000, warmup = 1000)</code>
+<li>example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(survival ~ size_1 + temp + precip, data = my_surv_data, family = binomial())</a></code>
 </li>
 </ul>
 </li>
 <li>
-<p>growth (<code>g</code>): a Bayesian linear regression</p>
+<p>growth (<code>g</code>): a linear regression</p>
 <ul>
-<li>example model formula: <code>brm(size_2 ~ size_1, data = my_grow_data, family = gaussian(), chains = 4,iter = 2000, warmup = 1000)</code>
+<li>example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(size_2 ~ size_1 + temp + precip, data = my_grow_data)</a></code>
 </li>
 </ul>
 </li>
 <li>
-<p>flower probability (<code>f_r</code>): A non-bayesian logistic regression.</p>
+<p>flower probability (<code>f_r</code>): A logistic regression.</p>
 <ul>
 <li>example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(repro ~ size_1, data = my_repro_data, family = binomial())</a></code>
 </li>
 </ul>
 </li>
 <li>
-<p>seed production (<code>f_s</code>): a non-bayesian logistic regression.</p>
+<p>seed production (<code>f_s</code>): a logistic regression.</p>
 <ul>
 <li>example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(flower_n ~ size_1, data = my_flower_data, family = poisson())</a></code>
 </li>
@@ -658,53 +652,55 @@
 
 <span class="co"># Define the fixed parameters in a list</span>
 
-<span class="no">constant_params</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">f_r_int</span>   <span class="kw">=</span> <span class="fl">0.3</span>,
-                        <span class="kw">f_r_slope</span> <span class="kw">=</span> <span class="fl">0.03</span>,
-                        <span class="kw">f_s_int</span>   <span class="kw">=</span> <span class="fl">0.4</span>,
-                        <span class="kw">f_s_slope</span> <span class="kw">=</span> <span class="fl">0.01</span>,
-                        <span class="kw">f_d_mu</span>    <span class="kw">=</span> <span class="fl">1.1</span>,
-                        <span class="kw">f_d_sd</span>    <span class="kw">=</span> <span class="fl">0.1</span>,
-                        <span class="kw">r_e</span>       <span class="kw">=</span> <span class="fl">0.3</span>,
-                        <span class="kw">r_d</span>       <span class="kw">=</span> <span class="fl">0.3</span>,
-                        <span class="kw">r_r</span>       <span class="kw">=</span> <span class="fl">0.2</span>,
-                        <span class="kw">r_s</span>       <span class="kw">=</span> <span class="fl">0.2</span>)
-
-<span class="co"># Simulate some random parameters to define the multivariate distribution</span>
-<span class="co"># to sample from. In user specified models, this might be replaced by</span>
-<span class="co"># cbind(posterior_samples(my_surv_mod), posterior_samples(my_grow_mod)).</span>
-
-<span class="no">posterior_distribution</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(
-  <span class="kw">s_int</span>     <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">4000</span>, <span class="kw">mean</span> <span class="kw">=</span> -<span class="fl">3</span>, <span class="kw">sd</span> <span class="kw">=</span> <span class="fl">2</span>),
-  <span class="kw">s_slope</span>   <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html">rgamma</a></span>(<span class="fl">4000</span>, <span class="kw">shape</span> <span class="kw">=</span> <span class="fl">1</span>), <span class="co"># slope should be positive for this example</span>
-  <span class="kw">g_int</span>     <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">4000</span>),
-  <span class="kw">g_slope</span>   <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">4000</span>, <span class="fl">0.85</span>, <span class="fl">1.15</span>),
-  <span class="kw">g_sd</span>      <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">4000</span>, <span class="fl">0.75</span>, <span class="fl">3</span>)
+<span class="no">constant_params</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+  <span class="kw">s_int</span>     <span class="kw">=</span> -<span class="fl">5</span>,
+  <span class="kw">s_slope</span>   <span class="kw">=</span> <span class="fl">2.2</span>,
+  <span class="kw">s_precip</span>  <span class="kw">=</span> <span class="fl">0.0002</span>,
+  <span class="kw">s_temp</span>    <span class="kw">=</span> -<span class="fl">0.003</span>,
+  <span class="kw">g_int</span>     <span class="kw">=</span> <span class="fl">0.2</span>,
+  <span class="kw">g_slope</span>   <span class="kw">=</span> <span class="fl">1.01</span>,
+  <span class="kw">g_sd</span>      <span class="kw">=</span> <span class="fl">1.2</span>,
+  <span class="kw">g_temp</span>    <span class="kw">=</span> -<span class="fl">0.002</span>,
+  <span class="kw">g_precip</span>  <span class="kw">=</span> <span class="fl">0.004</span>,
+  <span class="kw">f_r_int</span>   <span class="kw">=</span> <span class="fl">0.3</span>,
+  <span class="kw">f_r_slope</span> <span class="kw">=</span> <span class="fl">0.03</span>,
+  <span class="kw">f_s_int</span>   <span class="kw">=</span> <span class="fl">0.4</span>,
+  <span class="kw">f_s_slope</span> <span class="kw">=</span> <span class="fl">0.01</span>,
+  <span class="kw">f_d_mu</span>    <span class="kw">=</span> <span class="fl">1.1</span>,
+  <span class="kw">f_d_sd</span>    <span class="kw">=</span> <span class="fl">0.1</span>,
+  <span class="kw">r_e</span>       <span class="kw">=</span> <span class="fl">0.3</span>,
+  <span class="kw">r_d</span>       <span class="kw">=</span> <span class="fl">0.3</span>,
+  <span class="kw">r_r</span>       <span class="kw">=</span> <span class="fl">0.2</span>,
+  <span class="kw">r_s</span>       <span class="kw">=</span> <span class="fl">0.2</span>
 )
 
-<span class="co"># set the names to the parameter names we want to use in the model. These </span>
-<span class="co"># are already set in this example, but outputs from brms/rstan/lme4 may not be</span>
-<span class="co"># as conveniently named. </span>
+<span class="co"># Now, we create a set of environmental covariates. In this example, we use</span>
+<span class="co"># a normal distribution for temperature and a Gamma for precipitation. </span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">posterior_distribution</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(
-  <span class="st">'s_int'</span>,
-  <span class="st">'s_slope'</span>,
-  <span class="st">'g_int'</span>,
-  <span class="st">'g_slope'</span>,
-  <span class="st">'g_sd'</span>
+<span class="no">env_params</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+  <span class="kw">temp_mu</span> <span class="kw">=</span> <span class="fl">8.9</span>,
+  <span class="kw">temp_sd</span> <span class="kw">=</span> <span class="fl">1.2</span>,
+  <span class="kw">precip_shape</span> <span class="kw">=</span> <span class="fl">1000</span>,
+  <span class="kw">precip_rate</span>  <span class="kw">=</span> <span class="fl">2</span>
 )
 
-<span class="co"># We define a wrapper function that samples from a data frame containing the</span>
-<span class="co"># joint posterior distribution of each parameter. In this case, all posterior</span>
-<span class="co"># samples are weighted as equally probable for the sake of simplicity. One could</span>
-<span class="co"># modify this to generate more realistic sampling probabilities.</span>
+<span class="co"># We define a wrapper function that samples from these distributions</span>
 
-<span class="no">posterior_sample</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">posterior_distrib</span>) {
+<span class="no">sample_env</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">env_params</span>) {
 
-  <span class="no">sample_pos</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(<span class="no">posterior_distrib</span>)[<span class="fl">1</span>], <span class="kw">by</span> <span class="kw">=</span> <span class="fl">1</span>)
+  <span class="co"># We generate one value for each covariate per iteration, and return it </span>
+  <span class="co"># as a named list. We can reference the names in this list in vital rate </span>
+  <span class="co"># expressions.</span>
 
-  <span class="no">sample_ind</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="no">sample_pos</span>, <span class="kw">size</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">prob</span> <span class="kw">=</span> <span class="kw">NULL</span>)
+  <span class="no">temp</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">1</span>,
+                <span class="no">env_params</span>$<span class="no">temp_mu</span>,
+                <span class="no">env_params</span>$<span class="no">temp_sd</span>)
 
-  <span class="no">out</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="no">posterior_distrib</span>[<span class="no">sample_ind</span> , ])
+  <span class="no">precip</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html">rgamma</a></span>(<span class="fl">1</span>,
+                   <span class="kw">shape</span> <span class="kw">=</span> <span class="no">env_params</span>$<span class="no">precip_shape</span>,
+                   <span class="kw">rate</span> <span class="kw">=</span> <span class="no">env_params</span>$<span class="no">precip_rate</span>)
+
+  <span class="no">out</span>        <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">temp</span> <span class="kw">=</span> <span class="no">temp</span>, <span class="kw">precip</span> <span class="kw">=</span> <span class="no">precip</span>)
 
   <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="no">out</span>)
 
@@ -714,8 +710,8 @@
 <span class="co"># Again, we can define our own functions and pass them into calls to make_ipm. This</span>
 <span class="co"># isn't strictly necessary, but can make the model code more readable/less error prone.</span>
 
-<span class="no">inv_logit</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">int</span>, <span class="no">slope</span>, <span class="no">sv1</span>) {
-  <span class="fl">1</span>/(<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(-(<span class="no">int</span> + <span class="no">slope</span> * <span class="no">sv1</span>)))
+<span class="no">inv_logit</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">lin_term</span>) {
+  <span class="fl">1</span>/(<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(-<span class="no">lin_term</span>))
 }</pre></body></html></div>
 </div>
 <div id="the-continuously-varying-general-ipm" class="section level3">
@@ -737,14 +733,10 @@
     <span class="co"># they are passed in define_env_state() as opposed to the kernel's</span>
     <span class="co"># data_list</span>
 
-    <span class="kw">g_mu</span>          <span class="kw">=</span> <span class="no">g_int</span> + <span class="no">g_slope</span> * <span class="no">surf_area_1</span>,
-    <span class="kw">g</span>             <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">surf_area_2</span>, <span class="no">g_mu</span>, <span class="no">g_sd</span>),
-    <span class="kw">s</span>             <span class="kw">=</span> <span class="fu">inv_logit</span>(<span class="no">s_int</span>, <span class="no">s_slope</span>, <span class="no">surf_area_1</span>),
-
-    <span class="co"># Every parameter in this particular kernel varies with the environment,</span>
-    <span class="co"># so we don't actually need to put the constant_params object into the</span>
-    <span class="co"># data_list. It never hurts though - the parameters in there are simply</span>
-    <span class="co"># ignored when the kernel is built.</span>
+    <span class="kw">g_mu</span>    <span class="kw">=</span> <span class="no">g_int</span> + <span class="no">g_slope</span> * <span class="no">surf_area_1</span> + <span class="no">g_temp</span> * <span class="no">temp</span> + <span class="no">g_precip</span> * <span class="no">precip</span>,
+    <span class="kw">s_lin_p</span> <span class="kw">=</span> <span class="no">s_int</span> + <span class="no">s_slope</span> * <span class="no">surf_area_1</span> + <span class="no">s_temp</span> * <span class="no">temp</span> + <span class="no">s_precip</span> * <span class="no">precip</span>,
+    <span class="kw">s</span>       <span class="kw">=</span> <span class="fu">inv_logit</span>(<span class="no">s_lin_p</span>),
+    <span class="kw">g</span>       <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">surf_area_2</span>, <span class="no">g_mu</span>, <span class="no">g_sd</span>),
 
     <span class="kw">data_list</span>     <span class="kw">=</span> <span class="no">constant_params</span>,
     <span class="kw">states</span>        <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"surf_area"</span>)),
@@ -756,7 +748,9 @@
     <span class="kw">name</span>          <span class="kw">=</span> <span class="st">"F_stoch"</span>,
     <span class="kw">family</span>        <span class="kw">=</span> <span class="st">"CC"</span>,
     <span class="kw">formula</span>       <span class="kw">=</span> <span class="no">f_r</span> * <span class="no">f_s</span> * <span class="no">f_d</span> * (<span class="fl">1</span> - <span class="no">r_e</span>) * <span class="no">d_surf_area</span>,
-    <span class="kw">f_r</span>           <span class="kw">=</span> <span class="fu">inv_logit</span>(<span class="no">f_r_int</span>, <span class="no">f_r_slope</span>, <span class="no">surf_area_1</span>),
+
+    <span class="kw">f_r_lin_p</span>     <span class="kw">=</span> <span class="no">f_r_int</span> + <span class="no">f_r_slope</span> * <span class="no">surf_area_1</span>,
+    <span class="kw">f_r</span>           <span class="kw">=</span> <span class="fu">inv_logit</span>(<span class="no">f_r_lin_p</span>),
     <span class="kw">f_s</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">f_s_int</span> + <span class="no">f_s_slope</span> * <span class="no">surf_area_1</span>),
     <span class="kw">f_d</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">surf_area_2</span>, <span class="no">f_d_mu</span>, <span class="no">f_d_sd</span>),
     <span class="kw">data_list</span>     <span class="kw">=</span> <span class="no">constant_params</span>,
@@ -775,7 +769,8 @@
 
     <span class="kw">family</span>        <span class="kw">=</span> <span class="st">"CD"</span>,
     <span class="kw">formula</span>       <span class="kw">=</span> <span class="no">r_e</span> * <span class="no">r_s</span> * <span class="no">f_r</span> * <span class="no">f_s</span> * <span class="no">d_surf_area</span>,
-    <span class="kw">f_r</span>           <span class="kw">=</span> <span class="fu">inv_logit</span>(<span class="no">f_r_int</span>, <span class="no">f_r_slope</span>, <span class="no">surf_area_1</span>),
+    <span class="kw">f_r_lin_p</span>     <span class="kw">=</span> <span class="no">f_r_int</span> + <span class="no">f_r_slope</span> * <span class="no">surf_area_1</span>,
+    <span class="kw">f_r</span>           <span class="kw">=</span> <span class="fu">inv_logit</span>(<span class="no">f_r_lin_p</span>),
     <span class="kw">f_s</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">f_s_int</span> + <span class="no">f_s_slope</span> * <span class="no">surf_area_1</span>),
     <span class="kw">data_list</span>     <span class="kw">=</span> <span class="no">constant_params</span>,
     <span class="kw">states</span>        <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"surf_area"</span>)),
@@ -820,8 +815,9 @@
 
     <span class="kw">n_surf_area_t_1</span> <span class="kw">=</span> <span class="no">C_stoch</span>        <span class="kw">%*%</span> <span class="no">n_surf_area_t</span> +
                       <span class="no">leave_discrete</span> <span class="kw">%*%</span> <span class="no">n_sb_t</span>,
-    <span class="kw">n_sb_t_1</span>        <span class="kw">=</span> <span class="no">go_discrete</span> <span class="kw">%*%</span> <span class="no">n_surf_area_t</span> +
-                      <span class="no">stay_discrete</span> <span class="kw">%*%</span> <span class="no">n_sb_t</span>,
+
+    <span class="kw">n_sb_t_1</span>        <span class="kw">=</span> <span class="no">go_discrete</span>    <span class="kw">%*%</span> <span class="no">n_surf_area_t</span> +
+                      <span class="no">stay_discrete</span>  <span class="kw">%*%</span> <span class="no">n_sb_t</span>,
 
     <span class="kw">states</span>        <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span> (<span class="st">"surf_area"</span>),
     <span class="kw">has_hier_effs</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
@@ -851,15 +847,15 @@
     <span class="kw">surf_area</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">10</span>, <span class="fl">100</span>)
   ) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="../reference/define_star.html">define_env_state</a></span>(
-    <span class="kw">env_params</span> <span class="kw">=</span> <span class="fu">posterior_sample</span>(<span class="no">posterior</span>),
-    <span class="kw">data_list</span>  <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">posterior</span> <span class="kw">=</span> <span class="no">posterior_distribution</span>)
+    <span class="kw">env_covs</span>   <span class="kw">=</span> <span class="fu">sample_env</span>(<span class="no">env_params</span>),
+    <span class="kw">data_list</span>  <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">env_params</span> <span class="kw">=</span> <span class="no">env_params</span>)
   ) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="../reference/define_star.html">define_pop_state</a></span>(
     <span class="kw">n_surf_area_t</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">100</span>),
     <span class="kw">n_sb_t</span>        <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html">rpois</a></span>(<span class="fl">1</span>, <span class="fl">20</span>)
   ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>(<span class="kw">usr_funs</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">inv_logit</span>        <span class="kw">=</span> <span class="no">inv_logit</span>,
-                           <span class="kw">posterior_sample</span> <span class="kw">=</span> <span class="no">posterior_sample</span>),
+  <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>(<span class="kw">usr_funs</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">inv_logit</span>  <span class="kw">=</span> <span class="no">inv_logit</span>,
+                           <span class="kw">sample_env</span> <span class="kw">=</span> <span class="no">sample_env</span>),
            <span class="kw">iterate</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
            <span class="kw">iterations</span> <span class="kw">=</span> <span class="fl">100</span>)
 

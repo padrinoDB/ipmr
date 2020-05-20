@@ -658,8 +658,18 @@ test_that('ipmr lambdas match user generated ones', {
 
   expect_true(all(kern_test))
 
+
 })
 
+
+test_that("other outputs are of the expected form", {
+
+  expect_equal(names(gen_di_stoch_param$env_seq),
+               rando_names)
+
+  # Add more
+
+})
 
 
 iterate_model_norm <- function(env_params,
