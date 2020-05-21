@@ -36,7 +36,7 @@ states <- c('dbh', 'dbh')
 
 sim_di_det_1 <- init_ipm('simple_di_det') %>%
   define_kernel("P",
-                formula = s_g_mult(s, g),
+                formula = s * g,
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = dnorm(dbh_2, mu_g, sd_g),
@@ -73,7 +73,7 @@ sim_di_det_1 <- init_ipm('simple_di_det') %>%
 
 sim_di_det_2 <- init_ipm('simple_di_det') %>%
   define_kernel("P",
-                formula = s_g_mult(s, g),
+                formula = s * g,
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = dnorm(dbh_2, mu_g, sd_g),
@@ -114,7 +114,7 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
 
 sim_di_det_3 <- init_ipm('simple_di_det') %>%
   define_kernel("P",
-                formula = s_g_mult(s, g),
+                formula = s * g,
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = dnorm(dbh_2, mu_g, sd_g),
@@ -260,7 +260,7 @@ params     <- splice(data_list, g_params, s_params, f_s_params)
 sim_di_stoch_kern <- init_ipm('simple_di_stoch_kern') %>%
   define_kernel(
     name             = 'P_yr',
-    formula          = s_g_mult(s_yr, g_yr) ,
+    formula          = s_yr * g_yr ,
     family           = "CC",
     s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
       (1 - inv_logit(ht_1, f_r_int, f_r_slope)),
@@ -384,7 +384,7 @@ init_pop_vec <- runif(100, 0, 10)
 sim_di_stoch_param <- init_ipm('simple_di_stoch_param') %>%
   define_kernel(
     'P',
-    formula = s_g_mult(s, g),
+    formula = s * g,
     family = 'CC',
     g_mu = g_int_yr + g_slope * surf_area_1,
     s = inv_logit(s_int_yr, s_slope, surf_area_1),
@@ -528,7 +528,7 @@ inv_logit_2 <- function(int, slope, slope_2, sv) {
 gen_di_det_1 <- init_ipm("general_di_det") %>%
   define_kernel(
     name          = "P",
-    formula       = s_g_mult(s, g) * d_ht,
+    formula       = s * g * d_ht,
     family        = "CC",
     g             = dnorm(ht_2, g_mu, g_sd),
     g_mu          = g_int + g_slope * ht_1,
@@ -605,7 +605,7 @@ gen_di_det_1 <- init_ipm("general_di_det") %>%
 gen_di_det_2 <- init_ipm("general_di_det") %>%
   define_kernel(
     name          = "P",
-    formula       = s_g_mult(s, g) * d_ht,
+    formula       = s * g * d_ht,
     family        = "CC",
     g             = dnorm(ht_2, g_mu, g_sd),
     g_mu          = g_int + g_slope * ht_1,
@@ -1531,7 +1531,7 @@ states <- c('dbh', 'dbh')
 
 sim_di_det_1 <- init_ipm('simple_di_det') %>%
   define_kernel("P",
-                formula = s_g_mult(s, g),
+                formula = s * g,
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = dnorm(dbh_2, mu_g, sd_g),
@@ -1583,7 +1583,7 @@ test_that('right_ev.simple_di_det iterates un-iterated model correctly', {
 
 sim_di_det_2 <- init_ipm('simple_di_det') %>%
   define_kernel("P",
-                formula = s_g_mult(s, g),
+                formula = s * g,
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = dnorm(dbh_2, mu_g, sd_g),
@@ -1623,7 +1623,7 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
 
 sim_di_det_3 <- init_ipm('simple_di_det') %>%
   define_kernel("P",
-                formula = s_g_mult(s, g),
+                formula = s * g,
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = dnorm(dbh_2, mu_g, sd_g),
@@ -1829,7 +1829,7 @@ inv_logit_2 <- function(int, slope, slope_2, sv) {
 gen_di_det_1 <- init_ipm("general_di_det") %>%
   define_kernel(
     name          = "P",
-    formula       = s_g_mult(s, g) * d_ht,
+    formula       = s * g * d_ht,
     family        = "CC",
     g             = dnorm(ht_2, g_mu, g_sd),
     g_mu          = g_int + g_slope * ht_1,
@@ -1924,7 +1924,7 @@ test_that('right_ev.general_di_det returns the same as mega-matrix methods', {
 gen_di_det_2 <- init_ipm("general_di_det") %>%
   define_kernel(
     name          = "P",
-    formula       = s_g_mult(s, g) * d_ht,
+    formula       = s * g * d_ht,
     family        = "CC",
     g             = dnorm(ht_2, g_mu, g_sd),
     g_mu          = g_int + g_slope * ht_1,

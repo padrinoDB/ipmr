@@ -14,7 +14,7 @@ n_mesh_p <- 1000
 
 single_state <- init_ipm('simple_di_det') %>%
   define_kernel("P",
-                formula = s_g_mult(s, g),
+                formula = s * g,
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = dnorm(dbh_2, mu_g, sd_g),
@@ -64,7 +64,7 @@ impl_args_2 <- make_impl_args_list(c('P_1',"P_2", 'F', 'K'),
 
 two_state <- init_ipm('simple_di_det') %>%
   define_kernel("P_1",
-                formula = s_g_mult(s, g), # make helper for double transposes
+                formula = s * g, # make helper for double transposes
                 family = "CC",
                 s = inv_logit(s_int, s_slope, ht_1),
                 g = dnorm(dbh_2, mu_g, sd_g),
@@ -79,7 +79,7 @@ two_state <- init_ipm('simple_di_det') %>%
                 evict_fun = truncated_distributions(g,
                                                     n_mesh_p = 100)) %>%
   define_kernel("P_2",
-                formula = s_g_mult(s, g), # make helper for double transposes
+                formula = s * g, # make helper for double transposes
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = dnorm(dbh_2, mu_g, sd_g),

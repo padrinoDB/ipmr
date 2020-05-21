@@ -31,7 +31,7 @@ states <- c('dbh', 'dbh')
 
 x <- init_ipm('simple_dd_det') %>%
   define_kernel("P",
-                formula = s_g_mult(s, g),
+                formula = s * g,
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = dnorm(dbh_2, mu_g, sd_g),

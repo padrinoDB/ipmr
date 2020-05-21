@@ -1412,7 +1412,7 @@ test_that('partially stochastic models also work', {
   det_version <- init_ipm("general_di_det") %>%
     define_kernel(
       name          = "P",
-      formula       = s_g_mult(s, g) * d_ht,
+      formula       = s * g * d_ht,
       family        = "CC",
       g             = dnorm(ht_2, g_mu, g_sd),
       g_mu          = g_int + g_slope * ht_1,

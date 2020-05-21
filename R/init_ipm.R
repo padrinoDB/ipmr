@@ -6,7 +6,7 @@
 #'
 #' @param model_class The type of IPM. See \code{Details} for more information on classes
 #'
-#' @return An object of classes \code{proto_ipm} and \code{class}
+#' @return An object with classes \code{proto_ipm} and \code{model_class}
 #'
 #' @details Combinations of \code{simple} or \code{general}, \code{dd} or \code{di},
 #' and \code{det} or \code{stoch} are separated by an underscore to tell \code{ipmr}
@@ -15,10 +15,10 @@
 #' or density dependence).
 #'
 #' Within \code{stoch} model types, there are two additional options to append to
-#' the class: \code{"kern"} or code{"param"}. These distinguish between models that
+#' the class: \code{"kern"} or \code{"param"}. These distinguish between models that
 #' use kernel resampling vs those that use parameter resampling (\emph{sensu} Metcalf et al.
 #' 2015). Below are quick definitions, more detailed explanations can be found
-#' in the \code{vignettes("classes", package = 'ipmr')}.
+#' in the \code{vignettes("ipmr-introduction", package = 'ipmr')}.
 #'
 #' \itemize{
 #'
@@ -47,22 +47,16 @@
 #'     these models build all of the iteration kernels ahead of time and then choose one
 #'     at random or in a user-specified order as they move from iteration to iteration. The
 #'     user-specified population vector is multiplied by the chosen kernel and the result
-#'     is multiplied by the next kernel for the desired number of iterations or until
-#'     convergence is reached (depending on what you request following \code{make_ipm()}.}
-#'     \item{\code{param}}{: used to denote parameter resampling. This generates distributions
-#'     for each parameter based on user-specified functions supplied to \code{define_env()},
-#'     and then resamples those distributions at each iteration. This will be a bit slower than
-#'     \code{"kern"} resampling because iteration matrices need to be reconstructed
-#'     from new parameters at every time step. The \code{vignette("classes", package = "ipmr")}
-#'     contains more details and a number of suggestions for further reading on how to avoid this
-#'     slow down.}
+#'     is multiplied by the next kernel for the desired number of iterations.}
+#'     \item{\code{param}}{: used to denote parameter resampling. This samples distributions
+#'     for each parameter based on user-specified functions supplied to \code{define_env_state()}.
+#'     This will be a bit slower than \code{"kern"} resampling because iteration
+#'     matrices need to be reconstructed from new parameters at every time step.}
 #'}
 #'}
 #'
 #' @references Metcalf et al. (2015). Statistical modelling of annual variation for inference on stochastic
 #' population dynamics using Integral Projection Models. Methods in Ecology and Evolution, 6: 1007-1017
-#'
-#' \strong{UPDATE WITH MORE REFERENCES/MAKE COMPLETE LATER}
 #'
 #' @export
 

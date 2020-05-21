@@ -244,7 +244,7 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     # the expanded names, all will go well!
 
     name             = 'P_yr',
-    formula          = s_g_mult(s_yr, g_yr) ,
+    formula          = s_yr * g_yr,
     family           = "CC",
     s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
       (1 - inv_logit(ht_1, f_r_int, f_r_slope)),
@@ -417,7 +417,7 @@ test_that("order of kernel definition doesn't matter", {
     ) %>%
     define_kernel(
       name             = 'P_yr',
-      formula          = s_g_mult(s_yr, g_yr) ,
+      formula          = s_yr * g_yr,
       family           = "CC",
       s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
         (1 - inv_logit(ht_1, f_r_int, f_r_slope)),
@@ -491,7 +491,7 @@ test_that("return_all gets all of the environments back", {
     ) %>%
     define_kernel(
       name             = 'P_yr',
-      formula          = s_g_mult(s_yr, g_yr) ,
+      formula          = s_yr * g_yr,
       family           = "CC",
       s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
         (1 - inv_logit(ht_1, f_r_int, f_r_slope)),
@@ -560,7 +560,7 @@ test_that('normalizing pop vector gets same lambdas as before', {
     ) %>%
     define_kernel(
       name             = 'P_yr',
-      formula          = s_g_mult(s_yr, g_yr) ,
+      formula          = s_yr * g_yr,
       family           = "CC",
       s_yr             = inv_logit_r(ht_1, s_int, s_slope, s_r_yr) *
         (1 - inv_logit(ht_1, f_r_int, f_r_slope)),

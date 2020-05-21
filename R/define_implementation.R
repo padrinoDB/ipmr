@@ -11,15 +11,14 @@
 #' @param dom_start The name of the state variable for the kernel at time \emph{t}.
 #' @param dom_end The name of the state variable for the kernel at time \emph{t+1}.
 #' This is usually the same as \code{dom_start}, but general IPMs
-#' with discrete classes or IPMs that move from one state to another (e.g. tree
-#' seedling going from a height domain to a DBH domain at T+1) may have another
-#' value here. For cases with a discrete stage, kernels moving individuals from
-#' discrete to continuous should have a state variable entered here and an \code{NA}
-#' for \code{dom_start}. For kernels moving from continuous to discrete, vice versa.
-#' For discrete to discrete, both are \code{NA}.
+#' with discrete states or IPMs that move from one state to another (e.g. tree
+#' seedling going from a height domain at \emph{t} to a DBH domain at \emph{t+1})
+#' may have another value here. For cases with a discrete stage, kernels moving
+#' individuals from discrete to continuous should have a state variable entered
+#' here and an \code{NA} for \code{dom_start}. For kernels moving from continuous
+#' to discrete, vice versa. For discrete to discrete, both are \code{NA}.
 #' @param int_rule The integration rule to be used for the kernel. The default is
 #' "midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.
-#'  If "g-l", additional arguments need to be supplied (\strong{Work on this later!!}).
 #'
 #' @export
 
@@ -141,11 +140,4 @@ make_impl_args_list <- function(kernel_names,
   out <- rlang::list2(!!dom_start := start_state_info,
                       !!dom_end   := end_state_info)
   return(out)
-}
-
-
-.state_to_pop_info <- function(start_state) {
-
-  rlang::list2(!!start_state := NA_real_)
-
 }

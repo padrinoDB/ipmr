@@ -432,35 +432,42 @@ is_square <- function(x) {
 # eigenvalues or pop_state entries. For eigenvalues, looks at a vector,
 # for pop_state entries, two possibilities:
 #
-# SIMPLE_*_ipm: pop_state is a list holding a single matrix. this function
-# is called with ipm$pop_state[[1]], and the matrix is passed to code in first
-# if()
+# SIMPLE_*_ipm: If no hier_effs, pop_state is a list holding a single matrix.
+# this function is called with ipm$pop_state[[1]], and the matrix is passed to
+# code in first if()
 #
-# GENERAL_*_ipm: pop_state is a list with multiple matrices. this function is
+# GENERAL_*_ipm OR SIMPLE_*_ipm with hier_effs on the pop_state: pop_state is a
+# list with multiple matrices. this function is
 # called on ipm$pop_state, and the list is passed to the code in the second if()
+#
+# Eigenvalues are passed into the 3rd if(is.vector())
 
 .is_conv_to_asymptotic <- function(x, tol = 1e-10) {
 
   if(is.matrix(x)) {
 
-    # Standardize columns first if we're deatling w/ population vector (dim(x)[1] > 1)
+    # Standardize columns first if we're dealing w/ population vector (dim(x)[1] > 1)
 
     if(dim(x)[1] > 1){
       x <- apply(x, 2, FUN = function(y) y / sum(y))
     }
 
-    n_col     <- end_ind <- dim(x)[2]
-    start_ind <- n_col - 1
+    end_ind   <- dim(x)[2]
+    start_ind <- end_ind - 1
 
     start_val <- x[ , start_ind]
     end_val   <- x[ , end_ind]
 
   } else if(is.list(x)) {
 
-    # General
+    # General. Constructs a single vector out of the population state list.
+    # This will generate a single set of vectors for multiple populations,
+    # but they will still be matched by position in the result, and so are
+    # compared to each other in all.equal. Consider adding information for
+    # parts of the vectors that ARE NOT equal to each other for user reference.
 
-    n_col     <- end_ind <- dim(x[[1]])[2]
-    start_ind <- n_col - 1
+    end_ind   <- dim(x[[1]])[2]
+    start_ind <- end_ind - 1
 
     start_col <- lapply(x,
                         function(y, ind) matrix(y[ , ind], ncol = 1),
@@ -478,8 +485,8 @@ is_square <- function(x) {
 
   } else if(is.vector(x)) {
 
-    n_col     <- end_ind <- length(x)
-    start_ind <- n_col - 1
+    end_ind   <- length(x)
+    start_ind <- end_ind - 1
 
     start_val <- x[start_ind]
     end_val   <- x[end_ind]
@@ -501,10 +508,11 @@ is_square <- function(x) {
 #' @title Check for model convergence to asymptotic dynamics
 #'
 #' @param ipm An object returned by \code{make_ipm()}.
-#' @param tol The tolerance for convergence. Convergence is computed as the
-#' difference in sums for the population state vectors at time \emph{t} and \emph{t-1}.
+#' @param tol The tolerance for convergence. Convergence is evaluated by making an
+#' element by element comparison  for the population state vectors at time \emph{t}
+#' and \emph{t-1}.
 #'
-#' @return A logical
+#' @return Either \code{TRUE} or \code{FALSE}.
 #' @export
 #'
 

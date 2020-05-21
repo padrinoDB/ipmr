@@ -70,7 +70,7 @@ matrix and then compute the left/right eigenvectors for that. For
 
 \code{mega_mat} fits the pieces of the model together to create a
 a transpose of the model to iterate with. Kernel names/0s should be supplied
-in ROW MAJOR order (think \code{byrow = TRUE}. \code{ipmr} supplies
+in ROW MAJOR order (as in \code{byrow = TRUE}). \code{ipmr} supplies
 a helper function for large models \code{format_mega_matrix}
 to help with age-size models or ones with a lot of hierarchical effects.
 }

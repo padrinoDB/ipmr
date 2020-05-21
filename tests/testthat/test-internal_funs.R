@@ -56,7 +56,7 @@ test_that('exported is_conv_to_asymptotic works as well', {
   general_ipm <- init_ipm("general_di_det") %>%
     define_kernel(
       name          = "P",
-      formula       = s_g_mult(s, g) * d_ht,
+      formula       = s * g * d_ht,
       family        = "CC",
       g             = dnorm(ht_2, g_mu, g_sd),
       g_mu          = g_int + g_slope * ht_1,
@@ -139,7 +139,7 @@ test_that('exported is_conv_to_asymptotic works as well', {
   my_ipm <- init_ipm('simple_di_det') %>%
     define_kernel(
       name      = "P",
-      formula   = s_g_mult(s, g),
+      formula   = s * g,
       family    = "CC",
 
       s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),

@@ -88,7 +88,7 @@ states <- c('dbh', 'dbh')
 
 x <- init_ipm('simple_di_det') %>%
   define_kernel("P",
-                formula = s_g_mult(s, g),
+                formula = s * g,
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = dnorm(dbh_2, mu_g, sd_g),
@@ -222,7 +222,7 @@ test_that("order of kernel_definition doesn't matter", {
                                                       'f_d')
     ) %>%
     define_kernel("P",
-                  formula = s_g_mult(s, g),
+                  formula = s * g,
                   family = "CC",
                   s = inv_logit(s_int, s_slope, dbh_1),
                   g = dnorm(dbh_2, mu_g, sd_g),
@@ -274,7 +274,7 @@ test_that("order of kernel_definition doesn't matter", {
                                                       'f_d')
     ) %>%
     define_kernel("P",
-                  formula = s_g_mult(s, g),
+                  formula = s * g,
                   family = "CC",
                   s = inv_logit(s_int, s_slope, dbh_1),
                   g = dnorm(dbh_2, mu_g, sd_g),
@@ -308,7 +308,7 @@ test_that('iteration methods work the same as eigenvalue methods', {
 
   it <- init_ipm('simple_di_det') %>%
     define_kernel("P",
-                  formula = s_g_mult(s, g),
+                  formula = s * g,
                   family = "CC",
                   s = inv_logit(s_int, s_slope, dbh_1),
                   g = dnorm(dbh_2, mu_g, sd_g),
@@ -365,7 +365,7 @@ test_that('normalizing pop vector produces same lambdas as eigen methods', {
 
   it <- init_ipm('simple_di_det') %>%
     define_kernel("P",
-                  formula = s_g_mult(s, g),
+                  formula = s * g,
                   family = "CC",
                   s = inv_logit(s_int, s_slope, dbh_1),
                   g = dnorm(dbh_2, mu_g, sd_g),

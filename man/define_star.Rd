@@ -20,7 +20,7 @@ define_pop_state(proto_ipm, ..., pop_vectors = list())
 define_env_state(proto_ipm, ..., data_list = list())
 }
 \arguments{
-\item{proto_ipm}{The name of object you wish to append the new kernel to.}
+\item{proto_ipm}{The name of the model.}
 
 \item{kernel_impl_list}{A named list. Names correspond to kernel names. Each
 kernel should have 3 slots defined - the \code{int_rule} (integration rule),
@@ -32,21 +32,20 @@ to generate this.}
 that parameters are being defined for.}
 
 \item{int_rule}{The integration rule to be used for the kernel. The default is
-"midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.
- If "g-l", additional arguments need to be supplied (\strong{Work on this later!!}).}
+"midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.}
 
 \item{dom_start}{The name of the state variable for the kernel at time \emph{t}.}
 
 \item{dom_end}{The name of the state variable for the kernel at time \emph{t+1}.
 This is usually the same as \code{dom_start}, but general IPMs
-with discrete classes or IPMs that move from one state to another (e.g. tree
-seedling going from a height domain to a DBH domain at T+1) may have another
-value here. For cases with a discrete stage, kernels moving individuals from
-discrete to continuous should have a state variable entered here and an \code{NA}
-for \code{dom_start}. For kernels moving from continuous to discrete, vice versa.
-For discrete to discrete, both are \code{NA}.}
+with discrete states or IPMs that move from one state to another (e.g. tree
+seedling going from a height domain at \emph{t} to a DBH domain at \emph{t+1})
+may have another value here. For cases with a discrete stage, kernels moving
+individuals from discrete to continuous should have a state variable entered
+here and an \code{NA} for \code{dom_start}. For kernels moving from continuous
+to discrete, vice versa. For discrete to discrete, both are \code{NA}.}
 
-\item{...}{Named expressions. See details for more information on their usage in
+\item{...}{Named expressions. See Details for more information on their usage in
 each \code{define_*} function.}
 
 \item{pop_vectors}{If the population vectors are already pre-defined (i.e. are
@@ -59,41 +58,119 @@ This behaves in the same way as the \code{data_list} argument to \code{define_ke
 \value{
 All \code{define_*} functions return a proto_ipm. \code{make_impl_args_list}
 returns a list, and so must be used within a call to \code{define_impl} or
-before initiating the piped model creation procedure.
+before initiating the model creation procedure.
 }
 \description{
 Helpers for IPM construction
 }
 \details{
-These are helper functions to define certain types of IPM classes. It is recommended
-to use them within the IPM construction pipeline somewhere between \code{add_kernels}
-and \code{make_ipm}. The order in which they are called does not matter provided
-all values on the left hand side of the \code{...} appear in the right hand side
-of another expression used elsewhere. Expressions where the left hand side does
-not appear anywhere else will be ignored during construction, and so will not
-be present in the returned \code{ipm} object.
+These are helper functions to define IPMs. They are used after defining the kernels,
+but before calling \code{make_ipm()} They are meant to be called in the
+following order:
 
-Most \code{define_*} functions takes dots in the same way: named expressions
-are captured and evaluated later in the appropriate contexts with their respective
-kernels. Suffix expansion is supported so that hierarchical models with
-year/plot/what-have-you effects do not need to  be rewritten 10s or 100s of times.
+\enumerate{
 
-The one exception to this is \code{define_domains}. It takes named numeric
-vectors of length 3 where the name corresponds to the
+  \item \code{define_impl()}
+
+  \item \code{define_domains()}
+
+  \item \code{define_pop_state()}
+
+  \item \code{define_env_state()}
+
+}
+
+The order requirement is so that information is correctly matched to each kernel.
+Below are specific details on the way each one takes \code{...}.
+
+\strong{\code{define_impl}}
+
+This has two arguments - \code{proto_ipm} (the model object you wish to work with),
+and the \code{kernel_impl_list}. The \code{kernel_impl_list} has a very specific format.
+Names of the list should be kernel names, and each kernel should have 3 entries:
+\code{int_rule}, \code{dom_start}, and \code{dom_end}. See examples.
+
+\strong{\code{define_domains}}
+
+If the \code{int_rule = "midpoint"}, these are vectors of length 3 where the name corresponds to the
 state variable, the first entry is the lower bound of the domain, the second
 is the upper bound of the domain, and the third entry is the number of
-meshpoints (applies to \code{int_rule = "midpoint"} only! Other rules are not
-implemented yet).
+meshpoints. Other \code{int_rule}s are not yet implemented, so for now this is the
+only format they can take. See examples.
 
-\code{define_impl} is meant to help distinguish the process of
-generating the kernels' mathematical form from their implementation details.
-It takes a \code{proto_ipm} object and returns a modified one containing the
-implementation information.
+\strong{\code{define_pop_state}}
 
-\code{make_impl_args_list} helps generate that
-information in the correct format. It is usually easiest to call \code{make_impl_args_list}
-before calling \code{init_ipm} and then substituting that variable into
-the call to \code{define_impl}. Alternatively, one can do something like
-\code{define_impl(kernel_impl_list = make_impl_arg_list(...))} within the course
-of the model definitition pipeline.
+This takes either calls to functions in the \code{...}, or a pre-generated
+list of vectors in the \code{pop_vectors}. The names used
+for each entry in \code{...} and/or for the \code{pop_vectors} should be
+\code{n_<state_variable>}. See examples.
+
+\strong{\code{define_env_state}}
+
+Takes expressions that generate values for environmental covariates at each
+iteration of the model in \code{...}. The \code{data_list} should contain any
+parameters that the function uses, as well as the function itself. The
+functions should return named lists. Names in that list can be referenced in
+vital rate expressions and/or kernel formulas.
+}
+\examples{
+
+# Example with kernels named "P" and "F", and a domain "z"
+
+kernel_impl_list <- list(P = list(int_rule = "midpoint", dom_start = "z", dom_end = "z"),
+                         F = list(int_rule = "midpoint", dom_start = "z", dom_end = "z"))
+
+# an equivalent version using make_impl_args_list
+
+kernel_impl_list <- make_impl_args_list(
+     kernel_names = c("P", "F"),
+     int_rule     = c("midpoint", "midpoint"),
+     dom_start    = c("z", "z"),
+     dom_end      = c("z", "z")
+)
+
+# define_domains
+
+lower_bound <- 1
+upper_bound <- 100
+n_meshpoints <- 50
+
+\dontrun{
+
+define_domains(proto_ipm, c(lower_bound, upper_bound, n_meshpoints))
+
+# define_pop_state with a state variable named "z". Note that "n_" is prefixed
+# to denote that it is a population state function!
+
+define_pop_state(proto_ipm, n_z = runif(100))
+
+# alternative, we can make a list before starting to make the IPM
+
+pop_vecs <- list(n_z = runif(100))
+
+define_pop_state(proto_ipm, pop_vectors = pop_vecs)
+
+# define_env_state. Generates a random draw from a known distribution
+# of temperatures.
+
+env_sampler <- function(temp_mean, temp_sd) {
+
+  temp <- rnorm(1, temp_mean, temp_sd)
+
+  return(list(temp = temp))
+
+}
+
+env_pars <- list(temp_mean = 12, temp_sd = 2)
+
+define_env_state(
+ proto_ipm,
+ env_values = env_sampler(env_pars$temp_mean, env_pars$temp_sd),
+ data_list  = list(env_sampler = env_sampler,
+                   env_pars    = env_pars)
+
+)
+
+}
+
 }

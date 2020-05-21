@@ -89,7 +89,7 @@ mvt_wrapper <- function(r_means, r_sigma, nms) {
 test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
   define_kernel(
     'P',
-    formula = s_g_mult(s, g),
+    formula = s * g,
     family = 'CC',
     g_mu = g_int_yr + g_slope * surf_area_1,
     s = inv_logit(s_int_yr, s_slope, surf_area_1),
@@ -275,7 +275,7 @@ test_that('normalize pop_vectors works as it should', {
   test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     define_kernel(
       'P',
-      formula = s_g_mult(s, g),
+      formula = s * g,
       family = 'CC',
       g_mu = g_int_yr + g_slope * surf_area_1,
       s = inv_logit(s_int_yr, s_slope, surf_area_1),

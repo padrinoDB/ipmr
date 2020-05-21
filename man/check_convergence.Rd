@@ -9,11 +9,12 @@ is_conv_to_asymptotic(ipm, tol = 1e-10)
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
 
-\item{tol}{The tolerance for convergence. Convergence is computed as the
-difference in sums for the population state vectors at time \emph{t} and \emph{t-1}.}
+\item{tol}{The tolerance for convergence. Convergence is evaluated by making an
+element by element comparison  for the population state vectors at time \emph{t}
+and \emph{t-1}.}
 }
 \value{
-A logical
+Either \code{TRUE} or \code{FALSE}.
 }
 \description{
 Check for model convergence to asymptotic dynamics

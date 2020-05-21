@@ -3,19 +3,18 @@
 #'
 #' @description Adds a new kernel to the \code{proto_ipm} structure.
 #'
-#' @param proto_ipm The name of object you wish to append the new kernel to.
+#' @param proto_ipm The name of the model.
 #' @param name The name of the new kernel. There are only two rules: 1. For
 #' \code{define_k}, the name must start with \code{"K"} or \code{"k"}.
-#' 2. For \code{define_kernel}, the name must start with any letter but \code{"K"} or
+#' 2. For \code{define_kernel}, the name cannot start with \code{"K"} or
 #' \code{"k"}.
-#' @param formula A bare expression specifying the form of the kernel. See below
-#' for examples
+#' @param formula A bare expression specifying the form of the kernel. See Details.
 #' @param family The type of kernel. Options are \code{"CC"} for continuous to continuous
 #' transitions, \code{"DC"} for discrete to continuous (e.g. emergence from a seedbank),
 #' \code{"CD"} for continuous to discrete (e.g. entering a seedbank), and \code{"DD"} for
 #' discrete to discrete (e.g. stasis in a seedbank).
-#' @param ... For \code{define_kernel}, set of named expressions that correspond
-#' to vital rates in \code{formula}. For \code{define_K}, a set of named expressions
+#' @param ... For \code{define_kernel}, a set of named expressions that correspond
+#' to vital rates in \code{formula}. For \code{define_k}, a set of named expressions
 #' that relate the population state at T + 1 to the population state at T. Alternatively,
 #' can be an expression where the left hand side is the name of the kernel specified
 #' in \code{name} and the right hand side only describes the structure of the
@@ -24,8 +23,8 @@
 #' below.
 #' @param data_list A list of named values that correspond to constants in the formula.
 #' You do not need to specify vectors corresponding to the domains here.
-#' @param states A character vector containing the names of each state variable used in
-#' the kernel.
+#' @param states A list with character vector containing the names of each state
+#' variable used in the kernel.
 #' @param has_hier_effs A logical indicating whether or not the kernel and/or its
 #' underlying vital rates are structured with hierarchical effects. If so and you
 #' specify either the functional forms or the exact parameter values you want to use,
@@ -33,18 +32,18 @@
 #' rates and kernel formulae and multiple kernels will be built. See the vignette
 #' on the syntax for this feature for more details (\code{vignettes(
 #' 'hierarchical-notation', package = 'ipmr')}).
-#' @param levels_hier_effs A named list with vectors corresponding the various levels
-#' the hierarchical variable can take. Entries in this list should be a single
-#' vector and should be character or integer typed.
+#' @param levels_hier_effs A named list with vectors corresponding to the various levels
+#' the hierarchical variable can take. The names should match the suffixes used
+#' in the vital rate expressions.
 #' @param evict_cor A logical indicating whether an eviction correction should be applied
-#' to the kernel. It is generally recommended to use a function in the vital rate
-#' definition as opposed to using this option Default is \code{FALSE}.
+#' to the kernel.
 #' @param evict_fun If \code{evict_cor== TRUE}, then a function that corrects for it.
 #' Currently, the only implemented function is \code{truncated_distributions}.
 #' This works by modifying the functional form of the vital rate expressions
 #' \code{...}, and so supplying your own function in this slot will be difficult.
-#' One can also specify \code{usr_funs} function that performs the correction
-#' during the numerical implementation of the model itself. In that case,
+#' You can also either specify a \code{usr_funs} function that performs the correction
+#' during the implementation of the model itself, or incorporate the correction
+#' into individual vital rate expressions. In either of those cases,
 #' set \code{evict_cor} to \code{FALSE}.
 #'
 #'
@@ -59,9 +58,9 @@
 #'
 #' The preferred method of defining a \code{K} kernel is to use the left
 #' hand side of the \code{...} to reference the population vectors that the right
-#' hand side creates (e.g. \code{n_T_1 = (P + F) \%*\% n_T}). This enables powerful
-#' iteration-based methods to work properly. On the other hand, these iteration
-#' based methods can be quite time consuming, and many applications only require
+#' hand side creates (e.g. \code{n_T_1 = (P + F) \%*\% n_T}). This enables
+#' iteration-based methods to work properly. On the other hand, these iterations
+#' can be quite time consuming, and some applications only require
 #' an iteration matrix while not necessarily requiring the population vectors (e.g.
 #' calculations of deterministic population growth rate). In those cases, the
 #' \code{...} can contain something like \code{K = P + F}. In this case, the left
@@ -70,8 +69,8 @@
 #' \strong{\code{define_kernel}}
 #'
 #' \code{define_kernel} generates most of the information needed to create an IPM
-#' kernel. There are a few requirements - \code{name}, \code{family}, and
-#' \code{formula} must not be empty. The \code{formula} should be an expression
+#' kernel. There are a few requirements - \code{name}, \code{family},
+#' \code{formula}, and \code{states} must not be empty. The \code{formula} should be an expression
 #' for how vital rates produce a kernel (e.g. \code{formula = S * G}). The
 #' \code{...} should be a set of named expressions that correspond to vital rate
 #' expressions (e.g. \code{G = dnorm(size_2, mean_size, sd_size)}). See the vignettes

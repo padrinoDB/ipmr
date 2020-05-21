@@ -83,7 +83,7 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
 )
 }
 \arguments{
-\item{proto_ipm}{The proto_ipm object you wish to implement. This should be the
+\item{proto_ipm}{The proto_ipm. This should be the
 output of \code{define_kernel}, \code{define_k}, or the \code{define_*} functions.}
 
 \item{return_all}{A logical indicating whether to return the environments that
@@ -91,7 +91,7 @@ the kernel expressions are evaluated in. This is useful for developer
 debugging and not much else.}
 
 \item{usr_funs}{An optional list of user-specified functions that are passed
-on to the evaluation environments. This can help make vital rate expressions
+on to the  model building process. This can help make vital rate expressions
 more concise and expressive. Names in this list should exactly match the names
 of the function calls in the \code{...} or \code{formula}.}
 
@@ -101,9 +101,8 @@ of the function calls in the \code{...} or \code{formula}.}
 the IPM with.}
 
 \item{iterate}{A logical indicating whether or not iterate the model before exiting
-or just return the iteration kernels. For density dependent (\code{dd}) and/or
-stochastic parameter resampled models (\code{stoch_param}), this should always
-be \code{TRUE}.}
+or just return the iteration kernels. Only applies to density independent, deterministic
+models.}
 
 \item{iterations}{If \code{iterate} is \code{TRUE}, then the number of iterations
 to simulate.}
@@ -160,11 +159,12 @@ a \code{'simple_di_stoch_kern'} model will have the class
 The \code{make_ipm.*} methods convert a \code{proto_ipm} into a
 set of discretized kernels and population vectors. Methods have different
 requirements, so be sure to read the parameter documentation. \code{
-vignettes('Introduction to ipmr', 'ipmr')} also contains helpful information.
+vignette('ipmr-introduction', 'ipmr')} also contains helpful information.
 }
 \details{
 When \code{kernel_seq} is a character vector, names
-are matched using \code{grepl()}. When it is an integer vector, the vector
+are matched using \code{grepl()}.
+When it is an integer vector, the vector
 is first checked to make sure they are all present in kernel names. The model
 procedure will stop if thay are not all present.
 }

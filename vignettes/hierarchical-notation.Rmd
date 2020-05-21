@@ -574,63 +574,63 @@ ex_ipm <- init_ipm("general_di_stoch_param") %>%
     states        = list(c("z")),
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
-        evict_fun     = truncated_distributions("norm", "f_d")
-      ) %>%
-      define_kernel(
-        name          = "leave_sb_2",
-        family        = "DC",
-        formula       = s_sb2 * r_sb2 * f_d * d_z,
-        f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
-        data_list     = all_pars,
-        states        = list(c("z")),
-        has_hier_effs = FALSE,
-        evict_cor     = TRUE,
-        evict_fun     = truncated_distributions("norm", "f_d")
-      ) %>%
-      define_k(
-        name             = "K_site",
-        family           = "IPM",
-        K_site           = P_site + F_site,
-        n_z_t_1          = K_site     %*% n_z_t   + 
-          leave_sb_1 %*% n_sb1_t + 
-          leave_sb_2 %*% n_sb2_t,
-        n_sb1_t_1        = go_sb_1_site %*% n_z_t,
-        n_sb2_t_1        = go_sb_2 %*% n_sb1_t,
-        data_list        = all_pars,
-        states           = list(c("z")),
-        has_hier_effs    = TRUE,
-        levels_hier_effs = list(site = LETTERS[1:6]),
-        evict_cor        = FALSE
-      ) %>%
-      define_impl(
-        make_impl_args_list(
-          kernel_names = c("P_site", "F_site",
-                           "go_sb_1_site", "go_sb_2", 
-                           "leave_sb_1", "leave_sb_2",
-                           "K_site"),
-          int_rule     = rep("midpoint", 7),
-          dom_start    = c("z", "z", "z", NA_character_, NA_character_, NA_character_, "z"),
-          dom_end      = c("z", "z", NA_character_, NA_character_, "z", "z", "Z")
-        )
-      ) %>%
-      define_domains(
-        z = c(0.1, 100, 200)
-      ) %>%
-      define_pop_state(
-        n_z   = runif(200),
-        n_sb1 = 20,
-        n_sb2 = 20
-      ) %>%
-      define_env_state(
-        env_state = sample_fun(env_params),
-        data_list = list(env_params = env_params)
-      ) %>%  
-      make_ipm(
-        usr_funs           = list(sample_fun = sample_fun),
-        iterations         = 20,
-        kernel_seq         = sample(LETTERS[1:6], 20, replace = TRUE),
-        normalize_pop_size = TRUE
-      )
+    evict_fun     = truncated_distributions("norm", "f_d")
+  ) %>%
+  define_kernel(
+    name          = "leave_sb_2",
+    family        = "DC",
+    formula       = s_sb2 * r_sb2 * f_d * d_z,
+    f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
+    data_list     = all_pars,
+    states        = list(c("z")),
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "f_d")
+  ) %>%
+  define_k(
+    name             = "K_site",
+    family           = "IPM",
+    K_site           = P_site + F_site,
+    n_z_t_1          = K_site     %*% n_z_t   + 
+      leave_sb_1 %*% n_sb1_t + 
+      leave_sb_2 %*% n_sb2_t,
+    n_sb1_t_1        = go_sb_1_site %*% n_z_t,
+    n_sb2_t_1        = go_sb_2 %*% n_sb1_t,
+    data_list        = all_pars,
+    states           = list(c("z")),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(site = LETTERS[1:6]),
+    evict_cor        = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P_site", "F_site",
+                       "go_sb_1_site", "go_sb_2", 
+                       "leave_sb_1", "leave_sb_2",
+                       "K_site"),
+      int_rule     = rep("midpoint", 7),
+      dom_start    = c("z", "z", "z", NA_character_, NA_character_, NA_character_, "z"),
+      dom_end      = c("z", "z", NA_character_, NA_character_, "z", "z", "Z")
+    )
+  ) %>%
+  define_domains(
+    z = c(0.1, 100, 200)
+  ) %>%
+  define_pop_state(
+    n_z   = runif(200),
+    n_sb1 = 20,
+    n_sb2 = 20
+  ) %>%
+  define_env_state(
+    env_state = sample_fun(env_params),
+    data_list = list(env_params = env_params,
+                     sample_fun = sample_fun)
+  ) %>%  
+  make_ipm(
+    iterations         = 20,
+    kernel_seq         = sample(LETTERS[1:6], 20, replace = TRUE),
+    normalize_pop_size = TRUE
+  )
 ```
 
 

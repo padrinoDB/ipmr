@@ -4,9 +4,9 @@
 #' @description The \code{make_ipm.*} methods convert a \code{proto_ipm} into a
 #' set of discretized kernels and population vectors. Methods have different
 #' requirements, so be sure to read the parameter documentation. \code{
-#' vignettes('Introduction to ipmr', 'ipmr')} also contains helpful information.
+#' vignette('ipmr-introduction', 'ipmr')} also contains helpful information.
 #'
-#' @param proto_ipm The proto_ipm object you wish to implement. This should be the
+#' @param proto_ipm The proto_ipm. This should be the
 #' output of \code{define_kernel}, \code{define_k}, or the \code{define_*} functions.
 #' @param ... Other arguments passed to methods
 #' @param return_all A logical indicating whether to return the environments that
@@ -15,13 +15,12 @@
 #' @param domain_list An optional list of new domain information to implement
 #' the IPM with.
 #' @param usr_funs An optional list of user-specified functions that are passed
-#' on to the evaluation environments. This can help make vital rate expressions
+#' on to the  model building process. This can help make vital rate expressions
 #' more concise and expressive. Names in this list should exactly match the names
 #' of the function calls in the \code{...} or \code{formula}.
 #' @param iterate A logical indicating whether or not iterate the model before exiting
-#' or just return the iteration kernels. For density dependent (\code{dd}) and/or
-#' stochastic parameter resampled models (\code{stoch_param}), this should always
-#' be \code{TRUE}.
+#' or just return the iteration kernels. Only applies to density independent, deterministic
+#' models.
 #' @param iterations If \code{iterate} is \code{TRUE}, then the number of iterations
 #' to simulate.
 #' @param normalize_pop_size A logical indicating whether to re-scale the population
@@ -73,7 +72,8 @@
 #' \code{make_ipm}.
 #'
 #' @details When \code{kernel_seq} is a character vector, names
-#' are matched using \code{grepl()}. When it is an integer vector, the vector
+#' are matched using \code{grepl()}.
+#' When it is an integer vector, the vector
 #' is first checked to make sure they are all present in kernel names. The model
 #' procedure will stop if thay are not all present.
 #'

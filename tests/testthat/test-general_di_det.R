@@ -73,8 +73,7 @@ G <- h * g_x(domains$d1, domains$d2,
              slope = data_list_control$g_slope,
              gsd   = data_list_control$g_sd,
              L = L,
-             U = U) %>%
-  matrix(nrow = n, ncol = n, byrow = TRUE)
+             U = U)
 
 s <- s_x(data_list_control$s_int,
          data_list_control$s_slope,
@@ -83,7 +82,7 @@ s <- s_x(data_list_control$s_int,
 
 
 
-P <- s_g_mult(s, G)
+P <- s * G
 
 cd_co <- f_r_x(data_list_control$f_r_int,
                data_list_control$f_r_slope,
@@ -103,7 +102,7 @@ dc_co <- (dnorm(d2, mean = data_list_control$f_d_mu, sd = data_list_control$f_d_
   h %>%
   matrix(nrow = n, ncol = 1)
 
-cc_co <- P
+cc_co <- matrix(P, nrow = n, ncol = n, byrow = TRUE)
 dd_co <- 0
 
 K_co <- rbind(
@@ -119,8 +118,7 @@ G <- h * g_x(domains$d1, domains$d2,
              int   = data_list_cr$g_int,
              slope = data_list_cr$g_slope,
              gsd   = data_list_cr$g_sd,
-             L = L, U = U) %>%
-  matrix(nrow = n, ncol = n, byrow = TRUE)
+             L = L, U = U)
 
 s <- s_x(data_list_cr$s_int,
          data_list_cr$s_slope,
@@ -129,7 +127,8 @@ s <- s_x(data_list_cr$s_int,
 
 
 
-P <- s_g_mult(s, G)
+P <- s * G
+
 
 cd_cr <- f_r_x(data_list_cr$f_r_int,
                data_list_cr$f_r_slope,
@@ -149,7 +148,7 @@ dc_cr <- (dnorm(d2, mean = data_list_cr$f_d_mu, sd = data_list_cr$f_d_sd) /
   h %>%
   matrix(nrow = n, ncol = 1)
 
-cc_cr <- P
+cc_cr <- matrix(P, nrow = n, ncol = n, byrow = TRUE)
 dd_cr <- 0
 
 K_cr <- rbind(

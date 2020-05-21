@@ -7,7 +7,7 @@
 use_vr_model(model)
 }
 \arguments{
-\item{model}{A fitted model representing a vital rate. Primarily used to avoid
+\item{model}{A fitted model object representing a vital rate. Primarily used to avoid
 writing the mathematical expression for a vital rate, and using a \code{predict()}
 method instead.}
 }
@@ -18,7 +18,7 @@ A model object with a \code{"flat_protect"} attribute.
 This function is used when a \code{predict} method is incorporated
 into the vital rate expressions of a kernel. Generally, ipmr can handle this
 without any additional user effort, but some model classes will fail (often
-with an obscure error message that really needs some updating).
+with an obscure error message).
 When this happens, \code{use_vr_model} can ensure that model object is
 correctly represented in the \code{data_list}.
 }
@@ -34,6 +34,10 @@ to pass to \code{define_kernel}.
 \examples{
 
 \dontrun{
+
+grow_mod <- lm(size_next ~ size, data = grow_data)
+surv_mod <- glm(surv ~ size, data = surv_data, family = binomial())
+
 data_list <- list(
   grow_mod = use_vr_model(grow_mod),
   surv_mod = use_vr_model(surv_mod),

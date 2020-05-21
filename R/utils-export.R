@@ -65,7 +65,7 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
 
 #' @title Helpers for IPM construction
 #' @inheritParams define_kernel
-#' @param ... Named expressions. See details for more information on their usage in
+#' @param ... Named expressions. See Details for more information on their usage in
 #' each \code{define_*} function.
 #'
 #' @param pop_vectors If the population vectors are already pre-defined (i.e. are
@@ -73,41 +73,118 @@ inv_vec <- function(mat, square = TRUE, nrow = NULL, ncol = NULL) {
 #' be passed as a named list here.
 #'
 #' @details
-#' These are helper functions to define certain types of IPM classes. It is recommended
-#' to use them within the IPM construction pipeline somewhere between \code{add_kernels}
-#' and \code{make_ipm}. The order in which they are called does not matter provided
-#' all values on the left hand side of the \code{...} appear in the right hand side
-#' of another expression used elsewhere. Expressions where the left hand side does
-#' not appear anywhere else will be ignored during construction, and so will not
-#' be present in the returned \code{ipm} object.
+#' These are helper functions to define IPMs. They are used after defining the kernels,
+#' but before calling \code{make_ipm()} They are meant to be called in the
+#' following order:
 #'
-#' Most \code{define_*} functions takes dots in the same way: named expressions
-#' are captured and evaluated later in the appropriate contexts with their respective
-#' kernels. Suffix expansion is supported so that hierarchical models with
-#' year/plot/what-have-you effects do not need to  be rewritten 10s or 100s of times.
+#' \enumerate{
 #'
-#' The one exception to this is \code{define_domains}. It takes named numeric
-#' vectors of length 3 where the name corresponds to the
+#'   \item \code{define_impl()}
+#'
+#'   \item \code{define_domains()}
+#'
+#'   \item \code{define_pop_state()}
+#'
+#'   \item \code{define_env_state()}
+#'
+#' }
+#'
+#' The order requirement is so that information is correctly matched to each kernel.
+#' Below are specific details on the way each one takes \code{...}.
+#'
+#' \strong{\code{define_impl}}
+#'
+#' This has two arguments - \code{proto_ipm} (the model object you wish to work with),
+#' and the \code{kernel_impl_list}. The \code{kernel_impl_list} has a very specific format.
+#' Names of the list should be kernel names, and each kernel should have 3 entries:
+#' \code{int_rule}, \code{dom_start}, and \code{dom_end}. See examples.
+#'
+#' \strong{\code{define_domains}}
+#'
+#' If the \code{int_rule = "midpoint"}, these are vectors of length 3 where the name corresponds to the
 #' state variable, the first entry is the lower bound of the domain, the second
 #' is the upper bound of the domain, and the third entry is the number of
-#' meshpoints (applies to \code{int_rule = "midpoint"} only! Other rules are not
-#' implemented yet).
+#' meshpoints. Other \code{int_rule}s are not yet implemented, so for now this is the
+#' only format they can take. See examples.
 #'
-#' \code{define_impl} is meant to help distinguish the process of
-#' generating the kernels' mathematical form from their implementation details.
-#' It takes a \code{proto_ipm} object and returns a modified one containing the
-#' implementation information.
+#' \strong{\code{define_pop_state}}
 #'
-#' \code{make_impl_args_list} helps generate that
-#' information in the correct format. It is usually easiest to call \code{make_impl_args_list}
-#' before calling \code{init_ipm} and then substituting that variable into
-#' the call to \code{define_impl}. Alternatively, one can do something like
-#' \code{define_impl(kernel_impl_list = make_impl_arg_list(...))} within the course
-#' of the model definitition pipeline.
+#' This takes either calls to functions in the \code{...}, or a pre-generated
+#' list of vectors in the \code{pop_vectors}. The names used
+#' for each entry in \code{...} and/or for the \code{pop_vectors} should be
+#' \code{n_<state_variable>}. See examples.
+#'
+#' \strong{\code{define_env_state}}
+#'
+#' Takes expressions that generate values for environmental covariates at each
+#' iteration of the model in \code{...}. The \code{data_list} should contain any
+#' parameters that the function uses, as well as the function itself. The
+#' functions should return named lists. Names in that list can be referenced in
+#' vital rate expressions and/or kernel formulas.
 #'
 #' @return All \code{define_*} functions return a proto_ipm. \code{make_impl_args_list}
 #' returns a list, and so must be used within a call to \code{define_impl} or
-#' before initiating the piped model creation procedure.
+#' before initiating the model creation procedure.
+#'
+#' @examples
+#'
+#' # Example with kernels named "P" and "F", and a domain "z"
+#'
+#' kernel_impl_list <- list(P = list(int_rule = "midpoint", dom_start = "z", dom_end = "z"),
+#'                          F = list(int_rule = "midpoint", dom_start = "z", dom_end = "z"))
+#'
+#' # an equivalent version using make_impl_args_list
+#'
+#' kernel_impl_list <- make_impl_args_list(
+#'      kernel_names = c("P", "F"),
+#'      int_rule     = c("midpoint", "midpoint"),
+#'      dom_start    = c("z", "z"),
+#'      dom_end      = c("z", "z")
+#' )
+#'
+#' # define_domains
+#'
+#' lower_bound <- 1
+#' upper_bound <- 100
+#' n_meshpoints <- 50
+#'
+#' \dontrun{
+#'
+#' define_domains(proto_ipm, c(lower_bound, upper_bound, n_meshpoints))
+#'
+#' # define_pop_state with a state variable named "z". Note that "n_" is prefixed
+#' # to denote that it is a population state function!
+#'
+#' define_pop_state(proto_ipm, n_z = runif(100))
+#'
+#' # alternative, we can make a list before starting to make the IPM
+#'
+#' pop_vecs <- list(n_z = runif(100))
+#'
+#' define_pop_state(proto_ipm, pop_vectors = pop_vecs)
+#'
+#' # define_env_state. Generates a random draw from a known distribution
+#' # of temperatures.
+#'
+#' env_sampler <- function(temp_mean, temp_sd) {
+#'
+#'   temp <- rnorm(1, temp_mean, temp_sd)
+#'
+#'   return(list(temp = temp))
+#'
+#' }
+#'
+#' env_pars <- list(temp_mean = 12, temp_sd = 2)
+#'
+#' define_env_state(
+#'  proto_ipm,
+#'  env_values = env_sampler(env_pars$temp_mean, env_pars$temp_sd),
+#'  data_list  = list(env_sampler = env_sampler,
+#'                    env_pars    = env_pars)
+#'
+#' )
+#'
+#' }
 #'
 #' @rdname define_star
 #' @importFrom rlang is_empty
@@ -153,11 +230,11 @@ define_env_state <- function(proto_ipm, ..., data_list = list()) {
 #' @description This function is used when a \code{predict} method is incorporated
 #' into the vital rate expressions of a kernel. Generally, ipmr can handle this
 #' without any additional user effort, but some model classes will fail (often
-#' with an obscure error message that really needs some updating).
+#' with an obscure error message).
 #' When this happens, \code{use_vr_model} can ensure that model object is
 #' correctly represented in the \code{data_list}.
 #'
-#' @param model A fitted model representing a vital rate. Primarily used to avoid
+#' @param model A fitted model object representing a vital rate. Primarily used to avoid
 #' writing the mathematical expression for a vital rate, and using a \code{predict()}
 #' method instead.
 #'
@@ -171,9 +248,14 @@ define_env_state <- function(proto_ipm, ..., data_list = list()) {
 #' Wrap a model object in \code{use_vr_model} when building the \code{data_list}
 #' to pass to \code{define_kernel}.
 #'
+#'
 #' @examples
 #'
 #' \dontrun{
+#'
+#' grow_mod <- lm(size_next ~ size, data = grow_data)
+#' surv_mod <- glm(surv ~ size, data = surv_data, family = binomial())
+#'
 #' data_list <- list(
 #'   grow_mod = use_vr_model(grow_mod),
 #'   surv_mod = use_vr_model(surv_mod),
@@ -193,7 +275,9 @@ use_vr_model <- function(model) {
 }
 
 
-#' @rdname fun-mult-helpers
+#' @title Right multiplication
+#'
+#' @description Performs right multiplication.
 #'
 #' @param ... Symbols representing functions - usually things that appear on the
 #' left hand side of \code{formula} and/or \code{...} in \code{define_kernel} and
@@ -216,7 +300,7 @@ right_mult <- function(...) {
 
   id_dim <- max(dims, na.rm = TRUE)
 
-  init   <- diag(id_dim) # Identity matrix as initial starting point
+  init   <- diag(id_dim) # Identity matrix as starting point
 
   Reduce('%*%', to_mult, init = init)
 }
@@ -232,24 +316,6 @@ right_mult <- function(...) {
 #   Reduce('%*%', to_mult, init = init)
 #
 # }
-
-#' @title Function multiplication helpers
-#' @rdname fun-mult-helpers
-#'
-#' @description Helpers for multiplying functions - follows the terminology from
-#' Ellner, Rees & Childs (2016), Table 3.1. \code{s_g_mult} is a special function
-#' that correctly multiplies survival and growth
-#'
-#' @param s A vector of survival probabilities
-#' @param g A discretized growth kernel
-#'
-#' @export
-
-s_g_mult <- function(s, g) {
-
-  return(t(s * t(g)))
-
-}
 
 #' @title Raise a matrix to a power
 #' @rdname matrix-power
