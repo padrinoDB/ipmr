@@ -290,6 +290,7 @@ sim_di_stoch_kern <- init_ipm('simple_di_stoch_kern') %>%
   define_k(
     name             = 'K_yr',
     K_yr             = P_yr + F_yr,
+    n_ht_t_1         = K_yr %*% n_ht_t,
     family           = "IPM",
     data_list        = params,
     states           = list(c("ht")),
@@ -305,28 +306,26 @@ sim_di_stoch_kern <- init_ipm('simple_di_stoch_kern') %>%
     )
   ) %>%
   define_domains(ht = c(0.2, 40, 100)) %>%
+  define_pop_state(n_ht = runif(100)) %>%
   make_ipm(usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_r = inv_logit_r,
                            pois_r      = pois_r),
-           normalize_pop_size = FALSE)
+           normalize_pop_size = FALSE,
+           iterate = TRUE,
+           kernel_seq = sample(1:5, size = 50, replace = TRUE))
 
 
 test_that('print.simple_di_stoch_kern returns correctly', {
 
-  p <- capture_output(print_str <- print(sim_di_stoch_kern,
-                                         comp_method = 'eigen'))
+  p <- capture_output(print_str <- print(sim_di_stoch_kern))
 
   expect_s3_class(print_str,
                   'simple_di_stoch_kern_ipm')
 
-  print_msg <- capture_output_lines(
-    print(sim_di_stoch_kern, comp_method = 'eigen')
-  )
-
   expect_true(
     any(
       grepl('A simple, density independent, stochastic, kernel-resampled IPM',
-            print_msg)
+            p)
     )
   )
 
@@ -450,7 +449,7 @@ sim_di_stoch_param <- init_ipm('simple_di_stoch_param') %>%
 test_that('print.simple_di_stoch_param returns correctly', {
 
   p <- capture_output(print_str <- print(sim_di_stoch_param,
-                                         comp_method = 'pop_size'))
+                                         type_lambda = "all"))
 
   expect_s3_class(print_str,
                   'simple_di_stoch_param_ipm')

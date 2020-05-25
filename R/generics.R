@@ -129,10 +129,16 @@ print.simple_di_det_ipm <- function(x,
 
   if(comp_lambda) {
 
-    nm_ks  <- names(x$iterators)
+    if(!attr(x, "iterated") && comp_method == 'pop_size') {
 
-    lambdas <- lambda(x, comp_method = comp_method, type_lambda = 'all')
+      warning("Cannot compute lambda for 'comp_method = pop_size' because model is not iterated")
+      lambdas <- NA_real_
 
+    } else {
+      nm_ks  <- names(x$iterators)
+
+      lambdas <- lambda(x, comp_method = comp_method, type_lambda = 'all')
+    }
     l_msg  <- paste0('\nDeterministic lambda for ', nm_ks,' = ', lambdas, sep = "" )
 
     msg    <- c(msg, l_msg)
@@ -168,8 +174,7 @@ print.simple_di_det_ipm <- function(x,
 
 print.simple_di_stoch_kern_ipm <- function(x,
                                            comp_lambda = TRUE,
-                                           comp_method = c('pop_size'),
-                                           type_lambda = 'all',
+                                           type_lambda = 'stochastic',
                                            sig_digits = 3,
                                            ...) {
 
@@ -185,7 +190,14 @@ print.simple_di_stoch_kern_ipm <- function(x,
                 ' sub-kernel(s) defined.', sep = "")
 
   if(comp_lambda) {
-    all_lams <- lambda(x, comp_method = comp_method, type_lambda = type_lambda)
+
+    if(!attr(x, 'iterated')) {
+      warning("Cannot compute lambda for a model that is not iterated.")
+
+      all_lams <- NA_real_
+    } else {
+      all_lams <- lambda(x, type_lambda = type_lambda)
+    }
 
     l_msg  <- paste0('\nStochastic lambda for ',
                      mod_nm,
@@ -210,7 +222,6 @@ print.simple_di_stoch_kern_ipm <- function(x,
 
 print.simple_di_stoch_param_ipm <- function(x,
                                             comp_lambda = TRUE,
-                                            comp_method = c('pop_size'),
                                             type_lambda = 'stochastic',
                                             sig_digits  = 3,
                                             ...) {
@@ -228,7 +239,16 @@ print.simple_di_stoch_param_ipm <- function(x,
 
   if(comp_lambda) {
 
-    all_lams <- lambda(x, comp_method = comp_method, type_lambda = type_lambda)
+    if(!attr(x, 'iterated')) {
+
+      warning("Cannot compute lambda for a model that is not iterated.")
+      all_lams <- NA_real_
+
+    } else {
+
+      all_lams <- lambda(x, type_lambda = type_lambda)
+
+    }
 
     l_msg  <- paste0('\nStochastic lambda for ',
                      mod_nm,
@@ -256,7 +276,6 @@ print.simple_di_stoch_param_ipm <- function(x,
 
 print.general_di_det_ipm <- function(x,
                                      comp_lambda = TRUE,
-                                     comp_method = 'pop_size',
                                      type_lambda = 'all',
                                      sig_digits  = 3,
                                      all_lambdas = FALSE,
@@ -277,9 +296,16 @@ print.general_di_det_ipm <- function(x,
 
   if(comp_lambda) {
 
-    all_lams <- lambda(x,
-                       comp_method = 'pop_size',
-                       type_lambda = type_lambda)
+    if(!attr(x, 'iterated')) {
+
+      warning("Cannot compute lambda for a model that is not iterated.")
+      all_lams <- NA_real_
+
+    } else {
+
+      all_lams <- lambda(x, type_lambda = type_lambda)
+
+    }
 
     if(!all_lambdas) {
 
@@ -331,7 +357,6 @@ print.general_di_det_ipm <- function(x,
 
 print.general_di_stoch_kern_ipm <- function(x,
                                             comp_lambda = TRUE,
-                                            comp_method = 'pop_size',
                                             type_lambda = 'stochastic',
                                             sig_digits  = 3,
                                             ...) {
@@ -351,7 +376,16 @@ print.general_di_stoch_kern_ipm <- function(x,
 
   if(comp_lambda) {
 
-    all_lams <- lambda(x, comp_method = 'pop_size', type_lambda = type_lambda)
+    if(!attr(x, 'iterated')) {
+
+      warning("Cannot compute lambda for a model that is not iterated.")
+      all_lams <- NA_real_
+
+    } else {
+
+      all_lams <- lambda(x, type_lambda = type_lambda)
+
+    }
 
     l_msg  <- paste0('\nStochastic lambda for ',
                      mod_nm,
@@ -382,7 +416,6 @@ print.general_di_stoch_kern_ipm <- function(x,
 
 print.general_di_stoch_param_ipm <- function(x,
                                              comp_lambda = TRUE,
-                                             comp_method = 'pop_size',
                                              type_lambda = 'stochastic',
                                              sig_digits  = 3,
                                              ...) {
@@ -416,7 +449,16 @@ print.general_di_stoch_param_ipm <- function(x,
 
   if(comp_lambda) {
 
-    all_lams <- lambda(x, comp_method = 'pop_size', type_lambda = type_lambda)
+    if(!attr(x, 'iterated')) {
+
+      warning("Cannot compute lambda for a model that is not iterated.")
+      all_lams <- NA_real_
+
+    } else {
+
+      all_lams <- lambda(x, type_lambda = type_lambda)
+
+    }
 
     l_msg  <- paste0('\nStochastic lambda for ',
                      mod_nm,
@@ -457,7 +499,8 @@ print.general_di_stoch_param_ipm <- function(x,
 #' of log-per-capita growth rate from each time step.
 #' @param ... other arguments passed to methods.
 #'
-#' @return A single numeric vector or single value.
+#' @return An array. Rows correspond to time steps, and columns correspond
+#' to hierarchical effects (if any).
 #'
 #'
 #' @details There are two possible methods for computing \code{lambda} and these
@@ -481,9 +524,14 @@ lambda.simple_di_det_ipm <- function(ipm,
                                      type_lambda = 'last',
                                      ...) {
 
+  # Need to insert arg checking - probably should make it it's own s3 generic.
+
   all_lams <- switch(type_lambda,
                      "all"  = TRUE,
-                     'last' = FALSE)
+                     'last' = FALSE,
+                     'stochastic' = stop("Cannot compute stochastic lambda for deterministic IPM",
+                                         call. = FALSE))
+
   switch(comp_method,
          'eigen'    = .lambda_eigen(ipm),
          'pop_size' = .lambda_pop_size(ipm, all_lambdas = all_lams))
@@ -494,21 +542,23 @@ lambda.simple_di_det_ipm <- function(ipm,
 #' @export
 
 lambda.simple_di_stoch_kern_ipm <- function(ipm,
-                                            comp_method = c("eigen",
-                                                            "pop_size"),
+                                            comp_method = "pop_size",
                                             type_lambda = c('all',
                                                             'last',
                                                             'stochastic'),
                                             ...) {
 
-  temp <- switch(comp_method,
-                 'eigen'    = .lambda_eigen(ipm),
-                 'pop_size' = .lambda_pop_size(ipm, all_lambdas = TRUE))
+  all_lams <- switch(type_lambda,
+                     "all"  = TRUE,
+                     "stochastic" = TRUE,
+                     'last' = FALSE)
+
+  temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
 
   return(
     switch(type_lambda,
            'all'        = temp,
-           'last'       = temp[dim(temp)[1], ],
+           'last'       = temp,
            'stochastic' = mean(log(temp)))
   )
 }
@@ -517,35 +567,47 @@ lambda.simple_di_stoch_kern_ipm <- function(ipm,
 #' @export
 
 lambda.simple_di_stoch_param_ipm <- function(ipm,
-                                             comp_method = c("eigen", "pop_size"),
+                                             comp_method = "pop_size",
                                              type_lambda = c('all',
                                                              'last',
                                                              'stochastic'),
                                              ...) {
 
-  temp <- switch(comp_method,
-                 'eigen'    = .lambda_eigen(ipm),
-                 'pop_size' = .lambda_pop_size(ipm, all_lambdas = TRUE))
+  all_lams <- switch(type_lambda,
+                     "all"  = TRUE,
+                     'last' = FALSE)
+
+  temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
 
   return(
     switch(type_lambda,
            'all'        = temp,
-           'last'       = temp[dim(temp)[1], ],
+           'last'       = temp,
            'stochastic' = mean(log(temp)))
   )
 
 }
 
 #' @rdname lambda
+#' @importFrom methods hasArg
 #' @export
 
-lambda.general_di_det_ipm <- function(ipm, type_lambda = 'last', ...) {
+lambda.general_di_det_ipm <- function(ipm,
+                                      comp_method = "pop_size",
+                                      type_lambda = 'last',
+                                      ...) {
+
+  if(comp_method == "eigen") {
+    warning("'ipmr' will not compute dominant eigenvalues for general IPMs.\n",
+            "Using comp_method ='pop_size' instead.")
+  }
 
 
   all_lams <- switch(type_lambda,
-                     'all' = TRUE,
-                     'stochastic' = TRUE,
-                     'last' = FALSE)
+                     'all'  = TRUE,
+                     'last' = FALSE,
+                     'stochastic' = stop("Cannot compute stochastic lambda for deterministic IPM",
+                                         call. = FALSE))
 
   temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
 
@@ -562,9 +624,15 @@ lambda.general_di_det_ipm <- function(ipm, type_lambda = 'last', ...) {
 
 lambda.general_di_stoch_kern_ipm <- function(ipm,
                                              ...,
+                                             comp_method = 'pop_size',
                                              type_lambda = c('all',
                                                              'last',
                                                              'stochastic')) {
+
+  if(comp_method == "eigen") {
+    warning("'ipmr' will not compute dominant eigenvalues for general IPMs.\n",
+            "Using comp_method ='pop_size' instead.")
+  }
 
   all_lams <- switch(type_lambda,
                      'all' = TRUE,
@@ -586,10 +654,14 @@ lambda.general_di_stoch_kern_ipm <- function(ipm,
 
 lambda.general_di_stoch_param_ipm <- function(ipm,
                                               ...,
+                                              comp_method = 'pop_size',
                                               type_lambda = c('all',
                                                               'last',
                                                               'stochastic')) {
-
+  if(comp_method == "eigen") {
+    warning("'ipmr' will not compute dominant eigenvalues for general IPMs.\n",
+            "Using comp_method ='pop_size' instead.")
+  }
 
   all_lams <- switch(type_lambda,
                      'all' = TRUE,

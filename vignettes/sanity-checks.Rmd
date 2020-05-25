@@ -244,13 +244,11 @@ w_ipmr$dbh_w - w
 
 ```
 
-## Simple density independent stochastic kernel resampled model from the README
+## Simple density independent stochastic kernel resampled model
 
 ```{r eval = FALSE}
 
-
 library(ipmr)
-library(purrr)
 
 set.seed(50127)
 
@@ -300,10 +298,7 @@ g_params   <- as.list(g_r_int)
 s_params   <- as.list(s_r_int)
 f_s_params <- as.list(f_s_r_int)
 
-# purrr::splice combines each separate list into one without creating any 
-# additional depth to it. This keeps things a bit tidier.
-
-params     <- splice(data_list, g_params, s_params, f_s_params)
+params     <- c(data_list, g_params, s_params, f_s_params)
 
 ## Now, let's get to the ipmr model
 

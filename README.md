@@ -49,15 +49,14 @@ implement models with it. A more thorough introduction is available
 
 ## Model classes
 
-The first step of defining a model in `ipmr` (assuming all parameters
-have already been estimated) is to initialize the model using
-`init_ipm()`. This function takes a single argument: `model_class`. The
-`model_class` defines the basic infrastructure that will be available
-for subsequent analyses and helps make sure the kernels are correctly
-implemented from the underlying vital rates. `model_class` should be a
-character string with at least 3 (but possibly 4) entries separated by
-underscores (`_`). Below, the are the possible entries for each
-position.
+Once all parameters are estimated, the first step of defining a model in
+`ipmr` is to initialize the model using `init_ipm()`. This function
+takes a single argument: `model_class`. The `model_class` defines the
+basic infrastructure that will be available for subsequent analyses and
+helps make sure the kernels are correctly implemented from the
+underlying vital rates. `model_class` should be a character string with
+at least 3 (but possibly 4) entries separated by underscores (`_`).
+Below, the are the possible entries for each position.
 
   - Position 1: `"simple"`/`"general"`
 

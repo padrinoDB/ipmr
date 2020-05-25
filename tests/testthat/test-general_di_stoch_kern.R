@@ -709,7 +709,6 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
 # plug model object straight into lambda generic!
 
 ipmr_lambdas <- lambda(gen_di_stoch_kern,
-                       comp_method = 'pop_size',
                        type_lambda = "all") %>%
   as.vector()
 
@@ -1211,7 +1210,6 @@ test_that('normalize pop vec works', {
 
 
   lambdas_ipmr <- lambda(gen_di_stoch_kern,
-                         comp_method = 'pop_size',
                          type_lambda = 'all') %>%
     as.vector()
 

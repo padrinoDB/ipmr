@@ -16,23 +16,33 @@ lambda(ipm, ...)
 
 \method{lambda}{simple_di_stoch_kern_ipm}(
   ipm,
-  comp_method = c("eigen", "pop_size"),
+  comp_method = "pop_size",
   type_lambda = c("all", "last", "stochastic"),
   ...
 )
 
 \method{lambda}{simple_di_stoch_param_ipm}(
   ipm,
-  comp_method = c("eigen", "pop_size"),
+  comp_method = "pop_size",
   type_lambda = c("all", "last", "stochastic"),
   ...
 )
 
-\method{lambda}{general_di_det_ipm}(ipm, type_lambda = "last", ...)
+\method{lambda}{general_di_det_ipm}(ipm, comp_method = "pop_size", type_lambda = "last", ...)
 
-\method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., type_lambda = c("all", "last", "stochastic"))
+\method{lambda}{general_di_stoch_kern_ipm}(
+  ipm,
+  ...,
+  comp_method = "pop_size",
+  type_lambda = c("all", "last", "stochastic")
+)
 
-\method{lambda}{general_di_stoch_param_ipm}(ipm, ..., type_lambda = c("all", "last", "stochastic"))
+\method{lambda}{general_di_stoch_param_ipm}(
+  ipm,
+  ...,
+  comp_method = "pop_size",
+  type_lambda = c("all", "last", "stochastic")
+)
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
@@ -51,7 +61,8 @@ in length to the \code{iterations} argument of \code{make_ipm()}).
 of log-per-capita growth rate from each time step.}
 }
 \value{
-A single numeric vector or single value.
+An array. Rows correspond to time steps, and columns correspond
+to hierarchical effects (if any).
 }
 \description{
 Compute the per-capita growth rate for an IPM object

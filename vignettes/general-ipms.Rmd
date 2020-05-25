@@ -44,7 +44,7 @@ This example will use a single discrete stage (seed bank, abbreviated `b`) and a
 
 4. $go\_discrete(z) = f_s * f_r * g_i$
 
-5. $leave\_discrete(z') = e_p * \int_L^Uf_d(z') \mathrm{dz}$
+5. $leave\_discrete(z') = e_p * f_d(z')$
 
 6. $stay\_discrete = 0$
 

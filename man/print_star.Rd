@@ -22,28 +22,13 @@
   ...
 )
 
-\method{print}{simple_di_stoch_kern_ipm}(
-  x,
-  comp_lambda = TRUE,
-  comp_method = c("pop_size"),
-  type_lambda = "all",
-  sig_digits = 3,
-  ...
-)
+\method{print}{simple_di_stoch_kern_ipm}(x, comp_lambda = TRUE, type_lambda = "stochastic", sig_digits = 3, ...)
 
-\method{print}{simple_di_stoch_param_ipm}(
-  x,
-  comp_lambda = TRUE,
-  comp_method = c("pop_size"),
-  type_lambda = "stochastic",
-  sig_digits = 3,
-  ...
-)
+\method{print}{simple_di_stoch_param_ipm}(x, comp_lambda = TRUE, type_lambda = "stochastic", sig_digits = 3, ...)
 
 \method{print}{general_di_det_ipm}(
   x,
   comp_lambda = TRUE,
-  comp_method = "pop_size",
   type_lambda = "all",
   sig_digits = 3,
   all_lambdas = FALSE,
@@ -51,23 +36,9 @@
   ...
 )
 
-\method{print}{general_di_stoch_kern_ipm}(
-  x,
-  comp_lambda = TRUE,
-  comp_method = "pop_size",
-  type_lambda = "stochastic",
-  sig_digits = 3,
-  ...
-)
+\method{print}{general_di_stoch_kern_ipm}(x, comp_lambda = TRUE, type_lambda = "stochastic", sig_digits = 3, ...)
 
-\method{print}{general_di_stoch_param_ipm}(
-  x,
-  comp_lambda = TRUE,
-  comp_method = "pop_size",
-  type_lambda = "stochastic",
-  sig_digits = 3,
-  ...
-)
+\method{print}{general_di_stoch_param_ipm}(x, comp_lambda = TRUE, type_lambda = "stochastic", sig_digits = 3, ...)
 }
 \arguments{
 \item{x}{An object produced by \code{make_ipm}.}
