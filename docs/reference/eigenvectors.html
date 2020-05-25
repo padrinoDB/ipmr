@@ -227,7 +227,7 @@ matrix and then compute the left/right eigenvectors for that. For
 (e.g. using the means from the <code>env_seq</code> slot of the IPM).</p>
 <p><code>mega_mat</code> fits the pieces of the model together to create a
 a transpose of the model to iterate with. Kernel names/0s should be supplied
-in ROW MAJOR order (think <code>byrow = TRUE</code>. <code>ipmr</code> supplies
+in ROW MAJOR order (as in <code>byrow = TRUE</code>). <code>ipmr</code> supplies
 a helper function for large models <code>format_mega_matrix</code>
 to help with age-size models or ones with a lot of hierarchical effects.</p>
 
@@ -244,7 +244,8 @@ to help with age-size models or ones with a lot of hierarchical effects.</p>
                   <span class='kw'>mega_mat</span>     <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>stay_discrete</span>, <span class='no'>go_discrete</span>,
                                    <span class='no'>leave_discrete</span>, <span class='no'>P</span>),
                   <span class='kw'>mega_vec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>b</span>, <span class='no'>ht</span>),
-                  <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>)</div></pre>
+                  <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'gen_di_det_ex' did not converge after 100 iterations. Returning NA, please try again with more iterations.</span></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

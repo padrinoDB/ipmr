@@ -184,19 +184,18 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>proto_ipm</th>
-      <td><p>The name of object you wish to append the new kernel to.</p></td>
+      <td><p>The name of the model.</p></td>
     </tr>
     <tr>
       <th>name</th>
       <td><p>The name of the new kernel. There are only two rules: 1. For
 <code>define_k</code>, the name must start with <code>"K"</code> or <code>"k"</code>.
-2. For <code>define_kernel</code>, the name must start with any letter but <code>"K"</code> or
+2. For <code>define_kernel</code>, the name cannot start with <code>"K"</code> or
 <code>"k"</code>.</p></td>
     </tr>
     <tr>
       <th>formula</th>
-      <td><p>A bare expression specifying the form of the kernel. See below
-for examples</p></td>
+      <td><p>A bare expression specifying the form of the kernel. See Details.</p></td>
     </tr>
     <tr>
       <th>family</th>
@@ -207,8 +206,8 @@ discrete to discrete (e.g. stasis in a seedbank).</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>For <code>define_kernel</code>, set of named expressions that correspond
-to vital rates in <code>formula</code>. For <code>define_K</code>, a set of named expressions
+      <td><p>For <code>define_kernel</code>, a set of named expressions that correspond
+to vital rates in <code>formula</code>. For <code>define_k</code>, a set of named expressions
 that relate the population state at T + 1 to the population state at T. Alternatively,
 can be an expression where the left hand side is the name of the kernel specified
 in <code>name</code> and the right hand side only describes the structure of the
@@ -223,8 +222,8 @@ You do not need to specify vectors corresponding to the domains here.</p></td>
     </tr>
     <tr>
       <th>states</th>
-      <td><p>A character vector containing the names of each state variable used in
-the kernel.</p></td>
+      <td><p>A list with character vector containing the names of each state
+variable used in the kernel.</p></td>
     </tr>
     <tr>
       <th>has_hier_effs</th>
@@ -238,15 +237,14 @@ on the syntax for this feature for more details (<code><a href='https://rdrr.io/
     </tr>
     <tr>
       <th>levels_hier_effs</th>
-      <td><p>A named list with vectors corresponding the various levels
-the hierarchical variable can take. Entries in this list should be a single
-vector and should be character or integer typed.</p></td>
+      <td><p>A named list with vectors corresponding to the various levels
+the hierarchical variable can take. The names should match the suffixes used
+in the vital rate expressions.</p></td>
     </tr>
     <tr>
       <th>evict_cor</th>
       <td><p>A logical indicating whether an eviction correction should be applied
-to the kernel. It is generally recommended to use a function in the vital rate
-definition as opposed to using this option Default is <code>FALSE</code>.</p></td>
+to the kernel.</p></td>
     </tr>
     <tr>
       <th>evict_fun</th>
@@ -254,8 +252,9 @@ definition as opposed to using this option Default is <code>FALSE</code>.</p></t
 Currently, the only implemented function is <code>truncated_distributions</code>.
 This works by modifying the functional form of the vital rate expressions
 <code>...</code>, and so supplying your own function in this slot will be difficult.
-One can also specify <code>usr_funs</code> function that performs the correction
-during the numerical implementation of the model itself. In that case,
+You can also either specify a <code>usr_funs</code> function that performs the correction
+during the implementation of the model itself, or incorporate the correction
+into individual vital rate expressions. In either of those cases,
 set <code>evict_cor</code> to <code>FALSE</code>.</p></td>
     </tr>
     </table>
@@ -273,17 +272,17 @@ but with a different <code>K</code> kernel.</p>
 <p><strong><code>define_k</code></strong></p>
 <p>The preferred method of defining a <code>K</code> kernel is to use the left
 hand side of the <code>...</code> to reference the population vectors that the right
-hand side creates (e.g. <code>n_T_1 = (P + F) %*% n_T</code>). This enables powerful
-iteration-based methods to work properly. On the other hand, these iteration
-based methods can be quite time consuming, and many applications only require
+hand side creates (e.g. <code>n_T_1 = (P + F) %*% n_T</code>). This enables
+iteration-based methods to work properly. On the other hand, these iterations
+can be quite time consuming, and some applications only require
 an iteration matrix while not necessarily requiring the population vectors (e.g.
 calculations of deterministic population growth rate). In those cases, the
 <code>...</code> can contain something like <code>K = P + F</code>. In this case, the left
 hand side of the expression should match the <code>name</code> argument to <code>define_k</code>.</p>
 <p><strong><code>define_kernel</code></strong></p>
 <p><code>define_kernel</code> generates most of the information needed to create an IPM
-kernel. There are a few requirements - <code>name</code>, <code>family</code>, and
-<code>formula</code> must not be empty. The <code>formula</code> should be an expression
+kernel. There are a few requirements - <code>name</code>, <code>family</code>,
+<code>formula</code>, and <code>states</code> must not be empty. The <code>formula</code> should be an expression
 for how vital rates produce a kernel (e.g. <code>formula = S * G</code>). The
 <code>...</code> should be a set of named expressions that correspond to vital rate
 expressions (e.g. <code>G = dnorm(size_2, mean_size, sd_size)</code>). See the vignettes

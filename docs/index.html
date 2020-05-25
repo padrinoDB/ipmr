@@ -127,7 +127,7 @@
 <div id="model-classes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#model-classes" class="anchor"></a>Model classes</h2>
-<p>The first step of defining a model in <code>ipmr</code> (assuming all parameters have already been estimated) is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function takes a single argument: <code>model_class</code>. The <code>model_class</code> defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. <code>model_class</code> should be a character string with at least 3 (but possibly 4) entries separated by underscores (<code>_</code>). The possible entries for each position are:</p>
+<p>Once all parameters are estimated, the first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function takes a single argument: <code>model_class</code>. The <code>model_class</code> defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. <code>model_class</code> should be a character string with at least 3 (but possibly 4) entries separated by underscores (<code>_</code>). The possible entries for each position are:</p>
 <ul>
 <li>
 <p>Position 1: <code>"simple"</code>/<code>"general"</code></p>

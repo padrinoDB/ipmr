@@ -19,9 +19,6 @@
     <loc>https://levisc8.github.io/ipmr/reference/format_mega_matrix.html</loc>
   </url>
   <url>
-    <loc>https://levisc8.github.io/ipmr/reference/fun-mult-helpers.html</loc>
-  </url>
-  <url>
     <loc>https://levisc8.github.io/ipmr/reference/gen_di_det.html</loc>
   </url>
   <url>
@@ -53,6 +50,9 @@
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/raw_data_ex.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/reference/right_mult.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/sim_di_det.html</loc>

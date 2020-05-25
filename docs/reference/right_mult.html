@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • ipmr</title>
+<title>Right multiplication — right_mult • ipmr</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,8 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Right multiplication — right_mult" />
+<meta property="og:description" content="Performs right multiplication." />
 
 
 
@@ -58,7 +59,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -138,144 +139,32 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Right multiplication</h1>
+    
+    <div class="hidden name"><code>right_mult.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>Performs right multiplication.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>right_mult</span>(<span class='no'>...</span>)</pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="check_convergence.html">is_conv_to_asymptotic()</a></code> </p>
-        </td>
-        <td><p>Check for model convergence to asymptotic dynamics</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="define_star.html">define_impl()</a></code> <code><a href="define_star.html">make_impl_args_list()</a></code> <code><a href="define_star.html">define_domains()</a></code> <code><a href="define_star.html">define_pop_state()</a></code> <code><a href="define_star.html">define_env_state()</a></code> </p>
-        </td>
-        <td><p>Helpers for IPM construction</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="eigenvectors.html">right_ev()</a></code> <code><a href="eigenvectors.html">left_ev()</a></code> </p>
-        </td>
-        <td><p>Compute the standardized left and right eigenvectors via iteration</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="eviction.html">truncated_distributions()</a></code> </p>
-        </td>
-        <td><p>Eviction correction</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="format_mega_matrix.html">format_mega_matrix()</a></code> </p>
-        </td>
-        <td><p>Format a mega-matrix</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="gen_di_det.html">gen_di_det_ex</a></code> </p>
-        </td>
-        <td><p>A general deterministic IPM example</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="init_ipm.html">init_ipm()</a></code> </p>
-        </td>
-        <td><p>Initialize an IPM</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="kernel-definitions.html">define_kernel()</a></code> <code><a href="kernel-definitions.html">define_k()</a></code> <code><a href="kernel-definitions.html">remove_k()</a></code> </p>
-        </td>
-        <td><p>Functions to initialize and define IPM kernels</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="lambda.html">lambda()</a></code> </p>
-        </td>
-        <td><p>Compute the per-capita growth rate for an IPM object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="make_ipm.html">make_ipm()</a></code> </p>
-        </td>
-        <td><p>Methods to implement an IPM</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="matrix-power.html">`%^%`</a></code> <code><a href="matrix-power.html">mat_power()</a></code> </p>
-        </td>
-        <td><p>Raise a matrix to a power</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plot_star.html">plot(<i>&lt;ipmr_matrix&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;simple_di_det_ipm&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;simple_di_stoch_param_ipm&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;simple_di_stoch_kern_ipm&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Plot a matrix or an *_ipm object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="predict_methods.html">use_vr_model()</a></code> </p>
-        </td>
-        <td><p>Predict methods in ipmr</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="print_star.html">print(<i>&lt;proto_ipm&gt;</i>)</a></code> <code><a href="print_star.html">print(<i>&lt;simple_di_det_ipm&gt;</i>)</a></code> <code><a href="print_star.html">print(<i>&lt;simple_di_stoch_kern_ipm&gt;</i>)</a></code> <code><a href="print_star.html">print(<i>&lt;simple_di_stoch_param_ipm&gt;</i>)</a></code> <code><a href="print_star.html">print(<i>&lt;general_di_det_ipm&gt;</i>)</a></code> <code><a href="print_star.html">print(<i>&lt;general_di_stoch_kern_ipm&gt;</i>)</a></code> <code><a href="print_star.html">print(<i>&lt;general_di_stoch_param_ipm&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Print proto_ipms or *_ipm objects</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="raw_data_ex.html">iceplant_ex</a></code> </p>
-        </td>
-        <td><p>Raw demographic data to construct an example IPM</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="right_mult.html">right_mult()</a></code> </p>
-        </td>
-        <td><p>Right multiplication</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sim_di_det.html">sim_di_det_ex</a></code> </p>
-        </td>
-        <td><p>Simple deterministic IPM example</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="vec-operations.html">vec()</a></code> <code><a href="vec-operations.html">inv_vec()</a></code> </p>
-        </td>
-        <td><p>Perform the <em>vec</em> operation and it's inverse</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>...</th>
+      <td><p>Symbols representing functions - usually things that appear on the
+left hand side of <code>formula</code> and/or <code>...</code> in <code>define_kernel</code> and
+<code>define_k</code>.</p></td>
+    </tr>
     </table>
-  </div>
 
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>

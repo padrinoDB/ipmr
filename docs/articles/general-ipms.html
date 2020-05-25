@@ -135,7 +135,7 @@
 <li><p><span class="math inline">\(b(t + 1) = \int_L^Ugo\_discrete(z) n(z,t)d\mathrm{z}+ stay\_discrete\)</span></p></li>
 <li><p><span class="math inline">\(P(z',z) = s * g\)</span></p></li>
 <li><p><span class="math inline">\(go\_discrete(z) = f_s * f_r * g_i\)</span></p></li>
-<li><p><span class="math inline">\(leave\_discrete(z') = e_p * \int_L^Uf_d(z') \mathrm{dz}\)</span></p></li>
+<li><p><span class="math inline">\(leave\_discrete(z') = e_p * f_d(z')\)</span></p></li>
 <li><p><span class="math inline">\(stay\_discrete = 0\)</span></p></li>
 </ol>
 <p>The vital rates functions and example code to fit them are:</p>
@@ -204,19 +204,7 @@
   <span class="kw">g_i</span>       <span class="kw">=</span> <span class="fl">0.5067</span>
 )</pre></body></html></div>
 <p>Next, we set up the upper (<code>U</code>) and lower (<code>L</code>) size bounds for the population, define the number of meshpoints for integration (<code>n</code>). We also define initial population vectors for both <code>b</code> and <code>ht</code>, set up our <code>states</code> list, and a couple functions to pass into the model.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="co"># The lower and upper bounds for the continuous state variable and the number</span>
-<span class="co"># of meshpoints for the midpoint rule integration.</span>
-
-<span class="no">L</span> <span class="kw">&lt;-</span> <span class="fl">1.02</span>
-<span class="no">U</span> <span class="kw">&lt;-</span> <span class="fl">624</span>
-<span class="no">n</span> <span class="kw">&lt;-</span> <span class="fl">500</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">2312</span>)
-
-<span class="no">init_pop_vec</span>   <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">500</span>)
-<span class="no">init_seed_bank</span> <span class="kw">&lt;-</span> <span class="fl">20</span>
-
-<span class="co"># Initialize the state list and add some helper functions. The survival function</span>
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="co"># We'll set up some helper functions. The survival function</span>
 <span class="co"># in this model is a quadratic function, so we use an additional inverse logit function</span>
 <span class="co"># that can handle the quadratic term.</span>
 
@@ -227,7 +215,7 @@
 <span class="no">inv_logit_2</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">int</span>, <span class="no">slope</span>, <span class="no">slope_2</span>, <span class="no">sv</span>) {
   <span class="fl">1</span>/(<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(-(<span class="no">int</span> + <span class="no">slope</span> * <span class="no">sv</span> + <span class="no">slope_2</span> * <span class="no">sv</span> ^ <span class="fl">2</span>)))
 }</pre></body></html></div>
-<p>Now, we’re ready to begin making the IPM kernels</p>
+<p>Now, we’re ready to begin making the IPM kernels!</p>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">general_ipm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">"general_di_det"</span>) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
     <span class="kw">name</span>          <span class="kw">=</span> <span class="st">"P"</span>,
@@ -317,7 +305,13 @@
     <span class="kw">states</span>        <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ht'</span>)),
     <span class="kw">has_hier_effs</span> <span class="kw">=</span> <span class="fl">FALSE</span>
   )</pre></body></html></div>
-<p>We’ve now defined all of the kernels, and have to define the implementation details. These also differ somewhat from simple IPMs. The key difference in the implementation arguments list lies in the <code>dom_start</code> and <code>dom_end</code> of each kernel, and is related to the <code>family</code> argument of each kernel. Continuous -&gt; continuous transitions always have an entry for the starting and ending domains, but ones describing discrete transitions may have only one, or none. If the family is <code>"CD"</code>, then the <code>dom_start</code> is the name of the continuous domain, and the <code>dom_end</code> is <code>NA</code>. The opposite is true for <code>"DC"</code>. For <code>"DD"</code> transitions, both are <code>NA</code>. This reflects that there is no ending domain for a continuous -&gt; discrete transition, no starting domain for a discrete -&gt; continuous transition, and no domain at all for a discrete -&gt; discrete transition.</p>
+<p>We’ve now defined all of the kernels, and have to define the implementation details. These also differ somewhat from simple IPMs. The key difference in the implementation arguments list lies in the <code>dom_start</code> and <code>dom_end</code> of each kernel, and is related to the <code>family</code> argument of each kernel. Continuous -&gt; continuous transitions always have an entry for the starting and ending domains, but ones describing discrete transitions may have only one, or none.</p>
+<ol style="list-style-type: decimal">
+<li><p>If the family is <code>"CD"</code>, then the <code>dom_start</code> is the name of the continuous domain, and the <code>dom_end</code> is <code>NA</code>.</p></li>
+<li><p>If the family is <code>"DC"</code>, then the <code>dom_start</code> is <code>NA</code> amd the <code>dom_end</code> is the continuous state variable.</p></li>
+<li><p>For <code>"DD"</code> transitions, both are <code>NA</code>.</p></li>
+</ol>
+<p>This reflects that there is no ending domain for a continuous -&gt; discrete transition, no starting domain for a discrete -&gt; continuous transition, and no domain at all for a discrete -&gt; discrete transition.</p>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">general_ipm</span> <span class="kw">&lt;-</span> <span class="no">general_ipm</span> <span class="kw">%&gt;%</span>
   <span class="fu"><a href="../reference/define_star.html">define_impl</a></span>(
     <span class="fu"><a href="../reference/define_star.html">make_impl_args_list</a></span>(
@@ -328,12 +322,27 @@
     )
   )</pre></body></html></div>
 <p>The rest is the same as the simple IPM. We can use our pre-defined functions in <code>make_ipm</code>, and we can use pre-defined variables in <code>define_domains</code>.</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">general_ipm</span> <span class="kw">&lt;-</span> <span class="no">general_ipm</span> <span class="kw">%&gt;%</span>
+<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co"># The lower and upper bounds for the continuous state variable and the number</span>
+<span class="co"># of meshpoints for the midpoint rule integration. We'll also create the initial</span>
+<span class="co"># population vector from a random uniform distribution</span>
+
+<span class="no">L</span> <span class="kw">&lt;-</span> <span class="fl">1.02</span>
+<span class="no">U</span> <span class="kw">&lt;-</span> <span class="fl">624</span>
+<span class="no">n</span> <span class="kw">&lt;-</span> <span class="fl">500</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">2312</span>)
+
+<span class="no">init_pop_vec</span>   <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">500</span>)
+<span class="no">init_seed_bank</span> <span class="kw">&lt;-</span> <span class="fl">20</span>
+
+
+<span class="no">general_ipm</span> <span class="kw">&lt;-</span> <span class="no">general_ipm</span> <span class="kw">%&gt;%</span>
   <span class="fu"><a href="../reference/define_star.html">define_domains</a></span>(
 
     <span class="co"># We can pass the variables we created above into define_domains</span>
 
     <span class="kw">ht</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">L</span>, <span class="no">U</span>, <span class="no">n</span>)
+
   ) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="../reference/define_star.html">define_pop_state</a></span>(
 
@@ -587,15 +596,18 @@
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>(<span class="kw">iterations</span> <span class="kw">=</span> <span class="fl">100</span>,
 
            <span class="co"># We can specify a sequence of kernels to select for the simulation.</span>
-           <span class="co"># This helps others to reproduce what we did (by setting a seed first),</span>
+           <span class="co"># This helps others to reproduce what we did,</span>
            <span class="co"># and lets us keep track of the consequences of different selection</span>
-           <span class="co"># sequences for population dynamics. Note that we will need to specify</span>
-           <span class="co"># a seed and generate the kernel sequence as a variable</span>
-           <span class="co"># before building the IPM to make sure our output is fully reproducible!</span>
+           <span class="co"># sequences for population dynamics. </span>
 
            <span class="kw">kernel_seq</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="fl">1</span>:<span class="fl">5</span>, <span class="kw">size</span> <span class="kw">=</span> <span class="fl">100</span>, <span class="kw">replace</span> <span class="kw">=</span> <span class="fl">TRUE</span>),
            <span class="kw">usr_funs</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">inv_logit</span>   <span class="kw">=</span> <span class="no">inv_logit</span>,
-                           <span class="kw">inv_logit_2</span> <span class="kw">=</span> <span class="no">inv_logit_2</span>))</pre></body></html></div>
+                           <span class="kw">inv_logit_2</span> <span class="kw">=</span> <span class="no">inv_logit_2</span>))
+
+<span class="co"># We can access the order of the kernels from the simulation using the </span>
+<span class="co"># "env_seq" slot </span>
+
+<span class="no">general_di_stoch_kern_ipm</span>$<span class="no">env_seq</span></pre></body></html></div>
 <p>100 isn’t too many iterations, but hopefully this demonstrates how to set up and implement such a model.</p>
 </div>
 <div id="general-models-with-continuously-varying-environments" class="section level2">

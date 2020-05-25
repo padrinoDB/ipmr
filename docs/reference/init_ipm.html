@@ -167,7 +167,7 @@ with <code>define_kernel</code>, <code>define_k</code>, <code>make_ipm</code>, a
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of classes <code>proto_ipm</code> and <code>class</code></p>
+    <p>An object with classes <code>proto_ipm</code> and <code>model_class</code></p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Combinations of <code>simple</code> or <code>general</code>, <code>dd</code> or <code>di</code>,
@@ -176,10 +176,10 @@ the type of model you will be constructing (e.g. <code>"simple_di_det"</code> fo
 deterministic IPM with a single continuous state variable and no discrete stages
 or density dependence).</p>
 <p>Within <code>stoch</code> model types, there are two additional options to append to
-the class: <code>"kern"</code> or code"param". These distinguish between models that
+the class: <code>"kern"</code> or <code>"param"</code>. These distinguish between models that
 use kernel resampling vs those that use parameter resampling (<em>sensu</em> Metcalf et al.
 2015). Below are quick definitions, more detailed explanations can be found
-in the <code><a href='https://rdrr.io/r/utils/vignette.html'>vignettes("classes", package = 'ipmr')</a></code>.</p>
+in the <code><a href='https://rdrr.io/r/utils/vignette.html'>vignettes("ipmr-introduction", package = 'ipmr')</a></code>.</p>
 <ul>
 <li><p>One of</p><ul>
 <li><p><code>simple</code>: an IPM with a single continuous state variable that does not include
@@ -202,15 +202,11 @@ in the <code><a href='https://rdrr.io/r/utils/vignette.html'>vignettes("classes"
     these models build all of the iteration kernels ahead of time and then choose one
     at random or in a user-specified order as they move from iteration to iteration. The
     user-specified population vector is multiplied by the chosen kernel and the result
-    is multiplied by the next kernel for the desired number of iterations or until
-    convergence is reached (depending on what you request following <code><a href='make_ipm.html'>make_ipm()</a></code>.</p></li>
-<li><p><code>param</code>: used to denote parameter resampling. This generates distributions
-    for each parameter based on user-specified functions supplied to <code>define_env()</code>,
-    and then resamples those distributions at each iteration. This will be a bit slower than
-    <code>"kern"</code> resampling because iteration matrices need to be reconstructed
-    from new parameters at every time step. The <code>vignette("classes", package = "ipmr")</code>
-    contains more details and a number of suggestions for further reading on how to avoid this
-    slow down.</p></li>
+    is multiplied by the next kernel for the desired number of iterations.</p></li>
+<li><p><code>param</code>: used to denote parameter resampling. This samples distributions
+    for each parameter based on user-specified functions supplied to <code><a href='define_star.html'>define_env_state()</a></code>.
+    This will be a bit slower than <code>"kern"</code> resampling because iteration
+    matrices need to be reconstructed from new parameters at every time step.</p></li>
 </ul></li>
 </ul>
 
@@ -218,7 +214,6 @@ in the <code><a href='https://rdrr.io/r/utils/vignette.html'>vignettes("classes"
 
     <p>Metcalf et al. (2015). Statistical modelling of annual variation for inference on stochastic
 population dynamics using Integral Projection Models. Methods in Ecology and Evolution, 6: 1007-1017</p>
-<p><strong>UPDATE WITH MORE REFERENCES/MAKE COMPLETE LATER</strong></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

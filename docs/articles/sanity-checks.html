@@ -340,11 +340,10 @@
 
 <span class="no">w_ipmr</span>$<span class="no">dbh_w</span> - <span class="no">w</span></pre></body></html></div>
 </div>
-<div id="simple-density-independent-stochastic-kernel-resampled-model-from-the-readme" class="section level2">
+<div id="simple-density-independent-stochastic-kernel-resampled-model" class="section level2">
 <h2 class="hasAnchor">
-<a href="#simple-density-independent-stochastic-kernel-resampled-model-from-the-readme" class="anchor"></a>Simple density independent stochastic kernel resampled model from the README</h2>
+<a href="#simple-density-independent-stochastic-kernel-resampled-model" class="anchor"></a>Simple density independent stochastic kernel resampled model</h2>
 <div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ipmr</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">purrr</span>)
 
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">50127</span>)
 
@@ -394,10 +393,7 @@
 <span class="no">s_params</span>   <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="no">s_r_int</span>)
 <span class="no">f_s_params</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="no">f_s_r_int</span>)
 
-<span class="co"># purrr::splice combines each separate list into one without creating any </span>
-<span class="co"># additional depth to it. This keeps things a bit tidier.</span>
-
-<span class="no">params</span>     <span class="kw">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/splice.html">splice</a></span>(<span class="no">data_list</span>, <span class="no">g_params</span>, <span class="no">s_params</span>, <span class="no">f_s_params</span>)
+<span class="no">params</span>     <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">data_list</span>, <span class="no">g_params</span>, <span class="no">s_params</span>, <span class="no">f_s_params</span>)
 
 <span class="co">## Now, let's get to the ipmr model</span>
 

@@ -158,7 +158,7 @@
 <span class='co'># S3 method for simple_di_stoch_kern_ipm</span>
 <span class='fu'>lambda</span>(
   <span class='no'>ipm</span>,
-  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>),
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
   <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>),
   <span class='no'>...</span>
 )
@@ -166,19 +166,29 @@
 <span class='co'># S3 method for simple_di_stoch_param_ipm</span>
 <span class='fu'>lambda</span>(
   <span class='no'>ipm</span>,
-  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"eigen"</span>, <span class='st'>"pop_size"</span>),
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
   <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>),
   <span class='no'>...</span>
 )
 
 <span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"last"</span>, <span class='no'>...</span>)
+<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"last"</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for general_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>))
+<span class='fu'>lambda</span>(
+  <span class='no'>ipm</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>)
+)
 
 <span class='co'># S3 method for general_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>))</pre>
+<span class='fu'>lambda</span>(
+  <span class='no'>ipm</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"last"</span>, <span class='st'>"stochastic"</span>)
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -210,7 +220,8 @@ of log-per-capita growth rate from each time step.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A single numeric vector or single value.</p>
+    <p>An array. Rows correspond to time steps, and columns correspond
+to hierarchical effects (if any).</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>There are two possible methods for computing <code>lambda</code> and these

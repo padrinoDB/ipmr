@@ -43,7 +43,7 @@
 <meta property="og:description" content="The make_ipm.* methods convert a proto_ipm into a
 set of discretized kernels and population vectors. Methods have different
 requirements, so be sure to read the parameter documentation. 
-vignettes('Introduction to ipmr', 'ipmr') also contains helpful information." />
+vignette('ipmr-introduction', 'ipmr') also contains helpful information." />
 
 
 
@@ -152,8 +152,8 @@ vignettes('Introduction to ipmr', 'ipmr') also contains helpful information." />
     <div class="ref-description">
     <p>The <code>make_ipm.*</code> methods convert a <code>proto_ipm</code> into a
 set of discretized kernels and population vectors. Methods have different
-requirements, so be sure to read the parameter documentation. <code><a href='https://rdrr.io/r/utils/vignette.html'>
-vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful information.</p>
+requirements, so be sure to read the parameter documentation. <code><a href='../articles/ipmr-introduction.html'>
+vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful information.</p>
     </div>
 
     <pre class="usage"><span class='fu'>make_ipm</span>(<span class='no'>proto_ipm</span>, <span class='kw'>return_all</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='no'>...</span>)
@@ -239,7 +239,7 @@ vignettes('Introduction to ipmr', 'ipmr')</a></code> also contains helpful infor
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>proto_ipm</th>
-      <td><p>The proto_ipm object you wish to implement. This should be the
+      <td><p>The proto_ipm. This should be the
 output of <code>define_kernel</code>, <code>define_k</code>, or the <code>define_*</code> functions.</p></td>
     </tr>
     <tr>
@@ -251,7 +251,7 @@ debugging and not much else.</p></td>
     <tr>
       <th>usr_funs</th>
       <td><p>An optional list of user-specified functions that are passed
-on to the evaluation environments. This can help make vital rate expressions
+on to the  model building process. This can help make vital rate expressions
 more concise and expressive. Names in this list should exactly match the names
 of the function calls in the <code>...</code> or <code>formula</code>.</p></td>
     </tr>
@@ -267,9 +267,8 @@ the IPM with.</p></td>
     <tr>
       <th>iterate</th>
       <td><p>A logical indicating whether or not iterate the model before exiting
-or just return the iteration kernels. For density dependent (<code>dd</code>) and/or
-stochastic parameter resampled models (<code>stoch_param</code>), this should always
-be <code>TRUE</code>.</p></td>
+or just return the iteration kernels. Only applies to density independent, deterministic
+models.</p></td>
     </tr>
     <tr>
       <th>iterations</th>
@@ -332,7 +331,8 @@ a <code>'simple_di_stoch_kern'</code> model will have the class
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>When <code>kernel_seq</code> is a character vector, names
-are matched using <code><a href='https://rdrr.io/r/base/grep.html'>grepl()</a></code>. When it is an integer vector, the vector
+are matched using <code><a href='https://rdrr.io/r/base/grep.html'>grepl()</a></code>.
+When it is an integer vector, the vector
 is first checked to make sure they are all present in kernel names. The model
 procedure will stop if thay are not all present.</p>
 

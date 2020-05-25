@@ -165,7 +165,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>proto_ipm</th>
-      <td><p>The name of object you wish to append the new kernel to.</p></td>
+      <td><p>The name of the model.</p></td>
     </tr>
     <tr>
       <th>kernel_impl_list</th>
@@ -183,8 +183,7 @@ that parameters are being defined for.</p></td>
     <tr>
       <th>int_rule</th>
       <td><p>The integration rule to be used for the kernel. The default is
-"midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.
- If "g-l", additional arguments need to be supplied (<strong>Work on this later!!</strong>).</p></td>
+"midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.</p></td>
     </tr>
     <tr>
       <th>dom_start</th>
@@ -194,16 +193,16 @@ that parameters are being defined for.</p></td>
       <th>dom_end</th>
       <td><p>The name of the state variable for the kernel at time <em>t+1</em>.
 This is usually the same as <code>dom_start</code>, but general IPMs
-with discrete classes or IPMs that move from one state to another (e.g. tree
-seedling going from a height domain to a DBH domain at T+1) may have another
-value here. For cases with a discrete stage, kernels moving individuals from
-discrete to continuous should have a state variable entered here and an <code>NA</code>
-for <code>dom_start</code>. For kernels moving from continuous to discrete, vice versa.
-For discrete to discrete, both are <code>NA</code>.</p></td>
+with discrete states or IPMs that move from one state to another (e.g. tree
+seedling going from a height domain at <em>t</em> to a DBH domain at <em>t+1</em>)
+may have another value here. For cases with a discrete stage, kernels moving
+individuals from discrete to continuous should have a state variable entered
+here and an <code>NA</code> for <code>dom_start</code>. For kernels moving from continuous
+to discrete, vice versa. For discrete to discrete, both are <code>NA</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Named expressions. See details for more information on their usage in
+      <td><p>Named expressions. See Details for more information on their usage in
 each <code>define_*</code> function.</p></td>
     </tr>
     <tr>
@@ -223,37 +222,103 @@ This behaves in the same way as the <code>data_list</code> argument to <code>def
 
     <p>All <code>define_*</code> functions return a proto_ipm. <code>make_impl_args_list</code>
 returns a list, and so must be used within a call to <code>define_impl</code> or
-before initiating the piped model creation procedure.</p>
+before initiating the model creation procedure.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>These are helper functions to define certain types of IPM classes. It is recommended
-to use them within the IPM construction pipeline somewhere between <code>add_kernels</code>
-and <code>make_ipm</code>. The order in which they are called does not matter provided
-all values on the left hand side of the <code>...</code> appear in the right hand side
-of another expression used elsewhere. Expressions where the left hand side does
-not appear anywhere else will be ignored during construction, and so will not
-be present in the returned <code>ipm</code> object.</p>
-<p>Most <code>define_*</code> functions takes dots in the same way: named expressions
-are captured and evaluated later in the appropriate contexts with their respective
-kernels. Suffix expansion is supported so that hierarchical models with
-year/plot/what-have-you effects do not need to  be rewritten 10s or 100s of times.</p>
-<p>The one exception to this is <code>define_domains</code>. It takes named numeric
-vectors of length 3 where the name corresponds to the
+    <p>These are helper functions to define IPMs. They are used after defining the kernels,
+but before calling <code><a href='make_ipm.html'>make_ipm()</a></code> They are meant to be called in the
+following order:</p>
+<ol>
+<li><p><code>define_impl()</code></p></li>
+<li><p><code>define_domains()</code></p></li>
+<li><p><code>define_pop_state()</code></p></li>
+<li><p><code>define_env_state()</code></p></li>
+</ol>
+
+<p>The order requirement is so that information is correctly matched to each kernel.
+Below are specific details on the way each one takes <code>...</code>.</p>
+<p><strong><code>define_impl</code></strong></p>
+<p>This has two arguments - <code>proto_ipm</code> (the model object you wish to work with),
+and the <code>kernel_impl_list</code>. The <code>kernel_impl_list</code> has a very specific format.
+Names of the list should be kernel names, and each kernel should have 3 entries:
+<code>int_rule</code>, <code>dom_start</code>, and <code>dom_end</code>. See examples.</p>
+<p><strong><code>define_domains</code></strong></p>
+<p>If the <code>int_rule = "midpoint"</code>, these are vectors of length 3 where the name corresponds to the
 state variable, the first entry is the lower bound of the domain, the second
 is the upper bound of the domain, and the third entry is the number of
-meshpoints (applies to <code>int_rule = "midpoint"</code> only! Other rules are not
-implemented yet).</p>
-<p><code>define_impl</code> is meant to help distinguish the process of
-generating the kernels' mathematical form from their implementation details.
-It takes a <code>proto_ipm</code> object and returns a modified one containing the
-implementation information.</p>
-<p><code>make_impl_args_list</code> helps generate that
-information in the correct format. It is usually easiest to call <code>make_impl_args_list</code>
-before calling <code>init_ipm</code> and then substituting that variable into
-the call to <code>define_impl</code>. Alternatively, one can do something like
-<code>define_impl(kernel_impl_list = make_impl_arg_list(...))</code> within the course
-of the model definitition pipeline.</p>
+meshpoints. Other <code>int_rule</code>s are not yet implemented, so for now this is the
+only format they can take. See examples.</p>
+<p><strong><code>define_pop_state</code></strong></p>
+<p>This takes either calls to functions in the <code>...</code>, or a pre-generated
+list of vectors in the <code>pop_vectors</code>. The names used
+for each entry in <code>...</code> and/or for the <code>pop_vectors</code> should be
+<code>n_&lt;state_variable&gt;</code>. See examples.</p>
+<p><strong><code>define_env_state</code></strong></p>
+<p>Takes expressions that generate values for environmental covariates at each
+iteration of the model in <code>...</code>. The <code>data_list</code> should contain any
+parameters that the function uses, as well as the function itself. The
+functions should return named lists. Names in that list can be referenced in
+vital rate expressions and/or kernel formulas.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>
+<span class='co'># Example with kernels named "P" and "F", and a domain "z"</span>
+
+<span class='no'>kernel_impl_list</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>P</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>int_rule</span> <span class='kw'>=</span> <span class='st'>"midpoint"</span>, <span class='kw'>dom_start</span> <span class='kw'>=</span> <span class='st'>"z"</span>, <span class='kw'>dom_end</span> <span class='kw'>=</span> <span class='st'>"z"</span>),
+                         <span class='kw'>F</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>int_rule</span> <span class='kw'>=</span> <span class='st'>"midpoint"</span>, <span class='kw'>dom_start</span> <span class='kw'>=</span> <span class='st'>"z"</span>, <span class='kw'>dom_end</span> <span class='kw'>=</span> <span class='st'>"z"</span>))
+
+<span class='co'># an equivalent version using make_impl_args_list</span>
+
+<span class='no'>kernel_impl_list</span> <span class='kw'>&lt;-</span> <span class='fu'>make_impl_args_list</span>(
+     <span class='kw'>kernel_names</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"P"</span>, <span class='st'>"F"</span>),
+     <span class='kw'>int_rule</span>     <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"midpoint"</span>, <span class='st'>"midpoint"</span>),
+     <span class='kw'>dom_start</span>    <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"z"</span>, <span class='st'>"z"</span>),
+     <span class='kw'>dom_end</span>      <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"z"</span>, <span class='st'>"z"</span>)
+)
+
+<span class='co'># define_domains</span>
+
+<span class='no'>lower_bound</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>
+<span class='no'>upper_bound</span> <span class='kw'>&lt;-</span> <span class='fl'>100</span>
+<span class='no'>n_meshpoints</span> <span class='kw'>&lt;-</span> <span class='fl'>50</span>
+
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+
+<span class='fu'>define_domains</span>(<span class='no'>proto_ipm</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>lower_bound</span>, <span class='no'>upper_bound</span>, <span class='no'>n_meshpoints</span>))
+
+<span class='co'># define_pop_state with a state variable named "z". Note that "n_" is prefixed</span>
+<span class='co'># to denote that it is a population state function!</span>
+
+<span class='fu'>define_pop_state</span>(<span class='no'>proto_ipm</span>, <span class='kw'>n_z</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>100</span>))
+
+<span class='co'># alternative, we can make a list before starting to make the IPM</span>
+
+<span class='no'>pop_vecs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>n_z</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>100</span>))
+
+<span class='fu'>define_pop_state</span>(<span class='no'>proto_ipm</span>, <span class='kw'>pop_vectors</span> <span class='kw'>=</span> <span class='no'>pop_vecs</span>)
+
+<span class='co'># define_env_state. Generates a random draw from a known distribution</span>
+<span class='co'># of temperatures.</span>
+
+<span class='no'>env_sampler</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>temp_mean</span>, <span class='no'>temp_sd</span>) {
+
+  <span class='no'>temp</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>1</span>, <span class='no'>temp_mean</span>, <span class='no'>temp_sd</span>)
+
+  <span class='fu'><a href='https://rdrr.io/r/base/function.html'>return</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>temp</span> <span class='kw'>=</span> <span class='no'>temp</span>))
+
+}
+
+<span class='no'>env_pars</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>temp_mean</span> <span class='kw'>=</span> <span class='fl'>12</span>, <span class='kw'>temp_sd</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+
+<span class='fu'>define_env_state</span>(
+ <span class='no'>proto_ipm</span>,
+ <span class='kw'>env_values</span> <span class='kw'>=</span> <span class='fu'>env_sampler</span>(<span class='no'>env_pars</span>$<span class='no'>temp_mean</span>, <span class='no'>env_pars</span>$<span class='no'>temp_sd</span>),
+ <span class='kw'>data_list</span>  <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>env_sampler</span> <span class='kw'>=</span> <span class='no'>env_sampler</span>,
+                   <span class='kw'>env_pars</span>    <span class='kw'>=</span> <span class='no'>env_pars</span>)
+
+)
+
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

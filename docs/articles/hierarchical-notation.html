@@ -659,63 +659,63 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
     <span class="kw">states</span>        <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
     <span class="kw">has_hier_effs</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
     <span class="kw">evict_cor</span>     <span class="kw">=</span> <span class="fl">TRUE</span>,
-        <span class="kw">evict_fun</span>     <span class="kw">=</span> <span class="fu"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
-      ) <span class="kw">%&gt;%</span>
-      <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
-        <span class="kw">name</span>          <span class="kw">=</span> <span class="st">"leave_sb_2"</span>,
-        <span class="kw">family</span>        <span class="kw">=</span> <span class="st">"DC"</span>,
-        <span class="kw">formula</span>       <span class="kw">=</span> <span class="no">s_sb2</span> * <span class="no">r_sb2</span> * <span class="no">f_d</span> * <span class="no">d_z</span>,
-        <span class="kw">f_d</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">z_2</span>, <span class="no">mu_f_d</span>, <span class="no">sigma_f_d</span>),
-        <span class="kw">data_list</span>     <span class="kw">=</span> <span class="no">all_pars</span>,
-        <span class="kw">states</span>        <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
-        <span class="kw">has_hier_effs</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
-        <span class="kw">evict_cor</span>     <span class="kw">=</span> <span class="fl">TRUE</span>,
-        <span class="kw">evict_fun</span>     <span class="kw">=</span> <span class="fu"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
-      ) <span class="kw">%&gt;%</span>
-      <span class="fu"><a href="../reference/kernel-definitions.html">define_k</a></span>(
-        <span class="kw">name</span>             <span class="kw">=</span> <span class="st">"K_site"</span>,
-        <span class="kw">family</span>           <span class="kw">=</span> <span class="st">"IPM"</span>,
-        <span class="kw">K_site</span>           <span class="kw">=</span> <span class="no">P_site</span> + <span class="no">F_site</span>,
-        <span class="kw">n_z_t_1</span>          <span class="kw">=</span> <span class="no">K_site</span>     <span class="kw">%*%</span> <span class="no">n_z_t</span>   +
-          <span class="no">leave_sb_1</span> <span class="kw">%*%</span> <span class="no">n_sb1_t</span> +
-          <span class="no">leave_sb_2</span> <span class="kw">%*%</span> <span class="no">n_sb2_t</span>,
-        <span class="kw">n_sb1_t_1</span>        <span class="kw">=</span> <span class="no">go_sb_1_site</span> <span class="kw">%*%</span> <span class="no">n_z_t</span>,
-        <span class="kw">n_sb2_t_1</span>        <span class="kw">=</span> <span class="no">go_sb_2</span> <span class="kw">%*%</span> <span class="no">n_sb1_t</span>,
-        <span class="kw">data_list</span>        <span class="kw">=</span> <span class="no">all_pars</span>,
-        <span class="kw">states</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
-        <span class="kw">has_hier_effs</span>    <span class="kw">=</span> <span class="fl">TRUE</span>,
-        <span class="kw">levels_hier_effs</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">site</span> <span class="kw">=</span> <span class="no">LETTERS</span>[<span class="fl">1</span>:<span class="fl">6</span>]),
-        <span class="kw">evict_cor</span>        <span class="kw">=</span> <span class="fl">FALSE</span>
-      ) <span class="kw">%&gt;%</span>
-      <span class="fu"><a href="../reference/define_star.html">define_impl</a></span>(
-        <span class="fu"><a href="../reference/define_star.html">make_impl_args_list</a></span>(
-          <span class="kw">kernel_names</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"P_site"</span>, <span class="st">"F_site"</span>,
-                           <span class="st">"go_sb_1_site"</span>, <span class="st">"go_sb_2"</span>,
-                           <span class="st">"leave_sb_1"</span>, <span class="st">"leave_sb_2"</span>,
-                           <span class="st">"K_site"</span>),
-          <span class="kw">int_rule</span>     <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="fl">7</span>),
-          <span class="kw">dom_start</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>, <span class="st">"z"</span>, <span class="st">"z"</span>, <span class="fl">NA_character_</span>, <span class="fl">NA_character_</span>, <span class="fl">NA_character_</span>, <span class="st">"z"</span>),
-          <span class="kw">dom_end</span>      <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>, <span class="st">"z"</span>, <span class="fl">NA_character_</span>, <span class="fl">NA_character_</span>, <span class="st">"z"</span>, <span class="st">"z"</span>, <span class="st">"Z"</span>)
-        )
-      ) <span class="kw">%&gt;%</span>
-      <span class="fu"><a href="../reference/define_star.html">define_domains</a></span>(
-        <span class="kw">z</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.1</span>, <span class="fl">100</span>, <span class="fl">200</span>)
-      ) <span class="kw">%&gt;%</span>
-      <span class="fu"><a href="../reference/define_star.html">define_pop_state</a></span>(
-        <span class="kw">n_z</span>   <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">200</span>),
-        <span class="kw">n_sb1</span> <span class="kw">=</span> <span class="fl">20</span>,
-        <span class="kw">n_sb2</span> <span class="kw">=</span> <span class="fl">20</span>
-      ) <span class="kw">%&gt;%</span>
-      <span class="fu"><a href="../reference/define_star.html">define_env_state</a></span>(
-        <span class="kw">env_state</span> <span class="kw">=</span> <span class="fu">sample_fun</span>(<span class="no">env_params</span>),
-        <span class="kw">data_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">env_params</span> <span class="kw">=</span> <span class="no">env_params</span>)
-      ) <span class="kw">%&gt;%</span>
-      <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>(
-        <span class="kw">usr_funs</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">sample_fun</span> <span class="kw">=</span> <span class="no">sample_fun</span>),
-        <span class="kw">iterations</span>         <span class="kw">=</span> <span class="fl">20</span>,
-        <span class="kw">kernel_seq</span>         <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="no">LETTERS</span>[<span class="fl">1</span>:<span class="fl">6</span>], <span class="fl">20</span>, <span class="kw">replace</span> <span class="kw">=</span> <span class="fl">TRUE</span>),
-        <span class="kw">normalize_pop_size</span> <span class="kw">=</span> <span class="fl">TRUE</span>
-      )</pre></body></html></div>
+    <span class="kw">evict_fun</span>     <span class="kw">=</span> <span class="fu"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
+  ) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
+    <span class="kw">name</span>          <span class="kw">=</span> <span class="st">"leave_sb_2"</span>,
+    <span class="kw">family</span>        <span class="kw">=</span> <span class="st">"DC"</span>,
+    <span class="kw">formula</span>       <span class="kw">=</span> <span class="no">s_sb2</span> * <span class="no">r_sb2</span> * <span class="no">f_d</span> * <span class="no">d_z</span>,
+    <span class="kw">f_d</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">z_2</span>, <span class="no">mu_f_d</span>, <span class="no">sigma_f_d</span>),
+    <span class="kw">data_list</span>     <span class="kw">=</span> <span class="no">all_pars</span>,
+    <span class="kw">states</span>        <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
+    <span class="kw">has_hier_effs</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
+    <span class="kw">evict_cor</span>     <span class="kw">=</span> <span class="fl">TRUE</span>,
+    <span class="kw">evict_fun</span>     <span class="kw">=</span> <span class="fu"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
+  ) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="../reference/kernel-definitions.html">define_k</a></span>(
+    <span class="kw">name</span>             <span class="kw">=</span> <span class="st">"K_site"</span>,
+    <span class="kw">family</span>           <span class="kw">=</span> <span class="st">"IPM"</span>,
+    <span class="kw">K_site</span>           <span class="kw">=</span> <span class="no">P_site</span> + <span class="no">F_site</span>,
+    <span class="kw">n_z_t_1</span>          <span class="kw">=</span> <span class="no">K_site</span>     <span class="kw">%*%</span> <span class="no">n_z_t</span>   +
+      <span class="no">leave_sb_1</span> <span class="kw">%*%</span> <span class="no">n_sb1_t</span> +
+      <span class="no">leave_sb_2</span> <span class="kw">%*%</span> <span class="no">n_sb2_t</span>,
+    <span class="kw">n_sb1_t_1</span>        <span class="kw">=</span> <span class="no">go_sb_1_site</span> <span class="kw">%*%</span> <span class="no">n_z_t</span>,
+    <span class="kw">n_sb2_t_1</span>        <span class="kw">=</span> <span class="no">go_sb_2</span> <span class="kw">%*%</span> <span class="no">n_sb1_t</span>,
+    <span class="kw">data_list</span>        <span class="kw">=</span> <span class="no">all_pars</span>,
+    <span class="kw">states</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
+    <span class="kw">has_hier_effs</span>    <span class="kw">=</span> <span class="fl">TRUE</span>,
+    <span class="kw">levels_hier_effs</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">site</span> <span class="kw">=</span> <span class="no">LETTERS</span>[<span class="fl">1</span>:<span class="fl">6</span>]),
+    <span class="kw">evict_cor</span>        <span class="kw">=</span> <span class="fl">FALSE</span>
+  ) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_star.html">define_impl</a></span>(
+    <span class="fu"><a href="../reference/define_star.html">make_impl_args_list</a></span>(
+      <span class="kw">kernel_names</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"P_site"</span>, <span class="st">"F_site"</span>,
+                       <span class="st">"go_sb_1_site"</span>, <span class="st">"go_sb_2"</span>,
+                       <span class="st">"leave_sb_1"</span>, <span class="st">"leave_sb_2"</span>,
+                       <span class="st">"K_site"</span>),
+      <span class="kw">int_rule</span>     <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="fl">7</span>),
+      <span class="kw">dom_start</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>, <span class="st">"z"</span>, <span class="st">"z"</span>, <span class="fl">NA_character_</span>, <span class="fl">NA_character_</span>, <span class="fl">NA_character_</span>, <span class="st">"z"</span>),
+      <span class="kw">dom_end</span>      <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>, <span class="st">"z"</span>, <span class="fl">NA_character_</span>, <span class="fl">NA_character_</span>, <span class="st">"z"</span>, <span class="st">"z"</span>, <span class="st">"Z"</span>)
+    )
+  ) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_star.html">define_domains</a></span>(
+    <span class="kw">z</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.1</span>, <span class="fl">100</span>, <span class="fl">200</span>)
+  ) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_star.html">define_pop_state</a></span>(
+    <span class="kw">n_z</span>   <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">200</span>),
+    <span class="kw">n_sb1</span> <span class="kw">=</span> <span class="fl">20</span>,
+    <span class="kw">n_sb2</span> <span class="kw">=</span> <span class="fl">20</span>
+  ) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_star.html">define_env_state</a></span>(
+    <span class="kw">env_state</span> <span class="kw">=</span> <span class="fu">sample_fun</span>(<span class="no">env_params</span>),
+    <span class="kw">data_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">env_params</span> <span class="kw">=</span> <span class="no">env_params</span>,
+                     <span class="kw">sample_fun</span> <span class="kw">=</span> <span class="no">sample_fun</span>)
+  ) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>(
+    <span class="kw">iterations</span>         <span class="kw">=</span> <span class="fl">20</span>,
+    <span class="kw">kernel_seq</span>         <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="no">LETTERS</span>[<span class="fl">1</span>:<span class="fl">6</span>], <span class="fl">20</span>, <span class="kw">replace</span> <span class="kw">=</span> <span class="fl">TRUE</span>),
+    <span class="kw">normalize_pop_size</span> <span class="kw">=</span> <span class="fl">TRUE</span>
+  )</pre></body></html></div>
 </div>
 </div>
   </div>
