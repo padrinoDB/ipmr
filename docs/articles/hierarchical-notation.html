@@ -433,7 +433,7 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <ol style="list-style-type: decimal">
 <li><p><span class="math inline">\(n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n(z, t)\mathrm{dz} + \int_L^Us_{{sb}_1} * r_{{sb}_1} * f_d(z')n(sb_1, t)\mathrm{dz} + \int_L^Us_{{sb}_2} * r_{{sb}_2} * f_d(z')n(sb_2, t)\mathrm{dz}\)</span></p></li>
 <li><p><span class="math inline">\(n(sb_1, t + 1) = (1-r_i) * \int_L^U [f_p^{site}(z, \theta) * f_r^{site}(z,\theta)] n(z, t)\mathrm{dz}\)</span></p></li>
-<li><p><span class="math inline">\(n(sb_2, t + 1) = s_{{sb}_1} * (1-r_{{sb}_1})\)</span></p></li>
+<li><p><span class="math inline">\(n(sb_2, t + 1) = s_{{sb}_1} * (1-r_{{sb}_1}) * n(sb_1, t)\)</span></p></li>
 </ol>
 <p>The sub kernels are:</p>
 <ol start="4" style="list-style-type: decimal">
@@ -677,8 +677,8 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
     <span class="kw">family</span>           <span class="kw">=</span> <span class="st">"IPM"</span>,
     <span class="kw">K_site</span>           <span class="kw">=</span> <span class="no">P_site</span> + <span class="no">F_site</span>,
     <span class="kw">n_z_t_1</span>          <span class="kw">=</span> <span class="no">K_site</span>     <span class="kw">%*%</span> <span class="no">n_z_t</span>   +
-      <span class="no">leave_sb_1</span> <span class="kw">%*%</span> <span class="no">n_sb1_t</span> +
-      <span class="no">leave_sb_2</span> <span class="kw">%*%</span> <span class="no">n_sb2_t</span>,
+                       <span class="no">leave_sb_1</span> <span class="kw">%*%</span> <span class="no">n_sb1_t</span> +
+                       <span class="no">leave_sb_2</span> <span class="kw">%*%</span> <span class="no">n_sb2_t</span>,
     <span class="kw">n_sb1_t_1</span>        <span class="kw">=</span> <span class="no">go_sb_1_site</span> <span class="kw">%*%</span> <span class="no">n_z_t</span>,
     <span class="kw">n_sb2_t_1</span>        <span class="kw">=</span> <span class="no">go_sb_2</span> <span class="kw">%*%</span> <span class="no">n_sb1_t</span>,
     <span class="kw">data_list</span>        <span class="kw">=</span> <span class="no">all_pars</span>,

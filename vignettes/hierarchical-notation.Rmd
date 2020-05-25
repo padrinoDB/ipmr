@@ -351,7 +351,7 @@ The full IPM looks like this:
 
 2. $n(sb_1, t + 1) = (1-r_i) * \int_L^U [f_p^{site}(z, \theta) * f_r^{site}(z,\theta)] n(z, t)\mathrm{dz}$
 
-3. $n(sb_2, t + 1) = s_{{sb}_1} * (1-r_{{sb}_1})$
+3. $n(sb_2, t + 1) = s_{{sb}_1} * (1-r_{{sb}_1}) * n(sb_1, t)$
 
 The sub kernels are: 
 
@@ -592,8 +592,8 @@ ex_ipm <- init_ipm("general_di_stoch_param") %>%
     family           = "IPM",
     K_site           = P_site + F_site,
     n_z_t_1          = K_site     %*% n_z_t   + 
-      leave_sb_1 %*% n_sb1_t + 
-      leave_sb_2 %*% n_sb2_t,
+                       leave_sb_1 %*% n_sb1_t + 
+                       leave_sb_2 %*% n_sb2_t,
     n_sb1_t_1        = go_sb_1_site %*% n_z_t,
     n_sb2_t_1        = go_sb_2 %*% n_sb1_t,
     data_list        = all_pars,
