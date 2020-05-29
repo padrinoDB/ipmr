@@ -148,7 +148,17 @@
       )
 
 
-      temp <- rlang::quo_text(proto$evict_fun[[it]][[1]]) %>%
+      # Case when multiple hierarchical effects exist. The first iteration peels
+      # off a layer of list from the quosure, so we need to make sure we don't
+      # grab that at the second time of asking.
+
+      if(j > 1) {
+        use_ev_fun <- proto$evict_fun[[it]]
+      } else {
+        use_ev_fun <- proto$evict_fun[[it]][[1]]
+      }
+
+      temp <- rlang::quo_text(use_ev_fun) %>%
         gsub(pattern = nm, replacement = levels[k, j], x = .) %>%
         rlang::parse_expr()
 
