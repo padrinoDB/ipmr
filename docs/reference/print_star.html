@@ -176,9 +176,8 @@ Generics for IPM classes" />
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(
   <span class='no'>x</span>,
   <span class='kw'>comp_lambda</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"all"</span>,
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"last"</span>,
   <span class='kw'>sig_digits</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>all_lambdas</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>check_conv</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='no'>...</span>
 )
@@ -228,10 +227,6 @@ comp_lambda = TRUE</code>.</p></td>
 has converged to asymptotic dynamics? If <code>TRUE</code> and the model has not
 converged, a message will be printed. Only applies to <code>*_det</code>  when
 <code>comp_method = 'pop_size'</code></p></td>
-    </tr>
-    <tr>
-      <th>all_lambdas</th>
-      <td><p>Return lambdas for every time step or just the final one?</p></td>
     </tr>
     </table>
 

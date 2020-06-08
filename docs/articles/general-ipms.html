@@ -360,10 +360,9 @@
 
 
 <span class="co"># lambda is a generic function to compute per-capita growth rates. It has a number</span>
-<span class="co"># of different options which are explored in the "Generics" vignette (still to be</span>
-<span class="co"># written!).</span>
+<span class="co"># of different options depending on the type of model</span>
 
-<span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">general_ipm</span>, <span class="kw">comp_method</span> <span class="kw">=</span> <span class="st">'pop_size'</span>)[<span class="fl">100</span>]
+<span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">general_ipm</span>)
 
 <span class="co"># If we are worried about whether or not the model converged to stable</span>
 <span class="co"># dynamics, we can use the exported utility is_conv_to_asymptotic. The default</span>
@@ -1002,7 +1001,7 @@
 
 <span class="co"># These values should be almost identical, so this should ~0</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span>(<span class="no">mega_mat</span>)$<span class="no">values</span>[<span class="fl">1</span>]) - <span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">general_ipm</span>)[<span class="fl">100</span>]</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span>(<span class="no">mega_mat</span>)$<span class="no">values</span>[<span class="fl">1</span>]) - <span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">general_ipm</span>)</pre></body></html></div>
 <p>Say we wanted to program with this function. Passing bare expression is difficult programatically, and how to do that is not really within the scope of this vignette (though if you’re interested in learning how, <a href="https://dplyr.tidyverse.org/articles/programming.html">this</a> is a good start). <code>format_mega_matrix</code> also accepts text strings in the same format as above.</p>
 <div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="co"># Get the names of each sub_kernel</span>
 <span class="no">sub_k_nms</span>     <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">general_ipm</span>$<span class="no">sub_kernels</span>)

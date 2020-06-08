@@ -29,9 +29,8 @@
 \method{print}{general_di_det_ipm}(
   x,
   comp_lambda = TRUE,
-  type_lambda = "all",
+  type_lambda = "last",
   sig_digits = 3,
-  all_lambdas = FALSE,
   check_conv = TRUE,
   ...
 )
@@ -63,8 +62,6 @@ comp_lambda = TRUE}.}
 has converged to asymptotic dynamics? If \code{TRUE} and the model has not
 converged, a message will be printed. Only applies to \code{*_det}  when
 \code{comp_method = 'pop_size'}}
-
-\item{all_lambdas}{Return lambdas for every time step or just the final one?}
 }
 \value{
 \code{x} invisibly.

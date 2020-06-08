@@ -281,10 +281,9 @@ general_ipm <- general_ipm %>%
 
 
 # lambda is a generic function to compute per-capita growth rates. It has a number
-# of different options which are explored in the "Generics" vignette (still to be
-# written!).
+# of different options depending on the type of model
 
-lambda(general_ipm, comp_method = 'pop_size')[100]
+lambda(general_ipm)
 
 # If we are worried about whether or not the model converged to stable
 # dynamics, we can use the exported utility is_conv_to_asymptotic. The default
@@ -932,7 +931,7 @@ mega_mat <- format_mega_matrix(ipm = general_ipm,
 
 # These values should be almost identical, so this should ~0
 
-Re(eigen(mega_mat)$values[1]) - lambda(general_ipm)[100]
+Re(eigen(mega_mat)$values[1]) - lambda(general_ipm)
 
 
 ```

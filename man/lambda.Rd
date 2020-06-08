@@ -12,37 +12,17 @@
 \usage{
 lambda(ipm, ...)
 
-\method{lambda}{simple_di_det_ipm}(ipm, comp_method = c("eigen", "pop_size"), type_lambda = "last", ...)
+\method{lambda}{simple_di_det_ipm}(ipm, comp_method = "pop_size", type_lambda = "last", ...)
 
-\method{lambda}{simple_di_stoch_kern_ipm}(
-  ipm,
-  comp_method = "pop_size",
-  type_lambda = c("all", "last", "stochastic"),
-  ...
-)
+\method{lambda}{simple_di_stoch_kern_ipm}(ipm, comp_method = "pop_size", type_lambda = "stochastic", ...)
 
-\method{lambda}{simple_di_stoch_param_ipm}(
-  ipm,
-  comp_method = "pop_size",
-  type_lambda = c("all", "last", "stochastic"),
-  ...
-)
+\method{lambda}{simple_di_stoch_param_ipm}(ipm, comp_method = "pop_size", type_lambda = "stochastic", ...)
 
 \method{lambda}{general_di_det_ipm}(ipm, comp_method = "pop_size", type_lambda = "last", ...)
 
-\method{lambda}{general_di_stoch_kern_ipm}(
-  ipm,
-  ...,
-  comp_method = "pop_size",
-  type_lambda = c("all", "last", "stochastic")
-)
+\method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., comp_method = "pop_size", type_lambda = "stochastic")
 
-\method{lambda}{general_di_stoch_param_ipm}(
-  ipm,
-  ...,
-  comp_method = "pop_size",
-  type_lambda = c("all", "last", "stochastic")
-)
+\method{lambda}{general_di_stoch_param_ipm}(ipm, ..., comp_method = "pop_size", type_lambda = "stochastic")
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}

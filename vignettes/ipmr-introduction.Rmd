@@ -105,8 +105,8 @@ my_ipm <- define_kernel(
   
   family    = "CC",
   
-  # Perform the inverse logit transformation to get the probability of survival
-  # from coefficients of the GLM
+  # Here, we create an expression for the inverse of the link function from 
+  # our GLM for survival. In this case, it's the inverse logit.
   
   s         = 1/(1 + exp(-(s_int + s_slope * dbh_1))),
   
@@ -315,7 +315,27 @@ my_ipm <- my_ipm %>%
     )
   )
 
+my_ipm <- my_ipm %>%
+  
+  # Alternative 3 - skip make_ipml_args_list and create each entry by hand
+  
+  define_impl(
+    list(
+      K = list(int_rule  = "midpoint",
+               dom_start = "dbh",
+               dom_end   = "dbh"),
+      P = list(int_rule  = "midpoint",
+               dom_start = "dbh",
+               dom_end   = "dbh"),
+      F = list(int_rule  = "midpoint",
+               dom_start = "dbh",
+               dom_end   = "dbh")
+    )
+  )
+
 ```
+
+All 3 alternatives in the chunk above create the exact same output. You are free to use whichever format you think is easiest. 
 
 ### Defining domains for state variables
 
@@ -353,13 +373,13 @@ stable_dist <- right_ev(my_ipm)
 
 In this example, there are no additional arguments that need to be passed to `make_ipm()` - the `proto_ipm` has all of the information needed to generate a deterministic iteration kernel. All of the `make_ipm()` methods return a list with a length of 6 with entries: 
 
-- `iterators` contains iteration kernels, or `K`s.
+- `iterators` contains iteration kernels, AKA `K`s.
 
 - `sub_kernels` contains, in this example, `P` and `F`.
 
 - `env_list` is empty, but setting `return_all = TRUE` in `make_ipm()` returns the evaluation environments for each kernel and sub-kernel. These are used by subsequent analysis methods and so are important for internal usage, but are probably of limited use to most users. 
 
-- `env_seq` contains either an integer vector with the sequence of indices used to select kernels from the `iterators` during a stochastic simulation (`*_stoch_kern`), or a matrix of parameter estimates from each iteration of the stochastic simulation (`*_kern_param`). Not relevant for `*_det` methods with a single iteration kernel and so  contains either as sequence of 1s or `NA`s
+- `env_seq` contains either an integer vector with the sequence of indices used to select kernels from the `iterators` during a stochastic simulation (`*_stoch_kern`), or a matrix of parameter estimates from each iteration of the stochastic simulation (`*_kern_param`). Not relevant for `*_det` methods with a single iteration kernel and so  contains either a sequence of 1s or `NA`s
 
 - `pop_state` contains a list of matrices for each item defined in `define_pop_state()`. In this case, we never defined the initial population state, so it will be empty. When `define_pop_state()` is used with `iterate = TRUE`, the rows of each matrix correspond to the population state and columns are time steps.
 
@@ -369,7 +389,7 @@ In this example, there are no additional arguments that need to be passed to `ma
 
 ### Using `predict()` methods in vital rate expressions
 
-The vast majority of modelling pipelines entail fitting a statistical models to data create vital rate functions. Thus, we're typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or hierarchical effects, making them annoying to write out in full. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parameteric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM). 
+The vast majority of modelling pipelines entail fitting a statistical models to data to create vital rate functions. Thus, we're typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or hierarchical effects, and the vital rate expressions are annoying to write out in full. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parameteric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM). 
 
 To deal with this, many regression modelling packages provide a `predict` method for the class of models that they implement. We can use these in `ipmr` to take the place of the vital rate expressions (more common) or the kernel formulas (probably not as common). 
 
@@ -389,7 +409,7 @@ The vital rates models and the IPM variable names are as follows (`vital_rate_mo
 
 2. Survival (`surv_mod`, `s`)
 
-3. Probability of flowering (`f_p`)
+3. Probability of flowering (`repr_mod`, `f_p`)
 
 4. Number of flowers for flowering plants (`seed_mod`, `f_s`)
 
@@ -479,7 +499,7 @@ pred_ipm <- init_ipm("simple_di_det") %>%
     # Instead of the inverse logit transformation, we use predict() here.
     # We have to be sure that the "newdata" argument of predict is correctly specified.
     # This means matching the names used in the model itself (log_size) to the names
-    # we give the domains. In this case, we use "sa" (short for surface area) as
+    # we give the domains (sa_1). In this case, we use "sa" (short for surface area) as
     # the new data to generate predictions for.
     
     s             = predict(surv_mod, 
@@ -553,7 +573,7 @@ pred_ipm <- init_ipm("simple_di_det") %>%
 
 If you are sure that a `predict` method exists for your model type, but you get errors along the lines of `Element <some number> of `.x` must be a vector, not a call`, this usually means that I forgot to add the class of model you're trying to use to `ipmr`. We can get around this by wrapping those model objects in `use_vr_model()`. Please also create an [Issue here](https://github.com/levisc8/ipmr/issues) describing the model class you're trying to work with so it can be added to future versions. 
 
-Say our growth model isn't recognized by `ipmr`. We try to `make_ipm()`, and get our obscure error message about `.x`. The snippet below shows how to rectify this. We wrap our model objects in `use_vr_model()` when creating the `data_list`, and then re-run it with the exact same code as above. `use_vr_model()` tells `ipmr` that this object is a model object, not a raw parameter value. As the package (hopefully) gets used more widely, this issue should disappear, and `use_vr_model()` will (hopefully) become unnecessary.
+Say our growth model isn't recognized by `ipmr`. We try to `make_ipm()`, and get our obscure error message about `.x`. The snippet below shows how to rectify this. We wrap our model objects in `use_vr_model()` when creating the `data_list`, and then re-run it with the exact same code as above. `use_vr_model()` tells `ipmr` that this object is a model object, not a raw parameter value. As the package (hopefully) gets used more widely, this issue should disappear, and `use_vr_model()` will (hopefully) become obsolete.
 
 ```{r eval = FALSE}
 
@@ -827,7 +847,11 @@ my_ipm <- init_ipm('simple_di_det') %>%
   define_domains(ht = c(0.2, 40, 100)) %>%
   make_ipm(iterate  = FALSE)
   
-  lambda(my_ipm, comp_method = 'eigen', type_lambda = "all")
+
+# By default, ipmr computes lambdas based on population sizes, not eigenvalues.
+# We can change that behavior for simple IPMs by specifying comp_method = "eigen"
+
+lambda(my_ipm, comp_method = "eigen")
   
 
 ```
@@ -1092,15 +1116,19 @@ my_iterated_ipm <- my_ipm$proto_ipm %>%
            iterate    = TRUE,
            iterations = 100)
   
-# lambda(comp_method = 'pop_size', type = 'all') will compute the population 
-# growth rate for every time step as the sum(n_ht_t_1) / sum(n_ht_t).
-
-iteration_lambdas <- lambda(my_iterated_ipm, comp_method = 'pop_size', type = 'all')
 
 # lambda(comp_method = 'pop_size', type = 'stochastic') computes
 # the mean of the log'd values computed by type = 'all' (Caswell 2001, p 396).
+# This is the default option for stochastic models.
 
-stoch_lambda <- lambda(my_iterated_ipm, comp_method = 'pop_size', type = 'stochastic')
+stoch_lambda <- lambda(my_iterated_ipm)
+
+# lambda(comp_method = 'pop_size', type = 'all') will compute the population 
+# growth rate for every time step as the sum(n_ht_t_1) / sum(n_ht_t).
+
+iteration_lambdas <- lambda(my_iterated_ipm, type_lambda = 'all')
+
+
 
 ```
 
@@ -1326,14 +1354,20 @@ param_resamp_model <- param_resamp_model %>%
   define_pop_state(
     pop_vectors = list(
       n_surf_area_t = init_pop_vec
-    ),
+    )
   ) %>%
   make_ipm(usr_funs   = list(inv_logit  = inv_logit,
                              sample_env = sample_env),
            iterate    = TRUE,
            iterations = 10)
 
-lambda(param_resamp_model, comp_method = 'pop_size', type_lambda = 'all')
+# By default, lambda computes stochastic lambda with stochastic models 
+
+lambda(param_resamp_model)
+
+# We can get lambdas for each time step by adding type_lambda = "all"
+
+lambda(param_resamp_model, type_lambda = 'all')
 
 # If we want to see the actual draws that were used at each step of the 
 # model iteration, we can access these using the output's $env_seq slot.
@@ -1469,7 +1503,7 @@ lambda_obs <- lambda(obs_ipm, comp_method = 'eigen')
 
 ```
 
-Next, we'll initialize a vector to hold the lambdas at each timestep. We're also going to split out the new recruits from the other data. We only have 12, and the model building won't work if we happen to not pull any of them out when we resample the data
+Next, we'll initialize a vector to hold the lambdas at each timestep. We're also going to split out the new recruits from the other data. We only have 12, and the model building won't work if we happen to not pull any of them out when we resample the data.
 
 ```{r eval = FALSE}
 
@@ -1610,7 +1644,6 @@ An article on these is available on the [website](https://levisc8.github.io/ipmr
 
 ```{r eval = FALSE}
 
-vignette('General IPMs', 'ipmr')
+browseVignettes("ipmr")
 
 ```
-

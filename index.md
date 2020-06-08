@@ -30,7 +30,7 @@ if(!require('remotes', quietly = TRUE)) {
   install.packages("remotes")
 }
 
-remotes::install_github("levisc8/ipmr")
+remotes::install_github("levisc8/ipmr", build_vignettes = TRUE)
 ```
 
 ## Package scope

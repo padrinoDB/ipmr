@@ -30,7 +30,7 @@ if(!require('remotes', quietly = TRUE)) {
   install.packages("remotes")
 }
 
-remotes::install_github("levisc8/ipmr")
+remotes::install_github("levisc8/ipmr", build_vignettes = TRUE)
 ```
 
 ## Package scope
@@ -249,8 +249,9 @@ my_simple_ipm <- init_ipm('simple_di_det') %>%
     # defined for the domain associated with it. Use these to distinguish between 
     # size/weight/etc at time t vs size/weight/etc at time t+1
     
-    # Perform the inverse logit transformation to get survival probabilities
-    # from your model. For examples on using predict(my_surv_mod,...),
+    # Here, we create an expression for the inverse of the link function from 
+    # our GLM for survival. In this case, it's the inverse logit.
+    # For examples on using predict(my_surv_mod,...),
     # see the articles at https://levisc8.github.io/ipmr.
     
     s         = 1 / (1 + exp(-(s_int + s_slope * dbh_1))), 
@@ -366,7 +367,7 @@ implemented by hand, there is an article on that
 ## More complicated models
 
 Examples of more complicated models are included in the vignettes,
-accesible either using `browseVignettes('ipmr')` or by visiting the
+accesible using either `browseVignettes('ipmr')` or by visiting the
 Articles tab on [project’s webpage](https://levisc8.github.io/ipmr/).
 Please file all bug reports in the Issues tab of this repository or
 contact me via [email](mailto:levisc8@gmail.com) with a reproducible

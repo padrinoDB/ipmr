@@ -196,7 +196,7 @@ names(s_alpha_list) <- paste("alpha_s_", 2001:2006, sep = "")
 
 ```
 
-First, we strip away all of `lme4`-related attributes with `unlist()`, then convert it to the flat list format that we need. Next, we set the names Now, we can combine it with our `all_fixed_params` list and we have all of the parameters we need for the kernel functions:
+First, we strip away all of `lme4`-related attributes with `unlist()`, then convert it to the flat list format that we need. Next, we set the names. Now, we can combine it with our `all_fixed_params` list and we have all of the parameters we need for the kernel functions:
 
 ```{r eval = FALSE}
 

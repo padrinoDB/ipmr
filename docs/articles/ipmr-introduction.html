@@ -219,8 +219,8 @@
 
   <span class="kw">family</span>    <span class="kw">=</span> <span class="st">"CC"</span>,
 
-  <span class="co"># Perform the inverse logit transformation to get the probability of survival</span>
-  <span class="co"># from coefficients of the GLM</span>
+  <span class="co"># Here, we create an expression for the inverse of the link function from </span>
+  <span class="co"># our GLM for survival. In this case, it's the inverse logit.</span>
 
   <span class="kw">s</span>         <span class="kw">=</span> <span class="fl">1</span>/(<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(-(<span class="no">s_int</span> + <span class="no">s_slope</span> * <span class="no">dbh_1</span>))),
 
@@ -386,7 +386,26 @@
       <span class="kw">dom_start</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>, <span class="fl">3</span>),
       <span class="kw">dom_end</span>      <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>,<span class="fl">3</span>)
     )
+  )
+
+<span class="no">my_ipm</span> <span class="kw">&lt;-</span> <span class="no">my_ipm</span> <span class="kw">%&gt;%</span>
+
+  <span class="co"># Alternative 3 - skip make_ipml_args_list and create each entry by hand</span>
+
+  <span class="fu"><a href="../reference/define_star.html">define_impl</a></span>(
+    <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+      <span class="kw">K</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">int_rule</span>  <span class="kw">=</span> <span class="st">"midpoint"</span>,
+               <span class="kw">dom_start</span> <span class="kw">=</span> <span class="st">"dbh"</span>,
+               <span class="kw">dom_end</span>   <span class="kw">=</span> <span class="st">"dbh"</span>),
+      <span class="kw">P</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">int_rule</span>  <span class="kw">=</span> <span class="st">"midpoint"</span>,
+               <span class="kw">dom_start</span> <span class="kw">=</span> <span class="st">"dbh"</span>,
+               <span class="kw">dom_end</span>   <span class="kw">=</span> <span class="st">"dbh"</span>),
+      <span class="kw">F</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">int_rule</span>  <span class="kw">=</span> <span class="st">"midpoint"</span>,
+               <span class="kw">dom_start</span> <span class="kw">=</span> <span class="st">"dbh"</span>,
+               <span class="kw">dom_end</span>   <span class="kw">=</span> <span class="st">"dbh"</span>)
+    )
   )</pre></body></html></div>
+<p>All 3 alternatives in the chunk above create the exact same output. You are free to use whichever format you think is easiest.</p>
 </div>
 <div id="defining-domains-for-state-variables" class="section level3">
 <h3 class="hasAnchor">
@@ -415,10 +434,10 @@
 <span class="no">stable_dist</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/eigenvectors.html">right_ev</a></span>(<span class="no">my_ipm</span>)</pre></body></html></div>
 <p>In this example, there are no additional arguments that need to be passed to <code><a href="../reference/make_ipm.html">make_ipm()</a></code> - the <code>proto_ipm</code> has all of the information needed to generate a deterministic iteration kernel. All of the <code><a href="../reference/make_ipm.html">make_ipm()</a></code> methods return a list with a length of 6 with entries:</p>
 <ul>
-<li><p><code>iterators</code> contains iteration kernels, or <code>K</code>s.</p></li>
+<li><p><code>iterators</code> contains iteration kernels, AKA <code>K</code>s.</p></li>
 <li><p><code>sub_kernels</code> contains, in this example, <code>P</code> and <code>F</code>.</p></li>
 <li><p><code>env_list</code> is empty, but setting <code>return_all = TRUE</code> in <code><a href="../reference/make_ipm.html">make_ipm()</a></code> returns the evaluation environments for each kernel and sub-kernel. These are used by subsequent analysis methods and so are important for internal usage, but are probably of limited use to most users.</p></li>
-<li><p><code>env_seq</code> contains either an integer vector with the sequence of indices used to select kernels from the <code>iterators</code> during a stochastic simulation (<code>*_stoch_kern</code>), or a matrix of parameter estimates from each iteration of the stochastic simulation (<code>*_kern_param</code>). Not relevant for <code>*_det</code> methods with a single iteration kernel and so contains either as sequence of 1s or <code>NA</code>s</p></li>
+<li><p><code>env_seq</code> contains either an integer vector with the sequence of indices used to select kernels from the <code>iterators</code> during a stochastic simulation (<code>*_stoch_kern</code>), or a matrix of parameter estimates from each iteration of the stochastic simulation (<code>*_kern_param</code>). Not relevant for <code>*_det</code> methods with a single iteration kernel and so contains either a sequence of 1s or <code>NA</code>s</p></li>
 <li><p><code>pop_state</code> contains a list of matrices for each item defined in <code><a href="../reference/define_star.html">define_pop_state()</a></code>. In this case, we never defined the initial population state, so it will be empty. When <code><a href="../reference/define_star.html">define_pop_state()</a></code> is used with <code>iterate = TRUE</code>, the rows of each matrix correspond to the population state and columns are time steps.</p></li>
 <li><p><code>proto_ipm</code> contains the <code>proto_ipm</code> object used to generate the model. This is useful for rebuilding the model with a different set of <code>impl_args</code> or parameters to see how that changes your results.</p></li>
 </ul>
@@ -426,7 +445,7 @@
 <div id="using-predict-methods-in-vital-rate-expressions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#using-predict-methods-in-vital-rate-expressions" class="anchor"></a>Using <code>predict()</code> methods in vital rate expressions</h3>
-<p>The vast majority of modelling pipelines entail fitting a statistical models to data create vital rate functions. Thus, we’re typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or hierarchical effects, making them annoying to write out in full. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parameteric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM).</p>
+<p>The vast majority of modelling pipelines entail fitting a statistical models to data to create vital rate functions. Thus, we’re typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or hierarchical effects, and the vital rate expressions are annoying to write out in full. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parameteric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM).</p>
 <p>To deal with this, many regression modelling packages provide a <code>predict</code> method for the class of models that they implement. We can use these in <code>ipmr</code> to take the place of the vital rate expressions (more common) or the kernel formulas (probably not as common).</p>
 <p>We’ll go through a quick example of how to incorporate these expressions into the model building process using a data set for <em>Carpobrotus edulis</em>, an invasive succulent. This is real data collected in Israel and appears in Bogdan et al. (<em>in prep</em>). The data set is also included in <code>ipmr</code> and can be loaded by running <code><a href="https://rdrr.io/r/utils/data.html">data(iceplant_ex)</a></code>.</p>
 <p>First, we’ll load in the example data set and fit some simple vital rate models. Some notes about the data:</p>
@@ -439,7 +458,7 @@
 <ol style="list-style-type: decimal">
 <li><p>Growth (<code>grow_mod</code>, <code>g</code>)</p></li>
 <li><p>Survival (<code>surv_mod</code>, <code>s</code>)</p></li>
-<li><p>Probability of flowering (<code>f_p</code>)</p></li>
+<li><p>Probability of flowering (<code>repr_mod</code>, <code>f_p</code>)</p></li>
 <li><p>Number of flowers for flowering plants (<code>seed_mod</code>, <code>f_s</code>)</p></li>
 <li><p>Total number of new recruits at <span class="math inline">\(t + 1\)</span> (<code>recr_n</code>, <code>recr_n</code>)</p></li>
 <li><p>Total number of flowers at <span class="math inline">\(t\)</span> (<code>flow_n</code>, <code>flow_n</code>)</p></li>
@@ -519,7 +538,7 @@
     <span class="co"># Instead of the inverse logit transformation, we use predict() here.</span>
     <span class="co"># We have to be sure that the "newdata" argument of predict is correctly specified.</span>
     <span class="co"># This means matching the names used in the model itself (log_size) to the names</span>
-    <span class="co"># we give the domains. In this case, we use "sa" (short for surface area) as</span>
+    <span class="co"># we give the domains (sa_1). In this case, we use "sa" (short for surface area) as</span>
     <span class="co"># the new data to generate predictions for.</span>
 
     <span class="kw">s</span>             <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span>(<span class="no">surv_mod</span>,
@@ -588,7 +607,7 @@
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>(<span class="kw">iterate</span> <span class="kw">=</span> <span class="fl">FALSE</span>)</pre></body></html></div>
 <p><code><a href="../reference/make_ipm.html">make_ipm()</a></code> can handle most types of widely used model classes without any additional effort (e.g. <code>lm</code>, <code>glm</code>, <code>lme4</code>, <code>brms</code>, <code>nlme</code>, <code>stanfit</code>, <code>betareg</code>). The list of method available in <code>ipmr</code> is not exhaustive though, and sometimes there will be errors.</p>
 <p>If you are sure that a <code>predict</code> method exists for your model type, but you get errors along the lines of <code>Element &lt;some number&gt; of</code>.x<code>must be a vector, not a call</code>, this usually means that I forgot to add the class of model you’re trying to use to <code>ipmr</code>. We can get around this by wrapping those model objects in <code><a href="../reference/predict_methods.html">use_vr_model()</a></code>. Please also create an <a href="https://github.com/levisc8/ipmr/issues">Issue here</a> describing the model class you’re trying to work with so it can be added to future versions.</p>
-<p>Say our growth model isn’t recognized by <code>ipmr</code>. We try to <code><a href="../reference/make_ipm.html">make_ipm()</a></code>, and get our obscure error message about <code>.x</code>. The snippet below shows how to rectify this. We wrap our model objects in <code><a href="../reference/predict_methods.html">use_vr_model()</a></code> when creating the <code>data_list</code>, and then re-run it with the exact same code as above. <code><a href="../reference/predict_methods.html">use_vr_model()</a></code> tells <code>ipmr</code> that this object is a model object, not a raw parameter value. As the package (hopefully) gets used more widely, this issue should disappear, and <code><a href="../reference/predict_methods.html">use_vr_model()</a></code> will (hopefully) become unnecessary.</p>
+<p>Say our growth model isn’t recognized by <code>ipmr</code>. We try to <code><a href="../reference/make_ipm.html">make_ipm()</a></code>, and get our obscure error message about <code>.x</code>. The snippet below shows how to rectify this. We wrap our model objects in <code><a href="../reference/predict_methods.html">use_vr_model()</a></code> when creating the <code>data_list</code>, and then re-run it with the exact same code as above. <code><a href="../reference/predict_methods.html">use_vr_model()</a></code> tells <code>ipmr</code> that this object is a model object, not a raw parameter value. As the package (hopefully) gets used more widely, this issue should disappear, and <code><a href="../reference/predict_methods.html">use_vr_model()</a></code> will (hopefully) become obsolete.</p>
 <div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="no">params</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">recr_mu</span> <span class="kw">=</span> <span class="no">recr_mu</span>,
                <span class="kw">recr_sd</span> <span class="kw">=</span> <span class="no">recr_sd</span>,
                <span class="kw">grow_sd</span> <span class="kw">=</span> <span class="no">grow_sd</span>,
@@ -851,7 +870,11 @@
   <span class="fu"><a href="../reference/define_star.html">define_domains</a></span>(<span class="kw">ht</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.2</span>, <span class="fl">40</span>, <span class="fl">100</span>)) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>(<span class="kw">iterate</span>  <span class="kw">=</span> <span class="fl">FALSE</span>)
 
-  <span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">my_ipm</span>, <span class="kw">comp_method</span> <span class="kw">=</span> <span class="st">'eigen'</span>, <span class="kw">type_lambda</span> <span class="kw">=</span> <span class="st">"all"</span>)</pre></body></html></div>
+
+<span class="co"># By default, ipmr computes lambdas based on population sizes, not eigenvalues.</span>
+<span class="co"># We can change that behavior for simple IPMs by specifying comp_method = "eigen"</span>
+
+<span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">my_ipm</span>, <span class="kw">comp_method</span> <span class="kw">=</span> <span class="st">"eigen"</span>)</pre></body></html></div>
 <p>Aside from appending <code>_site</code> to a number of variables, the code is pretty much the same as the first example. <code>ipmr</code> automatically substitutes 1, 2, 3, 4, and 5 for each occurence of <code>site</code> in the kernel formulas and vital rate expressions. Thus, <code>P_site</code> is expanded to <code>P_1</code>, <code>P_2</code>, <code>P_3</code>, <code>P_4</code>, <code>P_5</code>, <code>s_yr</code> to <code>s_1</code>, <code>s_2</code>, <code>s_3</code>, <code>s_4</code>, and <code>s_5</code>. <code>s_r_site</code> is converted to <code>s_r_1</code>, <code>s_r_2</code>, etc. This is why we needed to make sure the names in <code>all_params_list</code> had the actual numbers appended to them.</p>
 <p>For more complicated models, you may need multiple suffixes. In those cases, you can append them in order you like to each variable. For example, sites (<code>_site</code>) and years (<code>_yr</code>) could be appended to survival (<code>s_</code>) like so:</p>
 <p><code>s_site_yr = some_expression</code></p>
@@ -1093,15 +1116,17 @@
            <span class="kw">iterate</span>    <span class="kw">=</span> <span class="fl">TRUE</span>,
            <span class="kw">iterations</span> <span class="kw">=</span> <span class="fl">100</span>)
 
-<span class="co"># lambda(comp_method = 'pop_size', type = 'all') will compute the population </span>
-<span class="co"># growth rate for every time step as the sum(n_ht_t_1) / sum(n_ht_t).</span>
-
-<span class="no">iteration_lambdas</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">my_iterated_ipm</span>, <span class="kw">comp_method</span> <span class="kw">=</span> <span class="st">'pop_size'</span>, <span class="kw">type</span> <span class="kw">=</span> <span class="st">'all'</span>)
 
 <span class="co"># lambda(comp_method = 'pop_size', type = 'stochastic') computes</span>
 <span class="co"># the mean of the log'd values computed by type = 'all' (Caswell 2001, p 396).</span>
+<span class="co"># This is the default option for stochastic models.</span>
 
-<span class="no">stoch_lambda</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">my_iterated_ipm</span>, <span class="kw">comp_method</span> <span class="kw">=</span> <span class="st">'pop_size'</span>, <span class="kw">type</span> <span class="kw">=</span> <span class="st">'stochastic'</span>)</pre></body></html></div>
+<span class="no">stoch_lambda</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">my_iterated_ipm</span>)
+
+<span class="co"># lambda(comp_method = 'pop_size', type = 'all') will compute the population </span>
+<span class="co"># growth rate for every time step as the sum(n_ht_t_1) / sum(n_ht_t).</span>
+
+<span class="no">iteration_lambdas</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">my_iterated_ipm</span>, <span class="kw">type_lambda</span> <span class="kw">=</span> <span class="st">'all'</span>)</pre></body></html></div>
 <p>100 iterations is not enough to estimate stochastic growth rates (<span class="math inline">\(\lambda_s\)</span>), but the computations can take some time with a lot of iterations, and are not practical for demonstration purposes.</p>
 </div>
 </div>
@@ -1330,14 +1355,20 @@
   <span class="fu"><a href="../reference/define_star.html">define_pop_state</a></span>(
     <span class="kw">pop_vectors</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
       <span class="kw">n_surf_area_t</span> <span class="kw">=</span> <span class="no">init_pop_vec</span>
-    ),
+    )
   ) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>(<span class="kw">usr_funs</span>   <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">inv_logit</span>  <span class="kw">=</span> <span class="no">inv_logit</span>,
                              <span class="kw">sample_env</span> <span class="kw">=</span> <span class="no">sample_env</span>),
            <span class="kw">iterate</span>    <span class="kw">=</span> <span class="fl">TRUE</span>,
            <span class="kw">iterations</span> <span class="kw">=</span> <span class="fl">10</span>)
 
-<span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">param_resamp_model</span>, <span class="kw">comp_method</span> <span class="kw">=</span> <span class="st">'pop_size'</span>, <span class="kw">type_lambda</span> <span class="kw">=</span> <span class="st">'all'</span>)
+<span class="co"># By default, lambda computes stochastic lambda with stochastic models </span>
+
+<span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">param_resamp_model</span>)
+
+<span class="co"># We can get lambdas for each time step by adding type_lambda = "all"</span>
+
+<span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">param_resamp_model</span>, <span class="kw">type_lambda</span> <span class="kw">=</span> <span class="st">'all'</span>)
 
 <span class="co"># If we want to see the actual draws that were used at each step of the </span>
 <span class="co"># model iteration, we can access these using the output's $env_seq slot.</span>
@@ -1464,7 +1495,7 @@
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>(<span class="kw">iterate</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
 
 <span class="no">lambda_obs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="no">obs_ipm</span>, <span class="kw">comp_method</span> <span class="kw">=</span> <span class="st">'eigen'</span>)</pre></body></html></div>
-<p>Next, we’ll initialize a vector to hold the lambdas at each timestep. We’re also going to split out the new recruits from the other data. We only have 12, and the model building won’t work if we happen to not pull any of them out when we resample the data</p>
+<p>Next, we’ll initialize a vector to hold the lambdas at each timestep. We’re also going to split out the new recruits from the other data. We only have 12, and the model building won’t work if we happen to not pull any of them out when we resample the data.</p>
 <div class="sourceCode" id="cb24"><html><body><pre class="r"><span class="no">all_lambdas</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(<span class="fl">1000L</span>)
 
 <span class="no">recr_data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(<span class="no">iceplant_ex</span>, <span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">log_size</span>))
@@ -1591,7 +1622,7 @@
 <h2 class="hasAnchor">
 <a href="#general-ipms" class="anchor"></a>General IPMs</h2>
 <p>An article on these is available on the <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">website</a> and from an R session:</p>
-<div class="sourceCode" id="cb26"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html">vignette</a></span>(<span class="st">'General IPMs'</span>, <span class="st">'ipmr'</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb26"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/browseVignettes.html">browseVignettes</a></span>(<span class="st">"ipmr"</span>)</pre></body></html></div>
 </div>
   </div>
 
