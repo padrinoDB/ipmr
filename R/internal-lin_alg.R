@@ -555,3 +555,177 @@ is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
   return(out)
 
 }
+
+
+#' @noRd
+
+# Internal generic to check arguments in lambda() for validity
+
+.check_lambda_args <- function(ipm, comp_method, type_lambda) {
+  UseMethod(".check_lambda_args")
+}
+
+
+#' @noRd
+
+.check_lambda_args.simple_di_det_ipm <- function(ipm, comp_method, type_lambda) {
+
+  if(!type_lambda %in% c("stochastic", "all", "last")) {
+    stop("'type_lambda' must be one of 'all' or 'last'.",
+         call. = FALSE)
+  }
+
+  if(!attr(ipm, "iterated") && comp_method == 'pop_size') {
+    stop("ipmr cannot compute lambda by population size for a model that is not yet",
+         " iterated.\n",
+         "Re-run with comp_method = 'eigen' or make_ipm(iterate = TRUE).",
+         call. = FALSE)
+  }
+
+  if(type_lambda == 'stochastic') {
+    stop("Cannot compute stochastic lambda for a deterministic IPM.", call. = FALSE)
+  }
+
+  invisible(TRUE)
+
+}
+
+#' @noRd
+
+.check_lambda_args.simple_di_stoch_kern_ipm <- function(ipm, comp_method, type_lambda) {
+
+  if(!attr(ipm, 'iterated')) {
+    stop("ipmr cannot compute lambda for a model that is not iterated!",
+         call. = FALSE)
+  }
+
+  if(!type_lambda %in% c("stochastic", "all", "last")) {
+    stop("'type_lambda' must be one of 'stochastic', 'all', or 'last'.",
+         call. = FALSE)
+  }
+
+  if(comp_method == 'eigen' && type_lambda == 'pop_size') {
+    stop("ipmr cannot compute stochastic lambda using comp_method = 'eigen'.",
+         call. = FALSE)
+  }
+
+  invisible(TRUE)
+}
+
+#' @noRd
+
+.check_lambda_args.simple_di_stoch_param_ipm <- function(ipm, comp_method, type_lambda) {
+
+  if(!attr(ipm, 'iterated')) {
+    stop("ipmr cannot compute lambda for a model that is not iterated!",
+         call. = FALSE)
+  }
+
+  if(!type_lambda %in% c("stochastic", "all", "last")) {
+    stop("'type_lambda' must be one of 'stochastic', 'all', or 'last'.",
+         call. = FALSE)
+  }
+
+  if(comp_method == 'eigen' && type_lambda == 'pop_size') {
+    stop("ipmr cannot compute stochastic lambda using comp_method = 'eigen'.",
+         call. = FALSE)
+  }
+
+  invisible(TRUE)
+
+}
+
+#' @noRd
+
+.check_lambda_args.general_di_det_ipm <- function(ipm, comp_method, type_lambda) {
+
+  if(comp_method != 'pop_size') {
+
+    stop("ipmr requires comp_method = 'pop_size' for all general IPMs.",
+         call. = FALSE)
+
+  }
+
+  if(!type_lambda %in% c("stochastic", "all", "last")) {
+
+    stop("'type_lambda' must be one of 'all' or 'last'.",
+         call. = FALSE)
+
+  } else if(type_lambda == 'stochastic') {
+
+    stop("ipmr cannot compute stochastic lambda for a deterministic IPM.",
+         call. = FALSE)
+  }
+
+  if(!attr(ipm, "iterated")) {
+
+    stop("Cannot compute lambda by population size for a model that is not yet",
+         " iterated.\n",
+         "Re-run with make_ipm(iterate = TRUE).",
+         call. = FALSE)
+  }
+
+  invisible(TRUE)
+
+}
+
+#' @noRd
+
+.check_lambda_args.general_di_stoch_kern_ipm <- function(ipm, comp_method, type_lambda) {
+
+  if(comp_method != 'pop_size') {
+
+    stop("ipmr requires comp_method = 'pop_size' for all general IPMs.",
+         call. = FALSE)
+
+  }
+
+  if(!type_lambda %in% c("stochastic", "all", "last")) {
+
+    stop("'type_lambda' must be one of 'stochastic', 'all', or 'last'.",
+         call. = FALSE)
+
+  }
+
+  if(!attr(ipm, "iterated")) {
+
+    stop("Cannot compute lambda by population size for a model that is not yet",
+         " iterated.\n",
+         "Re-run with make_ipm(iterate = TRUE).",
+         call. = FALSE)
+  }
+
+  invisible(TRUE)
+
+}
+
+#' @noRd
+
+.check_lambda_args.general_di_stoch_param_ipm <- function(ipm, comp_method, type_lambda) {
+
+  if(comp_method != 'pop_size') {
+
+    stop("ipmr requires comp_method = 'pop_size' for all general IPMs.",
+         call. = FALSE)
+
+  }
+
+  if(!type_lambda %in% c("stochastic", "all", "last")) {
+
+    stop("'type_lambda' must be one of 'stochastic', 'all', or 'last'.",
+         call. = FALSE)
+
+  }
+
+  if(!attr(ipm, "iterated")) {
+
+    stop("Cannot compute lambda by population size for a model that is not yet",
+         " iterated.\n",
+         "Re-run with make_ipm(iterate = TRUE).",
+         call. = FALSE)
+  }
+
+  invisible(TRUE)
+
+}
+
