@@ -16,3 +16,4 @@ paper/generics_progress.csv
 paper/generic_progress.csv
 profiling/*
 tests/sim_tests/test-alternate-l_ev impl.R
+*.docx

@@ -18,3 +18,5 @@
 ^vignettes/generic-progress\.Rmd$
 ^profiling/*$
 ^tests/sim_tests$
+^CODE_OF_CONDUCT\.md$
+^cran-comments\.md$

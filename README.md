@@ -372,3 +372,10 @@ Articles tab on [project’s webpage](https://levisc8.github.io/ipmr/).
 Please file all bug reports in the Issues tab of this repository or
 contact me via [email](mailto:levisc8@gmail.com) with a reproducible
 example.
+
+## Code of Conduct
+
+We welcome contributions from other developers. Please note that the
+ipmr project is released with a [Contributor Code of
+Conduct](https://levisc8.github.io/ipmr/CODE_OF_CONDUCT.html). By
+contributing to this project, you agree to abide by its terms.
