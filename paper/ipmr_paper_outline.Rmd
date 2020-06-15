@@ -14,9 +14,29 @@ Sam Levin[^1]^,^[^2]^,^[^3], Roberto Salguero-Gomez[^3], Aldo Compagnoni[^1]^,^[
 [^4]: Sheffield
 [^5]: UFZ Halle
 
+
+```{r echo = FALSE, message = FALSE, warning=FALSE}
+
+library(dplyr)
+library(purrr)
+
+ipm_pubs <- read.csv('../data-raw/padr-pubs-feb-2020.csv',
+                     stringsAsFactors = FALSE)
+
+pub_id <- pmap_chr(.l = data.frame(a = ipm_pubs$Authors,
+                                   b = ipm_pubs$Journal, 
+                                   c = ipm_pubs$Year),
+               .f = function(a, b, c) paste(a, b, c, sep = "_"))
+
+pub_tot  <- length(unique(pub_id))
+
+spec_tot <- length(unique(ipm_pubs$Species))
+
+```
+
 ## Intro
 
-Integral projection models (IPMs) have become one of the tools of choice for demographers studying structured populations in discrete time. Since Easterling, Ellner & Dixon's (2000) seminal paper, there have been > 100 publications using IPMs to address a variety of questions ranging from invasive species population dynamics to evolutionary stable strategies to endangered species conservation (a buttload of citations, Padrino DB, Levin et al. unpublished). Their main power lies in the fact that they allow for continuously distributed state variables to describe vital rates and population structure, as opposed to historically favored methods that relied on the sometimes arbitrary delineation of classes (e.g. matrix population models, Caswell 2001). 
+Integral projection models (IPMs) have become one of the tools of choice for demographers studying structured populations in discrete time. Since Easterling, Ellner & Dixon's (2000) seminal paper, there have been over `r pub_tot` publications for using IPMs to address a variety of questions ranging from invasive species population dynamics to evolutionary stable strategies to endangered species conservation. In plants alone, there are currently at least `r spec_tot` plant species for which an IPM exists (a buttload of citations, Padrino DB, Levin et al. unpublished). Their main power lies in the fact that they allow for continuously distributed state variables to describe vital rates and population structure, as opposed to historically favored methods that relied on the sometimes arbitrary delineation of classes (e.g. matrix population models, Caswell 2001). 
 
 IPMs are flexible models that rely on raw data to drive their functional form. They are built using regressions of vital rates on a state variable that is related to individual fitness in some way (e.g. dbh for trees, body mass in animals). Regression analysis has been a standard tool for ecologists for quite some time now, and the field is mature enough to accomodate almost any type of data (e.g. Wood 2011, Bates et al. 2015). Regression model parameters are usually easier to estimate than matrix parameters when data sets are small, facilitating analysis of population dynamics for threatened or endangered species in a way that matrix models cannot (Ramula et al. 2009). This flexibility has lead to an exponential increase in their appearance in the literature (Figure 1). This rise in popularity also spurred to the creation of software tools that assisted in their implementation and analysis (Metcalf et al. XXXX).
 

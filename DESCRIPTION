@@ -17,7 +17,6 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    brms,
     knitr,
     lme4,
     mvtnorm,
