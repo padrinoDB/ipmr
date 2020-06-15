@@ -17,13 +17,15 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: 
+    brms,
     knitr,
+    lme4,
     mvtnorm,
     rmarkdown,
     roxygen2,
     spelling,
     testthat,
-    covr
+    covr,
 VignetteBuilder: knitr
 Language: en-US
 Imports:
@@ -36,7 +38,4 @@ Imports:
     stats,
     utils
 Depends: R (>= 2.10)
-Enhances:
-    brms,
-    lme4
 RoxygenNote: 7.1.0
