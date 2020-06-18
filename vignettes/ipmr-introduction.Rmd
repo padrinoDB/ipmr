@@ -1449,13 +1449,6 @@ Next, we generate some parameter values for `temp` and `precip`:
 
 ```{r eval = FALSE}
 
-env_params <- list(
-  temp_mu = 8.9,
-  temp_sd = 1.2,
-  precip_shape = 1000,
-  precip_rate  = 2
-)
-
 env_states <- data.frame(precip = rgamma(10, shape = 1000, rate = 2),
                          temp   = rnorm(10, mean = 8.9, sd = 1.2))
 
