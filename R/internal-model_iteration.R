@@ -60,6 +60,11 @@
 
       for(j in seq_len(iterations)) {
 
+        # Bind a helper for the model iteration number. Users can use this
+        # to specify lagged effects.
+
+        .bind_iter_var(master_env, j)
+
         pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                           proto_ipm     = proto_ipm,
                                           sub_kern_list = use_kerns,
@@ -140,6 +145,8 @@
 
       # Simple model, no hierarchical stuff going on. We can just
       # stick the kernels and their expressions right into eval_general_det
+
+      .bind_iter_var(master_env, i)
 
       pop_list_t_1 <- .eval_general_det(k_row         = k_row,
                                         proto_ipm     = proto_ipm,
@@ -295,6 +302,8 @@
       use_k     <- k_row
 
     }
+
+    .bind_iter_var(master_env, i)
 
     # Need to return an iterated pop_state object
 
@@ -556,6 +565,8 @@
 
       for(j in seq_len(iterations)) {
 
+        .bind_iter_var(master_env, j)
+
         pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                           proto_ipm     = proto_ipm,
                                           sub_kern_list = use_kerns,
@@ -641,7 +652,7 @@
       use_kerns <- sub_kern_list
       use_k     <- k_row
 
-
+      .bind_iter_var(master_env, i)
 
       pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                         proto_ipm     = proto_ipm,
@@ -784,6 +795,8 @@
       use_k     <- k_row
 
     }
+
+    .bind_iter_var(master_env, i)
 
     pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                       proto_ipm     = proto_ipm,
@@ -992,3 +1005,18 @@
 
 }
 
+
+# Helpers --------------
+
+#' @noRd
+
+.bind_iter_var <- function(env, it) {
+
+  temp <- list(t = it)
+
+  rlang::env_bind(env,
+                  !!! temp)
+
+  invisible(TRUE)
+
+}

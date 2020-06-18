@@ -428,6 +428,8 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
     # multiple parameters meant to come from a joint distribution really come from
     # the joint distribution!
 
+    .bind_iter_var(master_env, i)
+
     sys         <- .make_sub_kernel_simple_lazy(others,
                                                 master_env,
                                                 return_envs = return_all,
@@ -859,6 +861,10 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
                              kernel_seq)
 
   for(i in seq_len(iterations)) {
+
+    # add the variable to let the user access the current iteration.
+
+    .bind_iter_var(master_env, i)
 
     # Lazy variant makes sure that whatever functions that generate parameter
     # values stochastically are only evaluated 1 time per iteration! This is so
