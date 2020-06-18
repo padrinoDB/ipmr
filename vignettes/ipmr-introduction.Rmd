@@ -1349,15 +1349,15 @@ param_resamp_model <- param_resamp_model %>%
   
   define_env_state(
     env_covs   = sample_env(env_params),
-    data_list  = list(env_params = env_params)
+    data_list  = list(env_params = env_params,
+                      sample_env = sample_env)
   ) %>%
   define_pop_state(
     pop_vectors = list(
       n_surf_area_t = init_pop_vec
     )
   ) %>%
-  make_ipm(usr_funs   = list(inv_logit  = inv_logit,
-                             sample_env = sample_env),
+  make_ipm(usr_funs   = list(inv_logit  = inv_logit),
            iterate    = TRUE,
            iterations = 10)
 
@@ -1375,6 +1375,127 @@ lambda(param_resamp_model, type_lambda = 'all')
 param_resamp_model$env_seq
 
 ```
+
+### Pre-determined sequences of environmental covariates
+
+In some cases, we might want to provide a sequence of environmental values ahead of time, as opposed to sampling them at each iteration. We can do this by re-writing the `sample_env` function so that it takes the current model iteration as a parameter that selects values from the pre-specified environmental values. `ipmr` defines the variable `t` internally, which we can reference in our expressions. First, we re-define the model:
+
+```{r eval = FALSE}
+
+
+param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
+  define_kernel(
+    name    = 'P',
+    formula = s * g,
+    family  = 'CC',
+    
+    # Parameters created by define_env_state() can be referenced by name just like
+    # any other parameter in the model.
+    
+    g_mu    = g_int + g_slope * surf_area_1 + g_temp * temp + g_precip * precip,
+    s_lin_p = s_int + s_slope * surf_area_1 + s_temp * temp + s_precip * precip,
+    s       = inv_logit(s_lin_p),
+    g       = dnorm(surf_area_2, g_mu, g_sd),
+    
+    
+    data_list = constant_params,
+    states    = list(c('surf_area')),
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "g")
+  ) %>%
+  define_kernel(
+    name          = 'F',
+    formula       = f_r * f_s * f_d,
+    family        = 'CC',
+    f_r_lin_p     = f_r_int + f_r_slope * surf_area_1,
+    f_r           = inv_logit(f_r_lin_p),
+    f_s           = exp(f_s_int + f_s_slope * surf_area_1),
+    f_d           = dnorm(surf_area_2, f_d_mu, f_d_sd),
+    data_list     = constant_params,
+    states        = list(c('surf_area')),
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "f_d")
+  ) %>%
+  define_k(
+    name = 'K',
+    
+    # Note that here, we specify both the form of the iteration kernel and
+    # the iteration procedure. 
+    
+    K               = P + F,
+    n_surf_area_t_1 = K %*% n_surf_area_t,
+    family          = 'IPM',
+    data_list       = constant_params,
+    states          = list(c('surf_area')),
+    has_hier_effs   = FALSE,
+    evict_cor          = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P", "F", "K"),
+      int_rule     = rep('midpoint', 3),
+      dom_start    = rep('surf_area',3),
+      dom_end      = rep('surf_area', 3)
+    )
+  ) %>%
+    define_domains(surf_area = c(0, 10, 100))
+
+
+```
+
+Next, we generate some parameter values for `temp` and `precip`:
+
+```{r eval = FALSE}
+
+env_params <- list(
+  temp_mu = 8.9,
+  temp_sd = 1.2,
+  precip_shape = 1000,
+  precip_rate  = 2
+)
+
+env_states <- data.frame(precip = rgamma(10, shape = 1000, rate = 2),
+                         temp   = rnorm(10, mean = 8.9, sd = 1.2))
+
+```
+In this case, we are trying to sample these in a specific order - the 1st row first, the 2nd row second, 3rd row third, etc. Instead of writing a function that generates random draws from a distribution, we write one that samples rows from this data frame and creates a named list. `ipmr` generates a helper variable, `t`, that lets us access the current model iteration. Thus, our function to generate the environmental variables at each time step could look like this:
+
+```{r eval = FALSE}
+
+sample_env <- function(env_states, iteration) {
+  
+  out <- as.list(env_states[iteration, ])
+  names(out) <- names(env_states)
+  
+  return(out)
+  
+}
+
+```
+
+We can now `define_env_state()` and `define_pop_state()`:
+
+```{r eval = FALSE}
+
+param_resamp_model <- param_resamp_model %>%
+  define_env_state(env_params = sample_env(env_states, iteration = t),
+                   data_list = list(
+                     env_states = env_states,
+                     sample_env = sample_env
+                   )) %>%
+  define_pop_state(
+    pop_vectors = list(
+      n_surf_area_t = init_pop_vec
+    )
+  ) %>%
+  make_ipm(usr_funs   = list(inv_logit  = inv_logit),
+           iterate    = TRUE,
+           iterations = 10)
+```
+
+Notice that we set `iteration = t` in the call to `sample_env`. Otherwise, everything else looks the same as before. 
 
 ## Uncertainty in simple IPMs
 

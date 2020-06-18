@@ -354,7 +354,7 @@
       out <- out[n_its, ]
     }
 
-    names(out) <- names(lams)
+    dimnames(out) <- list(NULL, names(lams))
 
     return(out)
 
