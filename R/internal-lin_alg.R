@@ -354,8 +354,11 @@
       out <- out[n_its, ]
     }
 
-    dimnames(out) <- list(NULL, names(lams))
+    if(inherits(out, c('matrix', 'array'))){
 
+      dimnames(out) <- list(NULL, names(lams))
+
+    }
     return(out)
 
   }
