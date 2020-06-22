@@ -5,6 +5,8 @@
 #' with \code{define_kernel}, \code{define_k}, \code{make_ipm}, and associated helper functions.
 #'
 #' @param model_class The type of IPM. See \code{Details} for more information on classes
+#' @param has_age A logical indicating whether the model has age structure. Default
+#' is \code{FALSE}
 #'
 #' @return An object with classes \code{proto_ipm} and \code{model_class}
 #'
@@ -60,7 +62,7 @@
 #'
 #' @export
 
-init_ipm <- function(model_class) {
+init_ipm <- function(model_class, has_age = FALSE) {
 
   out <- data.frame(
     id               = character(0L),
@@ -73,10 +75,12 @@ init_ipm <- function(model_class) {
     pop_state        =  character(0L),
     env_state        =  character(0L),
     hier_effs        = logical(0L),
+    has_age          = logical(0L),
     levels_hier_effs = character(0L),
     params           =  character(0L)
   )
 
+  if(has_age) model_class <- c('model_class', "age_x_size")
 
   class(out) <- c(model_class, 'proto_ipm', class(out))
 

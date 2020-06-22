@@ -99,7 +99,9 @@ define_kernel <- function(proto_ipm,
                           evict_fun = NULL) {
 
   cls <- class(proto_ipm)
+
   # Capture formulas and convert to text
+
   formula <- rlang::enquo(formula)
   vr_quos <- rlang::enquos(...,
                            .named = TRUE,
@@ -143,11 +145,11 @@ define_kernel <- function(proto_ipm,
     env_state        = I(list(NA_character_)),
     has_hier_effs    = has_hier_effs,
     levels_hier_effs = I(rlang::list2(levels_hier_effs)),
+    has_age          = ifelse(any(cls == "age_x_size"), TRUE, FALSE),
     params           = I(rlang::list2(!! name := param_tree)),
     usr_funs         = I(list(NA_character_)),
     stringsAsFactors = FALSE
   )
-
   out <- rbind(proto_ipm,
                temp,
                stringsAsFactors = FALSE)
@@ -222,6 +224,7 @@ define_k <- function(proto_ipm,
     env_state        = I(list(NA_character_)),
     has_hier_effs    = has_hier_effs,
     levels_hier_effs = I(rlang::list2(levels_hier_effs)),
+    has_age          = ifelse(any(cls == "age_x_size"), TRUE, FALSE),
     params           = I(rlang::list2(!! name := param_tree)),
     usr_funs         = I(list(NA_character_)),
     stringsAsFactors = FALSE
@@ -290,8 +293,7 @@ remove_k <- function(proto_ipm) {
 
   } else if(!rlang::quo_is_null(fun)) {
 
-    text <- rlang::quo_text(fun)
-    nm <- strsplit(text, '\\(|,|\\)')[[1]][2]
+    nm <- rlang::call_args(fun)[[2]][1]
 
     fun <- list(fun)
     names(fun) <- nm
