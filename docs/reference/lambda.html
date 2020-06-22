@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Compute the per-capita growth rate for an IPM object — lambda" />
-<meta property="og:description" content="Compute the per-capita growth rate for an IPM object" />
+<meta property="og:description" content="Compute the per-capita growth rate for a given model. Can handle
+stochastic and deterministic models, and has options for thinning." />
 
 
 
@@ -147,7 +148,8 @@
     </div>
 
     <div class="ref-description">
-    <p>Compute the per-capita growth rate for an IPM object</p>
+    <p>Compute the per-capita growth rate for a given model. Can handle
+stochastic and deterministic models, and has options for thinning.</p>
     </div>
 
     <pre class="usage"><span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>)
@@ -156,19 +158,43 @@
 <span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"last"</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for simple_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"stochastic"</span>, <span class='no'>...</span>)
+<span class='fu'>lambda</span>(
+  <span class='no'>ipm</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"stochastic"</span>,
+  <span class='kw'>burn_in</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
+  <span class='no'>...</span>
+)
 
 <span class='co'># S3 method for simple_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"stochastic"</span>, <span class='no'>...</span>)
+<span class='fu'>lambda</span>(
+  <span class='no'>ipm</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"stochastic"</span>,
+  <span class='kw'>burn_in</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
+  <span class='no'>...</span>
+)
 
 <span class='co'># S3 method for general_di_det_ipm</span>
 <span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"last"</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for general_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"stochastic"</span>)
+<span class='fu'>lambda</span>(
+  <span class='no'>ipm</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"stochastic"</span>,
+  <span class='kw'>burn_in</span> <span class='kw'>=</span> <span class='fl'>0.1</span>
+)
 
 <span class='co'># S3 method for general_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span>(<span class='no'>ipm</span>, <span class='no'>...</span>, <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>, <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"stochastic"</span>)</pre>
+<span class='fu'>lambda</span>(
+  <span class='no'>ipm</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>comp_method</span> <span class='kw'>=</span> <span class='st'>"pop_size"</span>,
+  <span class='kw'>type_lambda</span> <span class='kw'>=</span> <span class='st'>"stochastic"</span>,
+  <span class='kw'>burn_in</span> <span class='kw'>=</span> <span class='fl'>0.1</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -195,6 +221,11 @@ in length to the <code>iterations</code> argument of <code><a href='make_ipm.htm
 <code>'last'</code> returns the lambda value for the final timestep.
 <code>'stochastic'</code> returns a single value which is the geometric mean
 of log-per-capita growth rate from each time step.</p></td>
+    </tr>
+    <tr>
+      <th>burn_in</th>
+      <td><p>The proportion of iterations to discard. Default is 0.1
+(i.e. first 10% of iterations in the simulation).</p></td>
     </tr>
     </table>
 

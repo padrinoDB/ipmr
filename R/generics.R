@@ -427,6 +427,9 @@ print.general_di_stoch_param_ipm <- function(x,
 #' @title Compute the per-capita growth rate for an IPM object
 #' @rdname lambda
 #'
+#' @description Compute the per-capita growth rate for a given model. Can handle
+#' stochastic and deterministic models, and has options for thinning.
+#'
 #' @param ipm An object returned by \code{make_ipm()}.
 #' @param comp_method Either \code{"eigen"} or \code{"pop_size"}. \code{"eigen"}
 #' is only possible for \code{"simple_*"} methods.
@@ -438,10 +441,11 @@ print.general_di_stoch_param_ipm <- function(x,
 #' \code{'stochastic'} returns a single value which is the geometric mean
 #' of log-per-capita growth rate from each time step.
 #' @param ... other arguments passed to methods.
+#' @param burn_in The proportion of iterations to discard. Default is 0.1
+#' (i.e. first 10\% of iterations in the simulation).
 #'
 #' @return An array. Rows correspond to time steps, and columns correspond
 #' to hierarchical effects (if any).
-#'
 #'
 #' @details There are two possible methods for computing \code{lambda} and these
 #' are controlled by the \code{comp_method} argument. Possible values are
@@ -484,6 +488,7 @@ lambda.simple_di_det_ipm <- function(ipm,
 lambda.simple_di_stoch_kern_ipm <- function(ipm,
                                             comp_method = "pop_size",
                                             type_lambda = 'stochastic',
+                                            burn_in     = 0.1,
                                             ...) {
 
 
@@ -496,11 +501,15 @@ lambda.simple_di_stoch_kern_ipm <- function(ipm,
 
   temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
 
+  if(all_lams) {
+    burn_ind <- seq_len(round(length(temp) * burn_in))
+  }
+
   return(
     switch(type_lambda,
            'all'        = temp,
            'last'       = temp,
-           'stochastic' = mean(log(temp)))
+           'stochastic' = .thin_stoch_lambda(temp, burn_ind))
   )
 }
 
@@ -510,6 +519,7 @@ lambda.simple_di_stoch_kern_ipm <- function(ipm,
 lambda.simple_di_stoch_param_ipm <- function(ipm,
                                              comp_method = "pop_size",
                                              type_lambda = 'stochastic',
+                                             burn_in     = 0.1,
                                              ...) {
 
   .check_lambda_args(ipm, comp_method, type_lambda)
@@ -521,11 +531,15 @@ lambda.simple_di_stoch_param_ipm <- function(ipm,
 
   temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
 
+  if(all_lams) {
+    burn_ind <- seq_len(round(length(temp) * burn_in))
+  }
+
   return(
     switch(type_lambda,
            'all'        = temp,
            'last'       = temp,
-           'stochastic' = mean(log(temp)))
+           'stochastic' = .thin_stoch_lambda(temp, burn_ind))
   )
 
 }
@@ -559,7 +573,8 @@ lambda.general_di_det_ipm <- function(ipm,
 lambda.general_di_stoch_kern_ipm <- function(ipm,
                                              ...,
                                              comp_method = 'pop_size',
-                                             type_lambda = 'stochastic') {
+                                             type_lambda = 'stochastic',
+                                             burn_in     = 0.1) {
 
   .check_lambda_args(ipm, comp_method, type_lambda)
 
@@ -570,11 +585,15 @@ lambda.general_di_stoch_kern_ipm <- function(ipm,
 
   temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
 
+  if(all_lams) {
+    burn_ind <- seq_len(round(length(temp) * burn_in))
+  }
+
   return(
     switch(type_lambda,
            'all'        = temp,
            'last'       = temp,
-           'stochastic' = mean(log(temp)))
+           'stochastic' = .thin_stoch_lambda(temp, burn_ind))
   )
 }
 
@@ -584,7 +603,8 @@ lambda.general_di_stoch_kern_ipm <- function(ipm,
 lambda.general_di_stoch_param_ipm <- function(ipm,
                                               ...,
                                               comp_method = 'pop_size',
-                                              type_lambda = 'stochastic') {
+                                              type_lambda = 'stochastic',
+                                              burn_in     = 0.1) {
   .check_lambda_args(ipm, comp_method, type_lambda)
 
   all_lams <- switch(type_lambda,
@@ -594,17 +614,17 @@ lambda.general_di_stoch_param_ipm <- function(ipm,
 
   temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
 
+  if(all_lams) {
+    burn_ind <- seq_len(round(length(temp) * burn_in))
+  }
+
   return(
     switch(type_lambda,
            'all'        = temp,
            'last'       = temp,
-           'stochastic' = mean(log(temp)))
+           'stochastic' = .thin_stoch_lambda(temp, burn_ind))
   )
-
 }
-
-
-
 
 # Plot ---------------
 # Authors - whoever wrote the code from the IPM book
