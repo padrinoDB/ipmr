@@ -181,6 +181,10 @@ define_k <- function(proto_ipm,
                          .homonyms = "error",
                          .check_assign = TRUE)
 
+  name_suff <- substr(name, 2, nchar(name))
+  name      <- toupper(substr(name, 1, 1)) %>%
+    paste(., name_suff, sep = "")
+
   .check_k_def(proto_ipm,
                name = name,
                family = family)
