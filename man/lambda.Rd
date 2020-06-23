@@ -14,15 +14,39 @@ lambda(ipm, ...)
 
 \method{lambda}{simple_di_det_ipm}(ipm, comp_method = "pop_size", type_lambda = "last", ...)
 
-\method{lambda}{simple_di_stoch_kern_ipm}(ipm, comp_method = "pop_size", type_lambda = "stochastic", ...)
+\method{lambda}{simple_di_stoch_kern_ipm}(
+  ipm,
+  comp_method = "pop_size",
+  type_lambda = "stochastic",
+  burn_in = 0.1,
+  ...
+)
 
-\method{lambda}{simple_di_stoch_param_ipm}(ipm, comp_method = "pop_size", type_lambda = "stochastic", ...)
+\method{lambda}{simple_di_stoch_param_ipm}(
+  ipm,
+  comp_method = "pop_size",
+  type_lambda = "stochastic",
+  burn_in = 0.1,
+  ...
+)
 
 \method{lambda}{general_di_det_ipm}(ipm, comp_method = "pop_size", type_lambda = "last", ...)
 
-\method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., comp_method = "pop_size", type_lambda = "stochastic")
+\method{lambda}{general_di_stoch_kern_ipm}(
+  ipm,
+  ...,
+  comp_method = "pop_size",
+  type_lambda = "stochastic",
+  burn_in = 0.1
+)
 
-\method{lambda}{general_di_stoch_param_ipm}(ipm, ..., comp_method = "pop_size", type_lambda = "stochastic")
+\method{lambda}{general_di_stoch_param_ipm}(
+  ipm,
+  ...,
+  comp_method = "pop_size",
+  type_lambda = "stochastic",
+  burn_in = 0.1
+)
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
@@ -39,13 +63,17 @@ in length to the \code{iterations} argument of \code{make_ipm()}).
 \code{'last'} returns the lambda value for the final timestep.
 \code{'stochastic'} returns a single value which is the geometric mean
 of log-per-capita growth rate from each time step.}
+
+\item{burn_in}{The proportion of iterations to discard. Default is 0.1
+(i.e. first 10\% of iterations in the simulation).}
 }
 \value{
 An array. Rows correspond to time steps, and columns correspond
 to hierarchical effects (if any).
 }
 \description{
-Compute the per-capita growth rate for an IPM object
+Compute the per-capita growth rate for a given model. Can handle
+stochastic and deterministic models, and has options for thinning.
 }
 \details{
 There are two possible methods for computing \code{lambda} and these

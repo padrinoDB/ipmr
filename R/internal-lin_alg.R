@@ -732,3 +732,17 @@ is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
 
 }
 
+# Helper function to handle when burn_in == 0
+#' @noRd
+
+.thin_stoch_lambda <- function(lambdas, burn_ind) {
+
+  if(length(burn_ind > 0)) {
+    out <- mean(log(lambdas[-c(burn_ind)]))
+  } else {
+    out <- mean(log(lambdas))
+  }
+
+  return(out)
+}
+
