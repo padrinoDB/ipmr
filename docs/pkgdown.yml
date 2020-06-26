@@ -2,6 +2,7 @@ pandoc: 2.7.2
 pkgdown: 1.5.1
 pkgdown_sha: ~
 articles:
+  age_x_size: age_x_size.html
   general-ipms: general-ipms.html
   generic-funs: generic-funs.html
   generic-progress: generic-progress.html
@@ -9,7 +10,7 @@ articles:
   ipmr-introduction: ipmr-introduction.html
   proto-ipms: proto-ipms.html
   sanity-checks: sanity-checks.html
-last_built: 2020-06-22T14:59Z
+last_built: 2020-06-26T13:48Z
 urls:
   reference: https://levisc8.github.io/ipmr/reference
   article: https://levisc8.github.io/ipmr/articles

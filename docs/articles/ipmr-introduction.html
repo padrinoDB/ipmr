@@ -64,6 +64,9 @@
     <li>
       <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
     </li>
+    <li>
+      <a href="../articles/age_x_size.html">Age-Size IPMs</a>
+    </li>
     <li class="divider">
     <li class="dropdown-header">Generic Functions</li>
     <li>
@@ -119,7 +122,8 @@
 <h2 class="hasAnchor">
 <a href="#types-of-models-in-ipmr" class="anchor"></a>Types of models in <code>ipmr</code>
 </h2>
-<p>The first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="../reference/init_ipm.html">init_ipm()</a></code>. This function takes a single argument: <code>model_class</code>. The <code>model_class</code> defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. <code>model_class</code> should be a character string with at least 3 (but possibly 4) entries separated by underscores (<code>_</code>). Below, the are the possible entries for each position.</p>
+<p>The first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="../reference/init_ipm.html">init_ipm()</a></code>. This function has two arguments: <code>model_class</code>, and <code>has_age</code>. We will ignore <code>has_age</code> for now, because age-size models are a complicated topic and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own vignette</a>.</p>
+<p>The <code>model_class</code> defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. <code>model_class</code> should be a character string with at least 3 (but possibly 4) entries separated by underscores (<code>_</code>). Below, the are the possible entries for each position.</p>
 <ul>
 <li>
 <p>Position 1: <code>"simple"</code>/<code>"general"</code></p>

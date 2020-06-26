@@ -105,6 +105,9 @@
     <li>
       <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
     </li>
+    <li>
+      <a href="../articles/age_x_size.html">Age-Size IPMs</a>
+    </li>
     <li class="divider"></li>
     <li class="dropdown-header">Generic Functions</li>
     <li>
@@ -160,6 +163,7 @@
   <span class='no'>states</span>,
   <span class='kw'>has_hier_effs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>levels_ages</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
   <span class='kw'>evict_cor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )
@@ -173,6 +177,36 @@
   <span class='no'>states</span>,
   <span class='kw'>has_hier_effs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>levels_ages</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>evict_cor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)
+
+<span class='co'># S3 method for default</span>
+<span class='fu'>define_k</span>(
+  <span class='no'>proto_ipm</span>,
+  <span class='no'>name</span>,
+  <span class='no'>family</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>data_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='no'>states</span>,
+  <span class='kw'>has_hier_effs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>evict_cor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)
+
+<span class='co'># S3 method for age_x_size</span>
+<span class='fu'>define_k</span>(
+  <span class='no'>proto_ipm</span>,
+  <span class='no'>name</span>,
+  <span class='no'>family</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>data_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='no'>states</span>,
+  <span class='kw'>has_hier_effs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>levels_ages</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
   <span class='kw'>evict_cor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )
@@ -240,6 +274,11 @@ on the syntax for this feature for more details (<code><a href='https://rdrr.io/
       <td><p>A named list with vectors corresponding to the various levels
 the hierarchical variable can take. The names should match the suffixes used
 in the vital rate expressions.</p></td>
+    </tr>
+    <tr>
+      <th>levels_ages</th>
+      <td><p>A list with possible two entries: 1. <code>"age"</code>: the range
+of ages, and, optionally, 2. <code>"max_age"</code>: The maximum age for the model.</p></td>
     </tr>
     <tr>
       <th>evict_cor</th>
