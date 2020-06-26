@@ -3,6 +3,8 @@
 \name{define_kernel}
 \alias{define_kernel}
 \alias{define_k}
+\alias{define_k.default}
+\alias{define_k.age_x_size}
 \alias{remove_k}
 \title{Functions to initialize and define IPM kernels}
 \usage{
@@ -16,6 +18,7 @@ define_kernel(
   states,
   has_hier_effs = FALSE,
   levels_hier_effs = list(),
+  levels_ages = list(),
   evict_cor = FALSE,
   evict_fun = NULL
 )
@@ -29,6 +32,34 @@ define_k(
   states,
   has_hier_effs = FALSE,
   levels_hier_effs = list(),
+  levels_ages = list(),
+  evict_cor = FALSE,
+  evict_fun = NULL
+)
+
+\method{define_k}{default}(
+  proto_ipm,
+  name,
+  family,
+  ...,
+  data_list = list(),
+  states,
+  has_hier_effs = FALSE,
+  levels_hier_effs = list(),
+  evict_cor = FALSE,
+  evict_fun = NULL
+)
+
+\method{define_k}{age_x_size}(
+  proto_ipm,
+  name,
+  family,
+  ...,
+  data_list = list(),
+  states,
+  has_hier_effs = FALSE,
+  levels_hier_effs = list(),
+  levels_ages = list(),
   evict_cor = FALSE,
   evict_fun = NULL
 )
@@ -76,6 +107,9 @@ on the syntax for this feature for more details (\code{vignettes(
 \item{levels_hier_effs}{A named list with vectors corresponding to the various levels
 the hierarchical variable can take. The names should match the suffixes used
 in the vital rate expressions.}
+
+\item{levels_ages}{A list with possible two entries: 1. \code{"age"}: the range
+of ages, and, optionally, 2. \code{"max_age"}: The maximum age for the model.}
 
 \item{evict_cor}{A logical indicating whether an eviction correction should be applied
 to the kernel.}

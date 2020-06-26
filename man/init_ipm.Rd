@@ -4,13 +4,17 @@
 \alias{init_ipm}
 \title{Initialize an IPM}
 \usage{
-init_ipm(model_class)
+init_ipm(model_class, has_age = FALSE)
 }
 \arguments{
 \item{model_class}{The type of IPM. See \code{Details} for more information on classes}
+
+\item{has_age}{A logical indicating whether the model has age structure. Default
+is \code{FALSE}}
 }
 \value{
-An object with classes \code{proto_ipm} and \code{model_class}
+An object with classes \code{"proto_ipm"} and \code{model_class}. If
+\code{has_age = TRUE}, then an \code{"age_x_size"} class is also added.
 }
 \description{
 This is always the first step in constructing an IPM with \code{ipmr}.

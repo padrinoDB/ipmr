@@ -16,7 +16,10 @@ print.proto_ipm <- function(x, ...) {
 
   pretty_class <- .pretty_class(cls_switch)
 
-  msg          <- paste("A",
+
+  msg          <- paste(ifelse(.has_age(x),
+                               "An age structured",
+                               "A"),
                         pretty_class,
                         "proto_ipm with",
                         n_kerns,
@@ -32,6 +35,13 @@ print.proto_ipm <- function(x, ...) {
   invisible(x)
 }
 
+#' @noRd
+
+.has_age <- function(x) {
+
+  inherits(x, "age_x_size")
+
+}
 
 #' @noRd
 
@@ -75,10 +85,6 @@ print.proto_ipm <- function(x, ...) {
       'general_dd_det'         = "general, density dependent, deterministic",
       'general_dd_stoch_kern'  = "general, density dependent, stochastic, kernel-resampled",
       'general_dd_stoch_param' = "general, density dependent, stochastic, parameter-resampled"
-
-      # Perhaps add in the age x state_var as well, but work out what that
-      # even looks like first
-
 
     )
 
@@ -605,6 +611,7 @@ lambda.general_di_stoch_param_ipm <- function(ipm,
                                               comp_method = 'pop_size',
                                               type_lambda = 'stochastic',
                                               burn_in     = 0.1) {
+
   .check_lambda_args(ipm, comp_method, type_lambda)
 
   all_lams <- switch(type_lambda,

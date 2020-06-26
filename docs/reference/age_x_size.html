@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>A general deterministic IPM example — gen_di_det_ex • ipmr</title>
+<title>Age X Size models — all_ages • ipmr</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="A general deterministic IPM example — gen_di_det_ex" />
-<meta property="og:description" content="A general deterministic IPM example" />
+<meta property="og:title" content="Age X Size models — all_ages" />
+<meta property="og:description" content="Helper functions for implementing age x size models" />
 
 
 
@@ -144,35 +144,49 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>A general deterministic IPM example</h1>
+    <h1>Age X Size models</h1>
     
-    <div class="hidden name"><code>gen_di_det.Rd</code></div>
+    <div class="hidden name"><code>age_x_size.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>A general deterministic IPM example</p>
+    <p>Helper functions for implementing age x size models</p>
     </div>
 
-    <pre class="usage"><span class='no'>gen_di_det_ex</span></pre>
+    <pre class="usage"><span class='fu'>all_ages</span>(<span class='no'>expr</span>, <span class='no'>fun</span>, <span class='no'>...</span>)</pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>expr</th>
+      <td><p>The expression to modify. See details.</p></td>
+    </tr>
+    <tr>
+      <th>fun</th>
+      <td><p>The function to apply over <code>expr</code>.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Used internally. Modifying this will likely cause models to break.</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A general deterministic IPM with the following slots:</p><dl'>
+    <p>A modified expression.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-  <dt>iterators</dt><dd><p>Empty.</p></dd>
-  <dt>sub_kernels</dt><dd><p>The computed sub-kernels for the model, named <code>P</code>,
-  <code>go_discrete</code>, <code>stay_discrete</code>, and <code>leave_discrete</code>.</p></dd>
-  <dt>env_list</dt><dd><p>Empty.</p></dd>
-  <dt>env_seq</dt><dd><p>A vector of 1s. Not particularly useful for deterministic IPMs,
-  but critical for reproducing stochastic ones.</p></dd>
-  <dt>pop_state</dt><dd><p>A list of length 2, with names <code>pop_state_b</code> and
-  <code>pop_state_ht</code>.</p></dd>
-  <dt>proto_ipm</dt><dd><p>The <code>proto_ipm</code> used to implement the model.</p></dd>
-
-
-</dl>
-
+    <p>Currently only <code>all_ages</code> is exported. This is a helper
+to indicate that all of the levels of age should be included in a given expression,
+rather than split out into separate levels. The <code>fun</code> is used to combine
+the results of each individual evaluation of <code>expr</code>.</p>
+<p>The most common use case for <code>all_ages</code> will be when defining the size
+distribution of new recruits in an age structured model, when many <code>F</code> kernels
+are multiplied by their respective age X size distributions, and then summed.
+Note that using <code>sum</code> is almost never correct, as this will always return
+a single number whereas the size distribution should be a vector! Generally,
+use <code>+</code> instead.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

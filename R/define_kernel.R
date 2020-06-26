@@ -95,11 +95,14 @@ define_kernel <- function(proto_ipm,
                           states,
                           has_hier_effs = FALSE,
                           levels_hier_effs = list(),
+                          levels_ages      = list(),
                           evict_cor= FALSE,
                           evict_fun = NULL) {
 
   cls <- class(proto_ipm)
+
   # Capture formulas and convert to text
+
   formula <- rlang::enquo(formula)
   vr_quos <- rlang::enquos(...,
                            .named = TRUE,
@@ -143,11 +146,12 @@ define_kernel <- function(proto_ipm,
     env_state        = I(list(NA_character_)),
     has_hier_effs    = has_hier_effs,
     levels_hier_effs = I(rlang::list2(levels_hier_effs)),
+    has_age          = ifelse(.has_age(proto_ipm), TRUE, FALSE),
+    levels_ages      = I(rlang::list2(levels_ages)),
     params           = I(rlang::list2(!! name := param_tree)),
     usr_funs         = I(list(NA_character_)),
     stringsAsFactors = FALSE
   )
-
   out <- rbind(proto_ipm,
                temp,
                stringsAsFactors = FALSE)
@@ -159,7 +163,6 @@ define_kernel <- function(proto_ipm,
 
 #' @rdname kernel-definitions
 #'
-#'
 #' @export
 
 define_k <- function(proto_ipm,
@@ -170,14 +173,38 @@ define_k <- function(proto_ipm,
                      states,
                      has_hier_effs = FALSE,
                      levels_hier_effs = list(),
+                     levels_ages      = list(),
                      evict_cor = FALSE,
                      evict_fun = NULL) {
+
+  UseMethod("define_k")
+
+}
+
+#' @rdname kernel-definitions
+#'
+#' @export
+
+define_k.default <- function(proto_ipm,
+                             name,
+                             family,
+                             ...,
+                             data_list = list(),
+                             states,
+                             has_hier_effs = FALSE,
+                             levels_hier_effs = list(),
+                             evict_cor = FALSE,
+                             evict_fun = NULL) {
 
   cls <- class(proto_ipm)
   forms <- rlang::enquos(...,
                          .named = TRUE,
                          .homonyms = "error",
                          .check_assign = TRUE)
+
+  name_suff <- substr(name, 2, nchar(name))
+  name      <- toupper(substr(name, 1, 1)) %>%
+    paste(., name_suff, sep = "")
 
   .check_k_def(proto_ipm,
                name = name,
@@ -222,6 +249,94 @@ define_k <- function(proto_ipm,
     env_state        = I(list(NA_character_)),
     has_hier_effs    = has_hier_effs,
     levels_hier_effs = I(rlang::list2(levels_hier_effs)),
+    has_age          = FALSE,
+    levels_ages      = I(list(NA_character_)),
+    params           = I(rlang::list2(!! name := param_tree)),
+    usr_funs         = I(list(NA_character_)),
+    stringsAsFactors = FALSE
+  )
+
+  out <- rbind(proto_ipm,
+               temp,
+               stringsAsFactors = FALSE)
+
+  class(out) <- cls
+  return(out)
+
+}
+
+#' @rdname kernel-definitions
+#' @param levels_ages A list with possible two entries: 1. \code{"age"}: the range
+#' of ages, and, optionally, 2. \code{"max_age"}: The maximum age for the model.
+#'
+#' @export
+
+define_k.age_x_size <- function(proto_ipm,
+                                name,
+                                family,
+                                ...,
+                                data_list = list(),
+                                states,
+                                has_hier_effs = FALSE,
+                                levels_hier_effs = list(),
+                                levels_ages      = list(),
+                                evict_cor = FALSE,
+                                evict_fun = NULL) {
+  cls <- class(proto_ipm)
+  forms <- rlang::enquos(...,
+                         .named = TRUE,
+                         .homonyms = "error",
+                         .check_assign = TRUE)
+
+  name_suff <- substr(name, 2, nchar(name))
+  name      <- toupper(substr(name, 1, 1)) %>%
+    paste(., name_suff, sep = "")
+
+  .check_k_def(proto_ipm,
+               name = name,
+               family = family)
+
+  # make sure eviction function is correctly specified
+  evict_fun <- rlang::enquo(evict_fun)
+  evict_fun <- .check_evict_fun(evict_cor, evict_fun)
+
+  # protos store text rather than quos. They get converted back into quos later
+  forms_text <- lapply(forms, function(x) {
+    temp <- rlang::quo_text(x)
+    out <- gsub('n_t$', 'pop_state_t', temp)
+    return(out)
+  })
+
+
+  # retain names
+  names(forms_text) <- names(forms)
+
+  # Param_tree should always contain these four entries, regardless of class.
+  # pop_states and env_states get defined separately. In the case of define_k,
+  # vr_text is no longer relevant - expressions all get tossed into formula and
+  # will be evaluated in the kernel environment anyway.
+
+  param_tree <- list(formula = forms_text,
+                     family = family,
+                     vr_text = NA_character_,
+                     params = data_list)
+
+  if(!methods::hasArg(levels_hier_effs)) levels_hier_effs <- list(levels = NA)
+
+  temp <- data.frame(
+    id = 'A1',
+    kernel_id        = name,
+    domain           = I(list(NA_character_)),
+    state_var        = I(rlang::list2(!! name := states)),
+    int_rule         = NA_character_,
+    evict            = evict_cor,
+    evict_fun        = I(list(evict_fun)),
+    pop_state        = I(list(NA_character_)),
+    env_state        = I(list(NA_character_)),
+    has_hier_effs    = has_hier_effs,
+    levels_hier_effs = I(rlang::list2(levels_hier_effs)),
+    has_age          = TRUE,
+    levels_ages      = I(rlang::list2(levels_ages)),
     params           = I(rlang::list2(!! name := param_tree)),
     usr_funs         = I(list(NA_character_)),
     stringsAsFactors = FALSE
@@ -290,8 +405,7 @@ remove_k <- function(proto_ipm) {
 
   } else if(!rlang::quo_is_null(fun)) {
 
-    text <- rlang::quo_text(fun)
-    nm <- strsplit(text, '\\(|,|\\)')[[1]][2]
+    nm <- rlang::call_args(fun)[[2]][1]
 
     fun <- list(fun)
     names(fun) <- nm
