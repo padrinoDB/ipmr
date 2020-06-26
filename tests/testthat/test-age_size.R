@@ -265,15 +265,6 @@ r_iter <- function(x, na, F, P) {
   return(xnew)
 }
 
-## 'left' iteration one time step. 'x' is the list of age-specific size dists
-l_iter <- function(x, na, F, P) {
-  xnew <- list(0)
-  for (ia in seq_len(na-1)) {
-    xnew[[ia]] <- (x[[ia+1]] %*% P[[ia]]  + x[[1]] %*% F[[ia]])[,,drop=TRUE]
-  }
-  xnew[[na]] <- (x[[na]] %*% P[[na]] + x[[1]] %*% F[[na]])[,,drop=TRUE]
-  return(xnew)
-}
 
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ## Section 4 - Compare truth and estimated model predictions of lambda, and calculate w(z) and v(z), using
@@ -304,6 +295,108 @@ sim_lambda <- IPM.sim$lambda
 
 ## IPMR version
 
+param_list <- as.list(m.par.true) %>%
+  setNames(gsub(pattern = "\\.", replacement = "_", x = names(.)))
 
+inv_logit <- function(x) {
 
+  return( 1 / (1 + exp(-x)) )
+}
 
+f_fun <- function(age, s_age, pb_age, pr_age, recr) {
+
+  if(age == 0) return(0)
+
+  s_age * pb_age * pr_age * recr * 0.5
+
+}
+
+a_s_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
+  define_kernel(
+    name          = "P_age",
+    family        = "CC",
+    formula       = s_age * g_age * d_wt,
+    s_age         = inv_logit(surv_int + surv_z * wt_1 + surv_a * age),
+    g_age         = dnorm(wt_2, mu_g_age, grow_sd),
+    mu_g_age      = grow_int + grow_z * wt_1 + grow_a * age,
+    data_list     = param_list,
+    states        = list(c("wt")),
+    has_hier_effs = FALSE,
+    levels_ages   = list(age = c(0:20), max_age = 21),
+    evict_cor     = FALSE
+  ) %>%
+  define_kernel(
+    name          = "F_age",
+    family        = "CC",
+    formula       = f_fun(age, s_age, pb_age, pr_age, recr) * d_wt,
+    s_age         = inv_logit(surv_int + surv_z * wt_1 + surv_a * age),
+    pb_age        = inv_logit(repr_int + repr_z * wt_1 + repr_a * age),
+    pr_age        = inv_logit(recr_int + recr_a * age),
+    recr          = dnorm(wt_2, rcsz_mu, rcsz_sd),
+    rcsz_mu       = rcsz_int + rcsz_z * wt_1,
+    data_list     = param_list,
+    states        = list(c("wt")),
+    has_hier_effs = FALSE,
+    levels_ages   = list(age = c(0:20), max_age = 21),
+    evict_cor     = FALSE
+  ) %>%
+  define_k(
+    name               = "K",
+    family             = "IPM",
+    n_wt_0_t_1         = all_ages(F_age %*% n_wt_age_t, "+"),
+    n_wt_age_t_1       = P_age_minus_1 %*% n_wt_age_minus_1_t,
+    n_wt_max_age_t_1   = P_max_age %*% n_wt_max_age_t +
+                         P_max_age_minus_1 %*% n_wt_max_age_minus_1_t,
+    data_list          = param_list,
+    states             = list (c("wt")),
+    has_hier_effs      = FALSE,
+    levels_ages        = list(age = c(0:20), max_age = 21),
+    evict_cor          = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P_age", "F_age", "K"),
+      int_rule     = rep("midpoint", 3),
+      dom_start    = rep("wt", 3),
+      dom_end      = rep("wt", 3)
+    )
+  ) %>%
+  define_domains(
+    wt = c(1.6, 3.7, 100)
+  ) %>%
+  define_pop_state(
+    pop_vectors = list(
+      n_wt_age = runif(100))
+  ) %>%
+  make_ipm(
+    usr_funs = list(inv_logit = inv_logit,
+                    f_fun     = f_fun),
+    iterate  = TRUE,
+    iterations = 100,
+    return_all = TRUE
+  )
+
+ipmr_lambda <- lambda(a_s_ipm, type_lambda = 'last')
+
+test_that("age_x_size lambdas are recovered properly", {
+
+  expect_equal(ipmr_lambda, sim_lambda, tol = 1e-10)
+
+  pop_state_ipmr <- a_s_ipm$pop_state %>%
+    .[names(.) != 'lambda']
+
+  final_pop_comp <- vapply(1:22,
+                           function(i, ipmr, sim) {
+                             isTRUE(
+                               all.equal(
+                                 ipmr[[i]][, 101], sim[[i]]
+                               )
+                             )
+                           },
+                           FUN.VALUE = logical(1L),
+                           ipmr = pop_state_ipmr,
+                           sim = IPM.sim$x)
+
+  expect_true(all(final_pop_comp))
+
+})

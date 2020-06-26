@@ -1,7 +1,5 @@
 # Internal hierarchical effect functions
 
-
-
 .split_hier_effs <- function(proto_ipm) {
 
   kerns <- which(proto_ipm$has_hier_effs)
@@ -52,6 +50,7 @@
     for_bind  <- .sub_levels(temp, levels)
 
     new_proto <- rbind(new_proto, for_bind)
+
   }
 
   return(new_proto)
@@ -211,6 +210,7 @@
   for(i in seq_along(out)) {
 
     out[i] <- paste(levs[i, ], collapse = "_")
+
   }
 
   return(out)

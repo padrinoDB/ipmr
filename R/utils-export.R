@@ -415,3 +415,56 @@ format_mega_matrix <- function(ipm, mega_mat, presets = NULL) {
   return(out)
 
 }
+
+#' @title Age X Size models
+#' @rdname age_x_size
+#'
+#' @description Helper functions for implementing age x size models
+#'
+#' @param expr The expression to modify. See details.
+#' @param fun  The function to apply over \code{expr}.
+#' @param ... Used internally. Modifying this will likely cause models to break.
+#'
+#' @return A modified expression.
+#'
+#' @details Currently only \code{all_ages} is exported. This is a helper
+#' to indicate that all of the levels of age should be included in a given expression,
+#' rather than split out into separate levels. The \code{fun} is used to combine
+#' the results of each individual evaluation of \code{expr}.
+#'
+#' The most common use case for \code{all_ages} will be when defining the size
+#' distribution of new recruits in an age structured model, when many \code{F} kernels
+#' are multiplied by their respective age X size distributions, and then summed.
+#' Note that using \code{sum} is almost never correct, as this will always return
+#' a single number whereas the size distribution should be a vector! Generally,
+#' use \code{+} instead.
+#'
+#' @export
+
+all_ages <- function(expr, fun, ...) {
+
+  ages <- list(...) %>%
+    unlist()
+
+  new_text <- character(length(ages))
+
+  cur_text  <- deparse(substitute(expr), width.cutoff = 500L)
+
+  for(i in seq_along(ages)) {
+
+    new_text[i] <- gsub("age", ages[i], cur_text)
+
+  }
+
+  # add spaces around "fun" so output is more human readable. mostly for
+  # my own debugging purposes.
+  out_text <- paste(new_text, collapse = paste(" ",
+                                               as.character(fun),
+                                               " ",
+                                               sep = ""))
+
+  # out      <- rlang::parse_expr(out_text)
+
+  return(out_text)
+
+}

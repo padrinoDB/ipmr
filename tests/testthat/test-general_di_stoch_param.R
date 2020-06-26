@@ -282,7 +282,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     evict_cor        = FALSE
   ) %>%
   define_k(
-    name = 'k',
+    name = 'K',
     n_ln_leaf_l_t_1 = k_xx %*% n_ln_leaf_l_t +
                       k_zx %*% n_sqrt_area_t +
                       k_dx %*% n_d_t,
@@ -299,7 +299,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
                              c('xx',
                                'zx', 'dx', 'xz', 'xd', 'zd'),
                              sep = ""),
-                       'k'),
+                       'K'),
       int_rule     = rep('midpoint', 7),
       dom_start    = c('ln_leaf_l',
                        'sqrt_area',

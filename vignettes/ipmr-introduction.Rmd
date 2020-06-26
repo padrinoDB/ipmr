@@ -20,7 +20,9 @@ Unfortunately, `ipmr` does not yet have built-in functions for dealing with unce
   
 ## Types of models in `ipmr`
   
-The first step of defining a model in `ipmr` is to initialize the model using `init_ipm()`. This function takes a single argument: `model_class`. The `model_class` defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. `model_class` should be a character string with at least 3 (but possibly 4) entries separated by underscores (`_`). Below, the are the possible entries for each position.
+The first step of defining a model in `ipmr` is to initialize the model using `init_ipm()`. This function has two arguments: `model_class`, and `has_age`. We will ignore `has_age` for now, because age-size models are a complicated topic and have their [own vignette](https://levisc8.github.io/ipmr/articles/age_x_size.html). 
+
+The `model_class` defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. `model_class` should be a character string with at least 3 (but possibly 4) entries separated by underscores (`_`). Below, the are the possible entries for each position.
 
 - Position 1: `"simple"`/`"general"`
 
