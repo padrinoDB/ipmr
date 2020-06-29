@@ -21,10 +21,12 @@ tab <- read.csv("../paper/generic_progress.csv",
   .[-c(1, 8), ] %>% 
   as_tibble()
 
+tab$Model[7:12] <- paste(tab$Model[7:12], "_ipm", sep = "")
+
 
 knitr::kable(tab,
              format = 'pandoc',
-             align = paste(c('l', rep('c', 7)), collapse = "")) #%>%
+             align = paste(c('l', rep('c', 7)), collapse = "")) 
 
 
 ```
