@@ -185,9 +185,30 @@ the results of each individual evaluation of <code>expr</code>.</p>
 distribution of new recruits in an age structured model, when many <code>F</code> kernels
 are multiplied by their respective age X size distributions, and then summed.
 Note that using <code>sum</code> is almost never correct, as this will always return
-a single number whereas the size distribution should be a vector! Generally,
-use <code>+</code> instead.</p>
+a single number whereas we typically want the trait distribution function
+(i.e. a vector). It is usually best to use <code>+</code> instead.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+
+<span class='fu'><a href='kernel-definitions.html'>define_k</a></span>(
+ <span class='kw'>proto_ipm</span>          <span class='kw'>=</span> <span class='no'>some_age_size_proto_ipm</span>,
+ <span class='kw'>name</span>               <span class='kw'>=</span> <span class='st'>"K"</span>,
+ <span class='kw'>family</span>             <span class='kw'>=</span> <span class='st'>"IPM"</span>,
+ <span class='kw'>n_wt_0_t_1</span>         <span class='kw'>=</span> <span class='fu'>all_ages</span>(<span class='kw'>expr</span> <span class='kw'>=</span> <span class='no'>F_age</span> <span class='kw'>%*%</span> <span class='no'>n_wt_age_t</span>, <span class='kw'>fun</span> <span class='kw'>=</span> <span class='st'>"+"</span>),
+ <span class='kw'>n_wt_age_t_1</span>       <span class='kw'>=</span> <span class='no'>P_age_minus_1</span> <span class='kw'>%*%</span> <span class='no'>n_wt_age_minus_1_t</span>,
+ <span class='kw'>n_wt_max_age_t_1</span>   <span class='kw'>=</span> <span class='no'>P_max_age</span> <span class='kw'>%*%</span> <span class='no'>n_wt_max_age_t</span> +
+                      <span class='no'>P_max_age_minus_1</span> <span class='kw'>%*%</span> <span class='no'>n_wt_max_age_minus_1_t</span>,
+ <span class='kw'>data_list</span>          <span class='kw'>=</span> <span class='no'>param_list</span>,
+ <span class='kw'>states</span>             <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span> (<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"wt"</span>)),
+ <span class='kw'>has_hier_effs</span>      <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+ <span class='kw'>levels_ages</span>        <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>age</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>:<span class='fl'>20</span>), <span class='kw'>max_age</span> <span class='kw'>=</span> <span class='fl'>21</span>),
+ <span class='kw'>evict_cor</span>          <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)
+
+
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

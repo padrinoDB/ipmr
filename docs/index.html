@@ -255,129 +255,143 @@
                  <span class="kw">mu_fd</span>     <span class="kw">=</span> <span class="fl">2</span>,     <span class="co"># mean(recruit_data$size_next)</span>
                  <span class="kw">sd_fd</span>     <span class="kw">=</span> <span class="fl">0.3</span>)   <span class="co"># sd(recruit_data$size_next)</span>
 
-<span class="no">my_simple_ipm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_det'</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="reference/kernel-definitions.html">define_kernel</a></span>(
-
-    <span class="co"># Name of the kernel</span>
-
-    <span class="kw">name</span>      <span class="kw">=</span> <span class="st">"P_simple"</span>,
-
-    <span class="co"># The type of transition it describes (e.g. continuous - continuous, discrete - continuous).</span>
-    <span class="co"># These must be specified for all kernels!</span>
-
-    <span class="kw">family</span>    <span class="kw">=</span> <span class="st">"CC"</span>,
-
-    <span class="co"># The formula for the kernel. </span>
-
-    <span class="kw">formula</span>   <span class="kw">=</span> <span class="no">s</span> * <span class="no">g</span>,
-
-    <span class="co"># A named set of expressions for the vital rates it includes. </span>
-    <span class="co"># note the use of user-specified functions here. Additionally, each </span>
-    <span class="co"># state variable has a stateVariable_1 and stateVariable_2 internally defined</span>
-    <span class="co"># for the domain associated with it. Use these to distinguish between </span>
-    <span class="co"># size/weight/etc at time t vs size/weight/etc at time t+1</span>
-
-    <span class="co"># Perform the inverse logit transformation to get survival probabilities</span>
-    <span class="co"># from your model. For examples on using predict(my_surv_mod,...),</span>
-    <span class="co"># see below.</span>
-
-    <span class="kw">s</span>         <span class="kw">=</span> <span class="fl">1</span> / (<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(-(<span class="no">s_int</span> + <span class="no">s_slope</span> * <span class="no">dbh_1</span>))),
-
-    <span class="co"># The growth model requires a function to compute the mean as a function of dbh.</span>
-    <span class="co"># The SD is a constant, so we don't need to define that in ... expression, </span>
-    <span class="co"># just the data_list.</span>
-
-    <span class="kw">g</span>         <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">dbh_2</span>, <span class="no">mu_g</span>, <span class="no">sd_g</span>),
-    <span class="kw">mu_g</span>      <span class="kw">=</span> <span class="no">g_int</span> + <span class="no">g_slope</span> * <span class="no">dbh_1</span>,
+<span class="no">my_simple_ipm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_det'</span>)
 
 
-    <span class="co"># Specify the constants in the model in the data_list. </span>
+<span class="no">my_simple_ipm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/kernel-definitions.html">define_kernel</a></span>(
 
-    <span class="kw">data_list</span> <span class="kw">=</span> <span class="no">data_list</span>,
-    <span class="kw">states</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),
+  <span class="kw">proto_ipm</span> <span class="kw">=</span> <span class="no">my_simple_ipm</span>,
 
-    <span class="co"># If you want to correct for eviction, set evict_cor = TRUE and specify an</span>
-    <span class="co"># evict_fun. ipmr provides truncated_distributions() to help.</span>
+  <span class="co"># Name of the kernel</span>
 
-    <span class="kw">evict_cor</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-    <span class="kw">evict_fun</span> <span class="kw">=</span> <span class="fu"><a href="reference/eviction.html">truncated_distributions</a></span>(<span class="st">'norm'</span>,
-                                        <span class="st">'g'</span>)
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="reference/kernel-definitions.html">define_kernel</a></span>(<span class="st">'F_simple'</span>,
-                <span class="kw">formula</span>   <span class="kw">=</span> <span class="no">f_r</span> * <span class="no">f_s</span> * <span class="no">f_d</span>,
-                <span class="kw">family</span>    <span class="kw">=</span> <span class="st">'CC'</span>,
+  <span class="kw">name</span>      <span class="kw">=</span> <span class="st">"P_simple"</span>,
 
-                <span class="co"># Inverse logit transformation for flowering probability</span>
-                <span class="co"># (because we used a logistic regression)</span>
+  <span class="co"># The type of transition it describes (e.g. continuous - continuous, discrete - continuous).</span>
+  <span class="co"># These must be specified for all kernels!</span>
 
-                <span class="kw">f_r</span>       <span class="kw">=</span> <span class="fl">1</span> / (<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>( - (<span class="no">f_r_int</span> + <span class="no">f_r_slope</span> * <span class="no">dbh_1</span>))),
+  <span class="kw">family</span>    <span class="kw">=</span> <span class="st">"CC"</span>,
 
-                <span class="co"># Exponential function for seed progression </span>
-                <span class="co"># (because we used a Poisson)</span>
+  <span class="co"># The formula for the kernel. </span>
 
-                <span class="kw">f_s</span>       <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">f_s_int</span> + <span class="no">f_s_slope</span> * <span class="no">dbh_1</span>),
+  <span class="kw">formula</span>   <span class="kw">=</span> <span class="no">s</span> * <span class="no">g</span>,
 
-                <span class="co"># The recruit size distribution has no maternal effect for size,</span>
-                <span class="co"># so mu_fd and sd_fd are constants. These get passed in the </span>
-                <span class="co"># data_list</span>
+  <span class="co"># A named set of expressions for the vital rates it includes. </span>
+  <span class="co"># note the use of user-specified functions here. Additionally, each </span>
+  <span class="co"># state variable has a stateVariable_1 and stateVariable_2 internally defined</span>
+  <span class="co"># for the domain associated with it. Use these to distinguish between </span>
+  <span class="co"># size/weight/etc at time t vs size/weight/etc at time t+1</span>
 
-                <span class="kw">f_d</span>       <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">dbh_2</span>, <span class="no">mu_fd</span>, <span class="no">sd_fd</span>),
-                <span class="kw">data_list</span> <span class="kw">=</span> <span class="no">data_list</span>,
-                <span class="kw">states</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),
+  <span class="co"># Perform the inverse logit transformation to get survival probabilities</span>
+  <span class="co"># from your model. For examples on using predict(my_surv_mod,...),</span>
+  <span class="co"># see below.</span>
 
-                <span class="co"># Again, we'll correct for eviction in new recruits by</span>
-                <span class="co"># truncating the normal distribution.</span>
+  <span class="kw">s</span>         <span class="kw">=</span> <span class="fl">1</span> / (<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(-(<span class="no">s_int</span> + <span class="no">s_slope</span> * <span class="no">dbh_1</span>))),
 
-                <span class="kw">evict_cor</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-                <span class="kw">evict_fun</span> <span class="kw">=</span> <span class="fu"><a href="reference/eviction.html">truncated_distributions</a></span>(<span class="st">'norm'</span>,
-                                                    <span class="st">'f_d'</span>)
-  ) <span class="kw">%&gt;%</span>
+  <span class="co"># The growth model requires a function to compute the mean as a function of dbh.</span>
+  <span class="co"># The SD is a constant, so we don't need to define that in ... expression, </span>
+  <span class="co"># just the data_list.</span>
 
+  <span class="kw">g</span>         <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">dbh_2</span>, <span class="no">mu_g</span>, <span class="no">sd_g</span>),
+  <span class="kw">mu_g</span>      <span class="kw">=</span> <span class="no">g_int</span> + <span class="no">g_slope</span> * <span class="no">dbh_1</span>,
+
+
+  <span class="co"># Specify the constants in the model in the data_list. </span>
+
+  <span class="kw">data_list</span> <span class="kw">=</span> <span class="no">data_list</span>,
+  <span class="kw">states</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),
+
+  <span class="co"># If you want to correct for eviction, set evict_cor = TRUE and specify an</span>
+  <span class="co"># evict_fun. ipmr provides truncated_distributions() to help.</span>
+
+  <span class="kw">evict_cor</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
+  <span class="kw">evict_fun</span> <span class="kw">=</span> <span class="fu"><a href="reference/eviction.html">truncated_distributions</a></span>(<span class="st">'norm'</span>,
+                                      <span class="st">'g'</span>)
+  )
+
+<span class="no">my_simple_ipm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/kernel-definitions.html">define_kernel</a></span>(
+  <span class="kw">proto_ipm</span> <span class="kw">=</span> <span class="no">my_simple_ipm</span>,
+  <span class="kw">name</span>      <span class="kw">=</span> <span class="st">'F_simple'</span>,
+  <span class="kw">formula</span>   <span class="kw">=</span> <span class="no">f_r</span> * <span class="no">f_s</span> * <span class="no">f_d</span>,
+  <span class="kw">family</span>    <span class="kw">=</span> <span class="st">'CC'</span>,
+
+  <span class="co"># Inverse logit transformation for flowering probability</span>
+  <span class="co"># (because we used a logistic regression)</span>
+
+  <span class="kw">f_r</span>       <span class="kw">=</span> <span class="fl">1</span> / (<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>( - (<span class="no">f_r_int</span> + <span class="no">f_r_slope</span> * <span class="no">dbh_1</span>))),
+
+  <span class="co"># Exponential function for seed progression </span>
+  <span class="co"># (because we used a Poisson)</span>
+
+  <span class="kw">f_s</span>       <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">f_s_int</span> + <span class="no">f_s_slope</span> * <span class="no">dbh_1</span>),
+
+  <span class="co"># The recruit size distribution has no maternal effect for size,</span>
+  <span class="co"># so mu_fd and sd_fd are constants. These get passed in the </span>
+  <span class="co"># data_list</span>
+
+  <span class="kw">f_d</span>       <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">dbh_2</span>, <span class="no">mu_fd</span>, <span class="no">sd_fd</span>),
+  <span class="kw">data_list</span> <span class="kw">=</span> <span class="no">data_list</span>,
+  <span class="kw">states</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),
+
+  <span class="co"># Again, we'll correct for eviction in new recruits by</span>
+  <span class="co"># truncating the normal distribution.</span>
+
+  <span class="kw">evict_cor</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
+  <span class="kw">evict_fun</span> <span class="kw">=</span> <span class="fu"><a href="reference/eviction.html">truncated_distributions</a></span>(<span class="st">'norm'</span>,
+                                      <span class="st">'f_d'</span>)
+)
+
+<span class="no">my_simple_ipm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/kernel-definitions.html">define_k</a></span>(
   <span class="co"># K kernels get their own special define_k function. Rather than use the formula</span>
   <span class="co"># parameter, it simply takes named expressions for the format of the iteration</span>
   <span class="co"># kernels. It can also take expressions showing how these kernels generate </span>
   <span class="co"># population states at t+1 as a function of population state at t - see examples</span>
   <span class="co"># below for how to do that.</span>
 
-  <span class="fu"><a href="reference/kernel-definitions.html">define_k</a></span>(<span class="st">'K'</span>,
-           <span class="kw">K</span>         <span class="kw">=</span> <span class="no">P_simple</span> + <span class="no">F_simple</span>,
+  <span class="kw">proto_ipm</span> <span class="kw">=</span> <span class="no">my_simple_ipm</span>,
+  <span class="kw">name</span>      <span class="kw">=</span> <span class="st">'K'</span>,
+  <span class="kw">K</span>         <span class="kw">=</span> <span class="no">P_simple</span> + <span class="no">F_simple</span>,
 
-           <span class="co"># This is a new family - at the moment all K's will get the</span>
-           <span class="co"># 'IPM' family</span>
+  <span class="co"># This is a new family - at the moment all K's will get the</span>
+  <span class="co"># 'IPM' family</span>
 
-           <span class="kw">family</span>    <span class="kw">=</span> <span class="st">'IPM'</span>,
+  <span class="kw">family</span>    <span class="kw">=</span> <span class="st">'IPM'</span>,
 
-           <span class="co"># This kernel has no additional parameters, so the data_list</span>
-           <span class="co"># is empty</span>
+  <span class="co"># This kernel has no additional parameters, so the data_list</span>
+  <span class="co"># is empty</span>
 
-           <span class="kw">data_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(),
-           <span class="kw">states</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),
-           <span class="co"># We've already corrected eviction in the sub-kernels, so there's no</span>
-           <span class="co"># need to do that here</span>
-           <span class="kw">evict_cor</span> <span class="kw">=</span> <span class="fl">FALSE</span>
-  ) <span class="kw">%&gt;%</span>
-  <span class="co"># Next, we have to define the implementation details for the model. </span>
+  <span class="kw">data_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(),
+  <span class="kw">states</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),
+  <span class="co"># We've already corrected eviction in the sub-kernels, so there's no</span>
+  <span class="co"># need to do that here</span>
+  <span class="kw">evict_cor</span> <span class="kw">=</span> <span class="fl">FALSE</span>
+)
+
+<span class="co"># Next, we have to define the implementation details for the model. </span>
   <span class="co"># We need to tell ipmr how each kernel is integrated, what domain</span>
   <span class="co"># it starts on (i.e. the size/weight/etc from above), and what domain</span>
   <span class="co"># it ends on. In simple_* models, dom_start and dom_end will always be the same,</span>
   <span class="co"># because we only have a single continuous state variable. General_*</span>
   <span class="co"># models will be more complicated.</span>
 
-  <span class="fu"><a href="reference/define_star.html">define_impl</a></span>(
-    <span class="fu"><a href="reference/define_star.html">make_impl_args_list</a></span>(
-      <span class="kw">kernel_names</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"K_simple"</span>, <span class="st">"P_simple"</span>, <span class="st">"F_simple"</span>),
-      <span class="kw">int_rule</span>     <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="fl">3</span>),
-      <span class="kw">dom_start</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>, <span class="fl">3</span>),
-      <span class="kw">dom_end</span>      <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>, <span class="fl">3</span>)
-    )
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="reference/define_star.html">define_domains</a></span>(
-    <span class="kw">dbh</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="co"># the first entry is the lower bound of the domain.</span>
-            <span class="fl">50</span>, <span class="co"># the second entry is the upper bound of the domain.</span>
-            <span class="fl">100</span> <span class="co"># third entry is the number of meshpoints for the domain.</span>
-    )
-  )  <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="reference/make_ipm.html">make_ipm</a></span>()
+<span class="no">my_simple_ipm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/define_star.html">define_impl</a></span>(
+  <span class="kw">proto_ipm</span> <span class="kw">=</span> <span class="no">my_simple_ipm</span>,
+  <span class="fu"><a href="reference/define_star.html">make_impl_args_list</a></span>(
+    <span class="kw">kernel_names</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"K_simple"</span>, <span class="st">"P_simple"</span>, <span class="st">"F_simple"</span>),
+    <span class="kw">int_rule</span>     <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="fl">3</span>),
+    <span class="kw">dom_start</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>, <span class="fl">3</span>),
+    <span class="kw">dom_end</span>      <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>, <span class="fl">3</span>)
+  )
+)
+
+<span class="no">my_simple_ipm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/define_star.html">define_domains</a></span>(
+  <span class="kw">proto_ipm</span> <span class="kw">=</span> <span class="no">my_simple_ipm</span>,
+  <span class="kw">dbh</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="co"># the first entry is the lower bound of the domain.</span>
+          <span class="fl">50</span>, <span class="co"># the second entry is the upper bound of the domain.</span>
+          <span class="fl">100</span> <span class="co"># third entry is the number of meshpoints for the domain.</span>
+  )
+)
+
+<span class="no">my_simple_ipm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/make_ipm.html">make_ipm</a></span>(<span class="kw">proto_ipm</span> <span class="kw">=</span> <span class="no">my_simple_ipm</span>)
 
 
 <span class="no">lambda_ipmr</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/lambda.html">lambda</a></span>(<span class="no">my_simple_ipm</span>, <span class="kw">comp_method</span> <span class="kw">=</span> <span class="st">'eigen'</span>)
