@@ -525,7 +525,7 @@
                                           normal)  {
 
 
-  if(any(proto_ipm$has_hier_effs) && !.has_age(proto_ipm)) {
+  if(any(proto_ipm$has_hier_effs)) {
 
     hier_effs <- proto_ipm$levels_hier_effs[proto_ipm$has_hier_effs]
     hier_effs <- hier_effs[!duplicated(hier_effs)]
