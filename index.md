@@ -227,129 +227,143 @@ data_list = list(s_int     = 2.2,   # coefficients(my_surv_mod)[1]
                  mu_fd     = 2,     # mean(recruit_data$size_next)
                  sd_fd     = 0.3)   # sd(recruit_data$size_next)
 
-my_simple_ipm <- init_ipm('simple_di_det') %>%
-  define_kernel(
-    
-    # Name of the kernel
-    
-    name      = "P_simple",
-    
-    # The type of transition it describes (e.g. continuous - continuous, discrete - continuous).
-    # These must be specified for all kernels!
-    
-    family    = "CC",
-    
-    # The formula for the kernel. 
-    
-    formula   = s * g,
-    
-    # A named set of expressions for the vital rates it includes. 
-    # note the use of user-specified functions here. Additionally, each 
-    # state variable has a stateVariable_1 and stateVariable_2 internally defined
-    # for the domain associated with it. Use these to distinguish between 
-    # size/weight/etc at time t vs size/weight/etc at time t+1
-    
-    # Perform the inverse logit transformation to get survival probabilities
-    # from your model. For examples on using predict(my_surv_mod,...),
-    # see below.
-    
-    s         = 1 / (1 + exp(-(s_int + s_slope * dbh_1))), 
-    
-    # The growth model requires a function to compute the mean as a function of dbh.
-    # The SD is a constant, so we don't need to define that in ... expression, 
-    # just the data_list.
-    
-    g         = dnorm(dbh_2, mu_g, sd_g),
-    mu_g      = g_int + g_slope * dbh_1,
+my_simple_ipm <- init_ipm('simple_di_det')
 
-    
-    # Specify the constants in the model in the data_list. 
-    
-    data_list = data_list,
-    states    = list(c('dbh')),
-    
-    # If you want to correct for eviction, set evict_cor = TRUE and specify an
-    # evict_fun. ipmr provides truncated_distributions() to help.
-    
-    evict_cor = TRUE,
-    evict_fun = truncated_distributions('norm',
-                                        'g')
-  ) %>%
-  define_kernel('F_simple',
-                formula   = f_r * f_s * f_d,
-                family    = 'CC',
-                
-                # Inverse logit transformation for flowering probability
-                # (because we used a logistic regression)
-                
-                f_r       = 1 / (1 + exp( - (f_r_int + f_r_slope * dbh_1))),
-                
-                # Exponential function for seed progression 
-                # (because we used a Poisson)
-                
-                f_s       = exp(f_s_int + f_s_slope * dbh_1),
-                
-                # The recruit size distribution has no maternal effect for size,
-                # so mu_fd and sd_fd are constants. These get passed in the 
-                # data_list
-                
-                f_d       = dnorm(dbh_2, mu_fd, sd_fd),
-                data_list = data_list,
-                states    = list(c('dbh')),
-                
-                # Again, we'll correct for eviction in new recruits by
-                # truncating the normal distribution.
-                
-                evict_cor = TRUE,
-                evict_fun = truncated_distributions('norm',
-                                                    'f_d')
-  ) %>%
+
+my_simple_ipm <- define_kernel(
   
+  proto_ipm = my_simple_ipm,
+    
+  # Name of the kernel
+  
+  name      = "P_simple",
+  
+  # The type of transition it describes (e.g. continuous - continuous, discrete - continuous).
+  # These must be specified for all kernels!
+  
+  family    = "CC",
+  
+  # The formula for the kernel. 
+  
+  formula   = s * g,
+  
+  # A named set of expressions for the vital rates it includes. 
+  # note the use of user-specified functions here. Additionally, each 
+  # state variable has a stateVariable_1 and stateVariable_2 internally defined
+  # for the domain associated with it. Use these to distinguish between 
+  # size/weight/etc at time t vs size/weight/etc at time t+1
+  
+  # Perform the inverse logit transformation to get survival probabilities
+  # from your model. For examples on using predict(my_surv_mod,...),
+  # see below.
+  
+  s         = 1 / (1 + exp(-(s_int + s_slope * dbh_1))), 
+  
+  # The growth model requires a function to compute the mean as a function of dbh.
+  # The SD is a constant, so we don't need to define that in ... expression, 
+  # just the data_list.
+  
+  g         = dnorm(dbh_2, mu_g, sd_g),
+  mu_g      = g_int + g_slope * dbh_1,
+  
+  
+  # Specify the constants in the model in the data_list. 
+  
+  data_list = data_list,
+  states    = list(c('dbh')),
+  
+  # If you want to correct for eviction, set evict_cor = TRUE and specify an
+  # evict_fun. ipmr provides truncated_distributions() to help.
+  
+  evict_cor = TRUE,
+  evict_fun = truncated_distributions('norm',
+                                      'g')
+  ) 
+
+my_simple_ipm <- define_kernel(
+  proto_ipm = my_simple_ipm,
+  name      = 'F_simple',
+  formula   = f_r * f_s * f_d,
+  family    = 'CC',
+  
+  # Inverse logit transformation for flowering probability
+  # (because we used a logistic regression)
+  
+  f_r       = 1 / (1 + exp( - (f_r_int + f_r_slope * dbh_1))),
+  
+  # Exponential function for seed progression 
+  # (because we used a Poisson)
+  
+  f_s       = exp(f_s_int + f_s_slope * dbh_1),
+  
+  # The recruit size distribution has no maternal effect for size,
+  # so mu_fd and sd_fd are constants. These get passed in the 
+  # data_list
+  
+  f_d       = dnorm(dbh_2, mu_fd, sd_fd),
+  data_list = data_list,
+  states    = list(c('dbh')),
+  
+  # Again, we'll correct for eviction in new recruits by
+  # truncating the normal distribution.
+  
+  evict_cor = TRUE,
+  evict_fun = truncated_distributions('norm',
+                                      'f_d')
+) 
+
+my_simple_ipm <- define_k(
   # K kernels get their own special define_k function. Rather than use the formula
   # parameter, it simply takes named expressions for the format of the iteration
   # kernels. It can also take expressions showing how these kernels generate 
   # population states at t+1 as a function of population state at t - see examples
   # below for how to do that.
   
-  define_k('K',
-           K         = P_simple + F_simple,
+  proto_ipm = my_simple_ipm,
+  name      = 'K',
+  K         = P_simple + F_simple,
            
-           # This is a new family - at the moment all K's will get the
-           # 'IPM' family
-           
-           family    = 'IPM',
-           
-           # This kernel has no additional parameters, so the data_list
-           # is empty
-           
-           data_list = list(),
-           states    = list(c('dbh')),
-           # We've already corrected eviction in the sub-kernels, so there's no
-           # need to do that here
-           evict_cor = FALSE
-  ) %>%
-  # Next, we have to define the implementation details for the model. 
+  # This is a new family - at the moment all K's will get the
+  # 'IPM' family
+  
+  family    = 'IPM',
+  
+  # This kernel has no additional parameters, so the data_list
+  # is empty
+  
+  data_list = list(),
+  states    = list(c('dbh')),
+  # We've already corrected eviction in the sub-kernels, so there's no
+  # need to do that here
+  evict_cor = FALSE
+) 
+
+# Next, we have to define the implementation details for the model. 
   # We need to tell ipmr how each kernel is integrated, what domain
   # it starts on (i.e. the size/weight/etc from above), and what domain
   # it ends on. In simple_* models, dom_start and dom_end will always be the same,
   # because we only have a single continuous state variable. General_*
   # models will be more complicated.
   
-  define_impl(
-    make_impl_args_list(
-      kernel_names = c("K_simple", "P_simple", "F_simple"),
-      int_rule     = rep("midpoint", 3),
-      dom_start    = rep("dbh", 3),
-      dom_end      = rep("dbh", 3)
-    )
-  ) %>%
-  define_domains(
-    dbh = c(0, # the first entry is the lower bound of the domain.
-            50, # the second entry is the upper bound of the domain.
-            100 # third entry is the number of meshpoints for the domain.
-    ) 
-  )  %>%
-  make_ipm()
+my_simple_ipm <- define_impl(
+  proto_ipm = my_simple_ipm,
+  make_impl_args_list(
+    kernel_names = c("K_simple", "P_simple", "F_simple"),
+    int_rule     = rep("midpoint", 3),
+    dom_start    = rep("dbh", 3),
+    dom_end      = rep("dbh", 3)
+  )
+) 
+
+my_simple_ipm <- define_domains(
+  proto_ipm = my_simple_ipm,
+  dbh = c(0, # the first entry is the lower bound of the domain.
+          50, # the second entry is the upper bound of the domain.
+          100 # third entry is the number of meshpoints for the domain.
+  ) 
+) 
+
+my_simple_ipm <- make_ipm(proto_ipm = my_simple_ipm)
 
 
 lambda_ipmr <- lambda(my_simple_ipm, comp_method = 'eigen')
