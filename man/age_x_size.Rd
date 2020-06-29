@@ -29,6 +29,29 @@ The most common use case for \code{all_ages} will be when defining the size
 distribution of new recruits in an age structured model, when many \code{F} kernels
 are multiplied by their respective age X size distributions, and then summed.
 Note that using \code{sum} is almost never correct, as this will always return
-a single number whereas the size distribution should be a vector! Generally,
-use \code{+} instead.
+a single number whereas we typically want the trait distribution function
+(i.e. a vector). It is usually best to use \code{+} instead.
+}
+\examples{
+
+\dontrun{
+
+define_k(
+ proto_ipm          = some_age_size_proto_ipm,
+ name               = "K",
+ family             = "IPM",
+ n_wt_0_t_1         = all_ages(expr = F_age \%*\% n_wt_age_t, fun = "+"),
+ n_wt_age_t_1       = P_age_minus_1 \%*\% n_wt_age_minus_1_t,
+ n_wt_max_age_t_1   = P_max_age \%*\% n_wt_max_age_t +
+                      P_max_age_minus_1 \%*\% n_wt_max_age_minus_1_t,
+ data_list          = param_list,
+ states             = list (c("wt")),
+ has_hier_effs      = FALSE,
+ levels_ages        = list(age = c(0:20), max_age = 21),
+ evict_cor          = FALSE
+)
+
+
+}
+
 }
