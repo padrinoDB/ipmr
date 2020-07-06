@@ -205,6 +205,20 @@
   <span class='kw'>do_legend</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>exponent</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='no'>...</span>
+)
+
+<span class='co'># S3 method for general_di_det_ipm</span>
+<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(
+  <span class='kw'>x</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>y</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>ipm</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>mega_mat</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
+  <span class='kw'>col</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
+  <span class='kw'>bw</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>do_contour</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>do_legend</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>exponent</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='no'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -249,6 +263,14 @@ on the plot</p></td>
       <th>exponent</th>
       <td><p>The exponent to raise each kernel to. Setting this to a low
 number can help visualize kernels that are overwhelmed by a few very large numbers.</p></td>
+    </tr>
+    <tr>
+      <th>mega_mat</th>
+      <td><p>A vector with symbols and/or 0s representing the matrix blocks.
+They should be specified in ROW MAJOR order! Can also be a character
+string specifying the call. Hierarchical syntax is supported. When used,
+<code>format_mega_matrix</code> will produce as many mega-matrices as there are
+combinations of <code>levels_hier_effs</code> in the <code>proto_ipm</code>.</p></td>
     </tr>
     </table>
 

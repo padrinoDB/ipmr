@@ -183,7 +183,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
   <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>report_progress</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )
 
 <span class='co'># S3 method for simple_di_stoch_param</span>
@@ -196,7 +197,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
   <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>report_progress</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )
 
 <span class='co'># S3 method for general_di_det</span>
@@ -221,7 +223,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
   <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>report_progress</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )
 
 <span class='co'># S3 method for general_di_stoch_param</span>
@@ -234,7 +237,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
   <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>report_progress</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -296,6 +300,12 @@ sites - <code>'a', 'b', 'c'</code>), a Markov chain matrix with
 transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
 If it is empty, <code>make_ipm</code> will try to generate a sequence internally using
 a random selection of the <code>levels_hier_effs</code> defined in <code>define_kernel</code>.</p></td>
+    </tr>
+    <tr>
+      <th>report_progress</th>
+      <td><p>A logical indicating whether or not to periodically
+report progress for a stochastic simulation. Does not apply to deterministic
+methods. Default is <code>FALSE</code>.</p></td>
     </tr>
     </table>
 

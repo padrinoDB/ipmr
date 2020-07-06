@@ -24,7 +24,7 @@ Suggests:
     roxygen2,
     spelling,
     testthat,
-    covr,
+    covr
 VignetteBuilder: knitr
 Language: en-US
 Imports:

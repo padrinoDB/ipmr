@@ -678,8 +678,8 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
 
   graphics::par(mar = c(6, 5, 3, 2))
 
-  if(is.null(x)) x = seq_len(ncol(A))
-  if(is.null(y)) y = seq_len(nrow(A))
+  if(is.null(x)) x <- seq_len(ncol(A))
+  if(is.null(y)) y <- seq_len(nrow(A))
 
   nx = length(x)
   ny = length(y)
@@ -728,7 +728,6 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
 
   invisible(A)
 }
-
 
 #' @rdname plot_star
 #' @param sub_kernels A logical - also plot the sub-kernels?
@@ -878,6 +877,63 @@ plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
   invisible(ipm)
 }
 
+#' @rdname plot_star
+#' @inheritParams format_mega_matrix
+#'
+#' @export
+
+plot.general_di_det_ipm <- function(x = NULL, y = NULL,
+                                    ipm = NULL,
+                                    mega_mat = NA_character_,
+                                    col = NA_character_,
+                                    bw = FALSE,
+                                    do_contour = FALSE,
+                                    do_legend = FALSE,
+                                    exponent = 1,
+                                    ...) {
+
+  # This is used so that users can just say plot(my_model) instead of
+  # plot(ipm = my_model). ipmr_matrix expects x and y to both be NULL
+
+  if(!is.null(x) && is.null(ipm)){
+    ipm <- x
+    x   <- NULL
+  }
+
+  if(is.na(mega_mat)) {
+
+    stop("Plotting general IPMs requires building a 'mega_mat'.\n",
+         "Please specify an expression for the 'mega_mat' argument.")
+  }
+
+  if(is.na(col)) {
+    col <- rainbow(100,
+                   start = 0.67,
+                   end = 0,
+                   alpha = NULL)
+  }
+
+  old_par <- par('mar')
+  on.exit(par(old_par))
+
+  dots <- list(...)
+
+  mega_mat <- rlang::enquo(mega_mat)
+
+  plot_list <- list(format_mega_matrix(ipm, mega_mat = !! mega_mat))
+
+  lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
+                                                   y = y,
+                                                   A = ipm ^ exponent,
+                                                   col = col,
+                                                   bw = bw,
+                                                   do_contour = do_contour,
+                                                   do_legend = do_legend,
+                                                   dots))
+
+  invisible(ipm)
+
+}
 
 # right_ev ----------------
 
@@ -1167,7 +1223,7 @@ right_ev.general_di_det_ipm <- function(ipm,
 
     if(!rlang::quo_is_null(mega_vec) && !rlang::quo_is_null(mega_mat)) {
       vec_out <- .make_mega_vec(mega_vec, out)
-      mat_out <- .make_mega_mat(mega_mat, ipm$sub_kernels)
+      mat_out <- format_mega_matrix(ipm, !! mega_mat)[[1]]
       out     <- list(mega_mat = mat_out, mega_vec = vec_out)
 
     } else {
@@ -1396,7 +1452,7 @@ left_ev.general_di_det_ipm <- function(ipm,
 
   # Set everything up and iterate the transposed model
 
-  mega_k       <- .make_mega_mat(mega_mat, sub_kernels)
+  mega_k       <- format_mega_matrix(ipm, !! mega_mat)[[1]]
   mega_pop     <- .make_mega_vec(mega_vec, ipm$pop_state)
   t_k          <- t(mega_k)
 

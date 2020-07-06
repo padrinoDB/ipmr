@@ -153,7 +153,7 @@
     <p>Format a mega-matrix</p>
     </div>
 
-    <pre class="usage"><span class='fu'>format_mega_matrix</span>(<span class='no'>ipm</span>, <span class='no'>mega_mat</span>, <span class='kw'>presets</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>format_mega_matrix</span>(<span class='no'>ipm</span>, <span class='no'>mega_mat</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -166,18 +166,17 @@
       <th>mega_mat</th>
       <td><p>A vector with symbols and/or 0s representing the matrix blocks.
 They should be specified in ROW MAJOR order! Can also be a character
-string specifying the call. See examples.</p></td>
-    </tr>
-    <tr>
-      <th>presets</th>
-      <td><p>Either empty or one of 'age-size' or 'hier_effs'. Currently
-not implemented</p></td>
+string specifying the call. Hierarchical syntax is supported. When used,
+<code>format_mega_matrix</code> will produce as many mega-matrices as there are
+combinations of <code>levels_hier_effs</code> in the <code>proto_ipm</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A large matrix</p>
+    <p>A list containing a large matrix or many large matrices (when used with
+hierarchical syntax). The names in the former case will be <code>"mega_matrix"</code>
+and in the latter case, the level of the hierarchical effect.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>gen_di_det_ex</span>)
