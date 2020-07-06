@@ -279,15 +279,18 @@ nt0 <- with(i.par, lapply(seq_len(na), function(ia) rep(0, m)))
 nt0[[1]] <- with(i.par, rep(1 / m, m))
 
 # estimate lambda with the true parameters...
-IPM.sys <- mk_age_IPM(i.par, m.par.true)
-IPM.sim <- with(IPM.sys, {
-  x <- nt0
-  for (i in seq_len(100)) {
-    x1 <- r_iter(x, na, F, P)
-    lam <- sum(unlist(x1))
-    x <- lapply(x1, function(x) x / lam)
-  }
-  list(lambda = lam, x = x)
+
+hand_time <- system.time({
+  IPM.sys <- mk_age_IPM(i.par, m.par.true)
+  IPM.sim <- with(IPM.sys, {
+    x <- nt0
+    for (i in seq_len(100)) {
+      x1 <- r_iter(x, na, F, P)
+      lam <- sum(unlist(x1))
+      x <- lapply(x1, function(x) x / lam)
+    }
+    list(lambda = lam, x = x)
+  })
 })
 
 sim_lambda <- IPM.sim$lambda
@@ -311,70 +314,72 @@ f_fun <- function(age, s_age, pb_age, pr_age, recr) {
 
 }
 
-a_s_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
-  define_kernel(
-    name          = "P_age",
-    family        = "CC",
-    formula       = s_age * g_age * d_wt,
-    s_age         = inv_logit(surv_int + surv_z * wt_1 + surv_a * age),
-    g_age         = dnorm(wt_2, mu_g_age, grow_sd),
-    mu_g_age      = grow_int + grow_z * wt_1 + grow_a * age,
-    data_list     = param_list,
-    states        = list(c("wt")),
-    has_hier_effs = FALSE,
-    levels_ages   = list(age = c(0:20), max_age = 21),
-    evict_cor     = FALSE
-  ) %>%
-  define_kernel(
-    name          = "F_age",
-    family        = "CC",
-    formula       = f_fun(age, s_age, pb_age, pr_age, recr) * d_wt,
-    s_age         = inv_logit(surv_int + surv_z * wt_1 + surv_a * age),
-    pb_age        = inv_logit(repr_int + repr_z * wt_1 + repr_a * age),
-    pr_age        = inv_logit(recr_int + recr_a * age),
-    recr          = dnorm(wt_2, rcsz_mu, rcsz_sd),
-    rcsz_mu       = rcsz_int + rcsz_z * wt_1,
-    data_list     = param_list,
-    states        = list(c("wt")),
-    has_hier_effs = FALSE,
-    levels_ages   = list(age = c(0:20), max_age = 21),
-    evict_cor     = FALSE
-  ) %>%
-  define_k(
-    name               = "K",
-    family             = "IPM",
-    n_wt_0_t_1         = all_ages(F_age %*% n_wt_age_t, "+"),
-    n_wt_age_t_1       = P_age_minus_1 %*% n_wt_age_minus_1_t,
-    n_wt_max_age_t_1   = P_max_age %*% n_wt_max_age_t +
-                         P_max_age_minus_1 %*% n_wt_max_age_minus_1_t,
-    data_list          = param_list,
-    states             = list (c("wt")),
-    has_hier_effs      = FALSE,
-    levels_ages        = list(age = c(0:20), max_age = 21),
-    evict_cor          = FALSE
-  ) %>%
-  define_impl(
-    make_impl_args_list(
-      kernel_names = c("P_age", "F_age", "K"),
-      int_rule     = rep("midpoint", 3),
-      dom_start    = rep("wt", 3),
-      dom_end      = rep("wt", 3)
+ipmr_time <- system.time({
+  a_s_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
+    define_kernel(
+      name          = "P_age",
+      family        = "CC",
+      formula       = s_age * g_age * d_wt,
+      s_age         = inv_logit(surv_int + surv_z * wt_1 + surv_a * age),
+      g_age         = dnorm(wt_2, mu_g_age, grow_sd),
+      mu_g_age      = grow_int + grow_z * wt_1 + grow_a * age,
+      data_list     = param_list,
+      states        = list(c("wt")),
+      has_hier_effs = FALSE,
+      levels_ages   = list(age = c(0:20), max_age = 21),
+      evict_cor     = FALSE
+    ) %>%
+    define_kernel(
+      name          = "F_age",
+      family        = "CC",
+      formula       = f_fun(age, s_age, pb_age, pr_age, recr) * d_wt,
+      s_age         = inv_logit(surv_int + surv_z * wt_1 + surv_a * age),
+      pb_age        = inv_logit(repr_int + repr_z * wt_1 + repr_a * age),
+      pr_age        = inv_logit(recr_int + recr_a * age),
+      recr          = dnorm(wt_2, rcsz_mu, rcsz_sd),
+      rcsz_mu       = rcsz_int + rcsz_z * wt_1,
+      data_list     = param_list,
+      states        = list(c("wt")),
+      has_hier_effs = FALSE,
+      levels_ages   = list(age = c(0:20), max_age = 21),
+      evict_cor     = FALSE
+    ) %>%
+    define_k(
+      name               = "K",
+      family             = "IPM",
+      n_wt_0_t_1         = all_ages(F_age %*% n_wt_age_t, "+"),
+      n_wt_age_t_1       = P_age_minus_1 %*% n_wt_age_minus_1_t,
+      n_wt_max_age_t_1   = P_max_age %*% n_wt_max_age_t +
+        P_max_age_minus_1 %*% n_wt_max_age_minus_1_t,
+      data_list          = param_list,
+      states             = list (c("wt")),
+      has_hier_effs      = FALSE,
+      levels_ages        = list(age = c(0:20), max_age = 21),
+      evict_cor          = FALSE
+    ) %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c("P_age", "F_age", "K"),
+        int_rule     = rep("midpoint", 3),
+        dom_start    = rep("wt", 3),
+        dom_end      = rep("wt", 3)
+      )
+    ) %>%
+    define_domains(
+      wt = c(1.6, 3.7, 100)
+    ) %>%
+    define_pop_state(
+      pop_vectors = list(
+        n_wt_age = runif(100))
+    ) %>%
+    make_ipm(
+      usr_funs = list(inv_logit = plogis,
+                      f_fun     = f_fun),
+      iterate  = TRUE,
+      iterations = 100,
+      return_all = TRUE
     )
-  ) %>%
-  define_domains(
-    wt = c(1.6, 3.7, 100)
-  ) %>%
-  define_pop_state(
-    pop_vectors = list(
-      n_wt_age = runif(100))
-  ) %>%
-  make_ipm(
-    usr_funs = list(inv_logit = inv_logit,
-                    f_fun     = f_fun),
-    iterate  = TRUE,
-    iterations = 100,
-    return_all = TRUE
-  )
+})
 
 ipmr_lambda <- lambda(a_s_ipm, type_lambda = 'last')
 

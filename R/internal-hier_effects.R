@@ -66,10 +66,6 @@
 
     for(k in seq_len(dim(levels)[1])) { # variable values loop
 
-      # So far, the only things I can identify that require subbing is
-      # the kernel_id, kernel formula, and vital rate exprs. I fear I will
-      # come to regret this comment
-
       proto[it, 'kernel_id']            <- gsub(nm,
                                                 levels[k, j],
                                                 proto[it, 'kernel_id'])

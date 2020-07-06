@@ -36,6 +36,9 @@
 #' transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
 #' If it is empty, \code{make_ipm} will try to generate a sequence internally using
 #' a random selection of the \code{levels_hier_effs} defined in \code{define_kernel}.
+#' @param report_progress A logical indicating whether or not to periodically
+#' report progress for a stochastic simulation. Does not apply to deterministic
+#' methods. Default is \code{FALSE}.
 #'
 #'
 #' @return
@@ -227,7 +230,8 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
                                           iterate     = FALSE,
                                           iterations  = 50,
                                           kernel_seq  = NULL,
-                                          normalize_pop_size = TRUE) {
+                                          normalize_pop_size = TRUE,
+                                          report_progress = FALSE) {
 
 
   if(iterate && all(is.null(kernel_seq) | is.na(kernel_seq))) {
@@ -311,7 +315,8 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
                                      temp$pop_state,
                                      master_env,
                                      k_row,
-                                     normalize_pop_size)
+                                     normalize_pop_size,
+                                     report_progress)
 
     # In order to operate properly, we had to insert an extra entry in
     # lambda to make sure it had the same length as pop_state (it'll always be
@@ -363,7 +368,8 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                            iterate     = TRUE,
                                            iterations  = 50,
                                            kernel_seq  = NULL,
-                                           normalize_pop_size = TRUE) {
+                                           normalize_pop_size = TRUE,
+                                           report_progress = FALSE) {
 
   # Work out whether to append usr_funs to proto or to restore them from prior
   # implemenation. Logic is documented in make_ipm.simple_di_det()
@@ -429,6 +435,7 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
     # the joint distribution!
 
     .bind_iter_var(master_env, i)
+    .stoch_progress_message(report_progress, iterations, i)
 
     sys         <- .make_sub_kernel_simple_lazy(others,
                                                 master_env,
@@ -645,7 +652,8 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
                                            iterate     = TRUE,
                                            iterations  = 50,
                                            kernel_seq  = NULL,
-                                           normalize_pop_size = TRUE) {
+                                           normalize_pop_size = TRUE,
+                                           report_progress = FALSE) {
 
 
   if(iterate && all(is.null(kernel_seq) | is.na(kernel_seq))) {
@@ -742,7 +750,8 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
                                 kern_seq,
                                 temp$pop_state,
                                 master_env,
-                                normalize_pop_size)
+                                normalize_pop_size,
+                                report_progress)
 
     pop_state$lambda <- pop_state$lambda[-1]
   }
@@ -793,7 +802,8 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
                                             iterate     = TRUE,
                                             iterations  = 50,
                                             kernel_seq  = NULL,
-                                            normalize_pop_size = TRUE) {
+                                            normalize_pop_size = TRUE,
+                                            report_progress = FALSE) {
 
   # Work out whether to append usr_funs to proto or to restore them from prior
   # implemenation. Logic is documented in make_ipm.simple_di_det()
@@ -865,6 +875,8 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
     # add the variable to let the user access the current iteration.
 
     .bind_iter_var(master_env, i)
+
+    .stoch_progress_message(report_progress, iterations, i)
 
     # Lazy variant makes sure that whatever functions that generate parameter
     # values stochastically are only evaluated 1 time per iteration! This is so

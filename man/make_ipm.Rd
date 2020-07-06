@@ -32,7 +32,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   iterate = FALSE,
   iterations = 50,
   kernel_seq = NULL,
-  normalize_pop_size = TRUE
+  normalize_pop_size = TRUE,
+  report_progress = FALSE
 )
 
 \method{make_ipm}{simple_di_stoch_param}(
@@ -44,7 +45,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   iterate = TRUE,
   iterations = 50,
   kernel_seq = NULL,
-  normalize_pop_size = TRUE
+  normalize_pop_size = TRUE,
+  report_progress = FALSE
 )
 
 \method{make_ipm}{general_di_det}(
@@ -67,7 +69,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   iterate = TRUE,
   iterations = 50,
   kernel_seq = NULL,
-  normalize_pop_size = TRUE
+  normalize_pop_size = TRUE,
+  report_progress = FALSE
 )
 
 \method{make_ipm}{general_di_stoch_param}(
@@ -79,7 +82,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
   iterate = TRUE,
   iterations = 50,
   kernel_seq = NULL,
-  normalize_pop_size = TRUE
+  normalize_pop_size = TRUE,
+  report_progress = FALSE
 )
 }
 \arguments{
@@ -121,6 +125,10 @@ sites - \code{'a', 'b', 'c'}), a Markov chain matrix with
 transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
 If it is empty, \code{make_ipm} will try to generate a sequence internally using
 a random selection of the \code{levels_hier_effs} defined in \code{define_kernel}.}
+
+\item{report_progress}{A logical indicating whether or not to periodically
+report progress for a stochastic simulation. Does not apply to deterministic
+methods. Default is \code{FALSE}.}
 }
 \value{
 The \code{make_ipm.*} methods will always return a list of length 6

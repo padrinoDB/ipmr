@@ -177,6 +177,24 @@
       )
     )
   )
+}
 
+
+#' @noRd
+
+.stoch_progress_message <- function(report_progress, iterations, iteration) {
+
+  if(report_progress) {
+
+    perc_prog <- iteration / iterations * 100
+
+    if(perc_prog %% 10L == 0){
+
+      message("\nModel progress: ", iteration, "/", iterations)
+    }
+
+  }
+
+  invisible(TRUE)
 
 }

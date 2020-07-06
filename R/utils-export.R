@@ -374,11 +374,13 @@ mat_power <- function(x, y) {
 #' @param ipm Output from \code{make_ipm}.
 #' @param mega_mat A vector with symbols and/or 0s representing the matrix blocks.
 #' They should be specified in ROW MAJOR order! Can also be a character
-#' string specifying the call. See examples.
-#' @param presets Either empty or one of 'age-size' or 'hier_effs'. Currently
-#' not implemented
+#' string specifying the call. Hierarchical syntax is supported. When used,
+#' \code{format_mega_matrix} will produce as many mega-matrices as there are
+#' combinations of \code{levels_hier_effs} in the \code{proto_ipm}.
 #'
-#' @return A large matrix
+#' @return A list containing a large matrix or many large matrices (when used with
+#' hierarchical syntax). The names in the former case will be \code{"mega_matrix"}
+#' and in the latter case, the level of the hierarchical effect.
 #'
 #' @examples
 
@@ -396,7 +398,7 @@ mat_power <- function(x, y) {
 #'
 #' @export
 
-format_mega_matrix <- function(ipm, mega_mat, presets = NULL) {
+format_mega_matrix <- function(ipm, mega_mat) {
 
   mega_mat    <- rlang::enquo(mega_mat)
 
@@ -408,9 +410,65 @@ format_mega_matrix <- function(ipm, mega_mat, presets = NULL) {
 
   }
 
-  sub_kernels <- ipm$sub_kernels
+  if(any(ipm$proto_ipm$has_hier_effs)) {
 
-  out         <- .make_mega_mat(mega_mat, sub_kernels)
+    levs <- ipm$proto_ipm$levels_hier_effs[ipm$proto_ipm$has_hier_effs] %>%
+      .flatten_to_depth(1L) %>%
+      .[!duplicated(names(.))]
+
+    levs <- expand.grid(levs, stringsAsFactors = FALSE)
+
+    out_nms <- temp <- character(dim(levs)[1])
+
+    base_expr <- rlang::quo_text(mega_mat)
+    base_name <- names(levs) %>% paste(collapse = "_")
+
+    it <- 1
+
+    for(i in seq_len(dim(levs)[2])) {
+
+      nm <- names(levs)[i]
+
+      for(j in seq_len(dim(levs)[1])) {
+
+        if(i > 1) {
+          base_expr <- temp[it]
+          base_name <- out_nms[it]
+        }
+
+        temp[it] <- gsub(nm, levs[j, i], base_expr)
+        out_nms[it] <- gsub(nm, levs[j, i], base_name)
+
+        it <- it + 1
+
+      } # end single var substitution - reset counter to modify exprs w/ adtl hier_effs if present
+
+      it <- 1
+
+    }
+
+    mega_mat <- as.list(temp) %>%
+      lapply(function(x) {
+        y <- rlang::parse_expr(x)
+        rlang::enquo(y)
+      })
+
+
+
+  } else {
+
+    mega_mat <- list(mega_mat)
+    out_nms  <- "mega_matrix"
+
+  }
+
+  out         <- lapply(mega_mat,
+                        function(x, ipm) {
+                          .make_mega_mat(ipm, x)
+                        },
+                        ipm = ipm)
+
+  names(out) <- out_nms
 
   return(out)
 

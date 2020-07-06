@@ -4,20 +4,21 @@
 \alias{format_mega_matrix}
 \title{Format a mega-matrix}
 \usage{
-format_mega_matrix(ipm, mega_mat, presets = NULL)
+format_mega_matrix(ipm, mega_mat)
 }
 \arguments{
 \item{ipm}{Output from \code{make_ipm}.}
 
 \item{mega_mat}{A vector with symbols and/or 0s representing the matrix blocks.
 They should be specified in ROW MAJOR order! Can also be a character
-string specifying the call. See examples.}
-
-\item{presets}{Either empty or one of 'age-size' or 'hier_effs'. Currently
-not implemented}
+string specifying the call. Hierarchical syntax is supported. When used,
+\code{format_mega_matrix} will produce as many mega-matrices as there are
+combinations of \code{levels_hier_effs} in the \code{proto_ipm}.}
 }
 \value{
-A large matrix
+A list containing a large matrix or many large matrices (when used with
+hierarchical syntax). The names in the former case will be \code{"mega_matrix"}
+and in the latter case, the level of the hierarchical effect.
 }
 \description{
 Format a mega-matrix

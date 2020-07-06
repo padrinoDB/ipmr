@@ -5,6 +5,7 @@
 \alias{plot.simple_di_det_ipm}
 \alias{plot.simple_di_stoch_param_ipm}
 \alias{plot.simple_di_stoch_kern_ipm}
+\alias{plot.general_di_det_ipm}
 \title{Plot a matrix or an *_ipm object}
 \usage{
 \method{plot}{ipmr_matrix}(
@@ -56,6 +57,19 @@
   exponent = 1,
   ...
 )
+
+\method{plot}{general_di_det_ipm}(
+  x = NULL,
+  y = NULL,
+  ipm = NULL,
+  mega_mat = NA_character_,
+  col = NA_character_,
+  bw = FALSE,
+  do_contour = FALSE,
+  do_legend = FALSE,
+  exponent = 1,
+  ...
+)
 }
 \arguments{
 \item{x, y}{Either the values of the meshpoints or \code{NULL}. If \code{NULL},
@@ -79,6 +93,12 @@ on the plot}
 
 \item{exponent}{The exponent to raise each kernel to. Setting this to a low
 number can help visualize kernels that are overwhelmed by a few very large numbers.}
+
+\item{mega_mat}{A vector with symbols and/or 0s representing the matrix blocks.
+They should be specified in ROW MAJOR order! Can also be a character
+string specifying the call. Hierarchical syntax is supported. When used,
+\code{format_mega_matrix} will produce as many mega-matrices as there are
+combinations of \code{levels_hier_effs} in the \code{proto_ipm}.}
 }
 \value{
 \code{A} or \code{ipm} invisibly

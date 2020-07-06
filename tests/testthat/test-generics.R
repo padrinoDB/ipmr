@@ -2140,7 +2140,15 @@ test_that('fill_0s is working as it should', {
     d = matrix(rnorm(24, -70), 6, 4)
   )
 
-  mega_k   <- .make_mega_mat(mega_mat, sub_kernels)
+  ex_ipm <- list(
+    iterators = NA_real_,
+    sub_kernels = sub_kernels,
+    proto_ipm = data.frame(has_hier_effs = FALSE)
+  )
+
+  class(ex_ipm) <- c("simple_di_det_ipm", "list")
+
+  mega_k   <- .make_mega_mat(ex_ipm, mega_mat)
   mega_dim <- dim(mega_k)
 
   expect_equal(14, mega_dim[1])
@@ -2154,7 +2162,7 @@ test_that('fill_0s is working as it should', {
 
 })
 
-test_that('format_mega_mat works as advertize', {
+test_that('format_mega_mat works as advertised', {
 
   test_mat <- format_mega_matrix(gen_di_det_2,
                                  mega_mat = c(
@@ -2163,16 +2171,186 @@ test_that('format_mega_mat works as advertize', {
                                  ))
 
   expect_equal(unclass(gen_di_det_2$sub_kernels$P),
-               test_mat[2:501, 2:501])
+               test_mat[[1]][2:501, 2:501])
 
   disc <- unclass(gen_di_det_2$sub_kernels$go_discrete) %>%
     as.vector()
 
   expect_equal(disc,
-               test_mat[1, 2:501])
+               test_mat[[1]][1, 2:501])
 
 
 })
+
+
+test_that("format_mega_matrix can handle hier_effs", {
+
+  Ps <- lapply(1:5,
+               function(x) {
+                 matrix(runif(2500),
+                        nrow = 50,
+                        ncol = 50)
+               })
+
+  names(Ps) <- paste("P", 1:5, sep = "_")
+
+  go_discs  <- lapply(1:5,
+                      function(x) {
+                        matrix(rpois(50, 3), nrow = 1)
+                      })
+
+  names(go_discs) <- paste('go_disc', 1:5, sep = "_")
+
+  leave_discs <- lapply(1:5,
+                        function(x) {
+                          matrix(runif(50), ncol = 1)
+                        })
+
+  names(leave_discs) <- paste('leave_disc', 1:5, sep = "_")
+
+  mat_expr <- rlang::expr(c(0, go_disc_site, leave_disc_site, P_site))
+
+  actuals <- lapply(1:5,
+                    function(x, leaves, gos, Ps) {
+
+                      tr <- cbind(0, go_discs[[x]])
+                      br <- cbind(leaves[[x]], Ps[[x]])
+
+                      return(rbind(tr, br))
+
+                    },
+                    leaves = leave_discs,
+                    gos    = go_discs,
+                    Ps     = Ps)
+
+  ex_ipm <- list(
+    iterators = NA_integer_,
+    sub_kernels = c(
+      leave_discs,
+      go_discs,
+      Ps
+    ),
+    env_list = list(),
+    env_seq  = sample(1:5, 100, replace = TRUE),
+    pop_state = list(),
+    proto_ipm = data.frame(has_hier_effs = TRUE,
+                           levels_hier_effs = I(list(site = 1:5)))
+  )
+
+  class(ex_ipm)           <- c("general_di_det_ipm", 'list')
+  class(ex_ipm$proto_ipm) <- c("general_di_det", "proto_ipm", "data.frame")
+
+  ipmr_megas <- format_mega_matrix(ex_ipm,
+                                   c(0, go_disc_site,
+                                     leave_disc_site, P_site))
+
+  test_vals  <- vapply(1:5,
+                       function(x, actual, pkg_val) {
+
+                         isTRUE(
+                           all.equal(actual[[x]], pkg_val[[x]], tol = 1e-10)
+                         )
+
+                       },
+                       logical(1L),
+                       actual = actuals,
+                       pkg_val = ipmr_megas)
+
+  expect_true(all(test_vals))
+
+})
+
+test_that("format_mega_matrix works w/ multiple hier_effs", {
+
+
+  nms <- expand.grid(list(site = c("A", "B"),
+                          yr   = 1:3),
+                     stringsAsFactors = FALSE)
+
+  out_nms <- character(6L)
+
+  for(i in seq_len(6)) {
+    out_nms[i] <- paste(nms[i, ], collapse = "_")
+  }
+
+  Ps <- lapply(1:6,
+               function(x) {
+                 matrix(runif(2500),
+                        nrow = 50,
+                        ncol = 50)
+               })
+
+  names(Ps) <- paste("P_", out_nms, sep = "")
+  go_discs  <- lapply(1:6,
+                      function(x) {
+                        matrix(rpois(50, 3), nrow = 1)
+                      })
+
+  names(go_discs) <- paste("go_disc_", out_nms, sep = "")
+
+  leave_discs <- lapply(1:6,
+                        function(x) {
+                          matrix(runif(50), ncol = 1)
+                        })
+  names(leave_discs) <- paste("leave_disc_", out_nms, sep = "")
+
+
+  mat_expr <- rlang::expr(c(0, go_disc_site_yr, leave_disc_site_yr, P_site_yr))
+
+  actuals <- lapply(1:6,
+                    function(x, leaves, gos, Ps) {
+
+                      tr <- cbind(0, go_discs[[x]])
+                      br <- cbind(leaves[[x]], Ps[[x]])
+
+                      return(rbind(tr, br))
+
+                    },
+                    leaves = leave_discs,
+                    gos    = go_discs,
+                    Ps     = Ps)
+
+  names(actuals) <- out_nms
+
+  ex_ipm <- list(
+    iterators = NA_integer_,
+    sub_kernels = c(
+      leave_discs,
+      go_discs,
+      Ps
+    ),
+    env_list = list(),
+    env_seq  = sample(out_nms, 100, replace = TRUE),
+    pop_state = list(),
+    proto_ipm = data.frame(has_hier_effs = TRUE,
+                           levels_hier_effs = I(list(site = c("A","B"),
+                                                     yr   = 1:3)))
+  )
+
+  class(ex_ipm)           <- c("general_di_det_ipm", 'list')
+  class(ex_ipm$proto_ipm) <- c("general_di_det", "proto_ipm", "data.frame")
+
+  ipmr_megas <- format_mega_matrix(ex_ipm,
+                                   c(0, go_disc_site_yr,
+                                     leave_disc_site_yr, P_site_yr))
+
+  test_vals  <- vapply(1:6,
+                       function(x, actual, pkg_val) {
+
+                         isTRUE(
+                           all.equal(actual[[x]], pkg_val[[x]], tol = 1e-10)
+                         )
+
+                       },
+                       logical(1L),
+                       actual = actuals,
+                       pkg_val = ipmr_megas)
+
+  expect_true(all(test_vals))
+  expect_equal(names(ipmr_megas), names(actuals))
+
+})
+
 
 test_that('format_mega_matrix can handle character vectors', {
 
@@ -2191,7 +2369,7 @@ test_that('format_mega_matrix can handle character vectors', {
   sym_mat <- format_mega_matrix(ipm, mega_mat = c(x , y , z , 0))
 
   # First, make sure we've fooled the ipm argument
-  expect_equal(sym_mat, target)
+  expect_equal(sym_mat[[1]], target)
 
   # now, try with a character vector
   vec_text <- 'c(x , y, z, 0)'

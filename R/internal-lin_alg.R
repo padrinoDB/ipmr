@@ -43,9 +43,26 @@
   return(pop_nm)
 }
 
+
 #' @noRd
 
-.make_mega_mat <- function(mega_mat, sub_kernels) {
+.make_mega_mat <- function(ipm, mega_mat, ...) {
+
+  UseMethod(".make_mega_mat")
+
+}
+
+#' @noRd
+
+.make_mega_mat.age_x_size <- function(ipm) {
+
+  stop("not implemented", call. = FALSE)
+
+}
+
+#' @noRd
+
+.make_mega_mat.default <- function(ipm, mega_mat) {
 
   # Extract names of sub_kernels. We shouldn't need mega-mat after this
   # because call_args() returns the mega_mat call's arguments in order!
@@ -53,6 +70,8 @@
   sub_mats    <- rlang::call_args(mega_mat)
 
   sub_mat_nms <- Filter(Negate(function(x) x == 0 ), sub_mats)
+
+  sub_kernels <- ipm$sub_kernels
 
   if(!all(as.character(unlist(sub_mat_nms)) %in% names(sub_kernels))) {
 

@@ -243,7 +243,8 @@
                                                 pop_state,
                                                 master_env,
                                                 k_row,
-                                                normal) {
+                                                normal,
+                                                report_progress) {
 
   if(rlang::is_quosure(pop_state)) {
     pop_state <- rlang::eval_tidy(pop_state)
@@ -304,6 +305,9 @@
     }
 
     .bind_iter_var(master_env, i)
+
+    .stoch_progress_message(report_progress, iterations, i)
+
 
     # Need to return an iterated pop_state object
 
@@ -747,7 +751,8 @@
                                                  kern_seq,
                                                  pop_state,
                                                  master_env,
-                                                 normal) {
+                                                 normal,
+                                                 report_progress) {
 
 
   for(i in seq_len(iterations)) {
@@ -797,6 +802,8 @@
     }
 
     .bind_iter_var(master_env, i)
+    .stoch_progress_message(report_progress, iterations, i)
+
 
     pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                       proto_ipm     = proto_ipm,
