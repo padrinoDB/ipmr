@@ -41,7 +41,9 @@ between the kernels in the model. The names should correspond to kernel
 names, with 0s corresponding to sparse areas of the mega-matrix. The names can
 be either symbols or characters. These functions support suffix expansion as in
 \code{define_k(ernel)}, so expressions don't need to be re-written for every
-combination hierarchical effects.}
+combination hierarchical effects. DO NOT supply arguments \code{nrow},
+\code{ncol}, or \code{byrow}. These are set internally based on dimensions
+of each sub-kernel.}
 
 \item{mega_vec}{A vector of names specifying the format of the population
 vector. The names can be either symbols or characters.}

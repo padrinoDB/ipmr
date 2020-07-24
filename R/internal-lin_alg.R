@@ -69,7 +69,7 @@
 
   sub_mats    <- rlang::call_args(mega_mat)
 
-  sub_mat_nms <- Filter(Negate(function(x) x == 0 ), sub_mats)
+  sub_mat_nms <- Filter(Negate(function(x) .id_or_0(x)), sub_mats)
 
   sub_kernels <- ipm$sub_kernels
 
@@ -80,6 +80,21 @@
   } else if( (sqrt(length(sub_mats)) %% 1L) != 0L) {
 
     stop('mega_mat is not square!')
+
+  }
+
+  # Do identity mats first - we need these dimensions to work out
+  # the 0s afterwards
+
+  id_test <- vapply(sub_mats,
+                    function(x) x == "I",
+                    logical(1L))
+
+  if(any(id_test)) {
+
+    lists       <- .fill_Is(sub_mats, sub_kernels)
+    sub_mats    <- lists$sub_mats
+    sub_kernels <- lists$sub_kernels
 
   }
 
@@ -101,7 +116,7 @@
 
   }
 
-  # *_impl = implementation. This actually generates the full kernel
+    # *_impl = implementation. This actually generates the full kernel
 
   out <- .make_mega_mat_impl(sub_mats, sub_kernels)
 
@@ -149,10 +164,102 @@
 
 #' @noRd
 
-.fill_0s <- function(sub_mats, sub_kernels) {
+.id_or_0 <- function(x) {
 
-  # Create a character matrix that contains the dimensions of each
-  # block in the mega-matrix
+  x == 0 || x == "I"
+
+}
+
+#' @noRd
+
+.fill_Is <- function(sub_mats, sub_kernels) {
+
+  mega_block_dim <- sqrt(length(sub_mats))
+
+  dim_mat <- .make_dim_mat(sub_kernels, sub_mats)
+
+  it        <- 1
+  id_nm_ind <- 1
+
+  for(ro in seq_len(mega_block_dim)) {
+
+    for(co in seq_len(mega_block_dim)) {
+
+      if(dim_mat[ro, co] == "I") {
+
+        temp <- dim_mat
+        temp[ro, co] <- gsub("I", NA_character_, temp[ro, co])
+
+        ro_dim <- vapply(temp[ro, ],
+                         function(x) {
+                           strsplit(x, ", ")[[1]][1]
+                         },
+                         character(1L)) %>%
+          as.integer()
+
+        if(all(is.na(ro_dim))) {
+          ro_dim <- NA_integer_
+        } else {
+          ro_dim <- max(ro_dim, na.rm = TRUE)
+        }
+
+        co_dim <- vapply(temp[ , co],
+                         function(x) {
+                           strsplit(x, ', ')[[1]][2]
+                         },
+                         character(1L)) %>%
+          as.integer()
+
+        if(all(is.na(co_dim))) {
+          co_dim <- NA_integer_
+        } else {
+          co_dim <- max(co_dim, na.rm = TRUE)
+        }
+
+        if(isTRUE(co_dim != ro_dim) || is.na(co_dim != ro_dim)) {
+
+          use_dim <- max(co_dim, ro_dim, na.rm = TRUE)
+
+        } else {
+
+          use_dim <- co_dim
+
+        }
+
+        id_call <- paste("diag(", use_dim, ")", sep = "") %>%
+          rlang::parse_expr()
+
+        id_nm <- paste("id_", id_nm_ind, sep = "")
+
+        sub_mats[[it]]      <- rlang::parse_expr(id_nm)
+        names(sub_mats)[it] <- id_nm
+        id_nm_ind           <- id_nm_ind + 1
+
+        sub_kernels <- c(sub_kernels,
+                         rlang::list2(!! id_nm := eval(id_call)))
+
+      } else {
+
+        names(sub_mats)[it] <- as.character(sub_mats[[it]])
+
+      }
+
+      it <- it + 1
+
+    }
+  }
+
+  out <- list(
+    sub_mats    = sub_mats,
+    sub_kernels = sub_kernels
+  )
+
+  return(out)
+}
+
+#' @noRd
+
+.make_dim_mat <- function(sub_kernels, sub_mats) {
 
   kern_dims <- lapply(sub_kernels,
                       function(x) {
@@ -160,19 +267,46 @@
                         out <- paste(temp, collapse = ', ')
                       })
 
-  mega_block_dim <- sqrt(length(sub_mats))
   dim_env        <- rlang::env()
+  mega_block_dim <- sqrt(length(sub_mats))
 
   rlang::env_bind(!!! kern_dims,
                   .env = dim_env)
 
   dim_mat        <- lapply(sub_mats,
-                           function(x, env_) rlang::eval_tidy(x, env = env_),
-                           env_ = dim_env) %>%
+                           function(x, env_, sub_kernels) {
+
+                             if(as.character(x) %in% names(sub_kernels)) {
+
+                               rlang::eval_tidy(x, env = env_)
+
+                             } else {
+
+                               as.character(x)
+
+                             }
+                           },
+                           env_ = dim_env,
+                           sub_kernels = sub_kernels) %>%
     unlist() %>%
     matrix(ncol = mega_block_dim,
            nrow = mega_block_dim,
            byrow = TRUE)
+
+  return(dim_mat)
+
+}
+
+#' @noRd
+
+.fill_0s <- function(sub_mats, sub_kernels) {
+
+  mega_block_dim <- sqrt(length(sub_mats))
+
+  # Create a character matrix that contains the dimensions of each
+  # block in the mega-matrix
+
+  dim_mat <- .make_dim_mat(sub_kernels, sub_mats)
 
   # Now, loop over and determine the required dimensions for each 0 entry
 

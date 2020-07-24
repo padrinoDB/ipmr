@@ -2377,4 +2377,53 @@ test_that('format_mega_matrix can handle character vectors', {
   test_mat <- format_mega_matrix(ipm, vec_text)
 
   expect_equal(sym_mat, test_mat)
+
+  test_vec <- c("x", "y", "z", 0)
+
+  test_mat <- format_mega_matrix(ipm, test_vec)
+
+  expect_equal(sym_mat, test_mat)
+
+})
+
+test_that("format_mega_matrix can handles identity matrices as advertized", {
+
+  x <- matrix(rnorm(25), ncol = 5)
+  y <- matrix(rnorm(25), ncol = 5)
+  z <- matrix(runif(25), ncol = 5)
+  I <- diag(5)
+
+  target <- rbind(
+    cbind(x, y),
+    cbind(z, I)
+  )
+
+  ipm <- list(sub_kernels = list(x = x, y = y, z = z))
+
+  test_mat <- format_mega_matrix(ipm, c(x, y, z, I))
+
+  expect_equal(test_mat[[1]], target)
+
+})
+
+test_that("We can fill 0s and Identity matrices", {
+
+  x <- matrix(rnorm(25), ncol = 5)
+  y <- matrix(rnorm(25), ncol = 5)
+  z <- matrix(runif(25), ncol = 5)
+  I <- diag(5)
+
+  target <- rbind(
+    cbind(x, matrix(0, ncol = 5, nrow = 5)),
+    cbind(z, I)
+  )
+
+  ipm <- list(sub_kernels = list(x = x, z = z))
+
+  test_mat <- format_mega_matrix(ipm, c(x, 0, z, I))
+
+  expect_equal(test_mat[[1]], target)
+
+
+
 })

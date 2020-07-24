@@ -164,7 +164,7 @@
     </tr>
     <tr>
       <th>mega_mat</th>
-      <td><p>A vector with symbols and/or 0s representing the matrix blocks.
+      <td><p>A vector with symbols, I's, and/or 0s representing the matrix blocks.
 They should be specified in ROW MAJOR order! Can also be a character
 string specifying the call. Hierarchical syntax is supported. When used,
 <code>format_mega_matrix</code> will produce as many mega-matrices as there are
@@ -177,6 +177,13 @@ combinations of <code>levels_hier_effs</code> in the <code>proto_ipm</code>.</p>
     <p>A list containing a large matrix or many large matrices (when used with
 hierarchical syntax). The names in the former case will be <code>"mega_matrix"</code>
 and in the latter case, the level of the hierarchical effect.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>I</code> and <code>0</code> represent identity matrices and 0 matrices,
+respectively. They can be used to fill in blocks that represent either, without
+having to create those separately and append them to the model object. The function
+will work out the correct dimensions for both internally, and there is no
+restriction on the number that may be used in a given call.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>gen_di_det_ex</span>)
@@ -185,9 +192,15 @@ and in the latter case, the level of the hierarchical effect.</p>
                             <span class='kw'>mega_mat</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='no'>go_discrete</span>,
                                          <span class='no'>leave_discrete</span>, <span class='no'>P</span>))
 
-<span class='no'>char_call</span> <span class='kw'>&lt;-</span> <span class='st'>"c(0, go_discrete, leave_discrete, P)"</span>
+<span class='no'>char_call</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='st'>"go_discrete"</span>, <span class='st'>"leave_discrete"</span>, <span class='st'>"P"</span>)
 
-<span class='no'>big_k</span> <span class='kw'>&lt;-</span> <span class='fu'>format_mega_matrix</span>(<span class='no'>gen_di_det_ex</span>, <span class='kw'>mega_mat</span> <span class='kw'>=</span> <span class='no'>char_call</span>)</div></pre>
+<span class='no'>big_k</span> <span class='kw'>&lt;-</span> <span class='fu'>format_mega_matrix</span>(<span class='no'>gen_di_det_ex</span>, <span class='kw'>mega_mat</span> <span class='kw'>=</span> <span class='no'>char_call</span>)
+
+<span class='co'># Now, with an Identity matrix instead of a 0</span>
+
+<span class='no'>big_k</span> <span class='kw'>&lt;-</span> <span class='fu'>format_mega_matrix</span>(<span class='no'>gen_di_det_ex</span>,
+                            <span class='kw'>mega_mat</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>I</span>, <span class='no'>go_discrete</span>,
+                                         <span class='no'>leave_discrete</span>, <span class='no'>P</span>))</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

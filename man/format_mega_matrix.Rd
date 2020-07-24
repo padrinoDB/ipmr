@@ -9,7 +9,7 @@ format_mega_matrix(ipm, mega_mat)
 \arguments{
 \item{ipm}{Output from \code{make_ipm}.}
 
-\item{mega_mat}{A vector with symbols and/or 0s representing the matrix blocks.
+\item{mega_mat}{A vector with symbols, I's, and/or 0s representing the matrix blocks.
 They should be specified in ROW MAJOR order! Can also be a character
 string specifying the call. Hierarchical syntax is supported. When used,
 \code{format_mega_matrix} will produce as many mega-matrices as there are
@@ -23,6 +23,13 @@ and in the latter case, the level of the hierarchical effect.
 \description{
 Format a mega-matrix
 }
+\details{
+\code{I} and \code{0} represent identity matrices and 0 matrices,
+respectively. They can be used to fill in blocks that represent either, without
+having to create those separately and append them to the model object. The function
+will work out the correct dimensions for both internally, and there is no
+restriction on the number that may be used in a given call.
+}
 \examples{
 data(gen_di_det_ex)
 
@@ -30,9 +37,15 @@ big_k <- format_mega_matrix(gen_di_det_ex,
                             mega_mat = c(0, go_discrete,
                                          leave_discrete, P))
 
-char_call <- "c(0, go_discrete, leave_discrete, P)"
+char_call <- c(0, "go_discrete", "leave_discrete", "P")
 
 big_k <- format_mega_matrix(gen_di_det_ex, mega_mat = char_call)
+
+# Now, with an Identity matrix instead of a 0
+
+big_k <- format_mega_matrix(gen_di_det_ex,
+                            mega_mat = c(I, go_discrete,
+                                         leave_discrete, P))
 
 
 
