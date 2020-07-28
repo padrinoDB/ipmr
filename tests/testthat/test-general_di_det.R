@@ -773,3 +773,125 @@ test_that("hierarchical models get the same answers as hand generated models", {
 
 })
 
+
+test_that("DC/CD transitions without size-dependence work", {
+
+  data_list <- list(
+    g_int     = 0.6801982,
+    g_slope   = 0.8186528,
+    g_sd      = 0.1691976,
+    s_notH    = 0.99,
+    m_notH    = 0,
+    d_mu    = 6.33,
+    d_sd    = 2.06,
+    a       = 0.92,
+    b       = 0.057,
+    d       = 1
+  )
+
+  general_ipm <- init_ipm("general_di_det") %>%
+    define_kernel(
+      name          = "P",
+      formula       = s * g * (1-m) * d_size,
+      family        = "CC",
+      g             = dnorm(size_2, g_mu, g_sd),
+      g_mu          = g_int + g_slope * size_1,
+      s             = s_notH,
+      m             = m_notH,
+      data_list     = data_list,
+      states        = list(c('size')),
+      has_hier_effs = FALSE,
+      evict_cor     = TRUE,
+      evict_fun     = truncated_distributions('norm',
+                                              'g')
+    ) %>%
+
+    define_kernel(
+      name          = "go_sprout",
+      formula       = s * m * d_size,
+      family        = 'CD',
+      s             = s_notH,
+      m             = m_notH,
+      data_list     = data_list,
+      states        = list(c('size')),
+      has_hier_effs = FALSE
+    ) %>%
+
+
+    define_kernel(
+      name    = 'stay_sprout',
+      formula = a * (1-b),
+      family  = "DD",
+      data_list     = data_list, states  = list(c('size')),
+      evict_cor = FALSE
+    ) %>%
+
+    define_kernel(
+      name          = 'leave_sprout',
+      formula       = a * b * f_d * d_size,
+      f_d           = dnorm(size_2, d_mu, d_sd),
+      family        = 'DC',
+      data_list     = data_list,
+      states        = list(c('size')),
+      has_hier_effs = FALSE,
+      evict_cor     = TRUE,
+      evict_fun     = truncated_distributions('norm',
+                                              'f_d')
+    ) %>%
+
+    define_k(
+      name          = "K",
+      family        = "IPM",
+      n_sprout_t_1  = stay_sprout %*% n_sprout_t  + go_sprout %*% n_size_t,
+      n_size_t_1    = leave_sprout %*% n_sprout_t + P %*% n_size_t,
+      data_list     = data_list,
+      states        = list(c('size')),
+      has_hier_effs = FALSE
+    )
+
+  general_ipm <- general_ipm %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c("P", "go_sprout", "stay_sprout", "leave_sprout", "K"),
+        int_rule     = c(rep("midpoint", 5)),
+        dom_start    = c('size', "size", NA_character_, NA_character_, "size"),
+        dom_end      = c('size', NA_character_, NA_character_, 'size', 'size')
+      )
+    )
+
+  # The lower and upper bounds for the continuous state variable and the number
+  # of meshpoints for the midpoint rule integration. We'll also create the initial
+  # population vector from a random uniform distribution
+  L <- 1.02
+  U <- 4.3
+  n <- 500
+
+  init_pop_vec  <- rpois(500, 2)
+  init_sprout   <- 30
+
+  ipm <- general_ipm %>%
+    define_domains(
+      size = c(L, U, n)
+    ) %>%
+    define_pop_state(
+      pop_vectors = list(
+        n_size = init_pop_vec,
+        n_sprout  = init_sprout
+      )
+    ) %>%
+    make_ipm(iterations = 20,
+             usr_funs = list(inv_logit   = inv_logit),
+             normalize_pop_size = FALSE)
+
+
+  l_pop <- lambda(ipm)
+
+  # Lambda must always be less than 1 here
+
+  expect_true(l_pop < 1)
+
+  imputed_kern <- ipm$sub_kernels$go_sprout
+
+  expect_true(all(imputed_kern == 0))
+
+})

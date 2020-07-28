@@ -39,7 +39,8 @@
     out[[i]] <- .fun_to_iteration_mat(temp[[i]],
                                       state_var_start = names(proto$domain[[i]])[1],
                                       state_var_end   = names(proto$domain[[i]])[2],
-                                      master_env      = master_env)
+                                      master_env      = master_env,
+                                      kern_name       = proto$kernel_id[i])
 
     names(out)[i] <- proto$kernel_id[i]
 
@@ -139,7 +140,8 @@
     out[[i]] <- .fun_to_iteration_mat(temp[[i]],
                                       state_var_start = names(proto$domain[[i]])[1],
                                       state_var_end   = names(proto$domain[[i]])[2],
-                                      master_env      = master_env)
+                                      master_env      = master_env,
+                                      kern_name       = proto$kernel_id[i])
 
     names(out)[i] <- proto$kernel_id[i]
 
@@ -1275,7 +1277,8 @@
 .fun_to_iteration_mat <- function(fun,
                                   state_var_start,
                                   state_var_end,
-                                  master_env) {
+                                  master_env,
+                                  kern_name) {
 
   # store class of function to append to result. It gets stripped out
   # by `[` I think.
@@ -1337,9 +1340,50 @@
 
   out <- matrix(fun, nrow = n_mesh_p_end, ncol = n_mesh_p_start, byrow = TRUE)
 
+  if(fun_cls %in% c("DC", "CD")) {
+
+    out <- .check_it_mat(out, fun_cls, kern_name)
+
+  }
+
   class(out) <- c(fun_cls, class(out))
 
   return(out)
+
+}
+
+#' @noRd
+# Utility that will check for the edge case when a DC or CD transition is *not*
+# size dependent. When this happens, the kernel is a vector of constants, but
+# NA's get inserted after the first entry by default by matrix(fun,...).
+
+.check_it_mat <- function(it_mat, cls, kern_name) {
+
+  if(any(is.na(it_mat))) {
+
+    # check how many NAs we have. In the case specified above, the iteration
+    # matrix should only have 1 non-NA value. In that case, it gets inserted
+    # into all NA valued matrix elements.
+
+    test_na <- sum(is.na(it_mat))
+
+    if((test_na + 1) == max(dim(it_mat))) {
+
+      it_mat[is.na(it_mat)] <- it_mat[!is.na(it_mat)]
+
+    } else {
+
+      msg <- paste("NAs detected in kernel: ", kern_name,
+                   ". Check kernel definition and model parameters.",
+                   sep = "")
+
+      stop(msg, call. = FALSE)
+
+    }
+
+  }
+
+  return(it_mat)
 
 }
 
