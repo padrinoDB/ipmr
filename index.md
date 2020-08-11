@@ -3,7 +3,7 @@ status](https://travis-ci.org/levisc8/ipmr.svg?branch=master)](https://travis-ci
 [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/levisc8/ipmr?branch=master&svg=true)](https://ci.appveyor.com/project/levisc8/ipmr)
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/ipmr)](https://cran.r-project.org/package=ipmr)
 [![Codecov test
