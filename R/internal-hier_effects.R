@@ -18,9 +18,20 @@
 
   hier_rows <- proto_ipm[kerns, ]
 
+  all_hier_effs <- .flatten_to_depth(hier_rows$levels_hier_effs, 1L)
+
+
   for(i in seq_len(dim(hier_rows)[1])) {
 
     levs   <- hier_rows$levels_hier_effs[[i]]
+
+    if("drop_levels" %in% names(levs)) {
+
+      ind <- which(names(levs) != "drop_levels")
+
+      levs <- levs[ind]
+
+    }
 
     levels <- lapply(levs, eval) %>%
       expand.grid(stringsAsFactors = FALSE)
@@ -31,9 +42,32 @@
 
   }
 
+
+  if("drop_levels" %in% names(all_hier_effs)) {
+
+    out <- .drop_levels_hier_effs(out, all_hier_effs)
+
+  }
+
   return(out)
 }
 
+#'@noRd
+
+.drop_levels_hier_effs <- function(proto_ipm, all_hier_effs) {
+
+  to_drop <- all_hier_effs[!duplicated(names(all_hier_effs))]
+  to_drop <- to_drop$drop_levels
+
+  for(i in seq_along(to_drop)) {
+
+    proto_ipm <- proto_ipm[!grepl(to_drop[i], proto_ipm$kernel_id), ]
+
+  }
+
+  return(proto_ipm)
+
+}
 
 .expand_hier_effs <- function(rows, levels) {
 

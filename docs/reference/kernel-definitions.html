@@ -308,6 +308,17 @@ one requires its own call to this function, though there are some exceptions,
 namely for kernels derived from hierarchical models (e.g. vital rate models
 fit across plots and years). <code>remove_k</code> is a helper for re-building models
 but with a different <code>K</code> kernel.</p>
+<p>Internally, <code>ipmr</code> generates the <code>levels_hier_effs</code> using <code>expand.grid</code>.
+This  means that every combination of the values in <code>levels_hier_effs</code>
+must exist in the <code>data_list</code>, or the model will fail with an error along
+the lines of <code>Error in eval_tidy: object 'x_yz' not found</code>. In order to
+exclude levels that do not exist in your data, you can add a vector to the list
+in <code>levels_hier_effs</code> called <code>drop_levels</code>. This should contain the
+values you wish to exclude as a character vector. For example, if data are
+collected for <code>sites = c("a", "b", "c")</code>, and <code>years = c(2005:2008)</code>,
+but there is no data from site <code>"a"</code> in <code>2007</code>, we can use
+<code>levels_hier_effs = list(site = c("a", "b", "c"), year = c(2005:2008),
+drop_levels = c("a_2007"))</code>.</p>
 <p><strong><code>define_k</code></strong></p>
 <p>The preferred method of defining a <code>K</code> kernel is to use the left
 hand side of the <code>...</code> to reference the population vectors that the right

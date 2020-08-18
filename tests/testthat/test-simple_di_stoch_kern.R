@@ -79,7 +79,7 @@ g_params   <- list2(!!! g_r_int)
 s_params   <- list2(!!! s_r_int)
 f_s_params <- list2(!!! f_s_r_int)
 
-params     <- splice(data_list, g_params, s_params, f_s_params)
+params     <- c(data_list, g_params, s_params, f_s_params)
 
 
 b   <- seq(0.2, 40, length.out = 101)
@@ -647,5 +647,130 @@ test_that('normalizing pop vector gets same lambdas as before', {
   pop_sizes <- colSums(test_norm_1$pop_state$pop_state_ht)
 
   expect_equal(pop_sizes, rep(1, 101), tolerance = 1e-15)
+
+})
+
+
+test_that("drop_levels works in hier_effs", {
+
+  # Define some fixed parameters
+  data_list = list(
+    s_int     = 1.03,
+    s_slope   = 2.2,
+    g_int     = 8,
+    g_slope   = 0.92,
+    sd_g      = 0.9,
+    f_r_int   = 0.09,
+    f_r_slope = 0.05,
+    f_s_int   = 0.1,
+    f_s_slope = 0.005,
+    mu_fd     = 9,
+    sd_fd     = 2
+  )
+
+  # Now, simulate some random intercepts for growth, survival, and offspring production
+
+  g_r_int   <- rnorm(8, 0, 0.3)
+  s_r_int   <- rnorm(8, 0, 0.7)
+  f_s_r_int <- rnorm(8, 0, 0.2)
+
+  hier_levels <- list(yr = 1:5, site = c("a", "b"))
+
+  levels <- expand.grid(hier_levels)
+
+  levels <- apply(levels, 1, function(x) paste(x[1], x[2], sep = "_"))
+
+  to_drop <- c("1_a", "4_b")
+
+  levels <- levels[!levels %in% to_drop]
+
+  nms <- paste("r_", levels, sep = "")
+
+  names(g_r_int)   <- paste('g_', nms, sep = "")
+  names(s_r_int)   <- paste('s_', nms, sep = "")
+  names(f_s_r_int) <- paste('f_s_', nms, sep = "")
+
+  hier_levels$drop_levels <- to_drop
+
+  g_params   <- list2(!!! g_r_int)
+  s_params   <- list2(!!! s_r_int)
+  f_s_params <- list2(!!! f_s_r_int)
+
+  params     <- c(data_list, g_params, s_params, f_s_params)
+
+
+  init_pop <- runif(100)
+  usr_seq  <- sample(levels, size = 100, replace = TRUE)
+
+
+  test_drop <- init_ipm('simple_di_stoch_kern') %>%
+    define_kernel(
+      name             = "F_yr_site",
+      formula          = f_r * f_s_yr_site * f_d,
+      family           = "CC",
+      f_r              = inv_logit(ht_1, f_r_int, f_r_slope),
+      f_s_yr_site      = pois_r(ht_1, f_s_int, f_s_slope, f_s_r_yr_site),
+      f_d              = dnorm(ht_2, mu_fd, sd_fd),
+      data_list        = params,
+      states           = list(c('ht')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_levels,
+      evict_cor        = TRUE,
+      evict_fun        = truncated_distributions('norm', 'f_d')
+    ) %>%
+    define_kernel(
+      name             = 'P_yr_site',
+      formula          = s_yr_site * g_yr_site,
+      family           = "CC",
+      s_yr_site        = inv_logit_r(ht_1, s_int, s_slope, s_r_yr_site) *
+        (1 - inv_logit(ht_1, f_r_int, f_r_slope)),
+      g_yr_site        = dnorm(ht_2, mu_g_yr_site, sd_g),
+      mu_g_yr_site     = g_int + g_slope * ht_1 + g_r_yr_site,
+      data_list        = params,
+      states           = list(c('ht')),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_levels,
+      evict_cor        = TRUE,
+      evict_fun        = truncated_distributions('norm', 'g_yr_site')
+    ) %>%
+    define_k(
+      name             = 'K_yr_site',
+      K_yr_site        = P_yr_site + F_yr_site,
+      n_ht_t_1         = K_yr_site %*% n_ht_t,
+      family           = "IPM",
+      data_list        = params,
+      states           = list(c("ht")),
+      has_hier_effs    = TRUE,
+      levels_hier_effs = hier_levels
+    ) %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c("F_yr_site", "P_yr_site", "K_yr_site"),
+        int_rule     = rep("midpoint", 3),
+        dom_start    = rep("ht", 3),
+        dom_end      = rep("ht", 3)
+      )
+    ) %>%
+    define_domains(
+      ht = c(0.2, 40, 100)
+    ) %>%
+    define_pop_state(
+      n_ht = init_pop
+    ) %>%
+    make_ipm(usr_funs = list(inv_logit   = inv_logit,
+                             inv_logit_r = inv_logit_r,
+                             pois_r      = pois_r),
+             normalize_pop_size = TRUE,
+             iterate = TRUE,
+             iterations = 100,
+             kernel_seq = usr_seq)
+
+  kerns <- c(test_drop$iterators, test_drop$sub_kernels)
+
+  for(i in seq_along(to_drop)) {
+
+    expect_true(all(!grepl(to_drop[i], names(kerns))))
+
+  }
 
 })

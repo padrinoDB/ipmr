@@ -9,7 +9,7 @@ vignette: >
 
 This vignette describes how to write formulas using `ipmr`'s notation for hierarchical models. It is meant to mirror the standard mathematical notation used to represent the models. The examples here will primarily use [lme4](https://github.com/lme4/lme4/) to illustrate how to go from vital rate models to functional forms that you can use in `ipmr`. You are of course free to use whatever model fitting software you like, but the number of different possibilities are far too great to cover in this vignette. 
 
-The `ipmr` notation is meant to make implementing models more concise, as it allows you to avoid re-typing/copy+pasting the same kernel formats and just substituting, for example, plot name or transition year. It works by appending suffixes to kernels, vital rates, and parameters that can take multiple values (e.g. `P` becomes `P_yr`). We then add a named list where the names correspond to the suffix and the entries correspond to the values it can take and pass it to `levels_hier_effs` (`levels_hier_effs = list(yr = 1:5)`), and set `has_hier_effs = TRUE`. 
+The `ipmr` notation is meant to make implementing models more concise, as it allows you to avoid re-typing/copy+pasting the same kernel formats and just substituting, for example, plot name or transition year. It works by appending suffixes to kernels, vital rates, and parameters that can take multiple values (e.g. `P` becomes `P_yr`). We then add a named list where the names correspond to the suffix and the entries correspond to the values it can take and pass it to `levels_hier_effs` (i.e. `levels_hier_effs = list(yr = 1:5)`), and set `has_hier_effs = TRUE`. 
 
 ## Structure
 
@@ -24,6 +24,8 @@ The `ipmr` notation is meant to make implementing models more concise, as it all
 Some quick translations between mathematical notation, R model syntax, and `ipmr` style notation. In the `ipmr` column, suffixes that are appended are highlighted in **bold**.
 
 Suffix names are not restricted to the examples below. The only requirement is that the suffix not be named `"pop"`. This is an unfortunate side effect of the way `ipmr` handles population vectors internally - please use something like `"site"` or `"population"` instead.
+
+
 
 ### Notation guide
 
@@ -79,6 +81,7 @@ knitr::kable(
 
 ```
 
+Internally, `ipmr` generates the various levels using `expand.grid`. This means that every combination of the values in `levels_hier_effs` must exist in the `data_list`, or the model will fail with an error along the lines of (`Error in eval_tidy: object 'x_yz' not found`). In order to exclude levels that do not exist in your data, you can add a vector to the list in `levels_hier_effs` called `drop_levels`. This should contain the values you wish to exclude as a character vector. For example, if data are collected for `sites = c("a", "b", "c")`, and `years = c(2005:2008)`, but there is no data from site `"a"` in 2007, we can use `levels_hier_effs = list(site = c("a", "b", "c"), year = c(2005:2008), drop_levels = c("a_2007"))`.
 
 ## Hierarchical models with a single hierarchical variable {#sim_di_s_k}
 

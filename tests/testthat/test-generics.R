@@ -2427,3 +2427,100 @@ test_that("We can fill 0s and Identity matrices", {
 
 
 })
+
+
+test_that("format_mega_matrix works w/ drop_levels", {
+
+
+  nms <- expand.grid(list(site = c("A", "B"),
+                          yr   = 1:3),
+                     stringsAsFactors = FALSE)
+
+  out_nms <- character(6L)
+
+  for(i in seq_len(6)) {
+    out_nms[i] <- paste(nms[i, ], collapse = "_")
+  }
+
+  to_drop <- c("A_2", "B_1")
+
+  out_nms <- out_nms[!out_nms %in% to_drop]
+
+  Ps <- lapply(1:4,
+               function(x) {
+                 matrix(runif(2500),
+                        nrow = 50,
+                        ncol = 50)
+               })
+
+  names(Ps) <- paste("P_", out_nms, sep = "")
+  go_discs  <- lapply(1:4,
+                      function(x) {
+                        matrix(rpois(50, 3), nrow = 1)
+                      })
+
+  names(go_discs) <- paste("go_disc_", out_nms, sep = "")
+
+  leave_discs <- lapply(1:4,
+                        function(x) {
+                          matrix(runif(50), ncol = 1)
+                        })
+  names(leave_discs) <- paste("leave_disc_", out_nms, sep = "")
+
+
+  mat_expr <- rlang::expr(c(0, go_disc_site_yr, leave_disc_site_yr, P_site_yr))
+
+  actuals <- lapply(1:4,
+                    function(x, leaves, gos, Ps) {
+
+                      tr <- cbind(0, go_discs[[x]])
+                      br <- cbind(leaves[[x]], Ps[[x]])
+
+                      return(rbind(tr, br))
+
+                    },
+                    leaves = leave_discs,
+                    gos    = go_discs,
+                    Ps     = Ps)
+
+  names(actuals) <- out_nms
+
+  ex_ipm <- list(
+    iterators = NA_integer_,
+    sub_kernels = c(
+      leave_discs,
+      go_discs,
+      Ps
+    ),
+    env_list = list(),
+    env_seq  = sample(out_nms, 100, replace = TRUE),
+    pop_state = list(),
+    proto_ipm = data.frame(has_hier_effs = TRUE,
+                           levels_hier_effs = I(list(site = c("A","B"),
+                                                     yr   = 1:3,
+                                                     drop_levels = to_drop)))
+  )
+
+  class(ex_ipm)           <- c("general_di_det_ipm", 'list')
+  class(ex_ipm$proto_ipm) <- c("general_di_det", "proto_ipm", "data.frame")
+
+  ipmr_megas <- format_mega_matrix(ex_ipm,
+                                   c(0, go_disc_site_yr,
+                                     leave_disc_site_yr, P_site_yr))
+
+  test_vals  <- vapply(1:4,
+                       function(x, actual, pkg_val) {
+
+                         isTRUE(
+                           all.equal(actual[[x]], pkg_val[[x]], tol = 1e-10)
+                         )
+
+                       },
+                       logical(1L),
+                       actual = actuals,
+                       pkg_val = ipmr_megas)
+
+  expect_true(all(test_vals))
+  expect_equal(names(ipmr_megas), names(actuals))
+
+})

@@ -438,28 +438,40 @@ format_mega_matrix <- function(ipm, mega_mat) {
       .flatten_to_depth(1L) %>%
       .[!duplicated(names(.))]
 
-    levs <- expand.grid(levs, stringsAsFactors = FALSE)
+    if("drop_levels" %in% names(levs)) {
 
-    out_nms <- temp <- character(dim(levs)[1])
+      ind <- which(names(levs) != "drop_levels")
+
+      use_levs <- levs[ind]
+
+    } else {
+
+      use_levs <- levs
+
+    }
+
+    use_levs <- expand.grid(use_levs, stringsAsFactors = FALSE)
+
+    out_nms <- temp <- character(dim(use_levs)[1])
 
     base_expr <- rlang::quo_text(mega_mat)
-    base_name <- names(levs) %>% paste(collapse = "_")
+    base_name <- names(use_levs) %>% paste(collapse = "_")
 
     it <- 1
 
-    for(i in seq_len(dim(levs)[2])) {
+    for(i in seq_len(dim(use_levs)[2])) {
 
-      nm <- names(levs)[i]
+      nm <- names(use_levs)[i]
 
-      for(j in seq_len(dim(levs)[1])) {
+      for(j in seq_len(dim(use_levs)[1])) {
 
         if(i > 1) {
           base_expr <- temp[it]
           base_name <- out_nms[it]
         }
 
-        temp[it] <- gsub(nm, levs[j, i], base_expr)
-        out_nms[it] <- gsub(nm, levs[j, i], base_name)
+        temp[it] <- gsub(nm, use_levs[j, i], base_expr)
+        out_nms[it] <- gsub(nm, use_levs[j, i], base_name)
 
         it <- it + 1
 
@@ -468,6 +480,22 @@ format_mega_matrix <- function(ipm, mega_mat) {
       it <- 1
 
     }
+
+    if("drop_levels" %in% names(levs)) {
+
+      # Need to use fuzzy matching for temp because the level is already
+      # appended to each kernel name. Don't have the same problem for
+      # out_nms, as that is just vector with the exact levels
+
+      for(i in seq_along(levs$drop_levels)) {
+
+        temp    <- temp[!grepl(levs$drop_levels[i], temp)]
+      }
+
+      out_nms <- out_nms[!out_nms %in% levs$drop_levels]
+
+    }
+
 
     mega_mat <- as.list(temp) %>%
       lapply(function(x) {
