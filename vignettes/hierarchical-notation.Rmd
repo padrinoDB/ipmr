@@ -101,12 +101,12 @@ The vital rate models could be written on paper as follows:
 
 4. Growth
 
-    - $\mu_g = (\alpha_g + \alpha_g^{yr})+ \beta_g * z + e$
+    - $\mu_g = (\alpha_g + \alpha_g^{yr})+ \beta_g * z + e$ 
 
-    - $z' \sim Norm(\mu_g, \sigma_g)$
+    - $z' \sim Norm(\mu_g, \sigma_g)$ (where $\sigma_g$ = e in the $\mu_g$ expression)
 5. Survival
 
-    - $logit(s) = (\alpha_s + \alpha_s^{yr}) + \beta_s * z + e$
+    - $logit(s) = (\alpha_s + \alpha_s^{yr}) + \beta_s * z$
     
 6. Probability of reproducing
 

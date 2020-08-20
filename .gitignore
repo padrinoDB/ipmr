@@ -20,6 +20,6 @@ tests/sim_tests/test-alternate-l_ev impl.R
 data-raw/*.csv
 paper/Figures*
 paper/*.pdf
-paper/Analyses*
+paper/Analyses/Data/*
 *.zip
 paper/SI/Data*
