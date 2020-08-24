@@ -89,17 +89,19 @@ each position.
     a fourth entry. The two possibilities for the fourth are described
     next.
 
-  - Position 4: `"kern"`/`"param"`
+  - Position 4: `"kern"`/`"param"` (Complete definitions found in
+    [Metcalf et
+    al. 2015](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405))
 
   - A. **kern**: This describes an IPM with discretely varying
     parameters such that their values are known before the model is
-    specified. This is usually the case with models that estimate random
-    year/site effects and for which defining a multivariate joint
-    distribution to sample parameters from is not desirable/needed.
-    These models can be a bit more computationally efficient than the
-    `param` alternative because all kernels can be constructed before
-    the iteration procedure begins, as opposed to requiring
-    reconstruction for every single iteration.
+    specified. This is usually the case with models that estimate fixed
+    and/or random year/site effects and for which defining a
+    multivariate joint distribution to sample parameters from is not
+    desirable/needed. These models can be a bit more computationally
+    efficient than the `param` alternative because all kernels can be
+    constructed before the iteration procedure begins, as opposed to
+    requiring reconstruction for every single iteration.
 
   - B. **param**: This describes an IPM with parameters that are
     re-sampled from some distribution at each iteration of the model.

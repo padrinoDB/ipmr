@@ -256,7 +256,7 @@ age_size_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
   )
 
 
-lamb <- lambda(a_s_ipm)
+lamb <- lambda(age_size_ipm)
 
 stopifnot(
   isTRUE(
@@ -265,6 +265,3 @@ stopifnot(
     )
   )
 )
-
-
-
