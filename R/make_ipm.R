@@ -182,6 +182,10 @@ make_ipm.simple_di_det <- function(proto_ipm,
                                 master_env,
                                 k_row,
                                 normalize_pop_size)
+  } else {
+
+    pop_state <- NA_real_
+
   }
 
 
@@ -193,13 +197,6 @@ make_ipm.simple_di_det <- function(proto_ipm,
 
   out_seq <- NA_integer_
 
-
-  if(!all(is.na(unlist(proto_ipm$pop_state)))) {
-    out_pop <- pop_state
-  } else {
-    out_pop <- NA_real_
-  }
-
   iterators     <- set_ipmr_classes(iterators)
   sub_kern_list <- set_ipmr_classes(sub_kern_list)
 
@@ -207,7 +204,7 @@ make_ipm.simple_di_det <- function(proto_ipm,
               sub_kernels = sub_kern_list,
               env_list    = out_ret,
               env_seq     = out_seq,
-              pop_state   = out_pop,
+              pop_state   = pop_state,
               proto_ipm   = proto_ipm
   )
 
