@@ -15,7 +15,7 @@ os:
   - osx
 
 # Linux options
-dist: trusty
+dist: xenial
 cache: packages
 
 # Apparently R-devel for OSX is a pain on most CI platforms, so I'm excluding
