@@ -2,9 +2,12 @@
 % Please edit documentation in R/eviction.R
 \name{truncated_distributions}
 \alias{truncated_distributions}
+\alias{discrete_extrema}
 \title{Eviction correction}
 \usage{
-truncated_distributions(fun, param, L = NA, U = NA, ...)
+truncated_distributions(fun, param, ...)
+
+discrete_extrema(fun, state, ncol = NULL, nrow = NULL)
 }
 \arguments{
 \item{fun}{The cumulative density function to use. For example, could be
@@ -14,24 +17,32 @@ correct a log-normal density function.}
 \item{param}{The parameter/vital rate being modified. If this is a vector, the
 distribution specified in \code{fun} will be recycled.}
 
-\item{L}{Optionally, the name of the lower bound of the domain. Otherwise,
-the function will try to find the \code{param} inside of the \code{proto_ipm}
-object under construction and use that to infer the domain of the function.}
-
-\item{U}{Optionally, the name of the upper bound of the domain. Otherwise,
-the function will try to find the \code{param} inside of the \code{proto_ipm}
-object under construction and use that to infer the domain of the function.}
-
 \item{...}{Only used for internal modification - do not use!}
+
+\item{state}{The state variable used in the kernel that is being discretized.}
+
+\item{ncol, nrow}{The number of rows or column that the final form of the iteration
+matrix should have. This is only necessary for rectangular kernels with
+class \code{"CC"}. \code{make_ipm} works out the correct dimensions for
+\code{"DC"} and \code{"CD"} kernels internally.}
 }
 \value{
-A modified function call with that re-scales the probability density
+For \code{truncated_distributions} and \code{rescale_kernel}, a
+modified function call with that re-scales the probability density
 function based on the cumulative density function.
+
+For \code{discrete_extrema}, a numeric vector with modified entries based
+on the discretization process.
 }
 \description{
 Various helpers to correct for unintentional eviction (Williams
 et al. 2012). \code{rescale_kernel} is an alias for
 \code{truncated_distributions}.
+}
+\note{
+Neither of these functions are intended for use outside of
+\code{define_kernel}, as they rely on internally generated variables to
+work inside of \code{make_ipm}.
 }
 \references{
 Williams JL, Miller TEX & Ellner SP, (2012). Avoiding unintentional eviction

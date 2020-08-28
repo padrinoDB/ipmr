@@ -162,6 +162,15 @@
 
 .append_dz_to_kern_form <- function(kern_text, proto, id) {
 
+  # If discrete_extrema is used, then the d_z has already been appended
+  # somewhere on that kernel. Thus, just return the kernel text
+  if(proto$evict[id]) {
+
+    quo_l <- .flatten_to_depth(proto$evict_fun[[id]], 1L)
+    if(rlang::call_name(quo_l[[1]]) == "discrete_extrema") {
+      return(kern_text)
+    }
+  }
 
   sv <- names(proto$domain[[id]])
 

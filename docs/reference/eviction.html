@@ -157,7 +157,9 @@ et al. 2012). <code>rescale_kernel</code> is an alias for
 <code>truncated_distributions</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>truncated_distributions</span>(<span class='no'>fun</span>, <span class='no'>param</span>, <span class='kw'>L</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>U</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>truncated_distributions</span>(<span class='no'>fun</span>, <span class='no'>param</span>, <span class='no'>...</span>)
+
+<span class='fu'>discrete_extrema</span>(<span class='no'>fun</span>, <span class='no'>state</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -174,27 +176,34 @@ correct a log-normal density function.</p></td>
 distribution specified in <code>fun</code> will be recycled.</p></td>
     </tr>
     <tr>
-      <th>L</th>
-      <td><p>Optionally, the name of the lower bound of the domain. Otherwise,
-the function will try to find the <code>param</code> inside of the <code>proto_ipm</code>
-object under construction and use that to infer the domain of the function.</p></td>
-    </tr>
-    <tr>
-      <th>U</th>
-      <td><p>Optionally, the name of the upper bound of the domain. Otherwise,
-the function will try to find the <code>param</code> inside of the <code>proto_ipm</code>
-object under construction and use that to infer the domain of the function.</p></td>
-    </tr>
-    <tr>
       <th>...</th>
       <td><p>Only used for internal modification - do not use!</p></td>
+    </tr>
+    <tr>
+      <th>state</th>
+      <td><p>The state variable used in the kernel that is being discretized.</p></td>
+    </tr>
+    <tr>
+      <th>ncol, nrow</th>
+      <td><p>The number of rows or column that the final form of the iteration
+matrix should have. This is only necessary for rectangular kernels with
+class <code>"CC"</code>. <code>make_ipm</code> works out the correct dimensions for
+<code>"DC"</code> and <code>"CD"</code> kernels internally.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A modified function call with that re-scales the probability density
+    <p>For <code>truncated_distributions</code> and <code>rescale_kernel</code>, a
+modified function call with that re-scales the probability density
 function based on the cumulative density function.</p>
+<p>For <code>discrete_extrema</code>, a numeric vector with modified entries based
+on the discretization process.</p>
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p>Neither of these functions are intended for use outside of
+<code>define_kernel</code>, as they rely on internally generated variables to
+work inside of <code>make_ipm</code>.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Williams JL, Miller TEX &amp; Ellner SP, (2012). Avoiding unintentional eviction

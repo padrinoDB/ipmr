@@ -10,16 +10,19 @@
 #' correct a log-normal density function.
 #' @param param The parameter/vital rate being modified. If this is a vector, the
 #' distribution specified in \code{fun} will be recycled.
-#' @param L Optionally, the name of the lower bound of the domain. Otherwise,
-#' the function will try to find the \code{param} inside of the \code{proto_ipm}
-#' object under construction and use that to infer the domain of the function.
-#' @param U Optionally, the name of the upper bound of the domain. Otherwise,
-#' the function will try to find the \code{param} inside of the \code{proto_ipm}
-#' object under construction and use that to infer the domain of the function.
+#' @param state The state variable used in the kernel that is being discretized.
 #' @param ... Only used for internal modification - do not use!
 #'
-#' @return A modified function call with that re-scales the probability density
+#' @return For \code{truncated_distributions} and \code{rescale_kernel}, a
+#' modified function call with that re-scales the probability density
 #' function based on the cumulative density function.
+#'
+#' For \code{discrete_extrema}, a numeric vector with modified entries based
+#' on the discretization process.
+#'
+#' @note Neither of these functions are intended for use outside of
+#' \code{define_kernel}, as they rely on internally generated variables to
+#' work inside of \code{make_ipm}.
 #'
 #' @references
 #' Williams JL, Miller TEX & Ellner SP, (2012). Avoiding unintentional eviction
@@ -30,8 +33,6 @@
 
 truncated_distributions <- function(fun,
                                     param,
-                                    L = NA,
-                                    U = NA,
                                     ...) {
 
   proto <- ..1
@@ -48,14 +49,9 @@ truncated_distributions <- function(fun,
       use_fun <- fun[i]
     }
 
-
-    if(is.na(L) || is.na(U)) {
-
-      LU <- .get_bounds_from_proto(param[i], proto)
-      L <- LU[1]
-      U <- LU[2]
-
-    }
+    LU    <- .get_bounds_from_proto(param[i], proto)
+    L     <- LU[1]
+    U     <- LU[2]
 
     proto <- .sub_new_param_call(use_fun, param[i], L, U, proto)
   }
@@ -150,6 +146,7 @@ truncated_distributions <- function(fun,
 }
 
 #' @noRd
+#' @importFrom rlang expr_text
 
 .correct_eviction <- function(proto) {
 
@@ -165,25 +162,105 @@ truncated_distributions <- function(fun,
   )
 
  if(ev_call_nm == 'truncated_distributions' |
-            ev_call_nm == 'rescale_kernel') {
+    ev_call_nm == 'rescale_kernel') {
 
     evict_fun <- unlist(proto$evict_fun)[[1]]
 
-    text <- gsub(')$', ', proto = proto[i, ])', rlang::quo_text(evict_fun))
-    rep_expr <- rlang::parse_expr(text)
-    evict_fun <- rlang::quo_set_expr(evict_fun, rep_expr)
+    # This doesn't get evaluated at any point - just fixes a note from R CMD check
+    i <- NULL
 
-
+    evict_fun <- rlang::call_modify(evict_fun, proto = rlang::expr(proto[i, ]))
 
     evict_fun <- rlang::quo_set_env(evict_fun, rlang::caller_env())
 
     out <- rlang::eval_tidy(evict_fun)
 
+ } else if(ev_call_nm == "discrete_extrema") {
+
+   evict_fun <- unlist(proto$evict_fun)[[1]]
+
+   target <- rlang::call_args(evict_fun)[[1]][1]
+   d_z    <- rlang::call_args(evict_fun)[[2]][1]
+
+   d_z    <- paste("d_", d_z, sep = "")
+
+   vr_nms <- names(proto$params[[1]]$vr_text)
+
+   if(!target %in% vr_nms) {
+     stop("Cannot find '", target, "' in vital rate expressions.")
+   } else {
+     ind <- which(vr_nms == target)
+   }
+
+   original_form <- proto$params[[1]]$vr_text[ind] %>%
+     lapply(rlang::parse_expr)
+
+   modified_form <- lapply(original_form,
+                           function(x, d_z) {
+
+                             temp <- rlang::call2(.fn = "discrete_extrema",
+                                                  x, d_z)
+
+                             return(rlang::expr_text(temp))
+
+                           },
+                           d_z = rlang::ensym(d_z))
+
+   proto$params[[1]]$vr_text[ind] <- modified_form
+
+   return(proto)
+
  } else {
-    stop("This type of 'evict_fun' is not yet implemented", call. = FALSE)
-  }
+
+   stop("This type of 'evict_fun' is not yet implemented", call. = FALSE)
+
+ }
 
   return(out)
 
 }
 
+#' @rdname eviction
+#' @param ncol,nrow The number of rows or column that the final form of the iteration
+#' matrix should have. This is only necessary for rectangular kernels with
+#' class \code{"CC"}. \code{make_ipm} works out the correct dimensions for
+#' \code{"DC"} and \code{"CD"} kernels internally.
+#' @param state The state variable used in the kernel that is being discretized.
+
+#' @export
+
+discrete_extrema <- function(fun, state, ncol = NULL, nrow = NULL) {
+
+  if(is.null(ncol) && is.null(nrow)) {
+    ncol <- nrow <- sqrt(length(fun))
+  }
+
+  temp <- matrix(fun, ncol = ncol, nrow = nrow, byrow = TRUE) * state
+
+  top_seq <- seq(1, ncol / 2, by = 1)
+  bot_seq <- seq(max(top_seq + 1), ncol, by = 1)
+
+
+  for(i in top_seq) {
+
+    temp[1 ,i] <- temp[1, i] + (1 - sum(temp[ , i]))
+
+  }
+
+  for(i in bot_seq) {
+
+    temp[nrow ,i] <- temp[nrow, i] + (1 - sum(temp[ , i]))
+
+  }
+
+  # We need to transpose before stripping the dimensions, because otherwise
+  # it will create a vector from columns first, whereas our domains generate
+  # rows first.
+
+  out <- t(temp)
+
+  dim(out) <- NULL
+
+  return(out)
+
+}

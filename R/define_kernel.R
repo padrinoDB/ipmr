@@ -417,7 +417,9 @@ remove_k <- function(proto_ipm) {
 
   } else if(!rlang::quo_is_null(fun)) {
 
-    nm <- rlang::call_args(fun)[[2]][1]
+    temp <- rlang::call_args(fun)
+
+    nm   <- temp[[length(temp)]][1]
 
     fun <- list(fun)
     names(fun) <- nm
