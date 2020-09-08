@@ -32,14 +32,14 @@ states <- c('dbh', 'dbh')
 
 sim_di_det_ex <- init_ipm('simple_di_det') %>%
   define_kernel("P",
-                formula = s_g_mult(s, g),
+                formula = s * g,
                 family = "CC",
                 s = inv_logit(s_int, s_slope, dbh_1),
                 g = dnorm(dbh_2, mu_g, sd_g),
                 mu_g = g_int + g_slope * dbh_1,
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'g')
   ) %>%
@@ -51,7 +51,7 @@ sim_di_det_ex <- init_ipm('simple_di_det') %>%
                 f_d = dnorm(dbh_2, mu_fd, sd_fd),
                 data_list = data_list,
                 states = states,
-                evict = TRUE,
+                evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
   ) %>%
@@ -60,7 +60,7 @@ sim_di_det_ex <- init_ipm('simple_di_det') %>%
            family    = 'IPM',
            data_list = list(),
            states    = states,
-           evict     = FALSE) %>%
+           evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit))
@@ -112,7 +112,7 @@ inv_logit_2 <- function(int, slope, slope_2, sv) {
 gen_di_det_ex <- init_ipm("general_di_det") %>%
   define_kernel(
     name          = "P",
-    formula       = s_g_mult(s, g) * d_ht,
+    formula       = s * g * d_ht,
     family        = "CC",
     g             = dnorm(ht_2, g_mu, g_sd),
     g_mu          = g_int + g_slope * ht_1,
@@ -120,7 +120,7 @@ gen_di_det_ex <- init_ipm("general_di_det") %>%
     data_list     = data_list,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'g')
   ) %>%
@@ -135,11 +135,11 @@ gen_di_det_ex <- init_ipm("general_di_det") %>%
     has_hier_effs = FALSE
   ) %>%
   define_kernel(
-    name    = 'stay_discrete',
-    formula = 0,
-    family  = "DD",
-    states  = states,
-    evict = FALSE
+    name      = 'stay_discrete',
+    formula   = 0,
+    family    = "DD",
+    states    = states,
+    evict_cor = FALSE
   ) %>%
   define_kernel(
     name          = 'leave_discrete',
@@ -149,7 +149,7 @@ gen_di_det_ex <- init_ipm("general_di_det") %>%
     data_list     = data_list,
     states        = states,
     has_hier_effs = FALSE,
-    evict         = TRUE,
+    evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
   ) %>%

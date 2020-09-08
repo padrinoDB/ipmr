@@ -598,3 +598,82 @@ all_ages <- function(expr, fun, ...) {
   return(out_text)
 
 }
+
+
+#' @title Accessor functions for proto_ipm objects
+#' @rdname proto_accessors
+#'
+#' @description Functions that access specific slots of a \code{proto_ipm} for
+#' user examination
+#'
+#' @param proto_ipm A \code{proto_ipm} object.
+#'
+#' @return A named list of either numbers (for domains), or bare expressions (for
+#' vital rates and kernel formulae).
+#'
+#' @export
+
+domains <- function(proto_ipm) {
+
+  out <- lapply(proto_ipm$domain, function(x) x)
+
+  out <- lapply(out,
+                function(x) {
+
+                  temp <- lapply(x, function(y) {
+                    if(!all(is.na(y))) {
+                      names(y) <- c("lower_bound",
+                                    "upper_bound",
+                                    "n_meshpoints")
+
+                    }
+
+                    return(y)
+                  }
+                  )
+
+                  return(temp)
+                }
+  ) %>%
+    .flatten_to_depth(1L) %>%
+    Filter(f = Negate(is.na), x = .) %>%
+    .[!duplicated(names(.)) & !is.na(names(.))]
+
+  return(out)
+
+}
+
+#' @rdname proto_accessors
+#' @importFrom stats setNames
+#' @export
+
+vital_rate_functions <- function(proto_ipm) {
+
+  out <- lapply(proto_ipm$params, function(x) x$vr_text) %>%
+    stats::setNames(c("")) %>%
+    lapply(function(x)
+           if(any(is.na(x) || is.null(x) || rlang::is_empty(x))) {
+             return(NULL)
+           }  else {
+             return(x)
+           }
+    ) %>%
+    Filter(Negate(is.null), x = .) %>%
+    .flatten_to_depth(1L) %>%
+    lapply(rlang::parse_expr)
+
+  return(out)
+}
+
+#' @rdname proto_accessors
+#' @export
+
+kernel_formulae <- function(proto_ipm) {
+
+  out <- lapply(proto_ipm$params, function(x) x$formula) %>%
+    .flatten_to_depth(1L) %>%
+    Filter(f = Negate(is.na), x = .) %>%
+    lapply(rlang::parse_expr)
+
+  return(out)
+}
