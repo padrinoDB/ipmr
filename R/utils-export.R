@@ -652,15 +652,18 @@ vital_rate_functions <- function(proto_ipm) {
   out <- lapply(proto_ipm$params, function(x) x$vr_text) %>%
     stats::setNames(c("")) %>%
     lapply(function(x)
-           if(any(is.na(x) || is.null(x) || rlang::is_empty(x))) {
+           if(any(is.na(x) | is.null(x) | rlang::is_empty(x))) {
              return(NULL)
            }  else {
              return(x)
            }
     ) %>%
     Filter(Negate(is.null), x = .) %>%
+    Filter(Negate(rlang::is_empty), x = .) %>%
     .flatten_to_depth(1L) %>%
     lapply(rlang::parse_expr)
+
+  out <- out[!duplicated(names(out))]
 
   return(out)
 }
