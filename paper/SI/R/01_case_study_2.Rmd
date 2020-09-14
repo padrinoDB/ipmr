@@ -209,77 +209,13 @@ stable_dists <- right_ev(age_size_ipm)
 
 ```
 
-Say we want to compute R0. We first compute the next-generation kernel, $R$, and then take its dominant eigenvalue. The form of $R$ is given by the following equation from Ellner, Childs & Rees (2016):
 
-$$
-R = (F_0 + F_1P_0 + F_2P_1P_0 + F_3P_2P_1P_0 + ... + F_MP_{M-1}...P_0) + F_{M+1}(I + P_{M+1} + P^2_{M+1} + P^3_{M+1} + ...)
-$$
+We can plot the stable distributions using an `lapply()` on the `stable_dists` object.
 
-$$
-R = (F_0 + \sum_{a=1}^MF_a\prod_{m=0}^{a-1} P_m) + (F_{M+1}(I - P_{M+1})^{-1}\prod_{m=0}^MP_m)
-$$
+```{r} 
 
-The math may look intimidating, but hopefully the code below will help make sense of it. First, we extract the individual $F_a$ and $P_a$ kernels, and then write a function to compute the $R$ kernel. 
+plot(stable_dists[[1]], type = 'l')
 
-```{r}
-
-f_kernels <- age_size_ipm$sub_kernels[grepl("F_", names(age_size_ipm$sub_kernels))]
-p_kernels <- age_size_ipm$sub_kernels[grepl("P_", names(age_size_ipm$sub_kernels))]
-
-R_age <- function(f_kerns, p_kerns, max_age) {
-  
-  # Get the kernels for the oldest age class
-  f_greybeard <- f_kerns[grepl(max_age, names(f_kerns))]
-  p_greybeard <- p_kerns[grepl(max_age, names(p_kerns))]
-  
-  # get the kernels for every other age class
-  f_younger   <- f_kerns[! grepl(max_age, names(f_kerns))]
-  p_younger   <- p_kerns[! grepl(max_age, names(p_kerns))]
-  
-  temp <- list()
-  
-  for(a in seq_len(max_age - 1)) {
-    
-    # The list of Ps and Fs is in ascending order starting from age 0.
-    # in order to correctly calculate the matrix products, we have to arrange
-    # the Ps in descending order. This is accomplished by reversing the 
-    # names index we create below. 
-    
-    get_ps <- rev(paste("P_", 0:(a - 1), sep = ""))
-    get_fs <- paste("F_", a, sep = "")
-    
-    use_ps <- p_younger[get_ps]
-    use_f  <- f_younger[get_fs]
-    
-    # Reduce applies the function f to x, and starts with the initial value
-    # in init. This is the correct order for the matrix multiplication described
-    # in the equation above. 
-    
-    temp[[a]] <- Reduce(f = "%*%", x = use_ps, init = use_f[[1]])
-    
-  } 
-  
-  # create an identity matrix for the (I-P)^-1
-  init_p <- diag(nrow(p_kerns[[1]]))
-  
-  N_greybeard <- solve(init_p - p_greybeard[[1]])
-  
-  p_prod <- Reduce("%*%", p_younger[rev(names(p_younger))], init = init_p)
-  
-  R_greybeard <- f_greybeard[[1]] %*% N_greybeard %*% p_prod
-  
-  temp <- c(temp, list(R_greybeard))
-  
-  F_0  <- f_kerns[[1]]
-  
-  out  <- Reduce(f = "+", temp, init = F_0)
-  
-  return(list(R = out, kerns = temp))
-  
-}
-
-R <- R_age(f_kernels, p_kernels, 21)
-
-Re(eigen(R$R)$values[1])
+lapply(stable_dists[2:22], function(x) lines(x))
 
 ```

@@ -113,7 +113,7 @@ n_mesh_p <- 100
 
 ```
 
-We now have the parameter set prepared, and have the boundaries for our domains set up. We are ready to implement the model. We'll specify `return_all = TRUE` in `make_ipm()` because we'll need some pieces from the main environment for subsequent analyses.
+We now have the parameter set prepared, and have the boundaries for our domains set up. We are ready to implement the model. We'll specify `return_main_env = TRUE` in `make_ipm()` because we'll need the mesh points and bin width for some subsequent analyses. 
 
 ```{r}
 
@@ -166,9 +166,9 @@ carpobrotus_ipm <- init_ipm('simple_di_det') %>%
   define_pop_state(
     n_sa = rep(1/100, n_mesh_p)
   ) %>%
-  make_ipm(iterate    = TRUE,
-           iterations = 100,
-           return_all = TRUE)
+  make_ipm(iterate         = TRUE,
+           iterations      = 100,
+           return_main_env = TRUE)
 
 
 asymp_grow_rate <- lambda(carpobrotus_ipm)
@@ -318,16 +318,16 @@ gen_time <- function(ipm_obj) {
 
 ```
 
-We just need to extract the `d_z` value. We can find this in the `carpobrotus_ipm$env_list$master_env`. It will be called `d_sa` because we named our domain `"sa"` when we implemented the model. Once we have that, we can begin estimating our life history quantities of interest.
+We just need to extract the `d_z` value and meshpoints. We can extract this information in a list form using the `int_mesh()` function on our IPM object. The `d_z` in this case will be called `d_sa` because we named our domain `"sa"` when we implemented the model. Once we have that, we can begin computing the life history traits of interest.
 
 ```{r}
 
-d_z <- carpobrotus_ipm$env_list$master_env$d_sa
+mesh_info <- int_mesh(carpobrotus_ipm)
 
-sens_mat <- sens(carpobrotus_ipm, d_z)
-elas_mat <- elas(carpobrotus_ipm, d_z)
+sens_mat <- sens(carpobrotus_ipm, mesh_info$d_sa)
+elas_mat <- elas(carpobrotus_ipm, mesh_info$d_sa)
 
-R0 <- R_nought(carpobrotus_ipm)
+R0    <- R_nought(carpobrotus_ipm)
 gen_T <- gen_time(carpobrotus_ipm)
 
 R0
@@ -374,7 +374,7 @@ contour(x = x,
 
 ```
 
-Now, for the `ggplot2` version. First, create a function to create long format data frames for each matrix. Then, get the meshpoints for the model out of the `master_env`. Once we have those, we can use `geom_tile` and `geom_contour` to generate the `ggplot`s, and `grid.arrange` from the `gridExtra` package to put them side by side.
+Now, for the `ggplot2` version. First, create a function to create long format data frames for each matrix. Then, get the meshpoints for the model out of the `main_env`. Once we have those, we can use `geom_tile` and `geom_contour` to generate the `ggplot`s, and `grid.arrange` from the `gridExtra` package to put them side by side.
 
 ```{r, fig.width = 12, fig.height = 5}
 
@@ -399,8 +399,8 @@ mat_to_df <- function(mat, meshp) {
   return(meshp)
 }
 
-mesh_p <- data.frame(x = carpobrotus_ipm$env_list$master_env$sa_1,
-                     y = carpobrotus_ipm$env_list$master_env$sa_2)
+mesh_p <- data.frame(x = mesh_info$sa_1,
+                     y = mesh_info$sa_2)
 
 sens_df <- mat_to_df(sens_mat, mesh_p)
 elas_df <- mat_to_df(elas_mat, mesh_p)
