@@ -63,7 +63,9 @@ sim_di_det_ex <- init_ipm('simple_di_det') %>%
            evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
-  make_ipm(usr_funs = list(inv_logit = inv_logit))
+  make_ipm(usr_funs = list(inv_logit = inv_logit),
+           return_all_envs = FALSE,
+           return_main_env = FALSE)
 
 
 # Create a general deterministic ipm
@@ -180,6 +182,8 @@ gen_di_det_ex <- init_ipm("general_di_det") %>%
     )
   ) %>%
   make_ipm(iterations = 100,
+           return_all_envs = FALSE,
+           return_main_env = FALSE,
            usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_2 = inv_logit_2))
 

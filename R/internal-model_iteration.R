@@ -13,7 +13,7 @@
                                          sub_kern_list,
                                          iterations,
                                          pop_state,
-                                         master_env,
+                                         main_env,
                                          k_row,
                                          normal) {
 
@@ -63,13 +63,13 @@
         # Bind a helper for the model iteration number. Users can use this
         # to specify lagged effects.
 
-        .bind_iter_var(master_env, j)
+        .bind_iter_var(main_env, j)
 
         pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                           proto_ipm     = proto_ipm,
                                           sub_kern_list = use_kerns,
                                           pop_state     = use_pop,
-                                          master_env    = master_env)
+                                          main_env    = main_env)
 
         names(pop_list_t_1) <- gsub('_t_1', '', names(pop_list_t_1))
 
@@ -122,13 +122,13 @@
         )
 
         # Now, update the names so that we can bind the new n_*_t to
-        # master_env so that the next iteration is evaluated correctly
+        # main_env so that the next iteration is evaluated correctly
 
         names(pop_list_t_1) <- names(pop_list_t_1) %>%
           paste(., '_t', sep = "")
 
 
-        rlang::env_bind(.env = master_env,
+        rlang::env_bind(.env = main_env,
                         !!! pop_list_t_1)
 
       } # end single level simulation
@@ -146,13 +146,13 @@
       # Simple model, no hierarchical stuff going on. We can just
       # stick the kernels and their expressions right into eval_general_det
 
-      .bind_iter_var(master_env, i)
+      .bind_iter_var(main_env, i)
 
       pop_list_t_1 <- .eval_general_det(k_row         = k_row,
                                         proto_ipm     = proto_ipm,
                                         sub_kern_list = sub_kern_list,
                                         pop_state     = pop_state,
-                                        master_env    = master_env)
+                                        main_env    = main_env)
 
       # make names match pop_state and then reorder the list for easy
       # insertion
@@ -204,13 +204,13 @@
       )
 
       # Now, update the names so that we can bind the new n_*_t to
-      # master_env so that the next iteration is evaluated correctly
+      # main_env so that the next iteration is evaluated correctly
 
       names(pop_list_t_1) <- names(pop_list_t_1) %>%
         paste(., '_t', sep = "")
 
 
-      rlang::env_bind(.env = master_env,
+      rlang::env_bind(.env = main_env,
                       !!! pop_list_t_1)
 
     } # End no hierarchical stuff
@@ -241,7 +241,7 @@
                                                 iterations,
                                                 kern_seq,
                                                 pop_state,
-                                                master_env,
+                                                main_env,
                                                 k_row,
                                                 normal,
                                                 report_progress) {
@@ -304,7 +304,7 @@
 
     }
 
-    .bind_iter_var(master_env, i)
+    .bind_iter_var(main_env, i)
 
     .stoch_progress_message(report_progress, iterations, i)
 
@@ -315,7 +315,7 @@
                                       proto_ipm     = proto_ipm,
                                       sub_kern_list = use_kerns,
                                       pop_state     = pop_state,
-                                      master_env    = master_env)
+                                      main_env    = main_env)
 
     # make names match pop_state and then reorder the list for easy
     # insertion
@@ -367,13 +367,13 @@
     )
 
     # Now, update the names so that we can bind the new n_*_t to
-    # master_env so that the next iteration is evaluated correctly
+    # main_env so that the next iteration is evaluated correctly
 
     names(pop_list_t_1) <- names(pop_list_t_1) %>%
       paste(., '_t', sep = "")
 
 
-    rlang::env_bind(.env = master_env,
+    rlang::env_bind(.env = main_env,
                     !!! pop_list_t_1)
 
   }
@@ -390,7 +390,7 @@
                                                 current_iteration,
                                                 kern_seq,
                                                 pop_state,
-                                                master_env,
+                                                main_env,
                                                 k_row,
                                                 normal) {
 
@@ -451,7 +451,7 @@
                                     proto_ipm     = proto_ipm,
                                     sub_kern_list = use_kerns,
                                     pop_state     = pop_state,
-                                    master_env    = master_env)
+                                    main_env    = main_env)
 
   # make names match pop_state and then reorder the list for easy
   # insertion
@@ -503,13 +503,13 @@
   )
 
   # Now, update the names so that we can bind the new n_*_t to
-  # master_env so that the next iteration is evaluated correctly
+  # main_env so that the next iteration is evaluated correctly
 
   names(pop_list_t_1) <- names(pop_list_t_1) %>%
     paste(., '_t', sep = "")
 
 
-  rlang::env_bind(.env = master_env,
+  rlang::env_bind(.env = main_env,
                   !!! pop_list_t_1)
 
 
@@ -525,7 +525,7 @@
                                           sub_kern_list,
                                           iterations,
                                           pop_state,
-                                          master_env,
+                                          main_env,
                                           normal)  {
 
 
@@ -569,13 +569,13 @@
 
       for(j in seq_len(iterations)) {
 
-        .bind_iter_var(master_env, j)
+        .bind_iter_var(main_env, j)
 
         pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                           proto_ipm     = proto_ipm,
                                           sub_kern_list = use_kerns,
                                           pop_state     = use_pop,
-                                          master_env    = master_env)
+                                          main_env    = main_env)
 
         names(pop_list_t_1) <- gsub('_t_1', '', names(pop_list_t_1))
 
@@ -628,13 +628,13 @@
         )
 
         # Now, update the names so that we can bind the new n_*_t to
-        # master_env so that the next iteration is evaluated correctly
+        # main_env so that the next iteration is evaluated correctly
 
         names(pop_list_t_1) <- names(pop_list_t_1) %>%
           paste(., '_t', sep = "")
 
 
-        rlang::env_bind(.env = master_env,
+        rlang::env_bind(.env = main_env,
                         !!! pop_list_t_1)
 
       } # end single level simulation
@@ -656,13 +656,13 @@
       use_kerns <- sub_kern_list
       use_k     <- k_row
 
-      .bind_iter_var(master_env, i)
+      .bind_iter_var(main_env, i)
 
       pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                         proto_ipm     = proto_ipm,
                                         sub_kern_list = use_kerns,
                                         pop_state     = pop_state,
-                                        master_env    = master_env)
+                                        main_env    = main_env)
 
 
       # make names match pop_state and then reorder the list for easy
@@ -715,13 +715,13 @@
       )
 
       # Now, update the names so that we can bind the new n_*_t to
-      # master_env so that the next iteration is evaluated correctly
+      # main_env so that the next iteration is evaluated correctly
 
       names(pop_list_t_1) <- names(pop_list_t_1) %>%
         paste(., '_t', sep = "")
 
 
-      rlang::env_bind(.env = master_env,
+      rlang::env_bind(.env = main_env,
                       !!! pop_list_t_1)
 
     }
@@ -750,7 +750,7 @@
                                                  iterations,
                                                  kern_seq,
                                                  pop_state,
-                                                 master_env,
+                                                 main_env,
                                                  normal,
                                                  report_progress) {
 
@@ -801,7 +801,7 @@
 
     }
 
-    .bind_iter_var(master_env, i)
+    .bind_iter_var(main_env, i)
     .stoch_progress_message(report_progress, iterations, i)
 
 
@@ -809,7 +809,7 @@
                                       proto_ipm     = proto_ipm,
                                       sub_kern_list = use_kerns,
                                       pop_state     = pop_state,
-                                      master_env    = master_env)
+                                      main_env    = main_env)
 
 
     # make names match pop_state and then reorder the list for easy
@@ -862,13 +862,13 @@
     )
 
     # Now, update the names so that we can bind the new n_*_t to
-    # master_env so that the next iteration is evaluated correctly
+    # main_env so that the next iteration is evaluated correctly
 
     names(pop_list_t_1) <- names(pop_list_t_1) %>%
       paste(., '_t', sep = "")
 
 
-    rlang::env_bind(.env = master_env,
+    rlang::env_bind(.env = main_env,
                     !!! pop_list_t_1)
 
   }
@@ -887,7 +887,7 @@
                                                   current_iteration,
                                                   kern_seq,
                                                   pop_state,
-                                                  master_env,
+                                                  main_env,
                                                   normal) {
 
   # Select kernels from kern_seq, or just use all of them if it's
@@ -938,7 +938,7 @@
                                     proto_ipm     = proto_ipm,
                                     sub_kern_list = use_kerns,
                                     pop_state     = pop_state,
-                                    master_env    = master_env)
+                                    main_env    = main_env)
 
 
   # make names match pop_state and then reorder the list for easy
@@ -991,13 +991,13 @@
   )
 
   # Now, update the names so that we can bind the new n_*_t to
-  # master_env so that the next iteration is evaluated correctly
+  # main_env so that the next iteration is evaluated correctly
 
   names(pop_list_t_1) <- names(pop_list_t_1) %>%
     paste(., '_t', sep = "")
 
 
-  rlang::env_bind(.env = master_env,
+  rlang::env_bind(.env = main_env,
                   !!! pop_list_t_1)
 
 

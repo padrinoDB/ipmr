@@ -339,7 +339,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     )
   ) %>%
   make_ipm(
-    return_all = TRUE,
+    return_all_envs = TRUE,
     usr_funs   = list(
       inv_logit   = inv_logit,
       pois        = pois,
@@ -920,7 +920,7 @@ test_that('normalize_pop_vec works', {
       )
     ) %>%
     make_ipm(
-      return_all = TRUE,
+      return_all_envs = TRUE,
       usr_funs   = list(
         inv_logit   = inv_logit,
         pois        = pois,
@@ -1168,7 +1168,7 @@ test_that("t variable works as advertised", {
       )
     ) %>%
     make_ipm(
-      return_all = TRUE,
+      return_all_envs = TRUE,
       usr_funs   = list(
         inv_logit   = inv_logit,
         pois        = pois,
@@ -1362,7 +1362,7 @@ test_that("t variable works as advertised", {
       )
     ) %>%
     make_ipm(
-      return_all = TRUE,
+      return_all_envs = TRUE,
       usr_funs   = list(
         inv_logit   = inv_logit,
         pois        = pois

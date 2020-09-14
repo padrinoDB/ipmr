@@ -1232,7 +1232,7 @@ right_ev.general_di_det_ipm <- function(ipm,
 
   } else {
 
-    names(out) <- gsub('pop_state_', '', names(out))
+    names(out) <- gsub('n_', '', names(out))
     names(out) <- paste(names(out), 'w', sep = '_')
 
   }

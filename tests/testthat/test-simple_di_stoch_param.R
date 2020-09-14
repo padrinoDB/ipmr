@@ -151,7 +151,7 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
            iterations = 10,
            normalize_pop_size = FALSE)
 
-pop_state_ipmr <- test_stoch_param$pop_state$pop_state_surf_area
+pop_state_ipmr <- test_stoch_param$pop_state$n_surf_area
 lambda_ipmr <- lambda(test_stoch_param,
                       comp_method = 'pop_size',
                       type_lambda = 'all') %>%
@@ -400,10 +400,10 @@ test_that('normalize pop_vectors works as it should', {
 
 
   expect_equal(lambdas_norm, lambdas_hand, tolerance = 1e-10)
-  expect_equal(test_stoch_param$pop_state$pop_state_surf_area,
+  expect_equal(test_stoch_param$pop_state$n_surf_area,
                pop_holder)
 
-  pop_sizes <- colSums(test_stoch_param$pop_state$pop_state_surf_area)
+  pop_sizes <- colSums(test_stoch_param$pop_state$n_surf_area)
 
   expect_equal(pop_sizes, rep(1, 11), tolerance = 1e-15)
 
@@ -559,8 +559,8 @@ test_that("t helper variable works as advertised", {
 
   expect_equal(det_seq_l, ran_seq_l, tol = 1e-10)
 
-  pop_state_det <- test_det_seq$pop_state$pop_state_surf_area[ , 11]
-  pop_state_ran <- test_stoch_param$pop_state$pop_state_surf_area[ , 11]
+  pop_state_det <- test_det_seq$pop_state$n_surf_area[ , 11]
+  pop_state_ran <- test_stoch_param$pop_state$n_surf_area[ , 11]
 
   expect_equal(pop_state_det, pop_state_ran, tol = 1e-10)
 

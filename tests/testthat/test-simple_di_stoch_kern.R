@@ -346,7 +346,7 @@ iterated_sys <- proto %>%
            iterations = 50,
            normalize_pop_size = FALSE)
 
-ipmr_pop_state <- iterated_sys$pop_state$pop_state_ht
+ipmr_pop_state <- iterated_sys$pop_state$n_ht
 
 pop_holder <- array(NA_real_, dim = c(100, 51))
 
@@ -545,7 +545,7 @@ test_that("return_all gets all of the environments back", {
              return_all = TRUE,
              normalize_pop_size = FALSE)
 
-  env_list_nms <- c('master_env', c(paste('F', 1:5, sep = '_'),
+  env_list_nms <- c('main_env', c(paste('F', 1:5, sep = '_'),
                                     paste("P", 1:5, sep = "_")))
 
   expect_equal(names(test_order_1$env_list), env_list_nms)
@@ -642,9 +642,9 @@ test_that('normalizing pop vector gets same lambdas as before', {
   }
 
   expect_equal(lambdas_hand, lambdas_test, tolerance = 1e-10)
-  expect_equal(pop_holder, test_norm_1$pop_state$pop_state_ht)
+  expect_equal(pop_holder, test_norm_1$pop_state$n_ht)
 
-  pop_sizes <- colSums(test_norm_1$pop_state$pop_state_ht)
+  pop_sizes <- colSums(test_norm_1$pop_state$n_ht)
 
   expect_equal(pop_sizes, rep(1, 101), tolerance = 1e-15)
 

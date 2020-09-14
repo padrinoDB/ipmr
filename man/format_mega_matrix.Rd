@@ -2,18 +2,37 @@
 % Please edit documentation in R/utils-export.R
 \name{format_mega_matrix}
 \alias{format_mega_matrix}
+\alias{format_mega_matrix.default}
+\alias{format_mega_matrix.age_x_size_ipm}
 \title{Format a mega-matrix}
 \usage{
-format_mega_matrix(ipm, mega_mat)
+format_mega_matrix(ipm, ...)
+
+\method{format_mega_matrix}{default}(ipm, mega_mat, ...)
+
+\method{format_mega_matrix}{age_x_size_ipm}(ipm, name_ps, f_forms, ...)
 }
 \arguments{
 \item{ipm}{Output from \code{make_ipm}.}
+
+\item{...}{Other arguments passed to methods.}
 
 \item{mega_mat}{A vector with symbols, I's, and/or 0s representing the matrix blocks.
 They should be specified in ROW MAJOR order! Can also be a character
 string specifying the call. Hierarchical syntax is supported. When used,
 \code{format_mega_matrix} will produce as many mega-matrices as there are
 combinations of \code{levels_hier_effs} in the \code{proto_ipm}.}
+
+\item{name_ps}{The prefix(es) for the kernel name that correspond to survival
+and growth/maturation of existing individals. For the model
+\code{K = P_age + F_age}, this would be \code{"P"}.}
+
+\item{f_forms}{The names of the kernels that correspond to production of new
+individuals, and possibly, how they are combined. For example, a model that
+includes sexual (with an "F" kernel) and asexual reproduction (with a "C" kernel),
+this would be \code{"F + C"}. If data come from multiple sites or years,
+then this information is supplied using the suffix syntax (i.e.
+\code{f_forms = "F_yr + C_yr"}).}
 }
 \value{
 A list containing a large matrix or many large matrices (when used with
@@ -29,6 +48,12 @@ respectively. They can be used to fill in blocks that represent either, without
 having to create those separately and append them to the model object. The function
 will work out the correct dimensions for both internally, and there is no
 restriction on the number that may be used in a given call.
+
+For \code{age_size_ipm}s, the correct form of \code{mega_mat} is generated
+internally by creating sub-diagonal matrices for the \code{name_ps} kernels,
+and a top row using the \code{f_forms}. If hierarchical effects are part of the
+model, the suffixes should be attached to the \code{name_ps, f_forms} in the
+function arguments, and the correct block matrices will be generated internally.
 }
 \examples{
 data(gen_di_det_ex)

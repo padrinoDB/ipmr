@@ -4,7 +4,7 @@
 
 #'@noRd
 
-.make_k_simple <- function(k_rows, proto_ipm, sub_kern_list, master_env) {
+.make_k_simple <- function(k_rows, proto_ipm, sub_kern_list, main_env) {
 
   temp <- list()
   for(i in seq_along(k_rows$kernel_id)) {
@@ -13,7 +13,7 @@
     formula <- params$formula
 
     # set up the environment and bind the subkernels to it
-    k_env <- rlang::child_env(.parent = master_env,
+    k_env <- rlang::child_env(.parent = main_env,
                               !!! sub_kern_list)
 
     k_form        <- .parse_vr_formulae(formula,
@@ -36,7 +36,7 @@
 
 #' @noRd
 
-.make_k_kern_samp <- function(k_rows, proto_ipm, sub_kernel_list, master_env) {
+.make_k_kern_samp <- function(k_rows, proto_ipm, sub_kernel_list, main_env) {
 
   # result storage
   k_list <- list()
@@ -50,7 +50,7 @@
     # Part one of .generate_kernel env, but we don't want to bind kern_quos
     # because they do not exist yet!
 
-    kern_env <- rlang::child_env(.parent = master_env,
+    kern_env <- rlang::child_env(.parent = main_env,
                                  !!! param_tree$parameters)
 
     rlang::env_bind_lazy(kern_env,
@@ -83,7 +83,7 @@
 
 .make_k_param_samp <- function(k_rows,
                                sub_kernel_list,
-                               master_env) {
+                               main_env) {
 
   # result storage
   k_list <- list()
@@ -97,7 +97,7 @@
     # Part one of .generate_kernel env, but we don't want to bind kern_quos
     # because they do not exist yet!
 
-    kern_env <- rlang::child_env(.parent = master_env,
+    kern_env <- rlang::child_env(.parent = main_env,
                                  !!! param_tree$parameters)
 
     rlang::env_bind_lazy(kern_env,
@@ -151,7 +151,7 @@
                               proto_ipm,
                               sub_kern_list,
                               pop_state,
-                              master_env) {
+                              main_env) {
 
   pop_list <- list()
 
@@ -166,7 +166,7 @@
     # Part one of .generate_kernel env, but we don't want to bind kern_quos
     # because they do not exist yet!
 
-    kern_env <- rlang::child_env(.parent = master_env,
+    kern_env <- rlang::child_env(.parent = main_env,
                                  !!! param_tree$params)
 
     rlang::env_bind_lazy(kern_env,
@@ -195,7 +195,7 @@
 
 #' @noRd
 
-.add_pop_state_to_master_env <- function(pop_state, master_env) {
+.add_pop_state_to_main_env <- function(pop_state, main_env) {
 
 
   if(!all(is.na(pop_state))) {
@@ -203,7 +203,7 @@
       pop_state <- .flatten_to_depth(pop_state, 1)
     }
 
-    # We don't want to add lambda to the master env. I don't think
+    # We don't want to add lambda to the main env. I don't think
     # it'd cause any problems, as I don't we don't have any other objects
     # referencing that value further downstream. This is a safety precaution.
 
@@ -220,20 +220,20 @@
 
       nm <- paste0(names(pop_state)[i], '_t', sep = "")
       time_t <- pop_state[[i]][ , 1]
-      assign(nm, time_t, envir = master_env)
+      assign(nm, time_t, envir = main_env)
 
       # Finally, we need to bind the complete pop_state_list with size x time
       # matrices so these can be updated at each iteration (if iteration is requested)
       # by .iterate_kerns_* functions. Not using env_bind because that will
       # sometimes return a list of zaps invisibly when used with assignment at
-      # the next level up (I don't think it'd happen here since master_env is
+      # the next level up (I don't think it'd happen here since main_env is
       # explicitly returned, but just being safe!)
 
-      assign(names(pop_state)[i], pop_state[[i]], envir = master_env)
+      assign(names(pop_state)[i], pop_state[[i]], envir = main_env)
 
     }
   }
 
-  return(master_env)
+  return(main_env)
 
 }

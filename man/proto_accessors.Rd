@@ -2,13 +2,13 @@
 % Please edit documentation in R/utils-export.R
 \name{domains}
 \alias{domains}
-\alias{vital_rate_functions}
+\alias{vital_rates}
 \alias{kernel_formulae}
 \title{Accessor functions for proto_ipm objects}
 \usage{
 domains(proto_ipm)
 
-vital_rate_functions(proto_ipm)
+vital_rates(proto_ipm)
 
 kernel_formulae(proto_ipm)
 }
@@ -21,5 +21,5 @@ vital rates and kernel formulae).
 }
 \description{
 Functions that access specific slots of a \code{proto_ipm} for
-user examination
+user examination.
 }

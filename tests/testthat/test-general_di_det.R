@@ -299,7 +299,7 @@ ipmr_cr <- init_ipm("general_di_det") %>%
   make_ipm(iterations = 100,
            usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_2 = inv_logit_2),
-           return_all = TRUE,
+           return_all_envs = TRUE,
            normalize_pop_size = FALSE)
 
 
@@ -314,9 +314,9 @@ test_that('ipmr version matches hand version', {
 
   # compare final population distributions
   pop_size_final_cr   <- pop_size_cr$pop_state$ht_cr[ , 101]
-  pop_size_final_ipmr <- ipmr_cr$pop_state$pop_state_ht[ , 101]
+  pop_size_final_ipmr <- ipmr_cr$pop_state$n_ht[ , 101]
   bank_size_final_cr   <- pop_size_cr$pop_state$b_t_cr[ , 101]
-  bank_size_final_ipmr <- ipmr_cr$pop_state$pop_state_b[ , 101]
+  bank_size_final_ipmr <- ipmr_cr$pop_state$n_b[ , 101]
 
   expect_equal(pop_size_final_cr,
                pop_size_final_ipmr,
@@ -412,7 +412,7 @@ test_that("kernel definition order doesn't matter", {
     make_ipm(iterations = 100,
              usr_funs = list(inv_logit   = inv_logit,
                              inv_logit_2 = inv_logit_2),
-             return_all = TRUE,
+             return_all_envs = TRUE,
              normalize_pop_size = FALSE)
 
   test_lam_cr <- lambda(test_order,
@@ -500,7 +500,7 @@ test_that('normalize pop vec works the right way', {
     make_ipm(iterations = 100,
              usr_funs = list(inv_logit   = inv_logit,
                              inv_logit_2 = inv_logit_2),
-             return_all = TRUE,
+             return_all_envs = TRUE,
              normalize_pop_size = TRUE)
 
 
@@ -513,8 +513,8 @@ test_that('normalize pop vec works the right way', {
   pop_sizes <- vapply(1:101,
                       function(it, pop_state) {
 
-                        b <- pop_state$pop_state_b[ , it]
-                        ht <- pop_state$pop_state_ht[ , it]
+                        b <- pop_state$n_b[ , it]
+                        ht <- pop_state$n_ht[ , it]
 
                         sum(b, ht)
                       },
@@ -739,7 +739,7 @@ ipmr_control <- init_ipm("general_di_det") %>%
   make_ipm(iterations = 200,
            usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_2 = inv_logit_2),
-           return_all = TRUE,
+           return_all_envs = TRUE,
            normalize_pop_size = TRUE)
 
 lambdas_ipmr <- vapply(ipmr_control$pop_state[grepl("lambda", names(ipmr_control$pop_state))],

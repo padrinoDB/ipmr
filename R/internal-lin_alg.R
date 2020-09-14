@@ -369,7 +369,7 @@
 
 .make_mega_vec <- function(pop_vec, pop_state) {
 
-  names(pop_state) <- gsub('pop_state_', "", names(pop_state))
+  names(pop_state) <- gsub('^n_', "", names(pop_state))
 
   # if {...} else {...} to handle the case in right_ev where it is working
   # just with a list of vectors. In general, most instances should be a list
@@ -402,7 +402,7 @@
   n_rows        <- lapply(init_pop_state,
                           function(x) dim(x)[1])
 
-  names(n_rows) <- gsub('pop_state_', '', names(n_rows))
+  names(n_rows) <- gsub('^n_', '', names(n_rows))
 
   order_ind     <- rlang::eval_tidy(mega_vec, data = n_rows)
 

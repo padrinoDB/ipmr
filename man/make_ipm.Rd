@@ -10,11 +10,18 @@
 \alias{make_ipm.general_di_stoch_param}
 \title{Methods to implement an IPM}
 \usage{
-make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
+make_ipm(
+  proto_ipm,
+  return_main_env = TRUE,
+  return_all_envs = FALSE,
+  usr_funs = list(),
+  ...
+)
 
 \method{make_ipm}{simple_di_det}(
   proto_ipm,
-  return_all = FALSE,
+  return_main_env = TRUE,
+  return_all_envs = FALSE,
   usr_funs = list(),
   ...,
   domain_list = NULL,
@@ -25,7 +32,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
 
 \method{make_ipm}{simple_di_stoch_kern}(
   proto_ipm,
-  return_all = FALSE,
+  return_main_env = TRUE,
+  return_all_envs = FALSE,
   usr_funs = list(),
   ...,
   domain_list = NULL,
@@ -38,7 +46,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
 
 \method{make_ipm}{simple_di_stoch_param}(
   proto_ipm,
-  return_all = FALSE,
+  return_main_env = TRUE,
+  return_all_envs = FALSE,
   usr_funs = list(),
   ...,
   domain_list = NULL,
@@ -51,7 +60,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
 
 \method{make_ipm}{general_di_det}(
   proto_ipm,
-  return_all = FALSE,
+  return_main_env = TRUE,
+  return_all_envs = FALSE,
   usr_funs = list(),
   ...,
   domain_list = NULL,
@@ -62,7 +72,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
 
 \method{make_ipm}{general_di_stoch_kern}(
   proto_ipm,
-  return_all = FALSE,
+  return_main_env = TRUE,
+  return_all_envs = FALSE,
   usr_funs = list(),
   ...,
   domain_list = NULL,
@@ -75,7 +86,8 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
 
 \method{make_ipm}{general_di_stoch_param}(
   proto_ipm,
-  return_all = FALSE,
+  return_main_env = TRUE,
+  return_all_envs = FALSE,
   usr_funs = list(),
   ...,
   domain_list = NULL,
@@ -90,16 +102,23 @@ make_ipm(proto_ipm, return_all = FALSE, usr_funs = list(), ...)
 \item{proto_ipm}{The proto_ipm. This should be the
 output of \code{define_kernel}, \code{define_k}, or the \code{define_*} functions.}
 
-\item{return_all}{A logical indicating whether to return the environments that
-the kernel expressions are evaluated in. This is useful for developer
-debugging and not much else.}
+\item{return_main_env}{A logical indicating whether to return the main environment
+for the model. This environment contains the integration mesh, weights, and
+other potentially useful variables for subsequent analyses. Default is
+\code{TRUE}.}
+
+\item{return_all_envs}{A logical indicating whether to return the environments that
+the kernel expressions are evaluated in. These may be useful for some analyses,
+such as regression-level sensitivity/elasticity analyses, but can also rapidly
+increase memory consumption for models with many kernels (e.g. ones with hierarchical
+effects that have many levels). Default is \code{FALSE}.}
 
 \item{usr_funs}{An optional list of user-specified functions that are passed
 on to the  model building process. This can help make vital rate expressions
 more concise and expressive. Names in this list should exactly match the names
 of the function calls in the \code{...} or \code{formula}.}
 
-\item{...}{Other arguments passed to methods}
+\item{...}{Other arguments passed to methods.}
 
 \item{domain_list}{An optional list of new domain information to implement
 the IPM with.}
@@ -139,9 +158,10 @@ containing the following components:
                             for \code{simple_*}. otherwise contains \code{NA}.}
   \item{\strong{sub_kernels}}{: a list of sub_kernels specified in \code{define_kernel}.}
   \item{\strong{env_list}}{: a list containing the evaluation environments of
-                           kernel. This will always be empty unless \code{
-                           return_all} is \code{TRUE}. Mostly here for developer
-                           debugging.}
+                           kernel. This will contain the \code{main_env} object
+                           if \code{return_main_env = TRUE}. It will also contain
+                           the sub-kernels evaluation environments if
+                           \code{return_all_envs = TRUE}. }
   \item{\strong{env_seq}}{: a matrix with dimension \code{iterations} X 1 of
                              kernel indices indicating the order
                              in which kernels are to be/were resampled OR

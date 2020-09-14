@@ -36,5 +36,5 @@ Imports:
     rlang (>= 0.3.0),
     stats,
     utils
-Depends: R (>= 2.10)
+Depends: R (>= 3.2.3)
 RoxygenNote: 7.1.1

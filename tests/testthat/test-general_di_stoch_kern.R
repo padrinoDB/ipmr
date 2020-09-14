@@ -695,7 +695,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
     )
   ) %>%
   make_ipm(
-    return_all = TRUE,
+    return_all_envs = TRUE,
     usr_funs   = list(
       inv_logit = inv_logit,
       pois      = pois
@@ -718,8 +718,8 @@ test_that('ipmr version matches simulation', {
 
   # Standardized right eigenvectors
 
-  ipmr_w <- gen_di_stoch_kern$pop_state$pop_state_ln_leaf_l[ , 101] /
-    sum(gen_di_stoch_kern$pop_state$pop_state_ln_leaf_l[ , 101])
+  ipmr_w <- gen_di_stoch_kern$pop_state$n_ln_leaf_l[ , 101] /
+    sum(gen_di_stoch_kern$pop_state$n_ln_leaf_l[ , 101])
 
   hand_w <- pop_holder$ln_leaf_l[ , 101] /
     sum(pop_holder$ln_leaf_l[ , 101])
@@ -859,7 +859,7 @@ stoch_mod_ipmr <- temp_proto %>%
     )
   ) %>%
   make_ipm(
-    return_all = TRUE,
+    return_all_envs = TRUE,
     usr_funs   = list(
       inv_logit = inv_logit,
       pois      = pois
@@ -1004,7 +1004,7 @@ test_that('evict_fun warnings are correctly generated', {
         )
       ) %>%
       make_ipm(
-        return_all = TRUE,
+        return_all_envs = TRUE,
         usr_funs   = list(
           inv_logit = inv_logit,
           pois      = pois
@@ -1198,7 +1198,7 @@ test_that('normalize pop vec works', {
       )
     ) %>%
     make_ipm(
-      return_all = TRUE,
+      return_all_envs = TRUE,
       usr_funs   = list(
         inv_logit = inv_logit,
         pois      = pois
@@ -1403,7 +1403,7 @@ test_that('partially stochastic models also work', {
              kernel_seq = sample(1:5, size = 3, replace = TRUE),
              usr_funs = list(inv_logit   = inv_logit,
                              inv_logit_2 = inv_logit_2),
-             return_all = TRUE)
+             return_all_envs = TRUE)
 
   states <- list(c('ht'))
 
@@ -1480,7 +1480,7 @@ test_that('partially stochastic models also work', {
     make_ipm(iterations = 100,
              usr_funs = list(inv_logit   = inv_logit,
                              inv_logit_2 = inv_logit_2),
-             return_all = TRUE)
+             return_all_envs = TRUE)
 
   leave_discrete_stoch <- general_stoch_kern_ipm$sub_kernels$leave_discrete
   leave_discrete_det   <- det_version$sub_kernels$leave_discrete

@@ -5,7 +5,7 @@
 .make_sub_kernel_general <- function(proto, env_list, return_envs = FALSE) {
 
   out <- list()
-  master_env <- env_list$master_env
+  main_env <- env_list$main_env
 
   for(i in seq_len(dim(proto)[1])) {
 
@@ -16,7 +16,7 @@
     param_tree <- proto$params[[i]]
 
     kern_env         <- .make_kernel_env(param_tree$params,
-                                             master_env,
+                                             main_env,
                                              param_tree)
 
     kern_text        <- param_tree$formula
@@ -39,7 +39,7 @@
     out[[i]] <- .fun_to_iteration_mat(temp[[i]],
                                       state_var_start = names(proto$domain[[i]])[1],
                                       state_var_end   = names(proto$domain[[i]])[2],
-                                      master_env      = master_env,
+                                      main_env      = main_env,
                                       kern_name       = proto$kernel_id[i])
 
     names(out)[i] <- proto$kernel_id[i]
@@ -56,28 +56,28 @@
   return(res)
 }
 
-.make_sub_kernel_general_lazy <- function(proto, master_env, return_envs = FALSE) {
+.make_sub_kernel_general_lazy <- function(proto, main_env, return_envs = FALSE) {
 
   env_state_funs <- lapply(
     proto$env_state,
-    function(x, master_env) {
+    function(x, main_env) {
 
       temp <- x$env_quos
 
       if(rlang::is_quosure(temp[[1]]) || rlang::is_quosures(temp[[1]])) {
         out <- lapply(temp,
-                      function(x, master_env) {
+                      function(x, main_env) {
                         rlang::quo_set_env(x,
-                                           master_env)
+                                           main_env)
                       },
-                      master_env = master_env)
+                      main_env = main_env)
       } else {
         out <- NULL
       }
 
       return(out)
     },
-    master_env = master_env)
+    main_env = main_env)
 
   nms <- lapply(env_state_funs, names) %>% unlist()
 
@@ -85,16 +85,16 @@
 
   env_state_funs <- env_state_funs[!ind]
 
-  master_env     <- .bind_env_exprs(master_env, env_state_funs)
+  main_env     <- .bind_env_exprs(main_env, env_state_funs)
 
-  env_list       <- list(master_env = master_env)
+  env_list       <- list(main_env = main_env)
 
   sys            <- .make_sub_kernel_general(proto,
                                              env_list,
                                              return_envs = return_envs)
 
   out            <- list(ipm_system = sys,
-                         master_env = master_env)
+                         main_env = main_env)
 
   return(out)
 }
@@ -104,7 +104,7 @@
 .make_sub_kernel_simple <- function(proto, env_list, return_envs = FALSE) {
 
   out <- list()
-  master_env <- env_list$master_env
+  main_env <- env_list$main_env
 
   for(i in seq_len(dim(proto)[1])) {
 
@@ -115,7 +115,7 @@
     param_tree <- proto$params[[i]]
 
     kern_env         <- .make_kernel_env(param_tree$params,
-                                         master_env,
+                                         main_env,
                                          param_tree)
 
     kern_text        <- .append_dz_to_kern_form(param_tree$formula,
@@ -140,7 +140,7 @@
     out[[i]] <- .fun_to_iteration_mat(temp[[i]],
                                       state_var_start = names(proto$domain[[i]])[1],
                                       state_var_end   = names(proto$domain[[i]])[2],
-                                      master_env      = master_env,
+                                      main_env      = main_env,
                                       kern_name       = proto$kernel_id[i])
 
     names(out)[i] <- proto$kernel_id[i]
@@ -187,15 +187,15 @@
 # kernel resampling is preferred when a viable alternative (at least within
 # the context of ipmr).
 
-.make_sub_kernel_simple_lazy <- function(proto, master_env, return_envs = FALSE,
+.make_sub_kernel_simple_lazy <- function(proto, main_env, return_envs = FALSE,
                                          dd = 'n') {
 
   out <- switch(dd,
                 'n' = .make_sub_kernel_simple_lazy_di(proto,
-                                                      master_env,
+                                                      main_env,
                                                       return_envs),
                 'y' = .make_sub_kernel_simple_lazy_dd(proto,
-                                                      master_env,
+                                                      main_env,
                                                       return_envs))
 
   return(out)
@@ -203,40 +203,40 @@
 }
 
 .make_sub_kernel_simple_lazy_dd <- function(proto,
-                                            master_env,
+                                            main_env,
                                             return_envs) {
 
 
   out <- .make_sub_kernel_simple(proto,
-                                 list(master_env = master_env),
+                                 list(main_env = main_env),
                                  return_envs = return_envs)
 
   return(out)
 
 }
 
-.make_sub_kernel_simple_lazy_di <- function(proto, master_env, return_envs = FALSE) {
+.make_sub_kernel_simple_lazy_di <- function(proto, main_env, return_envs = FALSE) {
 
   env_state_funs <- lapply(
     proto$env_state,
-    function(x, master_env) {
+    function(x, main_env) {
 
       temp <- x$env_quos
 
       if(rlang::is_quosure(temp[[1]]) || rlang::is_quosures(temp[[1]])) {
         out <- lapply(temp,
-                      function(x, master_env) {
+                      function(x, main_env) {
                         rlang::quo_set_env(x,
-                                           master_env)
+                                           main_env)
                       },
-                      master_env = master_env)
+                      main_env = main_env)
       } else {
         out <- NULL
       }
 
       return(out)
     },
-    master_env = master_env)
+    main_env = main_env)
 
   nms <- lapply(env_state_funs, names) %>% unlist()
 
@@ -244,16 +244,16 @@
 
   env_state_funs <- env_state_funs[!ind]
 
-  master_env     <- .bind_env_exprs(master_env, env_state_funs)
+  main_env     <- .bind_env_exprs(main_env, env_state_funs)
 
-  env_list       <- list(master_env = master_env)
+  env_list       <- list(main_env = main_env)
 
   sys            <- .make_sub_kernel_simple(proto,
                                             env_list,
                                             return_envs = return_envs)
 
   out            <- list(ipm_system = sys,
-                         master_env = master_env)
+                         main_env = main_env)
 
   return(out)
 }
@@ -263,7 +263,7 @@
 # only one time per iteration of the whole model. Creates data in 2 formats:
 #
 # 1. Individual values of each parameter that are bound to a correspoding symbol
-# in the master environment. This means that users can reference each variable
+# in the main environment. This means that users can reference each variable
 # by NAME without using left hand side of the env_state expression. For example
 # in a vital rate expression, env_params$g_r_yr becomes g_r_yr, no env_params$.
 #
@@ -273,7 +273,7 @@
 # things by names provided by the user would probably get a bit more convoluted
 # and be error prone.
 
-.bind_env_exprs <- function(master_env, env_funs) {
+.bind_env_exprs <- function(main_env, env_funs) {
 
   nms <- lapply(env_funs, names) %>% unlist()
 
@@ -284,7 +284,7 @@
 
     temp <- rlang::eval_tidy(env_funs[[1]][[i]])
 
-    rlang::env_bind(master_env, !!! temp)
+    rlang::env_bind(main_env, !!! temp)
 
     # This creates a list containing the same values so that .update_env_output
     # can find them to store the env_seq data to return to the user.
@@ -293,11 +293,11 @@
 
     env_param_list <- rlang::list2(!! ass_nm := temp)
 
-    assign(ass_nm, env_param_list, envir = master_env)
+    assign(ass_nm, env_param_list, envir = main_env)
 
   }
 
-  return(master_env)
+  return(main_env)
 
 }
 
@@ -439,7 +439,7 @@
                                         ipm_system,
                                         pop_state,
                                         data_envs = NA_character_,
-                                        master_env,
+                                        main_env,
                                         output,
                                         tot_iterations,
                                         current_iteration) {
@@ -448,7 +448,7 @@
   # refers to environment in both the programming and the biological sense
 
   output <- .update_env_output(output,
-                               master_env        = master_env,
+                               main_env          = main_env,
                                data_envs         = data_envs,
                                tot_iterations    = tot_iterations,
                                current_iteration = current_iteration)
@@ -483,7 +483,7 @@
                                     ipm_system,
                                     pop_state,
                                     data_envs = NA_character_,
-                                    master_env,
+                                    main_env,
                                     output,
                                     tot_iterations,
                                     current_iteration) {
@@ -522,7 +522,7 @@
 .update_param_general_output <- function(sub_kernels,
                                          pop_state,
                                          data_envs,
-                                         master_env,
+                                         main_env,
                                          output,
                                          tot_iterations,
                                          current_iteration) {
@@ -531,7 +531,7 @@
   # refers to environment in both the programming and the biological sense
 
   output <- .update_env_output(output            = output,
-                               master_env        = master_env,
+                               main_env          = main_env,
                                data_envs         = data_envs,
                                tot_iterations    = tot_iterations,
                                current_iteration = current_iteration)
@@ -559,7 +559,7 @@
 # term maintenance.
 
 .update_env_output <- function(output,
-                               master_env,
+                               main_env,
                                data_envs,
                                tot_iterations,
                                current_iteration) {
@@ -578,7 +578,7 @@
     env_vars <- names(output$proto_ipm$env_state[[1]]$constants)
   }
 
-  env_temp   <- rlang::env_get_list(master_env,
+  env_temp   <- rlang::env_get_list(main_env,
                                     env_vars,
                                     default = NA_real_,
                                     inherit = FALSE) %>%
@@ -620,14 +620,14 @@
 
 #' @noRd
 # Generates evaluation environment for a sub-kernel. Assumes that all parameters
-# name/value pairs have been generated. Inherits from master_env so that it can
+# name/value pairs have been generated. Inherits from main_env so that it can
 # access domains, stochastic parameters, and population states.
 
 .make_kernel_env <- function(parameters,
-                                 master_env,
+                                 main_env,
                                  param_tree) {
 
-  kernel_env <- rlang::child_env(.parent = master_env)
+  kernel_env <- rlang::child_env(.parent = main_env)
   rlang::env_bind(kernel_env,
                   !!! parameters)
 
@@ -705,16 +705,16 @@
 #' @noRd
 #' @importFrom purrr flatten map_dbl
 #'
-# Rename to master_env or something like that - this doesn't strictly hold
+# Rename to main_env or something like that - this doesn't strictly hold
 # domain information anymore
 
-.make_master_env <- function(domain_list, usr_funs) {
+.make_main_env <- function(domain_list, usr_funs) {
 
   # Parent is whatever is 2nd on search path. all loaded functions/packges
   # should still be findable, but objects in the global environment should not
   # be to prevent overscoping!
 
-  master_env      <- new.env(parent = as.environment(search()[2]))
+  main_env      <- new.env(parent = as.environment(search()[2]))
 
   domain_list     <- purrr::flatten(domain_list)
 
@@ -745,7 +745,7 @@
   names(Us)       <- paste('U_', names(domain_list), sep = "")
   names(n_mesh_p) <- paste('n_', names(domain_list), sep = "")
 
-  rlang::env_bind(master_env,
+  rlang::env_bind(main_env,
                   !!! Ls,
                   !!! Us,
                   !!! n_mesh_p)
@@ -785,7 +785,7 @@
                                              n_mesh_p_cont[[i]] - 1,
                                              by = 1) * n_mesh_p_cont[[i]]) + 1)
 
-    rlang::env_bind(master_env,
+    rlang::env_bind(main_env,
                     !!! to_bind)
 
   }
@@ -806,24 +806,24 @@
 
     names(domain_grid) <- c(names(mids)[mid_ind])
 
-    rlang::env_bind(master_env,
+    rlang::env_bind(main_env,
                     !!! domain_grid)
 
     nm <- paste0('d_', i, sep = "")
 
     h  <- domain_grid[2, 1] - domain_grid[1, 1]
 
-    assign(nm, h, envir = master_env)
+    assign(nm, h, envir = main_env)
 
   }
 
-  # Add in user specified functions. These need to be in the master_env
+  # Add in user specified functions. These need to be in the main_env
   # so all kernels can access them during evaluation
 
-  rlang::env_bind(master_env,
+  rlang::env_bind(main_env,
                   !!! usr_funs)
 
-  invisible(master_env)
+  invisible(main_env)
 }
 
 #' @noRd
@@ -1286,7 +1286,7 @@
 .fun_to_iteration_mat <- function(fun,
                                   state_var_start,
                                   state_var_end,
-                                  master_env,
+                                  main_env,
                                   kern_name) {
 
   # store class of function to append to result. It gets stripped out
@@ -1310,13 +1310,13 @@
 
     n_mesh_p_start <- 1
 
-    ind <- paste('master_env$dc_ind_', state_var_end, sep = "")
+    ind <- paste('main_env$dc_ind_', state_var_end, sep = "")
     ind <- rlang::parse_expr(ind)
 
   } else {
 
     mesh_p_start_text <- paste('n_', state_var_start, sep = "")
-    n_mesh_p_start    <- master_env[[mesh_p_start_text]]
+    n_mesh_p_start    <- main_env[[mesh_p_start_text]]
 
   }
 
@@ -1328,14 +1328,14 @@
 
     n_mesh_p_end <- 1
 
-    ind <- paste('master_env$cd_ind_', state_var_start, sep = "")
+    ind <- paste('main_env$cd_ind_', state_var_start, sep = "")
     ind <- rlang::parse_expr(ind)
 
   } else {
 
     mesh_p_end_text   <- paste('n_', state_var_end, sep = "")
 
-    n_mesh_p_end      <- master_env[[mesh_p_end_text]]
+    n_mesh_p_end      <- main_env[[mesh_p_end_text]]
 
   }
 
@@ -1439,13 +1439,17 @@ set_ipmr_classes <- function(to_set, cls = NULL) {
 .prep_other_output <- function(env_list,
                                kern_seq,
                                pop_state,
-                               return_all,
+                               return_main_env,
+                               return_all_envs,
                                iterate) {
 
   out <- list()
 
-  if(return_all) {
+  if(return_all_envs) {
     out$env_ret <- env_list
+  } else if(return_main_env) {
+
+    out$env_ret <- env_list$main_env
   } else {
     out$env_ret <- NA_character_
   }

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Accessor functions for proto_ipm objects — domains • ipmr</title>
+<title>Accessor functions for IPM objects — int_mesh • ipmr</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="Accessor functions for proto_ipm objects — domains" />
-<meta property="og:description" content="Functions that access specific slots of a proto_ipm for
-user examination." />
+<meta property="og:title" content="Accessor functions for IPM objects — int_mesh" />
+<meta property="og:description" content="Functions that access specific slots of a *_ipm for
+user examination. These are not the same as the accessors for a proto_ipm." />
 
 
 
@@ -145,35 +145,32 @@ user examination." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Accessor functions for proto_ipm objects</h1>
+    <h1>Accessor functions for IPM objects</h1>
     
-    <div class="hidden name"><code>proto_accessors.Rd</code></div>
+    <div class="hidden name"><code>ipm_accessors.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Functions that access specific slots of a <code>proto_ipm</code> for
-user examination.</p>
+    <p>Functions that access specific slots of a <code>*_ipm</code> for
+user examination. These are not the same as the accessors for a <code>proto_ipm</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>domains</span>(<span class='no'>proto_ipm</span>)
-
-<span class='fu'>vital_rates</span>(<span class='no'>proto_ipm</span>)
-
-<span class='fu'>kernel_formulae</span>(<span class='no'>proto_ipm</span>)</pre>
+    <pre class="usage"><span class='fu'>int_mesh</span>(<span class='no'>ipm</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>proto_ipm</th>
-      <td><p>A <code>proto_ipm</code> object.</p></td>
+      <th>ipm</th>
+      <td><p>An object created by <code>make_ipm</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A named list of either numbers (for domains), or bare expressions (for
-vital rates and kernel formulae).</p>
+    <p>A list. Names correspond to the state variables, and values are the
+domains. There will also be entries named <code>"d_&lt;stateVariable&gt;"</code> which
+are the integration weights for a given domain.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

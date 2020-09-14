@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-`ipmr` includes a host of generic functions to analyze your IPM. Below is a list of all of them, grouped roughly by the type of analysis they might be useful for. Some of these may not be available for certain classes of IPMs, so be sure to see each functions help page for more information. 
+`ipmr` includes some generic and helper functions to analyze your IPM. Below is a list of all of them, grouped roughly by the type of analysis they might be useful for. Some of these may not be available for certain classes of IPMs, so be sure to see each functions help page for more information. 
 
 ## Asymptotic/stochastic behavior
 
@@ -40,4 +40,13 @@ knitr::opts_chunk$set(
 
 - [`all_ages()`](https://levisc8.github.io/ipmr/reference/age_x_size.html)
 
+## (proto_)ipm accessor functions
+
+- [`kernel_formulae()`](https://levisc8.github.io/ipmr/reference/proto_accessors.html)
+
+- [`vital_rates()`](https://levisc8.github.io/ipmr/reference/proto_accessors.html)
+
+- [`domains()`](https://levisc8.github.io/ipmr/reference/proto_accessors.html)
+
+- [`int_mesh()`](https://levisc8.github.io/ipmr/reference/ipm_accessors.html)
 
