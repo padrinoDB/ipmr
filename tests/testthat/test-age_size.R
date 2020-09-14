@@ -377,7 +377,7 @@ ipmr_time <- system.time({
                       f_fun     = f_fun),
       iterate  = TRUE,
       iterations = 100,
-      return_all = TRUE
+      return_all_envs = TRUE
     )
 })
 
@@ -403,5 +403,35 @@ test_that("age_x_size lambdas are recovered properly", {
                            sim = IPM.sim$x)
 
   expect_true(all(final_pop_comp))
+
+})
+
+test_that("format_mega_matrix.age_x_size_ipm works", {
+
+  subs <- a_s_ipm$sub_kernels
+
+  target_f <- do.call("cbind",
+                      subs[grepl("F", names(subs))])
+
+  target_p <- matrix(0, nrow = 2100, ncol = 2200)
+  Ps       <- subs[grepl("P", names(subs))]
+
+  for(i in seq_len(21)) {
+
+    row_ind <- col_ind <- seq(i * 100 - 99, i * 100, by = 1)
+    target_p[row_ind, col_ind] <- Ps[[i]]
+
+  }
+
+  target_p[2001:2100, 2101:2200] <- Ps[[22]]
+
+  target <- rbind(target_f, target_p)
+  rm(target_f, target_p)
+
+  ipmr_meg <- format_mega_matrix(a_s_ipm,
+                                 name_ps = "P",
+                                 f_forms = "F")$mega_mat
+
+  expect_equal(ipmr_meg, target, tol = 1e-10)
 
 })

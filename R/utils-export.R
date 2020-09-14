@@ -372,11 +372,7 @@ mat_power <- function(x, y) {
 #' @title Format a mega-matrix
 #'
 #' @param ipm Output from \code{make_ipm}.
-#' @param mega_mat A vector with symbols, I's, and/or 0s representing the matrix blocks.
-#' They should be specified in ROW MAJOR order! Can also be a character
-#' string specifying the call. Hierarchical syntax is supported. When used,
-#' \code{format_mega_matrix} will produce as many mega-matrices as there are
-#' combinations of \code{levels_hier_effs} in the \code{proto_ipm}.
+#' @param ... Other arguments passed to methods.
 #'
 #' @return A list containing a large matrix or many large matrices (when used with
 #' hierarchical syntax). The names in the former case will be \code{"mega_matrix"}
@@ -387,6 +383,12 @@ mat_power <- function(x, y) {
 #' having to create those separately and append them to the model object. The function
 #' will work out the correct dimensions for both internally, and there is no
 #' restriction on the number that may be used in a given call.
+#'
+#' For \code{age_size_ipm}s, the correct form of \code{mega_mat} is generated
+#' internally by creating sub-diagonal matrices for the \code{name_ps} kernels,
+#' and a top row using the \code{f_forms}. If hierarchical effects are part of the
+#' model, the suffixes should be attached to the \code{name_ps, f_forms} in the
+#' function arguments, and the correct block matrices will be generated internally.
 #'
 #' @examples
 #' data(gen_di_det_ex)
@@ -408,8 +410,24 @@ mat_power <- function(x, y) {
 #'
 #'
 #' @export
+#'
 
-format_mega_matrix <- function(ipm, mega_mat) {
+format_mega_matrix <- function(ipm, ...) {
+
+  UseMethod("format_mega_matrix")
+
+}
+
+#' @rdname format_mega_matrix
+#' @param mega_mat A vector with symbols, I's, and/or 0s representing the matrix blocks.
+#' They should be specified in ROW MAJOR order! Can also be a character
+#' string specifying the call. Hierarchical syntax is supported. When used,
+#' \code{format_mega_matrix} will produce as many mega-matrices as there are
+#' combinations of \code{levels_hier_effs} in the \code{proto_ipm}.
+#'
+#' @export
+
+format_mega_matrix.default <- function(ipm, mega_mat, ...) {
 
   mega_mat    <- rlang::enquo(mega_mat)
 
@@ -524,6 +542,125 @@ format_mega_matrix <- function(ipm, mega_mat) {
 
 }
 
+#' @rdname format_mega_matrix
+#' @param name_ps The prefix(es) for the kernel name that correspond to survival
+#' and growth/maturation of existing individals. For the model
+#' \code{K = P_age + F_age}, this would be \code{"P"}.
+#' @param f_forms The names of the kernels that correspond to production of new
+#' individuals, and possibly, how they are combined. For example, a model that
+#' includes sexual (with an "F" kernel) and asexual reproduction (with a "C" kernel),
+#' this would be \code{"F + C"}. If data come from multiple sites or years,
+#' then this information is supplied using the suffix syntax (i.e.
+#' \code{f_forms = "F_yr + C_yr"}).
+#'
+#' @export
+
+format_mega_matrix.age_x_size_ipm <- function(ipm,
+                                              name_ps,
+                                              f_forms,
+                                              ...) {
+
+  kern_ids <- ipm$proto_ipm$kernel_id
+
+  # Remove the iteration procedure from the id list. We shouldn't need that
+  # to generate a block matrix from the sub kernels anyway.
+
+  fams <- vapply(ipm$proto_ipm$params,
+                 function(x) x$family,
+                 character(1L))
+
+  if(any(fams == "IPM")) {
+    k_ind <- which(fams == "IPM")
+    kern_ids <- kern_ids[-c(k_ind)]
+  }
+
+  clean_ids <- vapply(kern_ids,
+                      function(x) strsplit(x, "_")[[1]][1],
+                      character(1L))
+
+  clean_p   <- strsplit(name_ps, "_")[[1]][1]
+  p_ind     <- which(clean_ids == clean_p)
+
+  # Get all ages. If there's  max age, we'll create an object with that
+  # info called add_p. if there isn't then add_p is just a column of 0s
+
+  ages     <- ipm$proto_ipm$levels_ages %>%
+    .flatten_to_depth(1L) %>%
+    .[!duplicated(names(.))]
+
+  all_ages <- unlist(ages)
+
+  tot_len  <- length(all_ages)
+
+  add_p <- matrix("0", nrow = (tot_len - 1), ncol = 1)
+
+  Ps <- matrix(data = NA_character_,
+                nrow = (tot_len - 1),
+                ncol = (tot_len - 1))
+
+  Fs <- matrix(NA_character_,
+               nrow = 1,
+               ncol = tot_len)
+
+  # Next, get the base kernel name. We need this because we only want to modify
+  # age here, not any additional hier_effs (if present). The ps are a bit easier
+  # because there really only should be 1 of those. However, the Fs may have a
+  # some additional terms (e.g. F + C), so we have to get both of those, then
+  # iterate over each one using the base expression and substituting as needed.
+
+  base_p  <- kern_ids[p_ind]
+
+  f_terms <- .args_from_txt(f_forms)
+
+  clean_fs <- vapply(f_terms,
+                     function(x) strsplit(x, "_")[[1]][1],
+                     character(1L))
+
+  base_fs <- kern_ids[clean_ids %in% clean_fs]
+
+  # Now, modify the f_forms expression to use the actual kernel names
+  # as they appear in the kernel_ids column
+
+  for(i in seq_along(base_fs)) {
+    f_forms <- gsub(f_terms[i], base_fs[i], f_forms)
+  }
+
+  diag_ps <- character(tot_len - 1)
+
+  for(i in seq_along(all_ages)) {
+
+    diag_ps[i] <- gsub("age", all_ages[i], base_p)
+    Fs[ , i]   <- gsub("age", all_ages[i], f_forms)
+
+  }
+
+  # now, handle the max_age case.
+  if("max_age" %in% names(ages)) {
+
+    max_p <- diag_ps[length(diag_ps)]
+    add_p[(tot_len - 1), ] <- max_p
+    diag_ps <- diag_ps[-c(tot_len)]
+  }
+
+  diag(Ps) <- diag_ps
+
+  mega_mat <- rbind(
+    Fs,
+    cbind(Ps, add_p)
+  )
+
+  # Insert 0s for impossible transitions. If only we could grow younger... ::sigh::
+  mega_mat[is.na(mega_mat)] <- "0"
+
+  # finally, convert back to vector that format_mega.default expects
+
+  mega_mat <- as.vector(t(mega_mat))
+
+  out <- format_mega_matrix.default(ipm, mega_mat = mega_mat)
+
+  return(out)
+}
+
 #' @title Age X Size models
 #' @rdname age_x_size
 #'
@@ -604,7 +741,7 @@ all_ages <- function(expr, fun, ...) {
 #' @rdname proto_accessors
 #'
 #' @description Functions that access specific slots of a \code{proto_ipm} for
-#' user examination
+#' user examination.
 #'
 #' @param proto_ipm A \code{proto_ipm} object.
 #'
@@ -647,7 +784,7 @@ domains <- function(proto_ipm) {
 #' @importFrom stats setNames
 #' @export
 
-vital_rate_functions <- function(proto_ipm) {
+vital_rates <- function(proto_ipm) {
 
   out <- lapply(proto_ipm$params, function(x) x$vr_text) %>%
     stats::setNames(c("")) %>%
@@ -679,4 +816,61 @@ kernel_formulae <- function(proto_ipm) {
     lapply(rlang::parse_expr)
 
   return(out)
+}
+
+#' @rdname ipm_accessors
+#' @title Accessor functions for IPM objects
+#'
+#' @description Functions that access specific slots of a \code{*_ipm} for
+#' user examination. These are not the same as the accessors for a \code{proto_ipm}.
+#'
+#' @param ipm An object created by \code{make_ipm}.
+#'
+#' @return A list. Names correspond to the state variables, and values are the
+#' domains. There will also be entries named \code{"d_<stateVariable>"} which
+#' are the integration weights for a given domain.
+#'
+#' @export
+
+int_mesh <- function(ipm) {
+
+  if(!"main_env" %in% names(ipm$env_list)) {
+    stop("Cannot find the 'main_env' object in the IPM. Do you need to re-run\n",
+         "make_ipm() with 'return_main_env = TRUE'?",
+         call. = FALSE)
+  }
+
+  states <- lapply(ipm$proto_ipm$domain,
+                   function(x) {
+                     all_nms <- names(x)
+                     temp    <- all_nms[!grepl("not_applicable", all_nms)]
+                     out     <- lapply(temp,
+                                       function(y) {
+                                         gsub("_[0-9+]", "", y)
+                                       }) %>%
+                       unlist() %>%
+                       unique()
+
+                     return(out)
+
+                   }
+  ) %>%
+    Filter(f = Negate(is.null), x = .) %>%
+    unlist() %>%
+    unique()
+
+  main_env <- ipm$env_list$main_env
+
+  all_nms <- c(paste("d_", states, sep = ""),
+               vapply(states,
+                      function(x) paste(x, c("_1", "_2"), sep = ""),
+                      character(2L)))
+
+  out <- rlang::env_get_list(main_env,
+                             all_nms,
+                             default = NULL,
+                             inherit = FALSE)
+
+  return(out)
+
 }

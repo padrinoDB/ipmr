@@ -198,3 +198,44 @@
   invisible(TRUE)
 
 }
+
+
+#' @noRd
+# Function to recursively extract argument names from text representations
+# of an expression. This returns a character vector of all arguments a call,
+# and does not track what the function call actually is.
+
+.args_from_txt <- function(txt) {
+
+  expr <- rlang::parse_expr(txt)
+
+  if(rlang::is_atomic(expr) || rlang::is_symbol(expr)) {
+
+    return(unlist(txt))
+
+  } else {
+
+    temp <- rlang::call_args(expr)
+    tst  <- vapply(temp,
+                   function(x) rlang::is_atomic(x) || rlang::is_symbol(x),
+                   logical(1L))
+
+    if(all(tst)) {
+
+      out <- vapply(temp,
+                    function(x) rlang::expr_text(x),
+                    character(1L),
+                    USE.NAMES = FALSE)
+
+      return(unlist(out))
+
+    } else {
+
+      temp <- lapply(temp, rlang::expr_text)
+      lapply(temp, .args_from_txt) %>%
+        unlist()
+    }
+  }
+}
+
+
