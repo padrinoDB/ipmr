@@ -106,7 +106,6 @@ The values in the `levels_ages` list will automatically get substituted in for `
 The `plogis` function is part of the `stats` package in _R_, and performs the inverse logit transformation.
 
 ```{r}
-# Implement the age x size model
 
 age_size_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
   define_kernel(
