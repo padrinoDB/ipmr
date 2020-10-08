@@ -223,6 +223,8 @@
 
 .make_hier_levels <- function(hier_effs) {
 
+  hier_effs <- .flatten_to_depth(hier_effs, 1L)
+
   if(length(hier_effs) == 1) {
 
     levs <- as.data.frame(unlist(hier_effs),
