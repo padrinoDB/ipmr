@@ -1,5 +1,5 @@
 ---
-title: "proto_ipm data structure"
+title: "proto_ipm Data Structure"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{proto_ipm Data Structure}

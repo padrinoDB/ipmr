@@ -2,7 +2,7 @@
 title: "List of Generic and Helper Functions in ipmr"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{generic-funs}
+  %\VignetteIndexEntry{List of Generic and Helper Functions in ipmr}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

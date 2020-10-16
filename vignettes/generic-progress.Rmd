@@ -4,6 +4,10 @@ author: "Sam Levin"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Generic Progress}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ## Generic implementation progress 
