@@ -108,6 +108,9 @@
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
     </li>
+    <li>
+      <a href="../articles/density-dependence.html">Density Dependent IPMs</a>
+    </li>
     <li class="divider"></li>
     <li class="dropdown-header">Generic Functions</li>
     <li>
@@ -153,7 +156,7 @@
     <p>Helper functions for implementing age x size models</p>
     </div>
 
-    <pre class="usage"><span class='fu'>all_ages</span>(<span class='no'>expr</span>, <span class='no'>fun</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>all_ages</span>(<span class='kw'>expr</span>, <span class='kw'>fun</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -186,29 +189,31 @@ distribution of new recruits in an age structured model, when many <code>F</code
 are multiplied by their respective age X size distributions, and then summed.
 Note that using <code>sum</code> is almost never correct, as this will always return
 a single number whereas we typically want the trait distribution function
-(i.e. a vector). It is usually best to use <code>+</code> instead.</p>
+(i.e. a vector). It is usually best to use <code><a href='https://rdrr.io/r/base/Arithmetic.html'>+</a></code> instead.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='co'>if</span> (<span class='fl'>FALSE</span>) {
 
-<span class='fu'><a href='kernel-definitions.html'>define_k</a></span>(
- <span class='kw'>proto_ipm</span>          <span class='kw'>=</span> <span class='no'>some_age_size_proto_ipm</span>,
- <span class='kw'>name</span>               <span class='kw'>=</span> <span class='st'>"K"</span>,
- <span class='kw'>family</span>             <span class='kw'>=</span> <span class='st'>"IPM"</span>,
- <span class='kw'>n_wt_0_t_1</span>         <span class='kw'>=</span> <span class='fu'>all_ages</span>(<span class='kw'>expr</span> <span class='kw'>=</span> <span class='no'>F_age</span> <span class='kw'>%*%</span> <span class='no'>n_wt_age_t</span>, <span class='kw'>fun</span> <span class='kw'>=</span> <span class='st'>"+"</span>),
- <span class='kw'>n_wt_age_t_1</span>       <span class='kw'>=</span> <span class='no'>P_age_minus_1</span> <span class='kw'>%*%</span> <span class='no'>n_wt_age_minus_1_t</span>,
- <span class='kw'>n_wt_max_age_t_1</span>   <span class='kw'>=</span> <span class='no'>P_max_age</span> <span class='kw'>%*%</span> <span class='no'>n_wt_max_age_t</span> +
-                      <span class='no'>P_max_age_minus_1</span> <span class='kw'>%*%</span> <span class='no'>n_wt_max_age_minus_1_t</span>,
- <span class='kw'>data_list</span>          <span class='kw'>=</span> <span class='no'>param_list</span>,
- <span class='kw'>states</span>             <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span> (<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"wt"</span>)),
- <span class='kw'>has_hier_effs</span>      <span class='kw'>=</span> <span class='fl'>FALSE</span>,
- <span class='kw'>levels_ages</span>        <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>age</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>:<span class='fl'>20</span>), <span class='kw'>max_age</span> <span class='kw'>=</span> <span class='fl'>21</span>),
- <span class='kw'>evict_cor</span>          <span class='kw'>=</span> <span class='fl'>FALSE</span>
+<span class='fu'><a href='define_kernel.html'>define_k</a></span>(
+ proto_ipm          = <span class='kw'>some_age_size_proto_ipm</span>,
+ name               = <span class='st'>"K"</span>,
+ family             = <span class='st'>"IPM"</span>,
+ n_wt_0_t_1         = <span class='fu'>all_ages</span>(expr = <span class='kw'>F_age</span> <span class='op'>%*%</span> <span class='kw'>n_wt_age_t</span>, fun = <span class='st'>"+"</span>),
+ n_wt_age_t_1       = <span class='kw'>P_age_minus_1</span> <span class='op'>%*%</span> <span class='kw'>n_wt_age_minus_1_t</span>,
+ n_wt_max_age_t_1   = <span class='kw'>P_max_age</span> <span class='op'>%*%</span> <span class='kw'>n_wt_max_age_t</span> <span class='op'>+</span>
+                      <span class='kw'>P_max_age_minus_1</span> <span class='op'>%*%</span> <span class='kw'>n_wt_max_age_minus_1_t</span>,
+ data_list          = <span class='kw'>param_list</span>,
+ states             = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span> (<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"wt"</span>)),
+ has_hier_effs      = <span class='fl'>FALSE</span>,
+ levels_ages        = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(age = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span><span class='op'>:</span><span class='fl'>20</span>), max_age = <span class='fl'>21</span>),
+ evict_cor          = <span class='fl'>FALSE</span>
 )
 
 
-}</div></pre>
+}
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -224,7 +229,7 @@ a single number whereas we typically want the trait distribution function
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

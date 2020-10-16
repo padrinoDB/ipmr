@@ -113,6 +113,9 @@ correctly represented in the data_list." />
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
     </li>
+    <li>
+      <a href="../articles/density-dependence.html">Density Dependent IPMs</a>
+    </li>
     <li class="divider"></li>
     <li class="dropdown-header">Generic Functions</li>
     <li>
@@ -163,7 +166,7 @@ When this happens, <code>use_vr_model</code> can ensure that model object is
 correctly represented in the <code>data_list</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>use_vr_model</span>(<span class='no'>model</span>)</pre>
+    <pre class="usage"><span class='fu'>use_vr_model</span>(<span class='kw'>model</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -190,18 +193,19 @@ to pass to <code>define_kernel</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='co'>if</span> (<span class='fl'>FALSE</span>) {
 
-<span class='no'>grow_mod</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span>(<span class='no'>size_next</span> ~ <span class='no'>size</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>grow_data</span>)
-<span class='no'>surv_mod</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>(<span class='no'>surv</span> ~ <span class='no'>size</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>surv_data</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span>())
+<span class='kw'>grow_mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span>(<span class='kw'>size_next</span> <span class='op'>~</span> <span class='kw'>size</span>, data = <span class='kw'>grow_data</span>)
+<span class='kw'>surv_mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>(<span class='kw'>surv</span> <span class='op'>~</span> <span class='kw'>size</span>, data = <span class='kw'>surv_data</span>, family = <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span>())
 
-<span class='no'>data_list</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
-  <span class='kw'>grow_mod</span> <span class='kw'>=</span> <span class='fu'>use_vr_model</span>(<span class='no'>grow_mod</span>),
-  <span class='kw'>surv_mod</span> <span class='kw'>=</span> <span class='fu'>use_vr_model</span>(<span class='no'>surv_mod</span>),
-  <span class='kw'>recruit_mean</span> <span class='kw'>=</span> <span class='fl'>20</span>,
-  <span class='kw'>recruit_sd</span>   <span class='kw'>=</span> <span class='fl'>5</span>
+<span class='kw'>data_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(
+  grow_mod = <span class='fu'>use_vr_model</span>(<span class='kw'>grow_mod</span>),
+  surv_mod = <span class='fu'>use_vr_model</span>(<span class='kw'>surv_mod</span>),
+  recruit_mean = <span class='fl'>20</span>,
+  recruit_sd   = <span class='fl'>5</span>
 )
-}</div></pre>
+}
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -217,7 +221,7 @@ to pass to <code>define_kernel</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

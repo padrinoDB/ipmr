@@ -110,6 +110,9 @@ with define_kernel, define_k, make_ipm, and associated helper functions." />
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
     </li>
+    <li>
+      <a href="../articles/density-dependence.html">Density Dependent IPMs</a>
+    </li>
     <li class="divider"></li>
     <li class="dropdown-header">Generic Functions</li>
     <li>
@@ -157,7 +160,7 @@ All you need for this is to know what type of IPM you want to construct - the re
 with <code>define_kernel</code>, <code>define_k</code>, <code>make_ipm</code>, and associated helper functions.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>init_ipm</span>(<span class='no'>model_class</span>, <span class='kw'>has_age</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>init_ipm</span>(<span class='kw'>model_class</span>, has_age = <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -213,7 +216,7 @@ in the <code><a href='https://rdrr.io/r/utils/vignette.html'>vignettes("ipmr-int
     user-specified population vector is multiplied by the chosen kernel and the result
     is multiplied by the next kernel for the desired number of iterations.</p></li>
 <li><p><code>param</code>: used to denote parameter resampling. This samples distributions
-    for each parameter based on user-specified functions supplied to <code><a href='define_star.html'>define_env_state()</a></code>.
+    for each parameter based on user-specified functions supplied to <code><a href='define_impl.html'>define_env_state()</a></code>.
     This will be a bit slower than <code>"kern"</code> resampling because iteration
     matrices need to be reconstructed from new parameters at every time step.</p></li>
 </ul></li>
@@ -239,7 +242,7 @@ population dynamics using Integral Projection Models. Methods in Ecology and Evo
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

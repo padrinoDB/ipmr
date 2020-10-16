@@ -67,6 +67,9 @@
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
     </li>
+    <li>
+      <a href="../articles/density-dependence.html">Density Dependent IPMs</a>
+    </li>
     <li class="divider">
     <li class="dropdown-header">Generic Functions</li>
     <li>
@@ -284,147 +287,161 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 </li>
 </ol>
 <p>and modelled in R as follows:</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">lme4</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ipmr</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/lme4/lme4">lme4</a></span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">ipmr</span>)
 
-<span class="no">grow_mod</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html">lmer</a></span>(<span class="no">size_2</span> ~ <span class="no">size_1</span> + (<span class="fl">1</span> <span class="kw">|</span> <span class="no">year</span>), <span class="kw">data</span> <span class="kw">=</span> <span class="no">grow_data</span>)
+<span class="kw">grow_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html">lmer</a></span>(<span class="kw">size_2</span> <span class="op">~</span> <span class="kw">size_1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> <span class="kw">year</span>), data = <span class="kw">grow_data</span>)
 
-<span class="no">surv_mod</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/glmer.html">glmer</a></span>(<span class="no">surv</span> ~ <span class="no">size_1</span> + (<span class="fl">1</span> <span class="kw">|</span> <span class="no">year</span>), <span class="kw">data</span> <span class="kw">=</span> <span class="no">surv_data</span>, <span class="kw">family</span> <span class="kw">=</span> <span class="no">binomial</span>)
+<span class="kw">surv_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/glmer.html">glmer</a></span>(<span class="kw">surv</span> <span class="op">~</span> <span class="kw">size_1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> <span class="kw">year</span>), data = <span class="kw">surv_data</span>, family = <span class="kw">binomial</span>)
 
-<span class="no">repr_mod</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span>(<span class="no">repr</span> ~ <span class="no">size_1</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">repr_data</span>, <span class="kw">family</span> <span class="kw">=</span> <span class="no">binomial</span>)
+<span class="kw">repr_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span>(<span class="kw">repr</span> <span class="op">~</span> <span class="kw">size_1</span>, data = <span class="kw">repr_data</span>, family = <span class="kw">binomial</span>)
 
-<span class="no">recr_mod</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span>(<span class="no">recr</span> ~ <span class="no">size_1</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">recr_data</span>, <span class="kw">family</span> <span class="kw">=</span> <span class="no">poisson</span>)
+<span class="kw">recr_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span>(<span class="kw">recr</span> <span class="op">~</span> <span class="kw">size_1</span>, data = <span class="kw">recr_data</span>, family = <span class="kw">poisson</span>)
 
-<span class="no">rcsz_mu</span>  <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">rcsz_data</span>$<span class="no">size_2</span>)
-<span class="no">rcsz_sd</span>  <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span>(<span class="no">rcsz_data</span>$<span class="no">size_2</span>)</pre></body></html></div>
+<span class="kw">rcsz_mu</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="kw">rcsz_data</span><span class="op">$</span><span class="kw">size_2</span>)
+<span class="kw">rcsz_sd</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span>(<span class="kw">rcsz_data</span><span class="op">$</span><span class="kw">size_2</span>)
+</pre></div>
 <p>We could then extract the fixed coefficients with the <code>fixef</code> method and the conditional modes of the random effects via the <code>ranef</code> method:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">beta_gs</span>     <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/fixef.html">fixef</a></span>(<span class="no">grow_mod</span>)
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="kw">beta_gs</span>     <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/fixef.html">fixef</a></span>(<span class="kw">grow_mod</span>)
 
-<span class="no">alpha_g_yrs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/ranef.html">ranef</a></span>(<span class="no">grow_mod</span>)
+<span class="kw">alpha_g_yrs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/ranef.html">ranef</a></span>(<span class="kw">grow_mod</span>)
 
-<span class="no">beta_ss</span>     <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/fixef.html">fixef</a></span>(<span class="no">surv_mod</span>)
+<span class="kw">beta_ss</span>     <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/fixef.html">fixef</a></span>(<span class="kw">surv_mod</span>)
 
-<span class="no">alpha_s_yrs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/ranef.html">ranef</a></span>(<span class="no">surv_mod</span>)</pre></body></html></div>
+<span class="kw">alpha_s_yrs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/ranef.html">ranef</a></span>(<span class="kw">surv_mod</span>)
+</pre></div>
 <p>The non-mixed models can use the <code>coef</code> method to extract a vector of coefficients:</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">repr_coef</span>   <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span>(<span class="no">repr_mod</span>)
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="kw">repr_coef</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span>(<span class="kw">repr_mod</span>)
 
-<span class="no">recr_coef</span>   <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span>(<span class="no">recr_mod</span>)</pre></body></html></div>
+<span class="kw">recr_coef</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span>(<span class="kw">recr_mod</span>)
+</pre></div>
 <p>The next step is to transform these values into something <code>ipmr</code> can use. This must always be a <strong>named list</strong> where the names of the list components are the names used in the vital expressions or kernel formula. Transforming the <span class="math inline">\(\beta\)</span>s is easier - the output from fixef is always a named vector, so we just use <code><a href="https://rdrr.io/r/base/list.html">as.list()</a></code> and change the names to whatever we want to use. We then bundle it into one big list with all the fixed coefficients.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">g_list</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="no">beta_gs</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">g_list</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"alpha_g"</span>, <span class="st">"beta_g"</span>)
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="kw">g_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="kw">beta_gs</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">g_list</span>) <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"alpha_g"</span>, <span class="st">"beta_g"</span>)
 
-<span class="no">s_list</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="no">beta_ss</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">s_list</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"alpha_s"</span>, <span class="st">"beta_s"</span>)
+<span class="kw">s_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="kw">beta_ss</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">s_list</span>) <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"alpha_s"</span>, <span class="st">"beta_s"</span>)
 
-<span class="no">f_p_list</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="no">recr_coef</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">f_p_list</span> ) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"alpha_f_p"</span>, <span class="st">"beta_f_p"</span>)
+<span class="kw">f_p_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="kw">recr_coef</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">f_p_list</span> ) <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"alpha_f_p"</span>, <span class="st">"beta_f_p"</span>)
 
-<span class="no">f_r_list</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="no">repr_coef</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">f_r_list</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"alpha_f_r"</span>, <span class="st">"beta_f_r"</span>)
+<span class="kw">f_r_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="kw">repr_coef</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">f_r_list</span>) <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"alpha_f_r"</span>, <span class="st">"beta_f_r"</span>)
 
-<span class="no">f_d_list</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">mu_f_d</span> <span class="kw">=</span> <span class="no">rcsz_mu</span>, <span class="kw">sigma_f_d</span> <span class="kw">=</span> <span class="no">rcsz_sd</span>)
+<span class="kw">f_d_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(mu_f_d = <span class="kw">rcsz_mu</span>, sigma_f_d = <span class="kw">rcsz_sd</span>)
 
-<span class="no">all_fixed_params</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">g_list</span>, <span class="no">s_list</span>, <span class="no">f_p_list</span>, <span class="no">f_r_list</span>, <span class="no">f_d_list</span>)</pre></body></html></div>
+<span class="kw">all_fixed_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">g_list</span>, <span class="kw">s_list</span>, <span class="kw">f_p_list</span>, <span class="kw">f_r_list</span>, <span class="kw">f_d_list</span>)
+</pre></div>
 <p>For the random effects, we probably need to do some a bit more processing, though this really depends on which modelling framework you use and the format of the outputs. For <code>lme4</code>, it looks like this:</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">g_alpha_list</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="no">alpha_g_yrs</span>))
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">g_alpha_list</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"alpha_g_"</span>, <span class="fl">2001</span>:<span class="fl">2006</span>, <span class="kw">sep</span> <span class="kw">=</span> <span class="st">""</span>)
+<div class="sourceCode" id="cb5"><pre class="downlit">
+<span class="kw">g_alpha_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="kw">alpha_g_yrs</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">g_alpha_list</span>) <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"alpha_g_"</span>, <span class="fl">2001</span><span class="op">:</span><span class="fl">2006</span>, sep = <span class="st">""</span>)
 
-<span class="no">s_alpha_list</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="no">alpha_s_yrs</span>))
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">s_alpha_list</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"alpha_s_"</span>, <span class="fl">2001</span>:<span class="fl">2006</span>, <span class="kw">sep</span> <span class="kw">=</span> <span class="st">""</span>)</pre></body></html></div>
+<span class="kw">s_alpha_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="kw">alpha_s_yrs</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">s_alpha_list</span>) <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"alpha_s_"</span>, <span class="fl">2001</span><span class="op">:</span><span class="fl">2006</span>, sep = <span class="st">""</span>)
+</pre></div>
 <p>First, we strip away all of <code>lme4</code>-related attributes with <code><a href="https://rdrr.io/r/base/unlist.html">unlist()</a></code>, then convert it to the flat list format that we need. Next, we set the names. Now, we can combine it with our <code>all_fixed_params</code> list and we have all of the parameters we need for the kernel functions:</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">all_params</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">all_fixed_params</span>, <span class="no">g_alpha_list</span>, <span class="no">s_alpha_list</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb6"><pre class="downlit">
+<span class="kw">all_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">all_fixed_params</span>, <span class="kw">g_alpha_list</span>, <span class="kw">s_alpha_list</span>)
+</pre></div>
 <p>We are now ready to begin implementing the kernels! This model will be a simple, density independent, stochastic kernel-resampled model (<code>"simple_di_stoch_kern"</code> class). The parts where the hierarchical syntax is used are highlighted by comments in the code block:</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="no">ex_ipm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">"simple_di_stoch_kern"</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
-
+<div class="sourceCode" id="cb7"><pre class="downlit">
+<span class="kw">ex_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">"simple_di_stoch_kern"</span>) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
+    
     <span class="co"># _yr is appended as a suffix with an underscore. Notice how the formula</span>
     <span class="co"># from 2 is translated into the formula argument and the kernel name</span>
-
-    <span class="kw">name</span>             <span class="kw">=</span> <span class="st">"P_yr"</span>,
-    <span class="kw">family</span>           <span class="kw">=</span> <span class="st">"CC"</span>,
-    <span class="kw">formula</span>          <span class="kw">=</span> <span class="no">s_yr</span> * <span class="no">g_yr</span>,
-
+    
+    name             = <span class="st">"P_yr"</span>,
+    family           = <span class="st">"CC"</span>,
+    formula          = <span class="kw">s_yr</span> <span class="op">*</span> <span class="kw">g_yr</span>,
+    
     <span class="co"># We also modify each parameter name with a suffix as well.</span>
     <span class="co"># Here, I've split out the linear predictor and the inverse logit</span>
     <span class="co"># transformation into separate steps to avoid over cluttering</span>
-
-    <span class="kw">s_lin_p</span>          <span class="kw">=</span> <span class="no">alpha_s</span> + <span class="no">alpha_s_yr</span> + <span class="no">beta_s</span> * <span class="no">z_1</span>,
-    <span class="kw">s_yr</span>             <span class="kw">=</span> <span class="fl">1</span> / (<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(- <span class="no">s_lin_p</span>)),
-
+    
+    s_lin_p          = <span class="kw">alpha_s</span> <span class="op">+</span> <span class="kw">alpha_s_yr</span> <span class="op">+</span> <span class="kw">beta_s</span> <span class="op">*</span> <span class="kw">z_1</span>,
+    s_yr             = <span class="fl">1</span> <span class="op">/</span> (<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span> <span class="kw">s_lin_p</span>)),
+    
     <span class="co"># We do the same with growth as we did with survival and the P_yr formula</span>
-
-    <span class="kw">g_yr</span>             <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">z_2</span>, <span class="no">mu_g_yr</span>, <span class="no">sigma_g</span>),
-    <span class="kw">mu_g_yr</span>          <span class="kw">=</span> <span class="no">alpha_g</span> + <span class="no">alpha_g_yr</span> + <span class="no">beta_g</span> * <span class="no">z_1</span>,
-
-    <span class="kw">data_list</span>        <span class="kw">=</span> <span class="no">all_params</span>,
-    <span class="kw">states</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
-
+    
+    g_yr             = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">z_2</span>, <span class="kw">mu_g_yr</span>, <span class="kw">sigma_g</span>),
+    mu_g_yr          = <span class="kw">alpha_g</span> <span class="op">+</span> <span class="kw">alpha_g_yr</span> <span class="op">+</span> <span class="kw">beta_g</span> <span class="op">*</span> <span class="kw">z_1</span>,
+    
+    data_list        = <span class="kw">all_params</span>,
+    states           = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
+    
     <span class="co"># We signal that the kernel has hierarchical effects</span>
-
-    <span class="kw">has_hier_effs</span>    <span class="kw">=</span> <span class="fl">TRUE</span>,
-
+    
+    has_hier_effs    = <span class="fl">TRUE</span>,
+    
     <span class="co"># And provide the values that each suffix can take as a named list. </span>
     <span class="co"># The name(s) in this list MUST match the suffix used in the expressions.</span>
-
-    <span class="kw">levels_hier_effs</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">yr</span> <span class="kw">=</span> <span class="fl">2001</span>:<span class="fl">2006</span>),
-    <span class="kw">evict_cor</span>        <span class="kw">=</span> <span class="fl">TRUE</span>,
-    <span class="kw">evict_fun</span>        <span class="kw">=</span> <span class="fu"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g_yr"</span>)
-  ) <span class="kw">%&gt;%</span>
-
+    
+    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(yr = <span class="fl">2001</span><span class="op">:</span><span class="fl">2006</span>),
+    evict_cor        = <span class="fl">TRUE</span>,
+    evict_fun        = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g_yr"</span>)
+  ) <span class="op">%&gt;%</span>
+  
   <span class="co"># This kernel doesn't get anything special because there are no</span>
   <span class="co"># time-varying parameter values.</span>
-
-  <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
-    <span class="kw">name</span>          <span class="kw">=</span> <span class="st">"F"</span>,
-    <span class="kw">family</span>        <span class="kw">=</span> <span class="st">"CC"</span>,
-    <span class="kw">formula</span>       <span class="kw">=</span> <span class="no">f_p</span> * <span class="no">f_r</span> * <span class="no">f_d</span>,
-    <span class="kw">f_p_lin_p</span>     <span class="kw">=</span> <span class="no">alpha_f_p</span> + <span class="no">beta_f_p</span> * <span class="no">z_1</span>,
-    <span class="kw">f_p</span>           <span class="kw">=</span> <span class="fl">1</span> / (<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>( -<span class="no">f_p_lin_p</span>)),
-    <span class="kw">f_r</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">alpha_f_r</span> + <span class="no">beta_f_r</span> * <span class="no">z_1</span>),
-    <span class="kw">f_d</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">z_2</span>, <span class="no">mu_f_d</span>, <span class="no">sigma_f_d</span>),
-    <span class="kw">data_list</span>     <span class="kw">=</span> <span class="no">all_params</span>,
-    <span class="kw">states</span>        <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
-    <span class="kw">has_hier_effs</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
-    <span class="kw">evict_cor</span>     <span class="kw">=</span> <span class="fl">TRUE</span>,
-    <span class="kw">evict_fun</span>     <span class="kw">=</span> <span class="fu"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/kernel-definitions.html">define_k</a></span>(
-
+  
+  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
+    name          = <span class="st">"F"</span>,
+    family        = <span class="st">"CC"</span>,
+    formula       = <span class="kw">f_p</span> <span class="op">*</span> <span class="kw">f_r</span> <span class="op">*</span> <span class="kw">f_d</span>,
+    f_p_lin_p     = <span class="kw">alpha_f_p</span> <span class="op">+</span> <span class="kw">beta_f_p</span> <span class="op">*</span> <span class="kw">z_1</span>,
+    f_p           = <span class="fl">1</span> <span class="op">/</span> (<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>( <span class="op">-</span><span class="kw">f_p_lin_p</span>)),
+    f_r           = <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw">alpha_f_r</span> <span class="op">+</span> <span class="kw">beta_f_r</span> <span class="op">*</span> <span class="kw">z_1</span>),
+    f_d           = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">z_2</span>, <span class="kw">mu_f_d</span>, <span class="kw">sigma_f_d</span>),
+    data_list     = <span class="kw">all_params</span>,
+    states        = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
+    has_hier_effs = <span class="fl">FALSE</span>,
+    evict_cor     = <span class="fl">TRUE</span>,
+    evict_fun     = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
+  ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_k</a></span>(
+    
     <span class="co"># name is modified to indicate that the K's will vary from year to year</span>
-
-    <span class="kw">name</span>             <span class="kw">=</span> <span class="st">"K_yr"</span>,
-    <span class="kw">family</span>           <span class="kw">=</span> <span class="st">"IPM"</span>,
-
+    
+    name             = <span class="st">"K_yr"</span>,
+    family           = <span class="st">"IPM"</span>,
+    
     <span class="co"># the formulas are modified to indicate that they will also</span>
     <span class="co"># vary from year to year</span>
-
-    <span class="kw">K_yr</span>             <span class="kw">=</span> <span class="no">P_yr</span> + <span class="no">F</span>,
-    <span class="kw">n_z_t_1</span>          <span class="kw">=</span> <span class="no">K_yr</span> <span class="kw">%*%</span> <span class="no">n_z_t</span>,
-    <span class="kw">states</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
-    <span class="kw">has_hier_effs</span>    <span class="kw">=</span> <span class="fl">TRUE</span>,
-    <span class="kw">levels_hier_effs</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">yr</span> <span class="kw">=</span> <span class="fl">2001</span>:<span class="fl">2006</span>),
-    <span class="kw">evict_cor</span>        <span class="kw">=</span> <span class="fl">FALSE</span>
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_star.html">define_impl</a></span>(
-    <span class="fu"><a href="../reference/define_star.html">make_impl_args_list</a></span>(
-      <span class="kw">kernel_names</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"P_yr"</span>, <span class="st">"F"</span>, <span class="st">"K_yr"</span>),
-      <span class="kw">int_rule</span>     <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="fl">3</span>),
-      <span class="kw">dom_start</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"z"</span>, <span class="fl">3</span>),
-      <span class="kw">dom_end</span>      <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"z"</span>, <span class="fl">3</span>)
+    
+    K_yr             = <span class="kw">P_yr</span> <span class="op">+</span> <span class="kw">F</span>,
+    n_z_t_1          = <span class="kw">K_yr</span> <span class="op">%*%</span> <span class="kw">n_z_t</span>,
+    states           = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
+    has_hier_effs    = <span class="fl">TRUE</span>,
+    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(yr = <span class="fl">2001</span><span class="op">:</span><span class="fl">2006</span>),
+    evict_cor        = <span class="fl">FALSE</span>
+  ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span>(
+    <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span>(
+      kernel_names = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"P_yr"</span>, <span class="st">"F"</span>, <span class="st">"K_yr"</span>),
+      int_rule     = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="fl">3</span>),
+      dom_start    = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"z"</span>, <span class="fl">3</span>),
+      dom_end      = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"z"</span>, <span class="fl">3</span>)
     )
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_star.html">define_domains</a></span>(
-    <span class="kw">z</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.1</span>, <span class="fl">10</span>, <span class="fl">50</span>)
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_star.html">define_pop_state</a></span>(
-    <span class="kw">n_z</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">50</span>)
-  ) <span class="kw">%&gt;%</span>
+  ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_impl.html">define_domains</a></span>(
+    z = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.1</span>, <span class="fl">10</span>, <span class="fl">50</span>)
+  ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_impl.html">define_pop_state</a></span>(
+    n_z = <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">50</span>)
+  ) <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>(
-    <span class="kw">iterate</span>    <span class="kw">=</span> <span class="fl">TRUE</span>,
-    <span class="kw">iterations</span> <span class="kw">=</span> <span class="fl">100</span>,
-    <span class="kw">kernel_seq</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="fl">2001</span>:<span class="fl">2006</span>, <span class="kw">size</span> <span class="kw">=</span> <span class="fl">100</span>, <span class="kw">replace</span> <span class="kw">=</span> <span class="fl">TRUE</span>),
-    <span class="kw">normalize_pop_size</span> <span class="kw">=</span> <span class="fl">TRUE</span>
-  )</pre></body></html></div>
+    iterate    = <span class="fl">TRUE</span>,
+    iterations = <span class="fl">100</span>,
+    kernel_seq = <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="fl">2001</span><span class="op">:</span><span class="fl">2006</span>, size = <span class="fl">100</span>, replace = <span class="fl">TRUE</span>),
+    normalize_pop_size = <span class="fl">TRUE</span>
+  )
+</pre></div>
 </div>
 <div id="complicated" class="section level2">
 <h2 class="hasAnchor">
@@ -487,239 +504,243 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <h3 class="hasAnchor">
 <a href="#simulating-parameters" class="anchor"></a>Simulating parameters</h3>
 <p>We have to simulate some parameters for each site. Additionally, we’ll specify the distribution parameters for each <span class="math inline">\(\theta\)</span> and write a function that samples them once.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ipmr</span>)
+<div class="sourceCode" id="cb8"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">ipmr</span>)
 
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">51</span>)
 
 <span class="co"># Set up the sites, and the parameters</span>
 
-<span class="no">sites</span> <span class="kw">&lt;-</span> <span class="no">LETTERS</span>[<span class="fl">1</span>:<span class="fl">6</span>]
+<span class="kw">sites</span> <span class="op">&lt;-</span> <span class="kw">LETTERS</span>[<span class="fl">1</span><span class="op">:</span><span class="fl">6</span>]
 
-<span class="no">all_pars</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-  <span class="kw">r_i</span>       <span class="kw">=</span> <span class="fl">0.6</span>,
-  <span class="kw">r_sb1</span>     <span class="kw">=</span> <span class="fl">0.2</span>,
-  <span class="kw">r_sb2</span>     <span class="kw">=</span> <span class="fl">0.3</span>,
-  <span class="kw">s_sb1</span>     <span class="kw">=</span> <span class="fl">0.4</span>,
-  <span class="kw">s_sb2</span>     <span class="kw">=</span> <span class="fl">0.1</span>,
-  <span class="kw">mu_f_d</span>    <span class="kw">=</span> <span class="fl">4</span>,
-  <span class="kw">sigma_f_d</span> <span class="kw">=</span> <span class="fl">0.9</span>,
-  <span class="kw">sigma_g</span>   <span class="kw">=</span> <span class="fl">3</span>,
-  <span class="kw">beta_s_prec</span> <span class="kw">=</span> <span class="fl">0.3</span>,
-  <span class="kw">beta_s_temp</span> <span class="kw">=</span> -<span class="fl">0.5</span>,
-  <span class="kw">beta_g_prec</span> <span class="kw">=</span> <span class="fl">0.01</span>,
-  <span class="kw">beta_g_temp</span> <span class="kw">=</span> <span class="fl">0.1</span>,
-  <span class="kw">beta_f_p_prec</span> <span class="kw">=</span> <span class="fl">0.6</span>,
-  <span class="kw">beta_f_p_temp</span> <span class="kw">=</span> -<span class="fl">0.3</span>,
-  <span class="kw">beta_f_r_prec</span> <span class="kw">=</span> -<span class="fl">0.3</span>,
-  <span class="kw">beta_f_r_temp</span> <span class="kw">=</span> <span class="fl">0.9</span>
+<span class="kw">all_pars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+  r_i       = <span class="fl">0.6</span>,
+  r_sb1     = <span class="fl">0.2</span>,
+  r_sb2     = <span class="fl">0.3</span>,
+  s_sb1     = <span class="fl">0.4</span>,
+  s_sb2     = <span class="fl">0.1</span>,
+  mu_f_d    = <span class="fl">4</span>,
+  sigma_f_d = <span class="fl">0.9</span>,
+  sigma_g   = <span class="fl">3</span>, 
+  beta_s_prec = <span class="fl">0.3</span>,
+  beta_s_temp = <span class="op">-</span><span class="fl">0.5</span>,
+  beta_g_prec = <span class="fl">0.01</span>,
+  beta_g_temp = <span class="fl">0.1</span>,
+  beta_f_p_prec = <span class="fl">0.6</span>,
+  beta_f_p_temp = <span class="op">-</span><span class="fl">0.3</span>,
+  beta_f_r_prec = <span class="op">-</span><span class="fl">0.3</span>,
+  beta_f_r_temp = <span class="fl">0.9</span>
 )
 
-<span class="no">g_alphs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">6</span>, <span class="kw">mean</span> <span class="kw">=</span> <span class="fl">4.5</span>, <span class="kw">sd</span> <span class="kw">=</span> <span class="fl">1</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="kw">%&gt;%</span>
+<span class="kw">g_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">6</span>, mean = <span class="fl">4.5</span>, sd = <span class="fl">1</span>) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span>(
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'alpha_g_'</span>, <span class="no">sites</span>, <span class="kw">sep</span> <span class="kw">=</span> <span class="st">""</span>)
+    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'alpha_g_'</span>, <span class="kw">sites</span>, sep = <span class="st">""</span>)
   )
 
-<span class="no">g_betas</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">6</span>, <span class="fl">0.85</span>, <span class="fl">1.15</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="kw">%&gt;%</span>
+<span class="kw">g_betas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">6</span>, <span class="fl">0.85</span>, <span class="fl">1.15</span>) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span>(
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'beta_g_'</span>, <span class="no">sites</span>, <span class="kw">sep</span> <span class="kw">=</span> <span class="st">""</span>)
+    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'beta_g_'</span>, <span class="kw">sites</span>, sep = <span class="st">""</span>)
   )
 
-<span class="no">s_alphs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">6</span>, <span class="kw">mean</span> <span class="kw">=</span> -<span class="fl">7</span>, <span class="kw">sd</span> <span class="kw">=</span> <span class="fl">1.5</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="kw">%&gt;%</span>
+<span class="kw">s_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">6</span>, mean = <span class="op">-</span><span class="fl">7</span>, sd = <span class="fl">1.5</span>) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span>(
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'alpha_s_'</span>, <span class="no">sites</span>, <span class="kw">sep</span> <span class="kw">=</span> <span class="st">""</span>)
+    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'alpha_s_'</span>, <span class="kw">sites</span>, sep = <span class="st">""</span>)
   )
-<span class="no">s_betas</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">6</span>, <span class="fl">2</span>, <span class="fl">3</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="kw">%&gt;%</span>
+<span class="kw">s_betas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">6</span>, <span class="fl">2</span>, <span class="fl">3</span>) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span>(
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'beta_s_'</span>, <span class="no">sites</span>, <span class="kw">sep</span> <span class="kw">=</span> <span class="st">""</span>)
-  )
-
-<span class="no">f_p_alphs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">6</span>, <span class="kw">mean</span> <span class="kw">=</span> -<span class="fl">10</span>, <span class="kw">sd</span> <span class="kw">=</span> <span class="fl">2</span>)  <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span>(
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'alpha_f_p_'</span>, <span class="no">sites</span>, <span class="kw">sep</span> <span class="kw">=</span> <span class="st">""</span>)
-  )
-<span class="no">f_p_betas</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">6</span>, <span class="fl">0.3</span>, <span class="fl">1</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span>(
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'beta_f_p_'</span>, <span class="no">sites</span>, <span class="kw">sep</span> <span class="kw">=</span> <span class="st">""</span>)
+    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'beta_s_'</span>, <span class="kw">sites</span>, sep = <span class="st">""</span>)
   )
 
-<span class="no">f_r_alphs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">6</span>, <span class="fl">0.01</span>, <span class="fl">0.1</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="kw">%&gt;%</span>
+<span class="kw">f_p_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">6</span>, mean = <span class="op">-</span><span class="fl">10</span>, sd = <span class="fl">2</span>)  <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span>(
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'alpha_f_r_'</span>, <span class="no">sites</span>, <span class="kw">sep</span> <span class="kw">=</span> <span class="st">""</span>)
+    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'alpha_f_p_'</span>, <span class="kw">sites</span>, sep = <span class="st">""</span>)
   )
-<span class="no">f_r_betas</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">6</span>, <span class="fl">0.0001</span>, <span class="fl">0.01</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="kw">%&gt;%</span>
+<span class="kw">f_p_betas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">6</span>, <span class="fl">0.3</span>, <span class="fl">1</span>) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span>(
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'beta_f_r_'</span>, <span class="no">sites</span>, <span class="kw">sep</span> <span class="kw">=</span> <span class="st">""</span>)
+    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'beta_f_p_'</span>, <span class="kw">sites</span>, sep = <span class="st">""</span>)
   )
 
-<span class="no">all_pars</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">all_pars</span>,
-              <span class="no">g_alphs</span>, <span class="no">g_betas</span>,
-              <span class="no">s_alphs</span>, <span class="no">s_betas</span>,
-              <span class="no">f_p_alphs</span>, <span class="no">f_p_betas</span>,
-              <span class="no">f_r_alphs</span>, <span class="no">f_r_betas</span>)
+<span class="kw">f_r_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">6</span>, <span class="fl">0.01</span>, <span class="fl">0.1</span>) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span>(
+    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'alpha_f_r_'</span>, <span class="kw">sites</span>, sep = <span class="st">""</span>)
+  )
+<span class="kw">f_r_betas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">6</span>, <span class="fl">0.0001</span>, <span class="fl">0.01</span>) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>() <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span>(
+    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'beta_f_r_'</span>, <span class="kw">sites</span>, sep = <span class="st">""</span>)
+  ) 
+
+<span class="kw">all_pars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">all_pars</span>,
+              <span class="kw">g_alphs</span>, <span class="kw">g_betas</span>,
+              <span class="kw">s_alphs</span>, <span class="kw">s_betas</span>,
+              <span class="kw">f_p_alphs</span>, <span class="kw">f_p_betas</span>,
+              <span class="kw">f_r_alphs</span>, <span class="kw">f_r_betas</span>)
 
 <span class="co"># This list contains parameters that define the distributions for environmental</span>
 <span class="co"># covariates</span>
 
-<span class="no">env_params</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-  <span class="kw">temp_mu</span> <span class="kw">=</span> <span class="fl">12</span>,
-  <span class="kw">temp_sd</span> <span class="kw">=</span> <span class="fl">2</span>,
-  <span class="kw">prec_shape</span> <span class="kw">=</span> <span class="fl">1000</span>,
-  <span class="kw">prec_rate</span>  <span class="kw">=</span> <span class="fl">2</span>
+<span class="kw">env_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+  temp_mu = <span class="fl">12</span>,
+  temp_sd = <span class="fl">2</span>,
+  prec_shape = <span class="fl">1000</span>,
+  prec_rate  = <span class="fl">2</span>
 )
 
 <span class="co"># This function samples the environmental covariate distributions and returns</span>
 <span class="co"># the values in a named list. We can reference the names in the list in our</span>
 <span class="co"># vital rate expressions.</span>
 
-<span class="no">sample_fun</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">env_params</span>) {
-
-  <span class="no">temp</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">1</span>, <span class="no">env_params</span>$<span class="no">temp_mu</span>, <span class="no">env_params</span>$<span class="no">temp_sd</span>)
-
-  <span class="no">prec</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html">rgamma</a></span>(<span class="fl">1</span>, <span class="no">env_params</span>$<span class="no">prec_shape</span>, <span class="no">env_params</span>$<span class="no">prec_rate</span>)
-
-  <span class="no">out</span>  <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">temp</span> <span class="kw">=</span> <span class="no">temp</span>,
-               <span class="kw">prec</span> <span class="kw">=</span> <span class="no">prec</span>)
-
-  <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="no">out</span>)
-
-}</pre></body></html></div>
+<span class="kw">sample_fun</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">env_params</span>) {
+  
+  <span class="kw">temp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">1</span>, <span class="kw">env_params</span><span class="op">$</span><span class="kw">temp_mu</span>, <span class="kw">env_params</span><span class="op">$</span><span class="kw">temp_sd</span>)
+  
+  <span class="kw">prec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html">rgamma</a></span>(<span class="fl">1</span>, <span class="kw">env_params</span><span class="op">$</span><span class="kw">prec_shape</span>, <span class="kw">env_params</span><span class="op">$</span><span class="kw">prec_rate</span>)
+  
+  <span class="kw">out</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(temp = <span class="kw">temp</span>,
+               prec = <span class="kw">prec</span>)
+  
+  <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="kw">out</span>)
+  
+}
+</pre></div>
 </div>
 <div id="implementing-the-model" class="section level3">
 <h3 class="hasAnchor">
 <a href="#implementing-the-model" class="anchor"></a>Implementing the model</h3>
 <p>We’ve written out our model - now we can implement it! We’ll use the general, density independent, stochastic parameter resampled machinery for this.</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="no">ex_ipm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">"general_di_stoch_param"</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
-
-    <span class="kw">name</span> <span class="kw">=</span> <span class="st">"P_site"</span>,
-    <span class="kw">family</span> <span class="kw">=</span> <span class="st">"CC"</span>,
-
+<div class="sourceCode" id="cb9"><pre class="downlit">
+<span class="kw">ex_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">"general_di_stoch_param"</span>) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
+    
+    name = <span class="st">"P_site"</span>,
+    family = <span class="st">"CC"</span>,
+    
     <span class="co"># site is appended so that we don't have to write out s_a, s_b, etc.</span>
-
-    <span class="kw">formula</span>          <span class="kw">=</span> <span class="no">s_site</span> * <span class="no">g_site</span> * <span class="no">d_z</span>,
-
-    <span class="kw">s_site_lin</span>       <span class="kw">=</span> <span class="no">alpha_s_site</span> + <span class="no">beta_s_site</span> * <span class="no">z_1</span> + <span class="no">beta_s_prec</span> * <span class="no">prec</span> + <span class="no">beta_s_temp</span> * <span class="no">temp</span>,
-    <span class="kw">s_site</span>           <span class="kw">=</span> <span class="fl">1</span> / (<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(-<span class="no">s_site_lin</span>)),
-    <span class="kw">mu_g_site</span>        <span class="kw">=</span> <span class="no">alpha_g_site</span> + <span class="no">beta_g_site</span> * <span class="no">z_1</span> + <span class="no">beta_g_prec</span> * <span class="no">prec</span> + <span class="no">beta_g_temp</span> * <span class="no">temp</span>,
-    <span class="kw">g_site</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">z_2</span>, <span class="no">mu_g_site</span>, <span class="no">sigma_g</span>),
-    <span class="kw">data_list</span>        <span class="kw">=</span> <span class="no">all_pars</span>,
-    <span class="kw">states</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
-    <span class="kw">has_hier_effs</span>    <span class="kw">=</span> <span class="fl">TRUE</span>,
-    <span class="kw">levels_hier_effs</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">site</span> <span class="kw">=</span> <span class="no">LETTERS</span>[<span class="fl">1</span>:<span class="fl">6</span>]),
-    <span class="kw">evict_cor</span>        <span class="kw">=</span> <span class="fl">TRUE</span>,
-    <span class="kw">evict_fun</span>        <span class="kw">=</span> <span class="fu"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g_site"</span>)
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
-    <span class="kw">name</span>             <span class="kw">=</span> <span class="st">"F_site"</span>,
-    <span class="kw">family</span>           <span class="kw">=</span> <span class="st">"CC"</span>,
-    <span class="kw">formula</span>          <span class="kw">=</span> <span class="no">f_p_site</span> * <span class="no">f_r_site</span> * <span class="no">f_d</span> * <span class="no">d_z</span>,
-    <span class="kw">f_p_site_lin</span>     <span class="kw">=</span> <span class="no">alpha_f_p_site</span> + <span class="no">beta_f_p_site</span> * <span class="no">z_1</span> + <span class="no">beta_f_p_prec</span> * <span class="no">prec</span> + <span class="no">beta_f_p_temp</span> * <span class="no">temp</span>,
-    <span class="kw">f_p_site</span>         <span class="kw">=</span> <span class="fl">1</span> / (<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(-<span class="no">f_p_site_lin</span>)),
-    <span class="kw">f_r_site</span>         <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">alpha_f_r_site</span> + <span class="no">beta_f_r_site</span> * <span class="no">z_1</span> + <span class="no">beta_f_r_prec</span> * <span class="no">prec</span> + <span class="no">beta_f_r_temp</span> * <span class="no">temp</span>),
-    <span class="kw">f_d</span>              <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">z_2</span>, <span class="no">mu_f_d</span>, <span class="no">sigma_f_d</span>),
-    <span class="kw">data_list</span>        <span class="kw">=</span> <span class="no">all_pars</span>,
-    <span class="kw">states</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
-    <span class="kw">has_hier_effs</span>    <span class="kw">=</span> <span class="fl">TRUE</span>,
-    <span class="kw">levels_hier_effs</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">site</span> <span class="kw">=</span> <span class="no">LETTERS</span>[<span class="fl">1</span>:<span class="fl">6</span>]),
-    <span class="kw">evict_cor</span>        <span class="kw">=</span> <span class="fl">TRUE</span>,
-    <span class="kw">evict_fun</span>        <span class="kw">=</span> <span class="fu"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
-    ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
-    <span class="kw">name</span>             <span class="kw">=</span> <span class="st">"go_sb_1_site"</span>,
-    <span class="kw">family</span>           <span class="kw">=</span> <span class="st">"CD"</span>,
-    <span class="kw">formula</span>          <span class="kw">=</span> (<span class="fl">1</span> - <span class="no">r_i</span>) * <span class="no">f_p_site</span> * <span class="no">f_r_site</span> * <span class="no">d_z</span>,
-    <span class="kw">f_p_site_lin</span>     <span class="kw">=</span> <span class="no">alpha_f_p_site</span> + <span class="no">beta_f_p_site</span> * <span class="no">z_1</span> + <span class="no">beta_f_p_prec</span> * <span class="no">prec</span> + <span class="no">beta_f_p_temp</span> * <span class="no">temp</span>,
-    <span class="kw">f_p_site</span>         <span class="kw">=</span> <span class="fl">1</span> / (<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(-<span class="no">f_p_site_lin</span>)),
-    <span class="kw">f_r_site</span>         <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">alpha_f_r_site</span> + <span class="no">beta_f_r_site</span> * <span class="no">z_1</span> + <span class="no">beta_f_r_prec</span> * <span class="no">prec</span> + <span class="no">beta_f_r_temp</span> * <span class="no">temp</span>),
-    <span class="kw">data_list</span>        <span class="kw">=</span> <span class="no">all_pars</span>,
-    <span class="kw">states</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
-    <span class="kw">has_hier_effs</span>    <span class="kw">=</span> <span class="fl">TRUE</span>,
-    <span class="kw">levels_hier_effs</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">site</span> <span class="kw">=</span> <span class="no">LETTERS</span>[<span class="fl">1</span>:<span class="fl">6</span>]),
-    <span class="kw">evict_cor</span>        <span class="kw">=</span> <span class="fl">FALSE</span>
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
-    <span class="kw">name</span>          <span class="kw">=</span> <span class="st">"go_sb_2"</span>,
-    <span class="kw">family</span>        <span class="kw">=</span> <span class="st">"DD"</span>,
-    <span class="kw">formula</span>       <span class="kw">=</span> <span class="no">s_sb1</span> * (<span class="fl">1</span> - <span class="no">r_sb1</span>),
-    <span class="kw">data_list</span>     <span class="kw">=</span> <span class="no">all_pars</span>,
-    <span class="kw">states</span>        <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'z'</span>)),
-    <span class="kw">has_hier_effs</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
-    <span class="kw">evict_cor</span>     <span class="kw">=</span> <span class="fl">FALSE</span>
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
-    <span class="kw">name</span>          <span class="kw">=</span> <span class="st">"leave_sb_1"</span>,
-    <span class="kw">family</span>        <span class="kw">=</span> <span class="st">"DC"</span>,
-    <span class="kw">formula</span>       <span class="kw">=</span> <span class="no">s_sb1</span> * <span class="no">r_sb1</span> * <span class="no">f_d</span> * <span class="no">d_z</span>,
-    <span class="kw">f_d</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">z_2</span>, <span class="no">mu_f_d</span>, <span class="no">sigma_f_d</span>),
-    <span class="kw">data_list</span>     <span class="kw">=</span> <span class="no">all_pars</span>,
-    <span class="kw">states</span>        <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
-    <span class="kw">has_hier_effs</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
-    <span class="kw">evict_cor</span>     <span class="kw">=</span> <span class="fl">TRUE</span>,
-    <span class="kw">evict_fun</span>     <span class="kw">=</span> <span class="fu"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span>(
-    <span class="kw">name</span>          <span class="kw">=</span> <span class="st">"leave_sb_2"</span>,
-    <span class="kw">family</span>        <span class="kw">=</span> <span class="st">"DC"</span>,
-    <span class="kw">formula</span>       <span class="kw">=</span> <span class="no">s_sb2</span> * <span class="no">r_sb2</span> * <span class="no">f_d</span> * <span class="no">d_z</span>,
-    <span class="kw">f_d</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">z_2</span>, <span class="no">mu_f_d</span>, <span class="no">sigma_f_d</span>),
-    <span class="kw">data_list</span>     <span class="kw">=</span> <span class="no">all_pars</span>,
-    <span class="kw">states</span>        <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
-    <span class="kw">has_hier_effs</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
-    <span class="kw">evict_cor</span>     <span class="kw">=</span> <span class="fl">TRUE</span>,
-    <span class="kw">evict_fun</span>     <span class="kw">=</span> <span class="fu"><a href="../reference/eviction.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/kernel-definitions.html">define_k</a></span>(
-    <span class="kw">name</span>             <span class="kw">=</span> <span class="st">"K_site"</span>,
-    <span class="kw">family</span>           <span class="kw">=</span> <span class="st">"IPM"</span>,
-    <span class="kw">K_site</span>           <span class="kw">=</span> <span class="no">P_site</span> + <span class="no">F_site</span>,
-    <span class="kw">n_z_t_1</span>          <span class="kw">=</span> <span class="no">K_site</span>     <span class="kw">%*%</span> <span class="no">n_z_t</span>   +
-                       <span class="no">leave_sb_1</span> <span class="kw">%*%</span> <span class="no">n_sb1_t</span> +
-                       <span class="no">leave_sb_2</span> <span class="kw">%*%</span> <span class="no">n_sb2_t</span>,
-    <span class="kw">n_sb1_t_1</span>        <span class="kw">=</span> <span class="no">go_sb_1_site</span> <span class="kw">%*%</span> <span class="no">n_z_t</span>,
-    <span class="kw">n_sb2_t_1</span>        <span class="kw">=</span> <span class="no">go_sb_2</span> <span class="kw">%*%</span> <span class="no">n_sb1_t</span>,
-    <span class="kw">data_list</span>        <span class="kw">=</span> <span class="no">all_pars</span>,
-    <span class="kw">states</span>           <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
-    <span class="kw">has_hier_effs</span>    <span class="kw">=</span> <span class="fl">TRUE</span>,
-    <span class="kw">levels_hier_effs</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">site</span> <span class="kw">=</span> <span class="no">LETTERS</span>[<span class="fl">1</span>:<span class="fl">6</span>]),
-    <span class="kw">evict_cor</span>        <span class="kw">=</span> <span class="fl">FALSE</span>
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_star.html">define_impl</a></span>(
-    <span class="fu"><a href="../reference/define_star.html">make_impl_args_list</a></span>(
-      <span class="kw">kernel_names</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"P_site"</span>, <span class="st">"F_site"</span>,
-                       <span class="st">"go_sb_1_site"</span>, <span class="st">"go_sb_2"</span>,
+    
+    formula          = <span class="kw">s_site</span> <span class="op">*</span> <span class="kw">g_site</span> <span class="op">*</span> <span class="kw">d_z</span>,
+    
+    s_site_lin       = <span class="kw">alpha_s_site</span> <span class="op">+</span> <span class="kw">beta_s_site</span> <span class="op">*</span> <span class="kw">z_1</span> <span class="op">+</span> <span class="kw">beta_s_prec</span> <span class="op">*</span> <span class="kw">prec</span> <span class="op">+</span> <span class="kw">beta_s_temp</span> <span class="op">*</span> <span class="kw">temp</span>,
+    s_site           = <span class="fl">1</span> <span class="op">/</span> (<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span><span class="kw">s_site_lin</span>)),
+    mu_g_site        = <span class="kw">alpha_g_site</span> <span class="op">+</span> <span class="kw">beta_g_site</span> <span class="op">*</span> <span class="kw">z_1</span> <span class="op">+</span> <span class="kw">beta_g_prec</span> <span class="op">*</span> <span class="kw">prec</span> <span class="op">+</span> <span class="kw">beta_g_temp</span> <span class="op">*</span> <span class="kw">temp</span>,
+    g_site           = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">z_2</span>, <span class="kw">mu_g_site</span>, <span class="kw">sigma_g</span>),
+    data_list        = <span class="kw">all_pars</span>,
+    states           = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
+    has_hier_effs    = <span class="fl">TRUE</span>,
+    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(site = <span class="kw">LETTERS</span>[<span class="fl">1</span><span class="op">:</span><span class="fl">6</span>]),
+    evict_cor        = <span class="fl">TRUE</span>,
+    evict_fun        = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g_site"</span>)
+  ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
+    name             = <span class="st">"F_site"</span>,
+    family           = <span class="st">"CC"</span>,
+    formula          = <span class="kw">f_p_site</span> <span class="op">*</span> <span class="kw">f_r_site</span> <span class="op">*</span> <span class="kw">f_d</span> <span class="op">*</span> <span class="kw">d_z</span>,
+    f_p_site_lin     = <span class="kw">alpha_f_p_site</span> <span class="op">+</span> <span class="kw">beta_f_p_site</span> <span class="op">*</span> <span class="kw">z_1</span> <span class="op">+</span> <span class="kw">beta_f_p_prec</span> <span class="op">*</span> <span class="kw">prec</span> <span class="op">+</span> <span class="kw">beta_f_p_temp</span> <span class="op">*</span> <span class="kw">temp</span>,
+    f_p_site         = <span class="fl">1</span> <span class="op">/</span> (<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span><span class="kw">f_p_site_lin</span>)),
+    f_r_site         = <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw">alpha_f_r_site</span> <span class="op">+</span> <span class="kw">beta_f_r_site</span> <span class="op">*</span> <span class="kw">z_1</span> <span class="op">+</span> <span class="kw">beta_f_r_prec</span> <span class="op">*</span> <span class="kw">prec</span> <span class="op">+</span> <span class="kw">beta_f_r_temp</span> <span class="op">*</span> <span class="kw">temp</span>),
+    f_d              = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">z_2</span>, <span class="kw">mu_f_d</span>, <span class="kw">sigma_f_d</span>),
+    data_list        = <span class="kw">all_pars</span>,
+    states           = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
+    has_hier_effs    = <span class="fl">TRUE</span>,
+    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(site = <span class="kw">LETTERS</span>[<span class="fl">1</span><span class="op">:</span><span class="fl">6</span>]),
+    evict_cor        = <span class="fl">TRUE</span>,
+    evict_fun        = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
+    ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
+    name             = <span class="st">"go_sb_1_site"</span>,
+    family           = <span class="st">"CD"</span>,
+    formula          = (<span class="fl">1</span> <span class="op">-</span> <span class="kw">r_i</span>) <span class="op">*</span> <span class="kw">f_p_site</span> <span class="op">*</span> <span class="kw">f_r_site</span> <span class="op">*</span> <span class="kw">d_z</span>,
+    f_p_site_lin     = <span class="kw">alpha_f_p_site</span> <span class="op">+</span> <span class="kw">beta_f_p_site</span> <span class="op">*</span> <span class="kw">z_1</span> <span class="op">+</span> <span class="kw">beta_f_p_prec</span> <span class="op">*</span> <span class="kw">prec</span> <span class="op">+</span> <span class="kw">beta_f_p_temp</span> <span class="op">*</span> <span class="kw">temp</span>,
+    f_p_site         = <span class="fl">1</span> <span class="op">/</span> (<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span><span class="kw">f_p_site_lin</span>)),
+    f_r_site         = <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw">alpha_f_r_site</span> <span class="op">+</span> <span class="kw">beta_f_r_site</span> <span class="op">*</span> <span class="kw">z_1</span> <span class="op">+</span> <span class="kw">beta_f_r_prec</span> <span class="op">*</span> <span class="kw">prec</span> <span class="op">+</span> <span class="kw">beta_f_r_temp</span> <span class="op">*</span> <span class="kw">temp</span>),
+    data_list        = <span class="kw">all_pars</span>,
+    states           = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
+    has_hier_effs    = <span class="fl">TRUE</span>,
+    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(site = <span class="kw">LETTERS</span>[<span class="fl">1</span><span class="op">:</span><span class="fl">6</span>]),
+    evict_cor        = <span class="fl">FALSE</span>
+  ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
+    name          = <span class="st">"go_sb_2"</span>,
+    family        = <span class="st">"DD"</span>,
+    formula       = <span class="kw">s_sb1</span> <span class="op">*</span> (<span class="fl">1</span> <span class="op">-</span> <span class="kw">r_sb1</span>),
+    data_list     = <span class="kw">all_pars</span>,
+    states        = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'z'</span>)),
+    has_hier_effs = <span class="fl">FALSE</span>,
+    evict_cor     = <span class="fl">FALSE</span>
+  ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
+    name          = <span class="st">"leave_sb_1"</span>,
+    family        = <span class="st">"DC"</span>,
+    formula       = <span class="kw">s_sb1</span> <span class="op">*</span> <span class="kw">r_sb1</span> <span class="op">*</span> <span class="kw">f_d</span> <span class="op">*</span> <span class="kw">d_z</span>,
+    f_d           = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">z_2</span>, <span class="kw">mu_f_d</span>, <span class="kw">sigma_f_d</span>),
+    data_list     = <span class="kw">all_pars</span>,
+    states        = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
+    has_hier_effs = <span class="fl">FALSE</span>,
+    evict_cor     = <span class="fl">TRUE</span>,
+    evict_fun     = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
+  ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
+    name          = <span class="st">"leave_sb_2"</span>,
+    family        = <span class="st">"DC"</span>,
+    formula       = <span class="kw">s_sb2</span> <span class="op">*</span> <span class="kw">r_sb2</span> <span class="op">*</span> <span class="kw">f_d</span> <span class="op">*</span> <span class="kw">d_z</span>,
+    f_d           = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">z_2</span>, <span class="kw">mu_f_d</span>, <span class="kw">sigma_f_d</span>),
+    data_list     = <span class="kw">all_pars</span>,
+    states        = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
+    has_hier_effs = <span class="fl">FALSE</span>,
+    evict_cor     = <span class="fl">TRUE</span>,
+    evict_fun     = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
+  ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_k</a></span>(
+    name             = <span class="st">"K_site"</span>,
+    family           = <span class="st">"IPM"</span>,
+    K_site           = <span class="kw">P_site</span> <span class="op">+</span> <span class="kw">F_site</span>,
+    n_z_t_1          = <span class="kw">K_site</span>     <span class="op">%*%</span> <span class="kw">n_z_t</span>   <span class="op">+</span> 
+                       <span class="kw">leave_sb_1</span> <span class="op">%*%</span> <span class="kw">n_sb1_t</span> <span class="op">+</span> 
+                       <span class="kw">leave_sb_2</span> <span class="op">%*%</span> <span class="kw">n_sb2_t</span>,
+    n_sb1_t_1        = <span class="kw">go_sb_1_site</span> <span class="op">%*%</span> <span class="kw">n_z_t</span>,
+    n_sb2_t_1        = <span class="kw">go_sb_2</span> <span class="op">%*%</span> <span class="kw">n_sb1_t</span>,
+    data_list        = <span class="kw">all_pars</span>,
+    states           = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>)),
+    has_hier_effs    = <span class="fl">TRUE</span>,
+    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(site = <span class="kw">LETTERS</span>[<span class="fl">1</span><span class="op">:</span><span class="fl">6</span>]),
+    evict_cor        = <span class="fl">FALSE</span>
+  ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span>(
+    <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span>(
+      kernel_names = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"P_site"</span>, <span class="st">"F_site"</span>,
+                       <span class="st">"go_sb_1_site"</span>, <span class="st">"go_sb_2"</span>, 
                        <span class="st">"leave_sb_1"</span>, <span class="st">"leave_sb_2"</span>,
                        <span class="st">"K_site"</span>),
-      <span class="kw">int_rule</span>     <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="fl">7</span>),
-      <span class="kw">dom_start</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>, <span class="st">"z"</span>, <span class="st">"z"</span>, <span class="fl">NA_character_</span>, <span class="fl">NA_character_</span>, <span class="fl">NA_character_</span>, <span class="st">"z"</span>),
-      <span class="kw">dom_end</span>      <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>, <span class="st">"z"</span>, <span class="fl">NA_character_</span>, <span class="fl">NA_character_</span>, <span class="st">"z"</span>, <span class="st">"z"</span>, <span class="st">"Z"</span>)
+      int_rule     = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="fl">7</span>),
+      dom_start    = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>, <span class="st">"z"</span>, <span class="st">"z"</span>, <span class="fl">NA_character_</span>, <span class="fl">NA_character_</span>, <span class="fl">NA_character_</span>, <span class="st">"z"</span>),
+      dom_end      = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"z"</span>, <span class="st">"z"</span>, <span class="fl">NA_character_</span>, <span class="fl">NA_character_</span>, <span class="st">"z"</span>, <span class="st">"z"</span>, <span class="st">"Z"</span>)
     )
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_star.html">define_domains</a></span>(
-    <span class="kw">z</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.1</span>, <span class="fl">100</span>, <span class="fl">200</span>)
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_star.html">define_pop_state</a></span>(
-    <span class="kw">n_z</span>   <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">200</span>),
-    <span class="kw">n_sb1</span> <span class="kw">=</span> <span class="fl">20</span>,
-    <span class="kw">n_sb2</span> <span class="kw">=</span> <span class="fl">20</span>
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_star.html">define_env_state</a></span>(
-    <span class="kw">env_state</span> <span class="kw">=</span> <span class="fu">sample_fun</span>(<span class="no">env_params</span>),
-    <span class="kw">data_list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">env_params</span> <span class="kw">=</span> <span class="no">env_params</span>,
-                     <span class="kw">sample_fun</span> <span class="kw">=</span> <span class="no">sample_fun</span>)
-  ) <span class="kw">%&gt;%</span>
+  ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_impl.html">define_domains</a></span>(
+    z = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.1</span>, <span class="fl">100</span>, <span class="fl">200</span>)
+  ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_impl.html">define_pop_state</a></span>(
+    n_z   = <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fl">200</span>),
+    n_sb1 = <span class="fl">20</span>,
+    n_sb2 = <span class="fl">20</span>
+  ) <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_impl.html">define_env_state</a></span>(
+    env_state = <span class="fu">sample_fun</span>(<span class="kw">env_params</span>),
+    data_list = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(env_params = <span class="kw">env_params</span>,
+                     sample_fun = <span class="kw">sample_fun</span>)
+  ) <span class="op">%&gt;%</span>  
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>(
-    <span class="kw">iterations</span>         <span class="kw">=</span> <span class="fl">20</span>,
-    <span class="kw">kernel_seq</span>         <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="no">LETTERS</span>[<span class="fl">1</span>:<span class="fl">6</span>], <span class="fl">20</span>, <span class="kw">replace</span> <span class="kw">=</span> <span class="fl">TRUE</span>),
-    <span class="kw">normalize_pop_size</span> <span class="kw">=</span> <span class="fl">TRUE</span>
-  )</pre></body></html></div>
+    iterations         = <span class="fl">20</span>,
+    kernel_seq         = <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="kw">LETTERS</span>[<span class="fl">1</span><span class="op">:</span><span class="fl">6</span>], <span class="fl">20</span>, replace = <span class="fl">TRUE</span>),
+    normalize_pop_size = <span class="fl">TRUE</span>
+  )
+</pre></div>
 </div>
 </div>
   </div>
@@ -739,7 +760,7 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

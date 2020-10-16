@@ -111,6 +111,9 @@ vignette('ipmr-introduction', 'ipmr') also contains helpful information." />
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
     </li>
+    <li>
+      <a href="../articles/density-dependence.html">Density Dependent IPMs</a>
+    </li>
     <li class="divider"></li>
     <li class="dropdown-header">Generic Functions</li>
     <li>
@@ -160,97 +163,126 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
     </div>
 
     <pre class="usage"><span class='fu'>make_ipm</span>(
-  <span class='no'>proto_ipm</span>,
-  <span class='kw'>return_main_env</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>return_all_envs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='no'>...</span>
+  <span class='kw'>proto_ipm</span>,
+  return_main_env = <span class='fl'>TRUE</span>,
+  return_all_envs = <span class='fl'>FALSE</span>,
+  usr_funs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>...</span>
 )
 
 <span class='co'># S3 method for simple_di_det</span>
 <span class='fu'>make_ipm</span>(
-  <span class='no'>proto_ipm</span>,
-  <span class='kw'>return_main_env</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>return_all_envs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='no'>...</span>,
-  <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>proto_ipm</span>,
+  return_main_env = <span class='fl'>TRUE</span>,
+  return_all_envs = <span class='fl'>FALSE</span>,
+  usr_funs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>...</span>,
+  domain_list = <span class='kw'>NULL</span>,
+  iterate = <span class='fl'>FALSE</span>,
+  iterations = <span class='fl'>50</span>,
+  normalize_pop_size = <span class='fl'>TRUE</span>
 )
 
 <span class='co'># S3 method for simple_di_stoch_kern</span>
 <span class='fu'>make_ipm</span>(
-  <span class='no'>proto_ipm</span>,
-  <span class='kw'>return_main_env</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>return_all_envs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='no'>...</span>,
-  <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>report_progress</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>proto_ipm</span>,
+  return_main_env = <span class='fl'>TRUE</span>,
+  return_all_envs = <span class='fl'>FALSE</span>,
+  usr_funs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>...</span>,
+  domain_list = <span class='kw'>NULL</span>,
+  iterate = <span class='fl'>FALSE</span>,
+  iterations = <span class='fl'>50</span>,
+  kernel_seq = <span class='kw'>NULL</span>,
+  normalize_pop_size = <span class='fl'>TRUE</span>,
+  report_progress = <span class='fl'>FALSE</span>
 )
 
 <span class='co'># S3 method for simple_di_stoch_param</span>
 <span class='fu'>make_ipm</span>(
-  <span class='no'>proto_ipm</span>,
-  <span class='kw'>return_main_env</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>return_all_envs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='no'>...</span>,
-  <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>report_progress</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>proto_ipm</span>,
+  return_main_env = <span class='fl'>TRUE</span>,
+  return_all_envs = <span class='fl'>FALSE</span>,
+  usr_funs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>...</span>,
+  domain_list = <span class='kw'>NULL</span>,
+  iterate = <span class='fl'>TRUE</span>,
+  iterations = <span class='fl'>50</span>,
+  kernel_seq = <span class='kw'>NULL</span>,
+  normalize_pop_size = <span class='fl'>TRUE</span>,
+  report_progress = <span class='fl'>FALSE</span>
 )
 
 <span class='co'># S3 method for general_di_det</span>
 <span class='fu'>make_ipm</span>(
-  <span class='no'>proto_ipm</span>,
-  <span class='kw'>return_main_env</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>return_all_envs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='no'>...</span>,
-  <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>proto_ipm</span>,
+  return_main_env = <span class='fl'>TRUE</span>,
+  return_all_envs = <span class='fl'>FALSE</span>,
+  usr_funs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>...</span>,
+  domain_list = <span class='kw'>NULL</span>,
+  iterate = <span class='fl'>TRUE</span>,
+  iterations = <span class='fl'>50</span>,
+  normalize_pop_size = <span class='fl'>TRUE</span>
 )
 
 <span class='co'># S3 method for general_di_stoch_kern</span>
 <span class='fu'>make_ipm</span>(
-  <span class='no'>proto_ipm</span>,
-  <span class='kw'>return_main_env</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>return_all_envs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='no'>...</span>,
-  <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>report_progress</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>proto_ipm</span>,
+  return_main_env = <span class='fl'>TRUE</span>,
+  return_all_envs = <span class='fl'>FALSE</span>,
+  usr_funs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>...</span>,
+  domain_list = <span class='kw'>NULL</span>,
+  iterate = <span class='fl'>TRUE</span>,
+  iterations = <span class='fl'>50</span>,
+  kernel_seq = <span class='kw'>NULL</span>,
+  normalize_pop_size = <span class='fl'>TRUE</span>,
+  report_progress = <span class='fl'>FALSE</span>
 )
 
 <span class='co'># S3 method for general_di_stoch_param</span>
 <span class='fu'>make_ipm</span>(
-  <span class='no'>proto_ipm</span>,
-  <span class='kw'>return_main_env</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>return_all_envs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>usr_funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='no'>...</span>,
-  <span class='kw'>domain_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>iterate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>iterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>kernel_seq</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>normalize_pop_size</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>report_progress</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>proto_ipm</span>,
+  return_main_env = <span class='fl'>TRUE</span>,
+  return_all_envs = <span class='fl'>FALSE</span>,
+  usr_funs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>...</span>,
+  domain_list = <span class='kw'>NULL</span>,
+  iterate = <span class='fl'>TRUE</span>,
+  iterations = <span class='fl'>50</span>,
+  kernel_seq = <span class='kw'>NULL</span>,
+  normalize_pop_size = <span class='fl'>TRUE</span>,
+  report_progress = <span class='fl'>FALSE</span>
+)
+
+<span class='co'># S3 method for simple_dd_det</span>
+<span class='fu'>make_ipm</span>(
+  <span class='kw'>proto_ipm</span>,
+  return_main_env = <span class='fl'>TRUE</span>,
+  return_all_envs = <span class='fl'>FALSE</span>,
+  usr_funs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>...</span>,
+  domain_list = <span class='kw'>NULL</span>,
+  iterate = <span class='fl'>TRUE</span>,
+  iterations = <span class='fl'>50</span>,
+  normalize_pop_size = <span class='fl'>FALSE</span>,
+  report_progress = <span class='fl'>FALSE</span>
+)
+
+<span class='co'># S3 method for simple_dd_stoch_kern</span>
+<span class='fu'>make_ipm</span>(
+  <span class='kw'>proto_ipm</span>,
+  return_main_env = <span class='fl'>TRUE</span>,
+  return_all_envs = <span class='fl'>FALSE</span>,
+  usr_funs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>...</span>,
+  domain_list = <span class='kw'>NULL</span>,
+  iterate = <span class='fl'>TRUE</span>,
+  iterations = <span class='fl'>50</span>,
+  kernel_seq = <span class='fl'>NA_character_</span>,
+  normalize_pop_size = <span class='fl'>FALSE</span>,
+  report_progress = <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -370,6 +402,9 @@ are matched using <code><a href='https://rdrr.io/r/base/grep.html'>grepl()</a></
 When it is an integer vector, the vector
 is first checked to make sure they are all present in kernel names. The model
 procedure will stop if thay are not all present.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Sam Levin</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -386,7 +421,7 @@ procedure will stop if thay are not all present.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

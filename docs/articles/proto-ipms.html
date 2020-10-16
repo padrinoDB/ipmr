@@ -67,6 +67,9 @@
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
     </li>
+    <li>
+      <a href="../articles/density-dependence.html">Density Dependent IPMs</a>
+    </li>
     <li class="divider">
     <li class="dropdown-header">Generic Functions</li>
     <li>
@@ -120,7 +123,7 @@
 <div id="the-actual-details" class="section level1">
 <h1 class="hasAnchor">
 <a href="#the-actual-details" class="anchor"></a>The actual details</h1>
-<p>The <code>proto_ipm</code> data structure powers most of <code>ipmr</code>. It represents the minimum amount of information one needs to specify to implement an IPM, and provides a (hopefully) standardized data structure going forward. It is a <code>data.frame</code>, and has as many rows as calls to <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code> + <code><a href="../reference/kernel-definitions.html">define_k()</a></code> that are used in the model definition pipeline. Each row corresponds to 1 or more kernels (the latter case being when hierarchical effects like age, year, or site are included in the model). The <code>proto_ipm</code> will also always contain the following columns:</p>
+<p>The <code>proto_ipm</code> data structure powers most of <code>ipmr</code>. It represents the minimum amount of information one needs to specify to implement an IPM, and provides a (hopefully) standardized data structure going forward. It is a <code>data.frame</code>, and has as many rows as calls to <code><a href="../reference/define_kernel.html">define_kernel()</a></code> + <code><a href="../reference/define_kernel.html">define_k()</a></code> that are used in the model definition pipeline. Each row corresponds to 1 or more kernels (the latter case being when hierarchical effects like age, year, or site are included in the model). The <code>proto_ipm</code> will also always contain the following columns:</p>
 <ol style="list-style-type: decimal">
 <li><p><code>id</code>: This is a model ID, and not especially useful for user-defined models. It is included to assist with implementing <em>Padrino</em>, a database of Integral Projection Models.</p></li>
 <li><p><code>kernel_id</code>: This is the name of each kernel and is a character string. <code>make_ipm</code> creates an object with this name from the parameters and functions in the <code>params</code> column.</p></li>
@@ -129,7 +132,7 @@
 <li><p><code>int_rule</code>: A character string. This is the name of the integration rule for the kernel. In the case of a discrete to discrete transition, this is just <code>NA_character_</code>.</p></li>
 <li><p><code>evict</code>: Either <code>TRUE</code> or <code>FALSE</code>. Denotes whether the kernel will have an eviction correction applied.</p></li>
 <li><p><code>evict_fun</code>: A list column. If <code>evict</code> is <code>TRUE</code>, each entry will contain one or more <a href="https://rlang.r-lib.org/reference/eval_tidy.html">quosures</a>. These should be calls that modify one or more vital rate expressions to generate the kernel itself.</p></li>
-<li><p><code>pop_state</code>: A list column. Contains either a quosure that generates the population state vector(s), or pre-evaluated vectors if passed into the <code>pop_vectors</code> slot of <code><a href="../reference/define_star.html">define_pop_state()</a></code>.</p></li>
+<li><p><code>pop_state</code>: A list column. Contains either a quosure that generates the population state vector(s), or pre-evaluated vectors if passed into the <code>pop_vectors</code> slot of <code><a href="../reference/define_impl.html">define_pop_state()</a></code>.</p></li>
 <li><p><code>env_state</code>: A list column. This contains quosure(s) that sample a continuous environmental variable, and the data that are needed to evaluate the quosures. If the quosure contains a user-defined function, then the data should also contain a variable pointing to that function’s definition (usually in the global environment).</p></li>
 <li><p><code>has_hier_effs</code>: Either <code>TRUE</code> or <code>FALSE</code>. This indicates whether to check all of the names in the model for hierarchical effects. If <code>TRUE</code>, <code>.split_hier_effs</code> is called inside of <code>make_ipm</code>.</p></li>
 <li><p><code>levels_hier_effs</code>: A list. If <code>has_hier_effs</code> is <code>TRUE</code>, then this will contain a list of integer or character vectors. The names in the list should correspond to the suffixes used in vital rate expressions/variable names, and the values in the list should correspond to the values the suffix can take on (e.g. <code><a href="https://rdrr.io/r/base/list.html">list(site = c("A", "B", "C"), yr = 1:5)</a></code>).</p></li>
@@ -169,7 +172,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -108,6 +108,9 @@
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
     </li>
+    <li>
+      <a href="../articles/density-dependence.html">Density Dependent IPMs</a>
+    </li>
     <li class="divider"></li>
     <li class="dropdown-header">Generic Functions</li>
     <li>
@@ -154,64 +157,64 @@
     </div>
 
     <pre class="usage"><span class='fu'>define_kernel</span>(
-  <span class='no'>proto_ipm</span>,
-  <span class='no'>name</span>,
-  <span class='no'>formula</span>,
-  <span class='no'>family</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>data_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='no'>states</span>,
-  <span class='kw'>has_hier_effs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>levels_ages</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>evict_cor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+  <span class='kw'>proto_ipm</span>,
+  <span class='kw'>name</span>,
+  <span class='kw'>formula</span>,
+  <span class='kw'>family</span>,
+  <span class='kw'>...</span>,
+  data_list = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>states</span>,
+  has_hier_effs = <span class='fl'>FALSE</span>,
+  levels_hier_effs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  levels_ages = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  evict_cor = <span class='fl'>FALSE</span>,
+  evict_fun = <span class='kw'>NULL</span>
 )
 
 <span class='fu'>define_k</span>(
-  <span class='no'>proto_ipm</span>,
-  <span class='no'>name</span>,
-  <span class='no'>family</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>data_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='no'>states</span>,
-  <span class='kw'>has_hier_effs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>levels_ages</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>evict_cor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+  <span class='kw'>proto_ipm</span>,
+  <span class='kw'>name</span>,
+  <span class='kw'>family</span>,
+  <span class='kw'>...</span>,
+  data_list = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>states</span>,
+  has_hier_effs = <span class='fl'>FALSE</span>,
+  levels_hier_effs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  levels_ages = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  evict_cor = <span class='fl'>FALSE</span>,
+  evict_fun = <span class='kw'>NULL</span>
 )
 
 <span class='co'># S3 method for default</span>
 <span class='fu'>define_k</span>(
-  <span class='no'>proto_ipm</span>,
-  <span class='no'>name</span>,
-  <span class='no'>family</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>data_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='no'>states</span>,
-  <span class='kw'>has_hier_effs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>evict_cor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+  <span class='kw'>proto_ipm</span>,
+  <span class='kw'>name</span>,
+  <span class='kw'>family</span>,
+  <span class='kw'>...</span>,
+  data_list = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>states</span>,
+  has_hier_effs = <span class='fl'>FALSE</span>,
+  levels_hier_effs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  evict_cor = <span class='fl'>FALSE</span>,
+  evict_fun = <span class='kw'>NULL</span>
 )
 
 <span class='co'># S3 method for age_x_size</span>
 <span class='fu'>define_k</span>(
-  <span class='no'>proto_ipm</span>,
-  <span class='no'>name</span>,
-  <span class='no'>family</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>data_list</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='no'>states</span>,
-  <span class='kw'>has_hier_effs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>levels_hier_effs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>levels_ages</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>evict_cor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>evict_fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+  <span class='kw'>proto_ipm</span>,
+  <span class='kw'>name</span>,
+  <span class='kw'>family</span>,
+  <span class='kw'>...</span>,
+  data_list = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>states</span>,
+  has_hier_effs = <span class='fl'>FALSE</span>,
+  levels_hier_effs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  levels_ages = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  evict_cor = <span class='fl'>FALSE</span>,
+  evict_fun = <span class='kw'>NULL</span>
 )
 
-<span class='fu'>remove_k</span>(<span class='no'>proto_ipm</span>)</pre>
+<span class='fu'>remove_k</span>(<span class='kw'>proto_ipm</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -353,7 +356,7 @@ for more information on how to get started.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

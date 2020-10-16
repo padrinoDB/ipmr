@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Perform the <em>vec</em> operation and it's inverse — vec • ipmr</title>
+<title>Perform the vec operation and it's inverse — vec • ipmr</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Perform the <em>vec</em> operation and it's inverse — vec" />
+<meta property="og:title" content="Perform the vec operation and it's inverse — vec" />
 <meta property="og:description" content="Unstacks a matrix into a single column vector. Each successive
 column is appended to the bottom of the vector" />
 
@@ -109,6 +109,9 @@ column is appended to the bottom of the vector" />
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
     </li>
+    <li>
+      <a href="../articles/density-dependence.html">Density Dependent IPMs</a>
+    </li>
     <li class="divider"></li>
     <li class="dropdown-header">Generic Functions</li>
     <li>
@@ -155,9 +158,9 @@ column is appended to the bottom of the vector" />
 column is appended to the bottom of the vector</p>
     </div>
 
-    <pre class="usage"><span class='fu'>vec</span>(<span class='no'>mat</span>)
+    <pre class="usage"><span class='fu'>vec</span>(<span class='kw'>mat</span>)
 
-<span class='fu'>inv_vec</span>(<span class='no'>mat</span>, <span class='kw'>square</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+<span class='fu'>inv_vec</span>(<span class='kw'>mat</span>, square = <span class='fl'>TRUE</span>, nrow = <span class='kw'>NULL</span>, ncol = <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -190,11 +193,12 @@ dimensions specified by <code>nrow</code> and <code>ncol</code></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='no'>mat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>5</span>)
+<span class='kw'>mat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fl'>1</span><span class='op'>:</span><span class='fl'>20</span>, nrow = <span class='fl'>4</span>, ncol = <span class='fl'>5</span>)
 
-<span class='no'>v</span> <span class='kw'>&lt;-</span> <span class='fu'>vec</span>(<span class='no'>mat</span>)
+<span class='kw'>v</span> <span class='op'>&lt;-</span> <span class='fu'>vec</span>(<span class='kw'>mat</span>)
 
-<span class='no'>v</span></div><div class='output co'>#&gt;       [,1]
+<span class='kw'>v</span>
+</div><div class='output co'>#&gt;       [,1]
 #&gt;  [1,]    1
 #&gt;  [2,]    2
 #&gt;  [3,]    3
@@ -215,7 +219,8 @@ dimensions specified by <code>nrow</code> and <code>ncol</code></p>
 #&gt; [18,]   18
 #&gt; [19,]   19
 #&gt; [20,]   20</div><div class='input'>
-<span class='fu'>inv_vec</span>(<span class='no'>v</span>)</div><div class='output co'>#&gt;      [,1] [,2] [,3] [,4]
+<span class='fu'>inv_vec</span>(<span class='kw'>v</span>)
+</div><div class='output co'>#&gt;      [,1] [,2] [,3] [,4]
 #&gt; [1,]    1    5    9   13
 #&gt; [2,]    2    6   10   14
 #&gt; [3,]    3    7   11   15
@@ -237,7 +242,7 @@ dimensions specified by <code>nrow</code> and <code>ncol</code></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

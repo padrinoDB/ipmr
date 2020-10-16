@@ -244,7 +244,7 @@
 
   env_state_funs <- env_state_funs[!ind]
 
-  main_env     <- .bind_env_exprs(main_env, env_state_funs)
+  main_env       <- .bind_env_exprs(main_env, env_state_funs)
 
   env_list       <- list(main_env = main_env)
 
@@ -1486,6 +1486,73 @@ set_ipmr_classes <- function(to_set, cls = NULL) {
     )
   )
 
+  return(proto)
+
+}
+
+#' @noRd
+# macro to insert updated pop_state names into vital rate expressions.
+# differs from prep_dd_k_exprs in that formula is a scalar here,
+# and probably a list there.
+
+.prep_dd_vr_exprs <- function(proto) {
+
+  possible_states <- unique(unlist(proto$state_var))
+
+  state_nms <- paste("n_", possible_states, "_t", sep = "")
+  to_sub    <- paste("pop_state_", possible_states, "_t", sep = "")
+
+  for(i in seq_along(state_nms)){
+
+    out <- lapply(proto$params, function(x, target, to_sub) {
+
+      x$formula <- gsub(target, to_sub, x$formula)
+      x$vr_text <- lapply(x$vr_text, function(y, target, to_sub) {
+        gsub(target, to_sub, y)
+      },
+      target = target,
+      to_sub = to_sub)
+
+      return(x)
+    },
+    target = state_nms[i],
+    to_sub = to_sub[i])
+  }
+
+  proto$params <- out
+  return(proto)
+
+}
+
+#' @noRd
+# Basically the same as above, but preserves list names in ... used by
+# define_k (i.e. the lapply(x$formula,...) and ignores x$vr_text)
+
+.prep_dd_k_exprs <- function(proto) {
+
+  possible_states <- unique(unlist(proto$state_var))
+
+  state_nms <- paste("n_", possible_states, "_t", sep = "")
+  to_sub    <- paste("pop_state_", possible_states, "_t", sep = "")
+
+  for(i in seq_along(state_nms)){
+
+    out <- lapply(proto$params, function(x, target, to_sub) {
+
+      x$formula <- lapply(x$formula, function(y, target, to_sub){
+        gsub(target, to_sub, y)
+      },
+      target = target,
+      to_sub = to_sub)
+
+
+      return(x)
+    },
+    target = state_nms[i],
+    to_sub = to_sub[i])
+  }
+
+  proto$params <- out
   return(proto)
 
 }

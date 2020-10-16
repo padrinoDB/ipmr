@@ -108,6 +108,9 @@
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
     </li>
+    <li>
+      <a href="../articles/density-dependence.html">Density Dependent IPMs</a>
+    </li>
     <li class="divider"></li>
     <li class="dropdown-header">Generic Functions</li>
     <li>
@@ -153,28 +156,28 @@
     <p>Compute the standardized left and right eigenvectors via iteration</p>
     </div>
 
-    <pre class="usage"><span class='fu'>right_ev</span>(<span class='no'>ipm</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>right_ev</span>(<span class='kw'>ipm</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>right_ev</span>(<span class='no'>ipm</span>, <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='no'>...</span>)
+<span class='fu'>right_ev</span>(<span class='kw'>ipm</span>, n_iterations = <span class='fl'>100</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for general_di_det_ipm</span>
 <span class='fu'>right_ev</span>(
-  <span class='no'>ipm</span>,
-  <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>mega_mat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>mega_vec</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>keep_mega</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>...</span>
+  <span class='kw'>ipm</span>,
+  n_iterations = <span class='fl'>100</span>,
+  mega_mat = <span class='kw'>NULL</span>,
+  mega_vec = <span class='kw'>NULL</span>,
+  keep_mega = <span class='fl'>FALSE</span>,
+  <span class='kw'>...</span>
 )
 
-<span class='fu'>left_ev</span>(<span class='no'>ipm</span>, <span class='no'>...</span>)
+<span class='fu'>left_ev</span>(<span class='kw'>ipm</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>left_ev</span>(<span class='no'>ipm</span>, <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='no'>...</span>)
+<span class='fu'>left_ev</span>(<span class='kw'>ipm</span>, n_iterations = <span class='fl'>100</span>, <span class='kw'>...</span>)
 
 <span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>left_ev</span>(<span class='no'>ipm</span>, <span class='no'>mega_mat</span>, <span class='no'>mega_vec</span>, <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>keep_mega</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>left_ev</span>(<span class='kw'>ipm</span>, <span class='kw'>mega_mat</span>, <span class='kw'>mega_vec</span>, n_iterations = <span class='fl'>100</span>, keep_mega = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -198,7 +201,7 @@ convergence. Default is 100.</p></td>
 between the kernels in the model. The names should correspond to kernel
 names, with 0s corresponding to sparse areas of the mega-matrix. The names can
 be either symbols or characters. These functions support suffix expansion as in
-<code><a href='kernel-definitions.html'>define_k(ernel)</a></code>, so expressions don't need to be re-written for every
+<code><a href='define_kernel.html'>define_k(ernel)</a></code>, so expressions don't need to be re-written for every
 combination hierarchical effects. DO NOT supply arguments <code>nrow</code>,
 <code>ncol</code>, or <code>byrow</code>. These are set internally based on dimensions
 of each sub-kernel.</p></td>
@@ -238,18 +241,20 @@ to help with age-size models or ones with a lot of hierarchical effects.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>gen_di_det_ex</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>gen_di_det_ex</span>)
 
 <span class='co'># mega matrix is specifed as a row-major vector/matrix of symbols. You can also</span>
 <span class='co'># supply a character vector/matrix. mega_vec is done the same way.</span>
 <span class='co'># DO NOT supply arguments like nrow or ncol if using \code{matrix(...)}.</span>
 <span class='co'># The function expects to work these out on its own.</span>
 
-<span class='no'>ipmr_v</span> <span class='kw'>&lt;-</span> <span class='fu'>left_ev</span>(<span class='no'>gen_di_det_ex</span>,
-                  <span class='kw'>mega_mat</span>     <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>stay_discrete</span>, <span class='no'>go_discrete</span>,
-                                   <span class='no'>leave_discrete</span>, <span class='no'>P</span>),
-                  <span class='kw'>mega_vec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>b</span>, <span class='no'>ht</span>),
-                  <span class='kw'>n_iterations</span> <span class='kw'>=</span> <span class='fl'>100</span>)</div></pre>
+<span class='kw'>ipmr_v</span> <span class='op'>&lt;-</span> <span class='fu'>left_ev</span>(<span class='kw'>gen_di_det_ex</span>,
+                  mega_mat     = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>stay_discrete</span>, <span class='kw'>go_discrete</span>,
+                                   <span class='kw'>leave_discrete</span>, <span class='kw'>P</span>),
+                  mega_vec = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>b</span>, <span class='kw'>ht</span>),
+                  n_iterations = <span class='fl'>100</span>)
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -265,7 +270,7 @@ to help with age-size models or ones with a lot of hierarchical effects.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

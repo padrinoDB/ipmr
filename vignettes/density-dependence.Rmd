@@ -1,0 +1,182 @@
+---
+title: "Density Dependent IPMs"
+output:
+  rmarkdown::html_vignette: 
+    toc: yes
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{General IPMs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Density dependent models
+
+A limited number of density dependent model classes are now implemented. Simple, deterministic and kernel-resampled stochastic models can now handle density dependent vital rate expressions. Others are coming soon.
+
+This vignette will get more details shortly. For now, see the example below:
+
+## Example of a simple, stochastic, kernel-resampled model with density dependence
+
+This example will probably look a lot like the ones from other vignettes. It assumes that density dependence is modeled as a fixed effect in survival and recruit production models, and assumes there is no density dependence in growth or probability of reproducing models. The survival ($s(z, N, \theta)$/`s_yr`), growth ($g(z',z, \theta)$/ `g_yr`), and number of recruit models ($f_s(z, N, \theta)$/`f_s_yr`) have year-specific intercepts as well.
+
+
+The mathematical form for the IPM is below:
+
+1. $n(z', t+1) = K(z', z, N, \theta)n(z, t)dz$
+
+2. $N = \int_L^Un(z,t)dz$
+
+3. $K(z', z, N) = P(z', z, N, \theta) + F(z', z, N, \theta)$
+
+Here, $N$ represents the total population size, and $\theta$ denotes the year specific intercepts. The kernel values fluctuate as a function of these at each iteration of the model.
+
+The $P(z', z, N)$ kernel is comprised of a density independent function for growth (Eq 6-7) and a density dependent function for survival (Eq 5):
+
+4. $P(z', z, N) = s(z, N) * g(z', z)$
+
+5. $Logit(s(z, N)) = \alpha_s + \alpha_s^{yr} + \beta_s^z * z + \beta_s^{N} * N$
+
+6. $g(z', z, \theta) \sim Norm(\mu_g(z, \theta), \sigma_g)$
+
+7. $\mu_g(z, \theta) = \alpha_g + \alpha_g^{yr} + \beta_g^z * z$
+
+The $F(z',z, N, \theta)$ kernel is comprised of a density independent function for recruit size (Eq 10) and probability of reproducing (Eq 9), and a density dependent function for number of recruits produced by parents (Eq 11).
+
+8. $F(z', z, N, \theta) = f_r(z) * f_s(z, N, \theta) + f_d(z')$
+
+9. $Logit(f_r(z)) = \alpha_{f_r} + \beta_{f_r}^z * z$
+
+10. $f_d(z') \sim Norm(\mu_{f_d}, \sigma_{f_d})$
+
+11. $Log(f_s(z, N, \theta)) = \alpha_{f_s} + \alpha_{f_s}^{yr} + \beta_{f_s}^z * z + \beta_{f_s}^N * N$
+
+We'll simulate a 50 year time series using hypothetical parameter values. The fixed parameter values are created as with a density independent model. The difference is that we now have two more parameters: `s_dd`, and `f_s_dd`. These are the coefficients that correspond to $\beta_s^N$ and $\beta_{f_s}^N$, respectively. The chunk below initializes the data list object, which we name `params`.
+
+
+```{r eval = FALSE}
+
+
+data_list = list(
+  s_int     = 1.03,
+  s_slope   = 2.2,
+  s_dd      = -0.7,
+  g_int     = 8,
+  g_slope   = 0.92,
+  sd_g      = 0.9,
+  f_r_int   = 0.09,
+  f_r_slope = 0.05,
+  f_s_int   = 0.1,
+  f_s_slope = 0.005,
+  f_s_dd    = -0.03,
+  mu_fd     = 9,
+  sd_fd     = 2
+)
+
+# Now, simulate some random intercepts for growth, survival, and offspring production
+
+g_r_int   <- rnorm(5, 0, 0.3)
+s_r_int   <- rnorm(5, 0, 0.7)
+f_s_r_int <- rnorm(5, 0, 0.2)
+
+nms <- paste("r_", 1:5, sep = "")
+
+names(g_r_int) <- paste("g_", nms, sep = "")
+names(s_r_int) <- paste("s_", nms, sep = "")
+names(f_s_r_int) <- paste("f_s_", nms, sep = "")
+
+params     <- c(data_list, g_r_int, s_r_int, f_s_r_int)
+
+```
+
+
+Next, we initialize the model using `init_ipm`. The difference is that the second bit of model class is now changed to `"dd"` to denote that this is a density dependent model.
+
+```{r eval = FALSE}
+
+dd_ipm <- init_ipm("simple_dd_stoch_kern") 
+
+```
+
+Once we've done that, we're ready to begin specifying the kernel forms. These will look very similar to the ones we specified for density-independent models, except that we now include the term `s_dd * sum(n_size_t)` in the survival expression. `sum(n_size_t)` is the syntax `ipmr` uses to denote total population size. Further down, there is an example of how to use subsets of the trait distribution. 
+
+```{r eval = FALSE}
+dd_ipm <- define_kernel(
+  proto_ipm        = dd_ipm,
+  name             = "P_yr",
+  formula          = s_yr * g_yr,
+  family           = "CC",
+  s_yr             = plogis(s_int + s_r_yr + s_slope * size_1 + s_dd * sum(n_size_t)),
+  g_yr             = dnorm(size_2, g_mu_yr, sd_g),
+  g_mu_yr          = g_int + g_r_yr + g_slope * size_1,
+  data_list        = params,
+  states           = list(c("size")),
+  has_hier_effs    = TRUE,
+  levels_hier_effs = list(yr = 1:5),
+  evict_cor        = TRUE,
+  evict_fun        = truncated_distributions("norm", "g_yr")
+) 
+  
+```
+
+Other than the inclusion of the density dependent term in the survival expression, this should look quite similar to the density-independent kernel-resampled models from the Introduction vignette. We are now ready to continue defining the $F(z',z,N,\theta)$ kernel.
+
+
+```{r eval = FALSE}
+
+dd_ipm <- define_kernel(
+  proto_ipm        = dd_ipm,
+  name             = "F_yr",
+  formula          = f_r * f_s_yr * f_d,
+  family           = "CC",
+  f_r              = plogis(f_r_int + f_r_slope * size_1),
+  f_s_yr           = exp(f_s_int + f_s_r_yr + f_s_slope * size_1 + f_s_dd * sum(n_size_t)),
+  f_d              = dnorm(size_2, mu_fd, sd_fd),
+  data_list        = params,
+  states           = list(c("size")),
+  has_hier_effs    = TRUE,
+  levels_hier_effs = list(yr = 1:5),
+  evict_cor        = TRUE,
+  evict_fun        = truncated_distributions("norm", "f_d")
+  ) 
+
+```
+
+Again, we've add the `f_s_dd * sum(n_size_t)` to the expression fof `f_s_yr`, but otherwise, not much is different from how we've defined density independent models. The rest of the model definition process is unchanged.
+
+```{r eval = FALSE}
+ dd_ipm <-  define_k(
+   proto_ipm        = dd_ipm,
+   name             = "K_yr",
+   family           = "IPM",
+   K_yr             = P_yr + F_yr,
+   n_size_t_1       = K_yr %*% n_size_t,
+   data_list        = params,
+   states           = list(c("size")),
+   has_hier_effs    = TRUE,
+   levels_hier_effs = list(yr = 1:5),
+   evict_cor        = FALSE
+ ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P_yr", "F_yr", "K_yr"),
+      int_rule     = rep("midpoint", 3),
+      dom_start    = rep("size", 3),
+      dom_end      = rep("size", 3)
+    )
+  ) %>%
+  define_domains(
+    size = c(0, 50, 200)
+  ) %>%
+  define_pop_state(
+    n_size = runif(200)
+  ) %>%
+  make_ipm(
+    iterate = TRUE,
+    iterations = 50,
+    kernel_seq = sample(1:5, 50, replace = TRUE)
+  )
+
+```
+
+More to come soon....
