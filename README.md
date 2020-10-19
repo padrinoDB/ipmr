@@ -1,9 +1,5 @@
-[![Travis build
-status](https://travis-ci.org/levisc8/ipmr.svg?branch=master)](https://travis-ci.org/levisc8/ipmr)
 [![R build
 status](https://github.com/levisc8/ipmr/workflows/R-CMD-check/badge.svg)](https://github.com/levisc8/ipmr/actions)
-[![AppVeyor build
-status](https://ci.appveyor.com/api/projects/status/github/levisc8/ipmr?branch=master&svg=true)](https://ci.appveyor.com/project/levisc8/ipmr)
 [![Lifecycle:
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![CRAN
@@ -135,7 +131,7 @@ The following possibilities are currently or will become available in
 
 <!-- end list -->
 
-  - Simple, density dependent models: **Please be patient**
+  - Simple, density dependent models: **In progress, not yet stable**
 
 <!-- end list -->
 
@@ -159,7 +155,7 @@ The following possibilities are currently or will become available in
 
 <!-- end list -->
 
-  - General, density dependent models: **Please be patient**
+  - General, density dependent models: **In progress, not yet stable**
 
 <!-- end list -->
 
@@ -177,8 +173,9 @@ functional and detailed below as well as
 The `general_*` versions of these are also ready, and an introduction to
 them is available
 [here](https://levisc8.github.io/ipmr/articles/general-ipms.html).
-However, expect changes as more complicated methods are implemented\!
-Below is an example implementing a `simple_di_det` IPM.
+Density dependent versions are completed for simple models, and in
+progress for general ones. These are not yet stable. Below is an example
+implementing a `simple_di_det` IPM.
 
 Next on the to-do list is to write generic functions for `lambda`,
 `right_ev` (right eigenvector), `left_ev` (left eigenvector), and

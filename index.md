@@ -1,7 +1,5 @@
-[![Travis build
-status](https://travis-ci.org/levisc8/ipmr.svg?branch=master)](https://travis-ci.org/levisc8/ipmr)
-[![AppVeyor build
-status](https://ci.appveyor.com/api/projects/status/github/levisc8/ipmr?branch=master&svg=true)](https://ci.appveyor.com/project/levisc8/ipmr)
+[![R build
+status](https://github.com/levisc8/ipmr/workflows/R-CMD-check/badge.svg)](https://github.com/levisc8/ipmr/actions)
 [![Lifecycle:
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![CRAN
@@ -133,7 +131,7 @@ The following possibilities are currently or will become available in
 
 <!-- end list -->
 
-  - Simple, density dependent models: **Please be patient**
+  - Simple, density dependent models: **In progress, not yet stable**
 
 <!-- end list -->
 
@@ -157,7 +155,7 @@ The following possibilities are currently or will become available in
 
 <!-- end list -->
 
-  - General, density dependent models: **Please be patient**
+  - General, density dependent models: **In progress, not yet stable**
 
 <!-- end list -->
 
@@ -170,13 +168,16 @@ The following possibilities are currently or will become available in
 Simple density-independent deterministic, simple kernel-resampled
 stochastic, and simple parameter resampled stochastic models
 (`simple_di_det`, `simple_di_stoch_kern`, `simple_di_stoch_param`) are
-now functional, and are introduced in detail
+functional and detailed below as well as
 [here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
 The `general_*` versions of these are also ready, and an introduction to
 them is available
 [here](https://levisc8.github.io/ipmr/articles/general-ipms.html).
-However, expect changes as more complicated methods are implemented\!
-See below for an example of how to implement an IPM in this framework.
+Density dependent versions are completed for simple models, and in
+progress for general ones. These are not yet stable.
+
+Keep reading below for examples of how to implement various IPMs in this
+framework.
 
 ## Examples for simple IPM classes
 
