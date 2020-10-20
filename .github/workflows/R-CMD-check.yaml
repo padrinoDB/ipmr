@@ -72,7 +72,7 @@ jobs:
 
       - name: Install stringi
         if: runner.os == 'Linux'
-        run |
+        run: |
           install.packages("stringi", type = "source")
         shell: Rscript {0}
 
