@@ -45,6 +45,12 @@
 #' during the implementation of the model itself, or incorporate the correction
 #' into individual vital rate expressions. In either of those cases,
 #' set \code{evict_cor} to \code{FALSE}.
+#' @param integrate For \code{simple_*} models, this controls whether a \code{"d_z"}
+#' is automatically appended to the \code{formula} argument. When \code{TRUE},
+#' this automatically creates a \code{formula * d_z}. There may be some cases where
+#' this behavior is not desirable. Set this to \code{FALSE} and specify the correct
+#' math if that happens. The default is \code{TRUE}. This argument is ignored for
+#' all \code{general_*} models.
 #'
 #'
 #' @details
@@ -109,9 +115,14 @@ define_kernel <- function(proto_ipm,
                           levels_hier_effs = list(),
                           levels_ages      = list(),
                           evict_cor= FALSE,
-                          evict_fun = NULL) {
+                          evict_fun = NULL,
+                          integrate = TRUE) {
 
   cls <- class(proto_ipm)
+
+  int <- any(grepl("simple", cls))
+
+  integrate <- integrate && int
 
   # Capture formulas and convert to text
 
@@ -133,7 +144,7 @@ define_kernel <- function(proto_ipm,
   # retain names
   names(vr_text) <- names(vr_quos)
 
-  # Param_tree should always contain these four entries, regardless of class.
+  # Param_tree should always contain these five entries, regardless of class.
   # pop_states and env_states get defined separately. .protect_model detects
   # model objects and keeps them from getting flattened beyond
 
@@ -142,7 +153,8 @@ define_kernel <- function(proto_ipm,
   param_tree <- list(formula = form_text,
                      family = family,
                      vr_text = vr_text,
-                     params = data_list)
+                     params = data_list,
+                     integrate = integrate)
 
   if(!methods::hasArg(levels_hier_effs)) levels_hier_effs <- list(levels = NA)
 

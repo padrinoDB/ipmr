@@ -39,13 +39,13 @@
     out[[i]] <- .fun_to_iteration_mat(temp[[i]],
                                       state_var_start = names(proto$domain[[i]])[1],
                                       state_var_end   = names(proto$domain[[i]])[2],
-                                      main_env      = main_env,
+                                      main_env        = main_env,
                                       kern_name       = proto$kernel_id[i])
 
     names(out)[i] <- proto$kernel_id[i]
 
     if(return_envs) {
-      env_list                 <- purrr::splice(env_list, list(kern_env))
+      env_list                 <- c(env_list, list(kern_env))
       names(env_list)[(i + 1)] <- proto$kernel_id[i]
     }
 
@@ -112,7 +112,9 @@
       proto[i, ] <- .correct_eviction(proto[i, ])
     }
 
+
     param_tree <- proto$params[[i]]
+    integrate  <- param_tree$integrate
 
     kern_env         <- .make_kernel_env(param_tree$params,
                                          main_env,
@@ -120,7 +122,8 @@
 
     kern_text        <- .append_dz_to_kern_form(param_tree$formula,
                                                 proto,
-                                                i)
+                                                i,
+                                                integrate)
 
     kern_form        <- .parse_vr_formulae(kern_text,
                                            kern_env)
@@ -160,10 +163,16 @@
 
 #' @noRd
 
-.append_dz_to_kern_form <- function(kern_text, proto, id) {
+.append_dz_to_kern_form <- function(kern_text, proto, id,
+                                    integrate) {
 
+  # If the user has specified not to integrate, then this step is not
+  # necessary
+
+  if(!integrate) return(kern_text)
   # If discrete_extrema is used, then the d_z has already been appended
   # somewhere on that kernel. Thus, just return the kernel text
+
   if(proto$evict[id]) {
 
     quo_l <- .flatten_to_depth(proto$evict_fun[[id]], 1L)
@@ -1500,7 +1509,7 @@ set_ipmr_classes <- function(to_set, cls = NULL) {
   possible_states <- unique(unlist(proto$state_var))
 
   state_nms <- paste("n_", possible_states, "_t", sep = "")
-  to_sub    <- paste("pop_state_", possible_states, "_t", sep = "")
+  to_sub    <- paste("as.vector(pop_state_", possible_states, "_t)", sep = "")
 
   for(i in seq_along(state_nms)){
 
@@ -1533,7 +1542,7 @@ set_ipmr_classes <- function(to_set, cls = NULL) {
   possible_states <- unique(unlist(proto$state_var))
 
   state_nms <- paste("n_", possible_states, "_t", sep = "")
-  to_sub    <- paste("pop_state_", possible_states, "_t", sep = "")
+  to_sub    <- paste("as.vector(pop_state_", possible_states, "_t)", sep = "")
 
   for(i in seq_along(state_nms)){
 

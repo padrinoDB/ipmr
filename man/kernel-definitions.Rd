@@ -20,7 +20,8 @@ define_kernel(
   levels_hier_effs = list(),
   levels_ages = list(),
   evict_cor = FALSE,
-  evict_fun = NULL
+  evict_fun = NULL,
+  integrate = TRUE
 )
 
 define_k(
@@ -122,6 +123,13 @@ You can also either specify a \code{usr_funs} function that performs the correct
 during the implementation of the model itself, or incorporate the correction
 into individual vital rate expressions. In either of those cases,
 set \code{evict_cor} to \code{FALSE}.}
+
+\item{integrate}{For \code{simple_*} models, this controls whether a \code{"d_z"}
+is automatically appended to the \code{formula} argument. When \code{TRUE},
+this automatically creates a \code{formula * d_z}. There may be some cases where
+this behavior is not desirable. Set this to \code{FALSE} and specify the correct
+math if that happens. The default is \code{TRUE}. This argument is ignored for
+all \code{general_*} models.}
 }
 \value{
 All functions described here return a  \code{proto_ipm}.

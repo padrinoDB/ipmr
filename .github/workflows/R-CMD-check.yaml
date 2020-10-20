@@ -68,6 +68,11 @@ jobs:
         run: |
           remotes::install_deps(dependencies = TRUE, force = TRUE)
           remotes::install_cran("rcmdcheck")
+        shell: Rscript {0}
+
+      - name: Install stringi
+        if: runner.os == 'Linux'
+        run |
           install.packages("stringi", type = "source")
         shell: Rscript {0}
 
