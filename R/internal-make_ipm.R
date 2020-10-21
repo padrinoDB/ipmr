@@ -1200,54 +1200,7 @@
 
 }
 
-
 #' @noRd
-# Returns a list with entries others and k_row with hier_effs split out
-# Checks ipm definition. slightly modified so that it can manipulate
-# vr_text as well.
-
-.initialize_kernels_dd <- function(proto_ipm, iterate) {
-
-  # checks pop_state, env_state, domain definitions
-  .check_ipm_definition(proto_ipm, iterate)
-
-  # modifies vr_text so that it density dependent parts are also gsub'd
-
-  proto_ipm <- .sub_dd_terms(proto_ipm)
-
-  # Split out K from Fothers so it isn't evaluated until we're ready. If it
-  # isn't there, then proceed as usual
-
-  K_row    <- which(grepl("K|^n_.*?_t", proto_ipm$kernel_id))
-
-  if(length(K_row) > 0) {
-
-    k_row  <- proto_ipm[K_row, ]
-    others <- proto_ipm[-c(K_row), ]
-
-  } else {
-
-    others <- proto_ipm
-    k_row <- NA_character_
-
-  }
-
-  # If vital rates are fit with a hierarchical model of any kind,
-  # then split those out into their respective years/plots/what-have-you
-
-  if(any(others$has_hier_effs) | any(k_row$has_hier_effs)) {
-
-    others <- .split_hier_effs(others)
-    k_row  <- .split_hier_effs(k_row)
-
-  }
-
-  out <- list(others = others,
-              k_row  = k_row)
-
-  return(out)
-
-}
 
 .sub_dd_terms <- function(proto) {
 
@@ -1283,14 +1236,14 @@
                                  to_sub = replace)
     }
 
-
-
     proto$params[[i]] <- kern_row
 
   }
 
   return(proto)
 }
+
+#' @noRd
 
 .fun_to_iteration_mat <- function(fun,
                                   state_var_start,

@@ -35,7 +35,8 @@ define_k(
   levels_hier_effs = list(),
   levels_ages = list(),
   evict_cor = FALSE,
-  evict_fun = NULL
+  evict_fun = NULL,
+  integrate = FALSE
 )
 
 \method{define_k}{default}(
@@ -48,7 +49,8 @@ define_k(
   has_hier_effs = FALSE,
   levels_hier_effs = list(),
   evict_cor = FALSE,
-  evict_fun = NULL
+  evict_fun = NULL,
+  integrate = FALSE
 )
 
 \method{define_k}{age_x_size}(
@@ -62,7 +64,8 @@ define_k(
   levels_hier_effs = list(),
   levels_ages = list(),
   evict_cor = FALSE,
-  evict_fun = NULL
+  evict_fun = NULL,
+  integrate = FALSE
 )
 
 remove_k(proto_ipm)

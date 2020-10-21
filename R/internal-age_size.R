@@ -26,6 +26,25 @@
 
 #' @noRd
 
+.expand_ages <- function(x, ages) {
+
+  if(is.character(x)) x <- rlang::parse_expr(x)
+
+  temp     <- rlang::call_standardise(x)
+  new_arg  <- rlang::call_args(temp)[[1]]
+  new_arg  <- rlang::expr_text(new_arg)
+  class(new_arg) <- c("age_size_expr", "character")
+  temp[[2]] <- NULL
+
+  new_call <- rlang::call_modify(temp,
+                                 expr = new_arg,
+                                 ages = ages)
+
+  out <- rlang::eval_tidy(new_call)
+
+  return(out)
+}
+
 .make_age_k_row <- function(k_row) {
 
   forms <- k_row$params[[1]]$formula
@@ -48,21 +67,17 @@
   # passed to all_ages. On the other hand, we also need to generate one expression
   # for each n_x_t_1 = p_x_minus_1 %*% n_x_minus_1_t
 
-  if(any(calls == "all_ages")) {
+  a_s_methods <- c("sum", "prod")
 
-    n_0_ind  <- which(calls == "all_ages")
+  if(any(calls %in% a_s_methods)) {
+
+    n_0_ind  <- which(calls %in% a_s_methods)
     n_0_call <- forms[n_0_ind]
 
     n_0_form <- lapply(
       n_0_call,
       function(x, ages) {
-        if(is.character(x)) x <- rlang::parse_expr(x)
-        temp     <- rlang::call_standardise(x)
-        new_call <- rlang::call_modify(temp,
-                                       ages = ages)
-
-        out <- rlang::eval_tidy(new_call)
-        return(out)
+        .expand_ages(x, ages)
 
       },
       ages = ages
