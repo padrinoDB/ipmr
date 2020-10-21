@@ -98,7 +98,7 @@ dd_ipm <- init_ipm("simple_dd_stoch_kern")
 
 ```
 
-Once we've done that, we're ready to begin specifying the kernel forms. These will look very similar to the ones we specified for density-independent models, except that we now include the term `s_dd * sum(n_size_t)` in the survival expression. `sum(n_size_t)` is the syntax `ipmr` uses to denote total population size. Further down, there is an example of how to use subsets of the trait distribution. 
+Once we've done that, we're ready to begin specifying the kernel forms. These will look very similar to the ones we specified for density-independent models, except that we now include the term `s_dd * sum(n_size_t) * d_size` in the survival expression. `sum(n_size_t) * d_size` is the syntax `ipmr` uses to denote total population size. Further down, there is an example of how to use subsets of the trait distribution. 
 
 ```{r eval = FALSE}
 dd_ipm <- define_kernel(
@@ -106,7 +106,7 @@ dd_ipm <- define_kernel(
   name             = "P_yr",
   formula          = s_yr * g_yr,
   family           = "CC",
-  s_yr             = plogis(s_int + s_r_yr + s_slope * size_1 + s_dd * sum(n_size_t)),
+  s_yr             = plogis(s_int + s_r_yr + s_slope * size_1 + s_dd * sum(n_size_t) * d_size),
   g_yr             = dnorm(size_2, g_mu_yr, sd_g),
   g_mu_yr          = g_int + g_r_yr + g_slope * size_1,
   data_list        = params,
@@ -130,7 +130,7 @@ dd_ipm <- define_kernel(
   formula          = f_r * f_s_yr * f_d,
   family           = "CC",
   f_r              = plogis(f_r_int + f_r_slope * size_1),
-  f_s_yr           = exp(f_s_int + f_s_r_yr + f_s_slope * size_1 + f_s_dd * sum(n_size_t)),
+  f_s_yr           = exp(f_s_int + f_s_r_yr + f_s_slope * size_1 + f_s_dd * sum(n_size_t) * d_size),
   f_d              = dnorm(size_2, mu_fd, sd_fd),
   data_list        = params,
   states           = list(c("size")),
@@ -142,7 +142,7 @@ dd_ipm <- define_kernel(
 
 ```
 
-Again, we've add the `f_s_dd * sum(n_size_t)` to the expression fof `f_s_yr`, but otherwise, not much is different from how we've defined density independent models. The rest of the model definition process is unchanged.
+Again, we've add the `f_s_dd * sum(n_size_t) * d_size` to the expression fof `f_s_yr`, but otherwise, not much is different from how we've defined density independent models. The rest of the model definition process is unchanged.
 
 ```{r eval = FALSE}
  dd_ipm <-  define_k(
