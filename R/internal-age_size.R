@@ -63,8 +63,9 @@
   # In the case where we have an n_0 = f_1 %*% n_1 + f_2 %*% n_2 etc,
   # We need to treat this differently from other hier_effs. Normally, they
   # get one call per level of the hier_eff. in this case, we need one call
-  # expanded to include all levels of the hier_eff, and collapsed by the "fun"
-  # passed to all_ages. On the other hand, we also need to generate one expression
+  # expanded to include all levels of the hier_eff. This is done w/ methods
+  # for generics sum and prod (and maybe others later).
+  # On the other hand, we also need to generate one expression
   # for each n_x_t_1 = p_x_minus_1 %*% n_x_minus_1_t
 
   a_s_methods <- c("sum", "prod")

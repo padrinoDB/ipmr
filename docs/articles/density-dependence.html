@@ -180,14 +180,14 @@
 <div class="sourceCode" id="cb2"><pre class="downlit">
 <span class="kw">dd_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">"simple_dd_stoch_kern"</span>) 
 </pre></div>
-<p>Once we’ve done that, we’re ready to begin specifying the kernel forms. These will look very similar to the ones we specified for density-independent models, except that we now include the term <code>s_dd * sum(n_size_t)</code> in the survival expression. <code><a href="https://rdrr.io/r/base/sum.html">sum(n_size_t)</a></code> is the syntax <code>ipmr</code> uses to denote total population size. Further down, there is an example of how to use subsets of the trait distribution.</p>
+<p>Once we’ve done that, we’re ready to begin specifying the kernel forms. These will look very similar to the ones we specified for density-independent models, except that we now include the term <code>s_dd * sum(n_size_t) * d_size</code> in the survival expression. <code>sum(n_size_t) * d_size</code> is the syntax <code>ipmr</code> uses to denote total population size. Further down, there is an example of how to use subsets of the trait distribution.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit">
 <span class="kw">dd_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
   proto_ipm        = <span class="kw">dd_ipm</span>,
   name             = <span class="st">"P_yr"</span>,
   formula          = <span class="kw">s_yr</span> <span class="op">*</span> <span class="kw">g_yr</span>,
   family           = <span class="st">"CC"</span>,
-  s_yr             = <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html">plogis</a></span>(<span class="kw">s_int</span> <span class="op">+</span> <span class="kw">s_r_yr</span> <span class="op">+</span> <span class="kw">s_slope</span> <span class="op">*</span> <span class="kw">size_1</span> <span class="op">+</span> <span class="kw">s_dd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="kw">n_size_t</span>)),
+  s_yr             = <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html">plogis</a></span>(<span class="kw">s_int</span> <span class="op">+</span> <span class="kw">s_r_yr</span> <span class="op">+</span> <span class="kw">s_slope</span> <span class="op">*</span> <span class="kw">size_1</span> <span class="op">+</span> <span class="kw">s_dd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="kw">n_size_t</span>) <span class="op">*</span> <span class="kw">d_size</span>),
   g_yr             = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">size_2</span>, <span class="kw">g_mu_yr</span>, <span class="kw">sd_g</span>),
   g_mu_yr          = <span class="kw">g_int</span> <span class="op">+</span> <span class="kw">g_r_yr</span> <span class="op">+</span> <span class="kw">g_slope</span> <span class="op">*</span> <span class="kw">size_1</span>,
   data_list        = <span class="kw">params</span>,
@@ -206,7 +206,7 @@
   formula          = <span class="kw">f_r</span> <span class="op">*</span> <span class="kw">f_s_yr</span> <span class="op">*</span> <span class="kw">f_d</span>,
   family           = <span class="st">"CC"</span>,
   f_r              = <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html">plogis</a></span>(<span class="kw">f_r_int</span> <span class="op">+</span> <span class="kw">f_r_slope</span> <span class="op">*</span> <span class="kw">size_1</span>),
-  f_s_yr           = <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw">f_s_int</span> <span class="op">+</span> <span class="kw">f_s_r_yr</span> <span class="op">+</span> <span class="kw">f_s_slope</span> <span class="op">*</span> <span class="kw">size_1</span> <span class="op">+</span> <span class="kw">f_s_dd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="kw">n_size_t</span>)),
+  f_s_yr           = <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw">f_s_int</span> <span class="op">+</span> <span class="kw">f_s_r_yr</span> <span class="op">+</span> <span class="kw">f_s_slope</span> <span class="op">*</span> <span class="kw">size_1</span> <span class="op">+</span> <span class="kw">f_s_dd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="kw">n_size_t</span>) <span class="op">*</span> <span class="kw">d_size</span>),
   f_d              = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">size_2</span>, <span class="kw">mu_fd</span>, <span class="kw">sd_fd</span>),
   data_list        = <span class="kw">params</span>,
   states           = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"size"</span>)),
@@ -216,7 +216,7 @@
   evict_fun        = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
   ) 
 </pre></div>
-<p>Again, we’ve add the <code>f_s_dd * sum(n_size_t)</code> to the expression fof <code>f_s_yr</code>, but otherwise, not much is different from how we’ve defined density independent models. The rest of the model definition process is unchanged.</p>
+<p>Again, we’ve add the <code>f_s_dd * sum(n_size_t) * d_size</code> to the expression fof <code>f_s_yr</code>, but otherwise, not much is different from how we’ve defined density independent models. The rest of the model definition process is unchanged.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit">
  <span class="kw">dd_ipm</span> <span class="op">&lt;-</span>  <span class="fu"><a href="../reference/define_kernel.html">define_k</a></span>(
    proto_ipm        = <span class="kw">dd_ipm</span>,

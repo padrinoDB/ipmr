@@ -239,3 +239,135 @@
 }
 
 
+# Utilities for sum() in vr_exprs
+
+#' @noRd
+
+.check_sum_calls <- function(text) {
+
+  grepl("sum\\(", text)
+
+}
+
+# Adds a call to divide by n_meshpoints if needed. nearly every vital rate expression
+# is evaluated on the domain [z', z], rather than just, say, z. This means there
+# are duplicated values for univariate functions, which for most cases doesn't
+# matter and helps us vectorize all calculations. However, if the user calls
+# sum(n_z_t * b_z), this will result in either length mismatches, or worse, a silent
+# failure whereby the sum of b_z, a function clearly intended to be univariate,
+# is internally considered bivariate.
+#' @noRd
+
+.prep_sum_calls <- function(text, proto_ipm, main_env) {
+
+  # Get vital rate names and domain names.
+
+  vr_nms <- names(vital_rates(proto_ipm))
+  vrs    <- vital_rates(proto_ipm)
+  do_nms <- names(domains(proto_ipm))
+
+  # Now get argument names from target expression. We'll check to see if
+  # any of those match names of other vital rate expressions in this kernel.
+
+  all_args <- .args_from_txt(text)
+
+  vr_tst <- vapply(vr_nms,
+                   function(x, args) x %in% args,
+                   logical(1L),
+                   args = all_args)
+
+  if(any(vr_tst)) {
+
+    sub_vrs    <- vrs[vr_tst] %>%
+      lapply(rlang::expr_text)
+
+    sub_vrs    <- .find_base_vrs(sub_vrs, all_vrs = vrs, do_nms)
+
+    vr_nms <- vr_nms[vr_tst]
+
+    dos    <- vapply(sub_vrs, function(x) .vr_domain(x, do_nms), character(1L)) %>%
+      unique()
+
+    for(i in seq_along(dos)) {
+
+      to_add <- paste(vr_nms[i], " / n_", dos[i], sep = "")
+
+      text <- gsub(vr_nms[i], to_add, text)
+
+    }
+  }
+
+  return(text)
+}
+
+.txt_has_domain <- function(text, domains) {
+
+  temp <- vapply(domains,
+                 function(x, text) any(grepl(x, text)),
+                 logical(1L),
+                 text = text)
+
+  return(any(temp))
+}
+
+.find_base_vrs <- function(targets, all_vrs, domains) {
+
+  force(domains)
+
+  all_nms  <- names(all_vrs)
+  all_vrs  <- lapply(all_vrs, function(x) {
+    if(is.character(x)) {
+      return(x)
+    } else {
+      return(rlang::expr_text(x))
+    }
+  })
+
+  all_args <- .args_from_txt(unlist(targets))
+
+  if(any(.txt_has_domain(all_args, domains))) {
+
+    return(targets)
+
+  }
+
+  if(any(all_nms %in% all_args)) {
+
+    temp_vrs <- all_vrs[which(all_nms %in% all_args)]
+
+    lapply(temp_vrs,
+           function(x, all_vrs, domains) .find_base_vrs(x,
+                                                        all_vrs = all_vrs,
+                                                        domains = domains),
+           all_vrs = all_vrs,
+           domains = domains)
+
+  } else {
+
+    return(targets)
+
+  }
+
+}
+
+
+#' @noRd
+# Infer the domain(s) of a vital rate expression
+
+.vr_domain <- function(text, domains) {
+
+  domains <- unique(domains)
+
+  ind <- logical(length(domains))
+
+  for(i in seq_along(domains)) {
+
+    ind[i] <- grepl(domains[i], text)
+
+  }
+
+  out <- domains[ind]
+
+  return(out)
+
+}

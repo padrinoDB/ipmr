@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Age X Size models — sum.age_size_expr • ipmr</title>
+<title>Update expressions in an IPM — update.proto_ipm • ipmr</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="Age X Size models — sum.age_size_expr" />
-<meta property="og:description" content="Helper functions for implementing age x size models
-Helper functions for implementing age x size models" />
+<meta property="og:title" content="Update expressions in an IPM — update.proto_ipm" />
+<meta property="og:description" content="Provides methods to readily update vital rate functions and kernel
+formulae, as well as pass new parameter values and/or functions to the model." />
 
 
 
@@ -148,104 +148,57 @@ Helper functions for implementing age x size models" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Age X Size models</h1>
+    <h1>Update expressions in an IPM</h1>
     
-    <div class="hidden name"><code>age_x_size.Rd</code></div>
+    <div class="hidden name"><code>update.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Helper functions for implementing age x size models</p>
-<p>Helper functions for implementing age x size models</p>
+    <p>Provides methods to readily update vital rate functions and kernel
+formulae, as well as pass new parameter values and/or functions to the model.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for age_size_expr</span>
-<span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='kw'>expr</span>, <span class='kw'>...</span>, na.rm = <span class='fl'>NA</span>)
-
-<span class='co'># S3 method for age_size_expr</span>
-<span class='fu'><a href='https://rdrr.io/r/base/prod.html'>prod</a></span>(<span class='kw'>expr</span>, <span class='kw'>...</span>, na.rm = <span class='fl'>NA</span>)
-
-<span class='co'># S3 method for age_size_expr</span>
-<span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='kw'>expr</span>, <span class='kw'>...</span>, na.rm = <span class='fl'>NA</span>)
-
-<span class='co'># S3 method for age_size_expr</span>
-<span class='fu'><a href='https://rdrr.io/r/base/prod.html'>prod</a></span>(<span class='kw'>expr</span>, <span class='kw'>...</span>, na.rm = <span class='fl'>NA</span>)</pre>
+    <pre class="usage"><span class='co'># S3 method for proto_ipm</span>
+<span class='fu'><a href='https://rdrr.io/r/stats/update.html'>update</a></span>(<span class='kw'>object</span>, <span class='kw'>kernels</span>, <span class='kw'>formulae</span>, <span class='kw'>dots</span>, <span class='kw'>parameters</span>, <span class='kw'>functions</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>expr</th>
-      <td><p>An expression to compute a sum for.</p></td>
+      <th>object</th>
+      <td><p>A <code>proto_ipm</code> or output from <code>make_ipm</code>.</p></td>
+    </tr>
+    <tr>
+      <th>kernels</th>
+      <td><p>The names of the kernels to modify.</p></td>
+    </tr>
+    <tr>
+      <th>formulae</th>
+      <td><p>The new kernel formulae (if any). This should be a named expression
+or list of expressions.</p></td>
+    </tr>
+    <tr>
+      <th>dots</th>
+      <td><p>The new vital rate expressions (e.g. the <code>...</code> of <code>define_(k)ernel</code>).
+This should be a named expression or list of expressions.</p></td>
+    </tr>
+    <tr>
+      <th>parameters</th>
+      <td><p>A list of new parameters to include in the model. Names that
+overlap with the current parameter list will overwrite the current values, while
+names that are not in the current parameter list will be appended to it.</p></td>
+    </tr>
+    <tr>
+      <th>functions</th>
+      <td><p>New user defined functions to include in the model.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Used internally. Modifying this will likely cause models to break.</p></td>
-    </tr>
-    <tr>
-      <th>na.rm</th>
-      <td><p>Not used and ignored.</p></td>
+      <td><p>not used</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A modified expression.</p>
-<p>A modified expression.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Note that these functions do not compute a single number, but rather
-expand an expression to compute the trait distribution. This differs from the
-usual behavior of the numeric methods for <code>sum, prod</code> as those
-return a single number or <code>NA</code>.</p>
-<p>Note that these functions do not compute a single number, but rather
-expand an expression to compute the trait distribution. This differs from the
-usual behavior of the numeric methods for <code>sum, prod</code> as those
-return a single number or <code>NA</code>.</p>
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-
-<span class='fu'><a href='define_kernel.html'>define_k</a></span>(
- proto_ipm          = <span class='kw'>some_age_size_proto_ipm</span>,
- name               = <span class='st'>"K"</span>,
- family             = <span class='st'>"IPM"</span>,
- n_wt_0_t_1         = <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='kw'>F_age</span> <span class='op'>%*%</span> <span class='kw'>n_wt_age_t</span>),
- n_wt_age_t_1       = <span class='kw'>P_age_minus_1</span> <span class='op'>%*%</span> <span class='kw'>n_wt_age_minus_1_t</span>,
- n_wt_max_age_t_1   = <span class='kw'>P_max_age</span> <span class='op'>%*%</span> <span class='kw'>n_wt_max_age_t</span> <span class='op'>+</span>
-                      <span class='kw'>P_max_age_minus_1</span> <span class='op'>%*%</span> <span class='kw'>n_wt_max_age_minus_1_t</span>,
- data_list          = <span class='kw'>param_list</span>,
- states             = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span> (<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"wt"</span>)),
- has_hier_effs      = <span class='fl'>FALSE</span>,
- levels_ages        = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(age = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span><span class='op'>:</span><span class='fl'>20</span>), max_age = <span class='fl'>21</span>),
- evict_cor          = <span class='fl'>FALSE</span>
-)
-
-
-}
-
-
-<span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-
-<span class='fu'><a href='define_kernel.html'>define_k</a></span>(
- proto_ipm          = <span class='kw'>some_age_size_proto_ipm</span>,
- name               = <span class='st'>"K"</span>,
- family             = <span class='st'>"IPM"</span>,
- n_wt_0_t_1         = <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='kw'>F_age</span> <span class='op'>%*%</span> <span class='kw'>n_wt_age_t</span>),
- n_wt_age_t_1       = <span class='kw'>P_age_minus_1</span> <span class='op'>%*%</span> <span class='kw'>n_wt_age_minus_1_t</span>,
- n_wt_max_age_t_1   = <span class='kw'>P_max_age</span> <span class='op'>%*%</span> <span class='kw'>n_wt_max_age_t</span> <span class='op'>+</span>
-                      <span class='kw'>P_max_age_minus_1</span> <span class='op'>%*%</span> <span class='kw'>n_wt_max_age_minus_1_t</span>,
- data_list          = <span class='kw'>param_list</span>,
- states             = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span> (<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"wt"</span>)),
- has_hier_effs      = <span class='fl'>FALSE</span>,
- levels_ages        = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(age = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span><span class='op'>:</span><span class='fl'>20</span>), max_age = <span class='fl'>21</span>),
- evict_cor          = <span class='fl'>FALSE</span>
-)
-
-
-}
-
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

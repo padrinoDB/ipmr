@@ -217,7 +217,7 @@
   <span class="fu"><a href="../reference/define_kernel.html">define_k</a></span>(
     name               = <span class="st">"K"</span>,
     family             = <span class="st">"IPM"</span>,
-    n_wt_0_t_1         = <span class="fu"><a href="../reference/all_ages.html">all_ages</a></span>(expr = <span class="kw">F_age</span> <span class="op">%*%</span> <span class="kw">n_wt_age_t</span>, fun = <span class="st">"+"</span>),
+    n_wt_0_t_1         = <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="kw">F_age</span> <span class="op">%*%</span> <span class="kw">n_wt_age_t</span>),
     n_wt_age_t_1       = <span class="kw">P_age_minus_1</span> <span class="op">%*%</span> <span class="kw">n_wt_age_minus_1_t</span>,
     n_wt_max_age_t_1   = <span class="kw">P_max_age</span> <span class="op">%*%</span> <span class="kw">n_wt_max_age_t</span> <span class="op">+</span> 
                          <span class="kw">P_max_age_minus_1</span> <span class="op">%*%</span> <span class="kw">n_wt_max_age_minus_1_t</span>,
@@ -228,7 +228,7 @@
     evict_cor          = <span class="fl">FALSE</span>
   )
 </pre></div>
-<p>The helper function <code>all_ages</code> is a convenience function that helps us say “all ages should be included in this single expression”. In other words, we do not need to write <code>n_wt_0_t_1 = F_0 %*% n_wt_0_t + F_1 %*% n_wt_1_t + ...</code>. The <code>expr</code> argument takes the generic form of the expression, and the <code>fun</code> argument takes a function that collapses the result into a single vector. The <code>fun</code> argument will almost always be <code>"+"</code>, as we wish to add together all newborns produced by every older age class. Note that <code>fun</code> needs to be a string (i.e. <code>"+"</code>, not <code><a href="https://rdrr.io/r/base/Arithmetic.html">`+`</a></code>) - supplying back-ticked symbols will result in an error.</p>
+<p>The expression for <code>n_wt_0_t_1</code> uses <code>sum</code> to reflect that we want to use all ages in our <code>levels_ages</code> list to generate a single trait distribution for age-0 individuals. This is slightly different from the usual suffix expansion in that rather than generating many separate expressions, it generates a single expression that is a lot longer than the short-hand we provide.</p>
 <p>Next, we define a generic expression for the size distribution of each 0 &lt; age &lt; max_age. This is the survival/growth kernel for individuals <code>age - 1</code> times the size distribution of individals at <code>age - 1</code>. Unfortunately, we can’t insert literal <code><a href="https://rdrr.io/r/base/Arithmetic.html">-</a></code> symbols in our expressions (R’s parser does not like this!). Instead, we use <code>_minus_</code> and <code>_plus_</code> as needed. We are not restricted to <code>_minus_1</code> or <code>_plus_1</code> - models that have longer time lags can be denoted <code>_minus_2</code>, <code>_plus_2</code>, etc.</p>
 <p>Finally, we need an expression for the maximum aged individuals. This is all surviving ones from the previous year, plus all the ones that were <code>max_age - 1</code> that survived.</p>
 <p>All of the steps that come after this are the same for age-size models as they are for other model types. We</p>

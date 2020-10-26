@@ -495,7 +495,7 @@ weevil_ipm <- init_ipm("simple_dd_det") %>%
     formula    = c_0 * N,
     family     = "CC",
     c_0        = dnorm(z_2, recr_mu, recr_sd),
-    N          = (d_z * sum(n_z_t * B_z / 200)) ^ 0.67,
+    N          = (d_z * sum(n_z_t * B_z)) ^ 0.67,
     B_z        = p_b * b_z,
     p_b        = plogis(p_b_int + p_b_slope * z_1),
     b_z        = exp(f_s_int + f_s_slope * z_1) / ((1 + e_z/16) ^ (f_s_exp)),
