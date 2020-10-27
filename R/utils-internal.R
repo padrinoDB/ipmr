@@ -179,7 +179,6 @@
   )
 }
 
-
 #' @noRd
 
 .stoch_progress_message <- function(report_progress, iterations, iteration) {
@@ -198,7 +197,6 @@
   invisible(TRUE)
 
 }
-
 
 #' @noRd
 # Function to recursively extract argument names from text representations
@@ -281,24 +279,18 @@
     sub_vrs    <- vrs[vr_tst] %>%
       lapply(rlang::expr_text)
 
-    sub_vrs    <- .find_base_vrs(sub_vrs, all_vrs = vrs, do_nms)
+    sub_vrs  <- c(sub_vrs, .find_base_vrs(sub_vrs, vrs, do_nms))
 
-    vr_nms <- vr_nms[vr_tst]
 
-    dos    <- vapply(sub_vrs, function(x) .vr_domain(x, do_nms), character(1L)) %>%
-      unique()
+    text <- .update_sum(text, sub_vrs, proto_ipm)
 
-    for(i in seq_along(dos)) {
-
-      to_add <- paste(vr_nms[i], " / n_", dos[i], sep = "")
-
-      text <- gsub(vr_nms[i], to_add, text)
-
-    }
   }
 
   return(text)
+
 }
+
+#' @noRd
 
 .txt_has_domain <- function(text, domains) {
 
@@ -310,9 +302,9 @@
   return(any(temp))
 }
 
-.find_base_vrs <- function(targets, all_vrs, domains) {
+#' @noRd
 
-  force(domains)
+.find_base_vrs <- function(targets, all_vrs, domains) {
 
   all_nms  <- names(all_vrs)
   all_vrs  <- lapply(all_vrs, function(x) {
@@ -350,7 +342,6 @@
 
 }
 
-
 #' @noRd
 # Infer the domain(s) of a vital rate expression
 
@@ -368,6 +359,216 @@
 
   out <- domains[ind]
 
+  if(length(out) == 0) return("")
+
   return(out)
 
 }
+
+#' @noRd
+
+.expr_type <- function(x) {
+  if (rlang::is_syntactic_literal(x)) {
+    "constant"
+  } else if (rlang::is_symbol(x)) {
+    "symbol"
+  } else if (rlang::is_call(x)) {
+    "call"
+  } else if (rlang::is_pairlist(x)) {
+    "pairlist"
+  } else {
+    rlang::type_of(x)
+  }
+}
+
+#' @noRd
+
+.switch_expr <- function(x, ...) {
+  switch(.expr_type(x),
+         ...,
+         stop("Don't know how to handle type ", typeof(x), call. = FALSE)
+  )
+}
+
+#' @noRd
+
+.calls_from_txt <- function(txt) {
+
+  if(is.character(txt)){
+    expr <- rlang::parse_expr(txt)
+  } else {
+    expr <- txt
+  }
+
+  .switch_expr(expr,
+               constant = character(),
+               symbol = character(),
+               call = {
+
+                 nm <- as.character(expr[[1]])
+                 children <- lapply(as.list(expr[-1]), .all_calls) %>%
+                   unlist()
+                 c(nm, children)
+
+               })
+}
+
+#' @noRd
+
+.all_calls <- function(txt) {
+
+  unique(.calls_from_txt(txt))
+
+}
+
+#' @noRd
+#' @importFrom rlang child_env as_environment
+
+.update_sum_txt <- function(txt, vr_exprs, nms, calls, proto_ipm) {
+
+  sym_list <- as.list(nms) %>%
+    setNames(nms)
+
+  sym_env  <- rlang::as_environment(sym_list, parent = f_env)
+  sum_env  <- rlang::child_env(.parent   = sym_env,
+                               sum       = .sum2,
+                               proto_ipm = proto_ipm,
+                               vr_exprs  = vr_exprs)
+
+  expr <- rlang::parse_expr(txt)
+  expr <- rlang::quo(!!expr)
+
+  eval_env <- rlang::child_env(sum_env)
+  expr <- rlang::quo_set_env(expr, eval_env)
+
+  out <- rlang::eval_tidy(expr)
+
+  return(out)
+
+}
+
+#' @noRd
+#' @importFrom rlang env_parents env_names
+
+# This is the function that is evaluated instead of sum() to produce
+# the correct result. It is bound as a function
+.sum2 <- function(expr) {
+
+  # Track down sum_env object and make it available here. We need this because
+  # it contains the proto_ipm and vr_exprs objects that we were unable to pass
+  # to sum(). Luckily, it will always be the parent of the caller environment,
+  # which we can track down.
+
+  ev_env  <- rlang::env_get(env = caller_env(),
+                            nm = rlang::env_names(rlang::caller_env())[2])
+
+  p_list  <- rlang::env_parents(ev_env)
+  sum_env <- p_list[[2]]
+
+  vr_exprs  <- rlang::env_get(env = sum_env,
+                              nm = "vr_exprs",
+                              inherit = FALSE,
+                              default = stop("couldn't find 'vr_exprs'"))
+  proto_ipm <- rlang::env_get(env = sum_env,
+                              nm = "proto_ipm",
+                              inherit = FALSE,
+                              default = stop("couldn't find 'proto_ipm'"))
+
+  # Now, we need to extract domain names and vr_expr names so that we can
+  # search for the correct domain. The goal here is to find out whether or not
+  # any of the terms in sum(...) are a function of z_1/z_2, so that we know
+  # to divide them by n_z_1/ n_z_2.
+  # NB: If we find no domains, then we don't actually do anything except re-wrap
+  # the expression in sum(...) and return that instead.
+
+  do_nms    <- names(domains(proto_ipm))
+
+  vr_nms    <- names(vr_exprs)
+
+  dos <- vapply(vr_exprs,
+                function(x, do_nms) .vr_domain(x, do_nms),
+                character(1L),
+                do_nms = do_nms) %>%
+    unique() %>%
+    Filter(f = function(y) y != "", x = .)
+
+  if(length(dos) > 0) {
+
+    for(i in seq_along(dos)) {
+
+      to_add <- paste(vr_nms[i], " / n_", dos[i], sep = "")
+
+      text <- gsub(vr_nms[i], to_add, expr)
+    }
+
+  }
+
+  expr <- paste("sum(", text, ")")
+
+  return(expr)
+
+}
+
+#' @noRd
+
+.update_sum <- function(txt, all_vrs,  proto_ipm) {
+
+  all_nms   <- .args_from_txt(txt)
+  all_calls <- .calls_from_txt(txt)
+  all_calls <- all_calls[all_calls != "sum"]
+
+  txt <- .update_sum_txt(txt,
+                         all_vrs,
+                         all_nms,
+                         all_calls,
+                         proto_ipm)
+
+  return(txt)
+
+}
+
+#' @noRd
+#' @importFrom rlang new_function caller_env exprs empty_env
+
+.unary_op <- function(left, right) {
+  rlang::new_function(
+    rlang::exprs(e1 = ),
+    rlang::expr(
+      paste0(!!left, e1, !!right)
+    ),
+    rlang::caller_env()
+  )
+}
+
+#' @noRd
+
+.binary_op <- function(sep) {
+  rlang::new_function(
+    rlang::exprs(e1 = , e2 = ),
+    rlang::expr(
+      paste0(e1, !!sep, e2)
+    ),
+    rlang::caller_env()
+  )
+}
+
+f_env <- rlang::child_env(
+  .parent = rlang::empty_env(),
+  `+` = .binary_op(" + "),
+  `-` = .binary_op(" - "),
+  `*` = .binary_op(" * "),
+  `/` = .binary_op(" / "),
+  `^` = .binary_op("^"),
+
+  paste = paste,
+  `[` = .unary_op("[", "]"),
+  `(` = .unary_op("(", ")"),
+  as.vector = .unary_op("as.vector(", ")"),
+
+  # Other math functions
+  sqrt = .unary_op("sqrt(", ")"),
+  sin =  .unary_op("sin(", ")"),
+  log =  .unary_op("log(", ")"),
+  abs =  .unary_op("abs(", ")")
+)
+

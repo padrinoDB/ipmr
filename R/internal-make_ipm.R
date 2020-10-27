@@ -675,7 +675,6 @@
 
   if(any(test)) {
 
-
     text[test] <- lapply(text[test],
                    function(x, proto_ipm, main_env) {
                      .prep_sum_calls(x,
