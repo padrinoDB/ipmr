@@ -129,7 +129,7 @@ age_size_ipm <- age_size_ipm %>%
   define_k(
     name               = "K",
     family             = "IPM",
-    n_wt_0_t_1         = all_ages(expr = F_age %*% n_wt_age_t, fun = "+"),
+    n_wt_0_t_1         = sum(F_age %*% n_wt_age_t),
     n_wt_age_t_1       = P_age_minus_1 %*% n_wt_age_minus_1_t,
     n_wt_max_age_t_1   = P_max_age %*% n_wt_max_age_t + 
                          P_max_age_minus_1 %*% n_wt_max_age_minus_1_t,
@@ -142,7 +142,7 @@ age_size_ipm <- age_size_ipm %>%
 
 ```
 
-The helper function `all_ages` is a convenience function that helps us say "all ages should be included in this single expression". In other words, we do not need to write `n_wt_0_t_1 = F_0 %*% n_wt_0_t + F_1 %*% n_wt_1_t + ...`. The `expr` argument takes the generic form of the expression, and the `fun` argument takes a function that collapses the result into a single vector. The `fun` argument will almost always be `"+"`, as we wish to add together all newborns produced by every older age class. Note that `fun` needs to be a string (i.e. `"+"`, not `` `+` ``) - supplying back-ticked symbols will result in an error.
+The expression for `n_wt_0_t_1` uses `sum` to reflect that we want to use all ages in our `levels_ages` list to generate a single trait distribution for age-0 individuals. This is slightly different from the usual suffix expansion in that rather than generating many separate expressions, it generates a single expression that is a lot longer than the short-hand we provide. 
 
 Next, we define a generic expression for the size distribution of each 0 < age < max_age. This is the survival/growth kernel for individuals `age - 1` times the size distribution of individals at `age - 1`. Unfortunately, we can't insert literal `-` symbols in our expressions (R's parser does not like this!). Instead, we use `_minus_` and `_plus_` as needed. We are not restricted to `_minus_1` or `_plus_1` - models that have longer time lags can be denoted `_minus_2`, `_plus_2`, etc.
 

@@ -168,7 +168,8 @@
   levels_hier_effs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
   levels_ages = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
   evict_cor = <span class='fl'>FALSE</span>,
-  evict_fun = <span class='kw'>NULL</span>
+  evict_fun = <span class='kw'>NULL</span>,
+  integrate = <span class='fl'>TRUE</span>
 )
 
 <span class='fu'>define_k</span>(
@@ -182,7 +183,8 @@
   levels_hier_effs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
   levels_ages = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
   evict_cor = <span class='fl'>FALSE</span>,
-  evict_fun = <span class='kw'>NULL</span>
+  evict_fun = <span class='kw'>NULL</span>,
+  integrate = <span class='fl'>FALSE</span>
 )
 
 <span class='co'># S3 method for default</span>
@@ -196,7 +198,8 @@
   has_hier_effs = <span class='fl'>FALSE</span>,
   levels_hier_effs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
   evict_cor = <span class='fl'>FALSE</span>,
-  evict_fun = <span class='kw'>NULL</span>
+  evict_fun = <span class='kw'>NULL</span>,
+  integrate = <span class='fl'>FALSE</span>
 )
 
 <span class='co'># S3 method for age_x_size</span>
@@ -211,7 +214,8 @@
   levels_hier_effs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
   levels_ages = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
   evict_cor = <span class='fl'>FALSE</span>,
-  evict_fun = <span class='kw'>NULL</span>
+  evict_fun = <span class='kw'>NULL</span>,
+  integrate = <span class='fl'>FALSE</span>
 )
 
 <span class='fu'>remove_k</span>(<span class='kw'>proto_ipm</span>)</pre>
@@ -298,6 +302,15 @@ You can also either specify a <code>usr_funs</code> function that performs the c
 during the implementation of the model itself, or incorporate the correction
 into individual vital rate expressions. In either of those cases,
 set <code>evict_cor</code> to <code>FALSE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>integrate</th>
+      <td><p>For <code>simple_*</code> models, this controls whether a <code>"d_z"</code>
+is automatically appended to the <code>formula</code> argument. When <code>TRUE</code>,
+this automatically creates a <code>formula * d_z</code>. There may be some cases where
+this behavior is not desirable. Set this to <code>FALSE</code> and specify the correct
+math if that happens. The default is <code>TRUE</code>. This argument is ignored for
+all <code>general_*</code> models.</p></td>
     </tr>
     </table>
 

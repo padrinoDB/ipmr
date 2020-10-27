@@ -199,7 +199,8 @@ define_k <- function(proto_ipm,
                      levels_hier_effs = list(),
                      levels_ages      = list(),
                      evict_cor = FALSE,
-                     evict_fun = NULL) {
+                     evict_fun = NULL,
+                     integrate = FALSE) {
 
   UseMethod("define_k")
 
@@ -218,7 +219,8 @@ define_k.default <- function(proto_ipm,
                              has_hier_effs = FALSE,
                              levels_hier_effs = list(),
                              evict_cor = FALSE,
-                             evict_fun = NULL) {
+                             evict_fun = NULL,
+                             integrate = FALSE) {
 
   cls <- class(proto_ipm)
   forms <- rlang::enquos(...,
@@ -257,7 +259,8 @@ define_k.default <- function(proto_ipm,
   param_tree <- list(formula = forms_text,
                      family = family,
                      vr_text = NA_character_,
-                     params = data_list)
+                     params = data_list,
+                     integrate = integrate)
 
   if(!methods::hasArg(levels_hier_effs)) levels_hier_effs <- list(levels = NA)
 
@@ -305,7 +308,8 @@ define_k.age_x_size <- function(proto_ipm,
                                 levels_hier_effs = list(),
                                 levels_ages      = list(),
                                 evict_cor = FALSE,
-                                evict_fun = NULL) {
+                                evict_fun = NULL,
+                                integrate = FALSE) {
   cls <- class(proto_ipm)
   forms <- rlang::enquos(...,
                          .named = TRUE,
@@ -343,7 +347,8 @@ define_k.age_x_size <- function(proto_ipm,
   param_tree <- list(formula = forms_text,
                      family = family,
                      vr_text = NA_character_,
-                     params = data_list)
+                     params = data_list,
+                     integrate = integrate)
 
   if(!methods::hasArg(levels_hier_effs)) levels_hier_effs <- list(levels = NA)
 

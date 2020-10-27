@@ -51,8 +51,9 @@ First, we will define the model parameters and function for the $F_a$ kernels.
 
 ```{r}
 
-library(ipmr)
+# library(ipmr)
 
+devtools::load_all()
 # Set parameter values and names
 
 param_list <- list(
@@ -149,7 +150,7 @@ Once we've defined the $P_a$ and $F_a$ kernels, we need to define how they inter
 
 1. We do not add `"_age"` to the `name` here. This is because we do not want to expand this into 22 separate iteration procedures - we only want 1 that iterates the 22 separate $P_a$ and $F_a$ kernels together. 
 
-2. The `all_ages` function indicates that we want to expand this one expression to include all ages in our list in a *single* expression, which is then collapsed using the `fun` argument. Since we want the sum of the integrals, we use `"+"`. Note that we most likely never want to use the `sum()` function instead of the `+` function, as `sum()` returns a single number while `+` is vectorized over its arguments. 
+2. the `n_z_0_t_1 = sum(F_age %*% n_z_age_t)`. This takes the place of the $\sum_{a = 0}^{M}...$ in Eq. 1 above. We don't need to supply $a=0$ and $M$ as those are inferred in the `levels_ages` list.
 
 3. The insertion of `age_minus_1` in the `n_z_age_t_1` expression. `ipmr` automatically generates the correct indices using these markers, so there is no need to worry about indexing correctly. Tragically, we could not implement a literal `age - 1`. `_plus_` is also available for models with different formats. The amount to add/subtract is not limited to 1, though it is hard to think of examples where we would want to index by larger increments (perhaps with censuses every 2 or 3 years instead annual?). 
 
@@ -160,7 +161,7 @@ age_size_ipm <- define_k(
   proto_ipm       = age_size_ipm,
   name            = "K",
   family          = "IPM",
-  n_z_0_t_1       = all_ages(expr = F_age %*% n_z_age_t, fun = "+"),
+  n_z_0_t_1       = sum(F_age %*% n_z_age_t),
   n_z_age_t_1     = P_age_minus_1 %*% n_z_age_minus_1_t,
   n_z_max_age_t_1 = P_max_age %*% n_z_max_age_t +
                     P_max_age_minus_1 %*% n_z_max_age_minus_1_t,
@@ -215,6 +216,6 @@ We can plot the stable distributions using an `lapply()` on the `stable_dists` o
 
 plot(stable_dists[[1]], type = 'l')
 
-lapply(stable_dists[2:22], function(x) lines(x))
+cap <- lapply(stable_dists[2:22], function(x) lines(x))
 
 ```

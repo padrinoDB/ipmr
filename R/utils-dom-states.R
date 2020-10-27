@@ -70,4 +70,4 @@ define_domains <- function(proto_ipm, ...) {
 
 #' @importFrom utils globalVariables
 
-utils::globalVariables(c('.'), add = FALSE)
+utils::globalVariables(c('.', "e1", "e2"), add = FALSE)

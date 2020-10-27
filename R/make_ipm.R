@@ -619,8 +619,8 @@ make_ipm.general_di_det <- function(proto_ipm,
                                     env_to_bind = main_env)
 
 
-  temp       <- .prep_di_output(others, k_row, proto_ipm, iterations,
-                                normalize_pop_size)
+  temp     <- .prep_di_output(others, k_row, proto_ipm, iterations,
+                              normalize_pop_size)
 
   # Thus far, I think general_* methods will have to use iteration for lambdas
   # as I'm not sure I want to work out the correct cbind(rbind(...)) rules for

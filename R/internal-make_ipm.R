@@ -16,13 +16,15 @@
     param_tree <- proto$params[[i]]
 
     kern_env         <- .make_kernel_env(param_tree$params,
-                                             main_env,
-                                             param_tree)
+                                         main_env,
+                                         proto[i, ])
 
     kern_text        <- param_tree$formula
 
     kern_form        <- .parse_vr_formulae(kern_text,
-                                           kern_env)
+                                           kern_env,
+                                           proto[i, ],
+                                           main_env)
 
     names(kern_form) <- proto$kernel_id[i]
 
@@ -118,7 +120,7 @@
 
     kern_env         <- .make_kernel_env(param_tree$params,
                                          main_env,
-                                         param_tree)
+                                         proto[i, ])
 
     kern_text        <- .append_dz_to_kern_form(param_tree$formula,
                                                 proto,
@@ -126,7 +128,9 @@
                                                 integrate)
 
     kern_form        <- .parse_vr_formulae(kern_text,
-                                           kern_env)
+                                           kern_env,
+                                           proto[i, ],
+                                           main_env)
 
     names(kern_form) <- proto$kernel_id[i]
 
@@ -633,15 +637,19 @@
 # access domains, stochastic parameters, and population states.
 
 .make_kernel_env <- function(parameters,
-                                 main_env,
-                                 param_tree) {
+                             main_env,
+                             proto) {
+
+  param_tree <- proto$params
 
   kernel_env <- rlang::child_env(.parent = main_env)
   rlang::env_bind(kernel_env,
                   !!! parameters)
 
-  kern_quos  <- .parse_vr_formulae(param_tree$vr_text,
-                                   kernel_env)
+  kern_quos  <- .parse_vr_formulae(param_tree[[1]]$vr_text,
+                                   kernel_env,
+                                   proto,
+                                   main_env)
 
   # Bind the vital rate expressions so the initial discretization can take
   # place
@@ -653,7 +661,30 @@
 }
 
 #' @noRd
-.parse_vr_formulae <- function(text, kernel_env) {
+.parse_vr_formulae <- function(text,
+                               kernel_env,
+                               proto,
+                               main_env) {
+
+  # Check for calls to sum() in text. These need to be modified to
+  # divide by the number of meshpoints over the domain of the function IF there
+  # is only one domain for the function (which is what the user will want, not
+  # the sum of the entire result of expand.grid(z, z1)).
+
+  test <- vapply(text, .check_sum_calls, logical(1L))
+
+  if(any(test)) {
+
+    text[test] <- lapply(text[test],
+                   function(x, proto_ipm, main_env) {
+                     .prep_sum_calls(x,
+                                     proto_ipm = proto_ipm,
+                                     main_env  = main_env)
+                   },
+                   proto_ipm = proto,
+                   main_env  = main_env)
+
+  }
 
   # parse the text expressions and then convert to list of depth 1.
   # This is critical as otherwise, env_bind_lazy bind a list containing the
@@ -675,7 +706,7 @@
   return(out)
 }
 
-.parse_k_formulae <- function(text, kernel_env) {
+.parse_k_formulae <- function(text, kernel_env, proto, main_env) {
 
   # This is very shaky - requires code to have whitespace, and will fail
   # when users don't put spaces between variables. I think that's bad practice
@@ -706,7 +737,7 @@
   })
 
   names(text) <- gsub('^n_', 'pop_state_', names(text))
-  out         <- .parse_vr_formulae(text, kernel_env)
+  out         <- .parse_vr_formulae(text, kernel_env, proto, main_env)
 
   return(out)
 }
@@ -1200,54 +1231,7 @@
 
 }
 
-
 #' @noRd
-# Returns a list with entries others and k_row with hier_effs split out
-# Checks ipm definition. slightly modified so that it can manipulate
-# vr_text as well.
-
-.initialize_kernels_dd <- function(proto_ipm, iterate) {
-
-  # checks pop_state, env_state, domain definitions
-  .check_ipm_definition(proto_ipm, iterate)
-
-  # modifies vr_text so that it density dependent parts are also gsub'd
-
-  proto_ipm <- .sub_dd_terms(proto_ipm)
-
-  # Split out K from Fothers so it isn't evaluated until we're ready. If it
-  # isn't there, then proceed as usual
-
-  K_row    <- which(grepl("K|^n_.*?_t", proto_ipm$kernel_id))
-
-  if(length(K_row) > 0) {
-
-    k_row  <- proto_ipm[K_row, ]
-    others <- proto_ipm[-c(K_row), ]
-
-  } else {
-
-    others <- proto_ipm
-    k_row <- NA_character_
-
-  }
-
-  # If vital rates are fit with a hierarchical model of any kind,
-  # then split those out into their respective years/plots/what-have-you
-
-  if(any(others$has_hier_effs) | any(k_row$has_hier_effs)) {
-
-    others <- .split_hier_effs(others)
-    k_row  <- .split_hier_effs(k_row)
-
-  }
-
-  out <- list(others = others,
-              k_row  = k_row)
-
-  return(out)
-
-}
 
 .sub_dd_terms <- function(proto) {
 
@@ -1283,14 +1267,14 @@
                                  to_sub = replace)
     }
 
-
-
     proto$params[[i]] <- kern_row
 
   }
 
   return(proto)
 }
+
+#' @noRd
 
 .fun_to_iteration_mat <- function(fun,
                                   state_var_start,
