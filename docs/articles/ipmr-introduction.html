@@ -101,7 +101,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="ipmr-introduction_files/header-attrs-2.3/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to ipmr</h1>
@@ -459,12 +459,12 @@
 <ul>
 <li><p><code>iterators</code> contains iteration kernels, AKA <code>K</code>s.</p></li>
 <li><p><code>sub_kernels</code> contains, in this example, <code>P</code> and <code>F</code>.</p></li>
-<li><p><code>env_list</code> is empty, but setting <code>return_all = TRUE</code> in <code><a href="../reference/make_ipm.html">make_ipm()</a></code> returns the evaluation environments for each kernel and sub-kernel. These are used by subsequent analysis methods and so are important for internal usage, but are probably of limited use to most users.</p></li>
+<li><p><code>env_list</code> is empty, but setting <code>return_main_env = TRUE</code> and <code>return_all_envs = TRUE</code> in <code><a href="../reference/make_ipm.html">make_ipm()</a></code> returns the evaluation environments for each kernel and sub-kernel. These are used by subsequent analysis methods and so are important for internal usage, but are probably of limited use to most users.</p></li>
 <li><p><code>env_seq</code> contains either an integer vector with the sequence of indices used to select kernels from the <code>iterators</code> during a stochastic simulation (<code>*_stoch_kern</code>), or a matrix of parameter estimates from each iteration of the stochastic simulation (<code>*_kern_param</code>). Not relevant for <code>*_det</code> methods with a single iteration kernel and so contains either a sequence of 1s or <code>NA</code>s</p></li>
 <li><p><code>pop_state</code> contains a list of matrices for each item defined in <code><a href="../reference/define_impl.html">define_pop_state()</a></code>. In this case, we never defined the initial population state, so it will be empty. When <code><a href="../reference/define_impl.html">define_pop_state()</a></code> is used with <code>iterate = TRUE</code>, the rows of each matrix correspond to the population state and columns are time steps.</p></li>
 <li><p><code>proto_ipm</code> contains the <code>proto_ipm</code> object used to generate the model. This is useful for rebuilding the model with a different set of <code>impl_args</code> or parameters to see how that changes your results.</p></li>
 </ul>
-<p><code>lambda</code>, <code>left_ev</code>, and <code>right_ev</code> are generic functions corresponding to the dominant eigenvalue, dominant left eigenvector, and dominant right eigenvector respectively. <code>lambda</code> is available for all classes of IPMs, while <code>left/right_ev</code> is available for all deterministic IPMs. Stochastic equivalents of the latter will get implemented eventually.</p>
+<p><code>lambda</code>, <code>left_ev</code>, and <code>right_ev</code> are generic functions corresponding to the dominant eigenvalue, dominant left eigenvector, and dominant right eigenvector of the iteration kernel, respectively. <code>lambda</code> is available for all classes of IPMs, while <code>left/right_ev</code> is available for all deterministic IPMs. Stochastic equivalents of the latter will get implemented eventually.</p>
 <div id="using-predict-methods-in-vital-rate-expressions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#using-predict-methods-in-vital-rate-expressions" class="anchor"></a>Using <code>predict()</code> methods in vital rate expressions</h3>
@@ -485,14 +485,14 @@
 <li><p>Number of flowers for flowering plants (<code>seed_mod</code>, <code>f_s</code>)</p></li>
 <li><p>Total number of new recruits at <span class="math inline">\(t + 1\)</span> (<code>recr_n</code>, <code>recr_n</code>)</p></li>
 <li><p>Total number of flowers at <span class="math inline">\(t\)</span> (<code>flow_n</code>, <code>flow_n</code>)</p></li>
-<li><p>The number of new recruits at <span class="math inline">\(t+1\)</span> per flower at <span class="math inline">\(t\)</span> (<code>NA</code>, <code>f_r</code>)</p></li>
-</ol>
+<li>
+<p>The number of new recruits at <span class="math inline">\(t+1\)</span> per flower at <span class="math inline">\(t\)</span> (<code>NA</code>, <code>f_r</code>)</p>
 <ul>
 <li>This is <code>f_r = recr_n / flow_n</code>
 </li>
 </ul>
-<ol start="8" style="list-style-type: decimal">
-<li>Recruit size distribution (<code>recr_mu, recr_sd</code>, <code>f_d</code>)</li>
+</li>
+<li><p>Recruit size distribution (<code>recr_mu, recr_sd</code>, <code>f_d</code>)</p></li>
 </ol>
 <div class="sourceCode" id="cb9"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">ipmr</span>)

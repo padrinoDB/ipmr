@@ -3,8 +3,12 @@ title: "ipmr: Flexibly implement Integral Projection Models in R"
 output:  
   word_document:
     toc: no
+    pandoc_args: ["-Fpandoc-crossref"]
 fig_caption: yes
 ---
+
+Target journal: Methods in Ecology and Evolution, submission type: Application. Word limit: 3000
+
 
 Sam C. Levin $^{\ast1,2,3}$, Aldo Compagnoni $^{1,2,3}$, Roberto Salguero-Gomez $^3$, Dylan Z. Childs $^4$, Sanne Evers $^{1,2}$, Tiffany M. Knight $^{1,2,5}$
 
@@ -22,31 +26,24 @@ $^5$UFZ
 
 $^*$Corresponding Author:
 
-Sam C Levin
+Sam C. Levin
 
-Deutscherplatz 5e, 04103 Leipzig, Germany
+Puschstrasse 4, 04103 Leipzig, Germany
 
 email: <levisc8@gmail.com>
 
 
-
-Target journal: Methods in Ecology and Evolution, submission type: Application. Word limit: 3000
-
-
-
-[Formatting guidelines](https://besjournals.onlinelibrary.wiley.com/hub/journal/2041210X/author-guidelines) (in case you care)
-
-Keywords: integral projection model, population dynamics, structured populations, life history
+Keywords: elasticity, integral projection model, life history, population dynamics, population growth rate, sensitivity, structured populations
 
 # **Abstract**
 
-1. Integral projection models (IPMs) have become an important tool for studying the demography of populations structured by one or more continuous state variables. IPMs are used to investigate questions ranging from single species conservation and management strategies for invasive species to understanding selective pressures in Soay sheep. _R_ is a commonly used data analysis tool for ecologists. However, to date, there has only been one package for _R_ that implements integral projection models - `IPMpack`. We offer an alternative, more flexible implementation for building IPMs that can handle a wider variety of applications.
+1. Integral projection models (IPMs) have become an important tool for studying the demography of populations structured by one or more continuous state variables (e.g. size, height, color). IPMs are used to investigate questions ranging from single species conservation and management strategies for invasive species to understanding selective pressures in natural populations. _R_ is a commonly used data analysis tool for ecologists. Previous _R_ package developments introduced a broad repetoire of functionality and outputs (e.g. IPMpack). However, there is a need to develop increasingly complex IPMs to address questions related to climate change, population genetics, and natural selection. These require more flexibility in model parameterization and specification than is allowed by existing software. Here, we introduce `ipmr`, a programmatic solution to flexibly build, analyze, and interpret IPMs.
 
-2. `ipmr` can implement determinstic or stochastic, density independent IPMs for discretely or continuously varying environments. The package operates at a much lower level of abstraction than previous efforts. Our framework relies on the mathematical notation of the models, and completely decouples the model parameterization step from the model implementation step. The latter point substantially increases `ipmr`'s flexibility to model complex life cycles. 
+2. The `ipmr` framework relies on the mathematical notation of the models and a lower level of abstraction than alternative IPM building software. Additionally, it completely decouples the model parameterization step from the model implementation step. The latter point substantially increases `ipmr`'s flexibility to model complex life cycles and demographic processes. 
 
-3. The `ipmr` package can handle a wider variety of models than currently existing software, including discretely and continuously stochastic environments, and multiple continuous and or discrete state variables. Specific methods for models with individuals cross-classified by age and size are also available. Furthermore, the package provides methods for basic analyses and visualization, and tools to facilitate more complex analyses.
+3. `ipmr` can handle a wider variety of models than currently existing software, including density dependence, discretely and continuously varying stochastic environments, and multiple continuous and/or discrete state variables. Specific methods for models with individuals cross-classified by age and size are also available. Furthermore, the package provides methods for basic analyses (e.g. asymptotic and stochastic growth rates) and visualization (e.g. kernel plotting), and tools to facilitate more complex analyses (e.g. sensitivity and elasticity).
 
-4. `ipmr` is far more flexible than existing packages for implementing integral projection models. The common underlying data structure used to generate models also presents opportunities to enhance reproducibility in the field. Furthermore, the package could be a template that allows researchers to represent IPMs in concise, text format databases that rely on functional forms and parameters values, rather than raw data, to represent models. 
+4. `ipmr` is far more flexible than existing packages for implementing integral projection models. The common underlying data structure used to generate models also presents opportunities to enhance reproducibility in the field. Furthermore, the package could be a template that allows researchers to represent IPMs in concise, text format databases that rely on functional forms and parameters values, rather than raw data, to represent models. This opens up intriguing opportunities for synthesis work.
 
 ```{r echo = FALSE, message = FALSE, warning=FALSE}
 
@@ -153,9 +150,9 @@ all_pubs$Year <- as.integer(all_pubs$Year)
 
 # **Introduction**
 
-Integral projection models (IPMs) are an important tool for ecologists studying population dynamics in discrete time. Since their introduction in Easterling, Ellner & Dixon's (2000) paper, there have been over 270 publications using IPMs to address a variety of questions ranging from invasive species population dynamics (e.g. Crandall & Knight 2017) to evolutionary stable strategies to endangered species conservation (Childs et al. 2011, Coulson 2012). In the plant kingdom alone, there are currently at least 300 plant species for which an IPM exists (Levin et al. unpublished). Advantages of using an IPM include (i) they allow for continuously distributed state variables to describe vital rates and population structure, (ii) the ability to mix discrete and continuous states in the same population model, and (iii) allow for efficient parameter estimation with widely used regression methods. Since the first IPM publication, methods to environmental stochasticity, spatial dynamics, and density dependence have been developed (Ellner & Rees 2006, Adler et al. 2010, Ellner et al. 2016).
+Integral projection models (IPMs) are an important tool for ecologists studying population dynamics in discrete time. Since their introduction over two decades ago (Easterling, Ellner & Dixon 2000), there have been over 270 publications using IPMs to address a variety of questions ranging from invasive species population dynamics (e.g. Crandall & Knight 2017) to evolutionary stable strategies to endangered species conservation (Childs et al. 2011, Coulson 2012). In the plant kingdom alone, there are currently at least 300 plant species for which an IPM exists (Levin et al. unpublished). Some of the advantages of using an IPM include (i) continuously distributed state variables to describe vital rates and population structure, (ii) the ability to mix discrete and continuous states in the same model (e.g. number of seeds in a seedbank and the dynamics of a height structured plant population), (iii) efficient parameter estimation with widely used regression methods, (iv) the numerical discretization of continuous kernels (see below) means that many tools available for matrix models are also available for IPMs, and (v) examining life history traits at more detailed levels (e.g. the kernel/sub-kernel level, the vital rate function level, and regression coefficient level). Furthermore, in recent years, researchers have developed methods to incorporate spatial dynamics, environmental stochasticity, and density/frequency dependence into IPMs (Ellner & Rees 2006, Adler et al. 2010, Ellner et al. 2016).
 
-IPMs are flexible models that use longitudinal data to determine the functional forms of state-fate relationships such as survival, growth/maturation, and (a)sexual reproduction. They are built using regression models of vital rates on a state variable that is related to individual fitness (usually, but not always, a measure of size, e.g. diameter at breast height for trees, body mass in animals). Regression modelling is a standard tool for ecologists, and the field is mature enough to accomodate many different types of data (e.g. Wood 2011, Bates et al. 2015). Parameter estimation for regression models is usually more efficient than estimating individual matrix transition parameters (Ellner & Rees 2006); there are usually fewer parameters to estimate with the same amount of data (in theory, one could estimate matrix transitions with regression models, but this is not often done in practice). This flexibility has lead to a rapid increase in their appearance in the literature (Figure 1). Additionally, this rise in popularity spurred the creation of software tools and guides that assisted in their implementation and analysis (Metcalf et al. 2013, Merow et al. 2014, Ellner et al. 2016). These range from _R_ scripts with detailed annotations to a complete R package.
+IPMs are flexible models that typically use longitudinal data to determine the functional forms of state-fate relationships such as survival, change in state (e.g. growth/shrinkage, development/aging), and (a)sexual reproduction. IPMs are built using regression models of vital rates on a state variable that serve as proxies for individual fitness. State variables are usually related to size (e.g. DBH, Metcalf et al. 2009, Crandall & Knight 2017, body mass for animals, Ozgul et al. 2010, though other types of variables are possible e.g. Coulson et al. 2011, Simmonds et al. 2020). Regression modelling is both a standard and highly flexible tool for ecologists, and the field is mature enough to accomodate many different types of data (e.g. Wood 2011, Bates et al. 2015). A particularly pertinent point for those interested in demography is that parameter estimation for regression models is usually more efficient than estimating individual matrix transition parameters (Ellner & Rees 2006). There are usually far fewer parameters to estimate with the same amount of data (in theory, one could estimate matrix transitions with regression models, but this is not often done in practice). This flexibility in regression parameterization, and by extension, IPM parameterization, has lead to a rapid increase in publications using IPMs (Figure 1). This rise in popularity spurred the creation of software tools and guides that assisted in their implementation and analysis (Coulson 2012, Metcalf et al. 2013, Merow et al. 2014, Ellner et al. 2016). These tools range from _R_ scripts with detailed annotations to a complete R package.
 
 ```{r figure 1, echo = FALSE, fig.height = 6, fig.width = 8, message = FALSE, warning = FALSE, fig.cap = "Figure 1: Cumulative number of publications that make use of Matrix Projection Models (MPMs) and Integral Projection Models (IPMs) (A) and number of publications per year for each type of model (B). IPMs have been adopted rapidly since the first publication describing them in 2000. Unfortunately, software packages to assist with their implementation have not kept pace with theoretical advancements."}
  
@@ -201,20 +198,29 @@ grid.arrange(run_sum_plot, ann_pubs)
 
 ```
 
-
-The only existing _R_ package that implements IPMs is `IPMpack`. `IPMpack` allows users to go from raw data to a set of projection kernels with just a few lines of code. However, this package is no longer actively developed, and so hasn't kept pace with more recent developments in IPM theory. `ipmr` fills this gap in a number of ways.  First, the package is explictly designed to work with more types of IPMs, and can handle models with individuals classified by a mixture of any number of continuously and discretely distributed state variables. Furthermore, it introduces specific classes and methods to deal with both discretely and continuously varying environments. Finally, the decoupling of the parameterization (i.e. regression model fitting) and implementation steps (i.e. kernel construction) of model building allows users to specify models of any functional form they desire.
+Despite the array of resources available to researchers, implementing an IPM is still not a straightforward exercise. For example, an IPM that simulates a population for 100 time steps would requires the user to either write from scratch or adapt from published guides multiple functions (e.g. for vital rates or to synthesize these vital rates into kernels), correctly specify the integration meshes from the desired domain bounds, and track how the population state changes over the course of a simulation. Running a stochastic, density dependent simulation for thousands of time steps requires users to track all of this plus the sequence of environments to ensure reproducibility of results. `ipmr` aims to abstract away those details while still giving the user maximum flexibility in specifying their model. The package is explictly designed to work with more types of IPMs than existing options, and can handle models with individuals classified by a mixture of any number of continuously and discretely distributed state variables. Furthermore, it introduces specific classes and methods to deal with both discretely and continuously varying stochastic environments, density independent and density dependent models, as well as age structured populations. Finally, the decoupling of the parameterization (i.e. regression model fitting) and implementation steps (i.e. kernel construction) of model building allows users to specify models of any functional form they desire.
 
 # Defining an IPM and terminology 
 
 Before describing `ipmr` in greater detail, we first need to define the various components of the model and some terminology. An IPM is comprised of a projection kernel (denoted $K$), and a trait distribution function. The latter describes the frequency of a trait value in a population, and is analogous to the population vector in a matrix projection model. The model can be written as follows:
 
-1. $n(z', t+1) = \int_L^UK(z',z)n(z,t)\mathrm{dz}$
+$$n(z', t+1) = \int_L^UK(z',z)n(z,t)\mathrm{dz}$$ {#eq:eqn1}
 
-Here, $n(z, t)$ and $n(z',t+1)$ are the distribution functions for some trait, $z$ at time $t$ and $t+1$. $L,U$ are the lower and upper bounds of values that a trait can have, and $K(z',z)$ is the projection kernel. The integral over $n(z,t)$ is the total population size. To make the model more biologically interpretable, the $K(z',z)$ kernel is usually decomposed into sub-kernels. For example, a model that captures survival and maturation transitions and sexual reproduction may be written as follows:
+Here, $n(z, t)$ and $n(z',t+1)$ are the distribution functions for a trait $Z$ at time $t$ and $t+1$. $L,U$ are the lower and upper bounds of values that the trait $Z$ can have, and $K(z',z)$ is the projection kernel. The integral over $n(z,t)$ is the total population size. To make the model more biologically interpretable, the $K(z',z)$ kernel is usually decomposed into sub-kernels. For example, a model that captures survival and maturation transitions and sexual reproduction may be written as follows:
 
-2. $K(z',z) = P(z',z) + F(z',z)$
+$$K(z',z) = P(z',z) + F(z',z)$$ {#eq:eqn2}
 
-Here, $P(z',z)$ describes transitions due to survival and growth/maturation of existing individuals, and $F(z',z)$ describes transitions that create new individuals through sexual reproduction. The sub-kernels themselves are typically generated with functions parameterized by regression models that relate the individuals trait value $z$ at time $t$ to some demographic outcome at $t+1$. For example, the $P$ kernel for a plant may contain two regression models: (i) a logistic regression of survival on plant size, and (ii) a regression of size at $t+1$ on size at $t$. We refer to these different scales (regressions and parameters, sub-kernels, and projection kernels) as levels of the model hierarchy. There have been numerous extensions of IPM theory. Examples include outlining a general, deterministic IPM that allows for a mixture of multiple discrete and/or continuous state variables (Ellner & Rees 2006), stochastically varying parameters to generate unique kernels (Rees & Ellner 2009), and spatial dynamics (Jongejans et al. 2011).
+Here, $P(z',z)$ describes transitions due to survival and growth/maturation of existing individuals, and $F(z',z)$ describes transitions that create new individuals through sexual reproduction. The sub-kernels themselves are typically generated with functions parameterized by regression models that relate the individuals trait value $z$ at time $t$ to some demographic outcome at $t+1$. For example, the $P$ kernel for a plant may contain two regression models: (i) a logistic regression of survival on plant size (Eq 4), and (ii) a regression of size at $t+1$ on size at $t$ (Eq 5-6). In this example, $\sigma_g$ is the standard deviation of the residuals from the regression model.
+
+$$P(z',z) = s(z) * g(z',z)$$ {#eq:eqn3}
+
+$$Logit(s(z)) = \alpha_s + \beta_s * z$$ {#eq:eqn4}
+
+$$g(z',z) \sim Norm(\mu_g, \sigma_g)$$ {#eq:eqn5} 
+
+$$\mu_g = \alpha_g + \beta_g * z$$ {#eq:eqn6}
+
+We refer to these different scales (parameters, regressions, sub-kernels, and projection kernels) as levels of the model hierarchy. There have been numerous extensions of IPM theory. Examples include the general, deterministic IPM that allows for a mixture of multiple discrete and/or continuous state variables (Ellner & Rees 2006), stochastically varying parameters to generate unique kernels (Rees & Ellner 2009), and spatial dynamics (Jongejans et al. 2011).
 
 Analytical solutions to the integrals in Equation 1 are usually too complicated (or not possible). Numerical approximations of these integrals are typically quite easy to compute though. Examples of integration rules are the midpoint rule and the trapezoid rule for integration, though more complicated and precise methods have also been used (Zuidema et al. 2010). A matrix multiplication of the discretized projection kernel and the discretized trait distribution then generates a new trait distribution, a process referred to as model iteration. 
 
@@ -228,7 +234,7 @@ The `ipmr` model construction syntax is designed to mimic the mathematical notat
 
 library(png)
 
-fig <- readPNG("../Figures/ex_worflow.png")
+fig <- readPNG("../Figures/ex_workflow.png")
 
 fig_grob <- rasterGrob(fig, interpolate = TRUE)
 
@@ -320,6 +326,16 @@ Currently, `ipmr` can only handle density independent models. Density dependent 
 27. Jongejans E., Shea K., Skarpaas O., Kelly D., & Ellner S.P. (2011). Importance of individual and environmental variation for invasive species spread: a spatial integral projection model. Ecology 92(1): 86-97. DOI: 10.1890/09-2226.1
 
 28. Zuidema P.A., Jongejans E., Chien P.D., During H.J., & Schieving F. (2010). Integral projection models for trees: a new parameterization method and a validation of model output. Journal of Ecology 98: 345-355. DOI: 10.1111/j.1365-2745.2009.01626.x
+
+29. Ozgul A., Childs D.Z., Oli M.K., Armitage K.B., Blumstein D.T., Olson L.E., Tuljapurkar S., & Coulson T.N. (2010). Coupled dynamics of body mass and population growth in response to environmental change. Nature 466 (7305): 482-485. DOI: 10.1038/nature09210
+
+30. Simmonds EG, Cole E.F., Sheldon B.C., & Coulson T.N. (2020). Phenological asynchrony: a ticking time-bomb for seemingly stable populations? Ecology Letters. DOI: 10.1111/ele/13603
+ 
+31. Metcalf C.J.E., Horvitz C.C., Tuljapurkar S., & Clark D.A. (2009). A time to grow and a time to die: A new way to analyze dynamics of size, light, age, and death of tropical trees. Ecology 90 (10): 2766-2778. DOI: 10.1890/08-1645.1
+
+32. Coulson T.N., MacNulty D. R., Stahler D.R., vonHoldt B., Wayne R.K., & Smith D.W. (2011). Modeling effects of environmental change on wolf population dynamics, trait evolution, and life history. Science 334(6060): 1275-1278. DOI: 10.1126/science.1209441
+
+
 
 
 ```{r echo = FALSE}

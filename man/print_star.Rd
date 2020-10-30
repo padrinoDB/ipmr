@@ -40,7 +40,7 @@
 \method{print}{general_di_stoch_param_ipm}(x, comp_lambda = TRUE, type_lambda = "stochastic", sig_digits = 3, ...)
 }
 \arguments{
-\item{x}{An object produced by \code{make_ipm}.}
+\item{x}{An object of class \code{proto_ipm} or produced by \code{make_ipm()}.}
 
 \item{...}{Ignored}
 
@@ -70,4 +70,9 @@ converged, a message will be printed. Only applies to \code{*_det}  when
 Print proto_ipms or *_ipm objects
 
 Generics for IPM classes
+}
+\details{
+For printing \code{proto_ipm} objects, suffixes are wrapped in
+\code{<suffix>} to assist with debugging. These are not carried into the model,
+just a visual aid.
 }

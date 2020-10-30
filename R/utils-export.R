@@ -198,6 +198,16 @@ define_pop_state <- function(proto_ipm, ..., pop_vectors = list()) {
 
   out                 <- Filter(Negate(rlang::is_empty), temp)
 
+  nm_test             <- vapply(names(out), function(x) substr(x, 1, 1), character(1L))
+
+  if(any(nm_test != "n")) {
+
+    stop("All population state names must start with 'n_'",
+         " (e.g. 'n_<stateVariable>)'.",
+         call. = FALSE)
+
+  }
+
   names(out)          <- gsub('^n_', 'pop_state_', names(out))
 
   proto_ipm$pop_state <- list(out)
@@ -669,8 +679,8 @@ format_mega_matrix.age_x_size_ipm <- function(ipm,
 #'
 #' @param proto_ipm A \code{proto_ipm} object.
 #'
-#' @return A named list of either numbers (for domains), or bare expressions (for
-#' vital rates and kernel formulae).
+#' @return A named list of either numbers (for domains and parameters),
+#' or bare expressions (for vital rates and kernel formulae).
 #'
 #' @export
 
@@ -726,6 +736,10 @@ vital_rates <- function(proto_ipm) {
 
   out <- out[!duplicated(names(out))]
 
+  class(out) <- c("ipmr_vital_rate_exprs", "list")
+
+  attr(out, "proto") <- proto_ipm
+
   return(out)
 }
 
@@ -739,7 +753,27 @@ kernel_formulae <- function(proto_ipm) {
     Filter(f = Negate(is.na), x = .) %>%
     lapply(rlang::parse_expr)
 
+  class(out) <- c("ipmr_kernel_exprs", "list")
+  attr(out, "proto") <- proto_ipm
+
   return(out)
+}
+
+#' @rdname proto_accessors
+#' @export
+
+parameters <- function(proto_ipm) {
+
+  out <- lapply(proto_ipm$params, function(x) x$params) %>%
+    stats::setNames(c("")) %>%
+    purrr::flatten() %>%
+    .[!duplicated(names(.))]
+
+  class(out) <- c("ipmr_parameters", "character")
+  attr(out, "proto") <- proto_ipm
+
+  return(out)
+
 }
 
 #' @rdname ipm_accessors

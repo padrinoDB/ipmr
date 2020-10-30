@@ -3,8 +3,12 @@
 #' @title Print proto_ipms or *_ipm objects
 #' @rdname print_star
 #'
-#' @param x An object of class \code{proto_ipm}
+#' @param x An object of class \code{proto_ipm} or produced by \code{make_ipm()}.
 #' @param ... Ignored
+#'
+#' @details For printing \code{proto_ipm} objects, suffixes are wrapped in
+#' \code{<suffix>} to assist with debugging. These are not carried into the model,
+#' just a visual aid.
 #'
 #' @export
 
@@ -27,13 +31,41 @@ print.proto_ipm <- function(x, ...) {
 
   msg          <- c(msg, paste(x$kernel_id, collapse = ', '))
 
-  msg          <- c(msg, '\n')
+  msg          <- c(msg, '\n\nKernel formulae:\n\n')
+
+  cat(msg)
+
+  forms        <- kernel_formulae(x)
+  print(forms)
+
+  cat("\n\nVital rates:\n\n")
+  vrs          <- vital_rates(x)
+
+  print(vrs)
+
+  cat("\n\nParameter names:\n\n")
+
+  pars <- parameters(x)
+
+  print(names(pars))
+
+  # Check if all parameters are in vital rate expressions, and if all
+  # vital rate expression args are found in parameters.
+
+  all_args <- lapply(vrs, function(y) {
+    temp <- rlang::expr_text(y)
+    .args_from_txt(temp)
+  }) %>%
+    unlist() %>%
+    unique()
+
+
 
   # Add more later -----------
-  cat(msg)
 
   invisible(x)
 }
+
 
 #' @noRd
 
@@ -94,7 +126,6 @@ print.proto_ipm <- function(x, ...) {
 #' @rdname print_star
 #' @title Generics for IPM classes
 #'
-#' @param x An object produced by \code{make_ipm}.
 #' @param comp_lambda A logical indicating whether or not to calculate lambdas
 #' for the iteration kernels and display them.
 #' @param comp_method Either \code{"pop_size"} or \code{"eigen"}. \code{"pop_size"}
@@ -163,7 +194,7 @@ print.simple_di_det_ipm <- function(x,
 
   }
 
-  print(msg)
+  cat(msg)
 
   invisible(x)
 
@@ -427,6 +458,114 @@ print.general_di_stoch_param_ipm <- function(x,
 
   cat(msg)
   invisible(x)
+}
+
+#' @export
+
+print.ipmr_vital_rate_exprs <- function(x, ...) {
+
+  proto <- attr(x, "proto")
+
+  if(any(proto$has_hier_effs) | .has_age(proto)) {
+
+    out <- .pretty_print_hier_effs(x, proto)
+
+  } else {
+
+    out <- lapply(x, rlang::expr_text)
+
+  }
+
+  attr(out, "proto") <- NULL
+
+  out <- paste(names(out), out, sep = ": ") %>%
+    paste(., collapse = "\n")
+
+  class(out) <- "character"
+
+  cat(out)
+  invisible(x)
+
+}
+
+.pretty_print_hier_effs <- function(x, proto) {
+
+  nm_hier_effs <- proto$levels_hier_effs %>%
+    .flatten_to_depth(1L) %>%
+    names() %>%
+    unique()
+
+  if(.has_age(proto)) {
+
+    ages <- proto$levels_ages %>%
+      .flatten_to_depth(1L) %>%
+      names() %>%
+      unique()
+
+    nm_hier_effs <- c(nm_hier_effs, ages)
+
+  }
+
+  nm_hier_effs <- nm_hier_effs[!is.na(nm_hier_effs)]
+
+  for(i in seq_along(nm_hier_effs)) {
+
+    to_print <- paste("<", nm_hier_effs[i], ">", sep = "")
+
+    x <- lapply(x,
+                function(y, nm, to_print) {
+                  y <- rlang::expr_text(y)
+                  gsub(nm, to_print, y)
+
+                },
+                nm       = nm_hier_effs[i],
+                to_print = to_print)
+
+    names(x) <- gsub(nm_hier_effs[i], to_print, names(x))
+
+  }
+
+  return(x)
+}
+
+#' @export
+
+print.ipmr_kernel_exprs <- function(x, ...) {
+
+  proto <- attr(x, "proto")
+
+  if(any(proto$has_hier_effs) | .has_age(proto)) {
+
+    out <- .pretty_print_hier_effs(x, proto)
+
+  } else {
+
+    out <- lapply(x, rlang::expr_text)
+
+  }
+
+  attr(out, "proto") <- NULL
+
+  out <- paste(names(out), out, sep = ": ") %>%
+    paste(., collapse = "\n")
+
+  class(out) <- "character"
+
+  cat(out)
+  invisible(x)
+
+}
+
+#' @export
+
+print.ipmr_parameters <- function(x, ...) {
+
+  out <- as.numeric(x)
+  names(out) <- names(x)
+
+  print(out)
+  invisible(x)
+
 }
 
 # Lambda------------

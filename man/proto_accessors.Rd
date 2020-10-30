@@ -4,6 +4,7 @@
 \alias{domains}
 \alias{vital_rates}
 \alias{kernel_formulae}
+\alias{parameters}
 \title{Accessor functions for proto_ipm objects}
 \usage{
 domains(proto_ipm)
@@ -11,13 +12,15 @@ domains(proto_ipm)
 vital_rates(proto_ipm)
 
 kernel_formulae(proto_ipm)
+
+parameters(proto_ipm)
 }
 \arguments{
 \item{proto_ipm}{A \code{proto_ipm} object.}
 }
 \value{
-A named list of either numbers (for domains), or bare expressions (for
-vital rates and kernel formulae).
+A named list of either numbers (for domains and parameters),
+or bare expressions (for vital rates and kernel formulae).
 }
 \description{
 Functions that access specific slots of a \code{proto_ipm} for

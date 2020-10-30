@@ -11,7 +11,7 @@ Many species experience some form of senesence, where survival increases and fec
 
 The model itself can be written on paper as:
 
-1. $n_0(z',t+1) = \sum_{a = 0}^{M} \int_L^UF_a(z',z)n_a(z,t)dz$
+1. $n_0(z',t+1) = \sum\limits_{a = 0}^{M} \int_L^UF_a(z',z)n_a(z,t)dz$
 
 2. $n_a(z',t+1) = \int_L^UP_{a-1}(z', z)n_{a-1}(z,t)dz$           a = 1,2,..., M-1
 
@@ -82,7 +82,8 @@ param_list <- list(
 # define a custom function to handle the F kernels. We could write a rather
 # verbose if(age == 0) {0} else {other_math} in the define_kernel(), but that 
 # might look ugly. Note that we CANNOT use ifelse(), as its output is the same
-# same length as its input (in this case, it would return 1 value, not 10000 values).
+# same length as its input (in this case, it would return 1 number, not 10000 
+# numbers).
 
 f_fun <- function(age, s_age, pb_age, pr_age, recr) {
 
@@ -94,7 +95,7 @@ f_fun <- function(age, s_age, pb_age, pr_age, recr) {
 
 ```
 
-Next, we set up the $P_a$ kernels (Equations 4-7 above). Because this is a general, deterministic IPM, we set the model class to `"general_di_det"`, and set `has_age = TRUE` to indicate that our model has age structure as well as size structure. There are 3 k ey things to note:
+Next, we set up the $P_a$ kernels (Equations 4-7 above). Because this is a general, deterministic IPM, we set the model class to `"general_di_det"`, and set `has_age = TRUE` to indicate that our model has age structure as well as size structure. There are 3 key things to note:
 
 1. the use of the suffix `_age` appended to the names of the `"P"` kernel and the `mu_g_age` variable
 
@@ -122,6 +123,7 @@ age_size_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
     levels_ages   = list(age = c(0:20), max_age = 21),
     evict_cor     = FALSE
   ) 
+
 ```
 
 The $F_a$ kernel (equations 8-13) will follow a similar pattern - we append a suffix to the `name` paramter, and then make sure that our functions also include `_age` suffixes and `age` values where they need to appear. 
@@ -150,7 +152,7 @@ Once we've defined the $P_a$ and $F_a$ kernels, we need to define how they inter
 
 1. We do not add `"_age"` to the `name` here. This is because we do not want to expand this into 22 separate iteration procedures - we only want 1 that iterates the 22 separate $P_a$ and $F_a$ kernels together. 
 
-2. the `n_z_0_t_1 = sum(F_age %*% n_z_age_t)`. This takes the place of the $\sum_{a = 0}^{M}...$ in Eq. 1 above. We don't need to supply $a=0$ and $M$ as those are inferred in the `levels_ages` list.
+2. the `n_z_0_t_1 = sum(F_age %*% n_z_age_t)`. This takes the place of the $\sum\limits_{a=0}^M...$ in Eq. 1 above. We don't need to supply $a=0$ and $M$ as those are inferred in the `levels_ages` list.
 
 3. The insertion of `age_minus_1` in the `n_z_age_t_1` expression. `ipmr` automatically generates the correct indices using these markers, so there is no need to worry about indexing correctly. Tragically, we could not implement a literal `age - 1`. `_plus_` is also available for models with different formats. The amount to add/subtract is not limited to 1, though it is hard to think of examples where we would want to index by larger increments (perhaps with censuses every 2 or 3 years instead annual?). 
 

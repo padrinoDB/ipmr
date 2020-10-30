@@ -53,7 +53,7 @@ single_state <- init_ipm('simple_di_det') %>%
     evict_cor = FALSE) %>%
   define_impl(impl_args_single) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
-  define_pop_state(dbh = rep(1:50, 2))
+  define_pop_state(n_dbh = rep(1:50, 2))
 
 
 states_2 <- c('dbh', 'ht')
@@ -119,8 +119,8 @@ two_state <- init_ipm('simple_di_det') %>%
   define_impl(impl_args_2) %>%
   define_domains(dbh = c(0, 50, 100),
                  ht = c(0, 10, 100)) %>%
-  define_pop_state(dbh = rep(1:50, 2),
-                   ht = runif(50, 0, 10))
+  define_pop_state(n_dbh = rep(1:50, 2),
+                   n_ht = runif(50, 0, 10))
 
 
 test_that('define_pop_state produces expected outputs', {
@@ -137,7 +137,7 @@ test_that('define_pop_state produces expected outputs', {
     as.vector() %>%
     unique()
 
-  expect_true(all(nms %in% c('ht', 'dbh')))
+  expect_true(all(nms %in% c('pop_state_ht', 'pop_state_dbh')))
 
   text_exprs <- lapply(unlist(pop_state), rlang::quo_text) %>%
     unlist() %>%
@@ -147,8 +147,9 @@ test_that('define_pop_state produces expected outputs', {
   expect_true(grepl('runif', text_exprs[2]))
   expect_true(grepl('rep', text_exprs[1]))
 
-  # define_pop_state should not produce errors related to evaluation as no
-  # evaluation occurs - .check_pop_state needs separate unit tests
+  expect_error(define_pop_state(two_state,
+                                dbh = runif(100)),
+               regexp = "All population state names must start with 'n_'")
 })
 
 test_that('define_domains can use global variables', {
