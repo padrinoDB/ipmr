@@ -671,22 +671,38 @@ format_mega_matrix.age_x_size_ipm <- function(ipm,
   return(out)
 }
 
-#' @title Accessor functions for proto_ipm objects
-#' @rdname proto_accessors
+# Accessors functions ----------------------
+
+#' @rdname accessors
+#' @export
+
+domains <- function(object) {
+  UseMethod("domains")
+}
+
+#' @title Accessor functions for (proto_)ipm objects
+#' @rdname accessors
 #'
-#' @description Functions that access specific slots of a \code{proto_ipm} for
-#' user examination.
+#' @description Functions that access slots of a \code{*_ipm} (including \code{proto_ipm}).
 #'
-#' @param proto_ipm A \code{proto_ipm} object.
+#' @param object A \code{proto_ipm} or object created by \code{make_ipm()}.
 #'
-#' @return A named list of either numbers (for domains and parameters),
-#' or bare expressions (for vital rates and kernel formulae).
+#' @return Depending on the class of \code{object}, a numeric vector, or a list
+#' with types numeric or character. See details on return types for each.
+#'
+#' @details The \code{*.default} method corresponds to output from \code{make_ipm()},
+#' and the \code{*.proto_ipm} methods correspond to outputs from \code{define_*}.
+#'
+#' Return types are as follows:
+#' \itemize{
+#'   \code{...}
+#' }
 #'
 #' @export
 
-domains <- function(proto_ipm) {
+domains.proto_ipm <- function(object) {
 
-  out <- lapply(proto_ipm$domain, function(x) x)
+  out <- lapply(object$domain, function(x) x)
 
   out <- lapply(out,
                 function(x) {
@@ -710,17 +726,38 @@ domains <- function(proto_ipm) {
     Filter(f = Negate(is.na), x = .) %>%
     .[!duplicated(names(.)) & !is.na(names(.))]
 
+  class(out) <- c("ipmr_domains", "list")
+  attr(out, "proto") <- object
+
   return(out)
 
 }
 
-#' @rdname proto_accessors
+#' @rdname accessors
+#' @export
+
+domains.default <- function(object) {
+
+  domains(object$proto_ipm)
+
+}
+
+#' @rdname accessors
+#' @export
+
+vital_rates <- function(object) {
+
+  UseMethod("vital_rates")
+
+}
+
+#' @rdname accessors
 #' @importFrom stats setNames
 #' @export
 
-vital_rates <- function(proto_ipm) {
+vital_rates.proto_ipm <- function(object) {
 
-  out <- lapply(proto_ipm$params, function(x) x$vr_text) %>%
+  out <- lapply(object$params, function(x) x$vr_text) %>%
     stats::setNames(c("")) %>%
     lapply(function(x)
            if(any(is.na(x) | is.null(x) | rlang::is_empty(x))) {
@@ -738,56 +775,149 @@ vital_rates <- function(proto_ipm) {
 
   class(out) <- c("ipmr_vital_rate_exprs", "list")
 
-  attr(out, "proto") <- proto_ipm
+  attr(out, "proto") <- object
 
   return(out)
 }
 
-#' @rdname proto_accessors
+#' @rdname accessors
 #' @export
 
-kernel_formulae <- function(proto_ipm) {
+vital_rates.default <- function(object) {
 
-  out <- lapply(proto_ipm$params, function(x) x$formula) %>%
+  vital_rates(object$proto_ipm)
+
+}
+
+#' @rdname accessors
+#' @export
+
+kernel_formulae <- function(object) {
+
+  UseMethod("kernel_formulae")
+
+}
+
+#' @rdname accessors
+#' @export
+
+kernel_formulae.proto_ipm <- function(object) {
+
+  out <- lapply(object$params, function(x) x$formula) %>%
     .flatten_to_depth(1L) %>%
     Filter(f = Negate(is.na), x = .) %>%
     lapply(rlang::parse_expr)
 
   class(out) <- c("ipmr_kernel_exprs", "list")
-  attr(out, "proto") <- proto_ipm
+  attr(out, "proto") <- object
 
   return(out)
 }
 
-#' @rdname proto_accessors
+#' @rdname accessors
 #' @export
 
-parameters <- function(proto_ipm) {
+kernel_formulae.default <- function(object) {
 
-  out <- lapply(proto_ipm$params, function(x) x$params) %>%
+  kernel_formulae(object$proto_ipm)
+
+}
+
+
+#' @export
+#' @rdname accessors
+
+parameters <- function(object) {
+
+  UseMethod("parameters")
+}
+
+#' @rdname accessors
+#' @export
+
+parameters.proto_ipm <- function(object) {
+
+  out <- lapply(object$params, function(x) x$params) %>%
     stats::setNames(c("")) %>%
     purrr::flatten() %>%
     .[!duplicated(names(.))]
 
-  class(out) <- c("ipmr_parameters", "character")
-  attr(out, "proto") <- proto_ipm
+  class(out) <- c("ipmr_parameters", "numeric")
+  attr(out, "proto") <- object
 
   return(out)
 
 }
 
-#' @rdname ipm_accessors
-#' @title Accessor functions for IPM objects
-#'
-#' @description Functions that access specific slots of a \code{*_ipm} for
-#' user examination. These are not the same as the accessors for a \code{proto_ipm}.
-#'
-#' @param ipm An object created by \code{make_ipm}.
-#'
-#' @return A list. Names correspond to the state variables, and values are the
-#' domains. There will also be entries named \code{"d_<stateVariable>"} which
-#' are the integration weights for a given domain.
-#'
+#' @rdname accessors
+#' @export
+
+parameters.default <- function(object) {
+
+  parameters(object$proto_ipm)
+
+}
+
+
+
+#' @rdname accessors
+#' @export
+
+`parameters<-` <- function(object, value) {
+
+  UseMethod("parameters<-")
+
+}
+
+#' @rdname accessors
+#' @param value A named list of new parameters. The new list does not need
+#' to contain all of the parameters, just the ones to update/append.
+#' @export
+
+`parameters<-.proto_ipm` <- function(object, value) {
+
+  for(i in seq_len(nrow(object))) {
+
+    old_pars <- object$params[[i]]$params
+
+    old_par_ind <- names(old_pars) %in% names(value)
+
+    if(all(old_par_ind)) {
+
+      object$params[[i]]$params <- value
+
+    } else {
+
+      temp_pars <- c(old_pars[!old_par_ind], value)
+
+      temp_pars <- temp_pars[!duplicated(names(temp_pars))]
+
+      object$params[[i]]$params <- temp_pars
+
+    }
+  }
+
+  return(object)
+
+}
+
+#' @rdname accessors
+#' @export
+
+`parameters<-.default` <- function(object, value) {
+
+  new_proto_ipm             <- object$proto_ipm
+  parameters(new_proto_ipm) <- value
+  object$proto_ipm          <- new_proto_ipm
+
+  return(object)
+
+}
+
+#' @rdname accessors
+#' @param ipm An object created by \code{make_ipm()}. This argument only applies
+#' \code{int_mesh()} (because the mesh is not built until \code{make_ipm()} is
+#' called).
 #' @export
 
 int_mesh <- function(ipm) {
@@ -828,6 +958,74 @@ int_mesh <- function(ipm) {
                              all_nms,
                              default = NULL,
                              inherit = FALSE)
+
+  return(out)
+
+}
+
+#' @rdname accessors
+#' @export
+
+pop_state <- function(object) {
+
+  UseMethod("pop_state")
+
+}
+
+#' @rdname accessors
+#' @export
+
+pop_state.proto_ipm <- function(object) {
+
+  ps <- object$pop_state %>%
+    .flatten_to_depth(1L)
+
+  if(!rlang::is_named(ps)) {
+    out <- list("No population state defined.")
+    class(out) <- c("ipmr_pop_state", "list")
+    return(out)
+  }
+
+  out <- lapply(ps, .pretty_pop_state)
+
+  out <- out[!duplicated(names(out))]
+
+  class(out) <- c("ipmr_pop_state", "list")
+  attr(out, "proto") <- object
+
+  return(out)
+
+}
+
+#' @noRd
+
+.pretty_pop_state <- function(pop_state) {
+
+  if(rlang::is_quosure(pop_state)) {
+    out <- rlang::quo_squash(pop_state)
+
+  } else if(rlang::is_atomic(pop_state)) {
+
+    out <- "Pre-defined population state."
+
+  } else if(is.na(pop_state)) {
+
+    out <- "Population state not defined."
+
+  }
+
+  return(out)
+
+}
+
+#' @rdname accessors
+#' @export
+
+pop_state.default <- function(object) {
+
+  ps <- object$pop_state
+
+  out <- ps[!grepl('lambda', names(ps))]
 
   return(out)
 

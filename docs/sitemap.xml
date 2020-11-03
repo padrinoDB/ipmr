@@ -4,6 +4,9 @@
     <loc>https://levisc8.github.io/ipmr/index.html</loc>
   </url>
   <url>
+    <loc>https://levisc8.github.io/ipmr/reference/accessors.html</loc>
+  </url>
+  <url>
     <loc>https://levisc8.github.io/ipmr/reference/age_x_size.html</loc>
   </url>
   <url>
@@ -28,9 +31,6 @@
     <loc>https://levisc8.github.io/ipmr/reference/init_ipm.html</loc>
   </url>
   <url>
-    <loc>https://levisc8.github.io/ipmr/reference/ipm_accessors.html</loc>
-  </url>
-  <url>
     <loc>https://levisc8.github.io/ipmr/reference/kernel-definitions.html</loc>
   </url>
   <url>
@@ -53,9 +53,6 @@
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/print_star.html</loc>
-  </url>
-  <url>
-    <loc>https://levisc8.github.io/ipmr/reference/proto_accessors.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/raw_data_ex.html</loc>

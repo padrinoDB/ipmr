@@ -52,20 +52,186 @@ print.proto_ipm <- function(x, ...) {
   # Check if all parameters are in vital rate expressions, and if all
   # vital rate expression args are found in parameters.
 
-  all_args <- lapply(vrs, function(y) {
-    temp <- rlang::expr_text(y)
-    .args_from_txt(temp)
-  }) %>%
-    unlist() %>%
-    unique()
+  in_mod <- .all_params_in_mod(x)
 
+  in_mod_tst <- vapply(in_mod, function(x) x$out, logical(1L)) %>%
+    all()
 
+  cat("\nAll parameters in vital rate expressions found in 'data_list': ",
+      in_mod_tst)
+
+  if(!in_mod_tst) {
+    stoch_params <- c(paste("simple_d", c('i', 'd'), "_stoch_param", sep = ""),
+                      paste("general_d", c('i', 'd'), "_stoch_param", sep = ""))
+    if(inherits(x, stoch_params)) {
+      cat("\nDid not test parameters in 'define_env_state()'.\n")
+    }
+
+    cat("\nItems in vital rate expressions not found in 'data_list':\n")
+
+    for(i in seq_along(in_mod)) {
+
+      if(!in_mod[[i]]$out) {
+        nm <- paste("\n*", names(in_mod)[i], "*\n", sep = "")
+        miss_msg <- paste(nm,
+                          paste(in_mod[[i]]$missing, collapse = "\n"),
+                          sep = "")
+        cat(miss_msg, '\n')
+      }
+
+    }
+    cat("\nDouble check the model definition and 'data_list'!\n")
+
+  }
+
+  cat("\n\nDomains for state variables:\n\n")
+
+  print(domains(x))
+
+  cat("\n\nPopulation states defined:\n\n")
+
+  print(pop_state(x))
 
   # Add more later -----------
 
   invisible(x)
 }
 
+#' @noRd
+
+.all_params_in_mod <- function(proto) {
+
+  kern_list <- list()
+
+  for(row in seq_len(nrow(proto))) {
+
+    use_proto <- proto[row, ]
+    kern_nm   <- proto$kernel_id[row]
+
+    vr_exprs <- vital_rates(use_proto)
+    params   <- parameters(proto)
+
+    # Age x size models and/or hier_effs models need expansion before we
+    # we can test whether all parameters are in the model
+
+    if(.has_age(proto) | any(proto$has_hier_effs)) {
+
+      all_levs <- .flatten_to_depth(proto$levels_hier_effs[proto$has_hier_effs],
+                                    1L) %>%
+        .[!duplicated(names(.))]
+
+      hier_nms <- names(all_levs)
+
+      if(length(all_levs) > 1) {
+        lev_df <- expand.grid(all_levs,
+                              stringsAsFactors = FALSE)
+      } else {
+
+        lev_df <- as.data.frame(all_levs)
+
+      }
+
+      # Hold the results
+
+      all_vr_exprs <- list()
+
+      it <- 1
+
+      # Replace suffixes in expressions
+      for(i in seq_along(vr_exprs)) {
+
+        base_expr <- rlang::expr_text(vr_exprs[[i]])
+
+        for(j in seq_len(dim(lev_df)[2])) {
+
+          hier_nm <- names(lev_df)[j]
+
+          for(k in seq_len(dim(lev_df)[1])) {
+
+            # Replace suffixes in expression and name
+            all_vr_exprs[[it]]      <- gsub(hier_nm,
+                                            lev_df[k, j],
+                                            base_expr)
+
+            names(all_vr_exprs)[it] <- gsub(hier_nm,
+                                            lev_df[k, j],
+                                            names(vr_exprs)[i])
+
+
+            it <- it + 1
+
+          }
+
+        }
+
+
+      }
+
+      vr_exprs <- lapply(all_vr_exprs, rlang::parse_expr)
+
+      vr_args  <- .vr_args(vr_exprs)
+
+    } else {
+
+      vr_args <- .vr_args(vr_exprs)
+
+    }
+
+    # If a vital rate expression creates another parameter, then remove that
+    # from this test, as it shouldn't appear in the data_list anyway.
+
+    to_exclude <- names(vr_exprs)
+    domains    <- names(domains(proto))
+
+    vr_args    <- Filter(.can_be_number, vr_args)
+
+    out <- vapply(vr_args[!vr_args %in% to_exclude],
+                  function(nm, pars) nm %in% pars,
+                  logical(1L),
+                  pars = c(names(params), domains))
+
+    if(!all(out)) {
+      vr_args <- vr_args[!vr_args %in% to_exclude]
+      ind     <- which(!vr_args %in% c(names(params), domains))
+
+      miss_args <- vr_args[ind]
+      out       <- FALSE
+
+    } else {
+
+      out       <- TRUE
+      miss_args <- NA_character_
+    }
+
+    kern_list <- c(kern_list,
+                   list(list(out = out,
+                        missing = miss_args)))
+
+    names(kern_list)[row] <- kern_nm
+  }
+
+  return(kern_list)
+
+}
+
+.can_be_number <- function(x) {
+  suppressWarnings(is.na(as.numeric(x)))
+}
+
+#' @noRd
+
+.vr_args <- function(vr_exprs) {
+
+  all_args <- lapply(vr_exprs, function(y) {
+    temp <- rlang::expr_text(y)
+    .args_from_txt(temp)
+  }) %>%
+    unlist() %>%
+    unique()
+
+  return(all_args)
+
+}
 
 #' @noRd
 
@@ -564,6 +730,57 @@ print.ipmr_parameters <- function(x, ...) {
   names(out) <- names(x)
 
   print(out)
+  invisible(x)
+
+}
+
+#' @export
+# Will need to update w/ other names for other integration rules as those
+# become available
+
+print.ipmr_domains <- function(x, ...) {
+
+  # Strips class and proto attributes
+
+  out <- lapply(x, function(y) {
+    y
+  })
+
+  out <- paste(names(out), out, sep = ": ") %>%
+    paste(., collapse = "\n")
+
+  out <- gsub("c\\(", "", out)
+  out <- gsub("\\)", "", out)
+
+  cat(out)
+  invisible(x)
+
+}
+
+#' @export
+print.ipmr_pop_state <- function(x, ...) {
+
+  out <- lapply(x, function(y) y)
+
+  if(out[[1]] == "No population state defined.") {
+
+    cat(out[[1]])
+
+  } else {
+
+    if(rlang::is_named(x) & !grepl("pop_state_", names(out))) {
+      message("Names of population states don't appear to be prefixed with 'n_'.")
+    }
+
+    names(out) <- gsub("pop_state_", "n_", names(out))
+
+    out <- paste(names(out), out, sep = ": ") %>%
+      paste(., collapse = "\n")
+
+    cat(out)
+
+  }
+
   invisible(x)
 
 }

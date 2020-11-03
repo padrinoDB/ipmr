@@ -23,9 +23,7 @@ The `ipmr` notation is meant to make implementing models more concise, as it all
 
 Some quick translations between mathematical notation, R model syntax, and `ipmr` style notation. In the `ipmr` column, suffixes that are appended are highlighted in **bold**.
 
-Suffix names are not restricted to the examples below. The only requirement is that the suffix not be named `"pop"`. This is an unfortunate side effect of the way `ipmr` handles population vectors internally - please use something like `"site"` or `"population"` instead.
-
-
+Suffix names are not restricted to the examples below, and can be anything you want them to be.
 
 ### Notation guide
 

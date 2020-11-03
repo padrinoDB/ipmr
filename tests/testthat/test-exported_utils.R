@@ -64,6 +64,7 @@ test_that("exported utils return expected values w simple IPMs", {
 context("int_mesh and other *_ipm helper funs")
 
 # simple_di_det methods ---------
+
 data_list = list(s_int = 2.2,
                  s_slope = 0.25,
                  g_int = 0.2,
@@ -132,5 +133,37 @@ test_that("int_mesh works as expected", {
 
   expect_equal(length(mesh_ps$dbh_1), 10000L)
   expect_equal(length(mesh_ps$d_dbh), 1L)
+
+})
+
+test_that("parameters gets and sets correctly", {
+
+  pars <- parameters(sim_di_det_2$proto_ipm)
+  expect_s3_class(pars, "ipmr_parameters")
+
+  pars <- unlist(pars)
+
+  expect_equal(unlist(data_list), pars)
+
+  new_pars <- lapply(data_list,
+                     function(x) x + rnorm(1, 0, 0.2))
+
+  new_proto <- sim_di_det_2$proto_ipm
+  parameters(new_proto) <- new_pars
+
+  expect_equal(unlist(parameters(new_proto)), unlist(new_pars))
+
+  # Now, test subsetted assignment
+
+  newer_pars <- new_pars[1:5]
+  newer_pars <- lapply(newer_pars, function(x) x  + rnorm(1, 0, 0.1))
+
+  parameters(new_proto) <- newer_pars
+
+  test_pars <- parameters(new_proto)
+  test_pars <- test_pars[names(new_pars)]
+
+  expect_equal(unlist(test_pars[names(newer_pars)]), unlist(newer_pars))
+  expect_equal(unlist(test_pars[6:11]), unlist(new_pars)[6:11])
 
 })

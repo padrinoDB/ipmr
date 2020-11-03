@@ -652,6 +652,12 @@ pred_ipm <- init_ipm("simple_di_det") %>%
 
 ```
 
+### Further debugging
+
+Because of the way `ipmr` is implemented internally, there can be some rather obscure error messages when building a model fails. The quickest way to deal with this is usually to print the `proto_ipm` object and inspect the output. `print.proto_ipm` shows information on the kernel names, vital rate expressions, and indicates whether or not every item in the vital rate expressions can be found in the `data_list` and `states`/`domain` that are provided. This can be useful for catching typos in vital rate expressions, or for instances when we've forgotten to define key parts like population states in stochastic simulation. 
+
+The most common problems are forgetting to name population states and the `data_list` correctly. 
+
 ## Defining more complicated models
 
 In the example above, we created a model with a single, deterministic kernel defined by a single state variable. Next, we'll go through an example showing how to build kernels that are constructed from discretely varying parameter estimates.
@@ -661,8 +667,6 @@ In the example above, we created a model with a single, deterministic kernel def
 Say we have multiple sites sampled in the same year, but are only interested in their asymptotic dynamics (perhaps to compare performance across space). `ipmr` uses a syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the examples above. 
 
 The general idea is to append a suffix to each variable that is modified, and supply a list of values that the suffix can actually take in the `levels_hier_effs` slot of `define_kernel()`. There is an entire vignette dedicated to translating math to R code to the `ipmr` syntax [here](https://levisc8.github.io/ipmr/articles/hierarchical-notation.html).
-
-**NOTE:** Because of the way `ipmr` handles population vectors internally, **the only suffix that isn't allowed is `_pop`**. This is unfortunate, but can be worked around. Please use `_site` or `_popul` or something instead. Sorry!
 
 For this example, we'll use the following vital rate models. The `(g)lmer` functions are from the `lme4` package.
 
