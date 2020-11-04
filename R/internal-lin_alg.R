@@ -568,69 +568,22 @@ is_square <- function(x) {
 
 #' @noRd
 # Checks for convergence to asymptotic dynamics. Supports either
-# eigenvalues or pop_state entries. For eigenvalues, looks at a vector,
-# for pop_state entries, two possibilities:
-#
-# SIMPLE_*_ipm: If no hier_effs, pop_state is a list holding a single matrix.
-# this function is called with ipm$pop_state[[1]], and the matrix is passed to
-# code in first if()
-#
-# GENERAL_*_ipm OR SIMPLE_*_ipm with hier_effs on the pop_state: pop_state is a
-# list with multiple matrices. this function is
-# called on ipm$pop_state, and the list is passed to the code in the second if()
-#
-# Eigenvalues are passed into the 3rd if(is.vector())
+# lambdas computed by iteration, which
 
 .is_conv_to_asymptotic <- function(x, tol = 1e-10) {
 
-  if(is.matrix(x)) {
+  # Standardize columns in case of dealing w/ population state
+  # within right/left_ev. lambdas won't be affected
 
-    # Standardize columns first if we're dealing w/ population vector (dim(x)[1] > 1)
+  x <- apply(x, 2, function(y) y / sum(y))
 
-    if(dim(x)[1] > 1){
-      x <- apply(x, 2, FUN = function(y) y / sum(y))
-    }
+  end_ind   <- dim(x)[2]
+  start_ind <- end_ind - 1
 
-    end_ind   <- dim(x)[2]
-    start_ind <- end_ind - 1
+  start_val <- x[ , start_ind]
+  end_val   <- x[ , end_ind]
 
-    start_val <- x[ , start_ind]
-    end_val   <- x[ , end_ind]
 
-  } else if(is.list(x)) {
-
-    # General. Constructs a single vector out of the population state list.
-    # This will generate a single set of vectors for multiple populations,
-    # but they will still be matched by position in the result, and so are
-    # compared to each other in all.equal. Consider adding information for
-    # parts of the vectors that ARE NOT equal to each other for user reference.
-
-    end_ind   <- dim(x[[1]])[2]
-    start_ind <- end_ind - 1
-
-    start_col <- lapply(x,
-                        function(y, ind) matrix(y[ , ind], ncol = 1),
-                        ind = start_ind) %>%
-      do.call("rbind", args = .)
-
-    start_val <- start_col / sum(start_col)
-
-    end_col   <- lapply(x,
-                        function(y, ind) matrix(y[ , ind], ncol = 1),
-                        ind = end_ind) %>%
-      do.call("rbind", args = .)
-
-    end_val <- end_col / sum(end_col)
-
-  } else if(is.vector(x)) {
-
-    end_ind   <- length(x)
-    start_ind <- end_ind - 1
-
-    start_val <- x[start_ind]
-    end_val   <- x[end_ind]
-
-  }
 
   return(
     isTRUE(
@@ -657,7 +610,9 @@ is_square <- function(x) {
 
 is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
 
-  pop_state_test <- vapply(ipm$pop_state, function(x) ! all(is.na(x)), logical(1L))
+  pop_state_test <- vapply(ipm$pop_state,
+                           function(x) ! all(is.na(x)),
+                           logical(1L))
 
   if(! any(pop_state_test)) {
 
@@ -685,13 +640,20 @@ is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
 
   } else {
 
-    pop_state <- ipm$pop_state[!grepl("lambda", names(ipm$pop_state))]
+    warning("Lambda and population state vectors contain NAs. Cannot check for",
+            " convergence.")
+
+    return(NA)
 
   }
 
-  out <- .is_conv_to_asymptotic(pop_state, tol = tol)
-
-  return(out)
+  #   pop_state <- ipm$pop_state[!grepl("lambda", names(ipm$pop_state))]
+  #
+  # }
+  #
+  # out <- .is_conv_to_asymptotic(pop_state, tol = tol)
+  #
+  # return(out)
 
 }
 

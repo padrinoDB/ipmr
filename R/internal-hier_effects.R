@@ -229,8 +229,21 @@
 
     levs <- as.data.frame(unlist(hier_effs),
                           stringsAsFactors = FALSE)
+    drop <- FALSE
 
   } else {
+
+    if("drop_levels" %in% names(hier_effs)) {
+
+      to_drop <- hier_effs$drop_levels
+      hier_effs <- hier_effs[-c("drop_levels")]
+      drop <- TRUE
+
+    } else {
+
+      drop <- FALSE
+
+    }
 
     levs <- lapply(hier_effs, eval) %>%
       expand.grid(stringsAsFactors = FALSE)
@@ -243,6 +256,10 @@
 
     out[i] <- paste(levs[i, ], collapse = "_")
 
+  }
+
+  if(drop){
+    out <- out[!out %in% to_drop]
   }
 
   return(out)

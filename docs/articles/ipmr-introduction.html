@@ -712,7 +712,7 @@
 <h3 class="hasAnchor">
 <a href="#further-debugging" class="anchor"></a>Further debugging</h3>
 <p>Because of the way <code>ipmr</code> is implemented internally, there can be some rather obscure error messages when building a model fails. The quickest way to deal with this is usually to print the <code>proto_ipm</code> object and inspect the output. <code>print.proto_ipm</code> shows information on the kernel names, vital rate expressions, and indicates whether or not every item in the vital rate expressions can be found in the <code>data_list</code> and <code>states</code>/<code>domain</code> that are provided. This can be useful for catching typos in vital rate expressions, or for instances when we’ve forgotten to define key parts like population states in stochastic simulation.</p>
-<p>The most common problems are forgetting</p>
+<p>The most common problems are forgetting to name population states and the <code>data_list</code> correctly.</p>
 </div>
 </div>
 <div id="defining-more-complicated-models" class="section level2">
@@ -810,26 +810,26 @@
 <span class="kw">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_det'</span>) <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
     
-    <span class="co"># Our P kernels will vary from site to site, so we append the "_pop" suffix</span>
+    <span class="co"># Our P kernels will vary from site to site, so we append the "_site" suffix</span>
     <span class="co"># to them.</span>
     
-    name             = <span class="st">'P_pop'</span>,  
+    name             = <span class="st">'P_site'</span>,  
     
     <span class="co"># Similarly, our survival and growth functions will vary from site to site</span>
     <span class="co"># so these are also modified</span>
     
-    formula          = <span class="kw">s_pop</span> <span class="op">*</span> <span class="kw">g_pop</span>,   
+    formula          = <span class="kw">s_site</span> <span class="op">*</span> <span class="kw">g_site</span>,   
     family           = <span class="st">"CC"</span>,
     
     <span class="co"># The linear predictor for the survival function can be split out</span>
     <span class="co"># into its own expression as well. This might help keep track of things.</span>
-    s_lin_pop       = <span class="kw">s_int</span> <span class="op">+</span> <span class="kw">s_r_pop</span> <span class="op">+</span> <span class="kw">s_slope</span> <span class="op">*</span> <span class="kw">ht_1</span>,
-    s_pop           = <span class="fl">1</span> <span class="op">/</span> (<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span><span class="kw">s_lin_pop</span>)),
+    s_lin_site       = <span class="kw">s_int</span> <span class="op">+</span> <span class="kw">s_r_site</span> <span class="op">+</span> <span class="kw">s_slope</span> <span class="op">*</span> <span class="kw">ht_1</span>,
+    s_site           = <span class="fl">1</span> <span class="op">/</span> (<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span><span class="kw">s_lin_site</span>)),
     
-    <span class="co"># Again, we modify the vital rate expression to include "_pop".</span>
+    <span class="co"># Again, we modify the vital rate expression to include "_site".</span>
     
-    g_pop           = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">ht_2</span>, mean = <span class="kw">mu_g_pop</span>, sd = <span class="kw">sd_g</span>),
-    mu_g_pop        = <span class="kw">g_int</span> <span class="op">+</span> <span class="kw">g_slope</span> <span class="op">*</span> <span class="kw">ht_1</span> <span class="op">+</span> <span class="kw">g_r_pop</span>,
+    g_site           = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">ht_2</span>, mean = <span class="kw">mu_g_site</span>, sd = <span class="kw">sd_g</span>),
+    mu_g_site        = <span class="kw">g_int</span> <span class="op">+</span> <span class="kw">g_slope</span> <span class="op">*</span> <span class="kw">ht_1</span> <span class="op">+</span> <span class="kw">g_r_site</span>,
     
     data_list        = <span class="kw">all_params_list</span>,
     states           = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ht'</span>)),
@@ -841,20 +841,20 @@
     <span class="co"># matched the levels we supply here.</span>
     
     has_hier_effs    = <span class="fl">TRUE</span>,
-    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(pop = <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>),
+    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(site = <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>),
     
     <span class="co"># We must also modify the variables in the eviction function</span>
     
     evict_cor        = <span class="fl">TRUE</span>,
-    evict_fun        = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g_pop"</span>)
+    evict_fun        = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g_site"</span>)
     
   ) <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
     
     <span class="co"># The F kernel also varies from site to site</span>
     
-    name             = <span class="st">"F_pop"</span>,             
-    formula          = <span class="kw">f_r</span> <span class="op">*</span> <span class="kw">f_s_pop</span> <span class="op">*</span> <span class="kw">f_d</span>,
+    name             = <span class="st">"F_site"</span>,             
+    formula          = <span class="kw">f_r</span> <span class="op">*</span> <span class="kw">f_s_site</span> <span class="op">*</span> <span class="kw">f_d</span>,
     family           = <span class="st">"CC"</span>,
     
     <span class="co"># In this example, we didn't include a site level effect for probability</span>
@@ -865,7 +865,7 @@
     
     <span class="co"># We modify the seed production expression with the site effect</span>
     
-    f_s_pop         = <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw">f_s_int</span> <span class="op">+</span> <span class="kw">f_s_r_pop</span> <span class="op">+</span> <span class="kw">f_s_slope</span> <span class="op">*</span> <span class="kw">ht_1</span>),
+    f_s_site         = <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw">f_s_int</span> <span class="op">+</span> <span class="kw">f_s_r_site</span> <span class="op">+</span> <span class="kw">f_s_slope</span> <span class="op">*</span> <span class="kw">ht_1</span>),
     f_d              = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">ht_2</span>, mean = <span class="kw">mu_fd</span>, sd = <span class="kw">sd_fd</span>),
     data_list        = <span class="kw">all_params_list</span>,
     states           = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ht'</span>)),
@@ -874,7 +874,7 @@
     <span class="co"># can take, and modify the eviction function.</span>
     
     has_hier_effs    = <span class="fl">TRUE</span>,
-    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(pop = <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>),
+    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(site = <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>),
     evict_cor        = <span class="fl">TRUE</span>,
     evict_fun        = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
   ) <span class="op">%&gt;%</span>
@@ -882,8 +882,8 @@
     
     <span class="co"># We also modify the K expressions. </span>
     
-    name             = <span class="st">'K_pop'</span>,
-    K_pop           = <span class="kw">P_pop</span> <span class="op">+</span> <span class="kw">F_pop</span>,
+    name             = <span class="st">'K_site'</span>,
+    K_site           = <span class="kw">P_site</span> <span class="op">+</span> <span class="kw">F_site</span>,
     family           = <span class="st">"IPM"</span>,
     data_list        = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(),
     states           = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ht"</span>)),
@@ -892,7 +892,7 @@
     <span class="co"># As in the P kernel, we specify the levels the hierarchical variable</span>
     <span class="co"># can take, and modify the eviction function.</span>
     
-    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(pop = <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>),
+    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(site = <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>),
     evict_cor        = <span class="fl">FALSE</span>
   ) <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span>(
@@ -900,7 +900,7 @@
       
       <span class="co"># The impl_args are also modified with the suffix</span>
       
-      kernel_names = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"K_pop"</span>, <span class="st">"P_pop"</span>, <span class="st">"F_pop"</span>),
+      kernel_names = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"K_site"</span>, <span class="st">"P_site"</span>, <span class="st">"F_site"</span>),
       int_rule     = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="fl">3</span>),
       dom_start    = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"ht"</span>, <span class="fl">3</span>),
       dom_end      = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"ht"</span>, <span class="fl">3</span>)

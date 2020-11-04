@@ -34,6 +34,7 @@ test_that("exported utils return expected values w general IPMs", {
 test_that("exported utils return expected values w simple IPMs", {
 
   data(sim_di_det_ex)
+  data(gen_di_det_ex)
 
   prot <- sim_di_det_ex$proto_ipm
 
@@ -58,6 +59,37 @@ test_that("exported utils return expected values w simple IPMs", {
 
   expect_true(all(dom_types))
 
+  vr_ipm <- vital_rates(sim_di_det_ex)
+
+  expect_identical(vr_exprs, vr_ipm)
+
+  kern_ipm <- kernel_formulae(sim_di_det_ex)
+
+  expect_identical(kern_ipm, forms)
+
+  dom_proto <- domains(prot)
+  dom_ipm   <- domains(sim_di_det_ex)
+
+  expect_identical(dom_proto, dom_ipm)
+
+
+  # pop_state shouldn't actually return the same thing here,
+  # so these expectations need to be adjusted
+  prot    <- gen_di_det_ex$proto_ipm
+
+  ps_prot <- pop_state(prot)
+
+  prot_tst <- vapply(ps_prot,
+                     function(x) x == "Pre-defined population state.",
+                     logical(1L))
+
+  expect_true(all(prot_tst))
+  expect_s3_class(ps_prot, "ipmr_pop_state")
+
+  ps_ipm  <- pop_state(gen_di_det_ex)
+
+  expect_true(all(is.array(ps_ipm$n_ht), is.array(ps_ipm$n_b)))
+  expect_type(ps_ipm, "list")
 
 })
 
@@ -165,5 +197,31 @@ test_that("parameters gets and sets correctly", {
 
   expect_equal(unlist(test_pars[names(newer_pars)]), unlist(newer_pars))
   expect_equal(unlist(test_pars[6:11]), unlist(new_pars)[6:11])
+
+
+  data(gen_di_det_ex)
+
+  ipm_params <- parameters(gen_di_det_ex)
+
+  proto_params <- parameters(gen_di_det_ex$proto_ipm)
+
+  expect_s3_class(ipm_params, "ipmr_parameters")
+  expect_s3_class(proto_params, "ipmr_parameters")
+
+  expect_identical(ipm_params, proto_params)
+
+  # Make sure parameters<-.default is operating on proto_ipm, not something
+  # else
+
+  parameters(gen_di_det_ex) <- list(g_i = 0.6)
+
+  new_params <- parameters(gen_di_det_ex)
+  new_prot_params <- parameters(gen_di_det_ex$proto_ipm)
+
+  expect_identical(ipm_params[1:13], new_params[1:13])
+
+  expect_identical(new_params, new_prot_params)
+
+
 
 })

@@ -768,7 +768,7 @@ print.ipmr_pop_state <- function(x, ...) {
 
   } else {
 
-    if(rlang::is_named(x) & !grepl("pop_state_", names(out))) {
+    if(rlang::is_named(x) && !grepl("pop_state_", names(out))) {
       message("Names of population states don't appear to be prefixed with 'n_'.")
     }
 
@@ -778,6 +778,7 @@ print.ipmr_pop_state <- function(x, ...) {
       paste(., collapse = "\n")
 
     cat(out)
+
 
   }
 
