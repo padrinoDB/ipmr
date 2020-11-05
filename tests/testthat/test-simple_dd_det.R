@@ -1,4 +1,3 @@
-context("Simple, density dependent models")
 
 data_list = list(s_int = 2.2,
                  s_slope = 0.25,
@@ -162,7 +161,6 @@ test_that("sub-kernel names and values are generated correctly", {
 })
 
 
-context("subsetting population vectors in vr_exprs 'dd' models")
 
 data_list = list(s_int = 2.2,
                  s_slope = 0.25,
@@ -313,7 +311,6 @@ test_that("asymptotic behavior is preserved at every time step (subsetted models
 })
 
 
-context("reproducing IPM book models")
 
 # Rees + Rose density dependent weevil infestation model. Here,
 # we rebuild that to make sure we're reproducing that behavior.

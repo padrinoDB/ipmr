@@ -1,4 +1,3 @@
-context("Using `predict()` works")
 
 data(iceplant_ex)
 
@@ -148,7 +147,7 @@ lambda_ipmr <- lambda(pred_ipm, comp_method = 'eigen') %>%
 
 test_that("Kernels w/ predict() are the same as hand implemented ones", {
 
-  expect_equal(lambda_hand, lambda_ipmr, tol = 1e-10)
+  expect_equal(lambda_hand, lambda_ipmr, tolerance = 1e-10)
 
 })
 
@@ -225,12 +224,11 @@ test_that("use_vr_model works as expected", {
   expect_true(attr(protected_params$surv_mod, "flat_protect"))
   expect_null(attr(protected_params$grow_sd, "flat_protect"))
 
-  expect_equal(lambda_protected, lambda_ipmr, tol = 1e-10)
+  expect_equal(lambda_protected, lambda_ipmr, tolerance = 1e-10)
 })
 
 
 
-context("sum() works in vr_exprs")
 
 
 f_z1z <- function(f_mod, s_mod, mu, r_sd, r_n, d1, d2, L, U) {
@@ -328,7 +326,7 @@ lambda_ipmr <- lambda(sum_ipm, comp_method = 'eigen') %>%
 
 test_that("Kernels w/ predict() are the same as hand implemented ones", {
 
-  expect_equal(lambda_hand, lambda_ipmr, tol = 1e-10)
+  expect_equal(lambda_hand, lambda_ipmr, tolerance = 1e-10)
 
   p_mat <- sum_ipm$sub_kernels$P
   class(p_mat) <- NULL

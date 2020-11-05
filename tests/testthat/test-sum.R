@@ -1,4 +1,3 @@
-context("test the behavior of sum() *_det vr_exprs")
 
 build_eval_exprs <- function(proto, kernel, dd = FALSE) {
 
@@ -225,8 +224,5 @@ test_that("sum works in di IPMs", {
 
 # context("dd_stoch_kern sums")
 
-
-
 # Make up some really gnarly vr_exprs to test this
 
-# context("highly nested sum expression")

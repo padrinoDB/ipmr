@@ -1,6 +1,4 @@
-context('test simple_di_stoch_kern')
 library(rlang)
-library(ipmr)
 library(purrr)
 
 # define functions for target ipm

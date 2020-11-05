@@ -1,4 +1,3 @@
-context('simple density indepenent models')
 
 # simple-ndd-det IPM test
 
@@ -168,7 +167,7 @@ test_that('define_impl() can handle mismatched argument lengths', {
       define_impl(
         make_impl_args_list(
           kernel_names = c('K', 'P', "F"),
-          int_rule     = 'midpoint',
+          int_rule     = rep('midpoint',3),
           dom_start    = rep('dbh', 3),
           dom_end      = 'dbh'
         )
@@ -201,7 +200,7 @@ test_that('define_impl() can handle mismatched argument lengths', {
 
   test_impl_lambda <- Re(eigen(test_impl$iterators$K)$values[1])
 
-  expect_equal(test_impl_lambda, lambda_ipmr, tol = 1e-10)
+  expect_equal(test_impl_lambda, lambda_ipmr, tolerance = 1e-10)
 
 })
 
@@ -418,7 +417,6 @@ test_that('normalizing pop vector produces same lambdas as eigen methods', {
 })
 
 
-context("iterating deterministic hierarchical models")
 
 fixed_list <- list(s_int = 2.2,
                    s_slope = 0.25,
@@ -624,8 +622,8 @@ names(lambdas_ipmr_pop) <- paste("K_", 1:5, sep = "")
 
 test_that('hierarchical deterministic simulations work', {
 
-  expect_equal(lambdas_ipmr_eigen, lambdas_hand, tol = 1e-10)
-  expect_equal(lambdas_ipmr_pop, lambdas_hand, tol = 1e-10)
+  expect_equal(lambdas_ipmr_eigen, lambdas_hand, tolerance = 1e-10)
+  expect_equal(lambdas_ipmr_pop, lambdas_hand, tolerance = 1e-10)
 
 })
 

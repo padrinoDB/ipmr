@@ -1,4 +1,3 @@
-context("simple, density dependent kernel-resampled models")
 
 # Define some fixed parameters
 data_list = list(

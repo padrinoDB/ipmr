@@ -1,4 +1,3 @@
-context('general density independent stochastic parameter resampled models')
 
 # test general_di_stoch_param models. This will use a simulation with some
 # parameters from Aikens & Roach, with the random effects part being stuff I
@@ -643,7 +642,7 @@ ipmr_sub_kernels <- gen_di_stoch_param$sub_kernels
 
 test_that('ipmr lambdas match user generated ones', {
 
-  expect_equal(ipmr_lambdas, usr_lambdas, tol = 1e-10)
+  expect_equal(ipmr_lambdas, usr_lambdas, tolerance = 1e-10)
 
   kern_test <- map2_lgl(
     ipmr_sub_kernels,
@@ -1374,7 +1373,14 @@ test_that("t variable works as advertised", {
   det_l <- lambda(test_det_seq)
   ran_l <- lambda(gen_di_stoch_param)
 
-  expect_equal(det_l, ran_l, tol = 1e-10)
+  expect_equal(det_l, ran_l, tolerance = 1e-10)
 
 })
 
+
+# test_that("Hierarchical effects work in parameter re-sampled model", {
+#
+#
+#
+#
+# })

@@ -1,4 +1,3 @@
-context('test internal functions')
 
 
 test_mat   <- matrix(c(1, 2, 3,

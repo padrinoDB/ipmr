@@ -1,4 +1,3 @@
-context('general density independent stochastic kernel models')
 
 # Test with parameters from Aikens & Roach 2014 Population dynamics in central
 # and edge populations of a narrowly endemic plant. They only report
@@ -714,7 +713,7 @@ ipmr_lambdas <- lambda(gen_di_stoch_kern,
 
 test_that('ipmr version matches simulation', {
 
-  expect_equal(ipmr_lambdas, actual_lambdas, tol = 1e-10)
+  expect_equal(ipmr_lambdas, actual_lambdas, tolerance = 1e-10)
 
   # Standardized right eigenvectors
 
@@ -724,7 +723,7 @@ test_that('ipmr version matches simulation', {
   hand_w <- pop_holder$ln_leaf_l[ , 101] /
     sum(pop_holder$ln_leaf_l[ , 101])
 
-  expect_equal(ipmr_w, hand_w, tol = 1e-10)
+  expect_equal(ipmr_w, hand_w, tolerance = 1e-10)
 
   kern_tests <- logical(length(gen_di_stoch_kern$sub_kernels))
 
@@ -921,7 +920,7 @@ for(i in seq_len(n_iterations)) {
 
 test_that('general stochastic simulations match hand generated ones', {
 
-  expect_equal(all_lambdas$hand, all_lambdas$ipmr, tol = 1e-7)
+  expect_equal(all_lambdas$hand, all_lambdas$ipmr, tolerance = 1e-7)
 
 })
 

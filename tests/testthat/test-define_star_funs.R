@@ -1,5 +1,3 @@
-context('test define_* functions')
-
 
 states_single <- c('dbh')
 

@@ -1,4 +1,3 @@
-context("Exported accessor functions")
 
 test_that("exported utils return expected values w general IPMs", {
 
@@ -93,7 +92,6 @@ test_that("exported utils return expected values w simple IPMs", {
 
 })
 
-context("int_mesh and other *_ipm helper funs")
 
 # simple_di_det methods ---------
 

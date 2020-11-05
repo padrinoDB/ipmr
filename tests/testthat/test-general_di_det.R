@@ -1,4 +1,3 @@
-context('general density independent deterministic models')
 
 
 set.seed(2312)
@@ -310,7 +309,7 @@ ipmr_lam_cr <- lambda(ipmr_cr,
 
 test_that('ipmr version matches hand version', {
 
-  expect_equal(ipmr_lam_cr, lam_s_cr, tol = 1e-10)
+  expect_equal(ipmr_lam_cr, lam_s_cr, tolerance = 1e-10)
 
   # compare final population distributions
   pop_size_final_cr   <- pop_size_cr$pop_state$ht_cr[ , 101]
@@ -320,10 +319,10 @@ test_that('ipmr version matches hand version', {
 
   expect_equal(pop_size_final_cr,
                pop_size_final_ipmr,
-               tol = 1e-7)
+               tolerance = 1e-7)
   expect_equal(bank_size_final_cr,
                bank_size_final_ipmr,
-               tol = 1e-7)
+               tolerance = 1e-7)
 
 })
 
@@ -526,7 +525,6 @@ test_that('normalize pop vec works the right way', {
 })
 
 
-context("iterating general hierarchical deterministic models")
 
 s_x <- function(int, int_r, slope1, slope2, sv1) {
   1/(1 + exp(-(int + int_r + slope1 * sv1 + slope2 * sv1^2)))
@@ -766,10 +764,10 @@ ws <- do.call("cbind", ws) %>%
 
 test_that("hierarchical models get the same answers as hand generated models", {
 
-  expect_equal(lambdas_ipmr, lambdas_hand, tol = 1e-10)
-  expect_equal(ws[ , 1], ws_hand[ , 1], tol = 1e-10)
-  expect_equal(ws[ , 2], ws_hand[ , 2], tol = 1e-10)
-  expect_equal(ws[ , 3], ws_hand[ , 3], tol = 1e-10)
+  expect_equal(lambdas_ipmr, lambdas_hand, tolerance = 1e-10)
+  expect_equal(ws[ , 1], ws_hand[ , 1], tolerance = 1e-10)
+  expect_equal(ws[ , 2], ws_hand[ , 2], tolerance = 1e-10)
+  expect_equal(ws[ , 3], ws_hand[ , 3], tolerance = 1e-10)
 
 })
 

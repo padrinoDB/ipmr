@@ -1,4 +1,3 @@
-context("age-size IPMs")
 
 # Code straight out of IPM book, chapter 6
 
@@ -383,7 +382,7 @@ ipmr_lambda <- lambda(a_s_ipm, type_lambda = 'last')
 
 test_that("age_x_size lambdas are recovered properly", {
 
-  expect_equal(ipmr_lambda, sim_lambda, tol = 1e-10)
+  expect_equal(ipmr_lambda, sim_lambda, tolerance = 1e-10)
 
   pop_state_ipmr <- a_s_ipm$pop_state %>%
     .[names(.) != 'lambda']
@@ -430,6 +429,6 @@ test_that("format_mega_matrix.age_x_size_ipm works", {
                                  name_ps = "P",
                                  f_forms = "F")$mega_mat
 
-  expect_equal(ipmr_meg, target, tol = 1e-10)
+  expect_equal(ipmr_meg, target, tolerance = 1e-10)
 
 })

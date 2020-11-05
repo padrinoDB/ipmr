@@ -1,4 +1,3 @@
-context("Simple, density dependent stochastic parameter resampled models")
 
 library(mvtnorm)
 

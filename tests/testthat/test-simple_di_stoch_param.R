@@ -2,7 +2,6 @@
 library(mvtnorm)
 library(rlang)
 
-context('Simple density independent stochastic parameter resampled models')
 
 set.seed(25129)
 
@@ -557,11 +556,11 @@ test_that("t helper variable works as advertised", {
   det_seq_l <- lambda(test_det_seq)
   ran_seq_l <- lambda(test_stoch_param)
 
-  expect_equal(det_seq_l, ran_seq_l, tol = 1e-10)
+  expect_equal(det_seq_l, ran_seq_l, tolerance = 1e-10)
 
   pop_state_det <- test_det_seq$pop_state$n_surf_area[ , 11]
   pop_state_ran <- test_stoch_param$pop_state$n_surf_area[ , 11]
 
-  expect_equal(pop_state_det, pop_state_ran, tol = 1e-10)
+  expect_equal(pop_state_det, pop_state_ran, tolerance = 1e-10)
 
 })

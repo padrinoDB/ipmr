@@ -1,4 +1,3 @@
-context('simple_di_det plot and print methods')
 library(rlang)
 library(purrr)
 library(mvtnorm)
@@ -195,7 +194,6 @@ test_that('plot.simple_di_det returns correctly', {
 
 
 # simple_di_stoch_kern methods --------------
-context('simple_di_stoch_kern print and plot methods')
 
 
 hier_levels <- list(yr = 1:5)
@@ -344,7 +342,6 @@ test_that('plot.simple_di_stoch_kern returns correctly', {
 
 # simple_di_stoch_param methods -----
 
-context('simple_di_stoch_param print and plot methods')
 
 data_list <- list(s_slope = 0.2,
                   g_slope = 0.99,
@@ -484,7 +481,6 @@ test_that('plot.simple_di_stoch_param returns correctly', {
 
 })
 
-context('general_di_det print methods')
 
 init_pop_vec   <- runif(500)
 init_seed_bank <- 20
@@ -708,7 +704,6 @@ test_that('print.general_di_det returns correctly', {
 })
 
 
-context('general_di_stoch_kern print methods')
 
 flatten_to_depth <- ipmr:::.flatten_to_depth
 
@@ -1075,7 +1070,6 @@ test_that('print.general_di_stoch_kern works', {
 
 })
 
-context('general_di_stoch_param print method')
 
 to_mu_sd <- function(x) {
   lapply(x,
@@ -1441,7 +1435,6 @@ test_that('print.general_di_stoch_param works', {
 
 })
 
-context('print.proto_ipm is working correctly')
 
 test_that('print.proto_ipm is working correctly', {
 
@@ -1462,7 +1455,6 @@ test_that('print.proto_ipm is working correctly', {
 
 })
 
-context('mat_power is working correctly')
 
 test_that("`%^%` is working correctly", {
 
@@ -1500,7 +1492,6 @@ test_that("`%^%` is working correctly", {
 
 })
 
-context('right_ev.simple_di_det is working correctly')
 
 data_list = list(s_int = 2.2,
                  s_slope = 0.25,
@@ -1578,7 +1569,7 @@ test_that('right_ev.simple_di_det iterates un-iterated model correctly', {
 
   ipmr_w <- right_ev(sim_di_det_1)[[1]]
 
-  expect_equal(target, ipmr_w, tol = 1e-10)
+  expect_equal(target, ipmr_w, tolerance = 1e-10)
 
 })
 
@@ -1666,11 +1657,11 @@ test_that('right_ev can handle iterated models', {
 
   ipmr_w <- right_ev(sim_di_det_2)[[1]]
 
-  expect_equal(target, ipmr_w, tol = 1e-10)
+  expect_equal(target, ipmr_w, tolerance = 1e-10)
 
   ipmr_w <- right_ev(sim_di_det_3)[[1]]
 
-  expect_equal(target, ipmr_w, tol = 1e-10)
+  expect_equal(target, ipmr_w, tolerance = 1e-10)
 
 })
 
@@ -1729,7 +1720,6 @@ test_that('right_ev messages are being produced correctly', {
 
 })
 
-context('left_ev.simple_di_det_ipm works')
 
 target_v <- Re(eigen(t(sim_di_det_1$iterators$K))$vectors[ , 1])
 target_v <- target_v / sum(target_v)
@@ -1737,14 +1727,14 @@ target_v <- target_v / sum(target_v)
 test_that('left_ev.simple_di_det_ipm is working correctly', {
 
   ipmr_v <- left_ev(sim_di_det_1)[[1]]
-  expect_equal(target_v, ipmr_v, tol = 1e-10)
+  expect_equal(target_v, ipmr_v, tolerance = 1e-10)
 
 })
 
 test_that('left_ev.simple_di_det_ipm can re-iterate models', {
 
   ipmr_v <- left_ev(sim_di_det_3)[[1]]
-  expect_equal(target_v, ipmr_v, tol = 1e-10)
+  expect_equal(target_v, ipmr_v, tolerance = 1e-10)
 
 })
 
@@ -1785,7 +1775,6 @@ test_that('warnings are produced correctly', {
 
 })
 
-context('right_ev.general_di_det_ipm is working correctly')
 
 init_pop_vec   <- runif(500)
 init_seed_bank <- 20
@@ -1918,7 +1907,7 @@ test_that('right_ev.general_di_det returns the same as mega-matrix methods', {
   ipmr_w    <- c(ipmr_temp$b_w,
                  ipmr_temp$ht_w)
 
-  expect_equal(target, ipmr_w, tol = 1e-10)
+  expect_equal(target, ipmr_w, tolerance = 1e-9)
 
 })
 
@@ -2007,7 +1996,7 @@ test_that('right_ev.general_di_det can re-iterate models', {
   ipmr_w <- c(test_reiterate$b_w,
               test_reiterate$ht_w)
 
-  expect_equal(target, ipmr_w, tol = 1e-10)
+  expect_equal(target, ipmr_w, tolerance = 1e-9)
 
 })
 
@@ -2043,7 +2032,6 @@ test_that('right_ev.general_di_det returns NAs and warnings properly', {
 
 })
 
-context('left_ev.general_di_det works')
 target_v <- Re(eigen(t(mega_k))$vectors[ , 1])
 target_v <- target_v / sum(target_v)
 
@@ -2059,7 +2047,7 @@ test_that('left_ev.gen_di_det returns the same as mega-matrix models', {
 
   ipmr_v <- c(ipmr_v$b_v, ipmr_v$ht_v)
 
-  expect_equal(target_v, ipmr_v, tol = 1e-10)
+  expect_equal(target_v, ipmr_v, tolerance = 1e-9)
 
 })
 
@@ -2077,7 +2065,7 @@ test_that('left_ev.general_di_det can re-iterate models', {
 
   ipmr_v <- c(ipmr_v$b_v, ipmr_v$ht_v)
 
-  expect_equal(target_v, ipmr_v, tol = 1e-10)
+  expect_equal(target_v, ipmr_v, tolerance = 1e-9)
 
 
 })
@@ -2117,8 +2105,6 @@ test_that('left_ev.general_di_det returns warnings properly', {
   )
 
 })
-
-context('mega-matrix functionality')
 
 test_that('fill_0s is working as it should', {
 
@@ -2248,7 +2234,7 @@ test_that("format_mega_matrix can handle hier_effs", {
                        function(x, actual, pkg_val) {
 
                          isTRUE(
-                           all.equal(actual[[x]], pkg_val[[x]], tol = 1e-10)
+                           all.equal(actual[[x]], pkg_val[[x]], tolerance = 1e-10)
                          )
 
                        },
@@ -2338,7 +2324,7 @@ test_that("format_mega_matrix works w/ multiple hier_effs", {
                        function(x, actual, pkg_val) {
 
                          isTRUE(
-                           all.equal(actual[[x]], pkg_val[[x]], tol = 1e-10)
+                           all.equal(actual[[x]], pkg_val[[x]], tolerance = 1e-10)
                          )
 
                        },
@@ -2512,7 +2498,7 @@ test_that("format_mega_matrix works w/ drop_levels", {
                        function(x, actual, pkg_val) {
 
                          isTRUE(
-                           all.equal(actual[[x]], pkg_val[[x]], tol = 1e-10)
+                           all.equal(actual[[x]], pkg_val[[x]], tolerance = 1e-10)
                          )
 
                        },
