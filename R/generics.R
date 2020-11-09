@@ -1367,7 +1367,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
         unlist() %>%
         unique() %>%
         .[1] %>%
-        paste('n_', ., '_t', sep = "")
+        paste('n_', ., sep = "")
 
       pop_nm <- rlang::ensym(pop_nm)
 
@@ -1456,6 +1456,11 @@ right_ev.simple_di_det_ipm <- function(ipm,
 
     len_pop_state <- dim(ipm$iterators[[1]])[1]
     init_pop      <- stats::runif(len_pop_state)
+
+    # Drop _t for defining the initial population vector so define_pop_state
+    # doesn't complain
+
+    pop_states[1] <- gsub("_t$", "", pop_states[1])
 
     test_conv     <- ipm$proto_ipm %>%
       define_pop_state(!! pop_states[1] := init_pop) %>%
@@ -1804,10 +1809,6 @@ left_ev.general_di_det_ipm <- function(ipm,
   mega_vec     <- rlang::enquo(mega_vec)
 
   mod_nm       <- deparse(substitute(ipm))
-
-  # extract kernels and make a mega_k. same for initial population vector
-  sub_kernels  <- ipm$sub_kernels
-
 
   # Set everything up and iterate the transposed model
 

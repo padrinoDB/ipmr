@@ -135,6 +135,8 @@ define_pop_state <- function(proto_ipm, ..., pop_vectors = list()) {
 
   out                 <- Filter(Negate(rlang::is_empty), temp)
 
+  # Catch a few cases where names me be defined incorrectly:
+
   nm_test             <- vapply(names(out), function(x) substr(x, 1, 1), character(1L))
 
   if(any(nm_test != "n")) {
@@ -142,6 +144,18 @@ define_pop_state <- function(proto_ipm, ..., pop_vectors = list()) {
     stop("All population state names must start with 'n_'",
          " (e.g. 'n_<stateVariable>)'.",
          call. = FALSE)
+
+  }
+
+  nm_test             <- vapply(names(out),
+                                function(x) grepl("*_t$", x) | grepl("*_t_1$", x),
+                                logical(1L))
+
+  if(any(nm_test)) {
+
+    stop("Detected '_t' attached to end of name supplied in 'define_pop_state()'.",
+         "\nVariables in define_pop_state() automatically have '_t' and '_t_1'",
+         " appended to them.\nPlease remove these suffixes!.")
 
   }
 

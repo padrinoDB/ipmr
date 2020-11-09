@@ -142,7 +142,7 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     )
   ) %>%
   define_pop_state(
-    pop_vectors = list(n_surf_area_t = init_pop_vec),
+    pop_vectors = list(n_surf_area = init_pop_vec),
   ) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit,
                            mvt_wrapper = mvt_wrapper),
@@ -328,7 +328,7 @@ test_that('normalize pop_vectors works as it should', {
       )
     ) %>%
     define_pop_state(
-      pop_vectors = list(n_surf_area_t = init_pop_vec),
+      pop_vectors = list(n_surf_area = init_pop_vec),
     ) %>%
     make_ipm(usr_funs = list(inv_logit = inv_logit,
                              mvt_wrapper = mvt_wrapper),
@@ -468,7 +468,7 @@ test_that("t helper variable works as advertised", {
       )
     ) %>%
     define_pop_state(
-      pop_vectors = list(n_surf_area_t = init_pop_vec),
+      pop_vectors = list(n_surf_area = init_pop_vec),
     ) %>%
     make_ipm(usr_funs = list(inv_logit = inv_logit,
                              mvt_wrapper = mvt_wrapper),
@@ -546,7 +546,7 @@ test_that("t helper variable works as advertised", {
       )
     ) %>%
     define_pop_state(
-      pop_vectors = list(n_surf_area_t = init_pop_vec),
+      pop_vectors = list(n_surf_area = init_pop_vec),
     ) %>%
     make_ipm(usr_funs = list(inv_logit = inv_logit),
              iterate = TRUE,
@@ -562,5 +562,204 @@ test_that("t helper variable works as advertised", {
   pop_state_ran <- test_stoch_param$pop_state$n_surf_area[ , 11]
 
   expect_equal(pop_state_det, pop_state_ran, tolerance = 1e-10)
+
+})
+
+
+
+test_that("stoch_param can handle Hier_effs", {
+
+  hier_vals <- rnorm(5, 0, 2) %>% as.list
+  names(hier_vals) <- paste("s_int", 2000:2004, sep = "_")
+
+
+  data_list <- list(s_slope = 0.2,
+                    s_int   = -0.8,
+                    g_slope = 0.99,
+                    g_sd = 0.2,
+                    f_r_slope = 0.003,
+                    f_s_slope = 0.01,
+                    f_d_mu = 2,
+                    f_d_sd = 0.75)
+
+  data_list <- c(data_list, hier_vals)
+
+  b <- seq(0, 10, length.out = 101)
+  d1 <- d2 <- (b[2:101] + b[1:100]) * 0.5
+  h <- d1[3] - d1[2]
+
+  r_means <- c(g_int_yr = 0.1,
+               f_r_int_yr = 0.3,
+               f_s_int_yr = 0.01)
+
+  # These are likely nonsense values - using for testing purposes only!
+  r_sigma <- runif(9)
+  r_sigma <- matrix(r_sigma, nrow = 3)
+
+  r_sigma <- r_sigma %*% t(r_sigma) # make symmetrical
+
+  iterations <- 10
+
+  pop_vec <- matrix(0, ncol = iterations + 1, nrow = length(d1))
+
+  pop_vec[ ,1] <- init_pop_vec <- runif(length(d1), 0, 10)
+
+  ## IPMR Version
+
+  mvt_wrapper <- function(r_means, r_sigma, nms) {
+    out <- rmvnorm(1, r_means, r_sigma) %>%
+      as.list()
+
+    names(out) <- nms
+    return(out)
+  }
+
+  test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
+    define_kernel(
+      'P_yr',
+      formula = s_yr * g,
+      family = 'CC',
+      g_mu = g_int_r + g_slope * surf_area_1,
+      s_yr = plogis(s_int + s_int_yr + s_slope * surf_area_1),
+      g = dnorm(surf_area_2, g_mu, g_sd),
+      data_list = data_list,
+      states = list(c('surf_area')),
+      has_hier_effs = TRUE,
+      levels_hier_effs = list(yr = 2000:2004),
+      evict_cor = TRUE,
+      evict_fun = truncated_distributions('norm', 'g')
+    ) %>%
+    define_kernel(
+      'F',
+      formula = f_r * f_s * f_d,
+      family = 'CC',
+      f_r = plogis(f_r_int_r + f_r_slope * surf_area_1),
+      f_s = exp(f_s_int_r + f_s_slope * surf_area_1),
+      f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
+      data_list = data_list,
+      states = list(c('surf_area')),
+      has_hier_effs = FALSE,
+      evict_cor = TRUE,
+      evict_fun = truncated_distributions('norm', 'f_d')
+    ) %>%
+    define_k(
+      'K_yr',
+      K_yr = P_yr + F,
+      n_surf_area_t_1 = right_mult(K_yr, n_surf_area_t),
+      family = 'IPM',
+      data_list = data_list,
+      states = list(c('surf_area')),
+      has_hier_effs = TRUE,
+      levels_hier_effs = list(yr = 2000:2004),
+      evict_cor = FALSE
+    ) %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c('P_yr', "F", "K_yr"),
+        int_rule = rep('midpoint', 3),
+        dom_start = rep('surf_area',3),
+        dom_end = rep('surf_area', 3)
+      )
+    ) %>%
+    define_domains(surf_area = c(0, 10, 100)) %>%
+    define_env_state(
+      env_params = mvt_wrapper(r_means, r_sigma, nms = c('g_int_r',
+                                                         'f_r_int_r',
+                                                         'f_s_int_r')),
+      data_list = list(
+        r_means = r_means,
+        r_sigma = r_sigma
+      )
+    ) %>%
+    define_pop_state(
+      pop_vectors = list(n_surf_area = init_pop_vec),
+    ) %>%
+    make_ipm(usr_funs = list(mvt_wrapper = mvt_wrapper),
+             iterate = TRUE,
+             iterations = 10,
+             normalize_pop_size = FALSE,
+             kernel_seq = sample(2000:2004, iterations, TRUE))
+
+  hand_lambda <- vector('numeric', iterations)
+
+  ks <- list()
+  ps <- list()
+  fs <- list()
+
+  s_r <- function(dom, params) {
+
+    plogis(params[1] + params[2] + params[3] * dom)
+
+  }
+
+  domains <- expand.grid(list(d2 = d1, d1 = d1))
+
+  temp_data <- data_list[!grepl('[0-9]', names(data_list))]
+
+  for(i in seq_len(iterations)) {
+
+    r_ests <- test_stoch_param$env_seq[i , 1:3] %>%
+      as.list() %>%
+      setNames(names(r_means))
+
+    yr <- test_stoch_param$env_seq[i , 4]
+
+    temp <- c(data_list,  r_ests)
+    s_r_yr <- unlist(hier_vals[grepl(yr, names(hier_vals))])
+
+    g_mat <- g(domains$d2, domains$d1,
+               params = c(temp$g_int_yr,
+                          temp$g_slope,
+                          temp$g_sd),
+               L = 0,
+               U = 10)
+
+    s_vec <- s_r(d1, params = c(temp$s_int,
+                                s_r_yr,
+                                temp$s_slope))
+
+    P <- (t(s_vec * t(g_mat)) * h) %>%
+      matrix(nrow = 100, ncol = 100, byrow = TRUE)
+
+    F_mat <- h * fec(domains$d2, domains$d1,
+                     params = c(temp$f_r_int_yr,
+                                temp$f_r_slope,
+                                temp$f_s_int_yr,
+                                temp$f_s_slope,
+                                temp$f_d_mu,
+                                temp$f_d_sd),
+                     L = 0,
+                     U = 10) %>%
+      matrix(nrow = 100, ncol = 100, byrow = TRUE)
+
+    K_temp <- P + F_mat
+
+    nm_k <- paste0('K_', i, sep = "")
+    nm_p <- paste0('P_', i, sep = "")
+    nm_f <- paste0('F_', i, sep = "")
+    ks[[i]] <- K_temp
+    ps[[i]] <- P
+    fs[[i]] <- F_mat
+    names(ks)[i] <- nm_k
+    names(ps)[i] <- nm_p
+    names(fs)[i] <- nm_f
+
+    n_t_1 <- K_temp %*% pop_vec[ , i]
+
+    hand_lambda[i] <- sum(n_t_1)/sum(pop_vec[ , i])
+
+    pop_vec[ , (i + 1)] <- n_t_1
+
+  }
+
+  ipmr_lambda <- lambda(test_stoch_param, type_lambda = "all") %>%
+    as.vector
+  expect_equal(hand_lambda, ipmr_lambda)
+
+  ipmr_ps <- test_stoch_param$pop_state$n_surf_area
+
+  expect_equal(pop_vec, ipmr_ps)
+
+
 
 })

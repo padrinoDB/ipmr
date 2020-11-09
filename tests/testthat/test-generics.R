@@ -104,7 +104,7 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
            evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
-  define_pop_state(n_dbh_t = runif(100)) %>%
+  define_pop_state(n_dbh = runif(100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit),
            iterate = TRUE,
            iterations = 100,
@@ -145,7 +145,7 @@ sim_di_det_3 <- init_ipm('simple_di_det') %>%
            evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
-  define_pop_state(n_dbh_t = runif(100)) %>%
+  define_pop_state(n_dbh = runif(100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit),
            iterate = TRUE,
            iterations = 5,
@@ -434,7 +434,7 @@ sim_di_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     )
   ) %>%
   define_pop_state(
-    pop_vectors = list(n_surf_area_t = init_pop_vec),
+    pop_vectors = list(n_surf_area = init_pop_vec),
   ) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit,
                            mvt_wrapper = mvt_wrapper),
@@ -1514,10 +1514,6 @@ inv_logit <- function(int, slope, sv) {
   return(1/(1 + exp(-(int + slope * sv))))
 }
 
-impl_args <- make_impl_args_list(c('P', 'F', 'K'),
-                                 int_rule = rep('midpoint', 3),
-                                 dom_start = rep('dbh', 3),
-                                 dom_end = rep('dbh', 3))
 
 states <- c('dbh', 'dbh')
 
@@ -1607,7 +1603,7 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
            evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
-  define_pop_state(n_dbh_t = runif(100)) %>%
+  define_pop_state(n_dbh = runif(100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit),
            iterate = TRUE,
            iterations = 200,
@@ -1646,7 +1642,7 @@ sim_di_det_3 <- init_ipm('simple_di_det') %>%
            states    = states,
            evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
-  define_pop_state(n_dbh_t = runif(100)) %>%
+  define_pop_state(n_dbh = runif(100)) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit),
            iterate = TRUE,

@@ -975,28 +975,29 @@
 
   if(any(proto_ipm$has_hier_effs)) {
 
-    # Set up altered lambda list names if first iteration
-
-    if(i == 1) {
-
       hier_effs <- proto_ipm$levels_hier_effs[proto_ipm$has_hier_effs]
       hier_effs <- hier_effs[!duplicated(hier_effs)]
 
       levs       <- .make_hier_levels(hier_effs)
-      lambda_nms <- paste("lambda", levs, sep = "_")
 
-      pop_state$lambda <- NULL
+      # Set up altered lambda list names if first iteration
 
-      lambdas        <- vector('list', length = length(levs))
-      names(lambdas) <- lambda_nms
+      if(i == 1) {
 
-      lambdas <- lapply(lambdas,
-                        function(x, iterations) {
-                          x <- array(NA_real_, dim = c(1, (iterations + 1)))
-                        },
-                        iterations = iterations)
+        lambda_nms <- paste("lambda", levs, sep = "_")
 
-      pop_state <- c(pop_state, lambdas)
+        pop_state$lambda <- NULL
+
+        lambdas        <- vector('list', length = length(levs))
+        names(lambdas) <- lambda_nms
+
+        lambdas <- lapply(lambdas,
+                          function(x, iterations) {
+                            x <- array(NA_real_, dim = c(1, (iterations + 1)))
+                          },
+                          iterations = iterations)
+
+        pop_state <- c(pop_state, lambdas)
 
     }
 
@@ -1077,7 +1078,7 @@
 
                                          return(.x)
                                        },
-                                       iteration = j
+                                       iteration = i
       )
 
       # Now, update the names so that we can bind the new n_*_t to

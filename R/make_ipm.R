@@ -535,6 +535,15 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
   }
 
+  temp$env_seq <- data.frame(temp$env_seq, stringsAsFactors = FALSE)
+
+  if(!is.null(kern_seq)) {
+
+    temp$env_seq <- cbind(temp$env_seq,
+                          kernel_seq = kern_seq)
+
+  }
+
   temp$pop_state$lambda <- temp$pop_state$lambda[-1]
   names(temp$pop_state) <- gsub("^pop_state_", "n_", names(temp$pop_state))
 

@@ -125,7 +125,7 @@
     # for simple IPMs (e.g. 1 state, iterator MUST be a square), but
     # then again, it only needs to work for them
 
-    names(k_list[[i]])      <- rep('placeholder', length(k_list))
+    names(k_list[[i]])      <- rep('placeholder', length(k_list[[i]]))
 
     k_ind <- vapply(temp, function(x) dim(x)[1] == dim(x)[2], logical(1L))
 

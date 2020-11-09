@@ -468,7 +468,7 @@
 
   # Determine who's a kernel and who's a pop_vector!
 
-  iterator   <- list(ipm_system$iterator)
+  iterator   <- list(ipm_system$iterators)
 
   # make names a bit prettier to help distinguish between iterations
 
@@ -1490,14 +1490,40 @@ set_ipmr_classes <- function(to_set, cls = NULL) {
 
 .prep_dd_vr_exprs <- function(proto) {
 
-  possible_states <- unique(unlist(proto$state_var))
+  possible_states <- unique(names(pop_state(proto))) %>%
+    gsub(pattern = "pop_state_", replacement = "", x = .)
 
   state_nms <- paste("n_", possible_states, "_t", sep = "")
   to_sub    <- paste("as.vector(pop_state_", possible_states, "_t)", sep = "")
 
+  if(any(proto$has_hier_effs)) {
+
+    hier_effs <- proto$levels_hier_effs %>%
+      .flatten_to_depth(1L) %>%
+      .[!duplicated(names(.))]
+
+    levs <- .make_hier_levels(hier_effs)
+    nms  <- names(hier_effs)[!names(hier_effs) %in% "to_drop"] %>%
+      paste(collapse = "_")
+
+    new_stn <- character()
+    new_sub <- character()
+
+    for(i in seq_along(levs)) {
+      new_sub <- c(new_sub, gsub(nms, levs[i], to_sub))
+      new_stn <- c(new_stn, gsub(nms, levs[i], state_nms))
+    }
+
+    to_sub    <- unique(new_sub)
+    state_nms <- unique(new_stn)
+  }
+
+  out <- proto$params
+
   for(i in seq_along(state_nms)){
 
-    out <- lapply(proto$params, function(x, target, to_sub) {
+    out <- lapply(out,
+                  function(x, target, to_sub) {
 
       x$formula <- gsub(target, to_sub, x$formula)
       x$vr_text <- lapply(x$vr_text, function(y, target, to_sub) {

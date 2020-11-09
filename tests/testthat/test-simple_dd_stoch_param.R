@@ -135,7 +135,7 @@ test_stoch_param <- init_ipm('simple_dd_stoch_param') %>%
     )
   ) %>%
   define_pop_state(
-    pop_vectors = list(n_surf_area_t = init_pop_vec),
+    pop_vectors = list(n_surf_area = init_pop_vec),
   ) %>%
   make_ipm(usr_funs = list(mvt_wrapper = mvt_wrapper),
            iterate = TRUE,

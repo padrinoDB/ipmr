@@ -148,7 +148,7 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
            evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
-  define_pop_state(n_dbh_t = runif(100)) %>%
+  define_pop_state(n_dbh = runif(100)) %>%
   make_ipm(iterate = TRUE,
            iterations = 100,
            normalize_pop_size = FALSE,
