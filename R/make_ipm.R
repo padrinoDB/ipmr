@@ -894,6 +894,16 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
                                             normalize_pop_size = TRUE,
                                             report_progress    = FALSE) {
 
+  if(iterate &&
+     all(is.null(kernel_seq) | is.na(kernel_seq))  &&
+     any(proto_ipm$has_hier_effs)) {
+
+    message("'kernel_seq' not defined. Will generate one internally")
+
+    kernel_seq <- "internal"
+
+  }
+
   # Work out whether to append usr_funs to proto or to restore them from prior
   # implemenation. Logic is documented in make_ipm.simple_di_det()
 
@@ -1263,6 +1273,15 @@ make_ipm.simple_dd_stoch_kern <- function(proto_ipm,
                                           report_progress    = FALSE) {
 
 
+  if(iterate &&
+     all(is.null(kernel_seq) | is.na(kernel_seq))) {
+
+    message("'kernel_seq' not defined. Will generate one internally")
+
+    kernel_seq <- "internal"
+
+  }
+
   # Figure out if we're dealing with a new model or an old one that is
   # being reimplemented. If the proto is not new and usr_funs isn't passed to the new
   # make_ipm call, then restore the old version. If usr_funs are passed,
@@ -1453,6 +1472,16 @@ make_ipm.simple_dd_stoch_param <-function(proto_ipm,
                                           report_progress    = FALSE) {
 
 
+  if(iterate &&
+     all(is.null(kernel_seq) | is.na(kernel_seq)) &&
+     any(proto_ipm$has_hier_effs)) {
+
+    message("'kernel_seq' not defined. Will generate one internally")
+
+    kernel_seq <- "internal"
+
+  }
+
   # Figure out if we're dealing with a new model or an old one that is
   # being reimplemented. If the proto is not new and usr_funs isn't passed to the new
   # make_ipm call, then restore the old version. If usr_funs are passed,
@@ -1514,7 +1543,11 @@ make_ipm.simple_dd_stoch_param <-function(proto_ipm,
 
     sub_kern_out <- list()
     env_ret      <- list(main_env = main_env)
-    kern_seq     <- as.character(kernel_seq)
+    kern_seq     <- .make_kern_seq(others,
+                                   c(others$kernel_id,
+                                     k_row$kernel_id),
+                                   iterations,
+                                   kernel_seq)
 
     for(i in seq_len(iterations)) {
 
@@ -1602,7 +1635,7 @@ make_ipm.simple_dd_stoch_param <-function(proto_ipm,
 
   temp$env_seq <- data.frame(temp$env_seq, stringsAsFactors = FALSE)
 
-  if(!is.na(kern_seq)) {
+  if(!is.null(kern_seq)) {
 
     temp$env_seq <- cbind(temp$env_seq,
                           kernel_seq = kern_seq)

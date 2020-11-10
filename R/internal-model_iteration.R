@@ -1319,7 +1319,7 @@
   # object so that .eval_general_det doesn't loop over ones which include
   # expressions for other levels of 'kern_seq'
 
-  if(!is.na(kern_seq)) {
+  if(!is.null(kern_seq)) {
 
     if(is.character(kern_seq)) {
 

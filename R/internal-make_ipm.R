@@ -908,7 +908,7 @@
 .make_kern_seq <- function(proto, kernels, iterations, kernel_seq) {
 
 
-  if(is.null(kernel_seq)) {
+  if(is.null(kernel_seq) || is.na(kernel_seq)) {
 
     seq_type   <- 'NA'
 

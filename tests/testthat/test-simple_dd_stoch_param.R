@@ -210,3 +210,193 @@ test_that("math works", {
   expect_equal(pop_state_ipmr, pop_vec)
 
 })
+
+# Hierarchical models -------------
+
+g_int_effs <- rnorm(3) %>%
+  as.list %>%
+  setNames(paste("g_int_yr_", 1:3, sep = ''))
+
+f_r_int_effs <- rnorm(3) %>%
+  as.list %>%
+  setNames(paste("f_r_int_yr_", 1:3, sep = ''))
+
+data_list <- c(data_list, g_int_effs, f_r_int_effs)
+
+
+test_stoch_param <- init_ipm('simple_dd_stoch_param') %>%
+  define_kernel(
+    'P_site',
+    formula = s * g_site,
+    family = 'CC',
+    g_mu_site = g_int_yr + g_int_yr_site + g_slope * surf_area_1,
+    s = plogis(s_int_yr +  s_slope * surf_area_1 + s_dd * sum(n_surf_area_t)),
+    g_site = dnorm(surf_area_2, g_mu_site, g_sd),
+    data_list = data_list,
+    states = list(c('surf_area')),
+    has_hier_effs = TRUE,
+    levels_hier_effs = list(site = 1:3),
+    evict_cor = TRUE,
+    evict_fun = truncated_distributions('norm', 'g_site')
+  ) %>%
+  define_kernel(
+    'F_site',
+    formula = f_r_site * f_s * f_d,
+    family = 'CC',
+    f_r_site = plogis(f_r_int_yr + f_r_int_yr_site + f_r_slope * surf_area_1),
+    f_s = exp(f_s_int_yr + f_s_slope * surf_area_1 + f_s_dd * sum(n_surf_area_t)),
+    f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
+    data_list = data_list,
+    states = list(c('surf_area')),
+    has_hier_effs = TRUE,
+    levels_hier_effs = list(site = 1:3),
+    evict_cor = TRUE,
+    evict_fun = truncated_distributions('norm', 'f_d')
+  ) %>%
+  define_k(
+    'K_site',
+    K_site = P_site + F_site,
+    n_surf_area_t_1 = right_mult(K_site, n_surf_area_t),
+    family = 'IPM',
+    data_list = data_list,
+    states = list(c('surf_area')),
+    has_hier_effs = TRUE,
+    levels_hier_effs = list(site = 1:3),
+    evict_cor = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c('P_site', "F_site", "K_site"),
+      int_rule = rep('midpoint', 3),
+      dom_start = rep('surf_area',3),
+      dom_end = rep('surf_area', 3)
+    )
+  ) %>%
+  define_domains(surf_area = c(0, 10, 100)) %>%
+  define_env_state(
+    env_params = mvt_wrapper(r_means, r_sigma, nms = c('s_int_yr',
+                                                       'g_int_yr',
+                                                       'f_r_int_yr',
+                                                       'f_s_int_yr')),
+    data_list = list(
+      r_means = r_means,
+      r_sigma = r_sigma
+    )
+  ) %>%
+  define_pop_state(
+    pop_vectors = list(n_surf_area = init_pop_vec),
+  ) %>%
+  make_ipm(usr_funs = list(mvt_wrapper = mvt_wrapper),
+           iterate = TRUE,
+           iterations = 10,
+           kernel_seq = sample(1:3, 10, TRUE),
+           normalize_pop_size = FALSE)
+
+
+# Hand version
+
+iterations <- 10
+
+pop_vec <- matrix(0, ncol = iterations + 1, nrow = length(d1))
+
+pop_vec[ ,1] <- test_stoch_param$pop_state$n_surf_area[ , 1]
+
+g <- function(sv1, sv2, params, L, U) {
+  mu <- params[1] + params[2] * sv1 + params[4]
+  ev <- pnorm(U, mu, params[3]) - pnorm(L, mu, params[3])
+  dnorm(sv2, mean = mu, sd = params[3]) / ev
+}
+
+fec <- function(sv1, sv2, params, L, U, pop_size) {
+  ev <- pnorm(U, params[6], params[7]) - pnorm(L, params[6], params[7])
+  f_r(sv1, params[c(1:2,8)]) *
+    f_s(sv1, params[3:5], pop_size) *
+    (f_d(sv2, params[6:7]) / ev)
+}
+
+f_r <- function(sv1, params) {
+  1/(1 + exp(-(params[1] + params[2] * sv1 + params[3])))
+}
+
+hand_lam <- vector('numeric', iterations)
+
+ks <- list()
+ps <- list()
+fs <- list()
+
+domains <- expand.grid(list(d2 = d1, d1 = d1))
+
+for(i in seq_len(iterations)) {
+
+  pop_size <- sum(pop_vec[ , i])
+
+  r_ests <- test_stoch_param$env_seq[i, 1:4] %>%
+    as.list() %>%
+    setNames(names(r_means))
+
+  temp <- c(data_list,  r_ests)
+
+  yr <- test_stoch_param$env_seq[i , 5]
+
+  g_yr_eff <- g_int_effs[grepl(yr, names(g_int_effs))] %>%
+    unlist()
+  f_r_yr_eff <- f_r_int_effs[grepl(yr, names(f_r_int_effs))] %>%
+    unlist()
+
+  g_mat <- g(domains$d2, domains$d1,
+             params = c(temp$g_int_yr,
+                        temp$g_slope,
+                        temp$g_sd,
+                        g_yr_eff),
+             L = 0,
+             U = 10)
+
+  s_vec <- s(d1, params = c(temp$s_int_yr,
+                            temp$s_slope,
+                            temp$s_dd),
+             pop_size)
+
+  P <- (t(s_vec * t(g_mat)) * h) %>%
+    matrix(nrow = 100, ncol = 100, byrow = TRUE)
+
+  F_mat <- h * fec(domains$d2, domains$d1,
+                   params = c(temp$f_r_int_yr,
+                              temp$f_r_slope,
+                              temp$f_s_int_yr,
+                              temp$f_s_slope,
+                              temp$f_s_dd,
+                              temp$f_d_mu,
+                              temp$f_d_sd,
+                              f_r_yr_eff),
+                   L = 0,
+                   U = 10,
+                   pop_size) %>%
+    matrix(nrow = 100, ncol = 100, byrow = TRUE)
+
+  K_temp <- P + F_mat
+
+  n_t_1 <- K_temp %*% pop_vec[ , i]
+
+  hand_lam[i] <- sum(n_t_1)/sum(pop_vec[ , i])
+
+  pop_vec[ , (i + 1)] <- n_t_1
+
+}
+
+hand_pop_sizes <- colSums(pop_vec)
+ipmr_pop_sizes <- colSums(test_stoch_param$pop_state$n_surf_area)
+
+hand_lams <- hand_pop_sizes[2:11] / hand_pop_sizes[1:10]
+ipmr_lams <- as.vector(test_stoch_param$pop_state$lambda)
+
+test_that("parameter resampled hierarchical models work", {
+
+
+  expect_equal(hand_pop_sizes, ipmr_pop_sizes)
+  expect_equal(hand_lams, ipmr_lams)
+
+})
+
+
+
+
