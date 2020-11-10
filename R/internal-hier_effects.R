@@ -6,6 +6,7 @@
 
   # Create a place to hold the output - either kernels with no hierarchical effects
   # or a new proto
+
   if(length(kerns) != dim(proto_ipm)[1]) {
 
     out <- proto_ipm[-kerns, ]
@@ -223,7 +224,8 @@
 
 .make_hier_levels <- function(hier_effs) {
 
-  hier_effs <- .flatten_to_depth(hier_effs, 1L)
+  hier_effs <- .flatten_to_depth(hier_effs, 1L) %>%
+    .[!names(.) == "levels"]
 
   if(length(hier_effs) == 1) {
 
