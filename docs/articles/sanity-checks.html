@@ -101,7 +101,8 @@
 
       
 
-      </header><script src="sanity-checks_files/header-attrs-2.3/header-attrs.js"></script><div class="row">
+      </header><script src="sanity-checks_files/header-attrs-2.5/header-attrs.js"></script><link href="sanity-checks_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="sanity-checks_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Sanity checks for ipmr examples</h1>
@@ -117,39 +118,39 @@
 <div id="the-simple-density-independent-deterministic-model-from-the-readme" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-simple-density-independent-deterministic-model-from-the-readme" class="anchor"></a>The simple, density-independent, deterministic model from the README</h2>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="co"># Load ipmr and get the parameter values. The data_list argument for define_kernel</span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Load ipmr and get the parameter values. The data_list argument for define_kernel</span>
 <span class="co"># should hold every regression parameter and every constant used in the model.</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">ipmr</span>)
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ipmr</span><span class="op">)</span>
 
-<span class="kw">data_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(s_int     = <span class="fl">2.2</span>,   <span class="co"># coefficients(my_surv_mod)[1]</span>
-                 s_slope   = <span class="fl">0.25</span>,  <span class="co"># coefficients(my_surv_mod)[2]</span>
-                 g_int     = <span class="fl">0.2</span>,   <span class="co"># coefficients(my_grow_mod)[1]</span>
-                 g_slope   = <span class="fl">1.02</span>,  <span class="co"># coefficients(my_grow_mod)[2]</span>
-                 sd_g      = <span class="fl">0.7</span>,   <span class="co"># sd(resid(my_grow_mod))</span>
-                 f_r_int   = <span class="fl">0.003</span>, <span class="co"># coefficients(my_pr_flower_mod)[1]</span>
-                 f_r_slope = <span class="fl">0.015</span>, <span class="co"># coefficients(my_pr_flower_mod)[2]</span>
-                 f_s_int   = <span class="fl">1.3</span>,   <span class="co"># coefficients(my_seed_mod)[1]</span>
-                 f_s_slope = <span class="fl">0.075</span>, <span class="co"># coefficients(my_seed_mod)[2]</span>
-                 mu_fd     = <span class="fl">2</span>,     <span class="co"># mean(recruit_data$size_next)</span>
-                 sd_fd     = <span class="fl">0.3</span>)   <span class="co"># sd(recruit_data$size_next)</span>
+<span class="va">data_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>s_int     <span class="op">=</span> <span class="fl">2.2</span>,   <span class="co"># coefficients(my_surv_mod)[1]</span>
+                 s_slope   <span class="op">=</span> <span class="fl">0.25</span>,  <span class="co"># coefficients(my_surv_mod)[2]</span>
+                 g_int     <span class="op">=</span> <span class="fl">0.2</span>,   <span class="co"># coefficients(my_grow_mod)[1]</span>
+                 g_slope   <span class="op">=</span> <span class="fl">1.02</span>,  <span class="co"># coefficients(my_grow_mod)[2]</span>
+                 sd_g      <span class="op">=</span> <span class="fl">0.7</span>,   <span class="co"># sd(resid(my_grow_mod))</span>
+                 f_r_int   <span class="op">=</span> <span class="fl">0.003</span>, <span class="co"># coefficients(my_pr_flower_mod)[1]</span>
+                 f_r_slope <span class="op">=</span> <span class="fl">0.015</span>, <span class="co"># coefficients(my_pr_flower_mod)[2]</span>
+                 f_s_int   <span class="op">=</span> <span class="fl">1.3</span>,   <span class="co"># coefficients(my_seed_mod)[1]</span>
+                 f_s_slope <span class="op">=</span> <span class="fl">0.075</span>, <span class="co"># coefficients(my_seed_mod)[2]</span>
+                 mu_fd     <span class="op">=</span> <span class="fl">2</span>,     <span class="co"># mean(recruit_data$size_next)</span>
+                 sd_fd     <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span>   <span class="co"># sd(recruit_data$size_next)</span>
 
-<span class="kw">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_det'</span>) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
+<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">'simple_di_det'</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     
     <span class="co"># Name of the kernel</span>
     
-    name      = <span class="st">"P_simple"</span>,
+    name      <span class="op">=</span> <span class="st">"P_simple"</span>,
     
     <span class="co"># The type of transition it describes (e.g. continuous - continuous, discrete - continuous).</span>
     <span class="co"># These must be specified for all kernels!</span>
     
-    family    = <span class="st">"CC"</span>,
+    family    <span class="op">=</span> <span class="st">"CC"</span>,
     
     <span class="co"># The formula for the kernel. </span>
     
-    formula   = <span class="kw">s</span> <span class="op">*</span> <span class="kw">g</span>,
+    formula   <span class="op">=</span> <span class="va">s</span> <span class="op">*</span> <span class="va">g</span>,
     
     <span class="co"># A named set of expressions for the vital rates it includes. </span>
     <span class="co"># note the use of user-specified functions here. Additionally, each </span>
@@ -161,57 +162,57 @@
     <span class="co"># from your model. For examples on using predict(my_surv_mod,...),</span>
     <span class="co"># see below.</span>
     
-    s         = <span class="fl">1</span> <span class="op">/</span> (<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(<span class="kw">s_int</span> <span class="op">+</span> <span class="kw">s_slope</span> <span class="op">*</span> <span class="kw">dbh_1</span>))), 
+    s         <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">s_int</span> <span class="op">+</span> <span class="va">s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, 
     
     <span class="co"># The growth model requires a function to compute the mean as a function of dbh.</span>
     <span class="co"># The SD is a constant, so we don't need to define that in ... expression, </span>
     <span class="co"># just the data_list.</span>
     
-    g         = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">dbh_2</span>, <span class="kw">mu_g</span>, <span class="kw">sd_g</span>),
-    mu_g      = <span class="kw">g_int</span> <span class="op">+</span> <span class="kw">g_slope</span> <span class="op">*</span> <span class="kw">dbh_1</span>,
+    g         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">mu_g</span>, <span class="va">sd_g</span><span class="op">)</span>,
+    mu_g      <span class="op">=</span> <span class="va">g_int</span> <span class="op">+</span> <span class="va">g_slope</span> <span class="op">*</span> <span class="va">dbh_1</span>,
 
     
     <span class="co"># Specify the constants in the model in the data_list. </span>
     
-    data_list = <span class="kw">data_list</span>,
-    states    = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),
+    data_list <span class="op">=</span> <span class="va">data_list</span>,
+    states    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,
     
     <span class="co"># If you want to correct for eviction, set evict_cor = TRUE and specify an</span>
     <span class="co"># evict_fun. ipmr provides truncated_distributions() to help.</span>
     
-    evict_cor = <span class="fl">TRUE</span>,
-    evict_fun = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">'norm'</span>,
-                                        <span class="st">'g'</span>)
-  ) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(<span class="st">'F_simple'</span>,
-                formula   = <span class="kw">f_r</span> <span class="op">*</span> <span class="kw">f_s</span> <span class="op">*</span> <span class="kw">f_d</span>,
-                family    = <span class="st">'CC'</span>,
+    evict_cor <span class="op">=</span> <span class="cn">TRUE</span>,
+    evict_fun <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">'norm'</span>,
+                                        <span class="st">'g'</span><span class="op">)</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span><span class="st">'F_simple'</span>,
+                formula   <span class="op">=</span> <span class="va">f_r</span> <span class="op">*</span> <span class="va">f_s</span> <span class="op">*</span> <span class="va">f_d</span>,
+                family    <span class="op">=</span> <span class="st">'CC'</span>,
                 
                 <span class="co"># Inverse logit transformation for flowering probability</span>
                 <span class="co"># (because we used a logistic regression)</span>
                 
-                f_r       = <span class="fl">1</span> <span class="op">/</span> (<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>( <span class="op">-</span> (<span class="kw">f_r_int</span> <span class="op">+</span> <span class="kw">f_r_slope</span> <span class="op">*</span> <span class="kw">dbh_1</span>))),
+                f_r       <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span> <span class="op">-</span> <span class="op">(</span><span class="va">f_r_int</span> <span class="op">+</span> <span class="va">f_r_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
                 
                 <span class="co"># Exponential function for seed progression </span>
                 <span class="co"># (because we used a Poisson)</span>
                 
-                f_s       = <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw">f_s_int</span> <span class="op">+</span> <span class="kw">f_s_slope</span> <span class="op">*</span> <span class="kw">dbh_1</span>),
+                f_s       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">f_s_int</span> <span class="op">+</span> <span class="va">f_s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>,
                 
                 <span class="co"># The recruit size distribution has no maternal effect for size,</span>
                 <span class="co"># so mu_fd and sd_fd are constants. These get passed in the </span>
                 <span class="co"># data_list</span>
                 
-                f_d       = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">dbh_2</span>, <span class="kw">mu_fd</span>, <span class="kw">sd_fd</span>),
-                data_list = <span class="kw">data_list</span>,
-                states    = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),
+                f_d       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">mu_fd</span>, <span class="va">sd_fd</span><span class="op">)</span>,
+                data_list <span class="op">=</span> <span class="va">data_list</span>,
+                states    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,
                 
                 <span class="co"># Again, we'll correct for eviction in new recruits by</span>
                 <span class="co"># truncating the normal distribution.</span>
                 
-                evict_cor = <span class="fl">TRUE</span>,
-                evict_fun = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">'norm'</span>,
-                                                    <span class="st">'f_d'</span>)
-  ) <span class="op">%&gt;%</span>
+                evict_cor <span class="op">=</span> <span class="cn">TRUE</span>,
+                evict_fun <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">'norm'</span>,
+                                                    <span class="st">'f_d'</span><span class="op">)</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
   
   <span class="co"># K kernels get their own special define_k function. Rather than use the formula</span>
   <span class="co"># parameter, it simply takes named expressions for the format of the iteration</span>
@@ -219,23 +220,23 @@
   <span class="co"># population states at t+1 as a function of population state at t - see examples</span>
   <span class="co"># below for how to do that.</span>
   
-  <span class="fu"><a href="../reference/define_kernel.html">define_k</a></span>(<span class="st">'K'</span>,
-           K         = <span class="kw">P_simple</span> <span class="op">+</span> <span class="kw">F_simple</span>,
+  <span class="fu"><a href="../reference/define_kernel.html">define_k</a></span><span class="op">(</span><span class="st">'K'</span>,
+           K         <span class="op">=</span> <span class="va">P_simple</span> <span class="op">+</span> <span class="va">F_simple</span>,
            
            <span class="co"># This is a new family - at the moment all K's will get the</span>
            <span class="co"># 'IPM' family</span>
            
-           family    = <span class="st">'IPM'</span>,
+           family    <span class="op">=</span> <span class="st">'IPM'</span>,
            
            <span class="co"># This kernel has no additional parameters, so the data_list</span>
            <span class="co"># is empty</span>
            
-           data_list = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(),
-           states    = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'dbh'</span>)),
+           data_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>,
+           states    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,
            <span class="co"># We've already corrected eviction in the sub-kernels, so there's no</span>
            <span class="co"># need to do that here</span>
-           evict_cor     = <span class="fl">FALSE</span>
-  ) <span class="op">%&gt;%</span>
+           evict_cor     <span class="op">=</span> <span class="cn">FALSE</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="co"># Next, we have to define the implementation details for the model. </span>
   <span class="co"># We need to tell ipmr how each kernel is integrated, what domain</span>
   <span class="co"># it starts on (i.e. the size/weight/etc from above), and what domain</span>
@@ -243,25 +244,25 @@
   <span class="co"># because we only have a single continuous state variable. General_*</span>
   <span class="co"># models will be more complicated.</span>
   
-  <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span>(
-    <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span>(
-      kernel_names = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"K_simple"</span>, <span class="st">"P_simple"</span>, <span class="st">"F_simple"</span>),
-      int_rule     = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="fl">3</span>),
-      dom_start    = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>, <span class="fl">3</span>),
-      dom_end      = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"dbh"</span>, <span class="fl">3</span>)
-    )
-  ) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_impl.html">define_domains</a></span>(
-    dbh = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="co"># the first entry is the lower bound of the domain.</span>
+  <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
+    <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
+      kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"K_simple"</span>, <span class="st">"P_simple"</span>, <span class="st">"F_simple"</span><span class="op">)</span>,
+      int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">3</span><span class="op">)</span>,
+      dom_start    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">3</span><span class="op">)</span>,
+      dom_end      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">3</span><span class="op">)</span>
+    <span class="op">)</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_impl.html">define_domains</a></span><span class="op">(</span>
+    dbh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="co"># the first entry is the lower bound of the domain.</span>
             <span class="fl">50</span>, <span class="co"># the second entry is the upper bound of the domain.</span>
             <span class="fl">100</span> <span class="co"># third entry is the number of meshpoints for the domain.</span>
-    ) 
-  )  <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>()
+    <span class="op">)</span> 
+  <span class="op">)</span>  <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span><span class="op">)</span>
 
 
-<span class="kw">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="kw">my_simple_ipm</span>, comp_method = <span class="st">'eigen'</span>)
-<span class="kw">w_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="../reference/right_ev.html">right_ev</a></span>(<span class="kw">my_simple_ipm</span>)
+<span class="va">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">my_simple_ipm</span>, comp_method <span class="op">=</span> <span class="st">'eigen'</span><span class="op">)</span>
+<span class="va">w_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="../reference/right_ev.html">right_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
 
 
 <span class="co"># Example of the setup for a simple IPM without density dependence or environmental</span>
@@ -271,106 +272,105 @@
 <span class="co"># output with</span>
 
 <span class="co"># Survival function</span>
-<span class="kw">s</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv1</span>, <span class="kw">params</span>) {
-  <span class="fl">1</span><span class="op">/</span>(<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(<span class="kw">params</span>[<span class="fl">1</span>] <span class="op">+</span> <span class="kw">params</span>[<span class="fl">2</span>] <span class="op">*</span> <span class="kw">sv1</span>)))
-}
+<span class="va">s</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">params</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">params</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="va">sv1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># growth function</span>
-<span class="kw">g</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv1</span>, <span class="kw">sv2</span>, <span class="kw">params</span>, <span class="kw">L</span>, <span class="kw">U</span>) {
-  <span class="kw">mu</span> <span class="op">&lt;-</span> <span class="kw">params</span>[<span class="fl">1</span>] <span class="op">+</span> <span class="kw">params</span>[<span class="fl">2</span>] <span class="op">*</span> <span class="kw">sv1</span>
-  <span class="kw">ev</span> <span class="op">&lt;-</span> (<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(<span class="kw">U</span>, <span class="kw">mu</span>, <span class="kw">params</span>[<span class="fl">3</span>]) <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(<span class="kw">L</span>, <span class="kw">mu</span>, <span class="kw">params</span>[<span class="fl">3</span>]))
-  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">sv2</span>, mean = <span class="kw">mu</span>, sd = <span class="kw">params</span>[<span class="fl">3</span>]) <span class="op">/</span> <span class="kw">ev</span>
-}
+<span class="va">g</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">sv2</span>, <span class="va">params</span>, <span class="va">L</span>, <span class="va">U</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">mu</span> <span class="op">&lt;-</span> <span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">params</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="va">sv1</span>
+  <span class="va">ev</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span><span class="op">(</span><span class="va">U</span>, <span class="va">mu</span>, <span class="va">params</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span><span class="op">(</span><span class="va">L</span>, <span class="va">mu</span>, <span class="va">params</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">sv2</span>, mean <span class="op">=</span> <span class="va">mu</span>, sd <span class="op">=</span> <span class="va">params</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op">/</span> <span class="va">ev</span>
+<span class="op">}</span>
 
 
 <span class="co"># flowering probability</span>
-<span class="kw">f_r</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv1</span>, <span class="kw">params</span>) {
-  <span class="fl">1</span><span class="op">/</span>(<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(<span class="kw">params</span>[<span class="fl">1</span>] <span class="op">+</span> <span class="kw">params</span>[<span class="fl">2</span>] <span class="op">*</span> <span class="kw">sv1</span>)))
-}
+<span class="va">f_r</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">params</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">params</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="va">sv1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># seed production</span>
-<span class="kw">f_s</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv1</span>, <span class="kw">params</span>) {
-  <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw">params</span>[<span class="fl">1</span>] <span class="op">+</span> <span class="kw">params</span>[<span class="fl">2</span>] <span class="op">*</span> <span class="kw">sv1</span>)
-}
+<span class="va">f_s</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">params</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">params</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="va">sv1</span><span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># recruit size distribution</span>
-<span class="kw">f_d</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv2</span>, <span class="kw">params</span>) {
-  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">sv2</span>, mean = <span class="kw">params</span>[<span class="fl">1</span>], sd = <span class="kw">params</span>[<span class="fl">2</span>])
-}
+<span class="va">f_d</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv2</span>, <span class="va">params</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">sv2</span>, mean <span class="op">=</span> <span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, sd <span class="op">=</span> <span class="va">params</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># F kernel function (combines f_r, f_s, and f_d while correcting for eviction)</span>
-<span class="kw">fec</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv1</span>, <span class="kw">sv2</span>, <span class="kw">params</span>, <span class="kw">L</span>, <span class="kw">U</span>) {
-  <span class="kw">ev</span> <span class="op">&lt;-</span> (<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(<span class="kw">U</span>, <span class="kw">params</span>[<span class="fl">5</span>], <span class="kw">params</span>[<span class="fl">6</span>]) <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(<span class="kw">L</span>, <span class="kw">params</span>[<span class="fl">5</span>], <span class="kw">params</span>[<span class="fl">6</span>]))
-  <span class="fu">f_r</span>(<span class="kw">sv1</span>, <span class="kw">params</span>[<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>]) <span class="op">*</span> <span class="fu">f_s</span>(<span class="kw">sv1</span>, <span class="kw">params</span>[<span class="fl">3</span><span class="op">:</span><span class="fl">4</span>]) <span class="op">*</span> (<span class="fu">f_d</span>(<span class="kw">sv2</span>, <span class="kw">params</span>[<span class="fl">5</span><span class="op">:</span><span class="fl">6</span>] <span class="op">/</span> <span class="kw">ev</span>))
-}
+<span class="va">fec</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">sv2</span>, <span class="va">params</span>, <span class="va">L</span>, <span class="va">U</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">ev</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span><span class="op">(</span><span class="va">U</span>, <span class="va">params</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span>, <span class="va">params</span><span class="op">[</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span><span class="op">(</span><span class="va">L</span>, <span class="va">params</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span>, <span class="va">params</span><span class="op">[</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu">f_r</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span> <span class="op">*</span> <span class="fu">f_s</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">params</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fu">f_d</span><span class="op">(</span><span class="va">sv2</span>, <span class="va">params</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span> <span class="op">/</span> <span class="va">ev</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># Generate implementation arguments (mesh bounds, mid points, and sizes)</span>
-<span class="kw">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">0</span>, <span class="fl">50</span>, length.out = <span class="fl">101</span>)
-<span class="kw">d1</span> <span class="op">&lt;-</span> (<span class="kw">b</span>[<span class="fl">2</span><span class="op">:</span><span class="fl">101</span>] <span class="op">+</span> <span class="kw">b</span>[<span class="fl">1</span><span class="op">:</span><span class="fl">100</span>]) <span class="op">*</span> <span class="fl">0.5</span>
-<span class="kw">h</span> <span class="op">&lt;-</span> <span class="kw">d1</span>[<span class="fl">3</span>] <span class="op">-</span> <span class="kw">d1</span>[<span class="fl">2</span>]
+<span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">50</span>, length.out <span class="op">=</span> <span class="fl">101</span><span class="op">)</span>
+<span class="va">d1</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">b</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">101</span><span class="op">]</span> <span class="op">+</span> <span class="va">b</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">]</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0.5</span>
+<span class="va">h</span> <span class="op">&lt;-</span> <span class="va">d1</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span> <span class="op">-</span> <span class="va">d1</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>
 
 <span class="co"># Expand the domains so they're fully crossed with each other. This replaces</span>
 <span class="co"># outer() in typical IPM code, and has the benefit of being fully vectorized (</span>
 <span class="co"># so a lot faster for larger meshes)</span>
 
-<span class="kw">domains</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(d2 = <span class="kw">d1</span>, d1 = <span class="kw">d1</span>))
+<span class="va">domains</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>d2 <span class="op">=</span> <span class="va">d1</span>, d1 <span class="op">=</span> <span class="va">d1</span><span class="op">)</span><span class="op">)</span>
 
-<span class="kw">G</span> <span class="op">&lt;-</span> <span class="fu">g</span>(<span class="kw">domains</span><span class="op">$</span><span class="kw">d2</span>,
-       <span class="kw">domains</span><span class="op">$</span><span class="kw">d1</span>,
-       params = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">data_list</span><span class="op">$</span><span class="kw">g_int</span>,
-                  <span class="kw">data_list</span><span class="op">$</span><span class="kw">g_slope</span>,
-                  <span class="kw">data_list</span><span class="op">$</span><span class="kw">sd_g</span>),
-       L = <span class="fl">0</span>,
-       U = <span class="fl">50</span>)
-
-
-
-<span class="kw">S</span> <span class="op">&lt;-</span> <span class="fu">s</span>(<span class="kw">d1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">data_list</span><span class="op">$</span><span class="kw">s_int</span>, <span class="kw">data_list</span><span class="op">$</span><span class="kw">s_slope</span>))
-
-<span class="kw">P</span> <span class="op">&lt;-</span> <span class="kw">h</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">S</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">G</span>))
-
-<span class="kw">Fm</span> <span class="op">&lt;-</span> <span class="kw">h</span> <span class="op">*</span> <span class="fu">fec</span>(<span class="kw">domains</span><span class="op">$</span><span class="kw">d2</span>,
-              <span class="kw">domains</span><span class="op">$</span><span class="kw">d1</span>,
-              params = <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="kw">data_list</span>[<span class="fl">6</span><span class="op">:</span><span class="fl">11</span>]),
-              L = <span class="fl">0</span>, U = <span class="fl">50</span>)
-
-<span class="kw">K</span> <span class="op">&lt;-</span> <span class="kw">P</span> <span class="op">+</span> <span class="kw">Fm</span>
-
-<span class="kw">K</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="kw">K</span>, nrow = <span class="fl">100</span>, ncol = <span class="fl">100</span>, byrow = <span class="fl">TRUE</span>)
+<span class="va">G</span> <span class="op">&lt;-</span> <span class="fu">g</span><span class="op">(</span><span class="va">domains</span><span class="op">$</span><span class="va">d2</span>,
+       <span class="va">domains</span><span class="op">$</span><span class="va">d1</span>,
+       params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">data_list</span><span class="op">$</span><span class="va">g_int</span>,
+                  <span class="va">data_list</span><span class="op">$</span><span class="va">g_slope</span>,
+                  <span class="va">data_list</span><span class="op">$</span><span class="va">sd_g</span><span class="op">)</span>,
+       L <span class="op">=</span> <span class="fl">0</span>,
+       U <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
 
 
-<span class="kw">lambda_usr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span>(<span class="kw">K</span>)<span class="op">$</span><span class="kw">values</span>[<span class="fl">1</span>])
-<span class="kw">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span>(<span class="kw">K</span>)<span class="op">$</span><span class="kw">vectors</span>[ , <span class="fl">1</span>])
-<span class="kw">w</span> <span class="op">&lt;-</span> <span class="kw">w</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="kw">w</span>)
 
-<span class="kw">lambda_ipmr</span> <span class="op">-</span> <span class="kw">lambda_usr</span>
+<span class="va">S</span> <span class="op">&lt;-</span> <span class="fu">s</span><span class="op">(</span><span class="va">d1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">data_list</span><span class="op">$</span><span class="va">s_int</span>, <span class="va">data_list</span><span class="op">$</span><span class="va">s_slope</span><span class="op">)</span><span class="op">)</span>
 
-<span class="kw">w_ipmr</span><span class="op">$</span><span class="kw">dbh_w</span> <span class="op">-</span> <span class="kw">w</span>
-</pre></div>
+<span class="va">P</span> <span class="op">&lt;-</span> <span class="va">h</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">S</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">G</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">Fm</span> <span class="op">&lt;-</span> <span class="va">h</span> <span class="op">*</span> <span class="fu">fec</span><span class="op">(</span><span class="va">domains</span><span class="op">$</span><span class="va">d2</span>,
+              <span class="va">domains</span><span class="op">$</span><span class="va">d1</span>,
+              params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="va">data_list</span><span class="op">[</span><span class="fl">6</span><span class="op">:</span><span class="fl">11</span><span class="op">]</span><span class="op">)</span>,
+              L <span class="op">=</span> <span class="fl">0</span>, U <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
+
+<span class="va">K</span> <span class="op">&lt;-</span> <span class="va">P</span> <span class="op">+</span> <span class="va">Fm</span>
+
+<span class="va">K</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="va">K</span>, nrow <span class="op">=</span> <span class="fl">100</span>, ncol <span class="op">=</span> <span class="fl">100</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+
+
+<span class="va">lambda_usr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/complex.html">Re</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span><span class="op">(</span><span class="va">K</span><span class="op">)</span><span class="op">$</span><span class="va">values</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>
+<span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/complex.html">Re</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span><span class="op">(</span><span class="va">K</span><span class="op">)</span><span class="op">$</span><span class="va">vectors</span><span class="op">[</span> , <span class="fl">1</span><span class="op">]</span><span class="op">)</span>
+<span class="va">w</span> <span class="op">&lt;-</span> <span class="va">w</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">w</span><span class="op">)</span>
+
+<span class="va">lambda_ipmr</span> <span class="op">-</span> <span class="va">lambda_usr</span>
+
+<span class="va">w_ipmr</span><span class="op">$</span><span class="va">dbh_w</span> <span class="op">-</span> <span class="va">w</span></code></pre></div>
 </div>
 <div id="simple-density-independent-stochastic-kernel-resampled-model" class="section level2">
 <h2 class="hasAnchor">
 <a href="#simple-density-independent-stochastic-kernel-resampled-model" class="anchor"></a>Simple density independent stochastic kernel resampled model</h2>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">ipmr</span>)
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ipmr</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">50127</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">50127</span><span class="op">)</span>
 
 <span class="co"># Define some fixed parameters</span>
 
-<span class="kw">data_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-  s_int     = <span class="fl">1.03</span>,
-  s_slope   = <span class="fl">2.2</span>,
-  g_int     = <span class="fl">8</span>,
-  g_slope   = <span class="fl">0.92</span>,
-  sd_g      = <span class="fl">0.9</span>,
-  f_r_int   = <span class="fl">0.09</span>,
-  f_r_slope = <span class="fl">0.05</span>,
-  f_s_int   = <span class="fl">0.1</span>,
-  f_s_slope = <span class="fl">0.005</span>,
-  mu_fd     = <span class="fl">9</span>,
-  sd_fd     = <span class="fl">2</span>
-)
+<span class="va">data_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+  s_int     <span class="op">=</span> <span class="fl">1.03</span>,
+  s_slope   <span class="op">=</span> <span class="fl">2.2</span>,
+  g_int     <span class="op">=</span> <span class="fl">8</span>,
+  g_slope   <span class="op">=</span> <span class="fl">0.92</span>,
+  sd_g      <span class="op">=</span> <span class="fl">0.9</span>,
+  f_r_int   <span class="op">=</span> <span class="fl">0.09</span>,
+  f_r_slope <span class="op">=</span> <span class="fl">0.05</span>,
+  f_s_int   <span class="op">=</span> <span class="fl">0.1</span>,
+  f_s_slope <span class="op">=</span> <span class="fl">0.005</span>,
+  mu_fd     <span class="op">=</span> <span class="fl">9</span>,
+  sd_fd     <span class="op">=</span> <span class="fl">2</span>
+<span class="op">)</span>
 
 <span class="co"># Now, simulate some random intercepts for growth, survival, and offspring production.</span>
 <span class="co"># For extracting random effects from real models, the following snippet should work</span>
@@ -383,55 +383,55 @@
 <span class="co"># "extract random effect estimates from class(insert_your_model_here) in R"</span>
 <span class="co"># should get you close to the code you need.</span>
 
-<span class="kw">g_r_int</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.3</span>) 
-<span class="kw">s_r_int</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.7</span>)
-<span class="kw">f_s_r_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.2</span>)
+<span class="va">g_r_int</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.3</span><span class="op">)</span> 
+<span class="va">s_r_int</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.7</span><span class="op">)</span>
+<span class="va">f_s_r_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.2</span><span class="op">)</span>
 
 <span class="co"># Now, generate parameter names for each set of random effect estimates. </span>
 
-<span class="kw">nms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"r_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, sep = <span class="st">""</span>)
+<span class="va">nms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"r_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">g_r_int</span>)   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'g_'</span>, <span class="kw">nms</span>, sep = <span class="st">""</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">s_r_int</span>)   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'s_'</span>, <span class="kw">nms</span>, sep = <span class="st">""</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">f_s_r_int</span>) <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">'f_s_'</span>, <span class="kw">nms</span>, sep = <span class="st">""</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">g_r_int</span><span class="op">)</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'g_'</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">s_r_int</span><span class="op">)</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'s_'</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">f_s_r_int</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'f_s_'</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
 
 <span class="co"># Each set of parameters is converted to a named list. The names should match</span>
 <span class="co"># the variables referenced in each define_kernel()/define_k() call.</span>
 
-<span class="kw">g_params</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="kw">g_r_int</span>)
-<span class="kw">s_params</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="kw">s_r_int</span>)
-<span class="kw">f_s_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span>(<span class="kw">f_s_r_int</span>)
+<span class="va">g_params</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">g_r_int</span><span class="op">)</span>
+<span class="va">s_params</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">s_r_int</span><span class="op">)</span>
+<span class="va">f_s_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">f_s_r_int</span><span class="op">)</span>
 
-<span class="kw">params</span>     <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">data_list</span>, <span class="kw">g_params</span>, <span class="kw">s_params</span>, <span class="kw">f_s_params</span>)
+<span class="va">params</span>     <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">data_list</span>, <span class="va">g_params</span>, <span class="va">s_params</span>, <span class="va">f_s_params</span><span class="op">)</span>
 
 <span class="co">## Now, let's get to the ipmr model</span>
 
 <span class="co"># This example will use additional 'usr_funs' to be passed into make_ipm(). </span>
 
-<span class="kw">inv_logit</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv</span>, <span class="kw">int</span>, <span class="kw">slope</span>) {
-  <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(
-    <span class="fl">1</span><span class="op">/</span>(<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(<span class="kw">int</span> <span class="op">+</span> <span class="kw">slope</span> <span class="op">*</span> <span class="kw">sv</span>)))
-  )
-}
+<span class="va">inv_logit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv</span>, <span class="va">int</span>, <span class="va">slope</span><span class="op">)</span> <span class="op">{</span>
+  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span>
+    <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">int</span> <span class="op">+</span> <span class="va">slope</span> <span class="op">*</span> <span class="va">sv</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+  <span class="op">)</span>
+<span class="op">}</span>
 
-<span class="kw">inv_logit_r</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv</span>, <span class="kw">int</span>, <span class="kw">slope</span>, <span class="kw">r_eff</span>) {
-  <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(
-    <span class="fl">1</span><span class="op">/</span>(<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(<span class="kw">int</span> <span class="op">+</span> <span class="kw">slope</span> <span class="op">*</span> <span class="kw">sv</span> <span class="op">+</span> <span class="kw">r_eff</span>)))
-  )
-}
+<span class="va">inv_logit_r</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv</span>, <span class="va">int</span>, <span class="va">slope</span>, <span class="va">r_eff</span><span class="op">)</span> <span class="op">{</span>
+  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span>
+    <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">int</span> <span class="op">+</span> <span class="va">slope</span> <span class="op">*</span> <span class="va">sv</span> <span class="op">+</span> <span class="va">r_eff</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+  <span class="op">)</span>
+<span class="op">}</span>
 
-<span class="kw">pois_r</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv</span>, <span class="kw">int</span>, <span class="kw">slope</span>, <span class="kw">r_eff</span>) {
-  <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(
-    <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(
-      <span class="kw">int</span> <span class="op">+</span> <span class="kw">slope</span> <span class="op">*</span> <span class="kw">sv</span> <span class="op">+</span> <span class="kw">r_eff</span>
-    )
-  )
-}
+<span class="va">pois_r</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv</span>, <span class="va">int</span>, <span class="va">slope</span>, <span class="va">r_eff</span><span class="op">)</span> <span class="op">{</span>
+  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span>
+      <span class="va">int</span> <span class="op">+</span> <span class="va">slope</span> <span class="op">*</span> <span class="va">sv</span> <span class="op">+</span> <span class="va">r_eff</span>
+    <span class="op">)</span>
+  <span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># The "model_class" argument is now changed to reflect a different model type</span>
 
-<span class="kw">monocarp_sys</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span>(<span class="st">'simple_di_stoch_kern'</span>) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
+<span class="va">monocarp_sys</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">'simple_di_stoch_kern'</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     
     <span class="co"># The yr suffix is appended to the kernel name and the parameter names</span>
     <span class="co"># within each vital rate expression. ipmr substitutes in the hier_levels</span>
@@ -440,252 +440,251 @@
     <span class="co"># etc. In the case of s_r_yr, provided that the names in the data_list match</span>
     <span class="co"># the expanded names, all will go well!</span>
     
-    name             = <span class="st">'P_yr'</span>,
+    name             <span class="op">=</span> <span class="st">'P_yr'</span>,
     
     <span class="co"># The formula is updated to reflect that survival and growth</span>
     <span class="co"># vary from year to year. We append the _yr suffix to each to let ipmr know</span>
     <span class="co"># to expand the expression</span>
     
-    formula          = <span class="kw">s_yr</span> <span class="op">*</span> <span class="kw">g_yr</span> ,
-    family           = <span class="st">"CC"</span>,
+    formula          <span class="op">=</span> <span class="va">s_yr</span> <span class="op">*</span> <span class="va">g_yr</span> ,
+    family           <span class="op">=</span> <span class="st">"CC"</span>,
     
     <span class="co"># This is a monocarpic perennial, so flowering is fatal. Thus, in order</span>
     <span class="co"># to survive to t+1, you have to both survive AND not flower. Also, note</span>
     <span class="co"># the use of inv_logit_r and inv_logit functions that we defined above.</span>
     
-    s_yr             = <span class="fu">inv_logit_r</span>(<span class="kw">ht_1</span>, <span class="kw">s_int</span>, <span class="kw">s_slope</span>, <span class="kw">s_r_yr</span>) <span class="op">*</span> 
-                       (<span class="fl">1</span> <span class="op">-</span> <span class="fu">inv_logit</span>(<span class="kw">ht_1</span>, <span class="kw">f_r_int</span>, <span class="kw">f_r_slope</span>)),
+    s_yr             <span class="op">=</span> <span class="fu">inv_logit_r</span><span class="op">(</span><span class="va">ht_1</span>, <span class="va">s_int</span>, <span class="va">s_slope</span>, <span class="va">s_r_yr</span><span class="op">)</span> <span class="op">*</span> 
+                       <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">ht_1</span>, <span class="va">f_r_int</span>, <span class="va">f_r_slope</span><span class="op">)</span><span class="op">)</span>,
     
     <span class="co"># Since the model for the mean of growth has a random year intercept,</span>
     <span class="co"># we modify all of these expressions as well to include the _yr</span>
     
-    g_yr             = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">ht_2</span>, <span class="kw">mu_g_yr</span>, <span class="kw">sd_g</span>),
-    mu_g_yr          = <span class="kw">g_int</span> <span class="op">+</span> <span class="kw">g_slope</span> <span class="op">*</span> <span class="kw">ht_1</span> <span class="op">+</span> <span class="kw">g_r_yr</span>,
+    g_yr             <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">ht_2</span>, <span class="va">mu_g_yr</span>, <span class="va">sd_g</span><span class="op">)</span>,
+    mu_g_yr          <span class="op">=</span> <span class="va">g_int</span> <span class="op">+</span> <span class="va">g_slope</span> <span class="op">*</span> <span class="va">ht_1</span> <span class="op">+</span> <span class="va">g_r_yr</span>,
     
-    data_list        = <span class="kw">params</span>,
-    states           = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ht'</span>)),
+    data_list        <span class="op">=</span> <span class="va">params</span>,
+    states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span><span class="op">)</span><span class="op">)</span>,
     
     <span class="co"># This where we tell ipmr that the model has hierarchical effects. </span>
     <span class="co"># The levels that it takes should specified in a named list. We're pretending</span>
     <span class="co"># this a random year effect, so we use the name 'yr'. This name can be whatever you</span>
     <span class="co"># want though.</span>
     
-    has_hier_effs    = <span class="fl">TRUE</span>,
-    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(yr = <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>),
+    has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
+    levels_hier_effs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>yr <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,
     
     <span class="co"># Again, correct for eviction. Note that the 2nd parameter is also modified</span>
     <span class="co"># with the _yr suffix</span>
     
-    evict_cor        = <span class="fl">TRUE</span>,
-    evict_fun        = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"g_yr"</span>)
-  ) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span>(
+    evict_cor        <span class="op">=</span> <span class="cn">TRUE</span>,
+    evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"g_yr"</span><span class="op">)</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     
     <span class="co"># As above, we modify all the expressions that have a random effect with the _yr</span>
     <span class="co"># suffix to let ipmr know to expand those.</span>
     
-    name             = <span class="st">"F_yr"</span>,
-    formula          = <span class="kw">f_r</span> <span class="op">*</span> <span class="kw">f_s_yr</span> <span class="op">*</span> <span class="kw">f_d</span>,
-    family           = <span class="st">"CC"</span>,
-    f_r              = <span class="fu">inv_logit</span>(<span class="kw">ht_1</span>, <span class="kw">f_r_int</span>, <span class="kw">f_r_slope</span>),
-    f_s_yr           = <span class="fu">pois_r</span>(<span class="kw">ht_1</span>, <span class="kw">f_s_int</span>, <span class="kw">f_s_slope</span>, <span class="kw">f_s_r_yr</span>),
-    f_d              = <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">ht_2</span>, <span class="kw">mu_fd</span>, <span class="kw">sd_fd</span>),
-    data_list        = <span class="kw">params</span>,
-    states           = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ht'</span>)), 
-    has_hier_effs    = <span class="fl">TRUE</span>,
-    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(yr = <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>),
-    evict_cor        = <span class="fl">TRUE</span>,
-    evict_fun        = <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span>(<span class="st">"norm"</span>, <span class="st">"f_d"</span>)
-  ) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_kernel.html">define_k</a></span>(
-    name             = <span class="st">'K_yr'</span>,
-    K_yr             = <span class="kw">P_yr</span> <span class="op">+</span> <span class="kw">F_yr</span>,
-    family           = <span class="st">"IPM"</span>,
-    data_list        = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(),
-    states           = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ht"</span>)),
-    has_hier_effs    = <span class="fl">TRUE</span>,
-    levels_hier_effs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(yr = <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>)
-  ) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span>(
-    <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span>(
-      kernel_names = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"K_yr"</span>, <span class="st">"P_yr"</span>, <span class="st">"F_yr"</span>),
-      int_rule     = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"midpoint"</span>, <span class="fl">3</span>),
-      dom_start    = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"ht"</span>, <span class="fl">3</span>),
-      dom_end      = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"ht"</span>, <span class="fl">3</span>)
-    )
-  ) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_impl.html">define_domains</a></span>(ht = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.2</span>, <span class="fl">40</span>, <span class="fl">100</span>)) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span>(usr_funs = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(inv_logit   = <span class="kw">inv_logit</span>,
-                           inv_logit_r = <span class="kw">inv_logit_r</span>,
-                           pois_r      = <span class="kw">pois_r</span>))
+    name             <span class="op">=</span> <span class="st">"F_yr"</span>,
+    formula          <span class="op">=</span> <span class="va">f_r</span> <span class="op">*</span> <span class="va">f_s_yr</span> <span class="op">*</span> <span class="va">f_d</span>,
+    family           <span class="op">=</span> <span class="st">"CC"</span>,
+    f_r              <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">ht_1</span>, <span class="va">f_r_int</span>, <span class="va">f_r_slope</span><span class="op">)</span>,
+    f_s_yr           <span class="op">=</span> <span class="fu">pois_r</span><span class="op">(</span><span class="va">ht_1</span>, <span class="va">f_s_int</span>, <span class="va">f_s_slope</span>, <span class="va">f_s_r_yr</span><span class="op">)</span>,
+    f_d              <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">ht_2</span>, <span class="va">mu_fd</span>, <span class="va">sd_fd</span><span class="op">)</span>,
+    data_list        <span class="op">=</span> <span class="va">params</span>,
+    states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span><span class="op">)</span><span class="op">)</span>, 
+    has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
+    levels_hier_effs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>yr <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,
+    evict_cor        <span class="op">=</span> <span class="cn">TRUE</span>,
+    evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_kernel.html">define_k</a></span><span class="op">(</span>
+    name             <span class="op">=</span> <span class="st">'K_yr'</span>,
+    K_yr             <span class="op">=</span> <span class="va">P_yr</span> <span class="op">+</span> <span class="va">F_yr</span>,
+    family           <span class="op">=</span> <span class="st">"IPM"</span>,
+    data_list        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>,
+    states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"ht"</span><span class="op">)</span><span class="op">)</span>,
+    has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
+    levels_hier_effs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>yr <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
+    <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
+      kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"K_yr"</span>, <span class="st">"P_yr"</span>, <span class="st">"F_yr"</span><span class="op">)</span>,
+      int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">3</span><span class="op">)</span>,
+      dom_start    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"ht"</span>, <span class="fl">3</span><span class="op">)</span>,
+      dom_end      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"ht"</span>, <span class="fl">3</span><span class="op">)</span>
+    <span class="op">)</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/define_impl.html">define_domains</a></span><span class="op">(</span>ht <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">40</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>inv_logit   <span class="op">=</span> <span class="va">inv_logit</span>,
+                           inv_logit_r <span class="op">=</span> <span class="va">inv_logit_r</span>,
+                           pois_r      <span class="op">=</span> <span class="va">pois_r</span><span class="op">)</span><span class="op">)</span>
 
-<span class="kw">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span>(<span class="kw">monocarp_sys</span>, 
-                      comp_method = <span class="st">'eigen'</span>,
-                      type_lambda = <span class="st">'all'</span>)
+<span class="va">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">monocarp_sys</span>, 
+                      comp_method <span class="op">=</span> <span class="st">'eigen'</span>,
+                      type_lambda <span class="op">=</span> <span class="st">'all'</span><span class="op">)</span>
 
 
 <span class="co"># define functions for target ipm ---------</span>
 
 
 <span class="co"># Survival - logistic regression</span>
-<span class="kw">s</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv1</span>, <span class="kw">params</span>, <span class="kw">r_effect</span>) {
-  <span class="fl">1</span><span class="op">/</span>(<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(<span class="kw">params</span>[<span class="fl">1</span>] <span class="op">+</span> <span class="kw">params</span>[<span class="fl">2</span>] <span class="op">*</span> <span class="kw">sv1</span> <span class="op">+</span> <span class="kw">r_effect</span>))) <span class="op">*</span>
-    (<span class="fl">1</span> <span class="op">-</span> <span class="fu">f_r</span>(<span class="kw">sv1</span>, <span class="kw">params</span>[<span class="fl">3</span><span class="op">:</span><span class="fl">4</span>]))
-}
+<span class="va">s</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">params</span>, <span class="va">r_effect</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">params</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="va">sv1</span> <span class="op">+</span> <span class="va">r_effect</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span>
+    <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="fu">f_r</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">params</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># Growth</span>
-<span class="kw">g</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv1</span>, <span class="kw">sv2</span>, <span class="kw">params</span>, <span class="kw">r_effect</span>, <span class="kw">L</span>, <span class="kw">U</span>) {
-  <span class="kw">mu</span> <span class="op">&lt;-</span> <span class="kw">params</span>[<span class="fl">1</span>] <span class="op">+</span> <span class="kw">params</span>[<span class="fl">2</span>] <span class="op">*</span> <span class="kw">sv1</span> <span class="op">+</span> <span class="kw">r_effect</span>
-  <span class="kw">ev</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(<span class="kw">U</span>, <span class="kw">mu</span>, <span class="kw">params</span>[<span class="fl">3</span>]) <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(<span class="kw">L</span>, <span class="kw">mu</span>, <span class="kw">params</span>[<span class="fl">3</span>])
-  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">sv2</span>, mean = <span class="kw">mu</span>, sd = <span class="kw">params</span>[<span class="fl">3</span>]) <span class="op">/</span> <span class="kw">ev</span>
-}
+<span class="va">g</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">sv2</span>, <span class="va">params</span>, <span class="va">r_effect</span>, <span class="va">L</span>, <span class="va">U</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">mu</span> <span class="op">&lt;-</span> <span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">params</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="va">sv1</span> <span class="op">+</span> <span class="va">r_effect</span>
+  <span class="va">ev</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span><span class="op">(</span><span class="va">U</span>, <span class="va">mu</span>, <span class="va">params</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span><span class="op">(</span><span class="va">L</span>, <span class="va">mu</span>, <span class="va">params</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">sv2</span>, mean <span class="op">=</span> <span class="va">mu</span>, sd <span class="op">=</span> <span class="va">params</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op">/</span> <span class="va">ev</span>
+<span class="op">}</span>
 
 <span class="co"># probability of reproducing</span>
-<span class="kw">f_r</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv1</span>, <span class="kw">params</span>) {
-  <span class="fl">1</span><span class="op">/</span>(<span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="op">-</span>(<span class="kw">params</span>[<span class="fl">1</span>] <span class="op">+</span> <span class="kw">params</span>[<span class="fl">2</span>] <span class="op">*</span> <span class="kw">sv1</span>)))
-}
+<span class="va">f_r</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">params</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">params</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="va">sv1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># offspring production</span>
-<span class="kw">f_s</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv1</span>, <span class="kw">params</span>, <span class="kw">r_effect</span>) {
-  <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw">params</span>[<span class="fl">1</span>] <span class="op">+</span> <span class="kw">params</span>[<span class="fl">2</span>] <span class="op">*</span> <span class="kw">sv1</span> <span class="op">+</span> <span class="kw">r_effect</span>)
-}
+<span class="va">f_s</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">params</span>, <span class="va">r_effect</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">params</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="va">sv1</span> <span class="op">+</span> <span class="va">r_effect</span><span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># offspring size distribution</span>
-<span class="kw">f_d</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv2</span>, <span class="kw">params</span>, <span class="kw">L</span>, <span class="kw">U</span>) {
-  <span class="kw">ev</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(<span class="kw">U</span>, <span class="kw">params</span>[<span class="fl">1</span>], <span class="kw">params</span>[<span class="fl">2</span>]) <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span>(<span class="kw">L</span>, <span class="kw">params</span>[<span class="fl">1</span>], <span class="kw">params</span>[<span class="fl">2</span>])
-  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="kw">sv2</span>, mean = <span class="kw">params</span>[<span class="fl">1</span>], sd = <span class="kw">params</span>[<span class="fl">2</span>]) <span class="op">/</span> <span class="kw">ev</span>
-}
+<span class="va">f_d</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv2</span>, <span class="va">params</span>, <span class="va">L</span>, <span class="va">U</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">ev</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span><span class="op">(</span><span class="va">U</span>, <span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">params</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">pnorm</a></span><span class="op">(</span><span class="va">L</span>, <span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">params</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">sv2</span>, mean <span class="op">=</span> <span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, sd <span class="op">=</span> <span class="va">params</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span> <span class="op">/</span> <span class="va">ev</span>
+<span class="op">}</span>
 
 <span class="co"># constructor function for the F kernel</span>
-<span class="kw">fec</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">sv1</span>, <span class="kw">sv2</span>, <span class="kw">params</span>, <span class="kw">r_effect</span>, <span class="kw">L</span>, <span class="kw">U</span>) {
-  <span class="fu">f_r</span>(<span class="kw">sv1</span>, <span class="kw">params</span>[<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>]) <span class="op">*</span> <span class="fu">f_s</span>(<span class="kw">sv1</span>, <span class="kw">params</span>[<span class="fl">3</span><span class="op">:</span><span class="fl">4</span>], <span class="kw">r_effect</span>) <span class="op">*</span> <span class="fu">f_d</span>(<span class="kw">sv2</span>, <span class="kw">params</span>[<span class="fl">5</span><span class="op">:</span><span class="fl">6</span>], <span class="kw">L</span>, <span class="kw">U</span>)
-}
+<span class="va">fec</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">sv2</span>, <span class="va">params</span>, <span class="va">r_effect</span>, <span class="va">L</span>, <span class="va">U</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu">f_r</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">params</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span> <span class="op">*</span> <span class="fu">f_s</span><span class="op">(</span><span class="va">sv1</span>, <span class="va">params</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, <span class="va">r_effect</span><span class="op">)</span> <span class="op">*</span> <span class="fu">f_d</span><span class="op">(</span><span class="va">sv2</span>, <span class="va">params</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span>, <span class="va">L</span>, <span class="va">U</span><span class="op">)</span>
+<span class="op">}</span>
 
-<span class="kw">b</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">0.2</span>, <span class="fl">40</span>, length.out = <span class="fl">101</span>)
+<span class="va">b</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">40</span>, length.out <span class="op">=</span> <span class="fl">101</span><span class="op">)</span>
 
-<span class="kw">sv1</span> <span class="op">&lt;-</span> (<span class="kw">b</span>[<span class="fl">2</span><span class="op">:</span><span class="fl">101</span>] <span class="op">+</span> <span class="kw">b</span>[<span class="fl">1</span><span class="op">:</span><span class="fl">100</span>]) <span class="op">*</span> <span class="fl">0.5</span>
+<span class="va">sv1</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">b</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">101</span><span class="op">]</span> <span class="op">+</span> <span class="va">b</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">]</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0.5</span>
 
-<span class="kw">domains</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(d2 = <span class="kw">sv1</span>, d1 = <span class="kw">sv1</span>))
+<span class="va">domains</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>d2 <span class="op">=</span> <span class="va">sv1</span>, d1 <span class="op">=</span> <span class="va">sv1</span><span class="op">)</span><span class="op">)</span>
 
-<span class="kw">h</span>   <span class="op">&lt;-</span> <span class="kw">sv1</span>[<span class="fl">2</span>] <span class="op">-</span> <span class="kw">sv1</span>[<span class="fl">1</span>]
+<span class="va">h</span>   <span class="op">&lt;-</span> <span class="va">sv1</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">-</span> <span class="va">sv1</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
 
 <span class="co"># repetitive to demonstrate the typical kernel construction process.</span>
 
-<span class="kw">g_1</span> <span class="op">&lt;-</span> <span class="fu">g</span>(<span class="kw">domains</span><span class="op">$</span><span class="kw">d2</span>, <span class="kw">domains</span><span class="op">$</span><span class="kw">d1</span>,
-         params = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">g_int</span>,
-                    <span class="kw">params</span><span class="op">$</span><span class="kw">g_slope</span>,
-                    <span class="kw">params</span><span class="op">$</span><span class="kw">sd_g</span>),
-         r_effect = <span class="kw">params</span><span class="op">$</span><span class="kw">g_r_1</span>,
-         L = <span class="fl">0.2</span>,
-         U = <span class="fl">40</span>)
+<span class="va">g_1</span> <span class="op">&lt;-</span> <span class="fu">g</span><span class="op">(</span><span class="va">domains</span><span class="op">$</span><span class="va">d2</span>, <span class="va">domains</span><span class="op">$</span><span class="va">d1</span>,
+         params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">g_int</span>,
+                    <span class="va">params</span><span class="op">$</span><span class="va">g_slope</span>,
+                    <span class="va">params</span><span class="op">$</span><span class="va">sd_g</span><span class="op">)</span>,
+         r_effect <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">g_r_1</span>,
+         L <span class="op">=</span> <span class="fl">0.2</span>,
+         U <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>
 
-<span class="kw">g_2</span> <span class="op">&lt;-</span> <span class="fu">g</span>(<span class="kw">domains</span><span class="op">$</span><span class="kw">d2</span>, <span class="kw">domains</span><span class="op">$</span><span class="kw">d1</span>,
-         params = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">g_int</span>,
-                    <span class="kw">params</span><span class="op">$</span><span class="kw">g_slope</span>,
-                    <span class="kw">params</span><span class="op">$</span><span class="kw">sd_g</span>),
-         r_effect = <span class="kw">params</span><span class="op">$</span><span class="kw">g_r_2</span>,
-         L = <span class="fl">0.2</span>,
-         U = <span class="fl">40</span>)
+<span class="va">g_2</span> <span class="op">&lt;-</span> <span class="fu">g</span><span class="op">(</span><span class="va">domains</span><span class="op">$</span><span class="va">d2</span>, <span class="va">domains</span><span class="op">$</span><span class="va">d1</span>,
+         params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">g_int</span>,
+                    <span class="va">params</span><span class="op">$</span><span class="va">g_slope</span>,
+                    <span class="va">params</span><span class="op">$</span><span class="va">sd_g</span><span class="op">)</span>,
+         r_effect <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">g_r_2</span>,
+         L <span class="op">=</span> <span class="fl">0.2</span>,
+         U <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>
 
-<span class="kw">g_3</span> <span class="op">&lt;-</span> <span class="fu">g</span>(<span class="kw">domains</span><span class="op">$</span><span class="kw">d2</span>, <span class="kw">domains</span><span class="op">$</span><span class="kw">d1</span>,
-         params = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">g_int</span>,
-                    <span class="kw">params</span><span class="op">$</span><span class="kw">g_slope</span>,
-                    <span class="kw">params</span><span class="op">$</span><span class="kw">sd_g</span>),
-         r_effect = <span class="kw">params</span><span class="op">$</span><span class="kw">g_r_3</span>,
-         L = <span class="fl">0.2</span>,
-         U = <span class="fl">40</span>)
+<span class="va">g_3</span> <span class="op">&lt;-</span> <span class="fu">g</span><span class="op">(</span><span class="va">domains</span><span class="op">$</span><span class="va">d2</span>, <span class="va">domains</span><span class="op">$</span><span class="va">d1</span>,
+         params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">g_int</span>,
+                    <span class="va">params</span><span class="op">$</span><span class="va">g_slope</span>,
+                    <span class="va">params</span><span class="op">$</span><span class="va">sd_g</span><span class="op">)</span>,
+         r_effect <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">g_r_3</span>,
+         L <span class="op">=</span> <span class="fl">0.2</span>,
+         U <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>
 
 
-<span class="kw">g_4</span> <span class="op">&lt;-</span> <span class="fu">g</span>(<span class="kw">domains</span><span class="op">$</span><span class="kw">d2</span>, <span class="kw">domains</span><span class="op">$</span><span class="kw">d1</span>,
-         params = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">g_int</span>,
-                    <span class="kw">params</span><span class="op">$</span><span class="kw">g_slope</span>,
-                    <span class="kw">params</span><span class="op">$</span><span class="kw">sd_g</span>),
-         r_effect = <span class="kw">params</span><span class="op">$</span><span class="kw">g_r_4</span>,
-         L = <span class="fl">0.2</span>,
-         U = <span class="fl">40</span>)
+<span class="va">g_4</span> <span class="op">&lt;-</span> <span class="fu">g</span><span class="op">(</span><span class="va">domains</span><span class="op">$</span><span class="va">d2</span>, <span class="va">domains</span><span class="op">$</span><span class="va">d1</span>,
+         params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">g_int</span>,
+                    <span class="va">params</span><span class="op">$</span><span class="va">g_slope</span>,
+                    <span class="va">params</span><span class="op">$</span><span class="va">sd_g</span><span class="op">)</span>,
+         r_effect <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">g_r_4</span>,
+         L <span class="op">=</span> <span class="fl">0.2</span>,
+         U <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>
 
-<span class="kw">g_5</span> <span class="op">&lt;-</span> <span class="fu">g</span>(<span class="kw">domains</span><span class="op">$</span><span class="kw">d2</span>, <span class="kw">domains</span><span class="op">$</span><span class="kw">d1</span>,
-         params = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">g_int</span>,
-                    <span class="kw">params</span><span class="op">$</span><span class="kw">g_slope</span>,
-                    <span class="kw">params</span><span class="op">$</span><span class="kw">sd_g</span>),
-         r_effect = <span class="kw">params</span><span class="op">$</span><span class="kw">g_r_5</span>,
-         L = <span class="fl">0.2</span>,
-         U = <span class="fl">40</span>)
+<span class="va">g_5</span> <span class="op">&lt;-</span> <span class="fu">g</span><span class="op">(</span><span class="va">domains</span><span class="op">$</span><span class="va">d2</span>, <span class="va">domains</span><span class="op">$</span><span class="va">d1</span>,
+         params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">g_int</span>,
+                    <span class="va">params</span><span class="op">$</span><span class="va">g_slope</span>,
+                    <span class="va">params</span><span class="op">$</span><span class="va">sd_g</span><span class="op">)</span>,
+         r_effect <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">g_r_5</span>,
+         L <span class="op">=</span> <span class="fl">0.2</span>,
+         U <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>
 
-<span class="kw">s_1</span> <span class="op">&lt;-</span> <span class="fu">s</span>(<span class="kw">sv1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">s_int</span>, <span class="kw">params</span><span class="op">$</span><span class="kw">s_slope</span>,
-                <span class="kw">params</span><span class="op">$</span><span class="kw">f_r_int</span>, <span class="kw">params</span><span class="op">$</span><span class="kw">f_r_slope</span>), <span class="kw">params</span><span class="op">$</span><span class="kw">s_r_1</span>)
-<span class="kw">s_2</span> <span class="op">&lt;-</span> <span class="fu">s</span>(<span class="kw">sv1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">s_int</span>, <span class="kw">params</span><span class="op">$</span><span class="kw">s_slope</span>,
-                <span class="kw">params</span><span class="op">$</span><span class="kw">f_r_int</span>, <span class="kw">params</span><span class="op">$</span><span class="kw">f_r_slope</span>), <span class="kw">params</span><span class="op">$</span><span class="kw">s_r_2</span>)
-<span class="kw">s_3</span> <span class="op">&lt;-</span> <span class="fu">s</span>(<span class="kw">sv1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">s_int</span>, <span class="kw">params</span><span class="op">$</span><span class="kw">s_slope</span>,
-                <span class="kw">params</span><span class="op">$</span><span class="kw">f_r_int</span>, <span class="kw">params</span><span class="op">$</span><span class="kw">f_r_slope</span>), <span class="kw">params</span><span class="op">$</span><span class="kw">s_r_3</span>)
-<span class="kw">s_4</span> <span class="op">&lt;-</span> <span class="fu">s</span>(<span class="kw">sv1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">s_int</span>, <span class="kw">params</span><span class="op">$</span><span class="kw">s_slope</span>,
-                <span class="kw">params</span><span class="op">$</span><span class="kw">f_r_int</span>, <span class="kw">params</span><span class="op">$</span><span class="kw">f_r_slope</span>), <span class="kw">params</span><span class="op">$</span><span class="kw">s_r_4</span>)
-<span class="kw">s_5</span> <span class="op">&lt;-</span> <span class="fu">s</span>(<span class="kw">sv1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">s_int</span>, <span class="kw">params</span><span class="op">$</span><span class="kw">s_slope</span>,
-                <span class="kw">params</span><span class="op">$</span><span class="kw">f_r_int</span>, <span class="kw">params</span><span class="op">$</span><span class="kw">f_r_slope</span>), <span class="kw">params</span><span class="op">$</span><span class="kw">s_r_5</span>)
+<span class="va">s_1</span> <span class="op">&lt;-</span> <span class="fu">s</span><span class="op">(</span><span class="va">sv1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">s_int</span>, <span class="va">params</span><span class="op">$</span><span class="va">s_slope</span>,
+                <span class="va">params</span><span class="op">$</span><span class="va">f_r_int</span>, <span class="va">params</span><span class="op">$</span><span class="va">f_r_slope</span><span class="op">)</span>, <span class="va">params</span><span class="op">$</span><span class="va">s_r_1</span><span class="op">)</span>
+<span class="va">s_2</span> <span class="op">&lt;-</span> <span class="fu">s</span><span class="op">(</span><span class="va">sv1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">s_int</span>, <span class="va">params</span><span class="op">$</span><span class="va">s_slope</span>,
+                <span class="va">params</span><span class="op">$</span><span class="va">f_r_int</span>, <span class="va">params</span><span class="op">$</span><span class="va">f_r_slope</span><span class="op">)</span>, <span class="va">params</span><span class="op">$</span><span class="va">s_r_2</span><span class="op">)</span>
+<span class="va">s_3</span> <span class="op">&lt;-</span> <span class="fu">s</span><span class="op">(</span><span class="va">sv1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">s_int</span>, <span class="va">params</span><span class="op">$</span><span class="va">s_slope</span>,
+                <span class="va">params</span><span class="op">$</span><span class="va">f_r_int</span>, <span class="va">params</span><span class="op">$</span><span class="va">f_r_slope</span><span class="op">)</span>, <span class="va">params</span><span class="op">$</span><span class="va">s_r_3</span><span class="op">)</span>
+<span class="va">s_4</span> <span class="op">&lt;-</span> <span class="fu">s</span><span class="op">(</span><span class="va">sv1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">s_int</span>, <span class="va">params</span><span class="op">$</span><span class="va">s_slope</span>,
+                <span class="va">params</span><span class="op">$</span><span class="va">f_r_int</span>, <span class="va">params</span><span class="op">$</span><span class="va">f_r_slope</span><span class="op">)</span>, <span class="va">params</span><span class="op">$</span><span class="va">s_r_4</span><span class="op">)</span>
+<span class="va">s_5</span> <span class="op">&lt;-</span> <span class="fu">s</span><span class="op">(</span><span class="va">sv1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">s_int</span>, <span class="va">params</span><span class="op">$</span><span class="va">s_slope</span>,
+                <span class="va">params</span><span class="op">$</span><span class="va">f_r_int</span>, <span class="va">params</span><span class="op">$</span><span class="va">f_r_slope</span><span class="op">)</span>, <span class="va">params</span><span class="op">$</span><span class="va">s_r_5</span><span class="op">)</span>
 
-<span class="kw">P_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">s_1</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">g_1</span>)) <span class="op">*</span> <span class="kw">h</span>
-<span class="kw">P_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">s_2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">g_2</span>)) <span class="op">*</span> <span class="kw">h</span>
-<span class="kw">P_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">s_3</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">g_3</span>)) <span class="op">*</span> <span class="kw">h</span>
-<span class="kw">P_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">s_4</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">g_4</span>)) <span class="op">*</span> <span class="kw">h</span>
-<span class="kw">P_5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">s_5</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">g_5</span>)) <span class="op">*</span> <span class="kw">h</span>
+<span class="va">P_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">s_1</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">g_1</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="va">h</span>
+<span class="va">P_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">s_2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">g_2</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="va">h</span>
+<span class="va">P_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">s_3</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">g_3</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="va">h</span>
+<span class="va">P_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">s_4</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">g_4</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="va">h</span>
+<span class="va">P_5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">s_5</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">g_5</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="va">h</span>
 
 <span class="co"># These are not corrected for eviction, but they probably should be</span>
 
-<span class="kw">F_1</span> <span class="op">&lt;-</span> <span class="kw">h</span> <span class="op">*</span> <span class="fu">fec</span>(<span class="kw">domains</span><span class="op">$</span><span class="kw">d2</span>, <span class="kw">domains</span><span class="op">$</span><span class="kw">d1</span>,
-               params = <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="kw">params</span>[<span class="fl">6</span><span class="op">:</span><span class="fl">11</span>]),
-               r_effect = <span class="kw">params</span><span class="op">$</span><span class="kw">f_s_r_1</span>,
-               L = <span class="fl">0.2</span>,
-               U = <span class="fl">40</span>)
+<span class="va">F_1</span> <span class="op">&lt;-</span> <span class="va">h</span> <span class="op">*</span> <span class="fu">fec</span><span class="op">(</span><span class="va">domains</span><span class="op">$</span><span class="va">d2</span>, <span class="va">domains</span><span class="op">$</span><span class="va">d1</span>,
+               params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="va">params</span><span class="op">[</span><span class="fl">6</span><span class="op">:</span><span class="fl">11</span><span class="op">]</span><span class="op">)</span>,
+               r_effect <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">f_s_r_1</span>,
+               L <span class="op">=</span> <span class="fl">0.2</span>,
+               U <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>
 
-<span class="kw">F_2</span> <span class="op">&lt;-</span> <span class="kw">h</span> <span class="op">*</span> <span class="fu">fec</span>(<span class="kw">domains</span><span class="op">$</span><span class="kw">d2</span>, <span class="kw">domains</span><span class="op">$</span><span class="kw">d1</span>,
-               params = <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="kw">params</span>[<span class="fl">6</span><span class="op">:</span><span class="fl">11</span>]),
-               r_effect = <span class="kw">params</span><span class="op">$</span><span class="kw">f_s_r_2</span>,
-               L = <span class="fl">0.2</span>,
-               U = <span class="fl">40</span>)
+<span class="va">F_2</span> <span class="op">&lt;-</span> <span class="va">h</span> <span class="op">*</span> <span class="fu">fec</span><span class="op">(</span><span class="va">domains</span><span class="op">$</span><span class="va">d2</span>, <span class="va">domains</span><span class="op">$</span><span class="va">d1</span>,
+               params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="va">params</span><span class="op">[</span><span class="fl">6</span><span class="op">:</span><span class="fl">11</span><span class="op">]</span><span class="op">)</span>,
+               r_effect <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">f_s_r_2</span>,
+               L <span class="op">=</span> <span class="fl">0.2</span>,
+               U <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>
 
-<span class="kw">F_3</span> <span class="op">&lt;-</span> <span class="kw">h</span> <span class="op">*</span> <span class="fu">fec</span>(<span class="kw">domains</span><span class="op">$</span><span class="kw">d2</span>, <span class="kw">domains</span><span class="op">$</span><span class="kw">d1</span>,
-               params = <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="kw">params</span>[<span class="fl">6</span><span class="op">:</span><span class="fl">11</span>]),
-               r_effect = <span class="kw">params</span><span class="op">$</span><span class="kw">f_s_r_3</span>,
-               L = <span class="fl">0.2</span>,
-               U = <span class="fl">40</span>)
-<span class="kw">F_4</span> <span class="op">&lt;-</span> <span class="kw">h</span> <span class="op">*</span> <span class="fu">fec</span>(<span class="kw">domains</span><span class="op">$</span><span class="kw">d2</span>, <span class="kw">domains</span><span class="op">$</span><span class="kw">d1</span>,
-               params = <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="kw">params</span>[<span class="fl">6</span><span class="op">:</span><span class="fl">11</span>]),
-               r_effect = <span class="kw">params</span><span class="op">$</span><span class="kw">f_s_r_4</span>,
-               L = <span class="fl">0.2</span>,
-               U = <span class="fl">40</span>)
-<span class="kw">F_5</span> <span class="op">&lt;-</span> <span class="kw">h</span> <span class="op">*</span> <span class="fu">fec</span>(<span class="kw">domains</span><span class="op">$</span><span class="kw">d2</span>, <span class="kw">domains</span><span class="op">$</span><span class="kw">d1</span>,
-               params = <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="kw">params</span>[<span class="fl">6</span><span class="op">:</span><span class="fl">11</span>]),
-               r_effect = <span class="kw">params</span><span class="op">$</span><span class="kw">f_s_r_5</span>,
-               L = <span class="fl">0.2</span>,
-               U = <span class="fl">40</span>)
+<span class="va">F_3</span> <span class="op">&lt;-</span> <span class="va">h</span> <span class="op">*</span> <span class="fu">fec</span><span class="op">(</span><span class="va">domains</span><span class="op">$</span><span class="va">d2</span>, <span class="va">domains</span><span class="op">$</span><span class="va">d1</span>,
+               params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="va">params</span><span class="op">[</span><span class="fl">6</span><span class="op">:</span><span class="fl">11</span><span class="op">]</span><span class="op">)</span>,
+               r_effect <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">f_s_r_3</span>,
+               L <span class="op">=</span> <span class="fl">0.2</span>,
+               U <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>
+<span class="va">F_4</span> <span class="op">&lt;-</span> <span class="va">h</span> <span class="op">*</span> <span class="fu">fec</span><span class="op">(</span><span class="va">domains</span><span class="op">$</span><span class="va">d2</span>, <span class="va">domains</span><span class="op">$</span><span class="va">d1</span>,
+               params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="va">params</span><span class="op">[</span><span class="fl">6</span><span class="op">:</span><span class="fl">11</span><span class="op">]</span><span class="op">)</span>,
+               r_effect <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">f_s_r_4</span>,
+               L <span class="op">=</span> <span class="fl">0.2</span>,
+               U <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>
+<span class="va">F_5</span> <span class="op">&lt;-</span> <span class="va">h</span> <span class="op">*</span> <span class="fu">fec</span><span class="op">(</span><span class="va">domains</span><span class="op">$</span><span class="va">d2</span>, <span class="va">domains</span><span class="op">$</span><span class="va">d1</span>,
+               params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="va">params</span><span class="op">[</span><span class="fl">6</span><span class="op">:</span><span class="fl">11</span><span class="op">]</span><span class="op">)</span>,
+               r_effect <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">f_s_r_5</span>,
+               L <span class="op">=</span> <span class="fl">0.2</span>,
+               U <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>
 
-<span class="kw">K_1</span> <span class="op">&lt;-</span> (<span class="kw">P_1</span> <span class="op">+</span> <span class="kw">F_1</span>) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(nrow = <span class="fl">100</span>, ncol = <span class="fl">100</span>, byrow = <span class="fl">TRUE</span>)
-<span class="kw">K_2</span> <span class="op">&lt;-</span> (<span class="kw">P_2</span> <span class="op">+</span> <span class="kw">F_2</span>) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(nrow = <span class="fl">100</span>, ncol = <span class="fl">100</span>, byrow = <span class="fl">TRUE</span>)
-<span class="kw">K_3</span> <span class="op">&lt;-</span> (<span class="kw">P_3</span> <span class="op">+</span> <span class="kw">F_3</span>) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(nrow = <span class="fl">100</span>, ncol = <span class="fl">100</span>, byrow = <span class="fl">TRUE</span>)
-<span class="kw">K_4</span> <span class="op">&lt;-</span> (<span class="kw">P_4</span> <span class="op">+</span> <span class="kw">F_4</span>) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(nrow = <span class="fl">100</span>, ncol = <span class="fl">100</span>, byrow = <span class="fl">TRUE</span>)
-<span class="kw">K_5</span> <span class="op">&lt;-</span> (<span class="kw">P_5</span> <span class="op">+</span> <span class="kw">F_5</span>) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(nrow = <span class="fl">100</span>, ncol = <span class="fl">100</span>, byrow = <span class="fl">TRUE</span>)
+<span class="va">K_1</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">P_1</span> <span class="op">+</span> <span class="va">F_1</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">100</span>, ncol <span class="op">=</span> <span class="fl">100</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">K_2</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">P_2</span> <span class="op">+</span> <span class="va">F_2</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">100</span>, ncol <span class="op">=</span> <span class="fl">100</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">K_3</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">P_3</span> <span class="op">+</span> <span class="va">F_3</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">100</span>, ncol <span class="op">=</span> <span class="fl">100</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">K_4</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">P_4</span> <span class="op">+</span> <span class="va">F_4</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">100</span>, ncol <span class="op">=</span> <span class="fl">100</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">K_5</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">P_5</span> <span class="op">+</span> <span class="va">F_5</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">100</span>, ncol <span class="op">=</span> <span class="fl">100</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
-<span class="kw">sys</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(K_1 = <span class="kw">K_1</span>,
-            K_2 = <span class="kw">K_2</span>,
-            K_3 = <span class="kw">K_3</span>,
-            K_4 = <span class="kw">K_4</span>,
-            K_5 = <span class="kw">K_5</span>)
+<span class="va">sys</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>K_1 <span class="op">=</span> <span class="va">K_1</span>,
+            K_2 <span class="op">=</span> <span class="va">K_2</span>,
+            K_3 <span class="op">=</span> <span class="va">K_3</span>,
+            K_4 <span class="op">=</span> <span class="va">K_4</span>,
+            K_5 <span class="op">=</span> <span class="va">K_5</span><span class="op">)</span>
 
-<span class="kw">eigen_sys</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="kw">sys</span>, <span class="kw">eigen</span>)
+<span class="va">eigen_sys</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="va">sys</span>, <span class="va">eigen</span><span class="op">)</span>
 
-<span class="kw">lambdas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span>(<span class="kw">eigen_sys</span>, <span class="fu">function</span>(<span class="kw">x</span>) <span class="fu"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="kw">x</span><span class="op">$</span><span class="kw">values</span>[<span class="fl">1</span>]), <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(<span class="fl">1</span>))
-<span class="kw">ws</span>      <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span>(<span class="kw">eigen_sys</span>, <span class="fu">function</span>(<span class="kw">x</span>) <span class="fu"><a href="https://rdrr.io/r/base/complex.html">Re</a></span>(<span class="kw">x</span><span class="op">$</span><span class="kw">vectors</span>[ , <span class="fl">1</span>]), <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(<span class="fl">100</span>))
-
-
+<span class="va">lambdas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span><span class="op">(</span><span class="va">eigen_sys</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/complex.html">Re</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">values</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>
+<span class="va">ws</span>      <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span><span class="op">(</span><span class="va">eigen_sys</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/complex.html">Re</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">vectors</span><span class="op">[</span> , <span class="fl">1</span><span class="op">]</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span>
 
 
-<span class="kw">lambda_ipmr</span> <span class="op">-</span> <span class="kw">lambdas</span>
-</pre></div>
+
+
+<span class="va">lambda_ipmr</span> <span class="op">-</span> <span class="va">lambdas</span></code></pre></div>
 </div>
   </div>
 

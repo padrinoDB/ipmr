@@ -156,15 +156,15 @@
     <p>Helpers for IPM construction</p>
     </div>
 
-    <pre class="usage"><span class='fu'>define_impl</span>(<span class='kw'>proto_ipm</span>, <span class='kw'>kernel_impl_list</span>)
+    <pre class="usage"><span class='fu'>define_impl</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='va'>kernel_impl_list</span><span class='op'>)</span>
 
-<span class='fu'>make_impl_args_list</span>(<span class='kw'>kernel_names</span>, <span class='kw'>int_rule</span>, <span class='kw'>dom_start</span>, <span class='kw'>dom_end</span>, <span class='kw'>...</span>)
+<span class='fu'>make_impl_args_list</span><span class='op'>(</span><span class='va'>kernel_names</span>, <span class='va'>int_rule</span>, <span class='va'>dom_start</span>, <span class='va'>dom_end</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>define_domains</span>(<span class='kw'>proto_ipm</span>, <span class='kw'>...</span>)
+<span class='fu'>define_domains</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>define_pop_state</span>(<span class='kw'>proto_ipm</span>, <span class='kw'>...</span>, pop_vectors = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>())
+<span class='fu'>define_pop_state</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='va'>...</span>, pop_vectors <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>define_env_state</span>(<span class='kw'>proto_ipm</span>, <span class='kw'>...</span>, data_list = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>())</pre>
+<span class='fu'>define_env_state</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='va'>...</span>, data_list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -270,61 +270,61 @@ vital rate expressions and/or kernel formulas.</p>
     <pre class="examples"><div class='input'>
 <span class='co'># Example with kernels named "P" and "F", and a domain "z"</span>
 
-<span class='kw'>kernel_impl_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(P = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(int_rule = <span class='st'>"midpoint"</span>, dom_start = <span class='st'>"z"</span>, dom_end = <span class='st'>"z"</span>),
-                         F = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(int_rule = <span class='st'>"midpoint"</span>, dom_start = <span class='st'>"z"</span>, dom_end = <span class='st'>"z"</span>))
+<span class='va'>kernel_impl_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>P <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>, dom_start <span class='op'>=</span> <span class='st'>"z"</span>, dom_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span>,
+                         F <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>, dom_start <span class='op'>=</span> <span class='st'>"z"</span>, dom_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># an equivalent version using make_impl_args_list</span>
 
-<span class='kw'>kernel_impl_list</span> <span class='op'>&lt;-</span> <span class='fu'>make_impl_args_list</span>(
-     kernel_names = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"P"</span>, <span class='st'>"F"</span>),
-     int_rule     = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"midpoint"</span>, <span class='st'>"midpoint"</span>),
-     dom_start    = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"z"</span>, <span class='st'>"z"</span>),
-     dom_end      = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"z"</span>, <span class='st'>"z"</span>)
-)
+<span class='va'>kernel_impl_list</span> <span class='op'>&lt;-</span> <span class='fu'>make_impl_args_list</span><span class='op'>(</span>
+     kernel_names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"P"</span>, <span class='st'>"F"</span><span class='op'>)</span>,
+     int_rule     <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"midpoint"</span>, <span class='st'>"midpoint"</span><span class='op'>)</span>,
+     dom_start    <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"z"</span>, <span class='st'>"z"</span><span class='op'>)</span>,
+     dom_end      <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"z"</span>, <span class='st'>"z"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
 <span class='co'># define_domains</span>
 
-<span class='kw'>lower_bound</span> <span class='op'>&lt;-</span> <span class='fl'>1</span>
-<span class='kw'>upper_bound</span> <span class='op'>&lt;-</span> <span class='fl'>100</span>
-<span class='kw'>n_meshpoints</span> <span class='op'>&lt;-</span> <span class='fl'>50</span>
+<span class='va'>lower_bound</span> <span class='op'>&lt;-</span> <span class='fl'>1</span>
+<span class='va'>upper_bound</span> <span class='op'>&lt;-</span> <span class='fl'>100</span>
+<span class='va'>n_meshpoints</span> <span class='op'>&lt;-</span> <span class='fl'>50</span>
 
-<span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 
-<span class='fu'>define_domains</span>(<span class='kw'>proto_ipm</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>lower_bound</span>, <span class='kw'>upper_bound</span>, <span class='kw'>n_meshpoints</span>))
+<span class='fu'>define_domains</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>lower_bound</span>, <span class='va'>upper_bound</span>, <span class='va'>n_meshpoints</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># define_pop_state with a state variable named "z". Note that "n_" is prefixed</span>
 <span class='co'># to denote that it is a population state function!</span>
 
-<span class='fu'>define_pop_state</span>(<span class='kw'>proto_ipm</span>, n_z = <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>100</span>))
+<span class='fu'>define_pop_state</span><span class='op'>(</span><span class='va'>proto_ipm</span>, n_z <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># alternative, we can make a list before starting to make the IPM</span>
 
-<span class='kw'>pop_vecs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(n_z = <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>100</span>))
+<span class='va'>pop_vecs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>n_z <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>define_pop_state</span>(<span class='kw'>proto_ipm</span>, pop_vectors = <span class='kw'>pop_vecs</span>)
+<span class='fu'>define_pop_state</span><span class='op'>(</span><span class='va'>proto_ipm</span>, pop_vectors <span class='op'>=</span> <span class='va'>pop_vecs</span><span class='op'>)</span>
 
 <span class='co'># define_env_state. Generates a random draw from a known distribution</span>
 <span class='co'># of temperatures.</span>
 
-<span class='kw'>env_sampler</span> <span class='op'>&lt;-</span> <span class='fu'>function</span>(<span class='kw'>temp_mean</span>, <span class='kw'>temp_sd</span>) {
+<span class='va'>env_sampler</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>temp_mean</span>, <span class='va'>temp_sd</span><span class='op'>)</span> <span class='op'>{</span>
 
-  <span class='kw'>temp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>1</span>, <span class='kw'>temp_mean</span>, <span class='kw'>temp_sd</span>)
+  <span class='va'>temp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='va'>temp_mean</span>, <span class='va'>temp_sd</span><span class='op'>)</span>
 
-  <span class='fu'><a href='https://rdrr.io/r/base/function.html'>return</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(temp = <span class='kw'>temp</span>))
+  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>temp <span class='op'>=</span> <span class='va'>temp</span><span class='op'>)</span><span class='op'>)</span>
 
-}
+<span class='op'>}</span>
 
-<span class='kw'>env_pars</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(temp_mean = <span class='fl'>12</span>, temp_sd = <span class='fl'>2</span>)
+<span class='va'>env_pars</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>temp_mean <span class='op'>=</span> <span class='fl'>12</span>, temp_sd <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 
-<span class='fu'>define_env_state</span>(
- <span class='kw'>proto_ipm</span>,
- env_values = <span class='fu'>env_sampler</span>(<span class='kw'>env_pars</span><span class='op'>$</span><span class='kw'>temp_mean</span>, <span class='kw'>env_pars</span><span class='op'>$</span><span class='kw'>temp_sd</span>),
- data_list  = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(env_sampler = <span class='kw'>env_sampler</span>,
-                   env_pars    = <span class='kw'>env_pars</span>)
+<span class='fu'>define_env_state</span><span class='op'>(</span>
+ <span class='va'>proto_ipm</span>,
+ env_values <span class='op'>=</span> <span class='fu'>env_sampler</span><span class='op'>(</span><span class='va'>env_pars</span><span class='op'>$</span><span class='va'>temp_mean</span>, <span class='va'>env_pars</span><span class='op'>$</span><span class='va'>temp_sd</span><span class='op'>)</span>,
+ data_list  <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>env_sampler <span class='op'>=</span> <span class='va'>env_sampler</span>,
+                   env_pars    <span class='op'>=</span> <span class='va'>env_pars</span><span class='op'>)</span>
 
-)
+<span class='op'>)</span>
 
-}
+<span class='op'>}</span>
 
 </div></pre>
   </div>

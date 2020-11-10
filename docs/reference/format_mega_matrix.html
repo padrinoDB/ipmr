@@ -156,13 +156,13 @@
     <p>Format a mega-matrix</p>
     </div>
 
-    <pre class="usage"><span class='fu'>format_mega_matrix</span>(<span class='kw'>ipm</span>, <span class='kw'>...</span>)
+    <pre class="usage"><span class='fu'>format_mega_matrix</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for default</span>
-<span class='fu'>format_mega_matrix</span>(<span class='kw'>ipm</span>, <span class='kw'>mega_mat</span>, <span class='kw'>...</span>)
+<span class='fu'>format_mega_matrix</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>mega_mat</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for age_x_size_ipm</span>
-<span class='fu'>format_mega_matrix</span>(<span class='kw'>ipm</span>, <span class='kw'>name_ps</span>, <span class='kw'>f_forms</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>format_mega_matrix</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>name_ps</span>, <span class='va'>f_forms</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -219,21 +219,21 @@ model, the suffixes should be attached to the <code>name_ps, f_forms</code> in t
 function arguments, and the correct block matrices will be generated internally.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>gen_di_det_ex</span>)
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gen_di_det_ex</span><span class='op'>)</span>
 
-<span class='kw'>big_k</span> <span class='op'>&lt;-</span> <span class='fu'>format_mega_matrix</span>(<span class='kw'>gen_di_det_ex</span>,
-                            mega_mat = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='kw'>go_discrete</span>,
-                                         <span class='kw'>leave_discrete</span>, <span class='kw'>P</span>))
+<span class='va'>big_k</span> <span class='op'>&lt;-</span> <span class='fu'>format_mega_matrix</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>,
+                            mega_mat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='va'>go_discrete</span>,
+                                         <span class='va'>leave_discrete</span>, <span class='va'>P</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='kw'>char_call</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='st'>"go_discrete"</span>, <span class='st'>"leave_discrete"</span>, <span class='st'>"P"</span>)
+<span class='va'>char_call</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='st'>"go_discrete"</span>, <span class='st'>"leave_discrete"</span>, <span class='st'>"P"</span><span class='op'>)</span>
 
-<span class='kw'>big_k</span> <span class='op'>&lt;-</span> <span class='fu'>format_mega_matrix</span>(<span class='kw'>gen_di_det_ex</span>, mega_mat = <span class='kw'>char_call</span>)
+<span class='va'>big_k</span> <span class='op'>&lt;-</span> <span class='fu'>format_mega_matrix</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>, mega_mat <span class='op'>=</span> <span class='va'>char_call</span><span class='op'>)</span>
 
 <span class='co'># Now, with an Identity matrix instead of a 0</span>
 
-<span class='kw'>big_k</span> <span class='op'>&lt;-</span> <span class='fu'>format_mega_matrix</span>(<span class='kw'>gen_di_det_ex</span>,
-                            mega_mat = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>I</span>, <span class='kw'>go_discrete</span>,
-                                         <span class='kw'>leave_discrete</span>, <span class='kw'>P</span>))
+<span class='va'>big_k</span> <span class='op'>&lt;-</span> <span class='fu'>format_mega_matrix</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>,
+                            mega_mat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>I</span>, <span class='va'>go_discrete</span>,
+                                         <span class='va'>leave_discrete</span>, <span class='va'>P</span><span class='op'>)</span><span class='op'>)</span>
 
 
 
