@@ -908,7 +908,7 @@
 .make_kern_seq <- function(proto, kernels, iterations, kernel_seq) {
 
 
-  if(is.null(kernel_seq) || is.na(kernel_seq)) {
+  if(is.null(kernel_seq) || all(is.na(kernel_seq))) {
 
     seq_type   <- 'NA'
 
@@ -920,7 +920,7 @@
 
       seq_type <- 'markov_chain_mat'
 
-    } else if(length(kernel_seq) == 1 && kernel_seq == 'internal') {
+    } else if(all(kernel_seq == 'internal')) {
 
       seq_type <- "internal"
 

@@ -251,7 +251,7 @@ g_params   <- list2(!!! g_r_int)
 s_params   <- list2(!!! s_r_int)
 f_s_params <- list2(!!! f_s_r_int)
 
-params     <- splice(data_list, g_params, s_params, f_s_params)
+params     <- c(data_list, g_params, s_params, f_s_params)
 
 # The "model_class" argument is now changed to reflect a different model type
 
@@ -1155,10 +1155,10 @@ dc_data_list <- list(
 # Compile full list, then split out fixed parameters into list form (passed to
 # define_kernel) and random parameters into vector form (passed to mvtnorm)
 
-all_params <- purrr::splice(nr_data_list,
-                            fec_data_list,
-                            ra_data_list,
-                            dc_data_list)
+all_params <- c(nr_data_list,
+                fec_data_list,
+                ra_data_list,
+                dc_data_list)
 
 ind_rand <- map_lgl(all_params,
                     .f = function(.x) {

@@ -7,6 +7,6 @@
 lhs \%>\% rhs
 }
 \description{
-See \url{https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html}.
+See vignette at \url{https://CRAN.R-project.org/package=magrittr}.
 }
 \keyword{internal}

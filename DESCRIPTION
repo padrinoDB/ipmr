@@ -1,5 +1,5 @@
 Package: ipmr
-Title: Fits IPMs using an expression based framework 
+Title: Fits IPMs using an Expression Based Framework 
 Version: 0.0.0.9000
 Authors@R: c( 
     person(given = "Sam",
