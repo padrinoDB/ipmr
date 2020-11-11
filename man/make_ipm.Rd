@@ -12,6 +12,7 @@
 \alias{make_ipm.simple_dd_stoch_kern}
 \alias{make_ipm.simple_dd_stoch_param}
 \alias{make_ipm.general_dd_det}
+\alias{make_ipm.general_dd_stoch_kern}
 \title{Methods to implement an IPM}
 \usage{
 make_ipm(
@@ -152,6 +153,20 @@ make_ipm(
   domain_list = NULL,
   iterate = TRUE,
   iterations = 50,
+  normalize_pop_size = FALSE,
+  report_progress = FALSE
+)
+
+\method{make_ipm}{general_dd_stoch_kern}(
+  proto_ipm,
+  return_main_env = TRUE,
+  return_all_envs = FALSE,
+  usr_funs = list(),
+  ...,
+  domain_list = NULL,
+  iterate = TRUE,
+  iterations = 50,
+  kernel_seq = NA_character_,
   normalize_pop_size = FALSE,
   report_progress = FALSE
 )

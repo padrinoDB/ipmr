@@ -549,6 +549,6 @@ test_that("return_all_envs works as expected", {
 
   all_nms <- c("main_env", names(tst_env_ret$sub_kernels))
 
-  # expect_equal(all_nms, names(tst_env_ret$env_list))
+  expect_equal(all_nms, names(tst_env_ret$env_list))
 
 })
