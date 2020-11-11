@@ -1768,6 +1768,131 @@
   return(pop_state)
 }
 
+#' @noRd
+
+.iterate_model.general_dd_stoch_param <- function(proto_ipm,
+                                                 k_row,
+                                                 sub_kern_list,
+                                                 current_iteration,
+                                                 iterations,
+                                                 kern_seq,
+                                                 pop_state,
+                                                 main_env,
+                                                 normal,
+                                                 report_progress) {
+
+
+  # Select kernels from kern_seq, or just use all of them if it's
+  # a deterministic simulation. Similarly, we need to subset the k_rows
+  # object so that .eval_general_det doesn't loop over ones which include
+  # expressions for other levels of 'kern_seq'
+
+  if(!is.null(kern_seq)) {
+
+    if(is.character(kern_seq)) {
+
+      kern_ind <- grepl(kern_seq[current_iteration], names(sub_kern_list))
+
+      k_row_ind <- which(grepl(kern_seq[current_iteration], k_row$kernel_id))
+
+
+      use_kerns <- sub_kern_list[kern_ind]
+      use_k     <- k_row[k_row_ind, ]
+
+      # Deals with the case where only a subset of kernels have suffixes.
+      # In that case, we need to include the ones that don't have them
+      # in the use_kerns list every single time!
+
+      if(any(!proto_ipm$has_hier_effs) && any(proto_ipm$has_hier_effs)) {
+
+        nm_ind <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+        to_add <- sub_kern_list[nm_ind]
+
+        use_kerns <- c(use_kerns, to_add)
+
+      }
+    }
+
+  } else {
+
+    use_kerns <- sub_kern_list
+    use_k     <- k_row
+
+  }
+
+  # Need to return an iterated pop_state object
+
+  pop_list_t_1 <- .eval_general_det(k_row         = use_k,
+                                    proto_ipm     = proto_ipm,
+                                    sub_kern_list = use_kerns,
+                                    pop_state     = pop_state,
+                                    main_env    = main_env)
+
+  # make names match pop_state and then reorder the list for easy
+  # insertion
+  names(pop_list_t_1) <- gsub('_t_1', '', names(pop_list_t_1))
+
+  pop_list_t_1        <- pop_list_t_1[names(pop_state)]
+
+  # Drop the NA entry created by the lambda slot.
+
+  pop_list_t_1        <- pop_list_t_1[!is.na(names(pop_list_t_1))]
+
+  # Next, compute population sizes and time step growth rates.
+  # this is required because if normalize_pop_size = TRUE,
+  # there isn't any way to compute growth rates at each
+  # time step after the fact
+
+  pop_size_t_1 <- vapply(
+    pop_list_t_1,
+    function(x) sum(x),
+    numeric(1L)
+  ) %>%
+    Reduce(f = '+', x = ., init = 0)
+
+  pop_size_t <- .pop_size(pop_state, current_iteration)
+
+  if(normal) {
+
+    pop_list_t_1 <- lapply(pop_list_t_1,
+                           function(x, pop_size) {
+                             x / pop_size
+                           },
+                           pop_size = pop_size_t_1)
+
+  }
+
+  pop_list_t_1$lambda <- pop_size_t_1 / pop_size_t
+
+  pop_list_t_1        <- pop_list_t_1[names(pop_state)]
+
+  pop_state           <- purrr::map2(.x = pop_state,
+                                     .y = pop_list_t_1,
+                                     .f = function(.x, .y, iteration) {
+
+                                       .x[ , (iteration + 1)] <- .y
+
+                                       return(.x)
+                                     },
+                                     iteration = current_iteration
+  )
+
+  # Now, update the names so that we can bind the new n_*_t to
+  # main_env so that the next iteration is evaluated correctly
+
+  names(pop_list_t_1) <- names(pop_list_t_1) %>%
+    paste(., '_t', sep = "")
+
+
+  rlang::env_bind(.env = main_env,
+                  !!! pop_list_t_1)
+
+
+
+  return(pop_state)
+
+}
+
 
 # Helpers --------------
 

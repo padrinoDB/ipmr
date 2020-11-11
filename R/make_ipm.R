@@ -2112,11 +2112,225 @@ make_ipm.general_dd_stoch_kern <- function(proto_ipm,
 
 }
 
-make_ipm.general_dd_stoch_param <- function(proto_ipm,
-                                            return_main_env    = TRUE,
-                                            return_all_envs    = FALSE,
-                                            usr_funs           = list(),
-                                            ...) {
+#' @rdname make_ipm
+#'
+#' @export
 
-  # DEFINE ME
+make_ipm.general_dd_stoch_param <-function(proto_ipm,
+                                          return_main_env    = TRUE,
+                                          return_all_envs    = FALSE,
+                                          usr_funs           = list(),
+                                          ...,
+                                          domain_list        = NULL,
+                                          iterate            = TRUE,
+                                          iterations         = 50,
+                                          kernel_seq         = NA_character_,
+                                          normalize_pop_size = FALSE,
+                                          report_progress    = FALSE) {
+
+
+  if(iterate &&
+     all(is.null(kernel_seq) | is.na(kernel_seq)) &&
+     any(proto_ipm$has_hier_effs)) {
+
+    message("'kernel_seq' not defined. Will generate one internally")
+
+    kernel_seq <- "internal"
+
+  }
+
+  # Figure out if we're dealing with a new model or an old one that is
+  # being reimplemented. If the proto is not new and usr_funs isn't passed to the new
+  # make_ipm call, then restore the old version. If usr_funs are passed,
+  # we append them regardless of whether or not the model has been implemented.
+
+  if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
+
+    if(!is.na(proto_ipm$usr_funs[[1]][1])) {
+
+      usr_funs  <- proto_ipm$usr_funs[[1]]
+
+    }
+
+  } else if(!rlang::is_empty(usr_funs)) {
+
+    proto_ipm <- .append_usr_funs_to_proto(proto_ipm, usr_funs)
+
+  }
+
+  proto_list <- .initialize_kernels(proto_ipm, iterate)
+
+  others <- proto_list$others
+  k_row  <- proto_list$k_row   # k_row is either an NA or a proto_ipm object
+
+  # Initialize the main_environment so these values can all be found at
+  # evaluation time
+
+  if(is.null(domain_list)) {
+    main_env       <- .make_main_env(others$domain, usr_funs)
+  } else {
+    main_env       <- .make_main_env(domain_list, usr_funs)
+    proto_ipm$domain <- I(list(domain_list))
+  }
+
+  temp           <- .prep_di_output(others,
+                                    k_row,
+                                    proto_ipm,
+                                    iterations,
+                                    normalize_pop_size)
+
+
+  # Bind env_exprs, constants, and pop_vectors to main_env so that
+  # we can always find them and avoid that miserable repitition
+
+  main_env     <- .bind_all_constants(env_state   = others$env_state[[1]]$constants,
+                                      env_to_bind = main_env)
+
+  main_env     <- .add_pop_state_to_main_env(temp$pop_state,
+                                             main_env)
+
+  # construct the kernels from their function defintions
+
+  # env_list      <- list(main_env = main_env)
+
+  others        <- .prep_dd_vr_exprs(others)
+  k_row         <- .prep_dd_k_exprs(k_row)
+
+  if(iterate) {
+
+    sub_kern_out <- list()
+    env_ret      <- list(main_env = main_env)
+    kern_seq     <- .make_kern_seq(others,
+                                   c(others$kernel_id,
+                                     k_row$kernel_id),
+                                   iterations,
+                                   kernel_seq)
+
+    for(i in seq_len(iterations)) {
+
+      # add the variable to let the user access the current iteration.
+
+      .bind_iter_var(main_env, i)
+
+      .stoch_progress_message(report_progress, iterations, i)
+
+      # Lazy variant makes sure that whatever functions that generate parameter
+      # values stochastically are only evaluated 1 time per iteration! This is so
+      # multiple parameters meant to come from a joint distribution really come from
+      # the joint distribution!
+
+      sys         <- .make_sub_kernel_simple_lazy(others,
+                                                  main_env,
+                                                  return_envs = return_all_envs,
+                                                  dd = "n")
+
+      sub_kernels <- sys$ipm_system$sub_kernels
+
+      # Generate the pop_state for a single iteration! This is critical to ensuring
+      # env_state_funs are only evaluated once per iteration. kern_seq = NULL
+      # because the environmental parameters are generated on the fly by the
+      # user defined function
+
+      pop_state <- .iterate_model(proto_ipm,
+                                  k_row,
+                                  sub_kernels,
+                                  current_iteration = i,
+                                  iterations,
+                                  kern_seq,
+                                  temp$pop_state,
+                                  main_env,
+                                  normalize_pop_size,
+                                  report_progress)
+
+      if(return_all_envs) {
+
+        sys$env_list$main_env <- NULL
+
+        names(sys$env_list) <- paste(names(sys$env_list), "it", i, sep = "_")
+
+        env_ret             <- c(env_ret, sys$env_list)
+
+      } else if(return_main_env) {
+
+        env_ret <- list(main_env = main_env)
+
+      } else{
+
+        env_ret <- NA_character_
+
+      }
+
+      temp         <- .update_param_general_output(sub_kernels,
+                                                   pop_state,
+                                                   env_ret,
+                                                   main_env,
+                                                   temp,
+                                                   iterations,
+                                                   i)
+
+      names(sub_kernels)           <- paste(names(sub_kernels), "it", i, sep = "_")
+      sub_kern_out                 <- c(sub_kern_out, sub_kernels)
+
+
+    }
+
+    # Remove the NA at 1 - it is a dummy so that purrr::map2 can work
+    # properly
+
+    pop_state[grepl('lambda', names(pop_state))] <- lapply(
+      pop_state[grepl("lambda", names(pop_state))],
+      function(x) {
+        out <- x[ , -1, drop = FALSE]
+        return(out)
+      }
+    )
+    # Convert pop_state names back to the user-supplied ones
+
+    names(pop_state) <- gsub("^pop_state_", "n_", names(pop_state))
+
+  } else {
+
+    pop_state <- NA_real_
+
+  }
+
+  temp$env_seq <- data.frame(temp$env_seq, stringsAsFactors = FALSE)
+
+  if(!is.null(kern_seq)) {
+
+    temp$env_seq <- cbind(temp$env_seq,
+                          kernel_seq = kern_seq)
+
+  }
+
+  out_seq <- temp$env_seq
+
+  sub_kern_out <- set_ipmr_classes(sub_kern_out)
+
+  # Not storing iteration kernels for now, though that *should* be
+  # fairly easy to change...
+
+  out <- list(iterators   = NA_real_,
+              sub_kernels = sub_kern_out,
+              env_list    = env_ret,
+              env_seq     = out_seq,
+              pop_state   = pop_state,
+              proto_ipm   = proto_ipm
+  )
+
+  attr(out$proto_ipm, 'implemented') <- TRUE
+  attr(out, "iterated")              <- (iterate && iterations >= 1)
+
+  if(inherits(proto_ipm, "age_x_size")) {
+    a_s_class <- "age_x_size_ipm"
+  } else {
+    a_s_class <- NULL
+  }
+
+  class(out)                         <- c('general_dd_stoch_param_ipm',
+                                          a_s_class,
+                                          'list')
+
+  return(out)
+
 }
