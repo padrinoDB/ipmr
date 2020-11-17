@@ -315,7 +315,7 @@
     }
   })
 
-  all_args <- .args_from_txt(unlist(targets))
+  all_args <- unlist(lapply(targets, .args_from_txt))
 
   if(any(.txt_has_domain(all_args, domains))) {
 
@@ -427,7 +427,8 @@
 .update_sum_txt <- function(txt, vr_exprs, nms, calls, proto_ipm) {
 
   sym_list <- as.list(nms) %>%
-    setNames(nms)
+    setNames(nms) %>%
+    .[!duplicated(names(.))]
 
   sym_env  <- rlang::as_environment(sym_list, parent = f_env)
   sum_env  <- rlang::child_env(.parent   = sym_env,

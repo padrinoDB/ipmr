@@ -674,15 +674,15 @@ print.ipmr_vital_rate_exprs <- function(x, ...) {
 
   nm_hier_effs <- nm_hier_effs[!is.na(nm_hier_effs)]
 
+  x <- lapply(x, rlang::expr_text)
+
   for(i in seq_along(nm_hier_effs)) {
 
     to_print <- paste("<", nm_hier_effs[i], ">", sep = "")
 
     x <- lapply(x,
                 function(y, nm, to_print) {
-                  y <- rlang::expr_text(y)
                   gsub(nm, to_print, y)
-
                 },
                 nm       = nm_hier_effs[i],
                 to_print = to_print)
