@@ -1442,7 +1442,7 @@ set_ipmr_classes <- function(to_set, cls = NULL) {
     out$env_ret <- env_list
   } else if(return_main_env) {
 
-    out$env_ret <- env_list$main_env
+    out$env_ret <- list(main_env = env_list$main_env)
   } else {
     out$env_ret <- NA_character_
   }
