@@ -167,34 +167,34 @@
 <li>Simple, density independent models: <strong>Completed and ready</strong>
 </li>
 </ul>
-<!-- end list --><ol>
+<ol>
 <li><p><code>"simple_di_det"</code></p></li>
 <li><p><code>"simple_di_stoch_kern"</code></p></li>
 <li><p><code>"simple_di_stoch_param"</code></p></li>
 </ol>
-<!-- end list --><ul>
+<ul>
 <li>Simple, density dependent models: <strong>In progress, not yet stable</strong>
 </li>
 </ul>
-<!-- end list --><ol>
+<ol>
 <li><p><code>"simple_dd_det"</code></p></li>
 <li><p><code>"simple_dd_stoch_kern"</code></p></li>
 <li><p><code>"simple_dd_stoch_param"</code></p></li>
 </ol>
-<!-- end list --><ul>
+<ul>
 <li>General, density independent models: <strong>Completed and ready</strong>
 </li>
 </ul>
-<!-- end list --><ol>
+<ol>
 <li><p><code>"general_di_det"</code></p></li>
 <li><p><code>"general_di_stoch_kern"</code></p></li>
 <li><p><code>"general_di_stoch_param"</code></p></li>
 </ol>
-<!-- end list --><ul>
+<ul>
 <li>General, density dependent models: <strong>In progress, not yet stable</strong>
 </li>
 </ul>
-<!-- end list --><ol>
+<ol>
 <li><p><code>"general_dd_det"</code></p></li>
 <li><p><code>"general_dd_stoch_kern"</code></p></li>
 <li><p><code>"general_dd_stoch_param"</code></p></li>
@@ -210,28 +210,28 @@
 <li>
 <p>Survival (<code>s</code>): a generalized linear model w/ a logit link.</p>
 <ul>
-<li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(surv ~ size_1, data = my_surv_data,     family = binomial())</a></code>
+<li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(surv ~ size_1, data = my_surv_data, family = binomial())</a></code>
 </li>
 </ul>
 </li>
 <li>
 <p>Growth (<code>g</code>): a linear model with a Normal error distribution.</p>
 <ul>
-<li>Example model formula: <code><a href="https://rdrr.io/r/stats/lm.html">lm(size_2 ~ size_1, data =     my_grow_data)</a></code>
+<li>Example model formula: <code><a href="https://rdrr.io/r/stats/lm.html">lm(size_2 ~ size_1, data = my_grow_data)</a></code>
 </li>
 </ul>
 </li>
 <li>
 <p>Pr(flowering) (<code>f_r</code>): a generalized linear model w/ a logit link.</p>
 <ul>
-<li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(flower ~ size_1, data =     my_repro_data, family = binomial())</a></code>
+<li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(flower ~ size_1, data = my_repro_data, family = binomial())</a></code>
 </li>
 </ul>
 </li>
 <li>
 <p>Seed production (<code>f_s</code>): a generalized linear model w/ log link.</p>
 <ul>
-<li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(seeds ~ size_1, data =     my_flower_data, family = poisson())</a></code>
+<li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(seeds ~ size_1, data = my_flower_data, family = poisson())</a></code>
 </li>
 </ul>
 </li>
@@ -397,7 +397,6 @@
 
 <span class="va">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">my_simple_ipm</span>, comp_method <span class="op">=</span> <span class="st">'eigen'</span><span class="op">)</span>
 <span class="va">w_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/right_ev.html">right_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span></code></pre></div>
-<p>If you’re interested in seeing how <code>ipmr</code> output compares to models implemented by hand, there is an article on that <a href="https://levisc8.github.io/ipmr/articles/sanity-checks.html">here</a>.</p>
 <p>A more detailed introduction to <code>ipmr</code> is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. That’s all for now, happy modelling!</p>
 </div>
 </div>

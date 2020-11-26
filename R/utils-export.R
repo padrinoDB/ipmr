@@ -984,3 +984,119 @@ pop_state.default <- function(object) {
   return(out)
 
 }
+
+#' @title Extract threshold based population size information
+#'
+#' @description Given a model object, this function computes population sizes
+#' given thresholds for a state variable of interest. For example,
+#' the number (or proportion) of individuals shorter than 60 cm tall at the 20th
+#' time step of the model.
+#'
+#' @param ipm An object created by \code{make_ipm}
+#' @param time_step the time step to pull out. Currently only supports single
+#' time steps, see examples for extracting time series.
+#' @param ... Named expressions that provide the threshold information for the
+#' desired classes. The expression should be logicals with a state variable name
+#' on the left side, and a threshold value on the right side.
+#'
+#' @return A named list with summed population sizes. Names are taken from
+#' \code{...}.
+#'
+#' @examples
+#' data(gen_di_det_ex)
+#'
+#' # Rebuild the model and return_main_env this time
+#'
+#' gen_di_det_ex <- gen_di_det_ex$proto_ipm %>%
+#'   make_ipm(iterate = TRUE, iterations = 50, return_main_env = TRUE)
+#'
+#' disc_sizes <- collapse_pop_state(gen_di_det_ex,
+#'                                  time_step = 20,
+#'                                  seedlings = ht <= 10,
+#'                                  NRA = ht > 10 & ht <= 200,
+#'                                  RA = ht > 200)
+#'
+#' # time series for this model. This extracts the first 20 iterations
+#' # (excluding the initial population state) and collapses them according
+#' # to the rules we pass to ...
+#'
+#' time_series <- matrix(0, nrow = 20, ncol = 3)
+#'
+#' for(i in 2:21) {
+#'
+#'   time_series[(i-1), ] <- unlist(collapse_pop_state(gen_di_det_ex,
+#'                                                     time_step = i,
+#'                                                     seedlings = ht <= 10,
+#'                                                     NRA = ht > 10 & ht <= 200,
+#'                                                     RA = ht > 200))
+#' }
+#'
+#' @export
+
+collapse_pop_state <- function(ipm, time_step, ...) {
+
+  thresh <- rlang::enquos(...)
+
+  args <- lapply(thresh, function(x) {
+    rlang::quo_text(x) %>%
+      .args_from_txt(.)
+  }) %>%
+    lapply(function(x) unique(Filter(f = .can_be_number, x = x)))
+
+  pos_states <- unlist(ipm$proto_ipm$state_var) %>%
+    unique()
+
+  for(i in seq_along(thresh)) {
+
+    if(any(args[[i]] %in% pos_states)) {
+
+      use_state <- args[[i]][which(args[[i]] %in% pos_states)]
+      use_state <- paste("n_", use_state, sep = "")
+
+      attr(thresh[[i]], "state_var") <- use_state
+
+    } else {
+
+      stop("could not infer state variable from expression: ",
+           rlang::quo_text(thresh[[i]]), ".\n",
+           "Is this state variable spelled correctly?")
+    }
+
+  }
+
+  mesh   <- int_mesh(ipm) %>%
+    lapply(unique) %>%
+    setNames(gsub("_[0-9]", "", names(.))) %>%
+    .[!duplicated(names(.))]
+
+  ev_env <- rlang::env(!!! mesh)
+  thresh <- lapply(thresh,
+                   function(x, set_env) rlang::quo_set_env(x, set_env),
+                   set_env = ev_env)
+
+  inds <- lapply(thresh,
+                 function(x) {
+                   temp <- rlang::eval_tidy(x)
+                   which(temp)
+                 })
+
+  pops <- ipm$pop_state[!grepl("lambda", names(ipm$pop_state))]
+  out  <- list()
+
+  for(i in seq_along(thresh)) {
+
+    use_state <- attr(thresh[[i]], "state_var")
+
+    use_ind <- inds[[i]]
+
+    temp <- pops[[use_state]][use_ind , time_step]
+
+    out[[i]] <- sum(temp)
+    names(out)[i] <- names(thresh)[i]
+  }
+
+  return(out)
+
+}
+
+

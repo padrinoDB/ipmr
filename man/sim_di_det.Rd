@@ -10,7 +10,7 @@ A simple deterministic IPM with the following slots:
 
   \item{iterators}{The computed iteration kernel, named \code{K}.}
   \item{sub_kernels}{The computed sub-kernels, named \code{P} and \code{F}.}
-  \item{env_list}{Empty.}
+  \item{env_list}{Empty}
   \item{env_seq}{Empty.}
   \item{pop_state}{Empty.}
   \item{proto_ipm}{The \code{proto_ipm} object used to implement the model.}

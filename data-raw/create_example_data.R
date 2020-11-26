@@ -65,7 +65,7 @@ sim_di_det_ex <- init_ipm('simple_di_det') %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit),
            return_all_envs = FALSE,
-           return_main_env = TRUE)
+           return_main_env = FALSE)
 
 
 # Create a general deterministic ipm

@@ -220,6 +220,28 @@ test_that("parameters gets and sets correctly", {
 
   expect_identical(new_params, new_prot_params)
 
+})
 
+test_that("collapse_pop_state works", {
+
+  data("gen_di_det_ex")
+
+  gen_di_det_ex <- gen_di_det_ex$proto_ipm %>%
+    make_ipm(iterate = TRUE,
+             iterations = 100,
+             return_main_env = TRUE)
+
+  temp <- collapse_pop_state(gen_di_det_ex,
+                             time_step = 100,
+                             seedlings = ht <= 10,
+                             NRA = ht > 10 & ht <= 200,
+                             RA = ht > 200) %>%
+    unlist() %>%
+    round(digits = 6)
+
+  target <- c(seedlings = 0.104909,
+              NRA       = 0.15683,
+              RA        = 0.002495)
+  expect_equal(temp, target)
 
 })
