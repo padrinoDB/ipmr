@@ -299,6 +299,4 @@ w_ipmr      <- right_ev(my_simple_ipm)
 
 ```
 
-If you're interested in seeing how `ipmr` output compares to models implemented by hand, there is an article on that [here](https://levisc8.github.io/ipmr/articles/sanity-checks.html). 
-
 A more detailed introduction to `ipmr` is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. That's all for now, happy modelling!

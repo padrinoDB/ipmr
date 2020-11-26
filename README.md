@@ -7,7 +7,8 @@ status](https://www.r-pkg.org/badges/version/ipmr)](https://cran.r-project.org/p
 [![Codecov test
 coverage](https://codecov.io/gh/levisc8/ipmr/branch/master/graph/badge.svg)](https://codecov.io/gh/levisc8/ipmr?branch=master)
 
-# ipmr
+ipmr
+====
 
 `ipmr` is a package for implementing Integral Projection Models (IPMs)
 in *R*. It relies heavily on the mathematical syntax of the models, and
@@ -18,7 +19,8 @@ complicated methods are brought online and tweaks are made. Below is a
 brief overview of how `ipmr` classifies different model types followed
 by examples of how to implement those types in this framework.
 
-## Installation
+Installation
+------------
 
 `ipmr` is not yet on CRAN. You can install the development version with
 the snippet below:
@@ -31,10 +33,11 @@ if(!require('remotes', quietly = TRUE)) {
 remotes::install_github("levisc8/ipmr", build_vignettes = TRUE)
 ```
 
-## Package scope
+Package scope
+-------------
 
 Note that this package **will not** help with the process of fitting
-vital rate models at all\! That is a sufficiently different (and vast)
+vital rate models at all! That is a sufficiently different (and vast)
 question that we decided it was not within the scope of this project.
 This will only help you turn those regression models into an IPM without
 shooting yourself in the foot. Thus, everything that follows assumes you
@@ -45,7 +48,8 @@ Below is a brief overview of the package and some examples of how to
 implement models with it. A more thorough introduction is available
 [here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
 
-## Model classes
+Model classes
+-------------
 
 Once all parameters are estimated, the first step of defining a model in
 `ipmr` is to initialize the model using `init_ipm()`. This function has
@@ -60,38 +64,38 @@ should be a character string with at least 3 (but possibly 4) entries
 separated by underscores (`_`). Below, the are the possible entries for
 each position.
 
-  - Position 1: `"simple"`/`"general"`
+-   Position 1: `"simple"`/`"general"`
 
-  - 1.  **simple**: This describes an IPM with a single continuous state
+-   1.  **simple**: This describes an IPM with a single continuous state
         variable and no discrete stages.
 
-  - 2.  **general**: This describes and IPM with either more than one
+-   1.  **general**: This describes and IPM with either more than one
         continuous state variable, one or more discrete stages, or both
         of the above. Basically, anything other than an IPM with a
         single continuous state variable.
 
-  - Position 2: `"di"`/`"dd"`
+-   Position 2: `"di"`/`"dd"`
 
-  - A. **di**: This is used to denote a density-independent IPM.
+-   A. **di**: This is used to denote a density-independent IPM.
 
-  - B. **dd**: This is used to denote a density-dependent IPM.
+-   B. **dd**: This is used to denote a density-dependent IPM.
 
-  - Position 3: `"det"`/`"stoch"`
+-   Position 3: `"det"`/`"stoch"`
 
-  - A. **det**: This is used to denote a deterministic IPM. If this is
+-   A. **det**: This is used to denote a deterministic IPM. If this is
     used in the third position of `model_class`, there should not be a
     fourth entry.
 
-  - B. **stoch**: This is used to denote a stochastic IPM. If this is
+-   B. **stoch**: This is used to denote a stochastic IPM. If this is
     used in the third position of `model_class`, there should always be
     a fourth entry. The two possibilities for the fourth are described
     next.
 
-  - Position 4: `"kern"`/`"param"` (Complete definitions found in
+-   Position 4: `"kern"`/`"param"` (Complete definitions found in
     [Metcalf et
     al. 2015](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405))
 
-  - A. **kern**: This describes an IPM with discretely varying
+-   A. **kern**: This describes an IPM with discretely varying
     parameters such that their values are known before the model is
     specified. This is usually the case with models that estimate fixed
     and/or random year/site effects and for which defining a
@@ -101,7 +105,7 @@ each position.
     constructed before the iteration procedure begins, as opposed to
     requiring reconstruction for every single iteration.
 
-  - B. **param**: This describes an IPM with parameters that are
+-   B. **param**: This describes an IPM with parameters that are
     re-sampled from some distribution at each iteration of the model.
     For example, this can be a multivariate normal defined by covarying
     slopes and intercepts, or posterior distribution(s) from a Bayesian
@@ -113,15 +117,13 @@ each position.
     article](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
 
 With the type of model selected, the `model_class` becomes a string and
-the call to `init_ipm` is composed like so: `init_ipm(model_class =
-"position1_position_2_position3_position4")`.
+the call to `init_ipm` is composed like so:
+`init_ipm(model_class = "position1_position_2_position3_position4")`.
 
 The following possibilities are currently or will become available in
 `ipmr` (bold text denotes development progress):
 
-  - Simple, density independent models: **Completed and ready**
-
-<!-- end list -->
+-   Simple, density independent models: **Completed and ready**
 
 1.  `"simple_di_det"`
 
@@ -129,41 +131,29 @@ The following possibilities are currently or will become available in
 
 3.  `"simple_di_stoch_param"`
 
-<!-- end list -->
+-   Simple, density dependent models: **In progress, not yet stable**
 
-  - Simple, density dependent models: **In progress, not yet stable**
+1.  `"simple_dd_det"`
 
-<!-- end list -->
+2.  `"simple_dd_stoch_kern"`
 
-4.  `"simple_dd_det"`
+3.  `"simple_dd_stoch_param"`
 
-5.  `"simple_dd_stoch_kern"`
+-   General, density independent models: **Completed and ready**
 
-6.  `"simple_dd_stoch_param"`
+1.  `"general_di_det"`
 
-<!-- end list -->
+2.  `"general_di_stoch_kern"`
 
-  - General, density independent models: **Completed and ready**
+3.  `"general_di_stoch_param"`
 
-<!-- end list -->
+-   General, density dependent models: **In progress, not yet stable**
 
-7.  `"general_di_det"`
+1.  `"general_dd_det"`
 
-8.  `"general_di_stoch_kern"`
+2.  `"general_dd_stoch_kern"`
 
-9.  `"general_di_stoch_param"`
-
-<!-- end list -->
-
-  - General, density dependent models: **In progress, not yet stable**
-
-<!-- end list -->
-
-10. `"general_dd_det"`
-
-11. `"general_dd_stoch_kern"`
-
-12. `"general_dd_stoch_param"`
+3.  `"general_dd_stoch_param"`
 
 Simple density-independent deterministic, simple kernel-resampled
 stochastic, and simple parameter resampled stochastic models
@@ -182,30 +172,31 @@ Next on the to-do list is to write generic functions for `lambda`,
 `plot`/`print` methods for all exported classes (`proto_ipm`,
 implemented `ipm` objects).
 
-## Examples for implemented IPM types
+Examples for implemented IPM types
+----------------------------------
 
 Here is a simple model implemented with `ipmr`. It will use the
 following set of vital rate models:
 
 1.  Survival (`s`): a generalized linear model w/ a logit link.
-    
-      - Example model formula: `glm(surv ~ size_1, data = my_surv_data,
-        family = binomial())`
+
+    -   Example model formula:
+        `glm(surv ~ size_1, data = my_surv_data, family = binomial())`
 
 2.  Growth (`g`): a linear model with a Normal error distribution.
-    
-      - Example model formula: `lm(size_2 ~ size_1, data =
-        my_grow_data)`
+
+    -   Example model formula:
+        `lm(size_2 ~ size_1, data = my_grow_data)`
 
 3.  Pr(flowering) (`f_r`): a generalized linear model w/ a logit link.
-    
-      - Example model formula: `glm(flower ~ size_1, data =
-        my_repro_data, family = binomial())`
+
+    -   Example model formula:
+        `glm(flower ~ size_1, data = my_repro_data, family = binomial())`
 
 4.  Seed production (`f_s`): a generalized linear model w/ log link.
-    
-      - Example model formula: `glm(seeds ~ size_1, data =
-        my_flower_data, family = poisson())`
+
+    -   Example model formula:
+        `glm(seeds ~ size_1, data = my_flower_data, family = poisson())`
 
 5.  Recruit size distribution (`f_d`): a normal distribution w
     parameters `mu_fd` (mean) and `sd_fd` (standard deviation).
@@ -383,11 +374,8 @@ lambda_ipmr <- lambda(my_simple_ipm, comp_method = 'eigen')
 w_ipmr      <- right_ev(my_simple_ipm)
 ```
 
-If you’re interested in seeing how `ipmr` output compares to models
-implemented by hand, there is an article on that
-[here](https://levisc8.github.io/ipmr/articles/sanity-checks.html).
-
-## More complicated models
+More complicated models
+-----------------------
 
 Examples of more complicated models are included in the vignettes,
 accesible using either `browseVignettes('ipmr')` or by visiting the
@@ -396,7 +384,8 @@ Please file all bug reports in the Issues tab of this repository or
 contact me via [email](mailto:levisc8@gmail.com) with a reproducible
 example.
 
-## Code of Conduct
+Code of Conduct
+---------------
 
 We welcome contributions from other developers. Please note that the
 ipmr project is released with a [Contributor Code of

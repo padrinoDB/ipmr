@@ -26,7 +26,4 @@ articles:
   navbar: proto_ipm Overview
   contents:
   - proto-ipms
-- title: ipmr Checks
-  navbar: ipmr Checks
-  contents:
-  - sanity-checks
+

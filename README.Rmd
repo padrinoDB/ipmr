@@ -301,8 +301,6 @@ w_ipmr      <- right_ev(my_simple_ipm)
 
 ```
 
-If you're interested in seeing how `ipmr` output compares to models implemented by hand, there is an article on that [here](https://levisc8.github.io/ipmr/articles/sanity-checks.html). 
-
 ## More complicated models
 
 Examples of more complicated models are included in the vignettes, accesible using either `browseVignettes('ipmr')` or by visiting the Articles tab on [project's webpage](https://levisc8.github.io/ipmr/). Please file all bug reports in the Issues tab of this repository or contact me via [email](mailto:levisc8@gmail.com) with a reproducible example.

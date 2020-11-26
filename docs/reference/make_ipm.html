@@ -127,11 +127,6 @@ vignette('ipmr-introduction', 'ipmr') also contains helpful information." />
     <li>
       <a href="../articles/proto-ipms.html">proto_ipm Data Structure</a>
     </li>
-    <li class="divider"></li>
-    <li class="dropdown-header">ipmr Checks</li>
-    <li>
-      <a href="../articles/sanity-checks.html">Sanity checks for ipmr examples</a>
-    </li>
   </ul>
 </li>
       </ul>
@@ -286,6 +281,50 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
 <span class='op'>)</span>
 
 <span class='co'># S3 method for simple_dd_stoch_param</span>
+<span class='fu'>make_ipm</span><span class='op'>(</span>
+  <span class='va'>proto_ipm</span>,
+  return_main_env <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  return_all_envs <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  usr_funs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  <span class='va'>...</span>,
+  domain_list <span class='op'>=</span> <span class='cn'>NULL</span>,
+  iterate <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  iterations <span class='op'>=</span> <span class='fl'>50</span>,
+  kernel_seq <span class='op'>=</span> <span class='cn'>NA_character_</span>,
+  normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for general_dd_det</span>
+<span class='fu'>make_ipm</span><span class='op'>(</span>
+  <span class='va'>proto_ipm</span>,
+  return_main_env <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  return_all_envs <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  usr_funs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  <span class='va'>...</span>,
+  domain_list <span class='op'>=</span> <span class='cn'>NULL</span>,
+  iterate <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  iterations <span class='op'>=</span> <span class='fl'>50</span>,
+  normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for general_dd_stoch_kern</span>
+<span class='fu'>make_ipm</span><span class='op'>(</span>
+  <span class='va'>proto_ipm</span>,
+  return_main_env <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  return_all_envs <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  usr_funs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  <span class='va'>...</span>,
+  domain_list <span class='op'>=</span> <span class='cn'>NULL</span>,
+  iterate <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  iterations <span class='op'>=</span> <span class='fl'>50</span>,
+  kernel_seq <span class='op'>=</span> <span class='cn'>NA_character_</span>,
+  normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for general_dd_stoch_param</span>
 <span class='fu'>make_ipm</span><span class='op'>(</span>
   <span class='va'>proto_ipm</span>,
   return_main_env <span class='op'>=</span> <span class='cn'>TRUE</span>,

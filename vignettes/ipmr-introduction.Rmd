@@ -1213,19 +1213,19 @@ library(ipmr)
 # coefficients are defined as s_temp, s_precip, g_temp, and g_precip.
 
 constant_params <- list(
-  s_int     = -5,
-  s_slope   = 2.2,
-  s_precip  = 0.0002,
+  s_int     = -10,
+  s_slope   = 1.5,
+  s_precip  = 0.00001,
   s_temp    = -0.003,
   g_int     = 0.2,
   g_slope   = 1.01,
   g_sd      = 1.2,
   g_temp    = -0.002,
   g_precip  = 0.004,
-  f_r_int   = 0.3,
-  f_r_slope = 0.03,
-  f_s_int   = 0.4,
-  f_s_slope = 0.001,
+  f_r_int   = -3.2,
+  f_r_slope = 0.55,
+  f_s_int   = -0.4,
+  f_s_slope = 0.5,
   f_d_mu    = 1.1,
   f_d_sd    = 0.1
 )
@@ -1360,7 +1360,7 @@ param_resamp_model <- param_resamp_model %>%
   ) %>%
   define_pop_state(
     pop_vectors = list(
-      n_surf_area_t = init_pop_vec
+      n_surf_area = init_pop_vec
     )
   ) %>%
   make_ipm(usr_funs   = list(inv_logit  = inv_logit),
@@ -1486,7 +1486,7 @@ param_resamp_model <- param_resamp_model %>%
                    )) %>%
   define_pop_state(
     pop_vectors = list(
-      n_surf_area_t = init_pop_vec
+      n_surf_area = init_pop_vec
     )
   ) %>%
   make_ipm(usr_funs   = list(inv_logit  = inv_logit),
@@ -1496,11 +1496,126 @@ param_resamp_model <- param_resamp_model %>%
 
 Notice that we set `iteration = t` in the call to `sample_env`. Otherwise, everything else looks the same as before. 
 
+### Modeling the environment directly
+
+Above, we defined the environment explicitly ahead of time. However, there may be cases where we'd rather incorporate other environmental models direcly into our stochastic IPM (e.g. a specific climate change scenario). We *could* sample our environmental model ahead of time and simply incorporate those directly into the model, indexing by time, similar to what we did above. However, this may not be convenient for some purposes. 
+
+Below is an example that is similar to above, but includes information on time when drawing environmental covariate values. This simulation will set up a scenario in which temperature increases and precipitation decreases with time, and adds random noise to each draw. 
+
+```{r eval = FALSE}
+
+
+param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
+  define_kernel(
+    name    = 'P',
+    formula = s * g,
+    family  = 'CC',
+    
+    # Parameters created by define_env_state() can be referenced by name just like
+    # any other parameter in the model.
+    
+    g_mu    = g_int + g_slope * surf_area_1 + g_temp * temp + g_precip * precip,
+    s_lin_p = s_int + s_slope * surf_area_1 + s_temp * temp + s_precip * precip,
+    s       = inv_logit(s_lin_p),
+    g       = dnorm(surf_area_2, g_mu, g_sd),
+    
+    
+    data_list = constant_params,
+    states    = list(c('surf_area')),
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "g")
+  ) %>%
+  define_kernel(
+    name          = 'F',
+    formula       = f_r * f_s * f_d,
+    family        = 'CC',
+    f_r_lin_p     = f_r_int + f_r_slope * surf_area_1,
+    f_r           = inv_logit(f_r_lin_p),
+    f_s           = exp(f_s_int + f_s_slope * surf_area_1),
+    f_d           = dnorm(surf_area_2, f_d_mu, f_d_sd),
+    data_list     = constant_params,
+    states        = list(c('surf_area')),
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "f_d")
+  ) %>%
+  define_k(
+    name = 'K',
+    
+    # Note that here, we specify both the form of the iteration kernel and
+    # the iteration procedure. 
+    
+    K               = P + F,
+    n_surf_area_t_1 = K %*% n_surf_area_t,
+    family          = 'IPM',
+    data_list       = constant_params,
+    states          = list(c('surf_area')),
+    has_hier_effs   = FALSE,
+    evict_cor          = FALSE
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P", "F", "K"),
+      int_rule     = rep('midpoint', 3),
+      dom_start    = rep('surf_area',3),
+      dom_end      = rep('surf_area', 3)
+    )
+  ) %>%
+    define_domains(surf_area = c(0, 10, 100))
+
+
+```
+ 
+Next, we'll set up a model for temperature and precipitation, and a function that samples from those models to generate values we can use in our IPM simulation. Setting the initial values `init_temp`/`init_precip` is optional, but making them parameters makes it a bit easier to specify a different model later on.
+
+```{r eval = FALSE}
+
+env_sampler <- function(time, init_temp = 10, init_precip = 1500) {
+  
+  t_est <- init_temp + 0.2 * time + rnorm(1, mean = 0, sd = 0.2)
+  
+  p_est <- init_precip + -3.3 * time + rnorm(1, mean = 0, sd = 100)
+  
+  if(p_est <= 0) p_est <- 1
+
+  out <- list(temp   = t_est,
+              precip = p_est)
+  
+  return(out)
+    
+}
+
+
+```
+
+We're pretty much ready to run our simulation now!
+
+```{r eval = FALSE}
+
+param_resamp_ipm <- param_resamp_model %>%
+  define_env_state(
+    env_params = env_sampler(time = t, init_temp = 10, init_precip = 1500),
+    data_list  = list()
+  ) %>%
+  define_pop_state(
+    n_surf_area = init_pop_vec
+  ) %>%
+  make_ipm(
+    iterations = 100,
+    usr_funs = list(env_sampler = env_sampler,
+                    inv_logit = inv_logit)
+  )
+
+lambda(param_resamp_ipm)
+
+```
+
 ## Uncertainty in simple IPMs
 
 Currently, `ipmr` doesn't contain functions to deal with uncertainty. The goal is to change that soon. In the meantime, here is an example of how to deal with that in the context of a simple, deterministic IPM. The procedure is similar for kernel- and parameter-resampled models, and can be adapted to suit those as needed.
 
-There are a multitude of ways to incorporate uncertainty and other sources of continuous variation into regression models and IPMs, and that variety is beyond the scope of this vignette. The following resources are excellent introductions to both and themselves contain a multitude of further readings: 
+There are a multitude of ways to incorporate uncertainty and other sources of continuous variation into regression models and IPMs. That variety is beyond the scope of this vignette. The following resources are excellent introductions to both and themselves contain a multitude of further readings: 
 
 1. [wiki for GLMMs](https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#introduction) 
 
