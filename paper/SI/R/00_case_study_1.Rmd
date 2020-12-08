@@ -5,7 +5,9 @@ output: pdf_document
 
 ## Two versions of a simple model
 
-The first case study in this manuscript creates a model for _Carpobrotus spp_. It is a simple IPM (i.e. no discrete states, one continuous state variable). The data that the regressions are fit to are included in the `ipmr` package, and can be accessed with `data(iceplant_ex)`. 
+The first case study in this manuscript creates a model for _Carpobrotus spp_. The dataset used in this case study was collected in Havatselet Ha'Sharon, a suburb of Tel Aviv, Israel. The data were collected by drones taking aerial imagery of the population in successive years. Images were combined into a single high-resolution orthomosaic and georeferenced so the map from year 2 laid on top of the map from year 1. Flowers on each plant were counted using a point layer, and polygons were drawn around each ramet to estimate sizes and survival from year to year. Plants that had 0 flowers were classified as non-reproductive, and any plant with 1 or more flowers was classified as reproductive. This led to four regression models - survival, growth conditional on survival, probability of flowering, and number of flowers produced conditional on flowering. Finally, plants present in year 2 that were not present in year 1 were considered new recruits. The mean and variance of their sizes were computed, and this was used to model the recruit size distribution. 
+
+The resulting IPM is a simple IPM (i.e. no discrete states, one continuous state variable). The data that the regressions are fit to are included in the `ipmr` package, and can be accessed with `data(iceplant_ex)`. 
 
 The IPM can be written on paper as follows:
 
@@ -97,7 +99,9 @@ all_params <- list(
 
 ```
 
-The next chunk generates a couple constants used to implement the model. We add 20% to the smallest and largest observed sizes to minimize eviction, and will implement the model with 100 meshpoints.
+The next chunk generates a couple constants used to implement the model. We add 20% to the smallest and largest observed sizes to minimize eviction, and will implement the model with 100 meshpoints. 
+
+NB: `L` is multiplied by 1.2 because the log of the minimum observed size is negative, and we want to extend the size range to make it more negative. If `L` were positive, we'd multiply by 0.8.
 
 ```{r}
 
@@ -137,7 +141,7 @@ After we have initialized our IPM, we need to start adding sub-kernels using the
 
 2. Size at $t+1$ is modeled with a Gaussian distribution with two parameters: the mean and standard deviation from the mean. The mean value of size at $t+1$ (`mu_g`) is itself a linear function of size at $t$ and is parameterized with coefficients from the linear model (`grow_mod`). The standard deviation is a constant derived from the residual variance from the linear model we fit.
 
-We start providing information on the `P` kernel by giving it a `name`. The name is important because we can use it to reference this kernel in higher level expression later on. It can have any name we want, but `P` is short, sweet, and consistent with the literature in this field (e.g. Easterling, Ellner & Dixon 2000, Ellner & Rees 2006). Next, we write the `formula`. The `formula` is the form of the kernel, and should look like Equation 3, minus the $z$s and $z'$s. 
+We start providing information on the `P` kernel by giving it a `name`. The name is important because we can use it to reference this kernel in higher level expressions later on. It can have any name we want, but `P` is short, sweet, and consistent with the literature in this field (e.g. Easterling, Ellner & Dixon 2000, Ellner & Rees 2006). Next, we write the `formula`. The `formula` is the form of the kernel, and should look like Equation 3, minus the $z$s and $z'$s. 
 
 ```{r, eval = FALSE}
 
