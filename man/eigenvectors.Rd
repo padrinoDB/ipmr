@@ -13,20 +13,13 @@ right_ev(ipm, ...)
 
 \method{right_ev}{simple_di_det_ipm}(ipm, n_iterations = 100, ...)
 
-\method{right_ev}{general_di_det_ipm}(
-  ipm,
-  n_iterations = 100,
-  mega_mat = NULL,
-  mega_vec = NULL,
-  keep_mega = FALSE,
-  ...
-)
+\method{right_ev}{general_di_det_ipm}(ipm, n_iterations = 100, ...)
 
 left_ev(ipm, ...)
 
 \method{left_ev}{simple_di_det_ipm}(ipm, n_iterations = 100, ...)
 
-\method{left_ev}{general_di_det_ipm}(ipm, mega_mat, mega_vec, n_iterations = 100, keep_mega = FALSE, ...)
+\method{left_ev}{general_di_det_ipm}(ipm, n_iterations = 100, ...)
 }
 \arguments{
 \item{ipm}{Output from \code{make_ipm()}.}
@@ -35,22 +28,6 @@ left_ev(ipm, ...)
 
 \item{n_iterations}{The number of times to iterate the model to reach
 convergence. Default is 100.}
-
-\item{mega_mat}{A vector of names and/or 0s specifying the relationship
-between the kernels in the model. The names should correspond to kernel
-names, with 0s corresponding to sparse areas of the mega-matrix. The names can
-be either symbols or characters. These functions support suffix expansion as in
-\code{define_k(ernel)}, so expressions don't need to be re-written for every
-combination hierarchical effects. DO NOT supply arguments \code{nrow},
-\code{ncol}, or \code{byrow}. These are set internally based on dimensions
-of each sub-kernel.}
-
-\item{mega_vec}{A vector of names specifying the format of the population
-vector. The names can be either symbols or characters.}
-
-\item{keep_mega}{A logical. TRUE returns a list with the mega matrix
-and full eigenvector, FALSE returns a list with each state's contribution
-to eigenvector. Default is FALSE, mostly for internal usage.}
 }
 \value{
 A list of named numeric vector(s) corresponding to the stable trait distribution

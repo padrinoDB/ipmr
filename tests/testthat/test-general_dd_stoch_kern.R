@@ -47,7 +47,7 @@ gen_dd_stoch_co <- init_ipm("general_dd_stoch_kern") %>%
     s                = plogis(s_int + s_slope * ht_1 + s_slope_2 * ht_1^2 + s_dd * sum(n_ht_t)),
     g_site           = dnorm(ht_2, g_mu_site, g_sd),
     g_mu_site        = g_int + g_int_site + g_slope * ht_1,
-    states           = list(c("ht")),
+    states           = list(c("ht", "b")),
     data_list        = data_list_hier,
     has_hier_effs    = TRUE,
     levels_hier_effs = list(site = LETTERS[1:3]),
@@ -60,7 +60,7 @@ gen_dd_stoch_co <- init_ipm("general_dd_stoch_kern") %>%
     formula          = f_r_site * f_s * g_i * d_ht,
     f_r_site         = plogis(f_r_int + f_r_int_site + f_r_slope * ht_1),
     f_s              = exp(f_s_int + f_s_slope * ht_1 + f_s_dd * sum(n_ht_t)),
-    states           = list(c("ht")),
+    states           = list(c("ht", "b")),
     data_list        = data_list_hier,
     has_hier_effs    = TRUE,
     levels_hier_effs = list(site = LETTERS[1:3]),
@@ -71,28 +71,18 @@ gen_dd_stoch_co <- init_ipm("general_dd_stoch_kern") %>%
     family        = "DC",
     formula       = e_p * f_d * d_ht,
     f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
-    states        = list(c("ht")),
+    states        = list(c("ht", "b")),
     data_list     = data_list_hier,
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
-  define_k(
-    name             = "K_site",
-    family           = "IPM",
-    n_ht_t_1         = P_site %*% n_ht_t + leave_discrete %*% n_b_t,
-    n_b_t_1          = go_discrete_site %*% n_ht_t,
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(site = LETTERS[1:3]),
-    states           = list(c("ht")),
-    data_list        = data_list_hier
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P_site", "go_discrete_site", "leave_discrete", "K"),
-      int_rule     = rep("midpoint", 4),
-      dom_start    = c("ht", "ht", NA, "ht"),
-      dom_end      = c("ht", NA, "ht", "ht")
+      kernel_names = c("P_site", "go_discrete_site", "leave_discrete"),
+      int_rule     = rep("midpoint", 3),
+      state_start    = c("ht", "ht", "b"),
+      state_end      = c("ht", "b", "ht")
     )
   ) %>%
   define_pop_state(

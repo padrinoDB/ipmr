@@ -111,23 +111,13 @@ test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
     has_hier_effs = FALSE,
     evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'f_d')
-  ) %>%
-  define_k(
-    'K',
-    K = P + F,
-    n_surf_area_t_1 = right_mult(K, n_surf_area_t),
-    family = 'IPM',
-    data_list = data_list,
-    states = list(c('surf_area')),
-    has_hier_effs = FALSE,
-    evict_cor = FALSE
-  ) %>%
+  )  %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c('P', "F", "K"),
-      int_rule = rep('midpoint', 3),
-      dom_start = rep('surf_area',3),
-      dom_end = rep('surf_area', 3)
+      kernel_names = c('P', "F"),
+      int_rule = rep('midpoint', 2),
+      state_start = rep('surf_area', 2),
+      state_end = rep('surf_area', 2)
     )
   ) %>%
   define_domains(surf_area = c(0, 10, 100)) %>%
@@ -173,7 +163,7 @@ for(i in seq_len(iterations)) {
     as.list() %>%
     setNames(names(r_means))
 
-  temp <- purrr::splice(data_list,  r_ests)
+  temp <- c(data_list,  r_ests)
 
   g_mat <- g(domains$d2, domains$d1,
              params = c(temp$g_int_yr,
@@ -220,12 +210,23 @@ for(i in seq_len(iterations)) {
 }
 
 ws <- vapply(ks, function(x) Re(eigen(x)$vectors[ , 1]), numeric(100L))
-ws_ipmr <- vapply(test_stoch_param$iterators,
+
+iterators <- lapply(1:10,
+                    function(x, kern_list) {
+
+                      nms <- paste(c("P_", "F_"), x, sep = "")
+
+                      do.call(`+`, kern_list[nms])
+
+                    },
+                    kern_list = test_stoch_param$sub_kernels)
+
+ws_ipmr <- vapply(iterators,
                   function(x) Re(eigen(x)$vectors[ , 1]),
                   numeric(100L))
 
 vs <- vapply(ks, function(x) Re(eigen(t(x))$vectors[ , 1]), numeric(100L))
-vs_ipmr <- vapply(test_stoch_param$iterators,
+vs_ipmr <- vapply(iterators,
                   function(x) Re(eigen(t(x))$vectors[ , 1]),
                   numeric(100L))
 
@@ -297,23 +298,13 @@ test_that('normalize pop_vectors works as it should', {
       has_hier_effs = FALSE,
       evict_cor = TRUE,
       evict_fun = truncated_distributions('norm', 'f_d')
-    ) %>%
-    define_k(
-      'K',
-      K = P + F,
-      n_surf_area_t_1 = right_mult(K, n_surf_area_t),
-      family = 'IPM',
-      data_list = data_list,
-      states = list(c('surf_area')),
-      has_hier_effs = FALSE,
-      evict_cor = FALSE
-    ) %>%
+    )  %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c('P', "F", "K"),
-        int_rule = rep('midpoint', 3),
-        dom_start = rep('surf_area',3),
-        dom_end = rep('surf_area', 3)
+        kernel_names = c('P', "F"),
+        int_rule = rep('midpoint', 2),
+        state_start = rep('surf_area', 2),
+        state_end = rep('surf_area', 2)
       )
     ) %>%
     define_domains(surf_area = c(0, 10, 100)) %>%
@@ -438,22 +429,12 @@ test_that("t helper variable works as advertised", {
       evict_cor = TRUE,
       evict_fun = truncated_distributions('norm', 'f_d')
     ) %>%
-    define_k(
-      'K',
-      K = P + F,
-      n_surf_area_t_1 = right_mult(K, n_surf_area_t),
-      family = 'IPM',
-      data_list = data_list,
-      states = list(c('surf_area')),
-      has_hier_effs = FALSE,
-      evict_cor = FALSE
-    ) %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c('P', "F", "K"),
-        int_rule = rep('midpoint', 3),
-        dom_start = rep('surf_area',3),
-        dom_end = rep('surf_area', 3)
+        kernel_names = c('P', "F"),
+        int_rule = rep('midpoint', 2),
+        state_start = rep('surf_area', 2),
+        state_end = rep('surf_area', 2)
       )
     ) %>%
     define_domains(surf_area = c(0, 10, 100)) %>%
@@ -517,23 +498,13 @@ test_that("t helper variable works as advertised", {
       has_hier_effs = FALSE,
       evict_cor = TRUE,
       evict_fun = truncated_distributions('norm', 'f_d')
-    ) %>%
-    define_k(
-      'K',
-      K = P + F,
-      n_surf_area_t_1 = right_mult(K, n_surf_area_t),
-      family = 'IPM',
-      data_list = data_list,
-      states = list(c('surf_area')),
-      has_hier_effs = FALSE,
-      evict_cor = FALSE
-    ) %>%
+    )%>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c('P', "F", "K"),
-        int_rule = rep('midpoint', 3),
-        dom_start = rep('surf_area',3),
-        dom_end = rep('surf_area', 3)
+        kernel_names = c('P', "F"),
+        int_rule = rep('midpoint', 2),
+        state_start = rep('surf_area', 2),
+        state_end = rep('surf_area', 2)
       )
     ) %>%
     define_domains(surf_area = c(0, 10, 100)) %>%
@@ -642,23 +613,12 @@ test_that("stoch_param can handle Hier_effs", {
       evict_cor = TRUE,
       evict_fun = truncated_distributions('norm', 'f_d')
     ) %>%
-    define_k(
-      'K_yr',
-      K_yr = P_yr + F,
-      n_surf_area_t_1 = right_mult(K_yr, n_surf_area_t),
-      family = 'IPM',
-      data_list = data_list,
-      states = list(c('surf_area')),
-      has_hier_effs = TRUE,
-      levels_hier_effs = list(yr = 2000:2004),
-      evict_cor = FALSE
-    ) %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c('P_yr', "F", "K_yr"),
-        int_rule = rep('midpoint', 3),
-        dom_start = rep('surf_area',3),
-        dom_end = rep('surf_area', 3)
+        kernel_names = c('P_yr', "F"),
+        int_rule = rep('midpoint', 2),
+        state_start = rep('surf_area', 2),
+        state_end = rep('surf_area', 2)
       )
     ) %>%
     define_domains(surf_area = c(0, 10, 100)) %>%
@@ -759,7 +719,5 @@ test_that("stoch_param can handle Hier_effs", {
   ipmr_ps <- test_stoch_param$pop_state$n_surf_area
 
   expect_equal(pop_vec, ipmr_ps)
-
-
 
 })

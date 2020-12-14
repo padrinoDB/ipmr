@@ -215,7 +215,7 @@ lam_s_cr <- ipmr:::.lambda_pop_size(pop_size_cr)
 lam_s_co <- ipmr:::.lambda_pop_size(pop_size_co)
 
 ## ipmr version --------
-states <- list(c('ht', 'sb'))
+states <- list(c('ht', 'b'))
 
 inv_logit <- function(int, slope, sv) {
   1/(1 + exp(-(int + slope * sv)))
@@ -269,21 +269,12 @@ ipmr_cr <- init_ipm("general_di_det") %>%
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
   ) %>%
-  define_k(
-    name     = "K",
-    family   = "IPM",
-    n_b_t_1  = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
-    n_ht_t_1 = leave_discrete %*% n_b_t + P %*% n_ht_t,
-    data_list     = data_list_cr,
-    states        = states,
-    has_hier_effs = FALSE
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
-      int_rule     = c(rep("midpoint", 5)),
-      dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
-      dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+      kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete"),
+      int_rule     = c(rep("midpoint", 4)),
+      state_start    = c('ht', "ht", "b", "b"),
+      state_end      = c('ht', "b","b", 'ht')
     )
   ) %>%
   define_domains(
@@ -381,22 +372,13 @@ test_that("kernel definition order doesn't matter", {
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'g')
-    ) %>%
-    define_k(
-      name     = "K",
-      family   = "IPM",
-      n_b_t_1  = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
-      n_ht_t_1 = leave_discrete %*% n_b_t + P %*% n_ht_t,
-      data_list     = data_list_cr,
-      states        = states,
-      has_hier_effs = FALSE
-    ) %>%
+    )  %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
-        int_rule     = c(rep("midpoint", 5)),
-        dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
-        dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+        kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete"),
+        int_rule     = c(rep("midpoint", 4)),
+        state_start    = c('ht', "ht", "b", "b"),
+        state_end      = c('ht', "b", "b", 'ht')
       )
     ) %>%
     define_domains(
@@ -470,21 +452,12 @@ test_that('normalize pop vec works the right way', {
       evict_fun     = truncated_distributions('norm',
                                               'f_d')
     ) %>%
-    define_k(
-      name     = "K",
-      family   = "IPM",
-      n_b_t_1  = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
-      n_ht_t_1 = leave_discrete %*% n_b_t + P %*% n_ht_t,
-      data_list     = data_list_cr,
-      states        = states,
-      has_hier_effs = FALSE
-    ) %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
-        int_rule     = c(rep("midpoint", 5)),
-        dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
-        dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+        kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete"),
+        int_rule     = c(rep("midpoint", 4)),
+        state_start    = c('ht', "ht", "b", "b"),
+        state_end      = c('ht', "b", "b", 'ht')
       )
     ) %>%
     define_domains(
@@ -707,22 +680,12 @@ ipmr_control <- init_ipm("general_di_det") %>%
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
   ) %>%
-  define_k(
-    name             = "K_site",
-    family           = "IPM",
-    n_b_site_t_1     = stay_discrete %*% n_b_site_t  + go_discrete %*% n_ht_site_t,
-    n_ht_site_t_1    = leave_discrete %*% n_b_site_t + P_site %*% n_ht_site_t,
-    data_list        = data_list_control,
-    states           = states,
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(site = 1:3)
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P_site", "go_discrete", "stay_discrete", "leave_discrete", "K_site"),
-      int_rule     = c(rep("midpoint", 5)),
-      dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
-      dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+      kernel_names = c("P_site", "go_discrete", "stay_discrete", "leave_discrete"),
+      int_rule     = c(rep("midpoint", 4)),
+      state_start    = c('ht', "ht", "b", "b"),
+      state_end      = c('ht', "b", "b", 'ht')
     )
   ) %>%
   define_domains(
@@ -811,7 +774,7 @@ test_that("DC/CD transitions without size-dependence work", {
       s             = s_notH,
       m             = m_notH,
       data_list     = data_list,
-      states        = list(c('size')),
+      states        = list(c('size', "sprout")),
       has_hier_effs = FALSE
     ) %>%
 
@@ -820,7 +783,7 @@ test_that("DC/CD transitions without size-dependence work", {
       name    = 'stay_sprout',
       formula = a * (1-b),
       family  = "DD",
-      data_list     = data_list, states  = list(c('size')),
+      data_list     = data_list, states  = list(c('size', "sprout")),
       evict_cor = FALSE
     ) %>%
 
@@ -830,30 +793,20 @@ test_that("DC/CD transitions without size-dependence work", {
       f_d           = dnorm(size_2, d_mu, d_sd),
       family        = 'DC',
       data_list     = data_list,
-      states        = list(c('size')),
+      states        = list(c('size', "sprout")),
       has_hier_effs = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'f_d')
-    ) %>%
-
-    define_k(
-      name          = "K",
-      family        = "IPM",
-      n_sprout_t_1  = stay_sprout %*% n_sprout_t  + go_sprout %*% n_size_t,
-      n_size_t_1    = leave_sprout %*% n_sprout_t + P %*% n_size_t,
-      data_list     = data_list,
-      states        = list(c('size')),
-      has_hier_effs = FALSE
     )
 
   general_ipm <- general_ipm %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c("P", "go_sprout", "stay_sprout", "leave_sprout", "K"),
-        int_rule     = c(rep("midpoint", 5)),
-        dom_start    = c('size', "size", NA_character_, NA_character_, "size"),
-        dom_end      = c('size', NA_character_, NA_character_, 'size', 'size')
+        kernel_names = c("P", "go_sprout", "stay_sprout", "leave_sprout"),
+        int_rule     = c(rep("midpoint", 4)),
+        state_start    = c('size', "size", "sprout", "sprout"),
+        state_end      = c('size',"sprout", "sprout", 'size')
       )
     )
 

@@ -16,6 +16,7 @@
   bw = FALSE,
   do_contour = FALSE,
   do_legend = FALSE,
+  canvas_dims,
   ...
 )
 
@@ -23,7 +24,6 @@
   x = NULL,
   y = NULL,
   ipm = NULL,
-  sub_kernels = FALSE,
   col = rainbow(100, start = 0.67, end = 0),
   bw = FALSE,
   do_contour = FALSE,
@@ -36,7 +36,6 @@
   x = NULL,
   y = NULL,
   ipm = NULL,
-  sub_kernels = FALSE,
   col = rainbow(100, start = 0.67, end = 0),
   bw = FALSE,
   do_contour = FALSE,
@@ -49,7 +48,6 @@
   x = NULL,
   y = NULL,
   ipm = NULL,
-  sub_kernels = FALSE,
   col = rainbow(100, start = 0.67, end = 0),
   bw = FALSE,
   do_contour = FALSE,
@@ -88,8 +86,6 @@ on the plot}
 \item{do_legend}{A logical indicating whether to draw a legend for the plot}
 
 \item{...}{further arguments passed to legend}
-
-\item{sub_kernels}{A logical - also plot the sub-kernels?}
 
 \item{exponent}{The exponent to raise each kernel to. Setting this to a low
 number can help visualize kernels that are overwhelmed by a few very large numbers.}

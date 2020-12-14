@@ -40,20 +40,13 @@ x <- init_ipm('simple_dd_det') %>%
                 data_list = data_list,
                 states = state_list,
                 evict_cor = TRUE,
-                evict_fun = truncated_distributions("norm", "f_d")) %>%
-  define_k(name = 'K',
-           family = "IPM",
-           K = P + F,
-           n_dbh_t_1 = K %*% n_dbh_t,
-           data_list = list(),
-           states = state_list,
-           evict_cor = FALSE) %>%
+                evict_fun = truncated_distributions("norm", "f_d"))  %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P","F", "K"),
-      int_rule = rep("midpoint",3),
-      dom_start = rep("dbh", 3),
-      dom_end   = rep("dbh", 3)
+      kernel_names = c("P","F"),
+      int_rule = rep("midpoint",2),
+      state_start = rep("dbh", 2),
+      state_end   = rep("dbh", 2)
     )
   ) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
@@ -181,7 +174,7 @@ state_list <- list(c("dbh"))
 
 x_sub <- init_ipm('simple_dd_det') %>%
   define_kernel("P",
-                formula = s * g, # make helper for double transposes
+                formula = s * g,
                 family = "CC",
                 s = plogis(s_int + s_slope * dbh_1 + dd_slope * sum(n_dbh_t[51:100]) * d_dbh),
                 g = dnorm(dbh_2, mu_g, sd_g),
@@ -204,19 +197,12 @@ x_sub <- init_ipm('simple_dd_det') %>%
                 states = state_list,
                 evict_cor = TRUE,
                 evict_fun = truncated_distributions("norm", "f_d")) %>%
-  define_k(name = 'K',
-           family = "IPM",
-           K = P + F,
-           n_dbh_t_1 = K %*% n_dbh_t,
-           data_list = list(),
-           states = state_list,
-           evict_cor = FALSE) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P","F", "K"),
-      int_rule = rep("midpoint",3),
-      dom_start = rep("dbh", 3),
-      dom_end   = rep("dbh", 3)
+      kernel_names = c("P","F"),
+      int_rule = rep("midpoint", 2),
+      state_start = rep("dbh", 2),
+      state_end   = rep("dbh", 2)
     )
   ) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
@@ -312,243 +298,6 @@ test_that("asymptotic behavior is preserved at every time step (subsetted models
 
 
 
-# Rees + Rose density dependent weevil infestation model. Here,
-# we rebuild that to make sure we're reproducing that behavior.
-# Consider adding to DD vignette
-
-m_par <- c(
-  ## herbivory intercept
-  weevil_int  = -17
-)
-
-## Growth function, pdf of size z1 given size z
-G_z1z <- function(z1, z, m_par) {
-
-  mu         <- 0.83 + 0.69 * z
-  sig        <- sqrt(0.19)
-  p.den.grow <- dnorm(z1, mean = mu, sd = sig)
-
-  return(p.den.grow)
-}
-
-## Survival function, logistic regression
-
-s_z <- function(z, m_par) {
-  linear.p <- -0.62 + 0.85 * z
-  p        <- plogis(linear.p)
-  return(p)
-}
-
-## Probability of flowering function, logistic regression
-p_bz <- function(z, m_par) {
-
-  linear.p <- -10.22 + 4.25 * z
-  p        <- plogis(linear.p)
-
-  return(p)
-}
-
-## Seed production function of a size z plant, taking into account
-## size dependent mean weevil load and negative exponential distribution
-## of weevils. See Rose et al. (2005) Appendix, Ecological Archives E086-022-A1
-
-b_z <- function(z, m_par) {
-
-  eps <- exp(m_par["weevil_int"] + 1.71 * z);
-  N   <- exp(-0.55 + 2.02 * z) / ((1 + eps / 16) ^ 0.32)
-
-  return(N)
-}
-
-## Recruit size distribution
-c_0z1 <- function(z1, m_par) {
-
-  pRecr <- dnorm(z1, mean = 0.75, sd = sqrt(0.17))
-
-  return(pRecr)
-}
-
-## Define the survival kernel function
-P_z1z <- function (z1, z, m_par) {
-
-  return((1 - p_bz(z, m_par)) * s_z(z, m_par) * G_z1z(z1, z, m_par))
-
-}
-
-## Define the total recruitment function
-B_z <- function (z, m_par) {
-
-  return( p_bz(z, m_par) * b_z(z, m_par) )
-
-}
-
-mk_P <- function(m, m_par, L, U) {
-
-  h       <- (U - L)/m
-  meshpts <- L + ((1:m) - 1/2) * h
-
-  P       <- h * (outer(meshpts, meshpts, P_z1z, m_par = m_par))
-
-  return(list(meshpts = meshpts, P = P))
-}
-
-## Function to iterate the IPM using midpoint rule
-## with mesh points meshpts
-Iterate <- function(nt,meshpts,P,m_par) {
-
-  h        <- meshpts[2] - meshpts[1]
-  N        <- h*sum(nt * B_z(meshpts,m_par))
-  recruits <- c_0z1(meshpts,m_par) * (N ^ 0.67)
-
-  return(recruits + P %*% nt)
-
-}
-
-
-weevilLoad <- function(nt, meshpts, m.par) {
-
-  nFlower <- h * sum(nt * p_bz(meshpts))
-  eps     <- exp(m_par["weevil_int"] + 1.71 * meshpts)
-  nWeevil <- h * sum(nt * p_bz(meshpts) * eps)
-
-  return(nWeevil/nFlower)
-
-}
-
-int <- numeric(5L)
-int[1] <- mean (c(-17.3,-17,-16.7))
-int[2] <- mean (c(-3.74,-3.39,-2.81))
-int[3] <- mean(c(-1.64,-0.96,-0.75))
-int[4] <- mean(c(-1.24,-0.52))
-int[5] <- 1.5; # beyond the range of the data
-
-
-m_par["weevil_int"] <- int[1]
-
-L <- -1.5
-U <- 4.5
-n <- 200
-
-n_size <- matrix(1, n, 201)
-
-consts  <- mk_P(n, m_par, L, U)
-P       <- consts$P
-mesh_pts <- consts$meshpts
-h        <- mesh_pts[2] - mesh_pts[1]
-
-for(i in seq_len(n)) {
-
-  n_size[ ,(i + 1)] <- Iterate(n_size[ , i],
-                              mesh_pts,
-                              P,
-                              m_par)
-
-}
-
-hand_pop_sizes <- colSums(n_size)
-hand_lam       <- hand_pop_sizes[2:201] / hand_pop_sizes[1:200]
-
-# IPMR constants
-
-data_list <- list(
-  g_int        = 0.83,
-  g_slope      = 0.69,
-  g_sd         = sqrt(0.19),
-  s_int        = -0.62,
-  s_slope      = 0.85,
-  p_b_int      = -10.22,
-  p_b_slope    = 4.25,
-  weevil_slope = 1.71,
-  f_s_int      = -0.55,
-  f_s_slope    = 2.02,
-  f_s_exp      = 0.32,
-  recr_mu      = 0.75,
-  recr_sd      = sqrt(0.17)
-)
-
-weevil_ints <- as.list(int) %>%
-  setNames(
-    paste("weevil_int_", 1:5, sep = "")
-  )
-
-data_list <- c(data_list, weevil_ints)
-
-weevil_ipm <- init_ipm("simple_dd_det") %>%
-  define_kernel(
-    name      = "P",
-    formula   = s * (1-p_b) * g,
-    family    = "CC",
-    s         = plogis(s_int + s_slope * z_1),
-    g_mu      = g_int + g_slope * z_1,
-    g         = dnorm(z_2, g_mu, g_sd),
-    p_b       = plogis(p_b_int + p_b_slope * z_1),
-    data_list = data_list,
-    states    = list(c("z")),
-    evict_cor = FALSE,
-    integrate = TRUE
-  ) %>%
-  define_kernel(
-    name       = "F",
-    formula    = c_0 * N,
-    family     = "CC",
-    c_0        = dnorm(z_2, recr_mu, recr_sd),
-    N          = (d_z * sum(n_z_t * B_z)) ^ 0.67,
-    B_z        = p_b * b_z,
-    p_b        = plogis(p_b_int + p_b_slope * z_1),
-    b_z        = exp(f_s_int + f_s_slope * z_1) / ((1 + e_z/16) ^ (f_s_exp)),
-    e_z        = exp(weevil_int + weevil_slope * z_1),
-    weevil_int = weevil_int_1,
-    data_list  = data_list,
-    states     = list(c("z")),
-    evict_cor  = FALSE,
-    integrate  = FALSE
-  ) %>%
-  define_k(
-    name      = "K",
-    family    = "IPM",
-    F_1       = F[ , 1],
-    n_z_t_1   = P %*% n_z_t + F_1,
-    data_list = data_list,
-    states    = list(c("z")),
-    evict_cor = FALSE
-  ) %>%
-  define_impl(
-    make_impl_args_list(
-      c("P", "F", "K"),
-      rep("midpoint",3),
-      rep("z",3),
-      rep("z", 3)
-    )
-  ) %>%
-  define_domains(
-    z = c(L, U, n)
-  ) %>%
-  define_pop_state(
-    pop_vectors = list(
-      n_z = n_size[ , 1]
-    )
-  ) %>%
-  make_ipm(
-    iterate = TRUE,
-    iterations = 200,
-    normalize_pop_size = FALSE,
-    report_progress = TRUE
-  )
-
-
-ipmr_lam       <- as.vector(weevil_ipm$pop_state$lambda)
-ipmr_pop_sizes <- colSums(weevil_ipm$pop_state$n_z)
-
-test_that("recover population dynamics from weevil-thistle IPM", {
-
-  expect_equal(ipmr_lam, hand_lam)
-  expect_equal(ipmr_pop_sizes, hand_pop_sizes)
-
-})
-
-
-
-
 # hierarachical density dependent models ----------
 
 data_list = list(s_int = 2.2,
@@ -582,9 +331,6 @@ hier_mod <- init_ipm('simple_dd_det') %>%
                 g_yr = dnorm(dbh_2, mu_g_yr, sd_g),
                 mu_g_yr = g_int + g_int_yr + g_slope * dbh_1,
                 data_list = data_list,
-
-                # split out implementation details into a separate
-                # function - named lists??
                 states = state_list,
                 has_hier_effs = TRUE,
                 levels_hier_effs = list(yr = 1:3),
@@ -602,21 +348,12 @@ hier_mod <- init_ipm('simple_dd_det') %>%
                 levels_hier_effs = list(yr = 1:3),
                 evict_cor = TRUE,
                 evict_fun = truncated_distributions("norm", "f_d")) %>%
-  define_k(name = 'K_yr',
-           family = "IPM",
-           K_yr = P_yr + F_yr,
-           n_dbh_yr_t_1 = K_yr %*% n_dbh_yr_t,
-           data_list = list(),
-           states = state_list,
-           has_hier_effs = TRUE,
-           levels_hier_effs = list(yr = 1:3),
-           evict_cor = FALSE) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P_yr","F_yr", "K_yr"),
-      int_rule = rep("midpoint",3),
-      dom_start = rep("dbh", 3),
-      dom_end   = rep("dbh", 3)
+      kernel_names = c("P_yr","F_yr"),
+      int_rule = rep("midpoint",2),
+      state_start = rep("dbh", 2),
+      state_end   = rep("dbh", 2)
     )
   ) %>%
   define_domains(dbh = c(0, 50, 100)) %>%

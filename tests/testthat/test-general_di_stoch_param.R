@@ -226,7 +226,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     gamma_nd  = dnorm(ln_leaf_l_2, dc_nr_int, dc_nr_sd),
 
     data_list = fixed_params,
-    states    = list(c('ln_leaf_l')),
+    states    = list(c('ln_leaf_l', "d")),
 
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
@@ -265,7 +265,7 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     sig_n            = inv_logit(nr_s_z_int, nr_s_z_b, ln_leaf_l_1),
     mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
     data_list        = fixed_params,
-    states           = list(c('ln_leaf_l')),
+    states           = list(c('ln_leaf_l', "d")),
     has_hier_effs    = FALSE,
     evict_cor        = FALSE
   ) %>%
@@ -276,44 +276,29 @@ gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
     sig_r            = inv_logit(ra_s_z_int, ra_s_z_b, sqrt_area_1),
     mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
     data_list        = fixed_params,
-    states           = list(c('sqrt_area')),
+    states           = list(c('sqrt_area', "d")),
     has_hier_effs    = FALSE,
     evict_cor        = FALSE
-  ) %>%
-  define_k(
-    name = 'K',
-    n_ln_leaf_l_t_1 = k_xx %*% n_ln_leaf_l_t +
-                      k_zx %*% n_sqrt_area_t +
-                      k_dx %*% n_d_t,
-    n_sqrt_area_t_1 = k_xz %*% n_ln_leaf_l_t,
-    n_d_t_1         = k_xd %*% n_ln_leaf_l_t +
-                      k_zd %*% n_sqrt_area_t,
-    family = 'IPM',
-    data_list = fixed_params,
-    states    = list(c('sqrt_area', 'ln_leaf_l'))
   ) %>%
   define_impl(
     make_impl_args_list(
       kernel_names = c(paste('k_',
                              c('xx',
                                'zx', 'dx', 'xz', 'xd', 'zd'),
-                             sep = ""),
-                       'K'),
-      int_rule     = rep('midpoint', 7),
-      dom_start    = c('ln_leaf_l',
+                             sep = "")),
+      int_rule     = rep('midpoint', 6),
+      state_start    = c('ln_leaf_l',
                        'sqrt_area',
-                       NA_character_,
+                       "d",
                        'ln_leaf_l',
                        'ln_leaf_l',
-                       'sqrt_area',
-                       NA_character_),
-      dom_end      = c('ln_leaf_l',
+                       'sqrt_area'),
+      state_end      = c('ln_leaf_l',
                        'ln_leaf_l',
                        'ln_leaf_l',
                        'sqrt_area',
-                       NA_character_,
-                       NA_character_,
-                       NA_character_)
+                       "d",
+                       "d")
     )
   ) %>%
   define_domains(
@@ -807,7 +792,7 @@ test_that('normalize_pop_vec works', {
       gamma_nd  = dnorm(ln_leaf_l_2, dc_nr_int, dc_nr_sd),
 
       data_list = fixed_params,
-      states    = list(c('ln_leaf_l')),
+      states    = list(c('ln_leaf_l', "d")),
 
       has_hier_effs = FALSE,
       evict_cor     = TRUE,
@@ -846,7 +831,7 @@ test_that('normalize_pop_vec works', {
       sig_n            = inv_logit(nr_s_z_int, nr_s_z_b, ln_leaf_l_1),
       mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
       data_list        = fixed_params,
-      states           = list(c('ln_leaf_l')),
+      states           = list(c('ln_leaf_l', "d")),
       has_hier_effs    = FALSE,
       evict_cor        = FALSE
     ) %>%
@@ -857,44 +842,29 @@ test_that('normalize_pop_vec works', {
       sig_r            = inv_logit(ra_s_z_int, ra_s_z_b, sqrt_area_1),
       mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
       data_list        = fixed_params,
-      states           = list(c('sqrt_area')),
+      states           = list(c('sqrt_area', "d")),
       has_hier_effs    = FALSE,
       evict_cor        = FALSE
-    ) %>%
-    define_k(
-      name = 'K',
-      n_ln_leaf_l_t_1 = k_xx %*% n_ln_leaf_l_t +
-        k_zx %*% n_sqrt_area_t +
-        k_dx %*% n_d_t,
-      n_sqrt_area_t_1 = k_xz %*% n_ln_leaf_l_t,
-      n_d_t_1         = k_xd %*% n_ln_leaf_l_t +
-        k_zd %*% n_sqrt_area_t,
-      family = 'IPM',
-      data_list = fixed_params,
-      states    = list(c('sqrt_area', 'ln_leaf_l'))
     ) %>%
     define_impl(
       make_impl_args_list(
         kernel_names = c(paste('k_',
                                c('xx',
                                  'zx', 'dx', 'xz', 'xd', 'zd'),
-                               sep = ""),
-                         'K'),
-        int_rule     = rep('midpoint', 7),
-        dom_start    = c('ln_leaf_l',
+                               sep = "")),
+        int_rule     = rep('midpoint', 6),
+        state_start    = c('ln_leaf_l',
                          'sqrt_area',
-                         NA_character_,
+                         "d",
                          'ln_leaf_l',
                          'ln_leaf_l',
-                         'sqrt_area',
-                         NA_character_),
-        dom_end      = c('ln_leaf_l',
+                         'sqrt_area'),
+        state_end      = c('ln_leaf_l',
                          'ln_leaf_l',
                          'ln_leaf_l',
                          'sqrt_area',
-                         NA_character_,
-                         NA_character_,
-                         NA_character_)
+                         "d",
+                         "d")
       )
     ) %>%
     define_domains(
@@ -968,7 +938,7 @@ test_that('normalize_pop_vec works', {
     kerns_temp        <- temp$kernels
     lambdas           <- temp$lambdas
     names(kerns_temp) <- paste(names(kerns_temp), i, sep = '_')
-    kernel_holder     <- splice(kernel_holder, kerns_temp)
+    kernel_holder     <- c(kernel_holder, kerns_temp)
 
   }
 
@@ -1055,7 +1025,7 @@ test_that("t variable works as advertised", {
       gamma_nd  = dnorm(ln_leaf_l_2, dc_nr_int, dc_nr_sd),
 
       data_list = fixed_params,
-      states    = list(c('ln_leaf_l')),
+      states    = list(c('ln_leaf_l', "d")),
 
       has_hier_effs = FALSE,
       evict_cor     = TRUE,
@@ -1094,7 +1064,7 @@ test_that("t variable works as advertised", {
       sig_n            = inv_logit(nr_s_z_int, nr_s_z_b, ln_leaf_l_1),
       mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
       data_list        = fixed_params,
-      states           = list(c('ln_leaf_l')),
+      states           = list(c('ln_leaf_l', "d")),
       has_hier_effs    = FALSE,
       evict_cor        = FALSE
     ) %>%
@@ -1105,44 +1075,29 @@ test_that("t variable works as advertised", {
       sig_r            = inv_logit(ra_s_z_int, ra_s_z_b, sqrt_area_1),
       mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
       data_list        = fixed_params,
-      states           = list(c('sqrt_area')),
+      states           = list(c('sqrt_area', "d")),
       has_hier_effs    = FALSE,
       evict_cor        = FALSE
-    ) %>%
-    define_k(
-      name = 'K',
-      n_ln_leaf_l_t_1 = k_xx %*% n_ln_leaf_l_t +
-        k_zx %*% n_sqrt_area_t +
-        k_dx %*% n_d_t,
-      n_sqrt_area_t_1 = k_xz %*% n_ln_leaf_l_t,
-      n_d_t_1         = k_xd %*% n_ln_leaf_l_t +
-        k_zd %*% n_sqrt_area_t,
-      family = 'IPM',
-      data_list = fixed_params,
-      states    = list(c('sqrt_area', 'ln_leaf_l'))
     ) %>%
     define_impl(
       make_impl_args_list(
         kernel_names = c(paste('k_',
                                c('xx',
                                  'zx', 'dx', 'xz', 'xd', 'zd'),
-                               sep = ""),
-                         'K'),
-        int_rule     = rep('midpoint', 7),
-        dom_start    = c('ln_leaf_l',
+                               sep = "")),
+        int_rule     = rep('midpoint', 6),
+        state_start    = c('ln_leaf_l',
                          'sqrt_area',
-                         NA_character_,
+                         "d",
                          'ln_leaf_l',
                          'ln_leaf_l',
-                         'sqrt_area',
-                         NA_character_),
-        dom_end      = c('ln_leaf_l',
+                         'sqrt_area'),
+        state_end      = c('ln_leaf_l',
                          'ln_leaf_l',
                          'ln_leaf_l',
                          'sqrt_area',
-                         NA_character_,
-                         NA_character_,
-                         NA_character_)
+                         "d",
+                         "d")
       )
     ) %>%
     define_domains(
@@ -1251,7 +1206,7 @@ test_that("t variable works as advertised", {
       gamma_nd  = dnorm(ln_leaf_l_2, dc_nr_int, dc_nr_sd),
 
       data_list = fixed_params,
-      states    = list(c('ln_leaf_l')),
+      states    = list(c('ln_leaf_l', 'd')),
 
       has_hier_effs = FALSE,
       evict_cor     = TRUE,
@@ -1290,7 +1245,7 @@ test_that("t variable works as advertised", {
       sig_n            = inv_logit(nr_s_z_int, nr_s_z_b, ln_leaf_l_1),
       mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
       data_list        = fixed_params,
-      states           = list(c('ln_leaf_l')),
+      states           = list(c('ln_leaf_l', 'd')),
       has_hier_effs    = FALSE,
       evict_cor        = FALSE
     ) %>%
@@ -1301,44 +1256,29 @@ test_that("t variable works as advertised", {
       sig_r            = inv_logit(ra_s_z_int, ra_s_z_b, sqrt_area_1),
       mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
       data_list        = fixed_params,
-      states           = list(c('sqrt_area')),
+      states           = list(c('sqrt_area', 'd')),
       has_hier_effs    = FALSE,
       evict_cor        = FALSE
-    ) %>%
-    define_k(
-      name = 'K',
-      n_ln_leaf_l_t_1 = k_xx %*% n_ln_leaf_l_t +
-        k_zx %*% n_sqrt_area_t +
-        k_dx %*% n_d_t,
-      n_sqrt_area_t_1 = k_xz %*% n_ln_leaf_l_t,
-      n_d_t_1         = k_xd %*% n_ln_leaf_l_t +
-        k_zd %*% n_sqrt_area_t,
-      family = 'IPM',
-      data_list = fixed_params,
-      states    = list(c('sqrt_area', 'ln_leaf_l'))
     ) %>%
     define_impl(
       make_impl_args_list(
         kernel_names = c(paste('k_',
                                c('xx',
                                  'zx', 'dx', 'xz', 'xd', 'zd'),
-                               sep = ""),
-                         'K'),
-        int_rule     = rep('midpoint', 7),
-        dom_start    = c('ln_leaf_l',
+                               sep = "")),
+        int_rule     = rep('midpoint', 6),
+        state_start    = c('ln_leaf_l',
                          'sqrt_area',
-                         NA_character_,
+                         'd',
                          'ln_leaf_l',
                          'ln_leaf_l',
-                         'sqrt_area',
-                         NA_character_),
-        dom_end      = c('ln_leaf_l',
+                         'sqrt_area'),
+        state_end      = c('ln_leaf_l',
                          'ln_leaf_l',
                          'ln_leaf_l',
                          'sqrt_area',
-                         NA_character_,
-                         NA_character_,
-                         NA_character_)
+                         'd',
+                         'd')
       )
     ) %>%
     define_domains(
@@ -1452,7 +1392,7 @@ test_that("Hierarchical effects work in parameter re-sampled model", {
       gamma_nd  = dnorm(ln_leaf_l_2, dc_nr_int, dc_nr_sd),
 
       data_list = fixed_params,
-      states    = list(c('ln_leaf_l')),
+      states    = list(c('ln_leaf_l', 'd')),
 
       has_hier_effs = FALSE,
       evict_cor     = TRUE,
@@ -1494,7 +1434,7 @@ test_that("Hierarchical effects work in parameter re-sampled model", {
       nr_s_z_int       = nr_s_z_int_site + nr_s_z_int_fixed,
       mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
       data_list        = fixed_params,
-      states           = list(c('ln_leaf_l')),
+      states           = list(c('ln_leaf_l', 'd')),
       has_hier_effs    = TRUE,
       levels_hier_effs = list(site = 1:5),
       evict_cor        = FALSE
@@ -1506,46 +1446,29 @@ test_that("Hierarchical effects work in parameter re-sampled model", {
       sig_r            = inv_logit(ra_s_z_int, ra_s_z_b, sqrt_area_1),
       mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
       data_list        = fixed_params,
-      states           = list(c('sqrt_area')),
+      states           = list(c('sqrt_area', 'd')),
       has_hier_effs    = FALSE,
       evict_cor        = FALSE
-    ) %>%
-    define_k(
-      name = 'K_site',
-      n_ln_leaf_l_t_1 = k_xx_site %*% n_ln_leaf_l_t +
-        k_zx %*% n_sqrt_area_t +
-        k_dx %*% n_d_t,
-      n_sqrt_area_t_1 = k_xz_site %*% n_ln_leaf_l_t,
-      n_d_t_1         = k_xd_site %*% n_ln_leaf_l_t +
-        k_zd %*% n_sqrt_area_t,
-      family = 'IPM',
-      data_list = fixed_params,
-      has_hier_effs = TRUE,
-      levels_hier_effs = list(site = 1:5),
-      states    = list(c('sqrt_area', 'ln_leaf_l'))
     ) %>%
     define_impl(
       make_impl_args_list(
         kernel_names = c(paste('k_',
                                c('xx_site',
                                  'zx', 'dx', 'xz_site', 'xd_site', 'zd'),
-                               sep = ""),
-                         'K_site'),
-        int_rule     = rep('midpoint', 7),
-        dom_start    = c('ln_leaf_l',
+                               sep = "")),
+        int_rule     = rep('midpoint', 6),
+        state_start    = c('ln_leaf_l',
                          'sqrt_area',
-                         NA_character_,
+                         'd',
                          'ln_leaf_l',
                          'ln_leaf_l',
-                         'sqrt_area',
-                         NA_character_),
-        dom_end      = c('ln_leaf_l',
+                         'sqrt_area'),
+        state_end      = c('ln_leaf_l',
                          'ln_leaf_l',
                          'ln_leaf_l',
                          'sqrt_area',
-                         NA_character_,
-                         NA_character_,
-                         NA_character_)
+                         'd',
+                         'd')
       )
     ) %>%
     define_domains(

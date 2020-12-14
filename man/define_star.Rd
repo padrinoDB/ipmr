@@ -11,7 +11,7 @@
 \usage{
 define_impl(proto_ipm, kernel_impl_list)
 
-make_impl_args_list(kernel_names, int_rule, dom_start, dom_end, ...)
+make_impl_args_list(kernel_names, int_rule, state_start, state_end, ...)
 
 define_domains(proto_ipm, ...)
 
@@ -34,9 +34,9 @@ that parameters are being defined for.}
 \item{int_rule}{The integration rule to be used for the kernel. The default is
 "midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.}
 
-\item{dom_start}{The name of the state variable for the kernel at time \emph{t}.}
+\item{state_start}{The name of the state variable for the kernel at time \emph{t}.}
 
-\item{dom_end}{The name of the state variable for the kernel at time \emph{t+1}.
+\item{state_end}{The name of the state variable for the kernel at time \emph{t+1}.
 This is usually the same as \code{dom_start}, but general IPMs
 with discrete states or IPMs that move from one state to another (e.g. tree
 seedling going from a height domain at \emph{t} to a DBH domain at \emph{t+1})

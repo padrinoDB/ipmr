@@ -72,16 +72,17 @@ K <- matrix(K, nrow = 100, ncol = 100, byrow = TRUE)
 
 lambda <- Re(eigen(K)$values[1])
 w <- Re(eigen(K)$vectors[ , 1])
+w <- w / sum(w)
 
 
 inv_logit <- function(int, slope, sv) {
   return(1/(1 + exp(-(int + slope * sv))))
 }
 
-impl_args <- make_impl_args_list(c('P', 'F', 'K'),
-                                 int_rule = rep('midpoint', 3),
-                                 dom_start = rep('dbh', 3),
-                                 dom_end = rep('dbh', 3))
+impl_args <- make_impl_args_list(c('P', 'F'),
+                                 int_rule = rep('midpoint', 2),
+                                 state_start = rep('dbh', 2),
+                                 state_end = rep('dbh', 2))
 
 states <- c('dbh', 'dbh')
 
@@ -110,21 +111,19 @@ x <- init_ipm('simple_di_det') %>%
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
   ) %>%
-  define_k('K',
-           K = P + F,
-           family = 'IPM',
-           data_list = list(),
-           states = states,
-           evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
+  define_pop_state(n_dbh = runif(100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit),
-           normalize_pop_size = FALSE)
+           normalize_pop_size = FALSE,
+           iterate = TRUE,
+           iterations = 200)
 
-K_ipmr <- x$iterators$K
 
-lambda_ipmr <- Re(eigen(K_ipmr)$values[1])
-w_ipmr <- Re(eigen(K_ipmr)$vectors[ , 1])
+lambda_ipmr <- lambda(x)
+w_ipmr <- x$pop_state$n_dbh[ , 201] / sum(x$pop_state$n_dbh[ , 201])
+
+init_pop_vec <- x$pop_state$n_dbh[ , 1]
 
 
 test_that('lambdas are equal', {
@@ -134,7 +133,6 @@ test_that('lambdas are equal', {
 
 test_that('classes are correctly set', {
 
-  expect_s3_class(x$iterators$K, 'ipmr_matrix')
   expect_s3_class(x$sub_kernels$P, 'ipmr_matrix')
   expect_s3_class(x$sub_kernels$F, 'ipmr_matrix')
   expect_s3_class(x, 'simple_di_det_ipm')
@@ -148,10 +146,10 @@ test_that('define_impl() can handle mismatched argument lengths', {
     test_impl <- x$proto_ipm %>%
       define_impl(
         make_impl_args_list(
-          kernel_names = c('K', 'P', "F"),
+          kernel_names = c('P', "F"),
           int_rule     = 'midpoint',
-          dom_start    = rep('dbh', 3),
-          dom_end      = rep('dbh', 3)
+          state_start    = rep('dbh', 2),
+          state_end      = rep('dbh', 2)
         )
       ) %>%
       define_domains(dbh = c(0, 50, 100)) %>%
@@ -166,17 +164,17 @@ test_that('define_impl() can handle mismatched argument lengths', {
     test_impl <- x$proto_ipm %>%
       define_impl(
         make_impl_args_list(
-          kernel_names = c('K', 'P', "F"),
-          int_rule     = rep('midpoint',3),
-          dom_start    = rep('dbh', 3),
-          dom_end      = 'dbh'
+          kernel_names = c('P', "F"),
+          int_rule     = rep('midpoint', 2),
+          state_start    = rep('dbh', 2),
+          state_end      = 'dbh'
         )
       ) %>%
       define_domains(dbh = c(0, 50, 100)) %>%
       make_ipm(usr_funs = list(inv_logit = inv_logit),
                normalize_pop_size = FALSE),
 
-    regexp = "Assuming that all kernels are implemented with the same 'dom_end'."
+    regexp = "Assuming that all kernels are implemented with the same 'state_end'."
 
   )
 
@@ -184,21 +182,23 @@ test_that('define_impl() can handle mismatched argument lengths', {
     test_impl <- x$proto_ipm %>%
       define_impl(
         make_impl_args_list(
-          kernel_names = c('K', 'P', "F"),
-          int_rule     = rep('midpoint', 3),
-          dom_start    = 'dbh',
-          dom_end      = rep('dbh', 3)
+          kernel_names = c('P', "F"),
+          int_rule     = rep('midpoint', 2),
+          state_start    = 'dbh',
+          state_end      = rep('dbh', 2)
         )
       ) %>%
       define_domains(dbh = c(0, 50, 100)) %>%
       make_ipm(usr_funs = list(inv_logit = inv_logit),
-               normalize_pop_size = FALSE),
+               normalize_pop_size = FALSE,
+               iterate = TRUE,
+               iterations = 100),
 
-    regexp = "Assuming that all kernels are implemented with the same 'dom_start'."
+    regexp = "Assuming that all kernels are implemented with the same 'state_start'."
 
   )
 
-  test_impl_lambda <- Re(eigen(test_impl$iterators$K)$values[1])
+  test_impl_lambda <- lambda(test_impl)
 
   expect_equal(test_impl_lambda, lambda_ipmr, tolerance = 1e-10)
 
@@ -232,73 +232,23 @@ test_that("order of kernel_definition doesn't matter", {
                   evict_fun = truncated_distributions('norm',
                                                       'g')
     ) %>%
-    define_k('K',
-             K = P + F,
-             family = 'IPM',
-             data_list = list(),
-             states = states,
-             evict_cor = FALSE) %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c('F', 'P', "K"),
-        int_rule = rep('midpoint', 3),
-        dom_start = rep('dbh', 3),
-        dom_end   = rep('dbh', 3)
-      )) %>%
-    define_domains(dbh = c(0, 50, 100)) %>%
-    make_ipm(usr_funs = list(inv_logit = inv_logit),
-             normalize_pop_size = FALSE)
-
-  lambda_out_of_order <- Re(eigen(y$iterators$K)$values[1])
-
-  expect_equal(lambda_ipmr, lambda_out_of_order)
-
-  y <- init_ipm('simple_di_det') %>%
-    define_k('K',
-             K = P + F,
-             family = 'IPM',
-             data_list = list(),
-             states = states,
-             evict_cor = FALSE) %>%
-    define_kernel('F',
-                  formula = f_r * f_s * f_d,
-                  family = 'CC',
-                  f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
-                  f_s = exp(f_s_int + f_s_slope * dbh_1),
-                  f_d = dnorm(dbh_2, mu_fd, sd_fd),
-                  data_list = data_list,
-                  states = states,
-                  evict_cor = TRUE,
-                  evict_fun = truncated_distributions('norm',
-                                                      'f_d')
-    ) %>%
-    define_kernel("P",
-                  formula = s * g,
-                  family = "CC",
-                  s = inv_logit(s_int, s_slope, dbh_1),
-                  g = dnorm(dbh_2, mu_g, sd_g),
-                  mu_g = g_int + g_slope * dbh_1,
-                  data_list = data_list,
-                  states = states,
-                  evict_cor = TRUE,
-                  evict_fun = truncated_distributions('norm',
-                                                      'g')
-    )  %>%
-    define_impl(
-      make_impl_args_list(
-        kernel_names = c('K', 'F', 'P'),
-        int_rule = rep('midpoint', 3),
-        dom_start = rep('dbh', 3),
-        dom_end   = rep('dbh', 3)
+        kernel_names = c('F', 'P'),
+        int_rule = rep('midpoint', 2),
+        state_start = rep('dbh', 2),
+        state_end   = rep('dbh', 2)
       )
     ) %>%
     define_domains(dbh = c(0, 50, 100)) %>%
+    define_pop_state(n_dbh = init_pop_vec) %>%
     make_ipm(usr_funs = list(inv_logit = inv_logit),
-             normalize_pop_size = FALSE)
+             normalize_pop_size = FALSE,
+             iterate = TRUE)
 
-  lambda_out_of_order_2 <- Re(eigen(y$iterators$K)$values[1])
+  lambda_out_of_order <- lambda(y)
 
-  expect_equal(lambda_ipmr, lambda_out_of_order_2)
+  expect_equal(lambda_ipmr, lambda_out_of_order)
 
 })
 
@@ -330,13 +280,6 @@ test_that('iteration methods work the same as eigenvalue methods', {
                   evict_fun = truncated_distributions('norm',
                                                       'f_d')
     ) %>%
-    define_k('K',
-             K = P + F,
-             n_dbh_t_1 = K %*% n_dbh_t,
-             family = 'IPM',
-             data_list = list(),
-             states = states,
-             evict_cor = FALSE) %>%
     define_impl(impl_args) %>%
     define_pop_state(
       n_dbh = runif(100)
@@ -347,8 +290,10 @@ test_that('iteration methods work the same as eigenvalue methods', {
              iterations = 100,
              normalize_pop_size = FALSE)
 
+  K <- it$sub_kernels$F + it$sub_kernels$P
+
   lambda_it <- lambda(it, comp_method = 'pop_size')
-  lambda_eig <- lambda(it, comp_method = 'eigen')
+  lambda_eig <- Re(eigen(K)$values[1])
   names(lambda_eig) <- NULL
   names(lambda_it)  <- NULL
 
@@ -387,13 +332,6 @@ test_that('normalizing pop vector produces same lambdas as eigen methods', {
                   evict_fun = truncated_distributions('norm',
                                                       'f_d')
     ) %>%
-    define_k('K',
-             K = P + F,
-             n_dbh_t_1 = K %*% n_dbh_t,
-             family = 'IPM',
-             data_list = list(),
-             states = states,
-             evict_cor = FALSE) %>%
     define_impl(impl_args) %>%
     define_pop_state(
       n_dbh = runif(100)
@@ -404,8 +342,10 @@ test_that('normalizing pop vector produces same lambdas as eigen methods', {
              iterations = 100,
              normalize_pop_size = TRUE)
 
+  K <- it$sub_kernels$F + it$sub_kernels$P
+
   lambda_it <- lambda(it, type_lambda = 'last', comp_method = 'pop_size')
-  lambda_eig <- lambda(it, comp_method = 'eigen')
+  lambda_eig <- Re(eigen(K)$values[1])
   names(lambda_eig) <- NULL
   names(lambda_it)  <- NULL
 
@@ -559,10 +499,10 @@ names(lambdas_hand) <- paste("K_", 1:5, sep = "")
 
 states <- list(c("dbh"))
 
-impl_args <-  make_impl_args_list(c('P_yr', 'F', 'K_yr'),
-                                  int_rule = rep('midpoint', 3),
-                                  dom_start = rep('dbh', 3),
-                                  dom_end = rep('dbh', 3))
+impl_args <-  make_impl_args_list(c('P_yr', 'F'),
+                                  int_rule = rep('midpoint', 2),
+                                  state_start = rep('dbh', 2),
+                                  state_end = rep('dbh', 2))
 
 inv_logit <- function(int, slope, sv) {
 
@@ -596,15 +536,6 @@ hier_mod <- init_ipm('simple_di_det') %>%
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
   ) %>%
-  define_k('K_yr',
-           K_yr = P_yr + F,
-           n_dbh_yr_t_1 = K_yr %*% n_dbh_yr_t,
-           family = 'IPM',
-           data_list = list(),
-           states = states,
-           has_hier_effs = TRUE,
-           levels_hier_effs = list(yr = 1:5),
-           evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_pop_state(
     n_dbh_yr = runif(100)
@@ -615,14 +546,12 @@ hier_mod <- init_ipm('simple_di_det') %>%
            iterations = 100,
            normalize_pop_size = FALSE)
 
-lambdas_ipmr_eigen <- lambda(hier_mod, comp_method = 'eigen')
 lambdas_ipmr_pop   <- lambda(hier_mod, comp_method = 'pop_size')
 
 names(lambdas_ipmr_pop) <- paste("K_", 1:5, sep = "")
 
 test_that('hierarchical deterministic simulations work', {
 
-  expect_equal(lambdas_ipmr_eigen, lambdas_hand, tolerance = 1e-10)
   expect_equal(lambdas_ipmr_pop, lambdas_hand, tolerance = 1e-10)
 
 })
@@ -726,12 +655,12 @@ test_that("discrete_extrema_works for simple models", {
     return(1/(1 + exp(-(int + slope * sv))))
   }
 
-  impl_args <- make_impl_args_list(c('P', 'F', 'K'),
-                                   int_rule = rep('midpoint', 3),
-                                   dom_start = rep('dbh', 3),
-                                   dom_end = rep('dbh', 3))
+  impl_args <- make_impl_args_list(c('P', 'F'),
+                                   int_rule = rep('midpoint', 2),
+                                   state_start = rep('dbh', 2),
+                                   state_end = rep('dbh', 2))
 
-  states <- c('dbh', 'dbh')
+  states <- c('dbh')
 
   x <- init_ipm('simple_di_det') %>%
     define_kernel("P",
@@ -755,19 +684,16 @@ test_that("discrete_extrema_works for simple models", {
                   states = states,
                   evict_cor = TRUE,
                   evict_fun = discrete_extrema('f_d', "dbh")
-    ) %>%
-    define_k('K',
-             K = P + F,
-             family = 'IPM',
-             data_list = list(),
-             states = states,
-             evict_cor = FALSE) %>%
+    )  %>%
     define_impl(impl_args) %>%
     define_domains(dbh = c(0, 50, 100)) %>%
     make_ipm(usr_funs = list(inv_logit = inv_logit),
-             normalize_pop_size = FALSE)
+             normalize_pop_size = FALSE,
+             iterate = FALSE)
 
-  lambda_ipmr <- unname(lambda(x, comp_method = "eigen"))
+  K_ipmr <- do.call(`+`, x$sub_kernels)
+
+  lambda_ipmr <- Re(eigen(K_ipmr)$values[1])
 
   expect_equal(lambda, lambda_ipmr)
 

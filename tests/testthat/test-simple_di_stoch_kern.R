@@ -197,8 +197,10 @@ sys <- list(K_1 = K_1,
 
 eigen_sys <- lapply(sys, eigen)
 
-lambdas <- vapply(eigen_sys, function(x) Re(x$values[1]), numeric(1))
-ws      <- vapply(eigen_sys, function(x) Re(x$vectors[ , 1]), numeric(100))
+lambdas <- vapply(eigen_sys, function(x) Re(x$values[1]), numeric(1)) %>%
+  unname()
+ws      <- vapply(eigen_sys, function(x) Re(x$vectors[ , 1]), numeric(100)) %>%
+  unname()
 
 ## ipmr version
 
@@ -229,17 +231,9 @@ pois_r <- function(sv, int, slope, r_eff) {
   )
 }
 
-# The "model_class" argument is now changed to reflect a different model type
 
 monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
   define_kernel(
-
-    # The yr suffix is appended to the kernel name and the parameter names
-    # within each vital rate expression. ipmr substitutes in the hier_levels
-    # for each suffix occurrence, thus changing P_yr in P_1, P_2, P_3, P_4, P_5,
-    # s_yr in s_1, s_2, s_3, s_4, and s_5. s_r_yr is converted to s_r_1, s_r_2,
-    # etc. In the case of s_r_yr, provided that the names in the data_list match
-    # the expanded names, all will go well!
 
     name             = 'P_yr',
     formula          = s_yr * g_yr,
@@ -269,38 +263,39 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm', 'f_d')
   ) %>%
-  define_k(
-    name             = 'K_yr',
-    K_yr             = P_yr + F_yr,
-    family           = "IPM",
-    data_list        = params,
-    states           = list(c("ht")),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_levels
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("K_yr", "P_yr", "F_yr"),
-      int_rule     = rep("midpoint", 3),
-      dom_start    = rep("ht", 3),
-      dom_end      = rep("ht", 3)
+      kernel_names = c("P_yr", "F_yr"),
+      int_rule     = rep("midpoint", 2),
+      state_start    = rep("ht", 2),
+      state_end      = rep("ht", 2)
     )
   ) %>%
   define_domains(ht = c(0.2, 40, 100)) %>%
+  define_pop_state(n_ht = runif(100)) %>%
   make_ipm(usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_r = inv_logit_r,
                            pois_r      = pois_r),
-           normalize_pop_size = FALSE)
+           normalize_pop_size = FALSE,
+           iterate = TRUE,
+           iterations = 100)
 
+Ks <- lapply(1:5,
+             function(x, kern_list) {
+               nms <- paste(c("P", "F"), x, sep = "_")
 
+               out <- do.call(`+`, kern_list[nms])
 
-lambdas_ipmr <- vapply(monocarp_sys$iterators,
+               return(out)
+             }, kern_list = monocarp_sys$sub_kernels)
+
+lambdas_ipmr <- vapply(Ks,
                        function(x) Re(eigen(x)$values[1]),
                        numeric(1))
-ws_ipmr <- vapply(monocarp_sys$iterators,
+
+ws_ipmr <- vapply(Ks,
                   function(x) Re(eigen(x)$vectors[ , 1]),
                   numeric(100L))
-
 
 test_that('eigenvectors and values are correct', {
 
@@ -317,22 +312,11 @@ test_that('eigenvectors and values are correct', {
 # Test whether .iterate kerns does what it should
 kern_seq <- sample(1:5, 50, replace = TRUE)
 
-proto <- monocarp_sys$proto_ipm %>%
-  remove_k()
+proto <- monocarp_sys$proto_ipm
 
 init_pop_vec <- runif(100)
 
 iterated_sys <- proto %>%
-  define_k(
-    name             = 'K_yr',
-    K_yr             = P_yr + F_yr,
-    n_ht_t_1         = K_yr %*% n_ht_t,
-    family           = "IPM",
-    data_list        = params,
-    states           = list(c("ht")),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_levels
-  ) %>%
   define_pop_state(
     n_ht = init_pop_vec
   ) %>%
@@ -394,12 +378,6 @@ test_that("burn_in works", {
 
 test_that('classes are correctly set', {
 
-  k_cls <- vapply(monocarp_sys$iterators,
-                  function(x) class(x)[1],
-                  character(1L))
-
-  expect_true(all(k_cls == 'ipmr_matrix'))
-
   sub_cls <- vapply(monocarp_sys$sub_kernels,
                   function(x) class(x)[1],
                   character(1L))
@@ -442,33 +420,34 @@ test_that("order of kernel definition doesn't matter", {
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'g_yr')
     ) %>%
-    define_k(
-      name             = 'K_yr',
-      K_yr             = P_yr + F_yr,
-      family           = "IPM",
-      data_list        = params,
-      states           = list(c("ht")),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_levels
-    ) %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c("F_yr", "P_yr", "K_yr"),
-        int_rule     = rep("midpoint", 3),
-        dom_start    = rep("ht", 3),
-        dom_end      = rep("ht", 3)
+        kernel_names = c("F_yr", "P_yr"),
+        int_rule     = rep("midpoint", 2),
+        state_start    = rep("ht", 2),
+        state_end      = rep("ht", 2)
       )
     ) %>%
     define_domains(ht = c(0.2, 40, 100)) %>%
+    define_pop_state(n_ht = runif(100)) %>%
     make_ipm(usr_funs = list(inv_logit   = inv_logit,
                              inv_logit_r = inv_logit_r,
                              pois_r      = pois_r),
              normalize_pop_size = FALSE)
 
-  lambdas_test <- vapply(test_order_1$iterators,
+  Ks <- lapply(1:5,
+               function(x, kern_list) {
+                 nms <- paste(c("P", "F"), x, sep = "_")
+
+                 out <- do.call(`+`, kern_list[nms])
+
+                 return(out)
+               }, kern_list = test_order_1$sub_kernels)
+
+  lambdas_test <- vapply(Ks,
                          function(x) Re(eigen(x)$values[1]),
                          numeric(1))
-  ws_test <- vapply(test_order_1$iterators,
+  ws_test <- vapply(Ks,
                     function(x) Re(eigen(x)$vectors[ , 1]),
                     numeric(100L))
 
@@ -516,21 +495,12 @@ test_that("return_all gets all of the environments back", {
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'g_yr')
     ) %>%
-    define_k(
-      name             = 'K_yr',
-      K_yr             = P_yr + F_yr,
-      family           = "IPM",
-      data_list        = params,
-      states           = list(c("ht")),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_levels
-    ) %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c("F_yr", "P_yr", "K_yr"),
-        int_rule     = rep("midpoint", 3),
-        dom_start    = rep("ht", 3),
-        dom_end      = rep("ht", 3)
+        kernel_names = c("F_yr", "P_yr"),
+        int_rule     = rep("midpoint", 2),
+        state_start    = rep("ht", 2),
+        state_end      = rep("ht", 2)
       )
     ) %>%
     define_domains(ht = c(0.2, 40, 100)) %>%
@@ -540,7 +510,7 @@ test_that("return_all gets all of the environments back", {
     make_ipm(usr_funs = list(inv_logit   = inv_logit,
                              inv_logit_r = inv_logit_r,
                              pois_r      = pois_r),
-             return_all = TRUE,
+             return_all_envs = TRUE,
              normalize_pop_size = FALSE)
 
   env_list_nms <- c('main_env', c(paste('F', 1:5, sep = '_'),
@@ -584,23 +554,13 @@ test_that('normalizing pop vector gets same lambdas as before', {
       levels_hier_effs = hier_levels,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'g_yr')
-    ) %>%
-    define_k(
-      name             = 'K_yr',
-      K_yr             = P_yr + F_yr,
-      n_ht_t_1         = K_yr %*% n_ht_t,
-      family           = "IPM",
-      data_list        = params,
-      states           = list(c("ht")),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_levels
-    ) %>%
+    )  %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c("F_yr", "P_yr", "K_yr"),
-        int_rule     = rep("midpoint", 3),
-        dom_start    = rep("ht", 3),
-        dom_end      = rep("ht", 3)
+        kernel_names = c("F_yr", "P_yr"),
+        int_rule     = rep("midpoint", 2),
+        state_start    = rep("ht", 2),
+        state_end      = rep("ht", 2)
       )
     ) %>%
     define_domains(
@@ -617,7 +577,9 @@ test_that('normalizing pop vector gets same lambdas as before', {
              iterations = 100,
              kernel_seq = usr_seq)
 
-  lambdas_test <- lambda(test_norm_1, comp_method = 'pop_size', type_lambda = 'all') %>%
+  lambdas_test <- lambda(test_norm_1,
+                         comp_method = 'pop_size',
+                         type_lambda = 'all') %>%
     as.vector()
 
   pop_holder       <- array(NA_real_, dim = c(100, 101))
@@ -730,23 +692,13 @@ test_that("drop_levels works in hier_effs", {
       levels_hier_effs = hier_levels,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'g_yr_site')
-    ) %>%
-    define_k(
-      name             = 'K_yr_site',
-      K_yr_site        = P_yr_site + F_yr_site,
-      n_ht_t_1         = K_yr_site %*% n_ht_t,
-      family           = "IPM",
-      data_list        = params,
-      states           = list(c("ht")),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_levels
-    ) %>%
+    )  %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c("F_yr_site", "P_yr_site", "K_yr_site"),
-        int_rule     = rep("midpoint", 3),
-        dom_start    = rep("ht", 3),
-        dom_end      = rep("ht", 3)
+        kernel_names = c("F_yr_site", "P_yr_site"),
+        int_rule     = rep("midpoint", 2),
+        state_start    = rep("ht", 2),
+        state_end      = rep("ht", 2)
       )
     ) %>%
     define_domains(
@@ -763,7 +715,7 @@ test_that("drop_levels works in hier_effs", {
              iterations = 100,
              kernel_seq = usr_seq)
 
-  kerns <- c(test_drop$iterators, test_drop$sub_kernels)
+  kerns <-test_drop$sub_kernels
 
   for(i in seq_along(to_drop)) {
 

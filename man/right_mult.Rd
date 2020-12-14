@@ -2,15 +2,21 @@
 % Please edit documentation in R/utils-export.R
 \name{right_mult}
 \alias{right_mult}
-\title{Right multiplication}
+\alias{left_mult}
+\title{Right/left multiplication}
 \usage{
-right_mult(...)
+right_mult(kernel, vectr)
+
+left_mult(kernel, vectr)
 }
 \arguments{
-\item{...}{Symbols representing functions - usually things that appear on the
-left hand side of \code{formula} and/or \code{...} in \code{define_kernel} and
-\code{define_k}.}
+\item{kernel, vectr}{\code{kernel} should be a bivariate kernel, \code{vectr}
+should be a univariate trait distribution.}
+}
+\value{
+\code{left_mult} returns \code{t(vectr) \%*\% kernel}. \code{right_mult}
+returns \code{kernel \%*\% vectr}.
 }
 \description{
-Performs right multiplication.
+Performs right and left multiplication.
 }

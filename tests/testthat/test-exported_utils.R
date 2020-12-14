@@ -107,10 +107,10 @@ data_list = list(s_int = 2.2,
                  mu_fd = 2,
                  sd_fd = 0.3)
 
-impl_args <- make_impl_args_list(c('P', 'F', 'K'),
-                                 int_rule = rep('midpoint', 3),
-                                 dom_start = rep('dbh', 3),
-                                 dom_end = rep('dbh', 3))
+impl_args <- make_impl_args_list(c('P', 'F'),
+                                 int_rule = rep('midpoint', 2),
+                                 state_start = rep('dbh', 2),
+                                 state_end = rep('dbh', 2))
 
 states <- list(c("dbh"))
 
@@ -138,14 +138,7 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
                 evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
-  ) %>%
-  define_k('K',
-           K         = P + F,
-           n_dbh_t_1 = K %*% n_dbh_t,
-           family    = 'IPM',
-           data_list = list(),
-           states    = states,
-           evict_cor = FALSE) %>%
+  )  %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   define_pop_state(n_dbh = runif(100)) %>%

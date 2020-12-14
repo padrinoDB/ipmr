@@ -31,9 +31,10 @@ make_ipm(
   usr_funs = list(),
   ...,
   domain_list = NULL,
-  iterate = FALSE,
+  iterate = TRUE,
   iterations = 50,
-  normalize_pop_size = TRUE
+  normalize_pop_size = TRUE,
+  iteration_direction = "right"
 )
 
 \method{make_ipm}{simple_di_stoch_kern}(
@@ -43,11 +44,12 @@ make_ipm(
   usr_funs = list(),
   ...,
   domain_list = NULL,
-  iterate = FALSE,
+  iterate = TRUE,
   iterations = 50,
   kernel_seq = NULL,
   normalize_pop_size = TRUE,
-  report_progress = FALSE
+  report_progress = FALSE,
+  iteration_direction = "right"
 )
 
 \method{make_ipm}{simple_di_stoch_param}(
@@ -61,7 +63,8 @@ make_ipm(
   iterations = 50,
   kernel_seq = NULL,
   normalize_pop_size = TRUE,
-  report_progress = FALSE
+  report_progress = FALSE,
+  iteration_direction = "right"
 )
 
 \method{make_ipm}{general_di_det}(
@@ -73,7 +76,8 @@ make_ipm(
   domain_list = NULL,
   iterate = TRUE,
   iterations = 50,
-  normalize_pop_size = TRUE
+  normalize_pop_size = TRUE,
+  iteration_direction = "right"
 )
 
 \method{make_ipm}{general_di_stoch_kern}(
@@ -87,7 +91,8 @@ make_ipm(
   iterations = 50,
   kernel_seq = NULL,
   normalize_pop_size = TRUE,
-  report_progress = FALSE
+  report_progress = FALSE,
+  iteration_direction = "right"
 )
 
 \method{make_ipm}{general_di_stoch_param}(
@@ -101,7 +106,8 @@ make_ipm(
   iterations = 50,
   kernel_seq = NULL,
   normalize_pop_size = TRUE,
-  report_progress = FALSE
+  report_progress = FALSE,
+  iteration_direction = "right"
 )
 
 \method{make_ipm}{simple_dd_det}(
@@ -114,7 +120,8 @@ make_ipm(
   iterate = TRUE,
   iterations = 50,
   normalize_pop_size = FALSE,
-  report_progress = FALSE
+  report_progress = FALSE,
+  iteration_direction = "right"
 )
 
 \method{make_ipm}{simple_dd_stoch_kern}(
@@ -128,7 +135,8 @@ make_ipm(
   iterations = 50,
   kernel_seq = NA_character_,
   normalize_pop_size = FALSE,
-  report_progress = FALSE
+  report_progress = FALSE,
+  iteration_direction = "right"
 )
 
 \method{make_ipm}{simple_dd_stoch_param}(
@@ -142,7 +150,8 @@ make_ipm(
   iterations = 50,
   kernel_seq = NA_character_,
   normalize_pop_size = FALSE,
-  report_progress = FALSE
+  report_progress = FALSE,
+  iteration_direction = "right"
 )
 
 \method{make_ipm}{general_dd_det}(
@@ -155,7 +164,8 @@ make_ipm(
   iterate = TRUE,
   iterations = 50,
   normalize_pop_size = FALSE,
-  report_progress = FALSE
+  report_progress = FALSE,
+  iteration_direction = "right"
 )
 
 \method{make_ipm}{general_dd_stoch_kern}(
@@ -169,7 +179,8 @@ make_ipm(
   iterations = 50,
   kernel_seq = NA_character_,
   normalize_pop_size = FALSE,
-  report_progress = FALSE
+  report_progress = FALSE,
+  iteration_direction = "right"
 )
 
 \method{make_ipm}{general_dd_stoch_param}(
@@ -183,7 +194,8 @@ make_ipm(
   iterations = 50,
   kernel_seq = NA_character_,
   normalize_pop_size = FALSE,
-  report_progress = FALSE
+  report_progress = FALSE,
+  iteration_direction = "right"
 )
 }
 \arguments{
@@ -222,6 +234,13 @@ to simulate.}
 vector to sum before each iteration. Default is \code{TRUE} for \code{*_di_*}
 methods and \code{FALSE} for \code{*_dd_*} methods.}
 
+\item{iteration_direction}{Either \code{"right"} (default) or \code{"left"}.
+This controls the direction of projection. Right iteration will generate
+the right eigenvector (if it exists), while left iteration generates
+the left eigenvector. These correspond the stable trait distributions, and
+reproductive values, respectively. This parameter is mostly used internally
+by other functions, and most users probably don't want to change it.}
+
 \item{kernel_seq}{For \code{*_stoch_kern} methods, the sequence of kernels
 to use during the simulation process. It should have the same number of entries
 as the number of \code{iterations}.
@@ -242,8 +261,6 @@ The \code{make_ipm.*} methods will always return a list of length 6
 containing the following components:
 
 \itemize{
-  \item{\strong{iterators}}{: iteration kernel(s) (if specified by \code{define_k})
-                            for \code{simple_*}. otherwise contains \code{NA}.}
   \item{\strong{sub_kernels}}{: a list of sub_kernels specified in \code{define_kernel}.}
   \item{\strong{env_list}}{: a list containing the evaluation environments of
                            kernel. This will contain the \code{main_env} object

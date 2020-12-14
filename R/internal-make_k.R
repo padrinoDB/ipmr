@@ -23,7 +23,9 @@
                          !!! k_form,
                          .eval_env = k_env)
 
-    temp <- c(temp, rlang::env_get_list(k_env, nms = k_rows$kernel_id[i]))
+    to_pull <- names(k_rows$params[[i]]$formula)
+
+    temp <- c(temp, rlang::env_get_list(k_env, nms = to_pull))
 
   }
 
@@ -174,7 +176,9 @@
                          .eval_env = kern_env)
 
     kern_form <- .parse_k_formulae(param_tree$formula,
-                                   kern_env)
+                                   kern_env,
+                                   k_row,
+                                   main_env)
 
     pull_name <- ifelse(names(kern_form) == id, id, names(kern_form))
 

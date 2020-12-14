@@ -104,23 +104,13 @@ test_stoch_param <- init_ipm('simple_dd_stoch_param') %>%
     has_hier_effs = FALSE,
     evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'f_d')
-  ) %>%
-  define_k(
-    'K',
-    K = P + F,
-    n_surf_area_t_1 = right_mult(K, n_surf_area_t),
-    family = 'IPM',
-    data_list = data_list,
-    states = list(c('surf_area')),
-    has_hier_effs = FALSE,
-    evict_cor = FALSE
-  ) %>%
+  )  %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c('P', "F", "K"),
-      int_rule = rep('midpoint', 3),
-      dom_start = rep('surf_area',3),
-      dom_end = rep('surf_area', 3)
+      kernel_names = c('P', "F"),
+      int_rule = rep('midpoint', 2),
+      state_start = rep('surf_area', 2),
+      state_end = rep('surf_area', 2)
     )
   ) %>%
   define_domains(surf_area = c(0, 10, 100)) %>%
@@ -253,23 +243,12 @@ test_stoch_param <- init_ipm('simple_dd_stoch_param') %>%
     evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'f_d')
   ) %>%
-  define_k(
-    'K_site',
-    K_site = P_site + F_site,
-    n_surf_area_t_1 = right_mult(K_site, n_surf_area_t),
-    family = 'IPM',
-    data_list = data_list,
-    states = list(c('surf_area')),
-    has_hier_effs = TRUE,
-    levels_hier_effs = list(site = 1:3),
-    evict_cor = FALSE
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c('P_site', "F_site", "K_site"),
-      int_rule = rep('midpoint', 3),
-      dom_start = rep('surf_area',3),
-      dom_end = rep('surf_area', 3)
+      kernel_names = c('P_site', "F_site"),
+      int_rule = rep('midpoint', 2),
+      state_start = rep('surf_area', 2),
+      state_end = rep('surf_area', 2)
     )
   ) %>%
   define_domains(surf_area = c(0, 10, 100)) %>%

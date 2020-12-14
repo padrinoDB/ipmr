@@ -1,10 +1,10 @@
 
 states_single <- c('dbh')
 
-impl_args_single <- make_impl_args_list(c('P', 'F', 'K'),
-                                        int_rule = rep('midpoint', 3),
-                                        dom_start = rep('dbh', 3),
-                                        dom_end = rep('dbh', 3))
+impl_args_single <- make_impl_args_list(c('P', 'F'),
+                                        int_rule = rep('midpoint', 2),
+                                        state_start = rep('dbh', 2),
+                                        state_end = rep('dbh', 2))
 
 L <- 100
 U <- 500
@@ -42,23 +42,16 @@ single_state <- init_ipm('simple_di_det') %>%
                 evict_cor = FALSE) %>%#,
   # evict_fun = truncated_distributions(f_d,
   #                                     n_mesh_p = 100)) %>%
-  define_k(
-    name = 'K',
-    K = P + F,
-    family = 'IPM',
-    data_list = list(),
-    states = states_single,
-    evict_cor = FALSE) %>%
   define_impl(impl_args_single) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   define_pop_state(n_dbh = rep(1:50, 2))
 
 
 states_2 <- c('dbh', 'ht')
-impl_args_2 <- make_impl_args_list(c('P_1',"P_2", 'F', 'K'),
-                                   int_rule = rep('midpoint', 4),
-                                   dom_start = c("ht", "dbh", 'dbh', "dbh"),
-                                   dom_end = c("dbh", "dbh", 'ht', "dbh"))
+impl_args_2 <- make_impl_args_list(c('P_1',"P_2", 'F'),
+                                   int_rule = rep('midpoint', 3),
+                                   state_start = c("ht", "dbh", "dbh"),
+                                   state_end = c("dbh", "dbh", 'ht'))
 
 two_state <- init_ipm('simple_di_det') %>%
   define_kernel("P_1",
@@ -104,16 +97,7 @@ two_state <- init_ipm('simple_di_det') %>%
                                  mu_fd = 0.5,
                                  sd_fd = 0.2),
                 states = states_2,
-                evict_cor = FALSE) %>%#,
-  # evict_fun = truncated_distributions(f_d,
-  #                                     n_mesh_p = 100)) %>%
-  define_k(
-    name = 'K',
-    K = P + F,
-    family = 'IPM',
-    data_list = list(),
-    states = states_2,
-    evict_cor = FALSE) %>%
+                evict_cor = FALSE)  %>%
   define_impl(impl_args_2) %>%
   define_domains(dbh = c(0, 50, 100),
                  ht = c(0, 10, 100)) %>%
@@ -156,7 +140,7 @@ test_that('define_domains can use global variables', {
   two_state <- define_domains(two_state,
                                dbh = c(L, U, n_mesh_p))
 
-  new_dom <- two_state$domain[[1]]$dbh_2
+  new_dom <- two_state$domain[[1]]$dbh
 
   expect_equal(new_dom, c(L, U, n_mesh_p))
 })

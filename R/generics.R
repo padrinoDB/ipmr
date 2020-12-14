@@ -1026,14 +1026,16 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
                              bw = FALSE,
                              do_contour = FALSE,
                              do_legend = FALSE,
+                             canvas_dims,
                              ...) {
 
-  old_par <- graphics::par('mar')
+  old_par <- graphics::par('mar', "mfrow")
   on.exit(par(old_par))
 
   if(do_legend) graphics::layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
 
-  graphics::par(mar = c(6, 5, 3, 2))
+  graphics::par(mar = c(6, 5, 3, 2), mfrow = c(canvas_dims$nrow,
+                                               canvas_dims$ncol))
 
   if(is.null(x)) x <- seq_len(ncol(A))
   if(is.null(y)) y <- seq_len(nrow(A))
@@ -1087,7 +1089,6 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
 }
 
 #' @rdname plot_star
-#' @param sub_kernels A logical - also plot the sub-kernels?
 #' @param exponent The exponent to raise each kernel to. Setting this to a low
 #' number can help visualize kernels that are overwhelmed by a few very large numbers.
 #'
@@ -1095,7 +1096,6 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
 
 plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
                                    ipm = NULL,
-                                   sub_kernels = FALSE,
                                    col = rainbow(100, start=0.67, end=0),
                                    bw = FALSE,
                                    do_contour = FALSE,
@@ -1111,20 +1111,16 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
     x   <- NULL
   }
 
-  old_par <- par('mar')
+  old_par <- par('mar', "mfrow")
   on.exit(par(old_par))
 
   dots <- list(...)
 
-  if(sub_kernels) {
+  plot_list <- ipm$sub_kernels
 
-    plot_list <- purrr::splice(ipm$iterators, ipm$sub_kernels)
+  plt_seq   <- seq_along(plot_list)
 
-  } else {
-
-    plot_list <- ipm$iterators
-
-  }
+  canvas_dims <- .ncol_nrow(plt_seq)
 
   lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
                                                    y = y,
@@ -1133,6 +1129,7 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
                                                    bw = bw,
                                                    do_contour = do_contour,
                                                    do_legend = do_legend,
+                                                   canvas_dims = canvas_dims,
                                                    dots))
 
   invisible(ipm)
@@ -1143,7 +1140,6 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
 
 plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
                                            ipm = NULL,
-                                           sub_kernels = FALSE,
                                            col = rainbow(100, start=0.67, end=0),
                                            bw = FALSE,
                                            do_contour = FALSE,
@@ -1164,15 +1160,10 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
 
   dots <- list(...)
 
-  if(sub_kernels) {
+  plot_list <- ipm$sub_kernels
+  plt_seq   <- seq_along(plot_list)
+  canvas_dims <- .ncol_nrow(plt_seq)
 
-    plot_list <- purrr::splice(ipm$iterators, ipm$sub_kernels)
-
-  } else {
-
-    plot_list <- ipm$iterators
-
-  }
 
   lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
                                                    y = y,
@@ -1181,6 +1172,7 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
                                                    bw = bw,
                                                    do_contour = do_contour,
                                                    do_legend = do_legend,
+                                                   canvas_dims = canvas_dims,
                                                    dots))
 
   invisible(ipm)
@@ -1191,7 +1183,6 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
 
 plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
                                           ipm = NULL,
-                                          sub_kernels = FALSE,
                                           col = rainbow(100, start=0.67, end=0),
                                           bw = FALSE,
                                           do_contour = FALSE,
@@ -1212,15 +1203,9 @@ plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
 
   dots <- list(...)
 
-  if(sub_kernels) {
-
-    plot_list <- purrr::splice(ipm$iterators, ipm$sub_kernels)
-
-  } else {
-
-    plot_list <- ipm$iterators
-
-  }
+  plot_list <- ipm$sub_kernels
+  plt_seq   <- seq_along(plot_list)
+  canvas_dims <- .ncol_nrow(plt_seq)
 
   lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
                                                    y = y,
@@ -1229,6 +1214,7 @@ plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
                                                    bw = bw,
                                                    do_contour = do_contour,
                                                    do_legend = do_legend,
+                                                   canvas_dims = canvas_dims,
                                                    dots))
 
   invisible(ipm)
@@ -1278,6 +1264,8 @@ plot.general_di_det_ipm <- function(x = NULL, y = NULL,
   mega_mat <- rlang::enquo(mega_mat)
 
   plot_list <- list(format_mega_matrix(ipm, mega_mat = !! mega_mat))
+  plt_seq   <- seq_along(plot_list)
+  canvas_dims <- .ncol_nrow(plt_seq)
 
   lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
                                                    y = y,
@@ -1286,9 +1274,30 @@ plot.general_di_det_ipm <- function(x = NULL, y = NULL,
                                                    bw = bw,
                                                    do_contour = do_contour,
                                                    do_legend = do_legend,
+                                                   canvas_dims = canvas_dims,
                                                    dots))
 
   invisible(ipm)
+
+}
+
+.ncol_nrow <- function(plt_seq) {
+
+  out <- list(ncol = NA,
+              nrow = NA)
+
+  if(length(plt_seq) > 25) {
+
+    out$ncol <- 5
+    out$nrow <- 5
+
+  } else {
+
+    out$ncol <- out$nrow <- round(sqrt(length(plt_seq)))
+
+  }
+
+  return(out)
 
 }
 
@@ -1433,28 +1442,10 @@ right_ev.simple_di_det_ipm <- function(ipm,
 
     pop_states  <- paste('n', pop_nm, c('t', 't_1'), sep = '_')
 
-    k_nm        <- names(ipm$iterators)
-
-    # Construct the call described above to relate pop_state_t_1 to K
-    # and pop_state_t
-
-    text_call   <- paste(k_nm, ' %*% ', pop_states[1])
-
-    to_add      <- rlang::list2(!! pop_states[2] := text_call)
-
-    # Insert into proto
-
-    proto_ind   <- which(ipm$proto_ipm$kernel_id == k_nm)
-
-    ipm$proto_ipm$params[[proto_ind]]$formula <- purrr::splice(
-      ipm$proto_ipm$params[[proto_ind]]$formula,
-      to_add
-    )
-
-    # Final step is to generate an initial pop_state. This is always just
+       # Final step is to generate an initial pop_state. This is always just
     # vector drawn from a random uniform distribution
 
-    len_pop_state <- dim(ipm$iterators[[1]])[1]
+    len_pop_state <- dim(ipm$sub_kernels[[1]])[1]
     init_pop      <- stats::runif(len_pop_state)
 
     # Drop _t for defining the initial population vector so define_pop_state
@@ -1465,7 +1456,8 @@ right_ev.simple_di_det_ipm <- function(ipm,
     test_conv     <- ipm$proto_ipm %>%
       define_pop_state(!! pop_states[1] := init_pop) %>%
       make_ipm(iterate = TRUE,
-               iterations = n_iterations)
+               iterations = n_iterations,
+               normalize_pop_size = TRUE)
 
     if(is_conv_to_asymptotic(test_conv)) {
 
@@ -1504,13 +1496,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
 
 right_ev.general_di_det_ipm <- function(ipm,
                                         n_iterations = 100,
-                                        mega_mat     = NULL,
-                                        mega_vec     = NULL,
-                                        keep_mega    = FALSE,
                                         ...) {
-
-  mega_mat  <- rlang::enquo(mega_mat)
-  mega_vec  <- rlang::enquo(mega_vec)
 
   mod_nm    <- deparse(substitute(ipm))
 
@@ -1577,27 +1563,9 @@ right_ev.general_di_det_ipm <- function(ipm,
     }
   }
 
-  # If the user wants the formatted mega-mat/vector (or we want it internally),
-  # Then build those up. Otherwise, just substitute names and return the list
-  # of vectors
+  names(out) <- gsub('n_', '', names(out))
+  names(out) <- paste(names(out), 'w', sep = '_')
 
-  if(keep_mega) {
-
-    if(!rlang::quo_is_null(mega_vec) && !rlang::quo_is_null(mega_mat)) {
-      vec_out <- .make_mega_vec(mega_vec, out)
-      mat_out <- format_mega_matrix(ipm, !! mega_mat)[[1]]
-      out     <- list(mega_mat = mat_out, mega_vec = vec_out)
-
-    } else {
-      stop("Cannot set 'keep_mega = TRUE' and leave mega_vec and/or mega_mat as NULL.")
-    }
-
-  } else {
-
-    names(out) <- gsub('n_', '', names(out))
-    names(out) <- paste(names(out), 'w', sep = '_')
-
-  }
 
   return(out)
 }
@@ -1619,128 +1587,59 @@ left_ev <- function(ipm, ...) {
 
 left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
 
-  mod_nm  <- deparse(substitute(ipm))
+  mod_nm <- deparse(substitute(ipm))
 
   # Identify state variable name
 
   pop_nm <- .get_pop_nm_simple(ipm)
 
-  # If it's already iterated, then we need to wrap K with a t()
-  if(.already_iterated(ipm)) {
+  # if it's already been iterated to convergence, we don't have much work to do.
 
-    # Models that are already iterated may have additional things.
-    # however, the id of the kernel should match the top level kernel in this
-    # list, so we'll use that.
+  # Create variables for internal usage
 
-    k_nm  <- names(ipm$iterators)
-    k_ind <- ifelse(length(k_nm) > 1,
-                    which(k_nm %in% ipm$proto_ipm$kernel_id),
-                    1)
+  pop_states  <- paste('n', pop_nm, c('t', 't_1'), sep = '_')
 
-    t_k   <- t(ipm$iterators[[k_ind]])
+  # Final step is to generate an initial pop_state. This is always just
+  # vector drawn from a random uniform distribution
 
-    # next, we pull out the initial population vector and set up
-    # something to hold the population state while we iterate. Simple ipms don't
-    # have a complicated pop_state structure, so this is straightforward.
+  len_pop_state <- dim(ipm$sub_kernels[[1]])[1]
+  init_pop      <- stats::runif(len_pop_state)
 
-    n_row          <- dim(ipm$pop_state[[1]])[1]
-    temp_pop_state <- matrix(NA_real_,
-                             nrow = n_row,
-                             ncol = (n_iterations + 1))
+  # Drop _t for defining the initial population vector so define_pop_state
+  # doesn't complain
 
-    temp_pop_state[ , 1] <- ipm$pop_state[[1]][ , 1]
+  pop_states[1] <- gsub("_t$", "", pop_states[1])
 
-    for(i in seq_len(n_iterations)) {
+  test_conv     <- ipm$proto_ipm %>%
+    define_pop_state(!! pop_states[1] := init_pop) %>%
+    make_ipm(iterate = TRUE,
+             iterations = n_iterations,
+             iteration_direction = "left")
 
-      temp_pop_state[ , (i + 1)] <- t_k %*% temp_pop_state[ , i]
+  if(is_conv_to_asymptotic(test_conv)) {
 
-    }
-
-    if(.is_conv_to_asymptotic(temp_pop_state)) {
-
-      out <- temp_pop_state[ , (n_iterations + 1)]
-      out_nm <- paste(pop_nm, 'v', sep = "_")
-
-    } else {
-
-      warning(
-        paste(
-          "'",
-          mod_nm,
-          "'",
-          ' did not converge after ',
-          n_iterations,
-          ' iterations. Returning NA, please try again with more iterations.',
-          sep = ""
-        )
-      )
-
-      return(NA_real_)
-
-    }
+    out    <- test_conv$pop_state[[1]][ , (n_iterations + 1)]
+    out_nm <- paste(pop_nm, 'w', sep = "_")
 
   } else {
 
-    # If not iterated, we need to generate a population vector and t(k)
-    message(
+    warning(
       paste(
         "'",
         mod_nm,
         "'",
-        ' has not been iterated yet. ',
-        'Generating a population vector using runif() and\niterating the model ',
+        ' did not converge after ',
         n_iterations,
-        ' times to check for convergence to asymptotic dynamics',
+        ' iterations. Returning NA, please try again with more iterations.',
         sep = ""
       )
     )
 
-    t_k    <- t(ipm$iterators[[1]])
-
-    # Create variables for internal usage
-
-    k_nm        <- names(ipm$iterators)
-
-    # Final step is to generate an initial pop_state. This is always just
-    # vector drawn from a random uniform distribution
-
-    len_pop_state <- dim(ipm$iterators[[1]])[1]
-
-    temp_pop_state <- matrix(NA_real_,
-                             nrow = len_pop_state,
-                             ncol = (n_iterations + 1))
-
-    temp_pop_state[ , 1] <- stats::runif(len_pop_state)
-
-    for(i in seq_len(n_iterations)) {
-
-      temp_pop_state[ , (i + 1)] <- t_k %*% temp_pop_state[ , i]
-
-    }
-
-    if(.is_conv_to_asymptotic(temp_pop_state)) {
-
-      out    <- temp_pop_state[ , (n_iterations + 1)]
-      out_nm <- paste(pop_nm, 'v', sep = "_")
-
-    } else {
-
-      warning(
-        paste(
-          "'",
-          mod_nm,
-          "'",
-          ' did not converge after ',
-          n_iterations,
-          ' iterations. Returning NA, please try again with more iterations.',
-          sep = ""
-        )
-      )
-
-      return(NA_real_)
-    }
-
+    return(NA_real_)
   }
+
+
+# Stuff into a list and standardize
 
   out <- rlang::list2(!! out_nm := (out / sum(out)))
 
@@ -1748,20 +1647,6 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
 }
 
 #' @rdname eigenvectors
-#' @param mega_mat A vector of names and/or 0s specifying the relationship
-#' between the kernels in the model. The names should correspond to kernel
-#' names, with 0s corresponding to sparse areas of the mega-matrix. The names can
-#' be either symbols or characters. These functions support suffix expansion as in
-#' \code{define_k(ernel)}, so expressions don't need to be re-written for every
-#' combination hierarchical effects. DO NOT supply arguments \code{nrow},
-#' \code{ncol}, or \code{byrow}. These are set internally based on dimensions
-#' of each sub-kernel.
-#' @param mega_vec A vector of names specifying the format of the population
-#' vector. The names can be either symbols or characters.
-#' @param keep_mega A logical. TRUE returns a list with the mega matrix
-#' and full eigenvector, FALSE returns a list with each state's contribution
-#' to eigenvector. Default is FALSE, mostly for internal usage.
-#'
 #'
 #' @details If the model has already been iterated, then these functions
 #' will just extract population state of the final iteration and return
@@ -1797,80 +1682,37 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
 #' @export
 
 left_ev.general_di_det_ipm <- function(ipm,
-                                       mega_mat,
-                                       mega_vec,
                                        n_iterations = 100,
-                                       keep_mega = FALSE,
                                        ...) {
 
-  # capture expressions and model names
+  mod_nm    <- deparse(substitute(ipm))
 
-  mega_mat     <- rlang::enquo(mega_mat)
-  mega_vec     <- rlang::enquo(mega_vec)
+  use_pop_state       <- ipm$pop_state[names(ipm$pop_state) != 'lambda']
 
-  mod_nm       <- deparse(substitute(ipm))
+  init_pop_vec       <- lapply(use_pop_state, function(x) x[ , 1])
 
-  # Set everything up and iterate the transposed model
+  names(init_pop_vec) <- gsub('pop_state', 'n', names(init_pop_vec))
 
-  mega_k       <- format_mega_matrix(ipm, !! mega_mat)[[1]]
-  mega_pop     <- .make_mega_vec(mega_vec, ipm$pop_state)
-  t_k          <- t(mega_k)
+  test_conv           <- ipm$proto_ipm %>%
+    define_pop_state(
+      pop_vectors = init_pop_vec
+    ) %>%
+    make_ipm(iterate    = TRUE,
+             iterations = n_iterations,
+             iteration_direction = "left",
+             normalize_pop_size = TRUE)
 
-  pop_holder   <- matrix(NA_real_,
-                         nrow = length(mega_pop),
-                         ncol = (n_iterations + 1))
+  if(is_conv_to_asymptotic(test_conv)) {
 
-  # Insert t_0 into pop_holder, then iterate!
-
-  pop_holder[ , 1] <- mega_pop
-
-  for(i in seq_len(n_iterations)) {
-
-    pop_holder[ , (i + 1)] <- t_k %*%  pop_holder[ , i]
-
-  }
-
-  # Convert output back to ipmr style list. I *really* hate this mega-matrix
-  # method, but genuinely have no idea how else to solve this.
-
-  if(.is_conv_to_asymptotic(pop_holder)) {
-
-    # Convert *back* to standard ipmr pop_state format - so dumb. Get the final
-    # iteration and convert it back to a pop_state list
-
-    use_pop    <- pop_holder[ , dim(pop_holder)[2]]
-
-    if(! keep_mega) {
-
-      pop_holder <- .mega_vec_to_list(mega_vec,
-                                      use_pop,
-                                      ipm$pop_state[names(ipm$pop_state != 'lambda')])
-
-      # I'm foolish and wrote .extract_conv_ev in a way that isn't compatible with
-      # the pop_holder format here, so we perform the standardization by hand
-      # before returning.
-
-      pop_std <- Reduce('sum', unlist(pop_holder), init = 0)
-
-      out     <- lapply(pop_holder,
-                        function(x, pop_std) x / pop_std,
-                        pop_std = pop_std)
-    } else {
-
-      out_vec <- use_pop / sum(use_pop)
-      out_mat <- mega_k
-
-      out <- list(mega_mat = out_mat, mega_vec = out_vec)
-
-    }
+    out <- .extract_conv_ev_general(test_conv$pop_state)
 
   } else {
 
-      warning(
-        paste(
-          "'",
-          mod_nm,
-          "'",
+    warning(
+      paste(
+        "'",
+        mod_nm,
+        "'",
         ' did not converge after ',
         n_iterations,
         ' iterations. Returning NA, please try again with more iterations.',
@@ -1881,6 +1723,10 @@ left_ev.general_di_det_ipm <- function(ipm,
     return(NA_real_)
 
   }
+
+
+  names(out) <- gsub('n_', '', names(out))
+  names(out) <- paste(names(out), 'v', sep = '_')
 
 
   return(out)

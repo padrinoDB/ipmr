@@ -44,9 +44,11 @@ define_domains <- function(proto_ipm, ...) {
 
 # Should work for all cases of domains
 .match_domains_to_kernels <- function(proto_ipm, domain_list) {
+
   dom_names <- names(domain_list)
 
   res <- proto_ipm$domain
+
   for(i in seq_along(dom_names)) {
     nm <- dom_names[i]
 
@@ -57,6 +59,7 @@ define_domains <- function(proto_ipm, ...) {
                          ind    <- grepl(nm, nms)
                          X[ind] <- domain_list[i]
                          return(X)
+
                        })
 
     res <- temp
