@@ -51,9 +51,9 @@ First, we will define all the model parameters and a function for the $F_a$ kern
 
 ```{r}
 
-# library(ipmr)
+library(ipmr)
 
-devtools::load_all()
+# devtools::load_all()
 # Set parameter values and names
 
 param_list <- list(
@@ -158,8 +158,8 @@ age_size_ipm <-  define_impl(
   make_impl_args_list(
     kernel_names = c("P_age", "F_age"),
     int_rule     = rep("midpoint", 3),
-    dom_start    = c("z_age", "z_age"),
-    dom_end      = c("z_age", "z_0")
+    state_start    = c("z_age", "z_age"),
+    state_end      = c("z_age", "z_0")
   )
 ) 
 
@@ -186,6 +186,7 @@ age_size_ipm <- age_size_ipm %>%
 
 
 lamb         <- lambda(age_size_ipm)
+lamb
 stable_dists <- right_ev(age_size_ipm)
 
 ```

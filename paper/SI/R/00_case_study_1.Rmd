@@ -384,8 +384,8 @@ The first is sensitivity of $\lambda$ to perturbations in the projection kernel.
 
 sens <- function(ipm_obj, d_z) {
   
-  w <- right_ev(ipm_obj)$z_w
-  v <- left_ev(ipm_obj)$z_v
+  w <- right_ev(ipm_obj)[[1]]
+  v <- left_ev(ipm_obj)[[1]]
   
   return(
     outer(v, w) / sum(v * w * d_z)
@@ -401,11 +401,11 @@ Next, we can define a function to compute the elasticity $\lambda$ to kernel per
 ```{r}
 elas <- function(ipm_obj, d_z) {
   
-  K           <- ipm_obj$iterators$K
+  K           <- do.call(`+`, ipm_obj$sub_kernels)
   
   sensitivity <- sens(ipm_obj, d_z)
   
-  lamb        <- lambda(ipm_obj, comp_method = "eigen")
+  lamb        <- lambda(ipm_obj)
   
   out         <- sensitivity * (K / d_z) / lamb
   
@@ -442,7 +442,7 @@ Finally, generation time is a useful metric in many analyses. Below, we make use
 ```{r}
 gen_time <- function(ipm_obj) {
   
-  lamb     <- unname(lambda(ipm_obj, comp_method = "eigen"))  
+  lamb     <- unname(lambda(ipm_obj))  
   
   r_nought <- R_nought(ipm_obj)
   
@@ -581,6 +581,7 @@ sens_plt <- ggplot(sens_df) +
   scale_x_continuous(name = "T") +
   scale_y_continuous(name = "T + 1") +
   def_theme +
+  theme(legend.position = "none") +
   ggtitle("Sensitivity")
 
 elas_plt <- ggplot(elas_df) +
