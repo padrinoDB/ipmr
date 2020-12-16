@@ -47,7 +47,7 @@ The $F_a$ kernel is multiplied by 0.5 because this model only models the populat
 
 Equations 5, 7, 10, 11, and 13 are parameterized from regression models, and equations 6 and 12 are constant parameters derived from observed data. This example will skip the step of model parameterization, and go straight into the IPM.  
 
-First, we will define the model parameters and function for the $F_a$ kernels.
+First, we will define all the model parameters and a function for the $F_a$ kernels.
 
 ```{r}
 
@@ -148,37 +148,7 @@ age_size_ipm <-   define_kernel(
 
 ```
 
-Once we've defined the $P_a$ and $F_a$ kernels, we need to define how they interact with age-specific size distributions to produce size distributions at the next time step. This corresponds to equations 1-3 above. There a couple things to note here:
-
-1. We do not add `"_age"` to the `name` here. This is because we do not want to expand this into 22 separate iteration procedures - we only want 1 that iterates the 22 separate $P_a$ and $F_a$ kernels together. 
-
-2. the `n_z_0_t_1 = sum(F_age %*% n_z_age_t)`. This takes the place of the $\sum\limits_{a=0}^M...$ in Eq. 1 above. We don't need to supply $a=0$ and $M$ as those are inferred in the `levels_ages` list.
-
-3. The insertion of `age_minus_1` in the `n_z_age_t_1` expression. `ipmr` automatically generates the correct indices using these markers, so there is no need to worry about indexing correctly. Tragically, we could not implement a literal `age - 1`. `_plus_` is also available for models with different formats. The amount to add/subtract is not limited to 1, though it is hard to think of examples where we would want to index by larger increments (perhaps with censuses every 2 or 3 years instead annual?). 
-
-4. the `max_age` in `n_z_max_age_t_1`. This corresponds to equation 3. We can adjust the maximum age value in the model by changing the `max_age` slot in the `levels_ages` list. 
-
-```{r}
-age_size_ipm <- define_k(
-  proto_ipm       = age_size_ipm,
-  name            = "K",
-  family          = "IPM",
-  n_z_0_t_1       = sum(F_age %*% n_z_age_t),
-  n_z_age_t_1     = P_age_minus_1 %*% n_z_age_minus_1_t,
-  n_z_max_age_t_1 = P_max_age %*% n_z_max_age_t +
-                    P_max_age_minus_1 %*% n_z_max_age_minus_1_t,
-  data_list       = param_list,
-  states          = list (c("z")),
-  has_hier_effs   = FALSE,
-  levels_ages     = list(age = c(0:20), max_age = 21),
-  evict_cor       = FALSE
-  ) 
-
-
-```
-
-
-The rest of the model definition code looks like the first case study. We define the implementation arguments using `define_impl()`, the domains using `define_domains()`, and the initial population state using `define_pop_state()`. We can compute the populations asymptotic growth rate, and stable size distributions for each age using the `lambda()` and `right_ev()` functions. 
+Once we've defined the $P_a$ and $F_a$ kernels, we need to define starting and ending states for each kernel. Age-size structured populations will look a little different from the previous ones, as we need to ensure that all fecundity kernels produce age-0 individuals, and all survival-growth kernels produce age+1 individuals. We define the implementation arguments using `define_impl()`, and set each kernel's `state_start` to `"z_age"`. Because the fecundity kernel produces age-0 individuals, regardless of the starting age, its `state_end` is `"z_0"`.
 
 ```{r}
 
@@ -186,12 +156,21 @@ The rest of the model definition code looks like the first case study. We define
 age_size_ipm <-  define_impl(
   proto_ipm = age_size_ipm,
   make_impl_args_list(
-    kernel_names = c("P_age", "F_age", "K"),
+    kernel_names = c("P_age", "F_age"),
     int_rule     = rep("midpoint", 3),
-    dom_start    = rep("z", 3),
-    dom_end      = rep("z", 3)
+    dom_start    = c("z_age", "z_age"),
+    dom_end      = c("z_age", "z_0")
   )
-) %>%
+) 
+
+
+```
+
+The rest of the model definition pipeline should look similar to Case Study 1. the domains using `define_domains()`, and the initial population state using `define_pop_state()`. We can compute the populations asymptotic growth rate, and stable size distributions for each age using the `lambda()` and `right_ev()` functions. 
+
+```{r}
+
+age_size_ipm <- age_size_ipm %>%
   define_domains(
     z = c(1.6, 3.7, 100)
   ) %>%
@@ -210,7 +189,6 @@ lamb         <- lambda(age_size_ipm)
 stable_dists <- right_ev(age_size_ipm)
 
 ```
-
 
 We can plot the stable distributions using an `lapply()` on the `stable_dists` object.
 

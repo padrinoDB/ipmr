@@ -242,38 +242,19 @@ carpobrotus_ipm <-  define_kernel(
 
 ```
 
-We've defined our sub-kernels. We are now ready to define the projection kernel, $K(z',z)$ and the model iteration procedure (Equations 1-2). We'll use the `define_k()` function instead of `define_kernel()`. The key difference between `define_k()` and `define_kernel()` is that the former does not have a `formula` argument. Rather, it just uses `...` to specify the form of the projection kernel and iteration procedures. Additionally, the family argument is now `"IPM"` rather than one of the other 4 described above. 
+We've defined our sub-kernels. The next step is tell `ipmr` how to implement it numerically, and provide the information needed to generate the correct iteration kernel. To do this, we use `define_impl()`, `define_domains()`, and `define_pop_state()`. 
 
-Here, we encounter two more variablest that `ipmr` generates internally: `n_z_t_1` and `n_z_t`. These are placeholders for the population trait distribution functions. As above, we could call them anything else we want and just change the list in the `states` argument. We don't correct for eviction here because we have already done so in the sub-kernels.
-
-```{r}
-
-carpobrotus_ipm <- define_k(
-  proto_ipm = carpobrotus_ipm,
-  name      = "K",
-  family    = "IPM",
-  K         = P + F,
-  n_z_t_1   = K %*% n_z_t,
-  data_list = all_params,
-  states    = list(c('z')),
-  evict_cor = FALSE
-) 
-
-```
-
-We have now defined the mathematical form of the IPM. The next step is tell `ipmr` how to implement it numerically. To do this, we use `define_impl()`, `define_domains()`, and `define_pop_state()`. 
-
-The first function tells `ipmr` which integration rule to use, which domain to start on, and which domain to end on for every kernel in the model. The format of the list it takes in the `kernel_impl_list` argument can be tricky to implement right, so the helper function `make_impl_args_list()` makes sure everything is formatted properly. The `kernel_names` argument can be in any order. The `int_rule`, `dom_start`, and `dom_end` arguments are then matched to kernels in the `proto_ipm` based on the order in the `kernel_names`. Note that, at the moment, the only integration rule that's implemented is `"midpoint"`. `"trapezoid"` and `"gauss_legendre"` are in the works, and others can be implemented by popular demand. 
+The first function tells `ipmr` which integration rule to use, which state variable each kernel acts on (`state_start`), and which state variable each kernel produces (`state_end`). The format of the list it takes in the `kernel_impl_list` argument can be tricky to implement right, so the helper function `make_impl_args_list()` makes sure everything is formatted properly. The `kernel_names` argument can be in any order. The `int_rule`, `state_start`, and `state_end` arguments are then matched to kernels in the `proto_ipm` based on the order in the `kernel_names`. Note that, at the moment, the only integration rule that's implemented is `"midpoint"`. `"trapezoid"` and `"gauss_legendre"` are in the works, and others can be implemented by popular demand. 
 
 ```{r}
 
 carpobrotus_ipm <-  define_impl(
   proto_ipm = carpobrotus_ipm,
   make_impl_args_list(
-    kernel_names = c("K", "P", "F"),
-    int_rule     = rep('midpoint', 3),
-    dom_start    = rep('z', 3),
-    dom_end      = rep('z', 3) 
+    kernel_names = c("P", "F"),
+    int_rule     = rep('midpoint', 2),
+    state_start    = rep('z', 2),
+    state_end      = rep('z', 2) 
   ) 
 ) 
 
@@ -300,7 +281,7 @@ carpobrotus_ipm <-  define_pop_state(
 
 ```
 
-IUp until this point, all we've done is add components to the `proto_ipm`. We now have enough information in it to build a model, iterate it, and compute some basic quantities. We'll set `return_main_env = TRUE` because we need the meshpoints and bin width for the analyses we'll do in the [Further Analyses](#further-analysis) section.
+Up until this point, all we've done is add components to the `proto_ipm`. We now have enough information in it to build a model, iterate it, and compute some basic quantities. We'll set `return_main_env = TRUE` because we need the meshpoints and bin width for the analyses we'll do in the [Further Analyses](#further-analysis) section.
 
 ```{r}
 
@@ -373,21 +354,12 @@ predict_method_carpobrotus <- init_ipm('simple_di_det') %>%
     evict_cor = TRUE,
     evict_fun = truncated_distributions("norm", "f_d")
   ) %>%
-  define_k(
-    name      = "K",
-    family    = "IPM",
-    K         = P + F,
-    n_z_t_1  = K %*% n_z_t,
-    data_list = list(),
-    states    = list(c('z')),
-    evict_cor = FALSE
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("K", "P", "F"),
-      int_rule     = rep('midpoint', 3),
-      dom_start    = rep('z', 3),
-      dom_end      = rep('z', 3) 
+      kernel_names = c("P", "F"),
+      int_rule     = rep('midpoint', 2),
+      state_start    = rep('z', 2),
+      state_end      = rep('z', 2) 
     ) 
   ) %>%
   define_domains(
@@ -480,7 +452,7 @@ gen_time <- function(ipm_obj) {
 
 ```
 
-We need to extract the `d_z` value and meshpoints from the IPM we built. We can extract this information in a list form using the `int_mesh()` function from `ipmr` on our IPM object. The `d_z` in this case will be called `d_z` because we named our domain `"z"` when we implemented the model. However, it will have a different name if the `states` argument in `define_k(ernel)` has different different values. Once we have that, we can begin computing the life history traits of interest.
+We need to extract the `d_z` value and meshpoints from the IPM we built. We can extract this information in a list form using the `int_mesh()` function from `ipmr` on our IPM object. The `d_z` in this case will be called `d_z` because we named our domain `"z"` when we implemented the model. However, it will have a different name if the `states` argument in `define_kernel` has different different values. Once we have that, we can begin computing the life history traits of interest.
 
 ```{r}
 
