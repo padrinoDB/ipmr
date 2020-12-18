@@ -59,23 +59,12 @@ x <- init_ipm("simple_dd_stoch_kern") %>%
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "f_d")
   ) %>%
-  define_k(
-    name             = "K_yr",
-    family           = "IPM",
-    K_yr             = P_yr + F_yr,
-    n_size_t_1       = K_yr %*% n_size_t,
-    data_list        = params,
-    states           = list(c("size")),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(yr = 1:5),
-    evict_cor        = FALSE
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P_yr", "F_yr", "K_yr"),
-      int_rule     = rep("midpoint", 3),
-      dom_start    = rep("size", 3),
-      dom_end      = rep("size", 3)
+      kernel_names = c("P_yr", "F_yr"),
+      int_rule     = rep("midpoint", 2),
+      state_start    = rep("size", 2),
+      state_end      = rep("size", 2)
     )
   ) %>%
   define_domains(

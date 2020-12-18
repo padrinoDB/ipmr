@@ -154,25 +154,18 @@
     <pre class="usage"><span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, n_iterations <span class='op'>=</span> <span class='fl'>100</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>right_ev</span><span class='op'>(</span>
-  <span class='va'>ipm</span>,
-  n_iterations <span class='op'>=</span> <span class='fl'>100</span>,
-  mega_mat <span class='op'>=</span> <span class='cn'>NULL</span>,
-  mega_vec <span class='op'>=</span> <span class='cn'>NULL</span>,
-  keep_mega <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span>
+<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, n_iterations <span class='op'>=</span> <span class='fl'>100</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>mega_mat</span>, <span class='va'>mega_vec</span>, n_iterations <span class='op'>=</span> <span class='fl'>100</span>, keep_mega <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -186,31 +179,9 @@
       <td><p>other arguments passed to methods</p></td>
     </tr>
     <tr>
-      <th>n_iterations</th>
+      <th>iterations</th>
       <td><p>The number of times to iterate the model to reach
 convergence. Default is 100.</p></td>
-    </tr>
-    <tr>
-      <th>mega_mat</th>
-      <td><p>A vector of names and/or 0s specifying the relationship
-between the kernels in the model. The names should correspond to kernel
-names, with 0s corresponding to sparse areas of the mega-matrix. The names can
-be either symbols or characters. These functions support suffix expansion as in
-<code><a href='define_kernel.html'>define_k(ernel)</a></code>, so expressions don't need to be re-written for every
-combination hierarchical effects. DO NOT supply arguments <code>nrow</code>,
-<code>ncol</code>, or <code>byrow</code>. These are set internally based on dimensions
-of each sub-kernel.</p></td>
-    </tr>
-    <tr>
-      <th>mega_vec</th>
-      <td><p>A vector of names specifying the format of the population
-vector. The names can be either symbols or characters.</p></td>
-    </tr>
-    <tr>
-      <th>keep_mega</th>
-      <td><p>A logical. TRUE returns a list with the mega matrix
-and full eigenvector, FALSE returns a list with each state's contribution
-to eigenvector. Default is FALSE, mostly for internal usage.</p></td>
     </tr>
     </table>
 
@@ -247,7 +218,7 @@ to help with age-size models or ones with a lot of hierarchical effects.</p>
                   mega_mat     <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>stay_discrete</span>, <span class='va'>go_discrete</span>,
                                    <span class='va'>leave_discrete</span>, <span class='va'>P</span><span class='op'>)</span>,
                   mega_vec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>b</span>, <span class='va'>ht</span><span class='op'>)</span>,
-                  n_iterations <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
+                  iterations <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
 
 </div></pre>
   </div>

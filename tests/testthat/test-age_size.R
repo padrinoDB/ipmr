@@ -342,25 +342,12 @@ a_s_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
     levels_ages   = list(age = c(0:20), max_age = 21),
     evict_cor     = FALSE
   ) %>%
-  define_k(
-    name               = "K",
-    family             = "IPM",
-    n_wt_0_t_1         = sum(F_age %*% n_wt_age_t),
-    n_wt_age_t_1       = P_age_minus_1 %*% n_wt_age_minus_1_t,
-    n_wt_max_age_t_1   = P_max_age %*% n_wt_max_age_t +
-      P_max_age_minus_1 %*% n_wt_max_age_minus_1_t,
-    data_list          = param_list,
-    states             = list (c("wt")),
-    has_hier_effs      = FALSE,
-    levels_ages        = list(age = c(0:20), max_age = 21),
-    evict_cor          = FALSE
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P_age", "F_age", "K"),
-      int_rule     = rep("midpoint", 3),
-      dom_start    = rep("wt", 3),
-      dom_end      = rep("wt", 3)
+      kernel_names = c("P_age", "F_age"),
+      int_rule     = rep("midpoint", 2),
+      state_start    = c("wt_age", "wt_age"),
+      state_end      = c("wt_age", "wt_0")
     )
   ) %>%
   define_domains(
@@ -432,3 +419,4 @@ test_that("format_mega_matrix.age_x_size_ipm works", {
   expect_equal(ipmr_meg, target, tolerance = 1e-10)
 
 })
+

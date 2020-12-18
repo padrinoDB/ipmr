@@ -131,7 +131,7 @@ The following possibilities are currently or will become available in
 
 3.  `"simple_di_stoch_param"`
 
--   Simple, density dependent models: **In progress, not yet stable**
+-   Simple, density dependent models: **Completed, likely stable**
 
 1.  `"simple_dd_det"`
 
@@ -147,7 +147,7 @@ The following possibilities are currently or will become available in
 
 3.  `"general_di_stoch_param"`
 
--   General, density dependent models: **In progress, not yet stable**
+-   General, density dependent models: **Completed, likely stable**
 
 1.  `"general_dd_det"`
 
@@ -163,8 +163,8 @@ functional and detailed below as well as
 The `general_*` versions of these are also ready, and an introduction to
 them is available
 [here](https://levisc8.github.io/ipmr/articles/general-ipms.html).
-Density dependent versions are completed for simple models, and in
-progress for general ones. These are not yet stable.
+Density dependent versions are completed for simple and general models,
+and are probably stable, but have not been tested enough to be certain.
 
 Keep reading below for examples of how to implement various IPMs in this
 framework.
@@ -306,32 +306,6 @@ my_simple_ipm <- define_kernel(
                                       'f_d')
 ) 
 
-my_simple_ipm <- define_k(
-  # K kernels get their own special define_k function. Rather than use the formula
-  # parameter, it simply takes named expressions for the format of the iteration
-  # kernels. It can also take expressions showing how these kernels generate 
-  # population states at t+1 as a function of population state at t - see examples
-  # below for how to do that.
-  
-  proto_ipm = my_simple_ipm,
-  name      = 'K',
-  K         = P_simple + F_simple,
-           
-  # This is a new family - at the moment all K's will get the
-  # 'IPM' family
-  
-  family    = 'IPM',
-  
-  # This kernel has no additional parameters, so the data_list
-  # is empty
-  
-  data_list = list(),
-  states    = list(c('dbh')),
-  # We've already corrected eviction in the sub-kernels, so there's no
-  # need to do that here
-  evict_cor = FALSE
-) 
-
 # Next, we have to define the implementation details for the model. 
   # We need to tell ipmr how each kernel is integrated, what domain
   # it starts on (i.e. the size/weight/etc from above), and what domain
@@ -342,10 +316,10 @@ my_simple_ipm <- define_k(
 my_simple_ipm <- define_impl(
   proto_ipm = my_simple_ipm,
   make_impl_args_list(
-    kernel_names = c("K_simple", "P_simple", "F_simple"),
-    int_rule     = rep("midpoint", 3),
-    dom_start    = rep("dbh", 3),
-    dom_end      = rep("dbh", 3)
+    kernel_names = c("P_simple", "F_simple"),
+    int_rule     = rep("midpoint", 2),
+    state_start    = rep("dbh", 2),
+    state_end      = rep("dbh", 2)
   )
 ) 
 
@@ -356,6 +330,15 @@ my_simple_ipm <- define_domains(
           100 # third entry is the number of meshpoints for the domain.
   ) 
 ) 
+
+# Next, we define the initial state of the population. We must do this because
+# ipmr computes everything through simulation, and simulations require a 
+# population state.
+
+my_simple_ipm <- define_pop_state(
+  proto_ipm = my_simple_ipm,
+  n_dbh = runif(100)
+)
 
 my_simple_ipm <- make_ipm(proto_ipm = my_simple_ipm)
 

@@ -113,8 +113,7 @@
 <div id="density-dependent-models" class="section level1">
 <h1 class="hasAnchor">
 <a href="#density-dependent-models" class="anchor"></a>Density dependent models</h1>
-<p>A limited number of density dependent model classes are now implemented. Simple, deterministic and kernel-resampled stochastic models can now handle density dependent vital rate expressions. Others are coming soon.</p>
-<p>This vignette will get more details shortly. For now, see the example below:</p>
+<p>Density dependent model classes are now implemented. This vignette will get more details shortly. For now, see the example below:</p>
 <div id="example-of-a-simple-stochastic-kernel-resampled-model-with-density-dependence" class="section level2">
 <h2 class="hasAnchor">
 <a href="#example-of-a-simple-stochastic-kernel-resampled-model-with-density-dependence" class="anchor"></a>Example of a simple, stochastic, kernel-resampled model with density dependence</h2>
@@ -208,26 +207,15 @@
   evict_cor        <span class="op">=</span> <span class="cn">TRUE</span>,
   evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
   <span class="op">)</span> </code></pre></div>
-<p>Again, we’ve add the <code>f_s_dd * sum(n_size_t) * d_size</code> to the expression fof <code>f_s_yr</code>, but otherwise, not much is different from how we’ve defined density independent models. The rest of the model definition process is unchanged.</p>
+<p>Again, we’ve add the <code>f_s_dd * sum(n_size_t) * d_size</code> to the expression for <code>f_s_yr</code>, but otherwise, not much is different from how we’ve defined density independent models. The rest of the model definition process is unchanged.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"> <span class="va">dd_ipm</span> <span class="op">&lt;-</span>  <span class="fu"><a href="../reference/define_kernel.html">define_k</a></span><span class="op">(</span>
-   proto_ipm        <span class="op">=</span> <span class="va">dd_ipm</span>,
-   name             <span class="op">=</span> <span class="st">"K_yr"</span>,
-   family           <span class="op">=</span> <span class="st">"IPM"</span>,
-   K_yr             <span class="op">=</span> <span class="va">P_yr</span> <span class="op">+</span> <span class="va">F_yr</span>,
-   n_size_t_1       <span class="op">=</span> <span class="va">K_yr</span> <span class="op">%*%</span> <span class="va">n_size_t</span>,
-   data_list        <span class="op">=</span> <span class="va">params</span>,
-   states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"size"</span><span class="op">)</span><span class="op">)</span>,
-   has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
-   levels_hier_effs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>yr <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,
-   evict_cor        <span class="op">=</span> <span class="cn">FALSE</span>
- <span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"> <span class="va">dd_ipm</span> <span class="op">&lt;-</span>  <span class="va">dd_ipm</span><span class="op">$</span><span class="va">proto_ipm</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
-      kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P_yr"</span>, <span class="st">"F_yr"</span>, <span class="st">"K_yr"</span><span class="op">)</span>,
-      int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">3</span><span class="op">)</span>,
-      dom_start    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"size"</span>, <span class="fl">3</span><span class="op">)</span>,
-      dom_end      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"size"</span>, <span class="fl">3</span><span class="op">)</span>
+      kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P_yr"</span>, <span class="st">"F_yr"</span><span class="op">)</span>,
+      int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">2</span><span class="op">)</span>,
+      state_start    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"size"</span>, <span class="fl">2</span><span class="op">)</span>,
+      state_end      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"size"</span>, <span class="fl">2</span><span class="op">)</span>
     <span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_domains</a></span><span class="op">(</span>
@@ -240,7 +228,9 @@
     iterate <span class="op">=</span> <span class="cn">TRUE</span>,
     iterations <span class="op">=</span> <span class="fl">50</span>,
     kernel_seq <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">50</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-  <span class="op">)</span></code></pre></div>
+  <span class="op">)</span>
+
+<span class="va">dd_ipm</span><span class="op">$</span><span class="va">pop_state</span><span class="op">$</span><span class="va">lambda</span></code></pre></div>
 <p>More to come soon….</p>
 </div>
 </div>

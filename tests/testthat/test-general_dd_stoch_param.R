@@ -50,7 +50,7 @@ gen_dd_stoch_co <- init_ipm("general_dd_stoch_param") %>%
     s                = plogis(s_int + s_slope * ht_1 + s_slope_2 * ht_1^2 + s_dd * sum(n_ht_t)),
     g                = dnorm(ht_2, g_mu, g_sd),
     g_mu             = g_int_yr + g_slope * ht_1,
-    states           = list(c("ht")),
+    states           = list(c("ht", "b")),
     data_list        = data_list_control,
     has_hier_effs    = FALSE,
     evict_cor        = TRUE,
@@ -62,7 +62,7 @@ gen_dd_stoch_co <- init_ipm("general_dd_stoch_param") %>%
     formula          = f_r * f_s * g_i * d_ht,
     f_r              = plogis(f_r_int_yr + f_r_slope * ht_1),
     f_s              = exp(f_s_int + f_s_slope * ht_1 + f_s_dd * sum(n_ht_t)),
-    states           = list(c("ht")),
+    states           = list(c("ht", "b")),
     data_list        = data_list_control,
     has_hier_effs    = FALSE,
     evict_cor        = FALSE
@@ -72,27 +72,18 @@ gen_dd_stoch_co <- init_ipm("general_dd_stoch_param") %>%
     family        = "DC",
     formula       = e_p * f_d * d_ht,
     f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
-    states        = list(c("ht")),
+    states        = list(c("ht", "b")),
     data_list     = data_list_control,
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
-  define_k(
-    name             = "K",
-    family           = "IPM",
-    n_ht_t_1         = P %*% n_ht_t + leave_discrete %*% n_b_t,
-    n_b_t_1          = go_discrete %*% n_ht_t,
-    has_hier_effs    = FALSE,
-    states           = list(c("ht")),
-    data_list        = data_list_control
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P", "go_discrete", "leave_discrete", "K"),
-      int_rule     = rep("midpoint", 4),
-      dom_start    = c("ht", "ht", NA, "ht"),
-      dom_end      = c("ht", NA, "ht", "ht")
+      kernel_names = c("P", "go_discrete", "leave_discrete"),
+      int_rule     = rep("midpoint", 3),
+      state_start    = c("ht", "ht", "b"),
+      state_end      = c("ht", "b", "ht")
     )
   ) %>%
   define_pop_state(

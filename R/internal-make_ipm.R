@@ -708,33 +708,12 @@
 
 .parse_k_formulae <- function(text, kernel_env, proto, main_env) {
 
-  # This is very shaky - requires code to have whitespace, and will fail
-  # when users don't put spaces between variables. I think that's bad practice
-  # in general, but I also think the whole n_ -> pop_state naming business
-  # needs a rethink. This is something that will happen once the rest of the
-  # di_* methods are written, so that tests can be re-written in bulk
+  # Modify forms to make sense w/ n->pop_state renaming
 
   text <- lapply(text, function(x) {
     gsub(' n_', ' pop_state_', x, perl = TRUE)
   }
   )
-
-  text   <- lapply(text, function(x) {
-
-    temp <- strsplit(x, split = '[=]')
-
-    if(length(temp[[1]]) == 1) { # defined by iteration matrix only
-
-      out <- temp[[1]][1]
-
-    } else {                     # defined by iteration matrix and pop_vector
-
-      out <- temp[[1]][2]
-
-    }
-
-    return(out)
-  })
 
   names(text) <- gsub('^n_', 'pop_state_', names(text))
   out         <- .parse_vr_formulae(text, kernel_env, proto, main_env)
@@ -748,17 +727,32 @@
 # Rename to main_env or something like that - this doesn't strictly hold
 # domain information anymore
 
-.make_main_env <- function(domain_list, usr_funs) {
+.make_main_env <- function(domain_list, usr_funs, age_size) {
 
   # Parent is whatever is 2nd on search path. all loaded functions/packges
   # should still be findable, but objects in the global environment should not
   # be to prevent overscoping!
 
-  main_env      <- new.env(parent = as.environment(search()[2]))
+  main_env    <- new.env(parent = as.environment(search()[2]))
+  domain_list <- .flatten_to_depth(domain_list, 1L)
+  domain_list <- domain_list[!duplicated(names(domain_list))]
 
-  domain_list     <- purrr::flatten(domain_list)
+  # Filter out some common troubles w/ age X size models
+  if(age_size) {
+    names(domain_list) <- gsub("_(age)", "", names(domain_list))
+    names(domain_list) <- gsub("_[0-9]", "", names(domain_list))
+    domain_list        <- domain_list[!duplicated(names(domain_list))] %>%
+      replicate(n = 2, expr = .) %>%
+      setNames(paste(names(.), c(1:2), sep = "_"))
 
-  domain_list     <- domain_list[!duplicated(names(domain_list))]
+  }
+
+
+
+  rm_ind      <- vapply(domain_list,
+                        function(x) any(is.na(x)),
+                        logical(1L))
+  domain_list <- domain_list[ ! rm_ind ]
 
   # This next bit guarantees that d_1 comes before d_2 every time.
   # testing partially hierarchical models produced a bug where d_2
@@ -905,7 +899,7 @@
 # Generates a sequence of indices to sample kernels during stochastic
 # kernel resampling procedures.
 
-.make_kern_seq <- function(proto, kernels, iterations, kernel_seq) {
+.make_kern_seq <- function(proto, iterations, kernel_seq) {
 
 
   if(is.null(kernel_seq) || all(is.na(kernel_seq))) {
@@ -933,11 +927,9 @@
   out <- switch(seq_type,
                 'NA'                 = NULL,
                 'markov_chain_mat'   = .make_markov_seq(proto,
-                                                        kernels,
                                                         kernel_seq,
                                                         iterations),
                 'usr_specified'      = .make_usr_seq(proto,
-                                                     kernels,
                                                      kernel_seq,
                                                      iterations),
                 'internal'           = .make_internal_seq(proto, iterations))
@@ -962,7 +954,6 @@
 }
 
 .make_markov_seq <- function(proto,
-                             kernels,
                              kernel_seq,
                              iterations) {
 
@@ -972,7 +963,7 @@
 
 #' @noRd
 
-.make_usr_seq <- function(proto, kernels, kernel_seq, iterations) {
+.make_usr_seq <- function(proto, kernel_seq, iterations) {
 
   if(is.integer(kernel_seq)) {
 
@@ -1096,9 +1087,9 @@
 
       if(all(len_test)) {
 
-        env_state <- .flatten_to_depth(env_state, 1)
+        to_bind <- .flatten_to_depth(env_state, 1) %>%
+          .[!duplicated(names(.))]
 
-        to_bind <- .drop_duplicated_names_and_splice(env_state)
 
       } else {
         to_bind <- env_state
@@ -1146,35 +1137,35 @@
 # Returns a list with entries others and k_row with hier_effs split out
 # Checks ipm definition
 
-.initialize_kernels.default <- function(proto_ipm, iterate) {
+.initialize_kernels.default <- function(proto_ipm, iterate, iter_dir) {
 
   # checks pop_state, env_state, domain definitions
   .check_ipm_definition(proto_ipm, iterate)
 
-  # Split out K from Fothers so it isn't evaluated until we're ready. If it
-  # isn't there, then proceed as usual
+  # Experimental function - automatically generates the k_row object.
+  # is meant to take the place of define_k.
 
-  K_row    <- which(grepl("K|^n_.*?_t", proto_ipm$kernel_id))
-
-  if(length(K_row) > 0) {
-
-    k_row  <- proto_ipm[K_row, ]
-    others <- proto_ipm[-c(K_row), ]
-
-  } else {
-
-    others <- proto_ipm
-    k_row <- NA_character_
-
-  }
+  k_row <- .init_iteration(proto_ipm, iterate, direction = iter_dir)
 
   # If vital rates are fit with a hierarchical model of any kind,
   # then split those out into their respective years/plots/what-have-you
 
-  if(any(others$has_hier_effs) || any(k_row$has_hier_effs)) {
+  if(any(proto_ipm$has_hier_effs)) {
 
-    others <- .split_hier_effs(others)
+    others <- .split_hier_effs(proto_ipm)
     k_row  <- .split_hier_effs(k_row)
+
+  } else {
+
+    others <- proto_ipm
+
+  }
+
+  for(i in seq_len(nrow(others))) {
+
+    names(others$domain[[i]]) <- paste(names(others$domain[[i]]),
+                                       1:2,
+                                       sep = "_")
 
   }
 
@@ -1187,7 +1178,7 @@
 
 #' @noRd
 
-.initialize_kernels.age_x_size <- function(proto_ipm, iterate) {
+.initialize_kernels.age_x_size <- function(proto_ipm, iterate, iter_dir) {
 
   # checks pop_state, env_state, domain definitions
   .check_ipm_definition(proto_ipm, iterate)
@@ -1195,21 +1186,9 @@
   # Split out K from Fothers so it isn't evaluated until we're ready. If it
   # isn't there, then proceed as usual
 
-  K_row    <- which(grepl("K|^n_.*?_t", proto_ipm$kernel_id))
+  k_row    <- .init_iteration(proto_ipm, iterate, direction = iter_dir)
 
-  if(length(K_row) > 0) {
-
-    k_row  <- proto_ipm[K_row, ]
-    others <- proto_ipm[-c(K_row), ]
-
-  } else {
-
-    others <- proto_ipm
-    k_row <- NA_character_
-
-  }
-
-  others <- .split_sub_kern_ages(others)
+  others <- .split_sub_kern_ages(proto_ipm)
   k_row  <- .make_age_k_row(k_row)
 
   if(any(others$has_hier_effs)) {
@@ -1221,6 +1200,21 @@
   if(any(k_row$has_hier_effs)) {
 
     k_row  <- .split_hier_effs(k_row)
+
+  }
+
+  # Finally, we want to remove the state_var_0 and state_var_age domain names.
+  # These are going to mess things up later on, and aren't really needed (unless
+  # someone really wants different domains for the same state across different
+  # ages...)
+
+  for(i in seq_len(nrow(others))) {
+
+    names(others$domain[[i]]) <- gsub("_(age)", "", names(others$domain[[i]]))
+    names(others$domain[[i]]) <- gsub("_(0)", "", names(others$domain[[i]]))
+    names(others$domain[[i]]) <- paste(names(others$domain[[i]]),
+                                       1:2,
+                                       sep = "_")
 
   }
 
@@ -1287,19 +1281,14 @@
 
   fun_cls <- class(fun)[1]
 
-  test_vec <- c(state_var_start, state_var_end)
-
-  ind_lgl  <- vapply(test_vec,
-                     function(x) grepl('_not_applicable', x),
-                     logical(1))
+  start_cd <- substr(fun_cls, 1, 1)
+  end_cd   <- substr(fun_cls, 2, 2)
 
   # If there is no starting domain, its a discrete to continuous, and will
   # produce a column vector (or scalar for DD). Otherwise, get number of
   # meshpoints
 
-  if(state_var_start == 'start_not_applicable' ||
-     is.null(state_var_start) ||
-     is.na(state_var_start)) {
+  if(start_cd == "D") {
 
     n_mesh_p_start <- 1
 
@@ -1315,9 +1304,7 @@
 
   # Same as above but for domain end and it makes a row vector (or scalar)
 
-  if(state_var_end == 'end_not_applicable' ||
-     is.na(state_var_end) ||
-     is.null(state_var_end)) {
+  if(end_cd == "D") {
 
     n_mesh_p_end <- 1
 
@@ -1336,7 +1323,7 @@
   # then we need to use ind to subset the values contained in fun. Then, we can
   # actually make an iteration matrix
 
-  if(!all(ind_lgl) && !all(!ind_lgl)) {
+  if(fun_cls %in% c("DC", "CD")) {
     fun <- fun[eval(ind)]
   }
 

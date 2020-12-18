@@ -8,8 +8,8 @@
 #' the \code{dom_start} (the domain the kernel begins on), and the \code{dom_end}
 #' (the domain the kernel ends on). It is safest to use \code{make_impl_args_list}
 #' to generate this.
-#' @param dom_start The name of the state variable for the kernel at time \emph{t}.
-#' @param dom_end The name of the state variable for the kernel at time \emph{t+1}.
+#' @param state_start The name of the state variable for the kernel at time \emph{t}.
+#' @param state_end The name of the state variable for the kernel at time \emph{t+1}.
 #' This is usually the same as \code{dom_start}, but general IPMs
 #' with discrete states or IPMs that move from one state to another (e.g. tree
 #' seedling going from a height domain at \emph{t} to a DBH domain at \emph{t+1})
@@ -34,8 +34,10 @@ define_impl <- function(proto_ipm,
 
     proto_ipm$int_rule[proto_ind] <- kernel_impl_list[[i]]$int_rule
 
-    domain_info                   <- .state_to_domain_info(kernel_impl_list[[i]]$dom_start,
-                                                           kernel_impl_list[[i]]$dom_end)
+    domain_info                   <- .state_to_domain_info(kernel_impl_list[[i]]$state_start,
+                                                           kernel_impl_list[[i]]$state_end,
+                                                           proto_ipm)
+
 
     proto_ipm$domain[proto_ind]   <- list(domain_info)
 
@@ -51,8 +53,8 @@ define_impl <- function(proto_ipm,
 
 make_impl_args_list <- function(kernel_names,
                                 int_rule,
-                                dom_start,
-                                dom_end,
+                                state_start,
+                                state_end,
                                 ...) {
 
   ln <- length(kernel_names)
@@ -68,36 +70,36 @@ make_impl_args_list <- function(kernel_names,
 
     int_rule <- i_rule[seq_len(ln)]
   }
-  if(ln != length(dom_start)) {
+  if(ln != length(state_start)) {
 
     warning("Assuming that all kernels are implemented with the same",
-            " 'dom_start'.",
+            " 'state_start'.",
             call. = FALSE)
 
-    ds_rule   <- replicate(ln, dom_start, simplify = FALSE) %>%
+    ds_rule   <- replicate(ln, state_start, simplify = FALSE) %>%
       unlist()
 
-    dom_start <- ds_rule[seq_len(ln)]
+    state_start <- ds_rule[seq_len(ln)]
   }
 
-  if(ln != length(dom_end)) {
+  if(ln != length(state_end)) {
 
     warning("Assuming that all kernels are implemented with the same",
-            " 'dom_end'.",
+            " 'state_end'.",
             call. = FALSE)
 
-    de_rule <- replicate(ln, dom_end, simplify = FALSE) %>%
+    de_rule <- replicate(ln, state_end, simplify = FALSE) %>%
       unlist()
 
-    dom_end <- de_rule[seq_len(ln)]
+    state_end <- de_rule[seq_len(ln)]
   }
 
   out <- vector('list', length = ln)
 
   for(i in seq_along(kernel_names)) {
     out[[i]]$int_rule  <- int_rule[i]
-    out[[i]]$dom_start <- dom_start[i]
-    out[[i]]$dom_end   <- dom_end[i]
+    out[[i]]$state_start <- state_start[i]
+    out[[i]]$state_end   <- state_end[i]
   }
 
   names(out) <- kernel_names
@@ -108,36 +110,16 @@ make_impl_args_list <- function(kernel_names,
 
 
 #' @noRd
-.state_to_domain_info <- function(dom_start, dom_end) {
+.state_to_domain_info <- function(dom_start, dom_end, proto_ipm) {
 
-  # match names, then get info. Otherwise, generate an NA. the domain name
-  # will always be first entry.
+  # Generate dummy vectors to hold domain information.
 
-  if(!is.na(dom_start)) {
+  start_state_info <- rep(NA_real_, 3)
 
-    start_state_info <- rep(NA_real_, 3)
-    dom_start        <- paste(dom_start, "_1", sep = "")
-
-  } else {
-
-    start_state_info <- NA_real_
-    dom_start        <- 'start_not_applicable'
-
-  }
-
-  if(!is.na(dom_end)) {
-
-    end_state_info <- rep(NA_real_, 3)
-    dom_end        <- paste(dom_end, "_2", sep = "")
-
-  } else {
-
-    end_state_info <- NA_real_
-    dom_end        <- 'end_not_applicable'
-
-  }
+  end_state_info <- rep(NA_real_, 3)
 
   out <- rlang::list2(!!dom_start := start_state_info,
                       !!dom_end   := end_state_info)
+
   return(out)
 }

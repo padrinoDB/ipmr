@@ -9,7 +9,6 @@
 #' @importFrom purrr map2
 
 .iterate_model.simple_di_det <- function(proto_ipm,
-                                         iterators,
                                          sub_kern_list,
                                          iterations,
                                          pop_state,
@@ -152,7 +151,7 @@
                                         proto_ipm     = proto_ipm,
                                         sub_kern_list = sub_kern_list,
                                         pop_state     = pop_state,
-                                        main_env    = main_env)
+                                        main_env      = main_env)
 
       # make names match pop_state and then reorder the list for easy
       # insertion
@@ -236,7 +235,6 @@
 #' @noRd
 
 .iterate_model.simple_di_stoch_kern <- function(proto_ipm,
-                                                iterators,
                                                 sub_kern_list,
                                                 iterations,
                                                 kern_seq,
@@ -364,7 +362,6 @@
 #' @noRd
 
 .iterate_model.simple_di_stoch_param <- function(proto_ipm,
-                                                iterators,
                                                 sub_kern_list,
                                                 current_iteration,
                                                 kern_seq,

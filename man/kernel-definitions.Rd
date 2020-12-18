@@ -2,10 +2,6 @@
 % Please edit documentation in R/define_kernel.R
 \name{define_kernel}
 \alias{define_kernel}
-\alias{define_k}
-\alias{define_k.default}
-\alias{define_k.age_x_size}
-\alias{remove_k}
 \title{Functions to initialize and define IPM kernels}
 \usage{
 define_kernel(
@@ -23,60 +19,11 @@ define_kernel(
   evict_fun = NULL,
   integrate = TRUE
 )
-
-define_k(
-  proto_ipm,
-  name,
-  family,
-  ...,
-  data_list = list(),
-  states,
-  has_hier_effs = FALSE,
-  levels_hier_effs = list(),
-  levels_ages = list(),
-  evict_cor = FALSE,
-  evict_fun = NULL,
-  integrate = FALSE
-)
-
-\method{define_k}{default}(
-  proto_ipm,
-  name,
-  family,
-  ...,
-  data_list = list(),
-  states,
-  has_hier_effs = FALSE,
-  levels_hier_effs = list(),
-  evict_cor = FALSE,
-  evict_fun = NULL,
-  integrate = FALSE
-)
-
-\method{define_k}{age_x_size}(
-  proto_ipm,
-  name,
-  family,
-  ...,
-  data_list = list(),
-  states,
-  has_hier_effs = FALSE,
-  levels_hier_effs = list(),
-  levels_ages = list(),
-  evict_cor = FALSE,
-  evict_fun = NULL,
-  integrate = FALSE
-)
-
-remove_k(proto_ipm)
 }
 \arguments{
 \item{proto_ipm}{The name of the model.}
 
-\item{name}{The name of the new kernel. There are only two rules: 1. For
-\code{define_k}, the name must start with \code{"K"} or \code{"k"}.
-2. For \code{define_kernel}, the name cannot start with \code{"K"} or
-\code{"k"}.}
+\item{name}{The name of the new kernel.}
 
 \item{formula}{A bare expression specifying the form of the kernel. See Details.}
 
@@ -86,13 +33,7 @@ transitions, \code{"DC"} for discrete to continuous (e.g. emergence from a seedb
 discrete to discrete (e.g. stasis in a seedbank).}
 
 \item{...}{For \code{define_kernel}, a set of named expressions that correspond
-to vital rates in \code{formula}. For \code{define_k}, a set of named expressions
-that relate the population state at T + 1 to the population state at T. Alternatively,
-can be an expression where the left hand side is the name of the kernel specified
-in \code{name} and the right hand side only describes the structure of the
-iteration kernel. In all cases, suffix expansion of hierarchical models is supported.
-Specific details for each case are in their respecitive function's sections
-below.}
+to vital rates in \code{formula}. Suffix expansion of hierarchical models is supported.}
 
 \item{data_list}{A list of named values that correspond to constants in the formula.
 You do not need to specify vectors corresponding to the domains here.}
@@ -112,8 +53,9 @@ on the syntax for this feature for more details (\code{vignettes(
 the hierarchical variable can take. The names should match the suffixes used
 in the vital rate expressions.}
 
-\item{levels_ages}{A list with possible two entries: 1. \code{"age"}: the range
-of ages, and, optionally, 2. \code{"max_age"}: The maximum age for the model.}
+\item{levels_ages}{A list with possibly 2 entries: 1. \code{"age"}: the range
+of possible ages in the model and, optionally, 2. \code{"max_age"}: the maximum
+age individuals in the model can attain.}
 
 \item{evict_cor}{A logical indicating whether an eviction correction should be applied
 to the kernel.}
@@ -152,26 +94,13 @@ This  means that every combination of the values in \code{levels_hier_effs}
 must exist in the \code{data_list}, or the model will fail with an error along
 the lines of \code{Error in eval_tidy: object 'x_yz' not found}. In order to
 exclude levels that do not exist in your data, you can add a vector to the list
-in \code{levels_hier_effs} called \code{drop_levels}. This should contain the
+in \code{levels_hier_effs} called \code{"drop_levels"}. This should contain the
 values you wish to exclude as a character vector. For example, if data are
 collected for \code{sites = c("a", "b", "c")}, and \code{years = c(2005:2008)},
 but there is no data from site \code{"a"} in \code{2007}, we can use
 \code{levels_hier_effs = list(site = c("a", "b", "c"), year = c(2005:2008),
 drop_levels = c("a_2007"))}.
 
-\strong{\code{define_k}}
-
-The preferred method of defining a \code{K} kernel is to use the left
-hand side of the \code{...} to reference the population vectors that the right
-hand side creates (e.g. \code{n_T_1 = (P + F) \%*\% n_T}). This enables
-iteration-based methods to work properly. On the other hand, these iterations
-can be quite time consuming, and some applications only require
-an iteration matrix while not necessarily requiring the population vectors (e.g.
-calculations of deterministic population growth rate). In those cases, the
-\code{...} can contain something like \code{K = P + F}. In this case, the left
-hand side of the expression should match the \code{name} argument to \code{define_k}.
-
-\strong{\code{define_kernel}}
 
 \code{define_kernel} generates most of the information needed to create an IPM
 kernel. There are a few requirements - \code{name}, \code{family},

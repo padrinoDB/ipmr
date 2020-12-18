@@ -611,7 +611,7 @@ is_square <- function(x) {
 is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
 
   pop_state_test <- vapply(ipm$pop_state,
-                           function(x) ! all(is.na(x)),
+                           function(x) ! any(is.na(x)),
                            logical(1L))
 
   if(! any(pop_state_test)) {

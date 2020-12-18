@@ -173,9 +173,10 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   usr_funs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
   <span class='va'>...</span>,
   domain_list <span class='op'>=</span> <span class='cn'>NULL</span>,
-  iterate <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  iterate <span class='op'>=</span> <span class='cn'>TRUE</span>,
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
-  normalize_pop_size <span class='op'>=</span> <span class='cn'>TRUE</span>
+  normalize_pop_size <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for simple_di_stoch_kern</span>
@@ -186,11 +187,12 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   usr_funs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
   <span class='va'>...</span>,
   domain_list <span class='op'>=</span> <span class='cn'>NULL</span>,
-  iterate <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  iterate <span class='op'>=</span> <span class='cn'>TRUE</span>,
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
   kernel_seq <span class='op'>=</span> <span class='cn'>NULL</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>
+  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for simple_di_stoch_param</span>
@@ -205,7 +207,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
   kernel_seq <span class='op'>=</span> <span class='cn'>NULL</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>
+  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for general_di_det</span>
@@ -218,7 +221,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   domain_list <span class='op'>=</span> <span class='cn'>NULL</span>,
   iterate <span class='op'>=</span> <span class='cn'>TRUE</span>,
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
-  normalize_pop_size <span class='op'>=</span> <span class='cn'>TRUE</span>
+  normalize_pop_size <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for general_di_stoch_kern</span>
@@ -233,7 +237,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
   kernel_seq <span class='op'>=</span> <span class='cn'>NULL</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>
+  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for general_di_stoch_param</span>
@@ -248,7 +253,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
   kernel_seq <span class='op'>=</span> <span class='cn'>NULL</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>
+  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for simple_dd_det</span>
@@ -262,7 +268,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   iterate <span class='op'>=</span> <span class='cn'>TRUE</span>,
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>
+  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for simple_dd_stoch_kern</span>
@@ -277,7 +284,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
   kernel_seq <span class='op'>=</span> <span class='cn'>NA_character_</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>
+  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for simple_dd_stoch_param</span>
@@ -292,7 +300,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
   kernel_seq <span class='op'>=</span> <span class='cn'>NA_character_</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>
+  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for general_dd_det</span>
@@ -306,7 +315,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   iterate <span class='op'>=</span> <span class='cn'>TRUE</span>,
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>
+  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for general_dd_stoch_kern</span>
@@ -321,7 +331,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
   kernel_seq <span class='op'>=</span> <span class='cn'>NA_character_</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>
+  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for general_dd_stoch_param</span>
@@ -336,7 +347,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
   kernel_seq <span class='op'>=</span> <span class='cn'>NA_character_</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>
+  report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -396,6 +408,15 @@ vector to sum before each iteration. Default is <code>TRUE</code> for <code>*_di
 methods and <code>FALSE</code> for <code>*_dd_*</code> methods.</p></td>
     </tr>
     <tr>
+      <th>iteration_direction</th>
+      <td><p>Either <code>"right"</code> (default) or <code>"left"</code>.
+This controls the direction of projection. Right iteration will generate
+the right eigenvector (if it exists), while left iteration generates
+the left eigenvector. These correspond the stable trait distributions, and
+reproductive values, respectively. This parameter is mostly used internally
+by other functions, and most users probably don't want to change it.</p></td>
+    </tr>
+    <tr>
       <th>kernel_seq</th>
       <td><p>For <code>*_stoch_kern</code> methods, the sequence of kernels
 to use during the simulation process. It should have the same number of entries
@@ -421,8 +442,6 @@ methods. Default is <code>FALSE</code>.</p></td>
     <p>The <code>make_ipm.*</code> methods will always return a list of length 6
 containing the following components:</p>
 <ul>
-<li><p><strong>iterators</strong>: iteration kernel(s) (if specified by <code>define_k</code>)
-                            for <code>simple_*</code>. otherwise contains <code>NA</code>.</p></li>
 <li><p><strong>sub_kernels</strong>: a list of sub_kernels specified in <code>define_kernel</code>.</p></li>
 <li><p><strong>env_list</strong>: a list containing the evaluation environments of
                            kernel. This will contain the <code>main_env</code> object

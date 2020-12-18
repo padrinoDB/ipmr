@@ -42,7 +42,7 @@ test_that('exported is_conv_to_asymptotic works as well', {
   L <- 1.02
   U <- 624
   n <- 500
-  states <- list(c('ht', 'sb'))
+  states <- list(c('ht', 'b'))
 
   inv_logit <- function(int, slope, sv) {
     1/(1 + exp(-(int + slope * sv)))
@@ -96,21 +96,12 @@ test_that('exported is_conv_to_asymptotic works as well', {
       evict_fun     = truncated_distributions('norm',
                                               'f_d')
     ) %>%
-    define_k(
-      name          = "K",
-      family        = "IPM",
-      n_b_t_1       = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
-      n_ht_t_1      = leave_discrete %*% n_b_t + P %*% n_ht_t,
-      data_list     = data_list,
-      states        = states,
-      has_hier_effs = FALSE
-    ) %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
-        int_rule     = c(rep("midpoint", 5)),
-        dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
-        dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+        kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete"),
+        int_rule     = c(rep("midpoint", 4)),
+        state_start    = c('ht', "ht", "b", "b"),
+        state_end      = c('ht', 'b', 'b', 'ht')
       )
     ) %>%
     define_domains(
@@ -165,9 +156,9 @@ test_that('exported is_conv_to_asymptotic works as well', {
       f_s       = exp(f_s_int + f_s_slope * dbh_1),
       f_d       = dnorm(dbh_2, f_d_mu, f_d_sd),
       data_list = list(
-        f_r_int   = 0.5,
+        f_r_int   = 5,
         f_r_slope = 0.1,
-        f_s_int   = 1.2,
+        f_s_int   = 10,
         f_s_slope = 0.03,
         f_d_mu    = 1.2,
         f_d_sd    = 0.7
@@ -177,28 +168,20 @@ test_that('exported is_conv_to_asymptotic works as well', {
       evict_cor        = TRUE,
       evict_fun     = truncated_distributions("norm", "f_d")
     ) %>%
-    define_k(
-      name          = "K",
-      family        = "IPM",
-      K             = P + F,
-      data_list     = list(),
-      states        = list(c('dbh')),
-      has_hier_effs = FALSE,
-      evict_cor        = FALSE
-    )  %>%
-    # Alternative 2, put the call to make_impl_args_list() inside of define_impl().
     define_impl(
       make_impl_args_list(
-        kernel_names = c("K", "P", "F"),
-        int_rule     = rep("midpoint", 3),
-        dom_start    = rep("dbh", 3),
-        dom_end      = rep("dbh",3)
+        kernel_names = c("P", "F"),
+        int_rule     = rep("midpoint", 2),
+        state_start    = rep("dbh", 2),
+        state_end      = rep("dbh", 2)
       )
     ) %>%
     define_domains(
       dbh = c(1, 30, 200)
     ) %>%
-    make_ipm(normalize_pop_size = FALSE)
+    define_pop_state(n_dbh = runif(200)) %>%
+    make_ipm(normalize_pop_size = FALSE,
+             iterations = 100)
 
   expect_error(is_conv_to_asymptotic(my_ipm),
                regexp = 'pop_state in IPM contains NAs - cannot check for convergence!')

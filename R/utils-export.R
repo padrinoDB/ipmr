@@ -67,16 +67,16 @@
 #'
 #' # Example with kernels named "P" and "F", and a domain "z"
 #'
-#' kernel_impl_list <- list(P = list(int_rule = "midpoint", dom_start = "z", dom_end = "z"),
-#'                          F = list(int_rule = "midpoint", dom_start = "z", dom_end = "z"))
+#' kernel_impl_list <- list(P = list(int_rule = "midpoint", state_start = "z", state_end = "z"),
+#'                          F = list(int_rule = "midpoint", state_start = "z", state_end = "z"))
 #'
 #' # an equivalent version using make_impl_args_list
 #'
 #' kernel_impl_list <- make_impl_args_list(
 #'      kernel_names = c("P", "F"),
 #'      int_rule     = c("midpoint", "midpoint"),
-#'      dom_start    = c("z", "z"),
-#'      dom_end      = c("z", "z")
+#'      state_start  = c("z", "z"),
+#'      state_end    = c("z", "z")
 #' )
 #'
 #' # define_domains
@@ -236,47 +236,33 @@ use_vr_model <- function(model) {
 }
 
 
-#' @title Right multiplication
+#' @title Right/left multiplication
 #'
-#' @description Performs right multiplication.
+#' @description Performs right and left multiplication.
 #'
-#' @param ... Symbols representing functions - usually things that appear on the
-#' left hand side of \code{formula} and/or \code{...} in \code{define_kernel} and
-#' \code{define_k}.
+#' @param kernel,vectr \code{kernel} should be a bivariate kernel, \code{vectr}
+#' should be a univariate trait distribution.
+#'
+#' @return \code{left_mult} returns \code{t(vectr) \%*\% kernel}. \code{right_mult}
+#' returns \code{kernel \%*\% vectr}.
+#'
 #'
 #' @export
 
-right_mult <- function(...) {
+right_mult <- function(kernel, vectr) {
 
-  to_mult <- list(...)
-  dims <- vapply(to_mult,
-                 function(x) {
-                   if(is.matrix(x)) {
-                     dim(x)
-                   } else {
-                     c(NA_integer_, NA_integer_)
-                   }
-                 },
-                 integer(2))
+  kernel %*% vectr
 
-  id_dim <- max(dims, na.rm = TRUE)
-
-  init   <- diag(id_dim) # Identity matrix as starting point
-
-  Reduce('%*%', to_mult, init = init)
 }
 
-# #' @rdname fun-mult-helpers
-# #' @inheritParams left_mult
-# #' @export
-#
-# left_mult <- function(...) {
-#   to_mult <- rev(list(...))
-#   init <- diag(dim(to_mult[[length(to_mult)]])[1]) # Identity matrix as initial starting point
-#
-#   Reduce('%*%', to_mult, init = init)
-#
-# }
+#' @rdname right_mult
+#' @export
+
+left_mult <- function(kernel, vectr) {
+
+  t(kernel) %*% vectr
+
+}
 
 #' @title Raise a matrix to a power
 #' @rdname matrix-power
@@ -674,7 +660,14 @@ domains.proto_ipm <- function(object) {
                 }
   ) %>%
     .flatten_to_depth(1L) %>%
-    .[!grepl("not_applicable", names(.))] %>%
+    lapply(function(x) {
+      if(any(is.na(x))) {
+        return(NULL)
+      } else {
+        return(x)
+      }
+    }) %>%
+    Filter(f = Negate(is.null), x = .) %>%
     .[!duplicated(names(.)) & !is.na(names(.))]
 
   class(out) <- c("ipmr_domains", "list")
@@ -826,6 +819,8 @@ parameters.default <- function(object) {
 #' @export
 
 `parameters<-.proto_ipm` <- function(object, value) {
+
+  value <- lapply(value, .protect_model)
 
   for(i in seq_len(nrow(object))) {
 

@@ -118,21 +118,12 @@ pred_ipm <- init_ipm("simple_di_det") %>%
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
-  define_k(
-    name          = "K",
-    family        = "IPM",
-    K             = P + F,
-    states        = list(c("sa")),
-    data_list     = list(),
-    has_hier_effs = FALSE,
-    evict_cor     = FALSE
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P", "F", "K"),
-      int_rule     = rep('midpoint', 3),
-      dom_start    = rep("sa", 3),
-      dom_end      = rep("sa", 3)
+      kernel_names = c("P", "F"),
+      int_rule     = rep('midpoint', 2),
+      state_start    = rep("sa", 2),
+      state_end      = rep("sa", 2)
     )
   ) %>%
   define_domains(
@@ -140,9 +131,11 @@ pred_ipm <- init_ipm("simple_di_det") %>%
            max(c(iceplant_ex$log_size, iceplant_ex$log_size_next), na.rm = TRUE) * 1.2,
            100)
   ) %>%
-  make_ipm(iterate = FALSE)
+  define_pop_state(n_sa = runif(100)) %>%
+  make_ipm(iterate = TRUE,
+           iterations = 100)
 
-lambda_ipmr <- lambda(pred_ipm, comp_method = 'eigen') %>%
+lambda_ipmr <- lambda(pred_ipm) %>%
   as.vector()
 
 test_that("Kernels w/ predict() are the same as hand implemented ones", {
@@ -191,21 +184,12 @@ prot_ipm <- init_ipm("simple_di_det") %>%
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
-  define_k(
-    name          = "K",
-    family        = "IPM",
-    K             = P + F,
-    states        = list(c("sa")),
-    data_list     = list(),
-    has_hier_effs = FALSE,
-    evict_cor     = FALSE
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P", "F", "K"),
-      int_rule     = rep('midpoint', 3),
-      dom_start    = rep("sa", 3),
-      dom_end      = rep("sa", 3)
+      kernel_names = c("P", "F"),
+      int_rule     = rep('midpoint', 2),
+      state_start    = rep("sa", 2),
+      state_end      = rep("sa", 2)
     )
   ) %>%
   define_domains(
@@ -213,9 +197,11 @@ prot_ipm <- init_ipm("simple_di_det") %>%
            max(c(iceplant_ex$log_size, iceplant_ex$log_size_next), na.rm = TRUE) * 1.2,
            100)
   ) %>%
-  make_ipm(iterate = FALSE)
+  define_pop_state(n_sa = runif(100)) %>%
+  make_ipm(iterate = TRUE,
+           iterations = 100)
 
-lambda_protected <- lambda(prot_ipm, comp_method = 'eigen') %>%
+lambda_protected <- lambda(prot_ipm) %>%
   as.vector()
 
 test_that("use_vr_model works as expected", {
@@ -297,21 +283,12 @@ sum_ipm <- init_ipm("simple_di_det") %>%
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
-  define_k(
-    name          = "K",
-    family        = "IPM",
-    K             = P + F,
-    states        = list(c("sa")),
-    data_list     = list(),
-    has_hier_effs = FALSE,
-    evict_cor     = FALSE
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P", "F", "K"),
-      int_rule     = rep('midpoint', 3),
-      dom_start    = rep("sa", 3),
-      dom_end      = rep("sa", 3)
+      kernel_names = c("P", "F"),
+      int_rule     = rep('midpoint', 2),
+      state_start    = rep("sa", 2),
+      state_end      = rep("sa", 2)
     )
   ) %>%
   define_domains(
@@ -319,9 +296,11 @@ sum_ipm <- init_ipm("simple_di_det") %>%
            max(c(iceplant_ex$log_size, iceplant_ex$log_size_next), na.rm = TRUE) * 1.2,
            100)
   ) %>%
-  make_ipm(iterate = FALSE)
+  define_pop_state(n_sa = runif(100)) %>%
+  make_ipm(iterate = TRUE,
+           iterations = 100)
 
-lambda_ipmr <- lambda(sum_ipm, comp_method = 'eigen') %>%
+lambda_ipmr <- lambda(sum_ipm, type_lambda = "last") %>%
   as.vector()
 
 test_that("Kernels w/ predict() are the same as hand implemented ones", {
@@ -336,11 +315,6 @@ test_that("Kernels w/ predict() are the same as hand implemented ones", {
 
   expect_equal(p_mat, p_kern)
   expect_equal(f_mat, f_kern)
-
-  k_mat <- sum_ipm$iterators$K
-  class(k_mat) <- NULL
-
-  expect_equal(k_mat, k_kern)
 
 })
 

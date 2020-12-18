@@ -586,7 +586,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
     gamma_nd_site = dnorm(ln_leaf_l_2, dc_nr_int_site, dc_nr_sd_site),
 
     data_list = full_data_list,
-    states = list(c('ln_leaf_l')),
+    states = list(c('ln_leaf_l', 'd')),
     has_hier_effs = TRUE,
     levels_hier_effs = hier_effs,
     evict_cor = TRUE,
@@ -626,7 +626,7 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
     sig_n_site       = inv_logit(nr_s_z_int_site, nr_s_z_b_site, ln_leaf_l_1),
     mu_n_site        = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
     data_list        = full_data_list,
-    states           = list(c('ln_leaf_l')),
+    states           = list(c('ln_leaf_l', 'd')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_effs,
     evict_cor        = FALSE
@@ -638,24 +638,10 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
     sig_r_site        = inv_logit(ra_s_z_int_site, ra_s_z_b_site, sqrt_area_1),
     mu_r_site         = inv_logit(ra_d_z_int_site, ra_d_z_b_site, sqrt_area_1),
     data_list        = full_data_list,
-    states           = list(c('sqrt_area')),
+    states           = list(c('sqrt_area', 'd')),
     has_hier_effs    = TRUE,
     levels_hier_effs = hier_effs,
     evict_cor        = FALSE
-  ) %>%
-  define_k(
-    name = 'K_site',
-    n_ln_leaf_l_t_1 = PF_xx_site %*% n_ln_leaf_l_t +
-      PF_zx_site %*% n_sqrt_area_t +
-      PF_dx_site %*% n_d_t,
-    n_sqrt_area_t_1 = PF_xz_site %*% n_ln_leaf_l_t,
-    n_d_t_1 =         PF_xd_site %*% n_ln_leaf_l_t +
-      PF_zd_site %*% n_sqrt_area_t,
-    family = 'IPM',
-    data_list = full_data_list,
-    states    = list(c('sqrt_area', 'ln_leaf_l')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_effs
   ) %>%
   define_impl(
     make_impl_args_list(
@@ -663,23 +649,20 @@ gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
                              c('xx',
                                'zx', 'dx', 'xz', 'xd', 'zd'),
                              '_site',
-                             sep = ""),
-                       'K_site'),
-      int_rule     = rep('midpoint', 7),
-      dom_start    = c('ln_leaf_l',
+                             sep = "")),
+      int_rule     = rep('midpoint', 6),
+      state_start    = c('ln_leaf_l',
                        'sqrt_area',
-                       NA_character_,
+                       'd',
                        'ln_leaf_l',
                        'ln_leaf_l',
-                       'sqrt_area',
-                       NA_character_),
-      dom_end      = c('ln_leaf_l',
+                       'sqrt_area'),
+      state_end      = c('ln_leaf_l',
                        'ln_leaf_l',
                        'ln_leaf_l',
                        'sqrt_area',
-                       NA_character_,
-                       NA_character_,
-                       NA_character_)
+                       'd',
+                       'd')
     )
   ) %>%
   define_domains(
@@ -811,39 +794,24 @@ stoch_mod_hand <- list(pop_state = pop_holder_stoch)
 
 # ipmr_version
 
-temp_proto <- gen_di_stoch_kern$proto_ipm %>%
-  remove_k()
+temp_proto <- gen_di_stoch_kern$proto_ipm
 
 stoch_mod_ipmr <- temp_proto %>%
-  define_k(
-    name = 'K_site',
-    n_ln_leaf_l_t_1 = PF_xx_site %*% n_ln_leaf_l_t +
-                      PF_zx_site %*% n_sqrt_area_t +
-                      PF_dx_site %*% n_d_t,
-    n_sqrt_area_t_1 = PF_xz_site %*% n_ln_leaf_l_t,
-    n_d_t_1         = PF_xd_site %*% n_ln_leaf_l_t +
-                      PF_zd_site %*% n_sqrt_area_t,
-    family = 'IPM',
-    data_list = full_data_list,
-    states    = list(c('sqrt_area', 'ln_leaf_l')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_effs
-  ) %>%
   define_impl(
     make_impl_args_list(
       kernel_names = c(paste('PF_',
                              c('xx',
                                'zx', 'dx', 'xz', 'xd', 'zd'),
                              '_site',
-                             sep = ""),
-                       'K_site'),
-      int_rule     = rep('midpoint', 7),
-      dom_start    = c('ln_leaf_l',
-                       'sqrt_area', NA_character_,
-                       'ln_leaf_l', 'ln_leaf_l', 'sqrt_area', NA_character_),
-      dom_end      = c('ln_leaf_l',
+                             sep = "")),
+      int_rule     = rep('midpoint', 6),
+      state_start    = c('ln_leaf_l',
+                       'sqrt_area',
+                       'd',
+                       'ln_leaf_l', 'ln_leaf_l', 'sqrt_area'),
+      state_end      = c('ln_leaf_l',
                        'ln_leaf_l', 'ln_leaf_l',
-                       'sqrt_area', NA_character_, NA_character_, NA_character_)
+                       'sqrt_area', 'd', 'd')
     )
   ) %>%
   define_domains(
@@ -928,7 +896,8 @@ test_that('general stochastic simulations match hand generated ones', {
 test_that('evict_fun warnings are correctly generated', {
 
   test_evict_fun <-
-    gen_di_stoch_kern$proto_ipm[!grepl('PF_zx_site', gen_di_stoch_kern$proto_ipm$kernel_id), ]
+    gen_di_stoch_kern$proto_ipm[!grepl('PF_zx_site',
+                                       gen_di_stoch_kern$proto_ipm$kernel_id), ]
 
   wrngs <- capture_warnings(
     test_evict_fun_warning <- test_evict_fun %>%
@@ -971,23 +940,20 @@ test_that('evict_fun warnings are correctly generated', {
             'PF_xz_site',
             'PF_xd_site',
             'PF_zd_site',
-            'K_site',
             'PF_zx_site'
           ),
-          int_rule     = rep('midpoint', 7),
-          dom_start    = c('ln_leaf_l',
-                           NA_character_,
+          int_rule     = rep('midpoint', 6),
+          state_start    = c('ln_leaf_l',
+                           'd',
                            'ln_leaf_l',
                            'ln_leaf_l',
                            'sqrt_area',
-                           NA_character_,
                            'sqrt_area'),
-          dom_end      = c('ln_leaf_l',
+          state_end      = c('ln_leaf_l',
                            'ln_leaf_l',
                            'sqrt_area',
-                           NA_character_,
-                           NA_character_,
-                           NA_character_,
+                           'd',
+                           'd',
                            'ln_leaf_l')
         )
       ) %>%
@@ -1089,7 +1055,7 @@ test_that('normalize pop vec works', {
       gamma_nd_site = dnorm(ln_leaf_l_2, dc_nr_int_site, dc_nr_sd_site),
 
       data_list = full_data_list,
-      states = list(c('ln_leaf_l')),
+      states = list(c('ln_leaf_l', 'd')),
       has_hier_effs = TRUE,
       levels_hier_effs = hier_effs,
       evict_cor = TRUE,
@@ -1129,7 +1095,7 @@ test_that('normalize pop vec works', {
       sig_n_site       = inv_logit(nr_s_z_int_site, nr_s_z_b_site, ln_leaf_l_1),
       mu_n_site        = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
       data_list        = full_data_list,
-      states           = list(c('ln_leaf_l')),
+      states           = list(c('ln_leaf_l', 'd')),
       has_hier_effs    = TRUE,
       levels_hier_effs = hier_effs,
       evict_cor        = FALSE
@@ -1141,24 +1107,10 @@ test_that('normalize pop vec works', {
       sig_r_site        = inv_logit(ra_s_z_int_site, ra_s_z_b_site, sqrt_area_1),
       mu_r_site         = inv_logit(ra_d_z_int_site, ra_d_z_b_site, sqrt_area_1),
       data_list        = full_data_list,
-      states           = list(c('sqrt_area')),
+      states           = list(c('sqrt_area', 'd')),
       has_hier_effs    = TRUE,
       levels_hier_effs = hier_effs,
       evict_cor        = FALSE
-    ) %>%
-    define_k(
-      name = 'K_site',
-      n_ln_leaf_l_t_1 = PF_xx_site %*% n_ln_leaf_l_t +
-        PF_zx_site %*% n_sqrt_area_t +
-        PF_dx_site %*% n_d_t,
-      n_sqrt_area_t_1 = PF_xz_site %*% n_ln_leaf_l_t,
-      n_d_t_1 =         PF_xd_site %*% n_ln_leaf_l_t +
-        PF_zd_site %*% n_sqrt_area_t,
-      family = 'IPM',
-      data_list = full_data_list,
-      states    = list(c('sqrt_area', 'ln_leaf_l')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_effs
     ) %>%
     define_impl(
       make_impl_args_list(
@@ -1166,23 +1118,20 @@ test_that('normalize pop vec works', {
                                c('xx',
                                  'zx', 'dx', 'xz', 'xd', 'zd'),
                                '_site',
-                               sep = ""),
-                         'K_site'),
-        int_rule     = rep('midpoint', 7),
-        dom_start    = c('ln_leaf_l',
+                               sep = "")),
+        int_rule     = rep('midpoint', 6),
+        state_start    = c('ln_leaf_l',
                          'sqrt_area',
-                         NA_character_,
+                         'd',
                          'ln_leaf_l',
                          'ln_leaf_l',
-                         'sqrt_area',
-                         NA_character_),
-        dom_end      = c('ln_leaf_l',
+                         'sqrt_area'),
+        state_end      = c('ln_leaf_l',
                          'ln_leaf_l',
                          'ln_leaf_l',
                          'sqrt_area',
-                         NA_character_,
-                         NA_character_,
-                         NA_character_)
+                         'd',
+                         'd')
       )
     ) %>%
     define_domains(
@@ -1268,8 +1217,8 @@ test_that('normalize pop vec works', {
 
 test_that('partially stochastic models also work', {
 
-  all_g_int   <- as.list(rnorm(5, mean = 5.781, sd = 0.9)) # as.list(t(ranef(my_growth_model)))
-  all_f_s_int <- as.list(rnorm(5, mean = 2.6204, sd = 0.3)) # as.list(t(ranef(my_seed_model)))
+  all_g_int   <- as.list(rnorm(5, mean = 5.781, sd = 0.9))
+  all_f_s_int <- as.list(rnorm(5, mean = 2.6204, sd = 0.3))
 
   names(all_g_int)   <- paste("g_int_", 1:5, sep = "")
   names(all_f_s_int) <- paste("f_s_int_", 1:5, sep = "")
@@ -1349,7 +1298,7 @@ test_that('partially stochastic models also work', {
       f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
       f_s_year      = exp(f_s_int_year + f_s_slope * ht_1),
       data_list     = all_params,
-      states        = list(c('ht')),
+      states        = list(c('ht', 'b')),
       has_hier_effs    = TRUE,
       levels_hier_effs = list(year = 1:5)
     ) %>%
@@ -1357,7 +1306,7 @@ test_that('partially stochastic models also work', {
       name    = 'stay_discrete',
       formula = 0,
       family  = "DD",
-      states  = list(c('ht')),
+      states  = list(c('b')),
       has_hier_effs = FALSE,
       evict_cor = FALSE
     ) %>%
@@ -1367,28 +1316,18 @@ test_that('partially stochastic models also work', {
       f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
       family        = 'DC',
       data_list     = all_params,
-      states        = list(c('ht')),
+      states        = list(c('ht', 'b')),
       has_hier_effs = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'f_d')
-    ) %>%
-    define_k(
-      name          = "K_year",
-      family        = "IPM",
-      n_b_t_1       = stay_discrete %*% n_b_t  + go_discrete_year %*% n_ht_t,
-      n_ht_t_1      = leave_discrete %*% n_b_t + P_year %*% n_ht_t,
-      data_list     = all_params,
-      states        = list(c('ht')),
-      has_hier_effs = TRUE,
-      levels_hier_effs = list(year = 1:5)
-    ) %>%
+    )  %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c("P_year", "go_discrete_year", "stay_discrete", "leave_discrete", "K"),
-        int_rule     = c(rep("midpoint", 5)),
-        dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
-        dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+        kernel_names = c("P_year", "go_discrete_year", "stay_discrete", "leave_discrete"),
+        int_rule     = c(rep("midpoint", 4)),
+        state_start    = c('ht', "ht",'b', 'b'),
+        state_end      = c('ht', 'b', 'b', 'ht')
       )
     ) %>%
     define_domains(
@@ -1404,7 +1343,7 @@ test_that('partially stochastic models also work', {
                              inv_logit_2 = inv_logit_2),
              return_all_envs = TRUE)
 
-  states <- list(c('ht'))
+  states <- list(c('ht', 'b'))
 
   det_version <- init_ipm("general_di_det") %>%
     define_kernel(
@@ -1450,21 +1389,12 @@ test_that('partially stochastic models also work', {
       evict_fun     = truncated_distributions('norm',
                                               'f_d')
     ) %>%
-    define_k(
-      name     = "K",
-      family   = "IPM",
-      n_b_t_1  = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
-      n_ht_t_1 = leave_discrete %*% n_b_t + P %*% n_ht_t,
-      data_list     = data_list_cr,
-      states        = states,
-      has_hier_effs = FALSE
-    ) %>%
     define_impl(
       make_impl_args_list(
-        kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
-        int_rule     = c(rep("midpoint", 5)),
-        dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
-        dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+        kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete"),
+        int_rule     = c(rep("midpoint", 4)),
+        state_start    = c('ht', "ht", 'b', 'b'),
+        state_end      = c('ht', 'b', 'b', 'ht')
       )
     ) %>%
     define_domains(

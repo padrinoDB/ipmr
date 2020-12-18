@@ -165,55 +165,7 @@
   evict_cor <span class='op'>=</span> <span class='cn'>FALSE</span>,
   evict_fun <span class='op'>=</span> <span class='cn'>NULL</span>,
   integrate <span class='op'>=</span> <span class='cn'>TRUE</span>
-<span class='op'>)</span>
-
-<span class='fu'>define_k</span><span class='op'>(</span>
-  <span class='va'>proto_ipm</span>,
-  <span class='va'>name</span>,
-  <span class='va'>family</span>,
-  <span class='va'>...</span>,
-  data_list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
-  <span class='va'>states</span>,
-  has_hier_effs <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  levels_hier_effs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
-  levels_ages <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
-  evict_cor <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  evict_fun <span class='op'>=</span> <span class='cn'>NULL</span>,
-  integrate <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span>
-
-<span class='co'># S3 method for default</span>
-<span class='fu'>define_k</span><span class='op'>(</span>
-  <span class='va'>proto_ipm</span>,
-  <span class='va'>name</span>,
-  <span class='va'>family</span>,
-  <span class='va'>...</span>,
-  data_list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
-  <span class='va'>states</span>,
-  has_hier_effs <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  levels_hier_effs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
-  evict_cor <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  evict_fun <span class='op'>=</span> <span class='cn'>NULL</span>,
-  integrate <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span>
-
-<span class='co'># S3 method for age_x_size</span>
-<span class='fu'>define_k</span><span class='op'>(</span>
-  <span class='va'>proto_ipm</span>,
-  <span class='va'>name</span>,
-  <span class='va'>family</span>,
-  <span class='va'>...</span>,
-  data_list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
-  <span class='va'>states</span>,
-  has_hier_effs <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  levels_hier_effs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
-  levels_ages <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
-  evict_cor <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  evict_fun <span class='op'>=</span> <span class='cn'>NULL</span>,
-  integrate <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span>
-
-<span class='fu'>remove_k</span><span class='op'>(</span><span class='va'>proto_ipm</span><span class='op'>)</span></pre>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -224,10 +176,7 @@
     </tr>
     <tr>
       <th>name</th>
-      <td><p>The name of the new kernel. There are only two rules: 1. For
-<code>define_k</code>, the name must start with <code>"K"</code> or <code>"k"</code>.
-2. For <code>define_kernel</code>, the name cannot start with <code>"K"</code> or
-<code>"k"</code>.</p></td>
+      <td><p>The name of the new kernel.</p></td>
     </tr>
     <tr>
       <th>formula</th>
@@ -243,13 +192,7 @@ discrete to discrete (e.g. stasis in a seedbank).</p></td>
     <tr>
       <th>...</th>
       <td><p>For <code>define_kernel</code>, a set of named expressions that correspond
-to vital rates in <code>formula</code>. For <code>define_k</code>, a set of named expressions
-that relate the population state at T + 1 to the population state at T. Alternatively,
-can be an expression where the left hand side is the name of the kernel specified
-in <code>name</code> and the right hand side only describes the structure of the
-iteration kernel. In all cases, suffix expansion of hierarchical models is supported.
-Specific details for each case are in their respecitive function's sections
-below.</p></td>
+to vital rates in <code>formula</code>. Suffix expansion of hierarchical models is supported.</p></td>
     </tr>
     <tr>
       <th>data_list</th>
@@ -279,8 +222,9 @@ in the vital rate expressions.</p></td>
     </tr>
     <tr>
       <th>levels_ages</th>
-      <td><p>A list with possible two entries: 1. <code>"age"</code>: the range
-of ages, and, optionally, 2. <code>"max_age"</code>: The maximum age for the model.</p></td>
+      <td><p>A list with possibly 2 entries: 1. <code>"age"</code>: the range
+of possible ages in the model and, optionally, 2. <code>"max_age"</code>: the maximum
+age individuals in the model can attain.</p></td>
     </tr>
     <tr>
       <th>evict_cor</th>
@@ -324,23 +268,13 @@ This  means that every combination of the values in <code>levels_hier_effs</code
 must exist in the <code>data_list</code>, or the model will fail with an error along
 the lines of <code>Error in eval_tidy: object 'x_yz' not found</code>. In order to
 exclude levels that do not exist in your data, you can add a vector to the list
-in <code>levels_hier_effs</code> called <code>drop_levels</code>. This should contain the
+in <code>levels_hier_effs</code> called <code>"drop_levels"</code>. This should contain the
 values you wish to exclude as a character vector. For example, if data are
 collected for <code>sites = c("a", "b", "c")</code>, and <code>years = c(2005:2008)</code>,
 but there is no data from site <code>"a"</code> in <code>2007</code>, we can use
 <code>levels_hier_effs = list(site = c("a", "b", "c"), year = c(2005:2008),
 drop_levels = c("a_2007"))</code>.</p>
-<p><strong><code>define_k</code></strong></p>
-<p>The preferred method of defining a <code>K</code> kernel is to use the left
-hand side of the <code>...</code> to reference the population vectors that the right
-hand side creates (e.g. <code>n_T_1 = (P + F) %*% n_T</code>). This enables
-iteration-based methods to work properly. On the other hand, these iterations
-can be quite time consuming, and some applications only require
-an iteration matrix while not necessarily requiring the population vectors (e.g.
-calculations of deterministic population growth rate). In those cases, the
-<code>...</code> can contain something like <code>K = P + F</code>. In this case, the left
-hand side of the expression should match the <code>name</code> argument to <code>define_k</code>.</p>
-<p><strong><code>define_kernel</code></strong></p>
+
 <p><code>define_kernel</code> generates most of the information needed to create an IPM
 kernel. There are a few requirements - <code>name</code>, <code>family</code>,
 <code>formula</code>, and <code>states</code> must not be empty. The <code>formula</code> should be an expression
