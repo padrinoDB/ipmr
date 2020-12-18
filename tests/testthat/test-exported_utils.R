@@ -232,9 +232,9 @@ test_that("collapse_pop_state works", {
     unlist() %>%
     round(digits = 6)
 
-  target <- c(seedlings = 0.104909,
-              NRA       = 0.15683,
-              RA        = 0.002495)
+  target <- c(seedlings = 0.104561,
+              NRA       = 0.148198,
+              RA        = 0.001998)
   expect_equal(temp, target)
 
 })

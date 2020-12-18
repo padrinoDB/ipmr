@@ -14,19 +14,15 @@ data_list = list(s_int = 2.2,
                  mu_fd = 2,
                  sd_fd = 0.3)
 
-impl_args <- make_impl_args_list(c('P', 'F', 'K'),
-                                 int_rule = rep('midpoint', 3),
-                                 dom_start = rep('dbh', 3),
-                                 dom_end = rep('dbh', 3))
 
 inv_logit <- function(int, slope, sv) {
   return(1/(1 + exp(-(int + slope * sv))))
 }
 
-impl_args <- make_impl_args_list(c('P', 'F', 'K'),
-                                 int_rule = rep('midpoint', 3),
-                                 dom_start = rep('dbh', 3),
-                                 dom_end = rep('dbh', 3))
+impl_args <- make_impl_args_list(c('P', 'F'),
+                                 int_rule = rep('midpoint', 2),
+                                 state_start = rep('dbh', 2),
+                                 state_end = rep('dbh', 2))
 
 states <- c('dbh', 'dbh')
 
@@ -55,15 +51,12 @@ sim_di_det_ex <- init_ipm('simple_di_det') %>%
                 evict_fun = truncated_distributions('norm',
                                                     'f_d')
   ) %>%
-  define_k('K',
-           K         = P + F,
-           family    = 'IPM',
-           data_list = list(),
-           states    = states,
-           evict_cor = FALSE) %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
+  define_pop_state(n_dbh = runif(100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit),
+           iterate = TRUE,
+           iterations = 100,
            return_all_envs = FALSE,
            return_main_env = FALSE)
 
@@ -101,7 +94,7 @@ n <- 500
 # Initialize the state list and add some helper functions. The survival function
 # in this model is a quadratic function.
 
-states <- list(c('ht', 'sb'))
+states <- list(c('ht', 'b'))
 
 inv_logit <- function(int, slope, sv) {
   1/(1 + exp(-(int + slope * sv)))
@@ -128,7 +121,7 @@ gen_di_det_ex <- init_ipm("general_di_det") %>%
   ) %>%
   define_kernel(
     name          = "go_discrete",
-    formula       = f_r * f_s * g_i,
+    formula       = f_r * f_s * g_i * d_ht,
     family        = 'CD',
     f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
     f_s           = exp(f_s_int + f_s_slope * ht_1),
@@ -155,21 +148,12 @@ gen_di_det_ex <- init_ipm("general_di_det") %>%
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
   ) %>%
-  define_k(
-    name          = "K",
-    family        = "IPM",
-    n_b_t_1       = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
-    n_ht_t_1      = leave_discrete %*% n_b_t + P %*% n_ht_t,
-    data_list     = data_list,
-    states        = states,
-    has_hier_effs = FALSE
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
-      int_rule     = c(rep("midpoint", 5)),
-      dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
-      dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+      kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete"),
+      int_rule     = c(rep("midpoint", 4)),
+      state_start    = c('ht', "ht", "b", "b"),
+      state_end      = c('ht', "b", "b", 'ht')
     )
   ) %>%
   define_domains(

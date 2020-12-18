@@ -113,16 +113,10 @@
 
   for(i in seq_along(others$kernel_id)) {
 
-    end_state   <- paste("n_", start_end[[i]][2], "_t_1", sep = "")
-    start_state <- paste("n_", start_end[[i]][1], "_t", sep = "")
+    temp <- .make_iter_expr(others, start_end, fun, i)
 
-    args <- list(kernel = rlang::sym(others$kernel_id[i]),
-                 vectr  = rlang::ensym(start_state))
-
-    iter_expr <- rlang::call2(fun, !!! args)
-
-    out[[i]]      <- iter_expr
-    names(out)[i] <- end_state
+    out[[i]]      <- temp$iter_expr
+    names(out)[i] <- temp$end_state
 
   }
 
@@ -134,14 +128,14 @@
 }
 
 
-.combine_iter_exprs <- function(temp, all_states) {
+.combine_iter_exprs <- function(temp, ...) {
 
   UseMethod(".combine_iter_exprs")
 }
 
 #' @noRd
 
-.combine_iter_exprs.default <- function(temp, all_states) {
+.combine_iter_exprs.default <- function(temp, all_states, ...) {
 
   out <- list()
 
@@ -172,11 +166,11 @@
 
 #' @noRd
 
-.combine_iter_exprs.age_x_size_exprs <- function(temp) {
+.combine_iter_exprs.age_x_size_exprs <- function(temp, ...) {
 
-  out <- list()
+  out  <- list()
 
-  temp       <- temp$out
+  temp <- temp$out
 
   if(!anyDuplicated(names(temp))) {
 
@@ -268,6 +262,86 @@
 }
 
 .handle_max_age <- function(expr_list, levels_ages, start_end, fun) {
+
+  switch(fun,
+         "right_mult" = .handle_max_age_right(expr_list,
+                                              levels_ages,
+                                              start_end,
+                                              fun),
+         "left_mult" = .handle_max_age_left(expr_list,
+                                            levels_ages,
+                                            start_end,
+                                            fun))
+
+}
+
+# Prevents age_plus_1 from going over the maximum age limit during left
+# iteration (which has form n_age_t_1 = kernel_age %*% n_age_plus_1_t)
+.handle_max_age_left <- function(expr_list, levels_ages, start_end, fun) {
+
+  if(!"max_age" %in% names(levels_ages)) {
+
+    max_age <- unlist(levels_ages) %>% max()
+
+  } else {
+
+    max_age <- levels_ages$max_age
+
+  }
+
+  kerns <- lapply(names(expr_list$out),
+                  function(x) {
+                    grepl("_age_", x)
+                  }) %>%
+    unlist() %>%
+    expr_list$out[.] %>%
+    lapply(function(y, start_end) {
+      args <- rlang::call_args(y)
+      kern <- rlang::expr_text(args$kernel)
+      sv   <- rlang::expr_text(args$vectr)
+
+      kern <- c(gsub("age", "max_age", kern)) # P_max_age %*% n_max_age_t
+      sv   <- c(gsub("age_plus_1", "max_age", sv))
+
+      out <- list(kern = kern,
+                  sv   = sv)
+      return(out)
+    },
+    start_end = start_end)
+
+  end_states <- gsub("_age_", "_max_age_", names(kerns))
+
+  out <- list()
+
+  it <- 1
+  for(i in seq_along(kerns)) {
+
+    if(length(kerns[[i]]$kern) != length(kerns[[i]]$sv)) {
+      stop("Error generating iteration format for max_age!")
+    }
+
+    for(j in seq_along(kerns[[i]]$kern)) {
+
+      args <- list(kernel = rlang::sym(kerns[[i]]$kern[j]),
+                   vectr  = rlang::sym(kerns[[i]]$sv[j]))
+
+      out[[it]] <- rlang::call2(fun, !!!args)
+
+      names(out)[it] <- end_states[i]
+
+      it <- it + 1
+
+    }
+
+  }
+
+  expr_list$out <- c(expr_list$out, out)
+
+  return(expr_list)
+
+}
+
+.handle_max_age_right <- function(expr_list, levels_ages, start_end, fun) {
 
   if(!"max_age" %in% names(levels_ages)) return(expr_list)
 
@@ -366,44 +440,12 @@
 
   }
 
-  # Things get a little hairy here. For any non-fecundity expression,
-  # we want end_state_age_t_1 = P_age_minus_1 %*% start_state_minus_1_t.
-  # The fecundity expressions will always have end_state_0_t_1, so we do not lag
-  # those. The ones that do not have _0_ in the name require an age_minus_1 for
-  # start state and the kernel name.
-
   for(i in seq_along(others$kernel_id)) {
 
-    end_state   <- paste("n_", start_end[[i]][2], "_t_1", sep = "")
+    temp <- .make_iter_expr(others, start_end, fun, i)
 
-    if(!grepl("_0_", end_state)) {
-
-      start_state <- paste("n_", start_end[[i]][1], "_t", sep = "") %>%
-        gsub(pattern = "age", replacement = "age_minus_1", x = .)
-
-      use_kernel  <- gsub("age", "age_minus_1", others$kernel_id[i])
-
-      args <- list(kernel = rlang::sym(use_kernel),
-                   vectr  = rlang::sym(start_state))
-
-      iter_expr <- rlang::call2(fun, !!! args)
-
-    } else {
-
-      start_state <- paste("n_", start_end[[i]][1], "_t", sep = "")
-      use_kernel  <- others$kernel_id[i]
-
-      args <- list(kernel = rlang::sym(use_kernel),
-                   vectr  = rlang::sym(start_state))
-
-      iter_expr <- rlang::call2(fun, !!! args)
-
-      iter_expr <- rlang::call2("sum", iter_expr)
-
-    }
-
-    out[[i]]      <- iter_expr
-    names(out)[i] <- end_state
+    out[[i]]      <- temp$iter_expr
+    names(out)[i] <- temp$end_state
 
   }
 
@@ -411,5 +453,155 @@
               all_names = all_names,
               all_levels = all_levels,
               all_states = all_states))
+
+}
+
+
+# Things get a little hairy here. For any non-fecundity expression in right iteration,
+# we want end_state_age_t_1 = P_age_minus_1 %*% start_state_minus_1_t.
+# The fecundity expressions will always have end_state_0_t_1, so we do not lag
+# those. The ones that do not have _0_ in the name require an age_minus_1 for
+# start state and the kernel name. On the other hand, the left iteration needs
+# age_plus_1 to start and ends on age, with v(M+1) == 0
+#' @noRd
+#'
+
+
+.make_iter_expr <- function(others, start_end, fun, it) {
+
+  switch(fun,
+         "right_mult" = .make_iter_right(others, start_end, fun, it),
+         "left_mult"  = .make_iter_left(others, start_end, fun, it))
+
+}
+
+
+.make_iter_left <- function(others, start_end, fun, it) {
+
+  UseMethod(".make_iter_left")
+
+}
+
+.make_iter_left.age_x_size <- function(others, start_end, fun, it) {
+
+  # Start by reversing the list. This corresponds to n_i(t + 1) = K_ij %*% n_j_t ->
+  # n_j(t+1) = K^T_ij %*% n_i(t) (Ellner Rees Am Nat 2006 Sup A, p 426)
+
+  start_end   <- lapply(start_end, function(x) rev(x))
+
+  start_state   <- paste("n_", start_end[[it]][1], "_t", sep = "")
+
+  if(!grepl("_0_", start_state)) {
+
+    end_state <- paste("n_", start_end[[it]][2], "_t_1", sep = "")
+
+    start_state <- gsub("age", "age_plus_1", start_state)
+
+    use_kernel  <- others$kernel_id[it]
+
+    args <- list(kernel = rlang::sym(use_kernel),
+                 vectr  = rlang::sym(start_state))
+
+    iter_expr <- rlang::call2(fun, !!! args)
+
+  } else {
+
+    end_state <- paste("n_", start_end[[it]][2], "_t_1", sep = "")
+    use_kernel  <- others$kernel_id[it]
+
+    args <- list(kernel = rlang::sym(use_kernel),
+                 vectr  = rlang::sym(start_state))
+
+    iter_expr <- rlang::call2(fun, !!! args)
+
+  }
+
+  out <- list(iter_expr = iter_expr,
+              end_state = end_state)
+
+  return(out)
+
+
+}
+
+.make_iter_left.default <- function(others, start_end, fun, it) {
+
+  start_end   <- lapply(start_end, function(x) rev(x))
+
+  end_state   <- paste("n_", start_end[[it]][2], "_t_1", sep = "")
+  start_state <- paste("n_", start_end[[it]][1], "_t", sep = "")
+
+  args <- list(kernel = rlang::sym(others$kernel_id[it]),
+               vectr  = rlang::ensym(start_state))
+
+  iter_expr <- rlang::call2(fun, !!! args)
+
+
+  out <- list(iter_expr = iter_expr,
+              end_state = end_state)
+
+  return(out)
+
+}
+
+.make_iter_right <- function(others, start_end, fun, it) {
+
+  UseMethod(".make_iter_right")
+
+}
+
+
+.make_iter_right.age_x_size <- function(others, start_end, fun, it) {
+
+  end_state   <- paste("n_", start_end[[it]][2], "_t_1", sep = "")
+
+  if(!grepl("_0_", end_state)) {
+
+    start_state <- paste("n_", start_end[[it]][1], "_t", sep = "") %>%
+      gsub(pattern = "age", replacement = "age_minus_1", x = .)
+
+    use_kernel  <- gsub("age", "age_minus_1", others$kernel_id[it])
+
+    args <- list(kernel = rlang::sym(use_kernel),
+                 vectr  = rlang::sym(start_state))
+
+    iter_expr <- rlang::call2(fun, !!! args)
+
+  } else {
+
+    start_state <- paste("n_", start_end[[it]][1], "_t", sep = "")
+    use_kernel  <- others$kernel_id[it]
+
+    args <- list(kernel = rlang::sym(use_kernel),
+                 vectr  = rlang::sym(start_state))
+
+    iter_expr <- rlang::call2(fun, !!! args)
+
+    iter_expr <- rlang::call2("sum", iter_expr)
+
+  }
+
+  out <- list(iter_expr = iter_expr,
+              end_state = end_state)
+
+  return(out)
+
+}
+
+.make_iter_right.default <- function(others, start_end, fun, it) {
+
+  end_state   <- paste("n_", start_end[[it]][2], "_t_1", sep = "")
+  start_state <- paste("n_", start_end[[it]][1], "_t", sep = "")
+
+  args <- list(kernel = rlang::sym(others$kernel_id[it]),
+               vectr  = rlang::ensym(start_state))
+
+  iter_expr <- rlang::call2(fun, !!! args)
+
+
+  out <- list(iter_expr = iter_expr,
+              end_state = end_state)
+
+  return(out)
 
 }

@@ -1572,19 +1572,19 @@ test_that('right_ev messages are being produced correctly', {
 
   test_message <- capture_warning(
     right_ev(sim_di_det_3,
-             n_iterations = 2)
+             iterations = 8)
   )
 
   expect_true(
     grepl(
-      'did not converge after 8 iterations\\. Returning NA',
+      'did not converge after 14 iterations\\. Returning NA',
       test_message$message
     )
   )
 
   test_message <- capture_warning(
     right_ev(sim_di_det_1,
-             n_iterations = 3)
+             iterations = 3)
   )
 
   expect_true(
@@ -1617,7 +1617,7 @@ test_that('left_ev.simple_di_det_ipm can re-iterate models', {
 test_that('warnings are produced correctly', {
 
   msg <- catch_cnd(left_ev(sim_di_det_3,
-                           n_iterations = 3))
+                           iterations = 3))
 
   expect_true(
     grepl(
@@ -1629,7 +1629,7 @@ test_that('warnings are produced correctly', {
 
   msg <- capture_warning(
     left_ev(sim_di_det_1,
-            n_iterations = 2
+            iterations = 2
     )
   )
 
@@ -1841,7 +1841,7 @@ gen_di_det_2 <- init_ipm("general_di_det") %>%
 test_that('right_ev.general_di_det can re-iterate models', {
 
   test_reiterate <- right_ev(gen_di_det_2,
-                             n_iterations = 100)
+                             iterations = 100)
 
   ipmr_w <- c(test_reiterate$b_w,
               test_reiterate$ht_w)
@@ -1855,7 +1855,7 @@ test_that('right_ev.general_di_det returns NAs and warnings properly', {
 
   test_message <- capture_warning(
     right_ev(gen_di_det_2,
-             n_iterations = 3)
+             iterations = 3)
   )
 
   expect_true(
@@ -1873,7 +1873,7 @@ target_v <- target_v / sum(target_v)
 test_that('left_ev.gen_di_det returns the same as mega-matrix models', {
 
   ipmr_v <- left_ev(gen_di_det_1,
-                    n_iterations = 200)
+                    iterations = 200)
 
   ipmr_v <- c(ipmr_v$b_v, ipmr_v$ht_v)
 
@@ -1886,7 +1886,7 @@ test_that('left_ev.general_di_det can re-iterate models', {
   # THis really shouldn't make a difference for the left eigenvector,
   # We don't actually use make_ipm() to re-iterate things
 
-  ipmr_v <- left_ev(gen_di_det_2, n_iterations = 200)
+  ipmr_v <- left_ev(gen_di_det_2, iterations = 200)
 
   ipmr_v <- c(ipmr_v$b_v, ipmr_v$ht_v)
 
@@ -1900,7 +1900,7 @@ test_that('left_ev.general_di_det returns warnings properly', {
 
   test_message <- capture_warning(
     left_ev(gen_di_det_2,
-            n_iterations = 3)
+            iterations = 3)
   )
 
   expect_true(
@@ -1911,6 +1911,126 @@ test_that('left_ev.general_di_det returns warnings properly', {
   )
 
 })
+
+test_that("age_size models left/right_ev", {
+
+  m.par.true <- c(## survival
+    surv.int  = -1.70e+1,
+    surv.z    =  6.68e+0,
+    surv.a    = -3.34e-1,
+    ## growth
+    grow.int  =  1.27e+0,
+    grow.z    =  6.12e-1,
+    grow.a    = -7.24e-3,
+    grow.sd   =  7.87e-2,
+    ## reproduce or not
+    repr.int  = -7.88e+0,
+    repr.z    =  3.11e+0,
+    repr.a    = -7.80e-2,
+    ## recruit or not
+    recr.int  =  1.11e+0,
+    recr.a    =  1.84e-1,
+    ## recruit size
+    rcsz.int  =  3.62e-1,
+    rcsz.z    =  7.09e-1,
+    rcsz.sd   =  1.59e-1)
+
+  param_list <- as.list(m.par.true) %>%
+    setNames(gsub(pattern = "\\.", replacement = "_", x = names(.)))
+
+  inv_logit <- function(x) {
+
+    return( 1 / (1 + exp(-x)) )
+  }
+
+  f_fun <- function(age, s_age, pb_age, pr_age, recr) {
+
+    if(age == 0) return(0)
+
+    s_age * pb_age * pr_age * recr * 0.5
+
+  }
+
+  a_s_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
+    define_kernel(
+      name          = "P_age",
+      family        = "CC",
+      formula       = s_age * g_age * d_wt,
+      s_age         = inv_logit(surv_int + surv_z * wt_1 + surv_a * age),
+      g_age         = dnorm(wt_2, mu_g_age, grow_sd),
+      mu_g_age      = grow_int + grow_z * wt_1 + grow_a * age,
+      data_list     = param_list,
+      states        = list(c("wt_age")),
+      has_hier_effs = FALSE,
+      levels_ages   = list(age = c(0:20), max_age = 21),
+      evict_cor     = FALSE
+    ) %>%
+    define_kernel(
+      name          = "F_age",
+      family        = "CC",
+      formula       = f_fun(age, s_age, pb_age, pr_age, recr) * d_wt,
+      s_age         = inv_logit(surv_int + surv_z * wt_1 + surv_a * age),
+      pb_age        = inv_logit(repr_int + repr_z * wt_1 + repr_a * age),
+      pr_age        = inv_logit(recr_int + recr_a * age),
+      recr          = dnorm(wt_2, rcsz_mu, rcsz_sd),
+      rcsz_mu       = rcsz_int + rcsz_z * wt_1,
+      data_list     = param_list,
+      states        = list(c("wt")),
+      has_hier_effs = FALSE,
+      levels_ages   = list(age = c(0:20), max_age = 21),
+      evict_cor     = FALSE
+    ) %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c("P_age", "F_age"),
+        int_rule     = rep("midpoint", 2),
+        state_start    = c("wt_age", "wt_age"),
+        state_end      = c("wt_age", "wt_0")
+      )
+    ) %>%
+    define_domains(
+      wt = c(1.6, 3.7, 100)
+    ) %>%
+    define_pop_state(
+      pop_vectors = list(
+        n_wt_age = runif(100))
+    ) %>%
+    make_ipm(
+      usr_funs = list(inv_logit = plogis,
+                      f_fun     = f_fun),
+      iterate  = TRUE,
+      iterations = 100,
+      return_all_envs = TRUE
+    )
+
+  mega <- format_mega_matrix(a_s_ipm,
+                             name_ps = "P",
+                             f_forms = "F")$mega_matrix
+
+  target_w <- target_v <- runif(2200)
+
+  for(i in 1:100) {
+
+    target_w <- mega %*% target_w
+    target_v <- t(mega) %*% target_v
+
+  }
+
+  ipmr_w   <- right_ev(a_s_ipm) %>%
+    unlist() %>%
+    unname()
+  ipmr_v   <- left_ev(a_s_ipm) %>%
+    unlist() %>%
+    unname()
+
+  target_w <- (target_w / sum(target_w)) %>% as.vector
+  target_v <- (target_v / sum(target_v)) %>% as.vector
+
+  expect_equal(target_w, ipmr_w)
+  expect_equal(target_v, ipmr_v)
+
+})
+
 
 test_that('fill_0s is working as it should', {
 

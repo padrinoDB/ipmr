@@ -67,16 +67,16 @@
 #'
 #' # Example with kernels named "P" and "F", and a domain "z"
 #'
-#' kernel_impl_list <- list(P = list(int_rule = "midpoint", dom_start = "z", dom_end = "z"),
-#'                          F = list(int_rule = "midpoint", dom_start = "z", dom_end = "z"))
+#' kernel_impl_list <- list(P = list(int_rule = "midpoint", state_start = "z", state_end = "z"),
+#'                          F = list(int_rule = "midpoint", state_start = "z", state_end = "z"))
 #'
 #' # an equivalent version using make_impl_args_list
 #'
 #' kernel_impl_list <- make_impl_args_list(
 #'      kernel_names = c("P", "F"),
 #'      int_rule     = c("midpoint", "midpoint"),
-#'      dom_start    = c("z", "z"),
-#'      dom_end      = c("z", "z")
+#'      state_start  = c("z", "z"),
+#'      state_end    = c("z", "z")
 #' )
 #'
 #' # define_domains
@@ -260,10 +260,7 @@ right_mult <- function(kernel, vectr) {
 
 left_mult <- function(kernel, vectr) {
 
-  if(dim(vectr)[1] != 1 || is.null(dim(vectr))) vectr <- t(vectr)
-  if(inherits(kernel, what = c("DC", "CD"))) kernel <- t(kernel)
-
-  vectr %*% kernel
+  t(kernel) %*% vectr
 
 }
 

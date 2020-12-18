@@ -1026,16 +1026,8 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
                              bw = FALSE,
                              do_contour = FALSE,
                              do_legend = FALSE,
-                             canvas_dims,
                              ...) {
 
-  old_par <- graphics::par('mar', "mfrow")
-  on.exit(par(old_par))
-
-  if(do_legend) graphics::layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
-
-  graphics::par(mar = c(6, 5, 3, 2), mfrow = c(canvas_dims$nrow,
-                                               canvas_dims$ncol))
 
   if(is.null(x)) x <- seq_len(ncol(A))
   if(is.null(y)) y <- seq_len(nrow(A))
@@ -1056,8 +1048,8 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
                   cex.axis = 1.5,
                   cex.lab  = 1.5,
                   bty      = "u",
-                  xlab     = 'T',
-                  ylab     = 'T + 1',
+                  xlab     = 't',
+                  ylab     = 't + 1',
                   ...)
 
   graphics::abline(v = range(x1))
@@ -1103,6 +1095,13 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
                                    exponent = 1,
                                    ...) {
 
+  dots <- list(...)
+
+  old_par <- graphics::par('mar', "mfrow")
+  on.exit(par(old_par))
+
+  if(do_legend) graphics::layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
+
   # This is used so that users can just say plot(my_model) instead of
   # plot(ipm = my_model). ipmr_matrix expects x and y to both be NULL
 
@@ -1122,15 +1121,25 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
 
   canvas_dims <- .ncol_nrow(plt_seq)
 
-  lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
-                                                   y = y,
-                                                   A = ipm ^ exponent,
-                                                   col = col,
-                                                   bw = bw,
-                                                   do_contour = do_contour,
-                                                   do_legend = do_legend,
-                                                   canvas_dims = canvas_dims,
-                                                   dots))
+  graphics::par(mar = c(6, 5, 3, 2),
+                mfrow = c(canvas_dims$nrow,
+                          canvas_dims$ncol))
+
+  for(i in seq_along(ipm$sub_kernels)){
+
+    use_kern <- ipm$sub_kernels[[i]]
+    nm       <- names(ipm$sub_kernels)[i]
+
+    plot.ipmr_matrix(x = x,
+                     y = y,
+                     A = use_kern ^ exponent,
+                     col = col,
+                     bw = bw,
+                     do_contour = do_contour,
+                     do_legend = do_legend,
+                     dots,
+                     main = nm)
+  }
 
   invisible(ipm)
 }
@@ -1147,6 +1156,13 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
                                            exponent = 1,
                                            ...) {
 
+  dots <- list(...)
+
+  old_par <- graphics::par('mar', "mfrow")
+  on.exit(par(old_par))
+
+  if(do_legend) graphics::layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
+
   # This is used so that users can just say plot(my_model) instead of
   # plot(ipm = my_model). ipmr_matrix expects x and y to both be NULL
 
@@ -1155,25 +1171,37 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
     x   <- NULL
   }
 
-  old_par <- par('mar')
+  old_par <- par('mar', "mfrow")
   on.exit(par(old_par))
 
   dots <- list(...)
 
   plot_list <- ipm$sub_kernels
+
   plt_seq   <- seq_along(plot_list)
+
   canvas_dims <- .ncol_nrow(plt_seq)
 
+  graphics::par(mar = c(6, 5, 3, 2),
+                mfrow = c(canvas_dims$nrow,
+                          canvas_dims$ncol))
 
-  lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
-                                                   y = y,
-                                                   A = ipm ^ exponent,
-                                                   col = col,
-                                                   bw = bw,
-                                                   do_contour = do_contour,
-                                                   do_legend = do_legend,
-                                                   canvas_dims = canvas_dims,
-                                                   dots))
+  for(i in seq_along(ipm$sub_kernels)){
+
+    use_kern <- ipm$sub_kernels[[i]]
+    nm       <- names(ipm$sub_kernels)[i]
+
+    plot.ipmr_matrix(x = x,
+                     y = y,
+                     A = use_kern ^ exponent,
+                     col = col,
+                     bw = bw,
+                     do_contour = do_contour,
+                     do_legend = do_legend,
+                     dots,
+                     main = nm)
+  }
+
 
   invisible(ipm)
 }
@@ -1189,6 +1217,12 @@ plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
                                           do_legend = FALSE,
                                           exponent = 1,
                                           ...) {
+  dots <- list(...)
+
+  old_par <- graphics::par('mar', "mfrow")
+  on.exit(par(old_par))
+
+  if(do_legend) graphics::layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
 
   # This is used so that users can just say plot(my_model) instead of
   # plot(ipm = my_model). ipmr_matrix expects x and y to both be NULL
@@ -1198,24 +1232,37 @@ plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
     x   <- NULL
   }
 
-  old_par <- par('mar')
+  old_par <- par('mar', "mfrow")
   on.exit(par(old_par))
 
   dots <- list(...)
 
   plot_list <- ipm$sub_kernels
+
   plt_seq   <- seq_along(plot_list)
+
   canvas_dims <- .ncol_nrow(plt_seq)
 
-  lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
-                                                   y = y,
-                                                   A = ipm ^ exponent,
-                                                   col = col,
-                                                   bw = bw,
-                                                   do_contour = do_contour,
-                                                   do_legend = do_legend,
-                                                   canvas_dims = canvas_dims,
-                                                   dots))
+  graphics::par(mar = c(6, 5, 3, 2),
+                mfrow = c(canvas_dims$nrow,
+                          canvas_dims$ncol))
+
+  for(i in seq_along(ipm$sub_kernels)){
+
+    use_kern <- ipm$sub_kernels[[i]]
+    nm       <- names(ipm$sub_kernels)[i]
+
+    plot.ipmr_matrix(x = x,
+                     y = y,
+                     A = use_kern ^ exponent,
+                     col = col,
+                     bw = bw,
+                     do_contour = do_contour,
+                     do_legend = do_legend,
+                     dots,
+                     main = nm)
+  }
+
 
   invisible(ipm)
 }
@@ -1243,7 +1290,9 @@ plot.general_di_det_ipm <- function(x = NULL, y = NULL,
     x   <- NULL
   }
 
-  if(is.na(mega_mat)) {
+  mega_mat <- rlang::enquo(mega_mat)
+
+  if(rlang::quo_text(mega_mat) == "NA") {
 
     stop("Plotting general IPMs requires building a 'mega_mat'.\n",
          "Please specify an expression for the 'mega_mat' argument.")
@@ -1261,9 +1310,7 @@ plot.general_di_det_ipm <- function(x = NULL, y = NULL,
 
   dots <- list(...)
 
-  mega_mat <- rlang::enquo(mega_mat)
-
-  plot_list <- list(format_mega_matrix(ipm, mega_mat = !! mega_mat))
+  plot_list <- format_mega_matrix(ipm, mega_mat = !! mega_mat)
   plt_seq   <- seq_along(plot_list)
   canvas_dims <- .ncol_nrow(plt_seq)
 
@@ -1274,7 +1321,6 @@ plot.general_di_det_ipm <- function(x = NULL, y = NULL,
                                                    bw = bw,
                                                    do_contour = do_contour,
                                                    do_legend = do_legend,
-                                                   canvas_dims = canvas_dims,
                                                    dots))
 
   invisible(ipm)
@@ -1322,13 +1368,13 @@ right_ev <- function(ipm, ...) {
 }
 
 #' @rdname eigenvectors
-#' @param n_iterations The number of times to iterate the model to reach
+#' @param iterations The number of times to iterate the model to reach
 #' convergence. Default is 100.
 #'
 #' @export
 
 right_ev.simple_di_det_ipm <- function(ipm,
-                                       n_iterations = 100,
+                                       iterations = 100,
                                        ...) {
 
   mod_nm <- deparse(substitute(ipm))
@@ -1364,7 +1410,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
           final_it,
           ' iterations.\n',
           'Will re-iterate the model ',
-          n_iterations,
+          iterations,
           ' times and check for convergence.',
           sep = ""
         )
@@ -1383,7 +1429,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
       test_conv <- ipm$proto_ipm %>%
         define_pop_state(!! pop_nm := init_pop_vec) %>%
         make_ipm(iterate    = TRUE,
-                 iterations = n_iterations)
+                 iterations = iterations)
 
       if(is_conv_to_asymptotic(test_conv)) {
 
@@ -1402,7 +1448,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
             mod_nm,
             "'",
             ' did not converge after ',
-            final_it + n_iterations,
+            final_it + iterations,
             ' iterations. Returning NA, please try again with more iterations.',
             sep = ""
           )
@@ -1422,7 +1468,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
         "'",
         ' has not been iterated yet. ',
         'Generating a population vector using runif() and\niterating the model ',
-        n_iterations,
+        iterations,
         ' times to check for convergence to asymptotic dynamics',
         sep = ""
       )
@@ -1456,12 +1502,12 @@ right_ev.simple_di_det_ipm <- function(ipm,
     test_conv     <- ipm$proto_ipm %>%
       define_pop_state(!! pop_states[1] := init_pop) %>%
       make_ipm(iterate = TRUE,
-               iterations = n_iterations,
+               iterations = iterations,
                normalize_pop_size = TRUE)
 
     if(is_conv_to_asymptotic(test_conv)) {
 
-      out    <- test_conv$pop_state[[1]][ , (n_iterations + 1)]
+      out    <- test_conv$pop_state[[1]][ , (iterations + 1)]
       out_nm <- paste(pop_nm, 'w', sep = "_")
 
     } else {
@@ -1472,7 +1518,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
           mod_nm,
           "'",
           ' did not converge after ',
-          n_iterations,
+          iterations,
           ' iterations. Returning NA, please try again with more iterations.',
           sep = ""
         )
@@ -1495,7 +1541,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
 #' @export
 
 right_ev.general_di_det_ipm <- function(ipm,
-                                        n_iterations = 100,
+                                        iterations = 100,
                                         ...) {
 
   mod_nm    <- deparse(substitute(ipm))
@@ -1519,7 +1565,7 @@ right_ev.general_di_det_ipm <- function(ipm,
         final_it,
         ' iterations.\n',
         'Will re-iterate the model ',
-        n_iterations,
+        iterations,
         ' times and check for convergence.',
         sep = ""
       )
@@ -1538,7 +1584,7 @@ right_ev.general_di_det_ipm <- function(ipm,
         pop_vectors = init_pop_vec
       ) %>%
       make_ipm(iterate    = TRUE,
-               iterations = n_iterations)
+               iterations = iterations)
 
     if(is_conv_to_asymptotic(test_conv)) {
 
@@ -1552,7 +1598,7 @@ right_ev.general_di_det_ipm <- function(ipm,
           mod_nm,
           "'",
           ' did not converge after ',
-          n_iterations,
+          iterations,
           ' iterations. Returning NA, please try again with more iterations.',
           sep = ""
         )
@@ -1585,7 +1631,7 @@ left_ev <- function(ipm, ...) {
 #' @rdname eigenvectors
 #' @importFrom stats runif
 
-left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
+left_ev.simple_di_det_ipm <- function(ipm, iterations = 100, ...) {
 
   mod_nm <- deparse(substitute(ipm))
 
@@ -1613,12 +1659,12 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
   test_conv     <- ipm$proto_ipm %>%
     define_pop_state(!! pop_states[1] := init_pop) %>%
     make_ipm(iterate = TRUE,
-             iterations = n_iterations,
+             iterations = iterations,
              iteration_direction = "left")
 
   if(is_conv_to_asymptotic(test_conv)) {
 
-    out    <- test_conv$pop_state[[1]][ , (n_iterations + 1)]
+    out    <- test_conv$pop_state[[1]][ , (iterations + 1)]
     out_nm <- paste(pop_nm, 'w', sep = "_")
 
   } else {
@@ -1629,7 +1675,7 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
         mod_nm,
         "'",
         ' did not converge after ',
-        n_iterations,
+        iterations,
         ' iterations. Returning NA, please try again with more iterations.',
         sep = ""
       )
@@ -1677,12 +1723,12 @@ left_ev.simple_di_det_ipm <- function(ipm, n_iterations = 100, ...) {
 #'                   mega_mat     = c(stay_discrete, go_discrete,
 #'                                    leave_discrete, P),
 #'                   mega_vec = c(b, ht),
-#'                   n_iterations = 100)
+#'                   iterations = 100)
 #'
 #' @export
 
 left_ev.general_di_det_ipm <- function(ipm,
-                                       n_iterations = 100,
+                                       iterations = 100,
                                        ...) {
 
   mod_nm    <- deparse(substitute(ipm))
@@ -1698,7 +1744,7 @@ left_ev.general_di_det_ipm <- function(ipm,
       pop_vectors = init_pop_vec
     ) %>%
     make_ipm(iterate    = TRUE,
-             iterations = n_iterations,
+             iterations = iterations,
              iteration_direction = "left",
              normalize_pop_size = TRUE)
 
@@ -1714,7 +1760,7 @@ left_ev.general_di_det_ipm <- function(ipm,
         mod_nm,
         "'",
         ' did not converge after ',
-        n_iterations,
+        iterations,
         ' iterations. Returning NA, please try again with more iterations.',
         sep = ""
       )

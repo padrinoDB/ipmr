@@ -419,3 +419,4 @@ test_that("format_mega_matrix.age_x_size_ipm works", {
   expect_equal(ipmr_meg, target, tolerance = 1e-10)
 
 })
+

@@ -1087,9 +1087,9 @@
 
       if(all(len_test)) {
 
-        env_state <- .flatten_to_depth(env_state, 1)
+        to_bind <- .flatten_to_depth(env_state, 1) %>%
+          .[!duplicated(names(.))]
 
-        to_bind <- .drop_duplicated_names_and_splice(env_state)
 
       } else {
         to_bind <- env_state

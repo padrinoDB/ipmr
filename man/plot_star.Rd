@@ -16,7 +16,6 @@
   bw = FALSE,
   do_contour = FALSE,
   do_legend = FALSE,
-  canvas_dims,
   ...
 )
 

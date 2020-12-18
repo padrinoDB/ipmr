@@ -11,22 +11,22 @@
 \usage{
 right_ev(ipm, ...)
 
-\method{right_ev}{simple_di_det_ipm}(ipm, n_iterations = 100, ...)
+\method{right_ev}{simple_di_det_ipm}(ipm, iterations = 100, ...)
 
-\method{right_ev}{general_di_det_ipm}(ipm, n_iterations = 100, ...)
+\method{right_ev}{general_di_det_ipm}(ipm, iterations = 100, ...)
 
 left_ev(ipm, ...)
 
-\method{left_ev}{simple_di_det_ipm}(ipm, n_iterations = 100, ...)
+\method{left_ev}{simple_di_det_ipm}(ipm, iterations = 100, ...)
 
-\method{left_ev}{general_di_det_ipm}(ipm, n_iterations = 100, ...)
+\method{left_ev}{general_di_det_ipm}(ipm, iterations = 100, ...)
 }
 \arguments{
 \item{ipm}{Output from \code{make_ipm()}.}
 
 \item{...}{other arguments passed to methods}
 
-\item{n_iterations}{The number of times to iterate the model to reach
+\item{iterations}{The number of times to iterate the model to reach
 convergence. Default is 100.}
 }
 \value{
@@ -66,6 +66,6 @@ ipmr_v <- left_ev(gen_di_det_ex,
                   mega_mat     = c(stay_discrete, go_discrete,
                                    leave_discrete, P),
                   mega_vec = c(b, ht),
-                  n_iterations = 100)
+                  iterations = 100)
 
 }
