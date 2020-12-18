@@ -92,6 +92,12 @@ print.proto_ipm <- function(x, ...) {
 
   print(pop_state(x))
 
+  k_row <- .init_iteration(x, TRUE, direction = "right")
+
+  cat("\n\nInternally generated model iteration procedure:\n\n")
+
+  print(kernel_formulae(k_row))
+
   # Add more later -----------
 
   invisible(x)
@@ -181,7 +187,10 @@ print.proto_ipm <- function(x, ...) {
     # from this test, as it shouldn't appear in the data_list anyway.
 
     to_exclude <- names(vr_exprs)
-    domains    <- names(domains(proto))
+    domains    <- names(domains(proto)) %>%
+      vapply(function(x) paste(x, c("_1", "_2"), sep = ""),
+             character(2L)) %>%
+      as.vector()
 
     vr_args    <- Filter(.can_be_number, vr_args)
 

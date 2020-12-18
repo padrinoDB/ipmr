@@ -121,72 +121,51 @@ age_size_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
 
 The `"F_age"` kernel has a custom function in the `formula` slot that allows us to always set fecundity for age-0 individuals to 0. Everything else probably looks familiar.
 
-Our call to `define_k` will look slightly different. We will have to specify the expressions that produce the age-0 individuals and the expressions produce age > 0 individuals separately. Additionally, we need to specify a third expression that generates the `"max_age"` individals. 
 
-```{r eval = FALSE}
-
-age_size_ipm <- age_size_ipm %>%
-  define_k(
-    name               = "K",
-    family             = "IPM",
-    n_wt_0_t_1         = sum(F_age %*% n_wt_age_t),
-    n_wt_age_t_1       = P_age_minus_1 %*% n_wt_age_minus_1_t,
-    n_wt_max_age_t_1   = P_max_age %*% n_wt_max_age_t + 
-                         P_max_age_minus_1 %*% n_wt_max_age_minus_1_t,
-    data_list          = param_list,
-    states             = list (c("wt")),
-    has_hier_effs      = FALSE,
-    levels_ages        = list(age = c(0:20), max_age = 21),
-    evict_cor          = FALSE
-  )
-
-```
-
-The expression for `n_wt_0_t_1` uses `sum` to reflect that we want to use all ages in our `levels_ages` list to generate a single trait distribution for age-0 individuals. This is slightly different from the usual suffix expansion in that rather than generating many separate expressions, it generates a single expression that is a lot longer than the short-hand we provide. 
-
-Next, we define a generic expression for the size distribution of each 0 < age < max_age. This is the survival/growth kernel for individuals `age - 1` times the size distribution of individals at `age - 1`. Unfortunately, we can't insert literal `-` symbols in our expressions (R's parser does not like this!). Instead, we use `_minus_` and `_plus_` as needed. We are not restricted to `_minus_1` or `_plus_1` - models that have longer time lags can be denoted `_minus_2`, `_plus_2`, etc.
-
-Finally, we need an expression for the maximum aged individuals. This is all surviving ones from the previous year, plus all the ones that were `max_age - 1` that survived. 
-
-All of the steps that come after this are the same for age-size models as they are for other model types. We 
-
-1. `define_impl()`
-
-2. `define_domains()`
-
-3. `define_pop_state()`
-
-4. Optionally, `define_env_state()` (though not here because it's a deterministic model)
-
-5. `make_ipm()`
+Our call to `define_impl()` will look a little different. This is because we have to make sure that our `P_age` kernels produce `wt_age` individuals, whereas our `F_age` kernels must produce `wt_0` individuals (i.e. only age-0 lambs). We do this using the `state_start` and `state_end` arguments.
 
 ```{r eval = FALSE}
 
 age_size_ipm <- age_size_ipm %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P_age", "F_age", "K"),
-      int_rule     = rep("midpoint", 3),
-      dom_start    = rep("wt", 3),
-      dom_end      = rep("wt", 3)
+      kernel_names = c("P_age", "F_age"),
+      int_rule     = rep("midpoint", 2),
+      state_start    = c("wt_age", "wt_age"),
+      state_end      = c("wt_age", "wt_0")
     )
-  ) %>%
+  ) 
+
+```
+
+All of the steps that come after this are the same for age-size models as they are for other model types. We 
+
+1. `define_domains()`
+
+2. `define_pop_state()`
+
+3. Optionally, `define_env_state()` (though not here because it's a deterministic model)
+
+4. `make_ipm()`
+
+```{r eval = FALSE}
+
+age_size_ipm <- age_size_ipm %>%
   define_domains(
     wt = c(1.6, 3.7, 100)
   ) %>%
   define_pop_state(
-    pop_vectors = list(
-      n_wt_age = runif(100))
+    n_wt_age = runif(100)
   ) %>%
   make_ipm(
     usr_funs = list(inv_logit = inv_logit,
                     f_fun     = f_fun),
     iterate  = TRUE,
-    iterations = 100,
-    return_all = TRUE
+    iterations = 100
   )
 
 lam <- lambda(age_size_ipm)
+lam
 
 ```
 

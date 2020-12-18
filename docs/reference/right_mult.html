@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Right multiplication — right_mult • ipmr</title>
+<title>Right/left multiplication — right_mult • ipmr</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Right multiplication — right_mult" />
-<meta property="og:description" content="Performs right multiplication." />
+<meta property="og:title" content="Right/left multiplication — right_mult" />
+<meta property="og:description" content="Performs right and left multiplication." />
 
 
 
@@ -142,28 +142,33 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Right multiplication</h1>
+    <h1>Right/left multiplication</h1>
     
     <div class="hidden name"><code>right_mult.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Performs right multiplication.</p>
+    <p>Performs right and left multiplication.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>right_mult</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>right_mult</span><span class='op'>(</span><span class='va'>kernel</span>, <span class='va'>vectr</span><span class='op'>)</span>
+
+<span class='fu'>left_mult</span><span class='op'>(</span><span class='va'>kernel</span>, <span class='va'>vectr</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>...</th>
-      <td><p>Symbols representing functions - usually things that appear on the
-left hand side of <code>formula</code> and/or <code>...</code> in <code>define_kernel</code> and
-<code>define_k</code>.</p></td>
+      <th>kernel, vectr</th>
+      <td><p><code>kernel</code> should be a bivariate kernel, <code>vectr</code>
+should be a univariate trait distribution.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p><code>left_mult</code> returns <code>t(vectr) %*% kernel</code>. <code>right_mult</code>
+returns <code>kernel %*% vectr</code>.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

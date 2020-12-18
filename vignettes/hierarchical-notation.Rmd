@@ -295,29 +295,12 @@ ex_ipm <- init_ipm("simple_di_stoch_kern") %>%
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
-  define_k(
-    
-    # name is modified to indicate that the K's will vary from year to year
-    
-    name             = "K_yr",
-    family           = "IPM",
-    
-    # the formulas are modified to indicate that they will also
-    # vary from year to year
-    
-    K_yr             = P_yr + F,
-    n_z_t_1          = K_yr %*% n_z_t,
-    states           = list(c("z")),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(yr = 2001:2006),
-    evict_cor        = FALSE
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P_yr", "F", "K_yr"),
-      int_rule     = rep("midpoint", 3),
-      dom_start    = rep("z", 3),
-      dom_end      = rep("z", 3)
+      kernel_names = c("P_yr", "F"),
+      int_rule     = rep("midpoint", 2),
+      state_start    = rep("z", 2),
+      state_end      = rep("z", 2)
     )
   ) %>%
   define_domains(
@@ -538,7 +521,7 @@ ex_ipm <- init_ipm("general_di_stoch_param") %>%
     f_r_site         = exp(alpha_f_r_site + beta_f_r_site * z_1 + beta_f_r_prec * prec + beta_f_r_temp * temp),
     f_d              = dnorm(z_2, mu_f_d, sigma_f_d),
     data_list        = all_pars,
-    states           = list(c("z")),
+    states           = list(c("z", "sb1", "sb2")),
     has_hier_effs    = TRUE,
     levels_hier_effs = list(site = LETTERS[1:6]),
     evict_cor        = TRUE,
@@ -552,7 +535,7 @@ ex_ipm <- init_ipm("general_di_stoch_param") %>%
     f_p_site         = 1 / (1 + exp(-f_p_site_lin)),
     f_r_site         = exp(alpha_f_r_site + beta_f_r_site * z_1 + beta_f_r_prec * prec + beta_f_r_temp * temp),
     data_list        = all_pars,
-    states           = list(c("z")),
+    states           = list(c("z", "sb1")),
     has_hier_effs    = TRUE,
     levels_hier_effs = list(site = LETTERS[1:6]),
     evict_cor        = FALSE
@@ -562,7 +545,7 @@ ex_ipm <- init_ipm("general_di_stoch_param") %>%
     family        = "DD",
     formula       = s_sb1 * (1 - r_sb1),
     data_list     = all_pars,
-    states        = list(c('z')),
+    states        = list(c("sb1", "sb2")),
     has_hier_effs = FALSE,
     evict_cor     = FALSE
   ) %>%
@@ -572,7 +555,7 @@ ex_ipm <- init_ipm("general_di_stoch_param") %>%
     formula       = s_sb1 * r_sb1 * f_d * d_z,
     f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
     data_list     = all_pars,
-    states        = list(c("z")),
+    states        = list(c("z", "sb1")),
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
@@ -583,35 +566,22 @@ ex_ipm <- init_ipm("general_di_stoch_param") %>%
     formula       = s_sb2 * r_sb2 * f_d * d_z,
     f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
     data_list     = all_pars,
-    states        = list(c("z")),
+    states        = list(c("z", "sb2")),
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
-  define_k(
-    name             = "K_site",
-    family           = "IPM",
-    K_site           = P_site + F_site,
-    n_z_t_1          = K_site     %*% n_z_t   + 
-                       leave_sb_1 %*% n_sb1_t + 
-                       leave_sb_2 %*% n_sb2_t,
-    n_sb1_t_1        = go_sb_1_site %*% n_z_t,
-    n_sb2_t_1        = go_sb_2 %*% n_sb1_t,
-    data_list        = all_pars,
-    states           = list(c("z")),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(site = LETTERS[1:6]),
-    evict_cor        = FALSE
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P_site", "F_site",
-                       "go_sb_1_site", "go_sb_2", 
-                       "leave_sb_1", "leave_sb_2",
-                       "K_site"),
-      int_rule     = rep("midpoint", 7),
-      dom_start    = c("z", "z", "z", NA_character_, NA_character_, NA_character_, "z"),
-      dom_end      = c("z", "z", NA_character_, NA_character_, "z", "z", "Z")
+      kernel_names = c("P_site",
+                       "F_site",
+                       "go_sb_1_site",
+                       "go_sb_2", 
+                       "leave_sb_1", 
+                       "leave_sb_2"),
+      int_rule     = rep("midpoint", 6),
+      state_start    = c("z", "z", "z", "sb1", "sb1", "sb2"),
+      state_end      = c("z", "z", "sb1", "sb2", "z", "z")
     )
   ) %>%
   define_domains(
@@ -632,6 +602,8 @@ ex_ipm <- init_ipm("general_di_stoch_param") %>%
     kernel_seq         = sample(LETTERS[1:6], 20, replace = TRUE),
     normalize_pop_size = TRUE
   )
+
+lambda(ex_ipm)
 ```
 
 

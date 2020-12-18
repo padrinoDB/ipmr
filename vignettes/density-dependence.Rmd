@@ -12,14 +12,11 @@ vignette: >
 
 # Density dependent models
 
-A limited number of density dependent model classes are now implemented. Simple, deterministic and kernel-resampled stochastic models can now handle density dependent vital rate expressions. Others are coming soon.
-
-This vignette will get more details shortly. For now, see the example below:
+Density dependent model classes are now implemented. This vignette will get more details shortly. For now, see the example below:
 
 ## Example of a simple, stochastic, kernel-resampled model with density dependence
 
 This example will probably look a lot like the ones from other vignettes. It assumes that density dependence is modeled as a fixed effect in survival and recruit production models, and assumes there is no density dependence in growth or probability of reproducing models. The survival ($s(z, N, \theta)$/`s_yr`), growth ($g(z',z, \theta)$/ `g_yr`), and number of recruit models ($f_s(z, N, \theta)$/`f_s_yr`) have year-specific intercepts as well.
-
 
 The mathematical form for the IPM is below:
 
@@ -142,27 +139,16 @@ dd_ipm <- define_kernel(
 
 ```
 
-Again, we've add the `f_s_dd * sum(n_size_t) * d_size` to the expression fof `f_s_yr`, but otherwise, not much is different from how we've defined density independent models. The rest of the model definition process is unchanged.
+Again, we've add the `f_s_dd * sum(n_size_t) * d_size` to the expression for `f_s_yr`, but otherwise, not much is different from how we've defined density independent models. The rest of the model definition process is unchanged.
 
 ```{r eval = FALSE}
- dd_ipm <-  define_k(
-   proto_ipm        = dd_ipm,
-   name             = "K_yr",
-   family           = "IPM",
-   K_yr             = P_yr + F_yr,
-   n_size_t_1       = K_yr %*% n_size_t,
-   data_list        = params,
-   states           = list(c("size")),
-   has_hier_effs    = TRUE,
-   levels_hier_effs = list(yr = 1:5),
-   evict_cor        = FALSE
- ) %>%
+ dd_ipm <-  dd_ipm$proto_ipm %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P_yr", "F_yr", "K_yr"),
-      int_rule     = rep("midpoint", 3),
-      dom_start    = rep("size", 3),
-      dom_end      = rep("size", 3)
+      kernel_names = c("P_yr", "F_yr"),
+      int_rule     = rep("midpoint", 2),
+      state_start    = rep("size", 2),
+      state_end      = rep("size", 2)
     )
   ) %>%
   define_domains(
@@ -176,6 +162,8 @@ Again, we've add the `f_s_dd * sum(n_size_t) * d_size` to the expression fof `f_
     iterations = 50,
     kernel_seq = sample(1:5, 50, replace = TRUE)
   )
+
+dd_ipm$pop_state$lambda
 
 ```
 

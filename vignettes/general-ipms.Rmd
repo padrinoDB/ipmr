@@ -24,17 +24,13 @@ We'll start with the least complicated of the general IPMs and build progressive
 
 As noted above, we are now working with models that may have multiple continuous state variables and/or discrete states to describe the demography of our species. Thus, we need to add some more information to the model's definition in order to fully capture these additional demographic details.
 
-Relative to how we define simple models in `ipmr`, there are now four new bits:
+Relative to how we define simple models in `ipmr`, there are now two new bits:
 
-1. We are required to `define_pop_state()` before calling `make_ipm()`. 
+1. Each kernel that has an integration requires that `d_statevariable` get appended to the kernel `formula`. This is equivalent to the "dz" in $\int_L^U K(z',z) n(z,t) \mathrm{dz}$. `ipmr` automatically generates this variable internally, so there is no need to define it in the `data_list` or `define_domains()`, we can just add it any of the formula(s) that we want to. We skipped this step in the simple IPMs because it gets appended automatically. Unfortunately, it is decidedly less easy to infer the correct state variable to `d_z` with for general IPMs where there may be many continuous and/or discrete states.
 
-2. Each kernel that has an integration requires that `d_statevariable` get appended to the kernel `formula`. This is equivalent to the "dz" in $\int_L^U K(z',z) n(z,t) \mathrm{dz}$. `ipmr` automatically generates this variable internally, so there is no need to define it in the `data_list` or `define_domains()`, we can just add it any of the formula(s) that we want to. We skipped this step in the simple IPMs because it gets appended automatically. Unfortunately, it is decidedly less easy to infer the correct state variable to `d_z` with for general IPMs where there may be many continuous and/or discrete states.
+2. The implementation arguments list can now have different values in the `state_start` and `state_end` slots. This is demonstrated in a separate chunk below.
 
-3. We don't necessarily define a formula for $K(z',z)$ as we did in the simple IPMs. This is due to the point above about using iteration based methods for computing. Instead, we define how the kernels manipulate different population states at time $t$ to produce new states at time $t+1$.
-
-4. The implementation arguments list can now have `NA`s in the `dom_start` and `dom_end` slots. This is demonstrated in a separate chunk below.
-
-This example will use a single discrete stage (seed bank, abbreviated `b`) and a single continuous state (height, abbreviated `ht`). Reproduction is time-lagged so all seeds must enter the seed bank. They can either germinate in the next year, or they can die (so `stay_discrete` = 0). Thus, the full model takes the following form:
+This example will use an IPM for _Ligustrum obtusifolium_, a tree species that is now invasive in North America. Data were collected outside of St. Louis, Missouri, and the full model is described in [Levin et al. 2019](https://esajournals.onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1002%2Fecy.2681&file=ecy2681-sup-0002-MetadataS1.pdf). The IPM consists of a single discrete stage (seed bank, abbreviated `b`) and a single continuous state (height, abbreviated `ht`). Reproduction is time-lagged so all seeds must enter the seed bank. They can either germinate in the next year, or they can die (so `stay_discrete` = 0). Thus, the full model takes the following form:
 
 1. $n(z', t + 1) = \int_L^U P(z', z) n(z,t)d\mathrm{z} + b(t) * \int_L^U leave\_discrete(z') \mathrm{dz'}$  
 
@@ -161,7 +157,7 @@ general_ipm <- init_ipm("general_di_det") %>%
     f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
     f_s           = exp(f_s_int + f_s_slope * ht_1),
     data_list     = data_list,
-    states        = list(c('ht')),
+    states        = list(c('ht', "b")),
     has_hier_effs = FALSE
   ) %>%
   define_kernel(
@@ -175,7 +171,7 @@ general_ipm <- init_ipm("general_di_det") %>%
     # Note that now, family = "DD" becuase it denotes a discrete -> discrete transition
     
     family  = "DD",
-    states  = list(c('ht')),
+    states  = list(c('b')),
     evict_cor = FALSE
   ) %>%
   define_kernel(
@@ -192,48 +188,26 @@ general_ipm <- init_ipm("general_di_det") %>%
     f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
     family        = 'DC',
     data_list     = data_list,
-    states        = list(c('ht')),
+    states        = list(c('ht', "b")),
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
-  ) %>%
-  define_k(
-    name          = "K",
-    family        = "IPM",
-    
-    # We don't really define a mega-K as we do with simple models, but rather
-    # describe how the state at t is modified by the sub-kernels to produce
-    # the state at t + 1. 
-    
-    n_b_t_1       = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
-    n_ht_t_1      = leave_discrete %*% n_b_t + P %*% n_ht_t,
-    data_list     = data_list,
-    states        = list(c('ht')),
-    has_hier_effs = FALSE
-  )
+  ) 
+
 ```
 
-We've now defined all of the kernels, and have to define the implementation details. These also differ somewhat from simple IPMs. The key difference in the implementation arguments list lies in the `dom_start` and `dom_end` of each kernel, and is related to the `family` argument of each kernel. Continuous -> continuous transitions always have an entry for the starting and ending domains, but ones describing discrete transitions may have only one, or none. 
-
-1. If the family is `"CD"`, then the `dom_start` is the name of the continuous domain, and the `dom_end` is `NA`. 
-
-2. If the family is `"DC"`, then the `dom_start` is `NA` amd the `dom_end` is the continuous state variable.
-
-3. For `"DD"` transitions, both are `NA`.
-
-This reflects that there is no ending domain for a continuous -> discrete transition, no starting domain for a discrete -> continuous transition, and no domain at all for a discrete -> discrete transition. 
-
+We've now defined all of the kernels, and have to define the implementation details. These also differ somewhat from simple IPMs. The key difference in the implementation arguments list lies in the `state_start` and `state_end` of each kernel, and is related to the `family` argument of each kernel. Kernels that begin with one state and end in a different state (e.g. moving from seed bank to a plant) will have different entries in the `state_start` and `state_end` slots. It is very important to get these correct, as `ipmr` uses this information to generate the model iteration procedure automatically (i.e. code correspond to Equations 1-2).
 
 ```{r eval = FALSE}
 
 general_ipm <- general_ipm %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
-      int_rule     = c(rep("midpoint", 5)),
-      dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
-      dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+      kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete"),
+      int_rule     = c(rep("midpoint", 4)),
+      state_start    = c('ht', "ht", "b", "b"),
+      state_end      = c('ht', "b", "b", 'ht')
     )
   )
 
@@ -441,7 +415,7 @@ general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
     f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
     f_s_year      = exp(f_s_int_year + f_s_slope * ht_1),
     data_list     = all_params,
-    states        = list(c('ht')),
+    states        = list(c('ht', "b")),
     has_hier_effs    = TRUE,
     levels_hier_effs = list(year = 1:5)
   ) %>%
@@ -456,7 +430,7 @@ general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
     # Note that now, family = "DD" becuase it denotes a discrete -> discrete transition
     
     family  = "DD",
-    states  = list(c('ht')),
+    states  = list(c('b')),
     
     # This kernel has no time-varying parameters, so we don't need to designate
     # it as such.
@@ -474,31 +448,18 @@ general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
     f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
     family        = 'DC',
     data_list     = all_params,
-    states        = list(c('ht')),
+    states        = list(c('ht', "b")),
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
-  ) %>%
-  define_k(
-    name          = "K_year",
-    family        = "IPM",
-    
-    # Note that again, here, we add the _year suffix to the kernel names
-    
-    n_b_t_1       = stay_discrete %*% n_b_t  + go_discrete_year %*% n_ht_t,
-    n_ht_t_1      = leave_discrete %*% n_b_t + P_year %*% n_ht_t,
-    data_list     = all_params,
-    states        = list(c('ht')),
-    has_hier_effs = TRUE,
-    levels_hier_effs = list(year = 1:5)
-  ) %>%
+  )  %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P_year", "go_discrete_year", "stay_discrete", "leave_discrete", "K"),
-      int_rule     = c(rep("midpoint", 5)),
-      dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
-      dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+      kernel_names = c("P_year", "go_discrete_year", "stay_discrete", "leave_discrete"),
+      int_rule     = c(rep("midpoint", 4)),
+      state_start    = c('ht', "ht", "b", "b"),
+      state_end      = c('ht', "b", "b", 'ht')
     )
   ) %>%
   define_domains(
@@ -525,7 +486,7 @@ general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
 # We can access the order of the kernels from the simulation using the 
 # "env_seq" slot 
 
-general_di_stoch_kern_ipm$env_seq
+general_stoch_kern_ipm$env_seq
 
 ```
 
@@ -702,7 +663,7 @@ general_stoch_param_model <- init_ipm("general_di_stoch_param") %>%
     f_r           = inv_logit(f_r_lin_p),
     f_s           = exp(f_s_int + f_s_slope * surf_area_1),
     data_list     = constant_params,
-    states        = list(c("surf_area")),
+    states        = list(c("surf_area", "sb")),
     has_hier_effs = FALSE,
     
     # There is not eviction to correct here, so we can set this to false
@@ -714,11 +675,7 @@ general_stoch_param_model <- init_ipm("general_di_stoch_param") %>%
     family        = "DD",
     formula       = r_s * r_r,
     data_list     = constant_params,
-    
-    # This can be empty - there are no continuous states associated with
-    # this kernel
-    
-    states        = list(),
+    states        = list("sb"),
     has_hier_effs = FALSE,
     evict_cor     = FALSE
   ) %>%
@@ -728,29 +685,10 @@ general_stoch_param_model <- init_ipm("general_di_stoch_param") %>%
     formula       = r_d * r_s * f_d * d_surf_area,
     f_d           = dnorm(surf_area_2, f_d_mu, f_d_sd),
     data_list     = constant_params,
-    states        = list(c("surf_area")),
+    states        = list(c("surf_area", "sb")),
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
-  ) %>%
-  define_k(
-    name   = "K",
-    family = "IPM",
-    
-    # Defining the place holder C_stoch is optional - I find it makes things
-    # it helps keep track of things though
-
-    C_stoch         = P_stoch + F_stoch,
-    
-    n_surf_area_t_1 = C_stoch        %*% n_surf_area_t +
-                      leave_discrete %*% n_sb_t,
-    
-    n_sb_t_1        = go_discrete    %*% n_surf_area_t +
-                      stay_discrete  %*% n_sb_t,
-    
-    states        = list ("surf_area"),
-    has_hier_effs = FALSE,
-    evict_cor     = FALSE
   ) %>%
   define_impl(
     make_impl_args_list(
@@ -760,15 +698,15 @@ general_stoch_param_model <- init_ipm("general_di_stoch_param") %>%
                        "stay_discrete", 
                        "leave_discrete"),
       int_rule     = rep("midpoint", 5),
-      dom_start    = c("surf_area", 
+      state_start    = c("surf_area", 
                        "surf_area",
                        "surf_area",
-                       NA_character_, 
-                       NA_character_),
-      dom_end      = c("surf_area",
+                       "sb", 
+                       "sb"),
+      state_end      = c("surf_area",
                        "surf_area", 
-                       NA_character_, 
-                       NA_character_, 
+                       "sb", 
+                       "sb", 
                        "surf_area")
     )
   ) %>%
@@ -780,8 +718,8 @@ general_stoch_param_model <- init_ipm("general_di_stoch_param") %>%
     data_list  = list(env_params = env_params)
   ) %>% 
   define_pop_state(
-    n_surf_area_t = runif(100),
-    n_sb_t        = rpois(1, 20)
+    n_surf_area = runif(100),
+    n_sb        = rpois(1, 20)
   ) %>%
   make_ipm(usr_funs = list(inv_logit  = inv_logit,
                            sample_env = sample_env),
@@ -795,10 +733,9 @@ summary(lambdas)
 ```
 
 
-
 ## Code to construct mega-matrices
 
-Iteration is all fine and good, and can be used to get most quantities. Issues arise when we need to, say, transpose a model (e.g. to compute the left eigenvector of the full discretized model). `ipmr` doesn't define a strict order in which to define expressions in `define_k()`, providing flexibility to define these however we see fit. The cost is that, internally, `ipmr` has no idea where things should go when transposing the model. This is where `format_mega_matrix()` comes in.
+Sometimes, we may want to work with our sub-kernels arranged into a single block matrix. This isn't required for any of the code in `ipmr`, except for the `plot` method for `general_di_det` IPMs. Other use cases my arise for analyses not included in this package though, so below is a brief overview of how to generate those.
 
 `format_mega_matrix` takes an IPM object and a vector of symbols (for interactive use) or a character version of the expression (for programming) showing where each sub-kernel should go. It works in **ROW MAJOR order**. This example will use the model from the general deterministic example at the top of the article.
 
@@ -866,14 +803,14 @@ general_ipm <- init_ipm("general_di_det") %>%
     f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
     f_s           = exp(f_s_int + f_s_slope * ht_1),
     data_list     = data_list,
-    states        = list(c('ht')),
+    states        = list(c('ht', "b")),
     has_hier_effs = FALSE
   ) %>%
   define_kernel(
     name      = 'stay_discrete',
     formula   = 0,
     family    = "DD",  
-    states    = list(c('ht')),
+    states    = list(c('ht', "b")),
     evict_cor = FALSE
   ) %>%
   define_kernel(
@@ -882,27 +819,18 @@ general_ipm <- init_ipm("general_di_det") %>%
     f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
     family        = 'DC',
     data_list     = data_list,
-    states        = list(c('ht')),
+    states        = list(c('ht', "b")),
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
   ) %>%
-  define_k(
-    name          = "K",
-    family        = "IPM",
-    n_b_t_1       = stay_discrete %*% n_b_t  + go_discrete %*% n_ht_t,
-    n_ht_t_1      = leave_discrete %*% n_b_t + P %*% n_ht_t,
-    data_list     = data_list,
-    states        = list(c('ht')),
-    has_hier_effs = FALSE
-  ) %>%
   define_impl(
     make_impl_args_list(
-      kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete", "K"),
-      int_rule     = c(rep("midpoint", 5)),
-      dom_start    = c('ht', "ht", NA_character_, NA_character_, "ht"),
-      dom_end      = c('ht', NA_character_, NA_character_, 'ht', 'ht')
+      kernel_names = c("P", "go_discrete", "stay_discrete", "leave_discrete"),
+      int_rule     = c(rep("midpoint", 4)),
+      state_start    = c('ht', "ht", "b", "b"),
+      state_end      = c('ht', "b", "b", 'ht')
     )
   ) %>%
   define_domains(
@@ -931,7 +859,7 @@ mega_mat <- format_mega_matrix(ipm = general_ipm,
 
 # These values should be almost identical, so this should ~0
 
-Re(eigen(mega_mat)$values[1]) - lambda(general_ipm)
+Re(eigen(mega_mat[[1]])$values[1]) - lambda(general_ipm)
 
 
 ```

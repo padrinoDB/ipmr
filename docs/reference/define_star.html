@@ -153,7 +153,7 @@
 
     <pre class="usage"><span class='fu'>define_impl</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='va'>kernel_impl_list</span><span class='op'>)</span>
 
-<span class='fu'>make_impl_args_list</span><span class='op'>(</span><span class='va'>kernel_names</span>, <span class='va'>int_rule</span>, <span class='va'>dom_start</span>, <span class='va'>dom_end</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>make_impl_args_list</span><span class='op'>(</span><span class='va'>kernel_names</span>, <span class='va'>int_rule</span>, <span class='va'>state_start</span>, <span class='va'>state_end</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='fu'>define_domains</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='va'>...</span><span class='op'>)</span>
 
@@ -187,11 +187,11 @@ that parameters are being defined for.</p></td>
 "midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.</p></td>
     </tr>
     <tr>
-      <th>dom_start</th>
+      <th>state_start</th>
       <td><p>The name of the state variable for the kernel at time <em>t</em>.</p></td>
     </tr>
     <tr>
-      <th>dom_end</th>
+      <th>state_end</th>
       <td><p>The name of the state variable for the kernel at time <em>t+1</em>.
 This is usually the same as <code>dom_start</code>, but general IPMs
 with discrete states or IPMs that move from one state to another (e.g. tree
@@ -265,16 +265,16 @@ vital rate expressions and/or kernel formulas.</p>
     <pre class="examples"><div class='input'>
 <span class='co'># Example with kernels named "P" and "F", and a domain "z"</span>
 
-<span class='va'>kernel_impl_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>P <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>, dom_start <span class='op'>=</span> <span class='st'>"z"</span>, dom_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span>,
-                         F <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>, dom_start <span class='op'>=</span> <span class='st'>"z"</span>, dom_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>kernel_impl_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>P <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>, state_start <span class='op'>=</span> <span class='st'>"z"</span>, state_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span>,
+                         F <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>, state_start <span class='op'>=</span> <span class='st'>"z"</span>, state_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># an equivalent version using make_impl_args_list</span>
 
 <span class='va'>kernel_impl_list</span> <span class='op'>&lt;-</span> <span class='fu'>make_impl_args_list</span><span class='op'>(</span>
      kernel_names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"P"</span>, <span class='st'>"F"</span><span class='op'>)</span>,
      int_rule     <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"midpoint"</span>, <span class='st'>"midpoint"</span><span class='op'>)</span>,
-     dom_start    <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"z"</span>, <span class='st'>"z"</span><span class='op'>)</span>,
-     dom_end      <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"z"</span>, <span class='st'>"z"</span><span class='op'>)</span>
+     state_start  <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"z"</span>, <span class='st'>"z"</span><span class='op'>)</span>,
+     state_end    <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"z"</span>, <span class='st'>"z"</span><span class='op'>)</span>
 <span class='op'>)</span>
 
 <span class='co'># define_domains</span>

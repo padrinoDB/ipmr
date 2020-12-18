@@ -322,7 +322,7 @@ a_s_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
     g_age         = dnorm(wt_2, mu_g_age, grow_sd),
     mu_g_age      = grow_int + grow_z * wt_1 + grow_a * age,
     data_list     = param_list,
-    states        = list(c("wt_age")),
+    states        = list(c("wt")),
     has_hier_effs = FALSE,
     levels_ages   = list(age = c(0:20), max_age = 21),
     evict_cor     = FALSE

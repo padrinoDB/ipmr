@@ -38,8 +38,6 @@ knitr::opts_chunk$set(
 
 - [`is_conv_to_asymptotic()`](https://levisc8.github.io/ipmr/reference/check_convergence.html)
 
-- [`all_ages()`](https://levisc8.github.io/ipmr/reference/age_x_size.html)
-
 ## (proto_)ipm accessor functions
 
 - [`kernel_formulae()`](https://levisc8.github.io/ipmr/reference/proto_accessors.html)

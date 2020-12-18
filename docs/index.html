@@ -173,7 +173,7 @@
 <li><p><code>"simple_di_stoch_param"</code></p></li>
 </ol>
 <ul>
-<li>Simple, density dependent models: <strong>In progress, not yet stable</strong>
+<li>Simple, density dependent models: <strong>Completed, likely stable</strong>
 </li>
 </ul>
 <ol>
@@ -191,7 +191,7 @@
 <li><p><code>"general_di_stoch_param"</code></p></li>
 </ol>
 <ul>
-<li>General, density dependent models: <strong>In progress, not yet stable</strong>
+<li>General, density dependent models: <strong>Completed, likely stable</strong>
 </li>
 </ul>
 <ol>
@@ -199,7 +199,7 @@
 <li><p><code>"general_dd_stoch_kern"</code></p></li>
 <li><p><code>"general_dd_stoch_param"</code></p></li>
 </ol>
-<p>Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (<code>simple_di_det</code>, <code>simple_di_stoch_kern</code>, <code>simple_di_stoch_param</code>) are functional and detailed below as well as <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">here</a>. The <code>general_*</code> versions of these are also ready, and an introduction to them is available <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">here</a>. Density dependent versions are completed for simple models, and in progress for general ones. These are not yet stable.</p>
+<p>Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (<code>simple_di_det</code>, <code>simple_di_stoch_kern</code>, <code>simple_di_stoch_param</code>) are functional and detailed below as well as <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">here</a>. The <code>general_*</code> versions of these are also ready, and an introduction to them is available <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">here</a>. Density dependent versions are completed for simple and general models, and are probably stable, but have not been tested enough to be certain.</p>
 <p>Keep reading below for examples of how to implement various IPMs in this framework.</p>
 </div>
 <div id="examples-for-simple-ipm-classes" class="section level2">
@@ -341,32 +341,6 @@
                                       <span class="st">'f_d'</span><span class="op">)</span>
 <span class="op">)</span> 
 
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_kernel.html">define_k</a></span><span class="op">(</span>
-  <span class="co"># K kernels get their own special define_k function. Rather than use the formula</span>
-  <span class="co"># parameter, it simply takes named expressions for the format of the iteration</span>
-  <span class="co"># kernels. It can also take expressions showing how these kernels generate </span>
-  <span class="co"># population states at t+1 as a function of population state at t - see examples</span>
-  <span class="co"># below for how to do that.</span>
-  
-  proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
-  name      <span class="op">=</span> <span class="st">'K'</span>,
-  K         <span class="op">=</span> <span class="va">P_simple</span> <span class="op">+</span> <span class="va">F_simple</span>,
-           
-  <span class="co"># This is a new family - at the moment all K's will get the</span>
-  <span class="co"># 'IPM' family</span>
-  
-  family    <span class="op">=</span> <span class="st">'IPM'</span>,
-  
-  <span class="co"># This kernel has no additional parameters, so the data_list</span>
-  <span class="co"># is empty</span>
-  
-  data_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>,
-  states    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,
-  <span class="co"># We've already corrected eviction in the sub-kernels, so there's no</span>
-  <span class="co"># need to do that here</span>
-  evict_cor <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span> 
-
 <span class="co"># Next, we have to define the implementation details for the model. </span>
   <span class="co"># We need to tell ipmr how each kernel is integrated, what domain</span>
   <span class="co"># it starts on (i.e. the size/weight/etc from above), and what domain</span>
@@ -377,10 +351,10 @@
 <span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_impl.html">define_impl</a></span><span class="op">(</span>
   proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
   <span class="fu"><a href="reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
-    kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"K_simple"</span>, <span class="st">"P_simple"</span>, <span class="st">"F_simple"</span><span class="op">)</span>,
-    int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">3</span><span class="op">)</span>,
-    dom_start    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">3</span><span class="op">)</span>,
-    dom_end      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">3</span><span class="op">)</span>
+    kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P_simple"</span>, <span class="st">"F_simple"</span><span class="op">)</span>,
+    int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">2</span><span class="op">)</span>,
+    state_start    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span>,
+    state_end      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span>
   <span class="op">)</span>
 <span class="op">)</span> 
 
@@ -391,6 +365,15 @@
           <span class="fl">100</span> <span class="co"># third entry is the number of meshpoints for the domain.</span>
   <span class="op">)</span> 
 <span class="op">)</span> 
+
+<span class="co"># Next, we define the initial state of the population. We must do this because</span>
+<span class="co"># ipmr computes everything through simulation, and simulations require a </span>
+<span class="co"># population state.</span>
+
+<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_impl.html">define_pop_state</a></span><span class="op">(</span>
+  proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
+  n_dbh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
+<span class="op">)</span>
 
 <span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span><span class="op">)</span>
 

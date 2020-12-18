@@ -28,7 +28,7 @@
 
   kernel_id <- paste(c("K", temp$all_names), collapse = "_")
 
-  temp_proto <- define_k(
+  temp_proto <- .define_k(
     others,
     name = kernel_id,
     family = "IPM",
@@ -240,7 +240,7 @@
 
   kernel_id <- paste(c("K", temp$all_names), collapse = "_")
 
-  temp_proto <- define_k(
+  temp_proto <- .define_k(
     others,
     name = kernel_id,
     family = "IPM",

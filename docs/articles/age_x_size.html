@@ -204,28 +204,19 @@
     evict_cor     <span class="op">=</span> <span class="cn">FALSE</span>
   <span class="op">)</span></code></pre></div>
 <p>The <code>"F_age"</code> kernel has a custom function in the <code>formula</code> slot that allows us to always set fecundity for age-0 individuals to 0. Everything else probably looks familiar.</p>
-<p>Our call to <code>define_k</code> will look slightly different. We will have to specify the expressions that produce the age-0 individuals and the expressions produce age &gt; 0 individuals separately. Additionally, we need to specify a third expression that generates the <code>"max_age"</code> individals.</p>
+<p>Our call to <code><a href="../reference/define_impl.html">define_impl()</a></code> will look a little different. This is because we have to make sure that our <code>P_age</code> kernels produce <code>wt_age</code> individuals, whereas our <code>F_age</code> kernels must produce <code>wt_0</code> individuals (i.e. only age-0 lambs). We do this using the <code>state_start</code> and <code>state_end</code> arguments.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="va">age_size_ipm</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_kernel.html">define_k</a></span><span class="op">(</span>
-    name               <span class="op">=</span> <span class="st">"K"</span>,
-    family             <span class="op">=</span> <span class="st">"IPM"</span>,
-    n_wt_0_t_1         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">F_age</span> <span class="op">%*%</span> <span class="va">n_wt_age_t</span><span class="op">)</span>,
-    n_wt_age_t_1       <span class="op">=</span> <span class="va">P_age_minus_1</span> <span class="op">%*%</span> <span class="va">n_wt_age_minus_1_t</span>,
-    n_wt_max_age_t_1   <span class="op">=</span> <span class="va">P_max_age</span> <span class="op">%*%</span> <span class="va">n_wt_max_age_t</span> <span class="op">+</span> 
-                         <span class="va">P_max_age_minus_1</span> <span class="op">%*%</span> <span class="va">n_wt_max_age_minus_1_t</span>,
-    data_list          <span class="op">=</span> <span class="va">param_list</span>,
-    states             <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"wt"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs      <span class="op">=</span> <span class="cn">FALSE</span>,
-    levels_ages        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>, max_age <span class="op">=</span> <span class="fl">21</span><span class="op">)</span>,
-    evict_cor          <span class="op">=</span> <span class="cn">FALSE</span>
-  <span class="op">)</span></code></pre></div>
-<p>The expression for <code>n_wt_0_t_1</code> uses <code>sum</code> to reflect that we want to use all ages in our <code>levels_ages</code> list to generate a single trait distribution for age-0 individuals. This is slightly different from the usual suffix expansion in that rather than generating many separate expressions, it generates a single expression that is a lot longer than the short-hand we provide.</p>
-<p>Next, we define a generic expression for the size distribution of each 0 &lt; age &lt; max_age. This is the survival/growth kernel for individuals <code>age - 1</code> times the size distribution of individals at <code>age - 1</code>. Unfortunately, we can’t insert literal <code><a href="https://rdrr.io/r/base/Arithmetic.html">-</a></code> symbols in our expressions (R’s parser does not like this!). Instead, we use <code>_minus_</code> and <code>_plus_</code> as needed. We are not restricted to <code>_minus_1</code> or <code>_plus_1</code> - models that have longer time lags can be denoted <code>_minus_2</code>, <code>_plus_2</code>, etc.</p>
-<p>Finally, we need an expression for the maximum aged individuals. This is all surviving ones from the previous year, plus all the ones that were <code>max_age - 1</code> that survived.</p>
+  <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
+    <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
+      kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P_age"</span>, <span class="st">"F_age"</span><span class="op">)</span>,
+      int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">2</span><span class="op">)</span>,
+      state_start    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"wt_age"</span>, <span class="st">"wt_age"</span><span class="op">)</span>,
+      state_end      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"wt_age"</span>, <span class="st">"wt_0"</span><span class="op">)</span>
+    <span class="op">)</span>
+  <span class="op">)</span> </code></pre></div>
 <p>All of the steps that come after this are the same for age-size models as they are for other model types. We</p>
 <ol style="list-style-type: decimal">
-<li><p><code><a href="../reference/define_impl.html">define_impl()</a></code></p></li>
 <li><p><code><a href="../reference/define_impl.html">define_domains()</a></code></p></li>
 <li><p><code><a href="../reference/define_impl.html">define_pop_state()</a></code></p></li>
 <li><p>Optionally, <code><a href="../reference/define_impl.html">define_env_state()</a></code> (though not here because it’s a deterministic model)</p></li>
@@ -233,30 +224,21 @@
 </ol>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="va">age_size_ipm</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
-    <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
-      kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P_age"</span>, <span class="st">"F_age"</span>, <span class="st">"K"</span><span class="op">)</span>,
-      int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">3</span><span class="op">)</span>,
-      dom_start    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"wt"</span>, <span class="fl">3</span><span class="op">)</span>,
-      dom_end      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"wt"</span>, <span class="fl">3</span><span class="op">)</span>
-    <span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_domains</a></span><span class="op">(</span>
     wt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1.6</span>, <span class="fl">3.7</span>, <span class="fl">100</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_pop_state</a></span><span class="op">(</span>
-    pop_vectors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
-      n_wt_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span>
+    n_wt_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>
     usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>inv_logit <span class="op">=</span> <span class="va">inv_logit</span>,
                     f_fun     <span class="op">=</span> <span class="va">f_fun</span><span class="op">)</span>,
     iterate  <span class="op">=</span> <span class="cn">TRUE</span>,
-    iterations <span class="op">=</span> <span class="fl">100</span>,
-    return_all <span class="op">=</span> <span class="cn">TRUE</span>
+    iterations <span class="op">=</span> <span class="fl">100</span>
   <span class="op">)</span>
 
-<span class="va">lam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">age_size_ipm</span><span class="op">)</span></code></pre></div>
+<span class="va">lam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">age_size_ipm</span><span class="op">)</span>
+<span class="va">lam</span></code></pre></div>
 </div>
   </div>
 

@@ -4,23 +4,14 @@
 #' @description Adds a new kernel to the \code{proto_ipm} structure.
 #'
 #' @param proto_ipm The name of the model.
-#' @param name The name of the new kernel. There are only two rules: 1. For
-#' \code{define_k}, the name must start with \code{"K"} or \code{"k"}.
-#' 2. For \code{define_kernel}, the name cannot start with \code{"K"} or
-#' \code{"k"}.
+#' @param name The name of the new kernel.
 #' @param formula A bare expression specifying the form of the kernel. See Details.
 #' @param family The type of kernel. Options are \code{"CC"} for continuous to continuous
 #' transitions, \code{"DC"} for discrete to continuous (e.g. emergence from a seedbank),
 #' \code{"CD"} for continuous to discrete (e.g. entering a seedbank), and \code{"DD"} for
 #' discrete to discrete (e.g. stasis in a seedbank).
 #' @param ... For \code{define_kernel}, a set of named expressions that correspond
-#' to vital rates in \code{formula}. For \code{define_k}, a set of named expressions
-#' that relate the population state at T + 1 to the population state at T. Alternatively,
-#' can be an expression where the left hand side is the name of the kernel specified
-#' in \code{name} and the right hand side only describes the structure of the
-#' iteration kernel. In all cases, suffix expansion of hierarchical models is supported.
-#' Specific details for each case are in their respecitive function's sections
-#' below.
+#' to vital rates in \code{formula}. Suffix expansion of hierarchical models is supported.
 #' @param data_list A list of named values that correspond to constants in the formula.
 #' You do not need to specify vectors corresponding to the domains here.
 #' @param states A list with character vector containing the names of each state
@@ -45,6 +36,9 @@
 #' during the implementation of the model itself, or incorporate the correction
 #' into individual vital rate expressions. In either of those cases,
 #' set \code{evict_cor} to \code{FALSE}.
+#' @param levels_ages A list with possibly 2 entries: 1. \code{"age"}: the range
+#' of possible ages in the model and, optionally, 2. \code{"max_age"}: the maximum
+#' age individuals in the model can attain.
 #' @param integrate For \code{simple_*} models, this controls whether a \code{"d_z"}
 #' is automatically appended to the \code{formula} argument. When \code{TRUE},
 #' this automatically creates a \code{formula * d_z}. There may be some cases where
@@ -65,26 +59,13 @@
 #' must exist in the \code{data_list}, or the model will fail with an error along
 #' the lines of \code{Error in eval_tidy: object 'x_yz' not found}. In order to
 #' exclude levels that do not exist in your data, you can add a vector to the list
-#' in \code{levels_hier_effs} called \code{drop_levels}. This should contain the
+#' in \code{levels_hier_effs} called \code{"drop_levels"}. This should contain the
 #' values you wish to exclude as a character vector. For example, if data are
 #' collected for \code{sites = c("a", "b", "c")}, and \code{years = c(2005:2008)},
 #' but there is no data from site \code{"a"} in \code{2007}, we can use
 #' \code{levels_hier_effs = list(site = c("a", "b", "c"), year = c(2005:2008),
 #' drop_levels = c("a_2007"))}.
 #'
-#' \strong{\code{define_k}}
-#'
-#' The preferred method of defining a \code{K} kernel is to use the left
-#' hand side of the \code{...} to reference the population vectors that the right
-#' hand side creates (e.g. \code{n_T_1 = (P + F) \%*\% n_T}). This enables
-#' iteration-based methods to work properly. On the other hand, these iterations
-#' can be quite time consuming, and some applications only require
-#' an iteration matrix while not necessarily requiring the population vectors (e.g.
-#' calculations of deterministic population growth rate). In those cases, the
-#' \code{...} can contain something like \code{K = P + F}. In this case, the left
-#' hand side of the expression should match the \code{name} argument to \code{define_k}.
-#'
-#' \strong{\code{define_kernel}}
 #'
 #' \code{define_kernel} generates most of the information needed to create an IPM
 #' kernel. There are a few requirements - \code{name}, \code{family},
@@ -184,12 +165,9 @@ define_kernel <- function(proto_ipm,
   return(out)
 }
 
+#' @noRd
 
-#' @rdname kernel-definitions
-#'
-#' @export
-
-define_k <- function(proto_ipm,
+.define_k <- function(proto_ipm,
                      name,
                      family,
                      ...,
@@ -202,15 +180,13 @@ define_k <- function(proto_ipm,
                      evict_fun = NULL,
                      integrate = FALSE) {
 
-  UseMethod("define_k")
+  UseMethod(".define_k")
 
 }
 
-#' @rdname kernel-definitions
-#'
-#' @export
+#' @noRd
 
-define_k.default <- function(proto_ipm,
+.define_k.default <- function(proto_ipm,
                              name,
                              family,
                              ...,
@@ -292,13 +268,9 @@ define_k.default <- function(proto_ipm,
 
 }
 
-#' @rdname kernel-definitions
-#' @param levels_ages A list with possible two entries: 1. \code{"age"}: the range
-#' of ages, and, optionally, 2. \code{"max_age"}: The maximum age for the model.
-#'
-#' @export
+#' @noRd
 
-define_k.age_x_size <- function(proto_ipm,
+.define_k.age_x_size <- function(proto_ipm,
                                 name,
                                 family,
                                 ...,
@@ -399,27 +371,7 @@ define_k.age_x_size <- function(proto_ipm,
 
 }
 
-#' @rdname kernel-definitions
-#' @export
-
-remove_k <- function(proto_ipm) {
-
-  # Using substr() %>% grepl() to avoid a case where P_sink or something
-  # flags a P kernel for removal. kernel_ids for Ks must start with K | k,
-  # so just searching the first characters *should* be safer. Will fail if
-  # for some reason, the beginning of another kernel's name is also a K.
-
-  K_test   <- vapply(proto_ipm$kernel_id,
-                     function(x) substr(x, 1, 1),
-                     character(1L))
-
-  keep_ind <- !grepl('K|k', K_test)
-
-  out      <- proto_ipm[keep_ind, ]
-
-  return(out)
-
-}
+#' @noRd
 
 .check_evict_fun <- function(evict_cor, fun) {
 

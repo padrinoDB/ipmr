@@ -660,7 +660,14 @@ domains.proto_ipm <- function(object) {
                 }
   ) %>%
     .flatten_to_depth(1L) %>%
-    .[!grepl("not_applicable", names(.))] %>%
+    lapply(function(x) {
+      if(any(is.na(x))) {
+        return(NULL)
+      } else {
+        return(x)
+      }
+    }) %>%
+    Filter(f = Negate(is.null), x = .) %>%
     .[!duplicated(names(.)) & !is.na(names(.))]
 
   class(out) <- c("ipmr_domains", "list")
@@ -812,6 +819,8 @@ parameters.default <- function(object) {
 #' @export
 
 `parameters<-.proto_ipm` <- function(object, value) {
+
+  value <- lapply(value, .protect_model)
 
   for(i in seq_len(nrow(object))) {
 
