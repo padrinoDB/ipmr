@@ -35,8 +35,11 @@ Imports:
     purrr (>= 0.3.0),
     rlang (>= 0.3.0),
     stats,
-    utils
+    utils,
+    Rcpp
 Depends: R (>= 3.2.3)
 RoxygenNote: 7.1.1
 Config/testthat/parallel: true
 Config/testthat/edition: 3
+LinkingTo: 
+    Rcpp
