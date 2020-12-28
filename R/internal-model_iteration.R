@@ -109,16 +109,9 @@
 
         pop_list_t_1 <- pop_list_t_1[names(use_pop)]
 
-        use_pop           <- purrr::map2(.x = use_pop,
-                                         .y = pop_list_t_1,
-                                         .f = function(.x, .y, iteration) {
 
-                                           .x[ , (iteration + 1)] <- .y
+        use_pop <- update_pop_state(use_pop, pop_list_t_1, iter = j)
 
-                                           return(.x)
-                                         },
-                                         iteration = j
-        )
 
         # Now, update the names so that we can bind the new n_*_t to
         # main_env so that the next iteration is evaluated correctly
@@ -191,16 +184,7 @@
 
       pop_list_t_1        <- pop_list_t_1[names(pop_state)]
 
-      pop_state           <- purrr::map2(.x = pop_state,
-                                         .y = pop_list_t_1,
-                                         .f = function(.x, .y, iteration) {
-
-                                           .x[ , (iteration + 1)] <- .y
-
-                                           return(.x)
-                                         },
-                                         iteration = i
-      )
+      pop_state <- update_pop_state(pop_state, pop_list_t_1, iter = i)
 
       # Now, update the names so that we can bind the new n_*_t to
       # main_env so that the next iteration is evaluated correctly
@@ -332,16 +316,8 @@
 
     pop_list_t_1        <- pop_list_t_1[names(pop_state)]
 
-    pop_state           <- purrr::map2(.x = pop_state,
-                                       .y = pop_list_t_1,
-                                       .f = function(.x, .y, iteration) {
+    pop_state <- update_pop_state(pop_state, pop_list_t_1, iter = i)
 
-                                         .x[ , (iteration + 1)] <- .y
-
-                                         return(.x)
-                                       },
-                                       iteration = i
-    )
 
     # Now, update the names so that we can bind the new n_*_t to
     # main_env so that the next iteration is evaluated correctly
@@ -452,16 +428,9 @@
 
   pop_list_t_1        <- pop_list_t_1[names(pop_state)]
 
-  pop_state           <- purrr::map2(.x = pop_state,
-                                     .y = pop_list_t_1,
-                                     .f = function(.x, .y, iteration) {
-
-                                       .x[ , (iteration + 1)] <- .y
-
-                                       return(.x)
-                                     },
-                                     iteration = current_iteration
-  )
+  pop_state <- update_pop_state(pop_state,
+                                pop_list_t_1,
+                                iter = current_iteration)
 
   # Now, update the names so that we can bind the new n_*_t to
   # main_env so that the next iteration is evaluated correctly
@@ -577,16 +546,8 @@
 
         pop_list_t_1 <- pop_list_t_1[names(use_pop)]
 
-        use_pop           <- purrr::map2(.x = use_pop,
-                                         .y = pop_list_t_1,
-                                         .f = function(.x, .y, iteration) {
 
-                                           .x[ , (iteration + 1)] <- .y
-
-                                           return(.x)
-                                         },
-                                         iteration = j
-        )
+        use_pop <- update_pop_state(use_pop, pop_list_t_1, j)
 
         # Now, update the names so that we can bind the new n_*_t to
         # main_env so that the next iteration is evaluated correctly
@@ -664,16 +625,7 @@
 
       pop_list_t_1 <- pop_list_t_1[names(pop_state)]
 
-      pop_state           <- purrr::map2(.x = pop_state,
-                                         .y = pop_list_t_1,
-                                         .f = function(.x, .y, iteration) {
-
-                                           .x[ , (iteration + 1)] <- .y
-
-                                           return(.x)
-                                         },
-                                         iteration = i
-      )
+      pop_state <- update_pop_state(pop_state, pop_list_t_1, i)
 
       # Now, update the names so that we can bind the new n_*_t to
       # main_env so that the next iteration is evaluated correctly
@@ -801,16 +753,7 @@
 
     pop_list_t_1 <- pop_list_t_1[names(pop_state)]
 
-    pop_state           <- purrr::map2(.x = pop_state,
-                                       .y = pop_list_t_1,
-                                       .f = function(.x, .y, iteration) {
-
-                                         .x[ , (iteration + 1)] <- .y
-
-                                         return(.x)
-                                       },
-                                       iteration = i
-    )
+    pop_state <- update_pop_state(pop_state, pop_list_t_1, i)
 
     # Now, update the names so that we can bind the new n_*_t to
     # main_env so that the next iteration is evaluated correctly
@@ -925,16 +868,7 @@
 
   pop_list_t_1 <- pop_list_t_1[names(pop_state)]
 
-  pop_state           <- purrr::map2(.x = pop_state,
-                                     .y = pop_list_t_1,
-                                     .f = function(.x, .y, iteration) {
-
-                                       .x[ , (iteration + 1)] <- .y
-
-                                       return(.x)
-                                     },
-                                     iteration = current_iteration
-  )
+  pop_state <- update_pop_state(pop_state, pop_list_t_1, current_iteration)
 
   # Now, update the names so that we can bind the new n_*_t to
   # main_env so that the next iteration is evaluated correctly
@@ -1067,16 +1001,7 @@
 
       pop_list_t_1 <- pop_list_t_1[names(use_pop)]
 
-      use_pop           <- purrr::map2(.x = use_pop,
-                                       .y = pop_list_t_1,
-                                       .f = function(.x, .y, iteration) {
-
-                                         .x[ , (iteration + 1)] <- .y
-
-                                         return(.x)
-                                       },
-                                       iteration = i
-      )
+      use_pop <- update_pop_state(use_pop, pop_list_t_1, i)
 
       # Now, update the names so that we can bind the new n_*_t to
       # main_env so that the next iteration is evaluated correctly
@@ -1142,16 +1067,7 @@
 
     pop_list_t_1        <- pop_list_t_1[names(pop_state)]
 
-    pop_state           <- purrr::map2(.x = pop_state,
-                                       .y = pop_list_t_1,
-                                       .f = function(.x, .y, iteration) {
-
-                                         .x[ , (iteration + 1)] <- .y
-
-                                         return(.x)
-                                       },
-                                       iteration = i
-    )
+    pop_state <- update_pop_state(pop_state, pop_list_t_1, i)
 
     # Now, update the names so that we can bind the new n_*_t to
     # main_env so that the next iteration is evaluated correctly
@@ -1272,16 +1188,7 @@
 
   pop_list_t_1        <- pop_list_t_1[names(pop_state)]
 
-  pop_state           <- purrr::map2(.x = pop_state,
-                                     .y = pop_list_t_1,
-                                     .f = function(.x, .y, iteration) {
-
-                                       .x[ , (iteration + 1)] <- .y
-
-                                       return(.x)
-                                     },
-                                     iteration = i
-  )
+  pop_state <- update_pop_state(pop_state, pop_list_t_1, i)
 
   # Now, update the names so that we can bind the new n_*_t to
   # main_env so that the next iteration is evaluated correctly
@@ -1395,16 +1302,7 @@
 
   pop_list_t_1        <- pop_list_t_1[names(pop_state)]
 
-  pop_state           <- purrr::map2(.x = pop_state,
-                                     .y = pop_list_t_1,
-                                     .f = function(.x, .y, iteration) {
-
-                                       .x[ , (iteration + 1)] <- .y
-
-                                       return(.x)
-                                     },
-                                     iteration = current_iteration
-  )
+  pop_state <- update_pop_state(pop_state, pop_list_t_1, current_iteration)
 
   # Now, update the names so that we can bind the new n_*_t to
   # main_env so that the next iteration is evaluated correctly
@@ -1536,16 +1434,7 @@
 
       pop_list_t_1 <- pop_list_t_1[names(use_pop)]
 
-      use_pop           <- purrr::map2(.x = use_pop,
-                                       .y = pop_list_t_1,
-                                       .f = function(.x, .y, iteration) {
-
-                                         .x[ , (iteration + 1)] <- .y
-
-                                         return(.x)
-                                       },
-                                       iteration = i
-      )
+      use_pop <- update_pop_state(use_pop, pop_list_t_1, i)
 
       # Now, update the names so that we can bind the new n_*_t to
       # main_env so that the next iteration is evaluated correctly
@@ -1611,16 +1500,7 @@
 
     pop_list_t_1        <- pop_list_t_1[names(pop_state)]
 
-    pop_state           <- purrr::map2(.x = pop_state,
-                                       .y = pop_list_t_1,
-                                       .f = function(.x, .y, iteration) {
-
-                                         .x[ , (iteration + 1)] <- .y
-
-                                         return(.x)
-                                       },
-                                       iteration = i
-    )
+    pop_state           <- update_pop_state(pop_state, pop_list_t_1, i)
 
     # Now, update the names so that we can bind the new n_*_t to
     # main_env so that the next iteration is evaluated correctly
@@ -1739,16 +1619,7 @@
 
   pop_list_t_1        <- pop_list_t_1[names(pop_state)]
 
-  pop_state           <- purrr::map2(.x = pop_state,
-                                     .y = pop_list_t_1,
-                                     .f = function(.x, .y, iteration) {
-
-                                       .x[ , (iteration + 1)] <- .y
-
-                                       return(.x)
-                                     },
-                                     iteration = i
-  )
+  pop_state           <- update_pop_state(pop_state, pop_list_t_1, i)
 
   # Now, update the names so that we can bind the new n_*_t to
   # main_env so that the next iteration is evaluated correctly
@@ -1863,16 +1734,9 @@
 
   pop_list_t_1        <- pop_list_t_1[names(pop_state)]
 
-  pop_state           <- purrr::map2(.x = pop_state,
-                                     .y = pop_list_t_1,
-                                     .f = function(.x, .y, iteration) {
-
-                                       .x[ , (iteration + 1)] <- .y
-
-                                       return(.x)
-                                     },
-                                     iteration = current_iteration
-  )
+  pop_state           <- update_pop_state(pop_state,
+                                          pop_list_t_1,
+                                          current_iteration)
 
   # Now, update the names so that we can bind the new n_*_t to
   # main_env so that the next iteration is evaluated correctly
