@@ -1,0 +1,35 @@
+---
+output:  
+  pdf_document
+---
+
+
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+
+library(dplyr)
+library(kableExtra)
+
+studies <- read.csv('../../../data-raw/padr-pubs-feb-2021.csv',
+                    stringsAsFactors = FALSE) %>%
+  select(Species, Kingdom, `Full.citation..APA.`) %>%
+  setNames(c("Species", "Kingdom", "Full Citation")) %>%
+  filter(!is.na(Species))
+
+sum_tab <- studies %>%
+  group_by(Kingdom) %>%
+  summarise(`Number of Species` = length(unique(Species)),
+            `Number of Studies` = length(unique(`Full Citation`)))
+
+
+tab_cap <- "Table S1: Table of species, kingdom, and publications for papers that contain Integral Projection Models. This table is not exhaustive and does not include some papers for which species and kingdom information is not relevant (e.g. papers developing new theory relying on simulated data)."
+
+kbl(studies,
+    align = c("l", "c", "r"),
+    format = "latex", 
+    longtable = TRUE,
+    caption = tab_cap) %>%
+  column_spec(1:2, width = "1in", border_left = TRUE) %>%
+  column_spec(3, width = "5in", border_right = TRUE) %>%
+  kable_styling(latex_options = "scale_down")
+
+```
