@@ -1,0 +1,231 @@
+---
+title: "Supplementary Online Materials for ipmr: Flexibly implement Integral Projection Models in R"
+output:  
+  pdf_document
+---
+
+
+```{r echo = FALSE, message = FALSE, warning=FALSE}
+
+library(dplyr)
+library(purrr)
+library(grid)
+library(gridExtra)
+library(ggplot2)
+
+ipm_pubs <- read.csv('../../data-raw/padr-pubs-feb-2021.csv',
+                     stringsAsFactors = FALSE)
+
+names(ipm_pubs) <- gsub("\\.\\.", "_", names(ipm_pubs))
+names(ipm_pubs) <- gsub("\\.$", "", names(ipm_pubs))
+names(ipm_pubs) <- gsub("\\.", "_", names(ipm_pubs))
+
+ipm_id <- pmap_chr(.l = data.frame(a = ipm_pubs$Authors,
+                                   b = ipm_pubs$Journal, 
+                                   c = ipm_pubs$Year),
+               .f = function(a, b, c) paste(a, b, c, sep = "_")) 
+
+ipm_pubs <- cbind(ipm_pubs, ipm_id)
+ipm_pubs$Year <- as.integer(ipm_pubs$Year)
+
+pub_tot  <- length(unique(ipm_id))
+
+spec_tot <- ipm_pubs %>%
+  group_by(Kingdom) %>%
+  summarise(length(unique(Species)))
+
+cdb_fetch <- function(cdb) {
+  # get url or path
+  if (tolower(cdb) == 'comadre') {
+    path <- url('https://compadre-db.org/Data/ComadreDownload')
+  } else if (tolower(cdb) == 'compadre') {
+    path <- url('https://compadre-db.org/Data/CompadreDownload')
+  } else {
+    path <- path.expand(cdb)
+  }
+  
+  # fetch and load
+  env <- new.env()
+  x <- load(path, env)[1]
+  dbFetch <- env[[x]]
+
+  # Deal with differences between s4 and s3 versions of database
+
+  if(inherits(dbFetch, 'list')) {
+    dbFetch <- dbFetch[[1]]
+  } else if(inherits(dbFetch, "CompadreDB")) {
+    dbFetch <- dbFetch@data
+  } else {
+    stop("Cannot recognize class of currently fetched com(p)adre object",
+         call. = FALSE)
+  }
+
+
+  return(dbFetch)
+
+}
+
+cpd <- cdb_fetch('compadre')
+
+mpm_id<- pmap_chr(.l = data.frame(a = cpd$Authors,
+                                  b = cpd$Journal, 
+                                  c = cpd$YearPublication),
+               .f = function(a, b, c) paste(a, b, c, sep = "_")) 
+
+cpd <- cbind(cpd, mpm_id)
+
+cpd$YearPublication <- as.integer(cpd$YearPublication)
+
+cpd_tot_pubs <- cpd %>% 
+  filter(!duplicated(mpm_id)) %>% 
+  group_by(YearPublication) %>%
+  summarise(n_tot = n()) %>%
+  ungroup() %>%
+  arrange(YearPublication) %>%
+  filter(!is.na(YearPublication))
+
+cpd_tot_pubs <- mutate(cpd_tot_pubs, run_sum = cumsum(n_tot),
+                       Database = "Compadre_MPM_Database") %>%
+  setNames(c(
+    "Year",
+    "Number_per_Year",
+    "Cumulative_Publications",
+    "Database"
+  ))
+
+pdr_tot_pubs <- ipm_pubs %>%
+  filter(!duplicated(ipm_id)) %>%
+  group_by(Year) %>%
+  summarise(n_tot = n()) %>%
+  ungroup() %>%
+  arrange(Year)
+  
+pdr_tot_pubs <- mutate(pdr_tot_pubs, run_sum = cumsum(n_tot),
+                       Database = "Padrino_IPM_Database") %>%
+  setNames(c(
+    "Year",
+    "Number_per_Year",
+    "Cumulative_Publications",
+    "Database"
+  ))  %>%
+  filter(!is.na(Year))
+
+all_pubs <- rbind(pdr_tot_pubs, cpd_tot_pubs)
+all_pubs$Year <- as.integer(all_pubs$Year)
+
+
+```
+
+```{r figure 1, echo = FALSE, fig.height = 8, fig.width = 10, message = FALSE, warning = FALSE, fig.cap = "Figure S1: The usage of integral projection models (IPMs) has increased rapidly since their introduction. Cumulative number of publications using matrix projection models (MPMs, red) and IPMs (black) (A) and number of publications per year for each type of model (B). IPMs have been adopted rapidly since their introduction in 2000. Unfortunately, software packages to assist with their implementation have not kept pace with their theoretical advancements and applications to ever more complex demographic data."}
+ 
+library(gridExtra)
+library(grid)
+
+all_pubs <- filter(all_pubs, Year < 2020)
+
+run_sum_plot <- ggplot(all_pubs,
+       aes(x = Year,
+           y = Cumulative_Publications)) +
+  geom_line(aes(color = Database),
+            size = 1.25) +
+  theme_bw() +
+  scale_color_manual(breaks = c("Compadre_MPM_Database",
+                                "Padrino_IPM_Database"),
+                     labels = c("COMPADRE MPM Database",
+                                "PADRINO IPM Database"),
+                     values = viridis::inferno(2,
+                                               begin = 0,
+                                               end = 0.5,
+                                               direction = -1)) +
+  annotate("text", x = 1965, y = 600, label = "A", size = 10) +
+  theme(legend.position = "bottom",
+        axis.title = element_text(size = 17),
+        axis.text =  element_text(size = 16),
+        legend.text = element_text(size = 16),
+        legend.title = element_text(size = 18),) +
+  ylab("Cumulative Publications") + 
+  xlab("")
+
+ann_pubs <- ggplot(all_pubs,
+                   aes(x = Year)) +
+  geom_col(aes(y = Number_per_Year,
+               fill = Database)) +
+  theme_bw() +
+  scale_fill_manual(breaks = c("Compadre_MPM_Database",
+                               "Padrino_IPM_Database"),
+                    labels = c("COMPADRE MPM Database",
+                               "PADRINO IPM Database"),
+                    values = viridis::inferno(2,
+                                               begin = 0,
+                                               end = 0.5,
+                                               direction = -1)) +
+  annotate("text", x = 1965, y = 50, label = "B", size = 10) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 18),
+        axis.text =  element_text(size = 16),
+        plot.margin = margin(b = 30, l = 0, r = 2)
+        ) +
+  ylab("Number per Year") + 
+  annotation_custom(grob = textGrob(label = "IPMpack Introduced",
+                                    gp = gpar(fontsize = 16)), 
+                    xmin = 2000,
+                    xmax = 2000,
+                    ymin = -16,
+                    ymax = -16) +
+  geom_segment(x = 2005, xend = 2013,
+               y = -12, yend = -4,
+               size = 1.5,
+               color = "black") +
+  annotation_custom(grob = textGrob("Ellner, Childs, & Rees,\nMerow et al. Published",
+                                    gp = gpar(fontsize = 16)),
+                    xmin = 2010,
+                    xmax = 2020,
+                    ymin = -16,
+                    ymax = -16) + 
+  geom_segment(x = 2016, 
+               xend = 2016,
+               y = -9,
+               yend = -4,
+               size = 1.5,
+               color = "black") + 
+  xlab("")
+ 
+
+gt <- ggplot_gtable(ggplot_build(ann_pubs))
+gt$layout$clip[gt$layout$name == "panel"] <- "off"
+
+grid.arrange(run_sum_plot, gt)
+
+```
+
+
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+
+library(dplyr)
+library(kableExtra)
+
+studies <- read.csv('../../../data-raw/padr-pubs-feb-2021.csv',
+                    stringsAsFactors = FALSE) %>%
+  select(Species, Kingdom, `Full.citation..APA.`) %>%
+  setNames(c("Species", "Kingdom", "Full Citation")) %>%
+  filter(!is.na(Species))
+
+sum_tab <- studies %>%
+  group_by(Kingdom) %>%
+  summarise(`Number of Species` = length(unique(Species)),
+            `Number of Studies` = length(unique(`Full Citation`)))
+
+
+tab_cap <- "Table S1: Table of species, kingdom, and publications for papers that contain Integral Projection Models. This table is not exhaustive and does not include some papers for which species and kingdom information is not relevant (e.g. papers developing new theory relying on simulated data)."
+
+kbl(studies,
+    align = c("l", "c", "r"),
+    format = "latex", 
+    longtable = TRUE,
+    caption = tab_cap) %>%
+  column_spec(1:2, width = "1in", border_left = TRUE) %>%
+  column_spec(3, width = "5in", border_right = TRUE) %>%
+  kable_styling(latex_options = "scale_down")
+
+```
+
