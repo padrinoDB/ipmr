@@ -44,7 +44,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -90,6 +90,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
 </div>
@@ -108,7 +111,8 @@
 <div id="ipmr" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#ipmr" class="anchor"></a>ipmr</h1></div>
-<p><code>ipmr</code> is a package for implementing Integral Projection Models (IPMs) in <em>R</em>. It relies heavily on the mathematical syntax of the models, and does not try to abstract over the process of fitting vital rates. It is still very much a work in progress, and so models implemented using current code may not run in the not-so-distant future as more complicated methods are brought online and tweaks are made. Below is a brief overview of how <code>ipmr</code> classifies different model types followed by examples of how to implement those types in this framework.</p>
+<p><code>ipmr</code> is a package for implementing Integral Projection Models (IPMs) in <em>R</em>. It relies heavily on the mathematical syntax of the models, and does not try to abstract over the process of fitting vital rates. It is now relatively stable, though tweaks may be made. The News tab at the top of this page will contain more details on breaking changes as they are introduced to successive versions.</p>
+<p>Below is a brief overview of how <code>ipmr</code> classifies different model types followed by examples of how to implement those types in this framework.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
@@ -123,20 +127,19 @@
 <div id="package-scope" class="section level2">
 <h2 class="hasAnchor">
 <a href="#package-scope" class="anchor"></a>Package scope</h2>
-<p>Note that this package <strong>will not</strong> help with the process of fitting vital rate models at all! That is a sufficiently different (and vast) question that we decided it was not within the scope of this project. This will only help you turn those regression models into an IPM without shooting yourself in the foot. Thus, everything that follows assumes you have parameterized those vital rate models and are now ready to begin implementing your model.</p>
-<p>Below is a brief overview of the package and some examples of how to implement models with it.</p>
+<p><code>ipmr</code> is intended to assist with IPM implementation and analysis. It is important to note that this package <strong>will not</strong> help with the process of fitting regression models for vital rates at all! That is a sufficiently different (and vast) topic that we decided it was not within the scope of this project. This will only help you turn those regression models into an IPM without shooting yourself in the foot. Furthermore, most of the documentation assumes a basic knowledge of IPM theory and construction. For those that are totally new to IPMs, it is strongly recommended to read a theoretical overview of the models first. Some favorites are <a href="https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658%282000%29081%5B0694%3ASSSAAN%5D2.0.CO%3B2">Easterling et al. 2000</a>, <a href="https://doi.org/10.1111/2041-210X.12146">Merow et al. 2013</a>, and <a href="https://doi.org/10.1111/1365-2656.12178">Rees et al. 2014</a>. The <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">Introduction to ipmr vignette</a> also contains a brief overview of IPM theory as well as a far more detailed introduction to this package. Thus, everything that follows here assumes you have some basic understanding of IPM theory, parameterized vital rate models, and are now ready to begin implementing your IPM.</p>
 </div>
 <div id="model-classes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#model-classes" class="anchor"></a>Model classes</h2>
-<p>Once all parameters are estimated, the first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function has two arguments: <code>model_class</code>, and <code>has_age</code>. We will ignore <code>has_age</code> for now, because age-size models are a complicated topic and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own vignette</a>.</p>
+<p>Once all parameters are estimated, the first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function has two arguments: <code>model_class</code>, and <code>has_age</code>. We will ignore <code>has_age</code> for now, because age × size models are a complicated topic and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own vignette</a>.</p>
 <p>The <code>model_class</code> defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. <code>model_class</code> should be a character string with at least 3 (but possibly 4) entries separated by underscores (<code>_</code>). The possible entries for each position are:</p>
 <ul>
 <li>
 <p>Position 1: <code>"simple"</code>/<code>"general"</code></p>
 <ul>
 <li><p>A. <strong>simple</strong>: This describes an IPM with a single continuous state variable and no discrete stages.</p></li>
-<li><p>B. <strong>general</strong>: This describes and IPM with either more than one continuous state variable, one or more discrete stages, or both of the above. Basically, anything other than an IPM with a single continuous state variable.</p></li>
+<li><p>B. <strong>general</strong>: This describes an IPM with either more than one continuous state variable, one or more discrete stages, or both of the above. Basically, anything other than an IPM with a single continuous state variable.</p></li>
 </ul>
 </li>
 <li>
@@ -156,8 +159,8 @@
 <li>
 <p>Position 4: <code>"kern"</code>/<code>"param"</code> (Complete definitions found in <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405">Metcalf et al. 2015</a>)</p>
 <ul>
-<li><p>A. <strong>kern</strong>: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and for which defining a multivariate joint distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the <code>param</code> alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration.</p></li>
-<li><p>B. <strong>param</strong>: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model (usually a multivariate joint distribution). This can be a multivariate normal defined by covarying slopes and intercepts, or posterior distribution from a Bayesian model. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the <code>"simple_di_stoch_param"</code> example for some inspiration in writing those.</p></li>
+<li><p>A. <strong>kern</strong>: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and for which defining a (multivariate joint) distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the <code>param</code> alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration.</p></li>
+<li><p>B. <strong>param</strong>: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. This could be, for example, a multivariate normal defined by covarying slopes and intercepts, or posterior distributions from a Bayesian model. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the <code>"simple_di_stoch_param"</code> example for some inspiration in writing those.</p></li>
 </ul>
 </li>
 </ul>
@@ -199,43 +202,67 @@
 <li><p><code>"general_dd_stoch_kern"</code></p></li>
 <li><p><code>"general_dd_stoch_param"</code></p></li>
 </ol>
-<p>Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (<code>simple_di_det</code>, <code>simple_di_stoch_kern</code>, <code>simple_di_stoch_param</code>) are functional and detailed below as well as <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">here</a>. The <code>general_*</code> versions of these are also ready, and an introduction to them is available <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">here</a>. Density dependent versions are completed for simple and general models, and are probably stable, but have not been tested enough to be certain.</p>
+<p>Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (<code>simple_di_det</code>, <code>simple_di_stoch_kern</code>, <code>simple_di_stoch_param</code>) are described below as well as <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">here</a>. The <code>general_*</code> versions of these are described <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">here</a>. Density dependent versions are completed for simple and general models, and are probably stable, but have not been tested enough to be certain. A very brief, though incomplete introduction is available <a href="https://levisc8.github.io/ipmr/articles/density-dependence.html">here</a>.</p>
 <p>Keep reading below for examples of how to implement various IPMs in this framework.</p>
 </div>
 <div id="examples-for-simple-ipm-classes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#examples-for-simple-ipm-classes" class="anchor"></a>Examples for simple IPM classes</h2>
-<p>Here is a simple model implemented with <code>ipmr</code>. It will use the following set of linear models:</p>
+<p>Here is a simple model implemented with <code>ipmr</code>. This is a hypothetical plant species where plants can survive and grow (<em>P</em>(<em>z</em>′, <em>z</em>)), and reproduce sexually (<em>F</em>(<em>z</em>′, <em>z</em>)). We’ll use 4 regressions: survival (<em>s</em>(<em>z</em>)), growth (<em>G</em>(<em>z</em>′, <em>z</em>)), probability of reproducing (<em>f</em><sub><em>r</em></sub>(<em>z</em>)), and number of seeds produced conditional on flowering (<em>f</em><sub><em>s</em></sub>(<em>z</em>)). New recruits will be generated with a Gaussian distribution, which requires calculating the mean and standard deviation of new recruits from the data. For simplicity, we’ll assume there’s no maternal effect on recruit size. First, we’ll write out the functional forms for each component of the model:</p>
+<ol>
+<li><p><em>n</em>(<em>z</em>′, <em>t</em> + 1) = ∫<sub><em>L</em></sub><sup><em>U</em></sup><em>K</em>(<em>z</em>′, <em>z</em>)<em>n</em>(<em>z</em>, <em>t</em>)*d**z*</p></li>
+<li><p><em>K</em>(<em>z</em>′, <em>z</em>) = <em>P</em>(<em>z</em>′, <em>z</em>) + <em>F</em>(<em>z</em>′, <em>z</em>)</p></li>
+<li><p><em>P</em>(<em>z</em>′, <em>z</em>) = <em>s</em>(<em>z</em>) * <em>G</em>(<em>z</em>′, <em>z</em>)</p></li>
+<li><p><em>L<strong>o</strong>g<strong>i</strong>t</em>(<em>s</em>(<em>z</em>)) = <em>α</em><sub><em>s</em></sub> + <em>β</em><sub><em>s</em></sub> * <em>z</em></p></li>
+<li><p><em>G</em>(<em>z</em>′, <em>z</em>) ∼ *N<strong>o</strong>r**m<em>(</em>μ<em><sub></sub></em>g<em>, </em>σ<em><sub></sub></em>g*)</p></li>
+<li><p>*m**u<em><sub></sub></em>g<em> = </em>α<em><sub></sub></em>g<em> + </em>β<em><sub></sub></em>g<em> * </em>z*</p></li>
+<li><p><em>F</em>(<em>z</em>′, <em>z</em>) = <em>f</em><sub><em>r</em></sub>(<em>z</em>) * <em>f</em><sub><em>s</em></sub>(<em>z</em>) * <em>f</em><sub><em>d</em></sub>(<em>z</em>′)</p></li>
+<li><p><em>L<strong>o</strong>g<strong>i</strong>t</em>(<em>f</em><sub><em>r</em></sub>(<em>z</em>)) = <em>α</em><sub><em>f</em><sub><em>r</em></sub></sub> + <em>β</em><sub><em>f</em><sub><em>r</em></sub></sub> * <em>z</em></p></li>
+<li><p><em>L<strong>o</strong>g</em>(<em>f</em><sub><em>s</em></sub>(<em>z</em>)) = <em>α</em><sub><em>f</em><sub><em>s</em></sub></sub> + <em>β</em><sub><em>f</em><sub><em>s</em></sub></sub> * <em>z</em></p></li>
+<li><p><em>f</em><sub><em>d</em></sub>(<em>z</em>′) ∼ *N<strong>o</strong>r**m<em>(</em>μ<em><sub></sub></em>f<em><sub></sub></em>d<em>, </em>σ<em><sub></sub></em>f<em><sub></sub></em>d*)</p></li>
+</ol>
+<p>Equation 1 describes how all the vital rates act on the initial trait distribution to produce a new one at <em>t</em> + 1. Equations 3-6 describe how existing individuals can survive, and if they survive, grow or shrink. Equations 7-10 describe how existing individuals create new individuals. In order to implement this, we need to fit regression models to our data. The following set of generalized linear models are equivalent to the functional forms described above:</p>
 <ol>
 <li>
-<p>Survival (<code>s</code>): a generalized linear model w/ a logit link.</p>
+<p>Survival (<em>s</em>(<em>z</em>) / <code>s</code>): a generalized linear model w/ a logit link.</p>
 <ul>
 <li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(surv ~ size_1, data = my_surv_data, family = binomial())</a></code>
 </li>
 </ul>
 </li>
 <li>
-<p>Growth (<code>g</code>): a linear model with a Normal error distribution.</p>
+<p>Growth (<em>G</em>(<em>z</em>′, <em>z</em>) / <code>g</code>): a linear model with a Normal error distribution.</p>
 <ul>
 <li>Example model formula: <code><a href="https://rdrr.io/r/stats/lm.html">lm(size_2 ~ size_1, data = my_grow_data)</a></code>
 </li>
 </ul>
 </li>
 <li>
-<p>Pr(flowering) (<code>f_r</code>): a generalized linear model w/ a logit link.</p>
+<p>Pr(flowering) (<em>f</em><sub><em>r</em></sub>(<em>z</em>) / <code>f_r</code>): a generalized linear model w/ a logit link.</p>
 <ul>
 <li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(flower ~ size_1, data = my_repro_data, family = binomial())</a></code>
 </li>
 </ul>
 </li>
 <li>
-<p>Seed production (<code>f_s</code>): a generalized linear model w/ log link.</p>
+<p>Seed production (<em>f</em><sub><em>s</em></sub>(<em>z</em>) / <code>f_s</code>): a generalized linear model w/ log link.</p>
 <ul>
 <li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(seeds ~ size_1, data = my_flower_data, family = poisson())</a></code>
 </li>
 </ul>
 </li>
-<li><p>Recruit size distribution (<code>f_d</code>): a normal distribution w parameters <code>mu_fd</code> (mean) and <code>sd_fd</code> (standard deviation).</p></li>
+<li>
+<p>Recruit size distribution (<em>f</em><sub><em>d</em></sub>(<em>z</em>′) / <code>f_d</code>): a normal distribution w parameters <code>mu_fd</code> (mean) and <code>sd_fd</code> (standard deviation).</p>
+<ul>
+<li>
+<p>Example computations:</p>
+<ul>
+<li><p><code>mu_fd = mean(seedling_data$size_2)</code></p></li>
+<li><p><code>sd_fd = sd(seedling_data$size_2)</code></p></li>
+</ul>
+</li>
+</ul>
+</li>
 </ol>
 <p>The example below assumes we’ve already fit our vital rate models from the raw data. In this example, the numbers are made up, but code that extracts the values you need from a real regression model is provided in comments.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -272,21 +299,20 @@
   
   family    <span class="op">=</span> <span class="st">"CC"</span>,
   
-  <span class="co"># The formula for the kernel. </span>
+  <span class="co"># The formula for the kernel. We dont need to tack on the "z'/z"s here.  </span>
   
   formula   <span class="op">=</span> <span class="va">s</span> <span class="op">*</span> <span class="va">g</span>,
   
   <span class="co"># A named set of expressions for the vital rates it includes. </span>
   <span class="co"># note the use of user-specified functions here. Additionally, each </span>
-  <span class="co"># state variable has a stateVariable_1 and stateVariable_2 internally defined</span>
-  <span class="co"># for the domain associated with it. Use these to distinguish between </span>
-  <span class="co"># size/weight/etc at time t vs size/weight/etc at time t+1</span>
+  <span class="co"># state variable has a stateVariable_1 and stateVariable_2, corresponding to</span>
+  <span class="co"># z and z' in the equations above. We don't need to define these variables ourselves,</span>
+  <span class="co"># just reference them correctly based on the way we've set up our model on paper.</span>
   
   <span class="co"># Perform the inverse logit transformation to get survival probabilities</span>
-  <span class="co"># from your model. For examples on using predict(my_surv_mod,...),</span>
-  <span class="co"># see below.</span>
-  
-  s         <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">s_int</span> <span class="op">+</span> <span class="va">s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, 
+  <span class="co"># from your model. plogis from the "stats" package does this for us. </span>
+
+  s         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html">plogis</a></span><span class="op">(</span><span class="va">s_int</span> <span class="op">+</span> <span class="va">s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>, 
   
   <span class="co"># The growth model requires a function to compute the mean as a function of dbh.</span>
   <span class="co"># The SD is a constant, so we don't need to define that in ... expression, </span>
@@ -296,13 +322,15 @@
   mu_g      <span class="op">=</span> <span class="va">g_int</span> <span class="op">+</span> <span class="va">g_slope</span> <span class="op">*</span> <span class="va">dbh_1</span>,
   
   
-  <span class="co"># Specify the constants in the model in the data_list. </span>
+  <span class="co"># Specify the constant parameters in the model in the data_list. </span>
   
   data_list <span class="op">=</span> <span class="va">data_list</span>,
   states    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,
   
   <span class="co"># If you want to correct for eviction, set evict_cor = TRUE and specify an</span>
-  <span class="co"># evict_fun. ipmr provides truncated_distributions() to help.</span>
+  <span class="co"># evict_fun. ipmr provides truncated_distributions() to help. This function</span>
+  <span class="co"># takes 2 arguments - the type of distribution, and the name of the parameter/</span>
+  <span class="co"># vital rate that it acts on.</span>
   
   evict_cor <span class="op">=</span> <span class="cn">TRUE</span>,
   evict_fun <span class="op">=</span> <span class="fu"><a href="reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">'norm'</span>,
@@ -318,7 +346,7 @@
   <span class="co"># Inverse logit transformation for flowering probability</span>
   <span class="co"># (because we used a logistic regression)</span>
   
-  f_r       <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span> <span class="op">-</span> <span class="op">(</span><span class="va">f_r_int</span> <span class="op">+</span> <span class="va">f_r_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
+  f_r       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html">plogis</a></span><span class="op">(</span><span class="va">f_r_int</span> <span class="op">+</span> <span class="va">f_r_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>,
   
   <span class="co"># Exponential function for seed progression </span>
   <span class="co"># (because we used a Poisson)</span>
@@ -342,19 +370,19 @@
 <span class="op">)</span> 
 
 <span class="co"># Next, we have to define the implementation details for the model. </span>
-  <span class="co"># We need to tell ipmr how each kernel is integrated, what domain</span>
-  <span class="co"># it starts on (i.e. the size/weight/etc from above), and what domain</span>
-  <span class="co"># it ends on. In simple_* models, dom_start and dom_end will always be the same,</span>
-  <span class="co"># because we only have a single continuous state variable. General_*</span>
-  <span class="co"># models will be more complicated.</span>
-  
+<span class="co"># We need to tell ipmr how each kernel is integrated, what state</span>
+<span class="co"># it starts on (i.e. z from above), and what state</span>
+<span class="co"># it ends on (i.e. z' above). In simple_* models, state_start and state_end will </span>
+<span class="co"># always be the same, because we only have a single continuous state variable. </span>
+<span class="co"># General_* models will be more complicated.</span>
+
 <span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_impl.html">define_impl</a></span><span class="op">(</span>
   proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
   <span class="fu"><a href="reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
     kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P_simple"</span>, <span class="st">"F_simple"</span><span class="op">)</span>,
     int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">2</span><span class="op">)</span>,
-    state_start    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span>,
-    state_end      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span>
+    state_start  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span>,
+    state_end    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span>
   <span class="op">)</span>
 <span class="op">)</span> 
 
@@ -378,9 +406,10 @@
 <span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span><span class="op">)</span>
 
 
-<span class="va">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">my_simple_ipm</span>, comp_method <span class="op">=</span> <span class="st">'eigen'</span><span class="op">)</span>
-<span class="va">w_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/right_ev.html">right_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span></code></pre></div>
-<p>A more detailed introduction to <code>ipmr</code> is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. That’s all for now, happy modelling!</p>
+<span class="va">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
+<span class="va">w_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/right_ev.html">right_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
+<span class="va">v_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/right_ev.html">left_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span></code></pre></div>
+<p>A more detailed introduction to <code>ipmr</code> is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. Help with age × size models, density dependent models, and the hierarchical notation syntax are also available there. That’s all for now, happy modelling!</p>
 </div>
 </div>
 

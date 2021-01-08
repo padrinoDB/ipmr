@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Raise a matrix to a power — %^% • ipmr</title>
+<title>Convert ipmr matrix to long data frame — ipm_to_df • ipmr</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,9 @@
 
 
 
-<meta property="og:title" content="Raise a matrix to a power — %^%" />
-<meta property="og:description" content="Raises a matrix x to the y-th power. x ^ y computes
-element wise powers, whereas this computes y - 1 matrix multiplications.
-mat_power(x, y) is identical to x %^% y." />
+<meta property="og:title" content="Convert ipmr matrix to long data frame — ipm_to_df" />
+<meta property="og:description" content="Converts IPM kernels into long data frames. These are useful for
+creating plots using ggplot2." />
 
 
 
@@ -147,38 +146,45 @@ mat_power(x, y) is identical to x %^% y." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Raise a matrix to a power</h1>
+    <h1>Convert ipmr matrix to long data frame</h1>
     
-    <div class="hidden name"><code>matrix-power.Rd</code></div>
+    <div class="hidden name"><code>ipm_to_df.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Raises a matrix <code>x</code> to the <code>y</code>-th power. <code>x ^ y</code> computes
-element wise powers, whereas this computes <em>y - 1</em> matrix multiplications.
-<code>mat_power(x, y)</code> is identical to <code>x %^% y</code>.</p>
+    <p>Converts IPM kernels into long data frames. These are useful for
+creating plots using <code>ggplot2</code>.</p>
     </div>
 
-    <pre class="usage"><span class='va'>x</span> <span class='op'>%^%</span> <span class='va'>y</span>
-
-<span class='fu'>mat_power</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>ipm_to_df</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>A numeric or integer matrix.</p></td>
+      <th>ipm</th>
+      <td><p>Output from <code>make_ipm</code>.</p></td>
     </tr>
     <tr>
-      <th>y</th>
-      <td><p>An integer.</p></td>
+      <th>...</th>
+      <td><p>Other arguments passed to methods.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A matrix.</p>
+    <p>A data frame with 3 columns named <code>"t"</code>, <code>"t_1"</code>, and
+<code>"value"</code>.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gen_di_det_ex</span><span class='op'>)</span>
+
+<span class='va'>big_mat_df</span> <span class='op'>&lt;-</span> <span class='fu'>ipm_to_df</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>,
+                        mega_mat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>stay_discrete</span>, <span class='va'>go_discrete</span>,
+                                     <span class='va'>leave_discrete</span>, <span class='va'>P</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in ipm_to_df(gen_di_det_ex, mega_mat = c(stay_discrete, go_discrete,     leave_discrete, P)): could not find function "ipm_to_df"</span></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

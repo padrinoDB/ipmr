@@ -40,8 +40,8 @@
 
 
 <meta property="og:title" content="Age X Size models — sum.age_size_expr" />
-<meta property="og:description" content="Helper functions for implementing age x size models
-Helper functions for implementing age x size models" />
+<meta property="og:description" content="Helper functions for implementing age x size models. These are
+only intended for use within define_kernel()." />
 
 
 
@@ -81,7 +81,7 @@ Helper functions for implementing age x size models" />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -127,6 +127,9 @@ Helper functions for implementing age x size models" />
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -149,17 +152,11 @@ Helper functions for implementing age x size models" />
     </div>
 
     <div class="ref-description">
-    <p>Helper functions for implementing age x size models</p>
-<p>Helper functions for implementing age x size models</p>
+    <p>Helper functions for implementing age x size models. These are
+only intended for use within <code><a href='define_kernel.html'>define_kernel()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for age_size_expr</span>
-<span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>expr</span>, <span class='va'>...</span>, na.rm <span class='op'>=</span> <span class='cn'>NA</span><span class='op'>)</span>
-
-<span class='co'># S3 method for age_size_expr</span>
-<span class='fu'><a href='https://rdrr.io/r/base/prod.html'>prod</a></span><span class='op'>(</span><span class='va'>expr</span>, <span class='va'>...</span>, na.rm <span class='op'>=</span> <span class='cn'>NA</span><span class='op'>)</span>
-
-<span class='co'># S3 method for age_size_expr</span>
 <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>expr</span>, <span class='va'>...</span>, na.rm <span class='op'>=</span> <span class='cn'>NA</span><span class='op'>)</span>
 
 <span class='co'># S3 method for age_size_expr</span>
@@ -185,62 +182,13 @@ Helper functions for implementing age x size models" />
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A modified expression.</p>
-<p>A modified expression.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Note that these functions do not compute a single number, but rather
 expand an expression to compute the trait distribution. This differs from the
 usual behavior of the numeric methods for <code>sum, prod</code> as those
 return a single number or <code>NA</code>.</p>
-<p>Note that these functions do not compute a single number, but rather
-expand an expression to compute the trait distribution. This differs from the
-usual behavior of the numeric methods for <code>sum, prod</code> as those
-return a single number or <code>NA</code>.</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-
-<span class='fu'>define_k</span><span class='op'>(</span>
- proto_ipm          <span class='op'>=</span> <span class='va'>some_age_size_proto_ipm</span>,
- name               <span class='op'>=</span> <span class='st'>"K"</span>,
- family             <span class='op'>=</span> <span class='st'>"IPM"</span>,
- n_wt_0_t_1         <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>F_age</span> <span class='op'>%*%</span> <span class='va'>n_wt_age_t</span><span class='op'>)</span>,
- n_wt_age_t_1       <span class='op'>=</span> <span class='va'>P_age_minus_1</span> <span class='op'>%*%</span> <span class='va'>n_wt_age_minus_1_t</span>,
- n_wt_max_age_t_1   <span class='op'>=</span> <span class='va'>P_max_age</span> <span class='op'>%*%</span> <span class='va'>n_wt_max_age_t</span> <span class='op'>+</span>
-                      <span class='va'>P_max_age_minus_1</span> <span class='op'>%*%</span> <span class='va'>n_wt_max_age_minus_1_t</span>,
- data_list          <span class='op'>=</span> <span class='va'>param_list</span>,
- states             <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"wt"</span><span class='op'>)</span><span class='op'>)</span>,
- has_hier_effs      <span class='op'>=</span> <span class='cn'>FALSE</span>,
- levels_ages        <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>age <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>20</span><span class='op'>)</span>, max_age <span class='op'>=</span> <span class='fl'>21</span><span class='op'>)</span>,
- evict_cor          <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span>
-
-
-<span class='op'>}</span>
-
-
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-
-<span class='fu'>define_k</span><span class='op'>(</span>
- proto_ipm          <span class='op'>=</span> <span class='va'>some_age_size_proto_ipm</span>,
- name               <span class='op'>=</span> <span class='st'>"K"</span>,
- family             <span class='op'>=</span> <span class='st'>"IPM"</span>,
- n_wt_0_t_1         <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>F_age</span> <span class='op'>%*%</span> <span class='va'>n_wt_age_t</span><span class='op'>)</span>,
- n_wt_age_t_1       <span class='op'>=</span> <span class='va'>P_age_minus_1</span> <span class='op'>%*%</span> <span class='va'>n_wt_age_minus_1_t</span>,
- n_wt_max_age_t_1   <span class='op'>=</span> <span class='va'>P_max_age</span> <span class='op'>%*%</span> <span class='va'>n_wt_max_age_t</span> <span class='op'>+</span>
-                      <span class='va'>P_max_age_minus_1</span> <span class='op'>%*%</span> <span class='va'>n_wt_max_age_minus_1_t</span>,
- data_list          <span class='op'>=</span> <span class='va'>param_list</span>,
- states             <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"wt"</span><span class='op'>)</span><span class='op'>)</span>,
- has_hier_effs      <span class='op'>=</span> <span class='cn'>FALSE</span>,
- levels_ages        <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>age <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>20</span><span class='op'>)</span>, max_age <span class='op'>=</span> <span class='fl'>21</span><span class='op'>)</span>,
- evict_cor          <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span>
-
-
-<span class='op'>}</span>
-
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -17,8 +17,42 @@ vignette: >
 **This package does not help with fitting regression models to demographic data!** This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a much better job of helping you with that than I can. Some of my favorites are `lme4`, `brms`, `mgcv`, and `nlme`. `IPMpack` handles the regression modelling and IPM construction, though be forewarned, there are certain types of models that you simply cannot construct with it! `IPMpack` is no longer on CRAN, but can be installed from the `MetaCRAN/IPMpack` [Github page](https://github.com/cran/IPMpack) or running `devtools::install_github("CRAN/IPMpack")`.
 
 Unfortunately, `ipmr` does not yet have built-in functions for dealing with uncertainty. The goal is to change that soon, but for now, doing this will require `for` loops and storing the results of each iteration. Some example code is provided at the end of this vignette.
+
+# Terminology and IPM construction
+
+NB: If you are already familiar with how to build IPMs, you can probably skip this part and get straight into the [next section](#model-types).
+
+An IPM describes how the distribution of trait values (also called _state variables_/*states*, and denoted $z$ and $z'$) for a population changes in discrete time. The distribution of trait values in a population at time $t$ is given by the function $n(z,t)$, which describes the relative frequency of individuals with trait value $z$ at time $t$. The IPM for the trait distribution $z'$ at time $t+1$ is then:   
+
+1. $n(z', t+1) = \int_L^UK(z',z)n(z,t)\mathrm{dz}$
+
+$K(z',z)$, known as the _projection kernel_, describes all possible transitions of existing individuals and recruitment of new individuals from $t$ to $t+1$, generating a new trait distribution $n(z',t+1)$. $L,U$ are the lower and upper bounds for values that the trait $z$ can have, and the range between them is called the integration _domain_. The integral $\int_L^Un(z,t)\mathrm{dz}$ is the total population size at time $t$. 
+
+To make the model more biologically interpretable, the projection kernel $K(z',z)$ is usually decomposed into _sub-kernels_ (Eq 2). For example, a projection kernel to describe a lifecycle where individuals can survive, transition to different state values, and reproduce via sexual and asexual pathways, can be decomposed as follows:
+
+2. $K(z',z) = P(z',z) + F(z',z) + C(z',z)$
+
+$P(z',z)$ is a sub-kernel describing transitions due to survival and state values changes of existing individuals, $F(z',z)$ is a sub-kernel describing per-capita sexual contributions of existing individuals to recruitment, and $C(z',z)$ is a sub-kernel describing per-capita asexual contributions of existing individuals to recruitment. The sub-kernels are typically comprised of functions parameterized by regression models that relate an individuals trait value $z$ at time $t$ to a new trait value at $t+1$. For example, the $P$ kernel for Soay sheep (_Ovis aries_) on St. Kilda (Eq 3) may contain two regression models: (i) a logistic regression of survival on log body mass (Eq 4), and (ii) a regression of log body mass at $t+1$ on log body mass at $t$ (Eq 5-6). In this example, $\sigma_g$ is the standard deviation of the residuals from the growth regression model.
+
+3. $P(z',z) = s(z) * g(z',z)$
+
+4. $Logit(s(z)) = \alpha_s + \beta_s * z$
+
+5. $g(z',z) \sim Norm(\mu_g, \sigma_g)$ 
+
+6. $\mu_g = \alpha_g + \beta_g * z$
+
+Here, we refer to these different scales (parameters (_e.g._ $\alpha_g,\beta_g$ in Eq 6), regressions (_e.g._ Eq 4), sub-kernels (_e.g._ Eq 3), and projection kernels (_e.g._ Eq 2)) as levels of the _model hierarchy_. `ipmr` is intended to help with the last two levels of the model hierarchy. 
+
+Projecting the population state $n(z',t+1)$ requires a solution to the integral in Eq 1. Analytical solutions to the integral in Eq 1 are usually too complicated (or not possible; Ellner & Rees 2006). Numerical approximations of these integrals are usually straightforward using a numerical integration rule. A commonly used rule is the midpoint rule (this is currently the only integration rule available in `ipmr`, though others should be implemented soon(ish)). The midpoint rule divides the domain $[L,U]$ into $m$ artifical size bins $z_i$ with width $h = (U-L) / m$. The midpoints $z_i = L + (i - 0.5) * h$ for $i = \textrm{1, 2, ...}, m$. The midpoint rule approximation for Eq 1 then becomes:
+
+7. $n(z_j, t+1) = h\sum\limits_{i = 1}^mK(z_j, z_i)n(z_i,t)$
+
+In practice, the numerical approximation of the integral converts the continuous projection kernel into a (large) discretized matrix. A matrix multiplication of the discretized projection kernel and the discretized trait distribution then generates a new trait distribution, a process referred to as _model iteration_ (_sensu_ Easterling et al. 2000). 
+
+While `ipmr` intends to mimic the notation above as closely as possible, it does provide some abstraction layers. For example, Equations 1 and 2 are generated internally by `ipmr`, so you will not need to define those. Sub-kernels are the highest level of the hierarchy that you will need to work with when defining the model. 
   
-## Types of models in `ipmr`
+## Types of models in `ipmr` {#model-types}
   
 The first step of defining a model in `ipmr` is to initialize the model using `init_ipm()`. This function has two arguments: `model_class`, and `has_age`. We will ignore `has_age` for now, because age-size models are a complicated topic and have their [own vignette](https://levisc8.github.io/ipmr/articles/age_x_size.html). 
 
@@ -26,7 +60,7 @@ The `model_class` defines the basic infrastructure that will be available for su
 
 - Position 1: `"simple"`/`"general"`
 
-    + A.  **simple**: This describes an IPM with a single continuous state variable and no discrete stages. 
+    + A.  **simple**: This describes an IPM with a single continuous state variable and no discrete stages. The model presented in the Terminology section is a simple IPM, because it makes use of one, and only one, continuous state variable ($z$). 
 
     + B.  **general**: This describes and IPM with either more than one continuous state variable, one or more discrete stages, or both of the above. Basically, anything other than an IPM with a single continuous state variable.
 
@@ -250,17 +284,17 @@ my_ipm <- init_ipm('simple_di_det') %>%
 
 ```
 
-We are now ready to how to implement the model numerically.
+We are now ready to describe how to implement the model numerically.
 
 ### Defining the implementation arguments (`impl_args`)
 
-Next, we need to define how the kernels are implemented numerically. This is where we define the integration rule `int_rule`, the state the kernels begin on `state_start`, and the state that they finish on `state_end`. This is done with the `define_impl()` function. It takes a named list where names correspond to the kernel names, and each entry is itself a list of length 3 containing slots `int_rule`, `state_start`, and `state_end`. Because this is a bit specific, there is a helper function that can be called within `define_impl` or called before initializing the IPM to make sure everything is formatted correctly - `make_ipml_args_list()`.
+Next, we need to define how the kernels are implemented numerically. This is where we define the integration rule `int_rule`, the state the kernels modify `state_start`, and the state that they produce `state_end`. This is done with the `define_impl()` function. It takes a named list where names correspond to the kernel names, and each entry is itself a list of length 3 containing slots `int_rule`, `state_start`, and `state_end`. Because this is a bit specific, there is a helper function that can be called within `define_impl` or called before initializing the IPM to make sure everything is formatted correctly - `make_ipml_args_list()`.
 
-The first argument to the `make_ipml_args_list()` function is `kernel_names`. This is a character vector with kernel names for which the implementation arguments are being supplied. 
+The first argument to the `make_ipml_args_list()` function is `kernel_names`. This is a character vector with kernel names for which the implementation arguments are being supplied. These should be the same as `name` from `define_kernel`.
 
 Next, `int_rule` is a character vector, and currently `'midpoint'` is the only option that is implemented. `'trapezoid'` and `'g-l'` (Gauss-Legendre) are on the to-do list. Additional rules may be added if there is more demand for certain ones (e.g. cumulative density functions like in `IPMpack`). 
 
-`state_start` and `state_end` are always the same in `simple_*` IPMs. In `general_*` ones, they may be different as individuals move from, for example, discrete to continuous states or vice versa. These must always match the names provided in the `states` list. `state_start`'s have `_1` and `state_end`'s have `_2`  appended to them internally, so they may be referenced by vital rate functions without explicitly creating a variable for them.
+`state_start` and `state_end` are always the same in `simple_*` IPMs. In `general_*` ones, they may be different as individuals move from, for example, discrete to continuous states or vice versa. These must always match the names provided in the `states` list.
 
 Elements of each vector in each argument in `make_impl_args_list()` are matched by position. Thus, if you specify `"P"` as the first entry in `kernel_names`, then the first entries of `int_rule`, `state_start`, and `state_end` should all correspond to the `P` kernel. If you specify `"F"` as the second entry, the second entries in `int_rule`, `state_start`, and `state_end` should be the rules that correspond to the `F` kernel, and so on.
 
@@ -314,7 +348,7 @@ All 3 alternatives in the chunk above create the exact same output. You are free
 
 ### Defining domains for state variables
 
-The final step in creating an IPM with `ipmr` is to define the domain of each continuouse state variable in the `states` list. This is done with the `define_domains()` function. When the `int_rule` is `"midpoint"`, this takes a named set of vectors that have 3 entries each. The name corresponds to the `state` it is associated with, the first entry is the lower bound, the second entry is the upper bound, and the third entry is the number of meshpoints.
+The next step in creating an IPM with `ipmr` is to define the domain of each continuouse state variable in the `states` list. This is done with the `define_domains()` function. When the `int_rule` is `"midpoint"`, this takes a named set of vectors that have 3 entries each. The name corresponds to the `state` it is associated with, the first entry is the lower bound, the second entry is the upper bound, and the third entry is the number of meshpoints.
 
 Note that for other `int_rule`s, the vectors associated with each domain will look different. However, those are not yet implemented and so beyond the scope of this vignette for now.
 
@@ -619,14 +653,6 @@ pred_ipm <- init_ipm("simple_di_det") %>%
            iterations = 200)
 
 ```
-
-### Further debugging
-
-Because of the way `ipmr` is implemented internally, there can be some rather obscure error messages when building a model fails. The quickest way to deal with this is usually to print the `proto_ipm` object and inspect the output. `print.proto_ipm` shows information on the kernel names, vital rate expressions, and indicates whether or not every item in the vital rate expressions can be found in the `data_list` and `states`/`domain` that are provided. This can be useful for catching typos in vital rate expressions, or for instances when we've forgotten to define key parts like initial population states. 
-
-The most common problems are forgetting to name population states and the `data_list` correctly. 
-
-NEED TO EXPAND THIS!!!!
 
 ## Defining more complicated models
 

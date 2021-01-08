@@ -7,15 +7,19 @@
 \alias{vital_rates}
 \alias{vital_rates.proto_ipm}
 \alias{vital_rates.default}
+\alias{vital_rates<-}
+\alias{vital_rates<-.proto_ipm}
+\alias{new_fun_form}
 \alias{kernel_formulae}
 \alias{kernel_formulae.proto_ipm}
 \alias{kernel_formulae.default}
+\alias{kernel_formulae<-}
+\alias{kernel_formulae<-.proto_ipm}
 \alias{parameters}
 \alias{parameters.proto_ipm}
 \alias{parameters.default}
 \alias{parameters<-}
 \alias{parameters<-.proto_ipm}
-\alias{parameters<-.default}
 \alias{int_mesh}
 \alias{pop_state}
 \alias{pop_state.proto_ipm}
@@ -34,11 +38,21 @@ vital_rates(object)
 
 \method{vital_rates}{default}(object)
 
+vital_rates(object, kernel, vital_rate) <- value
+
+\method{vital_rates}{proto_ipm}(object, kernel, vital_rate) <- value
+
+new_fun_form(form)
+
 kernel_formulae(object)
 
 \method{kernel_formulae}{proto_ipm}(object)
 
 \method{kernel_formulae}{default}(object)
+
+kernel_formulae(object, kernel) <- value
+
+\method{kernel_formulae}{proto_ipm}(object, kernel) <- value
 
 parameters(object)
 
@@ -49,8 +63,6 @@ parameters(object)
 parameters(object) <- value
 
 \method{parameters}{proto_ipm}(object) <- value
-
-\method{parameters}{default}(object) <- value
 
 int_mesh(ipm)
 
@@ -63,8 +75,18 @@ pop_state(object)
 \arguments{
 \item{object}{A \code{proto_ipm} or object created by \code{make_ipm()}.}
 
+\item{kernel}{The name of the kernel to insert the new vital rate expression
+into}
+
+\item{vital_rate}{The name of the vital rate to replace. If the vital rate
+doesn't already exist in the \code{object}, a new one with this name will be
+created.}
+
 \item{value}{A named list of new parameters. The new list does not need
 to contain all of the parameters, just the ones to update/append.}
+
+\item{form}{An expression representing the new vital rate or kernel formula
+to insert.}
 
 \item{ipm}{An object created by \code{make_ipm()}. This argument only applies
 \code{int_mesh()} (because the mesh is not built until \code{make_ipm()} is
@@ -73,6 +95,8 @@ called).}
 \value{
 Depending on the class of \code{object}, a numeric vector, or a list
 with types numeric or character. See details on return types for each.
+
+A modified \code{object}.
 }
 \description{
 Functions that access slots of a \code{*_ipm} (including \code{proto_ipm}).
@@ -81,8 +105,58 @@ Functions that access slots of a \code{*_ipm} (including \code{proto_ipm}).
 The \code{*.default} method corresponds to output from \code{make_ipm()},
 and the \code{*.proto_ipm} methods correspond to outputs from \code{define_*}.
 
+When using \code{kernel_formulae<-} and \code{vital_rates<-}, the right
+hand side of the expression must be wrapped in \code{new_fun_form}. See
+examples.
+
 Return types are as follows:
 \itemize{
   \code{...}
 }
+}
+\examples{
+
+\dontrun{
+
+data(gen_di_det_ex)
+
+proto <- gen_di_det_ex$proto_ipm
+
+vital_rates(gen_di_det_ex)
+kernel_formulae(gen_di_det_ex)
+
+domains(gen_di_det_ex)
+parameters(gen_di_det_ex)
+
+# Usage is the same for proto_ipm's as *_ipm's
+
+vital_rates(proto)
+kernel_formulae(proto)
+
+domains(proto)
+parameters(proto)
+
+
+int_mesh(gen_di_det_ex)g
+
+# Setting new parameters, vital rate expressions, and kernel formulae
+# only works on proto_ipm's.
+
+# This replaces the "g_int" parameter and leaves the rest untouched
+
+parameters(proto) <- list(g_int = 1.5)
+
+# This creates a new g_z parameter and leaves the rest of parameters untouched
+parameters(proto) <- list(g_z = 2.2)
+
+# setting a new vital rate or kernel expression requires wrapping the
+# right-hand side in a call to new_fun_form(). new_fun_form uses expressions
+# with the same format as ... in define_kernel()
+
+vital_rates(proto, kernel = "P", vital_rate = "g_mu") <- new_fun_form(g_int + g_z + g_slope * ht_1)
+
+kernel_formulae(proto, kernel = "stay_discrete") <- new_fun_form(g_z * d_ht)
+
+}
+
 }

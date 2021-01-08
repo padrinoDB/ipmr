@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -85,6 +85,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
 </div>
@@ -96,8 +99,7 @@
 
       
 
-      </header><script src="ipmr-introduction_files/header-attrs-2.5/header-attrs.js"></script><link href="ipmr-introduction_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="ipmr-introduction_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="ipmr-introduction_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to ipmr</h1>
@@ -117,9 +119,36 @@
 <p><strong>This package does not help with fitting regression models to demographic data!</strong> This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a much better job of helping you with that than I can. Some of my favorites are <code>lme4</code>, <code>brms</code>, <code>mgcv</code>, and <code>nlme</code>. <code>IPMpack</code> handles the regression modelling and IPM construction, though be forewarned, there are certain types of models that you simply cannot construct with it! <code>IPMpack</code> is no longer on CRAN, but can be installed from the <code>MetaCRAN/IPMpack</code> <a href="https://github.com/cran/IPMpack">Github page</a> or running <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github("CRAN/IPMpack")</a></code>.</p>
 <p>Unfortunately, <code>ipmr</code> does not yet have built-in functions for dealing with uncertainty. The goal is to change that soon, but for now, doing this will require <code>for</code> loops and storing the results of each iteration. Some example code is provided at the end of this vignette.</p>
 </div>
-<div id="types-of-models-in-ipmr" class="section level2">
+<div id="terminology-and-ipm-construction" class="section level1">
+<h1 class="hasAnchor">
+<a href="#terminology-and-ipm-construction" class="anchor"></a>Terminology and IPM construction</h1>
+<p>NB: If you are already familiar with how to build IPMs, you can probably skip this part and get straight into the <a href="#model-types">next section</a>.</p>
+<p>An IPM describes how the distribution of trait values (also called <em>state variables</em>/<em>states</em>, and denoted <span class="math inline">\(z\)</span> and <span class="math inline">\(z'\)</span>) for a population changes in discrete time. The distribution of trait values in a population at time <span class="math inline">\(t\)</span> is given by the function <span class="math inline">\(n(z,t)\)</span>, which describes the relative frequency of individuals with trait value <span class="math inline">\(z\)</span> at time <span class="math inline">\(t\)</span>. The IPM for the trait distribution <span class="math inline">\(z'\)</span> at time <span class="math inline">\(t+1\)</span> is then:</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(n(z', t+1) = \int_L^UK(z',z)n(z,t)\mathrm{dz}\)</span></li>
+</ol>
+<p><span class="math inline">\(K(z',z)\)</span>, known as the <em>projection kernel</em>, describes all possible transitions of existing individuals and recruitment of new individuals from <span class="math inline">\(t\)</span> to <span class="math inline">\(t+1\)</span>, generating a new trait distribution <span class="math inline">\(n(z',t+1)\)</span>. <span class="math inline">\(L,U\)</span> are the lower and upper bounds for values that the trait <span class="math inline">\(z\)</span> can have, and the range between them is called the integration <em>domain</em>. The integral <span class="math inline">\(\int_L^Un(z,t)\mathrm{dz}\)</span> is the total population size at time <span class="math inline">\(t\)</span>.</p>
+<p>To make the model more biologically interpretable, the projection kernel <span class="math inline">\(K(z',z)\)</span> is usually decomposed into <em>sub-kernels</em> (Eq 2). For example, a projection kernel to describe a lifecycle where individuals can survive, transition to different state values, and reproduce via sexual and asexual pathways, can be decomposed as follows:</p>
+<ol start="2" style="list-style-type: decimal">
+<li><span class="math inline">\(K(z',z) = P(z',z) + F(z',z) + C(z',z)\)</span></li>
+</ol>
+<p><span class="math inline">\(P(z',z)\)</span> is a sub-kernel describing transitions due to survival and state values changes of existing individuals, <span class="math inline">\(F(z',z)\)</span> is a sub-kernel describing per-capita sexual contributions of existing individuals to recruitment, and <span class="math inline">\(C(z',z)\)</span> is a sub-kernel describing per-capita asexual contributions of existing individuals to recruitment. The sub-kernels are typically comprised of functions parameterized by regression models that relate an individuals trait value <span class="math inline">\(z\)</span> at time <span class="math inline">\(t\)</span> to a new trait value at <span class="math inline">\(t+1\)</span>. For example, the <span class="math inline">\(P\)</span> kernel for Soay sheep (<em>Ovis aries</em>) on St. Kilda (Eq 3) may contain two regression models: (i) a logistic regression of survival on log body mass (Eq 4), and (ii) a regression of log body mass at <span class="math inline">\(t+1\)</span> on log body mass at <span class="math inline">\(t\)</span> (Eq 5-6). In this example, <span class="math inline">\(\sigma_g\)</span> is the standard deviation of the residuals from the growth regression model.</p>
+<ol start="3" style="list-style-type: decimal">
+<li><p><span class="math inline">\(P(z',z) = s(z) * g(z',z)\)</span></p></li>
+<li><p><span class="math inline">\(Logit(s(z)) = \alpha_s + \beta_s * z\)</span></p></li>
+<li><p><span class="math inline">\(g(z',z) \sim Norm(\mu_g, \sigma_g)\)</span></p></li>
+<li><p><span class="math inline">\(\mu_g = \alpha_g + \beta_g * z\)</span></p></li>
+</ol>
+<p>Here, we refer to these different scales (parameters (<em>e.g.</em> <span class="math inline">\(\alpha_g,\beta_g\)</span> in Eq 6), regressions (<em>e.g.</em> Eq 4), sub-kernels (<em>e.g.</em> Eq 3), and projection kernels (<em>e.g.</em> Eq 2)) as levels of the <em>model hierarchy</em>. <code>ipmr</code> is intended to help with the last two levels of the model hierarchy.</p>
+<p>Projecting the population state <span class="math inline">\(n(z',t+1)\)</span> requires a solution to the integral in Eq 1. Analytical solutions to the integral in Eq 1 are usually too complicated (or not possible; Ellner &amp; Rees 2006). Numerical approximations of these integrals are usually straightforward using a numerical integration rule. A commonly used rule is the midpoint rule (this is currently the only integration rule available in <code>ipmr</code>, though others should be implemented soon(ish)). The midpoint rule divides the domain <span class="math inline">\([L,U]\)</span> into <span class="math inline">\(m\)</span> artifical size bins <span class="math inline">\(z_i\)</span> with width <span class="math inline">\(h = (U-L) / m\)</span>. The midpoints <span class="math inline">\(z_i = L + (i - 0.5) * h\)</span> for <span class="math inline">\(i = \textrm{1, 2, ...}, m\)</span>. The midpoint rule approximation for Eq 1 then becomes:</p>
+<ol start="7" style="list-style-type: decimal">
+<li><span class="math inline">\(n(z_j, t+1) = h\sum\limits_{i = 1}^mK(z_j, z_i)n(z_i,t)\)</span></li>
+</ol>
+<p>In practice, the numerical approximation of the integral converts the continuous projection kernel into a (large) discretized matrix. A matrix multiplication of the discretized projection kernel and the discretized trait distribution then generates a new trait distribution, a process referred to as <em>model iteration</em> (<em>sensu</em> Easterling et al. 2000).</p>
+<p>While <code>ipmr</code> intends to mimic the notation above as closely as possible, it does provide some abstraction layers. For example, Equations 1 and 2 are generated internally by <code>ipmr</code>, so you will not need to define those. Sub-kernels are the highest level of the hierarchy that you will need to work with when defining the model.</p>
+<div id="model-types" class="section level2">
 <h2 class="hasAnchor">
-<a href="#types-of-models-in-ipmr" class="anchor"></a>Types of models in <code>ipmr</code>
+<a href="#model-types" class="anchor"></a>Types of models in <code>ipmr</code>
 </h2>
 <p>The first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="../reference/init_ipm.html">init_ipm()</a></code>. This function has two arguments: <code>model_class</code>, and <code>has_age</code>. We will ignore <code>has_age</code> for now, because age-size models are a complicated topic and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own vignette</a>.</p>
 <p>The <code>model_class</code> defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. <code>model_class</code> should be a character string with at least 3 (but possibly 4) entries separated by underscores (<code>_</code>). Below, the are the possible entries for each position.</p>
@@ -129,7 +158,7 @@
 <ul>
 <li><ol style="list-style-type: upper-alpha">
 <li>
-<strong>simple</strong>: This describes an IPM with a single continuous state variable and no discrete stages.</li>
+<strong>simple</strong>: This describes an IPM with a single continuous state variable and no discrete stages. The model presented in the Terminology section is a simple IPM, because it makes use of one, and only one, continuous state variable (<span class="math inline">\(z\)</span>).</li>
 </ol></li>
 <li><ol start="2" style="list-style-type: upper-alpha">
 <li>
@@ -342,15 +371,15 @@
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
   <span class="op">)</span></code></pre></div>
-<p>We are now ready to how to implement the model numerically.</p>
+<p>We are now ready to describe how to implement the model numerically.</p>
 </div>
 <div id="defining-the-implementation-arguments-impl_args" class="section level3">
 <h3 class="hasAnchor">
 <a href="#defining-the-implementation-arguments-impl_args" class="anchor"></a>Defining the implementation arguments (<code>impl_args</code>)</h3>
-<p>Next, we need to define how the kernels are implemented numerically. This is where we define the integration rule <code>int_rule</code>, the state the kernels begin on <code>state_start</code>, and the state that they finish on <code>state_end</code>. This is done with the <code><a href="../reference/define_impl.html">define_impl()</a></code> function. It takes a named list where names correspond to the kernel names, and each entry is itself a list of length 3 containing slots <code>int_rule</code>, <code>state_start</code>, and <code>state_end</code>. Because this is a bit specific, there is a helper function that can be called within <code>define_impl</code> or called before initializing the IPM to make sure everything is formatted correctly - <code>make_ipml_args_list()</code>.</p>
-<p>The first argument to the <code>make_ipml_args_list()</code> function is <code>kernel_names</code>. This is a character vector with kernel names for which the implementation arguments are being supplied.</p>
+<p>Next, we need to define how the kernels are implemented numerically. This is where we define the integration rule <code>int_rule</code>, the state the kernels modify <code>state_start</code>, and the state that they produce <code>state_end</code>. This is done with the <code><a href="../reference/define_impl.html">define_impl()</a></code> function. It takes a named list where names correspond to the kernel names, and each entry is itself a list of length 3 containing slots <code>int_rule</code>, <code>state_start</code>, and <code>state_end</code>. Because this is a bit specific, there is a helper function that can be called within <code>define_impl</code> or called before initializing the IPM to make sure everything is formatted correctly - <code>make_ipml_args_list()</code>.</p>
+<p>The first argument to the <code>make_ipml_args_list()</code> function is <code>kernel_names</code>. This is a character vector with kernel names for which the implementation arguments are being supplied. These should be the same as <code>name</code> from <code>define_kernel</code>.</p>
 <p>Next, <code>int_rule</code> is a character vector, and currently <code>'midpoint'</code> is the only option that is implemented. <code>'trapezoid'</code> and <code>'g-l'</code> (Gauss-Legendre) are on the to-do list. Additional rules may be added if there is more demand for certain ones (e.g. cumulative density functions like in <code>IPMpack</code>).</p>
-<p><code>state_start</code> and <code>state_end</code> are always the same in <code>simple_*</code> IPMs. In <code>general_*</code> ones, they may be different as individuals move from, for example, discrete to continuous states or vice versa. These must always match the names provided in the <code>states</code> list. <code>state_start</code>’s have <code>_1</code> and <code>state_end</code>’s have <code>_2</code> appended to them internally, so they may be referenced by vital rate functions without explicitly creating a variable for them.</p>
+<p><code>state_start</code> and <code>state_end</code> are always the same in <code>simple_*</code> IPMs. In <code>general_*</code> ones, they may be different as individuals move from, for example, discrete to continuous states or vice versa. These must always match the names provided in the <code>states</code> list.</p>
 <p>Elements of each vector in each argument in <code><a href="../reference/define_impl.html">make_impl_args_list()</a></code> are matched by position. Thus, if you specify <code>"P"</code> as the first entry in <code>kernel_names</code>, then the first entries of <code>int_rule</code>, <code>state_start</code>, and <code>state_end</code> should all correspond to the <code>P</code> kernel. If you specify <code>"F"</code> as the second entry, the second entries in <code>int_rule</code>, <code>state_start</code>, and <code>state_end</code> should be the rules that correspond to the <code>F</code> kernel, and so on.</p>
 <p>It is important to note that <code>make_impl_args_list</code> <em>does not return a <code>proto_ipm</code></em>. Thus, it must either be called before beginning the model definition, or inside of <code>define_impl</code>!</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -398,7 +427,7 @@
 <div id="defining-domains-for-state-variables" class="section level3">
 <h3 class="hasAnchor">
 <a href="#defining-domains-for-state-variables" class="anchor"></a>Defining domains for state variables</h3>
-<p>The final step in creating an IPM with <code>ipmr</code> is to define the domain of each continuouse state variable in the <code>states</code> list. This is done with the <code><a href="../reference/define_impl.html">define_domains()</a></code> function. When the <code>int_rule</code> is <code>"midpoint"</code>, this takes a named set of vectors that have 3 entries each. The name corresponds to the <code>state</code> it is associated with, the first entry is the lower bound, the second entry is the upper bound, and the third entry is the number of meshpoints.</p>
+<p>The next step in creating an IPM with <code>ipmr</code> is to define the domain of each continuouse state variable in the <code>states</code> list. This is done with the <code><a href="../reference/define_impl.html">define_domains()</a></code> function. When the <code>int_rule</code> is <code>"midpoint"</code>, this takes a named set of vectors that have 3 entries each. The name corresponds to the <code>state</code> it is associated with, the first entry is the lower bound, the second entry is the upper bound, and the third entry is the number of meshpoints.</p>
 <p>Note that for other <code>int_rule</code>s, the vectors associated with each domain will look different. However, those are not yet implemented and so beyond the scope of this vignette for now.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="va">my_ipm</span> <span class="op">%&gt;%</span>
@@ -664,13 +693,6 @@
   <span class="fu"><a href="../reference/define_impl.html">define_pop_state</a></span><span class="op">(</span>n_sa <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>iterate <span class="op">=</span> <span class="cn">TRUE</span>,
            iterations <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></code></pre></div>
-</div>
-<div id="further-debugging" class="section level3">
-<h3 class="hasAnchor">
-<a href="#further-debugging" class="anchor"></a>Further debugging</h3>
-<p>Because of the way <code>ipmr</code> is implemented internally, there can be some rather obscure error messages when building a model fails. The quickest way to deal with this is usually to print the <code>proto_ipm</code> object and inspect the output. <code>print.proto_ipm</code> shows information on the kernel names, vital rate expressions, and indicates whether or not every item in the vital rate expressions can be found in the <code>data_list</code> and <code>states</code>/<code>domain</code> that are provided. This can be useful for catching typos in vital rate expressions, or for instances when we’ve forgotten to define key parts like initial population states.</p>
-<p>The most common problems are forgetting to name population states and the <code>data_list</code> correctly.</p>
-<p>NEED TO EXPAND THIS!!!!</p>
 </div>
 </div>
 <div id="defining-more-complicated-models" class="section level2">
@@ -1638,6 +1660,7 @@
 <p>An article on these is available on the <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">website</a> and from an R session:</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/browseVignettes.html">browseVignettes</a></span><span class="op">(</span><span class="st">"ipmr"</span><span class="op">)</span></code></pre></div>
+</div>
 </div>
   </div>
 

@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -126,6 +126,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -167,6 +170,13 @@
 <span class='co'># S3 method for default</span>
 <span class='fu'>vital_rates</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
+<span class='fu'>vital_rates</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>kernel</span>, <span class='va'>vital_rate</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+
+<span class='co'># S3 method for proto_ipm</span>
+<span class='fu'>vital_rates</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>kernel</span>, <span class='va'>vital_rate</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+
+<span class='fu'>new_fun_form</span><span class='op'>(</span><span class='va'>form</span><span class='op'>)</span>
+
 <span class='fu'>kernel_formulae</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
 <span class='co'># S3 method for proto_ipm</span>
@@ -174,6 +184,11 @@
 
 <span class='co'># S3 method for default</span>
 <span class='fu'>kernel_formulae</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
+
+<span class='fu'>kernel_formulae</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>kernel</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+
+<span class='co'># S3 method for proto_ipm</span>
+<span class='fu'>kernel_formulae</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>kernel</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='fu'>parameters</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
@@ -186,9 +201,6 @@
 <span class='fu'>parameters</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S3 method for proto_ipm</span>
-<span class='fu'>parameters</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='co'># S3 method for default</span>
 <span class='fu'>parameters</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='fu'>int_mesh</span><span class='op'>(</span><span class='va'>ipm</span><span class='op'>)</span>
@@ -209,9 +221,25 @@
       <td><p>A <code>proto_ipm</code> or object created by <code><a href='make_ipm.html'>make_ipm()</a></code>.</p></td>
     </tr>
     <tr>
+      <th>kernel</th>
+      <td><p>The name of the kernel to insert the new vital rate expression
+into</p></td>
+    </tr>
+    <tr>
+      <th>vital_rate</th>
+      <td><p>The name of the vital rate to replace. If the vital rate
+doesn't already exist in the <code>object</code>, a new one with this name will be
+created.</p></td>
+    </tr>
+    <tr>
       <th>value</th>
       <td><p>A named list of new parameters. The new list does not need
 to contain all of the parameters, just the ones to update/append.</p></td>
+    </tr>
+    <tr>
+      <th>form</th>
+      <td><p>An expression representing the new vital rate or kernel formula
+to insert.</p></td>
     </tr>
     <tr>
       <th>ipm</th>
@@ -225,15 +253,21 @@ called).</p></td>
 
     <p>Depending on the class of <code>object</code>, a numeric vector, or a list
 with types numeric or character. See details on return types for each.</p>
+<p>A modified <code>object</code>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The <code>*.default</code> method corresponds to output from <code><a href='make_ipm.html'>make_ipm()</a></code>,
 and the <code>*.proto_ipm</code> methods correspond to outputs from <code>define_*</code>.</p>
+<p>When using <code>kernel_formulae&lt;-</code> and <code>vital_rates&lt;-</code>, the right
+hand side of the expression must be wrapped in <code>new_fun_form</code>. See
+examples.</p>
 <p>Return types are as follows:</p><ul>
 <li><p><code>...</code></p></li>
 </ul>
 
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
