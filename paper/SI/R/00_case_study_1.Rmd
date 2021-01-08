@@ -117,7 +117,7 @@ n_mesh_p <- 100
 
 ```
 
-We now have the parameter set prepared, and have the boundaries for our domains set up. We are ready to implement the model. We'll specify `return_main_env = TRUE` in `make_ipm()` because we'll need the mesh points and bin width for some subsequent analyses. 
+We now have the parameter set prepared, and have the boundaries for our domains set up. We are ready to implement the model.
 
 We start with the function `init_ipm()`. This function has two arguments: `model_class` and `has_age`. For now, we will ignore the latter argument, as it is covered in case study 2, and has its own introduction [here](https://levisc8.github.io/ipmr/articles/age_x_size.html). The `model_class` argument specifies the type of IPM we are building and has 3 parts:
 
@@ -508,36 +508,18 @@ contour(x = x,
 
 ```
 
-Now, for the `ggplot2` version. First, create a function to create long format data frames for each matrix. Then, get the meshpoints for the model out of the `main_env`. Once we have those, we can use `geom_tile` and `geom_contour` to generate the `ggplot`s, and `grid.arrange` from the `gridExtra` package to put them side by side.
+Now, for the `ggplot2` version. First, we create a long format of the matrix using `ipmr`'s `ipm_to_df` function. Then, get the meshpoints for the model out of the `main_env`. Once we have those, we can use `geom_tile` and `geom_contour` to generate the `ggplot`s, and `grid.arrange` from the `gridExtra` package to put them side by side.
 
 ```{r, fig.width = 12, fig.height = 5}
 
 library(ggplot2)
 library(gridExtra)
 
-mat_to_df <- function(mat, meshp) {
-  
-  meshp$value <- NA_real_
-  
-  it <- 1
-  
-  for(i in seq_len(dim(mat)[1])) {
-    for(j in seq_len(dim(mat)[2])) {
-      
-      meshp[it, 3] <- mat[i, j]
-      it <- it + 1
-      
-    }
-  }
-  
-  return(meshp)
-}
-
 mesh_p <- data.frame(x = mesh_info$z_1,
                      y = mesh_info$z_2)
 
-sens_df <- mat_to_df(sens_mat, mesh_p)
-elas_df <- mat_to_df(elas_mat, mesh_p)
+sens_df <- cbind(mesh_p, value = ipm_to_df(sens_mat)$value)
+elas_df <- cbind(mesh_p, value = ipm_to_df(elas_mat)$value)
 
 # Create a default theme for our plots
 

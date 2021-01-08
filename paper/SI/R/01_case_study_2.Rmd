@@ -7,7 +7,7 @@ output: pdf_document
 
 Many life cycles cannot be described by a single, continuous state variable. For example, some plants are best modeled using height or diameter at breast height (DBH) as a state variable, and may also form a seed bank. Seeds in the seed bank can't have a value for height or DBH, but may lose their viability as they age. Thus, we require a discrete state to capture the dynamics of the seed bank. Models that include discrete states and/or multiple continuous state variables are _general IPMs_. 
 
-Many species experience some form of senesence, where survival increases and fecundity decreases after a certain age is attained. Age may interact with a measure of size, for example body mass, resulting in neither single variable reliably predicting demography on its own. Data sets where individuals are cross-classified by age and size represent an interesting opportunity for demographic research. Unfortunately, they can be a bit more complicated to model. This case study will use an age and size structured population to illustrate how to implement general IPMs in `ipmr`. 
+Many species experience some form of senesence as they age. Age may interact with a measure of size, for example body mass, resulting in neither single variable reliably predicting demography on its own. Data sets where individuals are cross-classified by age and size represent an interesting opportunity for demographic research. Unfortunately, they can be a bit more complicated to model. This case study will use an age and size structured population to illustrate how to implement general IPMs in `ipmr`. 
 
 The model itself can be written on paper as:
 
@@ -29,7 +29,7 @@ The sub-kernel $P_a(z',z)$ is comprised of the following functions:
 
 7. $\mu_g(z) = \alpha_g + \beta_g^z * z + \beta_g^a * a$
 
-and the sub-kernel $F_a(z',z) is comprised of the following functions:
+and the sub-kernel $F_a(z',z)$ is comprised of the following functions:
 
 8. $F_0 = 0$
 
@@ -45,7 +45,7 @@ The $F_a$ kernel is multiplied by 0.5 because this model only models the populat
 
 13. $\mu_{f_d}(z) = \alpha_{f_d} + \beta_{f_d}^z * z$
 
-Equations 5, 7, 10, 11, and 13 are parameterized from regression models, and equations 6 and 12 are constant parameters derived from observed data. This example will skip the step of model parameterization, and go straight into the IPM.  
+Equations 5, 7, 10, 11, and 13 are parameterized from regression models, and equations 6 and 12 are constant parameters derived from observed data. The parameter values are taken from Ellner, Childs & Rees, Chapter 6 (2016). These can be found here: https://github.com/levisc8/first-edition/blob/master/Rcode/c6/Ungulate%20Age%20Demog%20Funs.R#L13. In the code from the book, these paramters were used to simulate an IBM to generate a data set. The data were then used to fit regression models and an age$\times$size IPM. We are going to skip those steps and just use the "true" parameter estimates to generate the IPM. 
 
 First, we will define all the model parameters and a function for the $F_a$ kernels.
 
@@ -53,7 +53,6 @@ First, we will define all the model parameters and a function for the $F_a$ kern
 
 library(ipmr)
 
-# devtools::load_all()
 # Set parameter values and names
 
 param_list <- list(
@@ -97,13 +96,13 @@ f_fun <- function(age, s_age, pb_age, pr_age, recr) {
 
 Next, we set up the $P_a$ kernels (Equations 4-7 above). Because this is a general, deterministic IPM, we set the model class to `"general_di_det"`, and set `has_age = TRUE` to indicate that our model has age structure as well as size structure. There are 3 key things to note:
 
-1. the use of the suffix `_age` appended to the names of the `"P"` kernel and the `mu_g_age` variable
+1. the use of the suffix `_age` appended to the names of the `"P_age"` kernel and the `mu_g_age` variable
 
 2. the value `age` used in the vital rate expressions
 
 3. the list in the `levels_ages` argument
 
-The values in the `levels_ages` list will automatically get substituted in for `"age"` each time it appears in the vital rate expressions and kernels. This single call to `define_kernel()` will result in 22 actual kernels, one for each value of `age` from 0-21.
+The values in the `levels_ages` list will automatically get substituted in for `"age"` each time it appears in the vital rate expressions and kernels. This single call to `define_kernel()` will result in 22 actual kernels, one for each value of `age` from 0-21. For general IPMs that are not age-structured, we would use `has_hier_effs` and `levels_hier_effs` in the same way we're using `age` below. 
 
 The `plogis` function is part of the `stats` package in _R_, and performs the inverse logit transformation.
 
@@ -157,7 +156,7 @@ age_size_ipm <-  define_impl(
   proto_ipm = age_size_ipm,
   make_impl_args_list(
     kernel_names = c("P_age", "F_age"),
-    int_rule     = rep("midpoint", 3),
+    int_rule     = rep("midpoint", 2),
     state_start    = c("z_age", "z_age"),
     state_end      = c("z_age", "z_0")
   )

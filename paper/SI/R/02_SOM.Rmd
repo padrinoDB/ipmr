@@ -13,7 +13,7 @@ library(grid)
 library(gridExtra)
 library(ggplot2)
 
-ipm_pubs <- read.csv('../../data-raw/padr-pubs-feb-2021.csv',
+ipm_pubs <- read.csv('../../../data-raw/padr-pubs-feb-2021.csv',
                      stringsAsFactors = FALSE)
 
 names(ipm_pubs) <- gsub("\\.\\.", "_", names(ipm_pubs))
