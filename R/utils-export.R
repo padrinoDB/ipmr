@@ -630,9 +630,58 @@ domains <- function(object) {
 #' @details The \code{*.default} method corresponds to output from \code{make_ipm()},
 #' and the \code{*.proto_ipm} methods correspond to outputs from \code{define_*}.
 #'
+#' When using \code{kernel_formulae<-} and \code{vital_rates<-}, the right
+#' hand side of the expression must be wrapped in \code{new_fun_form}. See
+#' examples.
+#'
 #' Return types are as follows:
 #' \itemize{
 #'   \code{...}
+#' }
+#'
+#' @examples
+#'
+#' \dontrun{
+#'
+#' data(gen_di_det_ex)
+#'
+#' proto <- gen_di_det_ex$proto_ipm
+#'
+#' vital_rates(gen_di_det_ex)
+#' kernel_formulae(gen_di_det_ex)
+#'
+#' domains(gen_di_det_ex)
+#' parameters(gen_di_det_ex)
+#'
+#' # Usage is the same for proto_ipm's as *_ipm's
+#'
+#' vital_rates(proto)
+#' kernel_formulae(proto)
+#'
+#' domains(proto)
+#' parameters(proto)
+#'
+#'
+#' int_mesh(gen_di_det_ex)g
+#'
+#' # Setting new parameters, vital rate expressions, and kernel formulae
+#' # only works on proto_ipm's.
+#'
+#' # This replaces the "g_int" parameter and leaves the rest untouched
+#'
+#' parameters(proto) <- list(g_int = 1.5)
+#'
+#' # This creates a new g_z parameter and leaves the rest of parameters untouched
+#' parameters(proto) <- list(g_z = 2.2)
+#'
+#' # setting a new vital rate or kernel expression requires wrapping the
+#' # right-hand side in a call to new_fun_form(). new_fun_form uses expressions
+#' # with the same format as ... in define_kernel()
+#'
+#' vital_rates(proto, kernel = "P", vital_rate = "g_mu") <- new_fun_form(g_int + g_z + g_slope * ht_1)
+#'
+#' kernel_formulae(proto, kernel = "stay_discrete") <- new_fun_form(g_z * d_ht)
+#'
 #' }
 #'
 #' @export
@@ -734,6 +783,48 @@ vital_rates.default <- function(object) {
 }
 
 #' @rdname accessors
+#'
+#' @param kernel The name of the kernel to insert the new vital rate expression
+#' into
+#' @param vital_rate The name of the vital rate to replace. If the vital rate
+#' doesn't already exist in the \code{object}, a new one with this name will be
+#' created.
+#' @param value The new vital rate form, wrapped in a call to \code{new_fun_form}.
+#'
+#' @return A modified \code{object}.
+#'
+#' @export
+
+`vital_rates<-` <- function(object, kernel, vital_rate, value) {
+
+  UseMethod("vital_rates<-")
+
+}
+
+#' @rdname accessors
+#' @export
+
+`vital_rates<-.proto_ipm` <- function(object, kernel, vital_rate, value) {
+
+
+  object$params[[kernel]]$vr_text[[vital_rate]] <- rlang::quo_text(value)
+
+  return(object)
+
+}
+
+#' @rdname accessors
+#'
+#' @param form An expression representing the new vital rate or kernel formula
+#' to insert.
+
+new_fun_form <- function(form) {
+
+  rlang::enquo(form)
+
+}
+
+#' @rdname accessors
 #' @export
 
 kernel_formulae <- function(object) {
@@ -767,6 +858,25 @@ kernel_formulae.default <- function(object) {
 
 }
 
+#' @rdname accessors
+#' @export
+
+`kernel_formulae<-` <- function(object, kernel, value) {
+
+  UseMethod("kernel_formulae<-")
+
+}
+
+#' @rdname accessors
+#' @export
+
+`kernel_formulae<-.proto_ipm` <- function(object, kernel, value) {
+
+  object$params[[kernel]]$formula <- rlang::quo_text(value)
+
+  return(object)
+
+}
 
 #' @export
 #' @rdname accessors
@@ -842,19 +952,6 @@ parameters.default <- function(object) {
 
     }
   }
-
-  return(object)
-
-}
-
-#' @rdname accessors
-#' @export
-
-`parameters<-.default` <- function(object, value) {
-
-  new_proto_ipm             <- object$proto_ipm
-  parameters(new_proto_ipm) <- value
-  object$proto_ipm          <- new_proto_ipm
 
   return(object)
 
@@ -1094,4 +1191,53 @@ collapse_pop_state <- function(ipm, time_step, ...) {
 
 }
 
+#' @title Convert ipmr matrix to long data frame
+#'
+#' @description Converts IPM kernels into long data frames. These are useful for
+#' creating plots using \code{ggplot2}.
+#'
+#' @inheritParams format_mega_matrix
+#'
+#' @return A data frame with 3 columns named \code{"t"}, \code{"t_1"}, and
+#' \code{"value"}.
+#'
+#' @examples
+#'
+#' data(gen_di_det_ex)
+#'
+#' big_mat_df <- ipm_to_df(gen_di_det_ex,
+#'                         mega_mat = c(stay_discrete, go_discrete,
+#'                                      leave_discrete, P))
+#'
+#' @export
 
+ipm_to_df <- function(ipm, ...) {
+
+  UseMethod("ipm_to_df")
+
+}
+
+#' @export
+
+ipm_to_df.array <- function(ipm, ...) {
+
+  mat_to_df_impl(ipm)
+
+}
+
+#' @export
+
+ipm_to_df.default <- function(ipm, ..., mega_mat, name_ps = NULL, f_forms = NULL) {
+
+  mega_mat <- rlang::enquo(mega_mat)
+
+  megas <- format_mega_matrix(ipm,
+                              mega_mat = !! mega_mat,
+                              name_ps = name_ps,
+                              f_forms = f_forms)
+
+  out <- lapply(megas, mat_to_df_impl)
+
+  return(out)
+
+}

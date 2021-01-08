@@ -201,17 +201,6 @@ test_that("parameters gets and sets correctly", {
 
   expect_identical(ipm_params, proto_params)
 
-  # Make sure parameters<-.default is operating on proto_ipm, not something
-  # else
-
-  parameters(gen_di_det_ex) <- list(g_i = 0.6)
-
-  new_params <- parameters(gen_di_det_ex)
-  new_prot_params <- parameters(gen_di_det_ex$proto_ipm)
-
-  expect_identical(ipm_params[1:13], new_params[1:13])
-
-  expect_identical(new_params, new_prot_params)
 
 })
 

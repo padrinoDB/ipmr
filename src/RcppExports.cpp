@@ -5,6 +5,17 @@
 
 using namespace Rcpp;
 
+// mat_to_df_impl
+DataFrame mat_to_df_impl(NumericMatrix mat);
+RcppExport SEXP _ipmr_mat_to_df_impl(SEXP matSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
+    rcpp_result_gen = Rcpp::wrap(mat_to_df_impl(mat));
+    return rcpp_result_gen;
+END_RCPP
+}
 // update_pop_state
 List update_pop_state(List holder, List current, int iter);
 RcppExport SEXP _ipmr_update_pop_state(SEXP holderSEXP, SEXP currentSEXP, SEXP iterSEXP) {
@@ -20,6 +31,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_ipmr_mat_to_df_impl", (DL_FUNC) &_ipmr_mat_to_df_impl, 1},
     {"_ipmr_update_pop_state", (DL_FUNC) &_ipmr_update_pop_state, 3},
     {NULL, NULL, 0}
 };

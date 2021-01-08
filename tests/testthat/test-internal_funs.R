@@ -8,6 +8,8 @@ test_mat   <- matrix(c(1, 2, 3,
 test_mat_2 <- matrix(c(test_mat, test_mat, test_mat),
                    nrow = 3)
 
+test_df <- cbind(expand.grid(t = 1:3, t_1 = 1:3), value = as.vector(test_mat))
+
 test_that('.conv_to_asymptotic and is_square work/fail properly', {
 
   expect_true(is_square(test_mat))
@@ -16,6 +18,37 @@ test_that('.conv_to_asymptotic and is_square work/fail properly', {
 
   expect_false(is_square(test_mat_2))
 
+
+})
+
+test_that("ipm_to_df works properly", {
+
+  expect_equal(test_df, mat_to_df_impl(test_mat))
+
+  data(gen_di_det_ex)
+
+  temp_big <- format_mega_matrix(gen_di_det_ex,
+                                 c(stay_discrete, go_discrete,
+                                   leave_discrete, P))[[1]]
+
+  target_df <- expand.grid(t = 1:501, t_1 = 1:501, value = NA_real_) %>% as.list()
+  it <- 1
+
+  for(i in seq_len(nrow(temp_big))) {
+    for(j in seq_len(ncol(temp_big))) {
+
+      target_df$value[it] <- temp_big[i, j]
+      it <- it + 1
+
+    }
+  }
+
+  target_df <- as.data.frame(target_df)
+
+  ipmr_df <- ipm_to_df(gen_di_det_ex, mega_mat = c(stay_discrete, go_discrete,
+                                                    leave_discrete, P))
+
+  expect_equal(target_df, ipmr_df$mega_matrix)
 
 })
 
