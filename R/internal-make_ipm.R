@@ -449,7 +449,6 @@
 #' @noRd
 
 .update_param_simple_output <- function(sub_kernels,
-                                        ipm_system,
                                         pop_state,
                                         data_envs = NA_character_,
                                         main_env,
@@ -466,21 +465,13 @@
                                tot_iterations    = tot_iterations,
                                current_iteration = current_iteration)
 
-  # Determine who's a kernel and who's a pop_vector!
-
-  iterator   <- list(ipm_system$iterators)
-
   # make names a bit prettier to help distinguish between iterations
 
   names(sub_kernels) <- paste(names(sub_kernels),
                               current_iteration,
                               sep = "_")
 
-  names(iterator)    <- paste('K', current_iteration, sep = "_")
-
   output$sub_kernels <- purrr::splice(output$sub_kernels, sub_kernels)
-  output$iterators   <- purrr::splice(output$iterators, iterator)
-
 
   output$pop_state   <- pop_state
 

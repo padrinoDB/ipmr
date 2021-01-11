@@ -317,13 +317,6 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
   sub_kern_list <- all_sub_kerns$sub_kernels
   env_list      <- all_sub_kerns$env_list
 
-  # build up the iteration kernels from their sub-kernels
-
-  # iterators     <- .make_k_kern_samp(k_row,
-  #                                    proto_ipm,
-  #                                    sub_kern_list,
-  #                                    main_env)
-
   kern_seq      <-  .make_kern_seq(proto_ipm,
                                    iterations,
                                    kernel_seq)
@@ -489,10 +482,6 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
     sub_kernels <- sys$ipm_system$sub_kernels
 
-    sys_i       <- .make_k_param_samp(k_row,
-                                      sub_kernels,
-                                      main_env)
-
     # .iterate_model is internal generic - see internal-model_iteration.R
 
     pop_state   <- .iterate_model(proto_ipm,
@@ -521,7 +510,6 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
     temp <- .update_param_simple_output(
       sub_kernels,
-      sys_i,
       pop_state,
       env_list,
       main_env,

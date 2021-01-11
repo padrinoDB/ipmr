@@ -25,3 +25,5 @@ paper/Analyses/Data/*
 paper/SI/Data*
 *.tmp
 build_artefacts/*
+*.o
+*.dll

@@ -795,6 +795,34 @@ print.ipmr_pop_state <- function(x, ...) {
 
 }
 
+#' @export
+print.ipmr_mp_mesh <- function(x, ...) {
+
+  uses <- Filter(Negate(is.null), x)
+
+  msg <- vapply(uses, function(z) {
+
+    if(length(z) > 1) {
+
+      paste("Lower bound: ", range(z)[1], ", Upper bound: ", range(z)[2],
+            ", # of Meshpoints: ", sqrt(length(z)),
+            sep = "")
+
+    } else {
+      as.character(z)
+    }
+
+  },
+  character(1L)) %>%
+    paste(names(.), " - ", ., sep = "") %>%
+    paste(., collapse = "\n")
+
+  cat(msg)
+
+  invisible(x)
+
+}
+
 # Lambda------------
 #' @title Compute the per-capita growth rate for an IPM object
 #' @rdname lambda
