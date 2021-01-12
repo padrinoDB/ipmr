@@ -101,9 +101,11 @@ define_kernel <- function(proto_ipm,
 
   cls <- class(proto_ipm)
 
-  int <- any(grepl("simple", cls))
+  simple <- any(grepl("simple", cls))
 
-  integrate <- integrate && int
+  if(missing(family) && simple) family <- "CC"
+
+  integrate <- integrate && simple
 
   # Capture formulas and convert to text
 
