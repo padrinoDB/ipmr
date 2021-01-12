@@ -1554,3 +1554,103 @@ set_ipmr_classes <- function(to_set, cls = NULL) {
 
 }
 
+
+#' @noRd
+# Evaluates the K exprs with their population vectors. Not prefaced with .make_*
+# because for general IPMs, we don't really "make" a K, just iterate it with
+# the sub kernels and use the population vectors. I think it may simplify the API
+# eventually to revert this back to make_* naming though
+
+.eval_general_det <- function(k_row,
+                              proto_ipm,
+                              sub_kern_list,
+                              pop_state,
+                              main_env) {
+
+  pop_list <- list()
+
+  n_ks <- dim(k_row)[1]
+
+  for(i in seq_len(n_ks)) {
+
+    id         <- k_row$kernel_id[i]
+
+    param_tree <- k_row$params[[i]]
+
+    # Part one of .generate_kernel env, but we don't want to bind kern_quos
+    # because they do not exist yet!
+
+    kern_env <- rlang::child_env(.parent = main_env,
+                                 !!! param_tree$params)
+
+    rlang::env_bind_lazy(kern_env,
+                         !!! sub_kern_list,
+                         .eval_env = kern_env)
+
+    kern_form <- .parse_k_formulae(param_tree$formula,
+                                   kern_env,
+                                   k_row,
+                                   main_env)
+
+    pull_name <- ifelse(names(kern_form) == id, id, names(kern_form))
+
+    rlang::env_bind_lazy(kern_env,
+                         !!! kern_form,
+                         .eval_env = kern_env)
+
+    pop_list[[i]]        <- rlang::env_get_list(kern_env, nms = pull_name)
+
+    names(pop_list[[i]]) <- pull_name
+
+  }
+
+  pop_list <- .flatten_to_depth(pop_list, 1L)
+
+  return(pop_list)
+}
+
+#' @noRd
+
+.add_pop_state_to_main_env <- function(pop_state, main_env) {
+
+
+  if(!all(is.na(pop_state))) {
+    if(rlang::is_list(pop_state)) {
+      pop_state <- .flatten_to_depth(pop_state, 1)
+    }
+
+    # We don't want to add lambda to the main env. I don't think
+    # it'd cause any problems, as I don't we don't have any other objects
+    # referencing that value further downstream. This is a safety precaution.
+
+    pop_state <- pop_state[names(pop_state != 'lambda')]
+
+    # Turn pop_states for continuous vars into column vectors. discrete
+    # vars get a 1x1 matrix
+
+    for(i in seq_along(pop_state)) {
+
+      # We have our matrix. Next, we need to create the n_*t helper variable.
+      # This is always initialized as the first column of the size x time population
+      # state matrix.
+
+      nm <- paste0(names(pop_state)[i], '_t', sep = "")
+      time_t <- pop_state[[i]][ , 1]
+      assign(nm, time_t, envir = main_env)
+
+      # Finally, we need to bind the complete pop_state_list with size x time
+      # matrices so these can be updated at each iteration (if iteration is requested)
+      # by .iterate_kerns_* functions. Not using env_bind because that will
+      # sometimes return a list of zaps invisibly when used with assignment at
+      # the next level up (I don't think it'd happen here since main_env is
+      # explicitly returned, but just being safe!)
+
+      assign(names(pop_state)[i], pop_state[[i]], envir = main_env)
+
+    }
+  }
+
+  return(main_env)
+
+}
+
