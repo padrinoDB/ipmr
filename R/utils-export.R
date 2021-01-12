@@ -624,8 +624,8 @@ domains <- function(object) {
 #'
 #' @param object A \code{proto_ipm} or object created by \code{make_ipm()}.
 #'
-#' @return Depending on the class of \code{object}, a numeric vector, or a list
-#' with types numeric or character. See details on return types for each.
+#' @return Depending on the class of \code{object}, a list
+#' with types numeric or character.
 #'
 #' @details The \code{*.default} method corresponds to output from \code{make_ipm()},
 #' and the \code{*.proto_ipm} methods correspond to outputs from \code{define_*}.
@@ -634,24 +634,20 @@ domains <- function(object) {
 #' hand side of the expression must be wrapped in \code{new_fun_form}. See
 #' examples.
 #'
-#' Return types are as follows:
-#' \itemize{
-#'   \code{...}
-#' }
-#'
 #' @examples
-#'
-#' \dontrun{
 #'
 #' data(gen_di_det_ex)
 #'
 #' proto <- gen_di_det_ex$proto_ipm
 #'
-#' vital_rates(gen_di_det_ex)
-#' kernel_formulae(gen_di_det_ex)
+#' # Create a new, iterated IPM
+#' new_ipm <- make_ipm(proto, iterate = TRUE, iterations = 100)
 #'
-#' domains(gen_di_det_ex)
-#' parameters(gen_di_det_ex)
+#' vital_rates(new_ipm)
+#' kernel_formulae(new_ipm)
+#'
+#' domains(new_ipm)
+#' parameters(new_ipm)
 #'
 #' # Usage is the same for proto_ipm's as *_ipm's
 #'
@@ -661,8 +657,7 @@ domains <- function(object) {
 #' domains(proto)
 #' parameters(proto)
 #'
-#'
-#' int_mesh(gen_di_det_ex)g
+#' int_mesh(new_ipm)
 #'
 #' # Setting new parameters, vital rate expressions, and kernel formulae
 #' # only works on proto_ipm's.
@@ -681,8 +676,6 @@ domains <- function(object) {
 #' vital_rates(proto, kernel = "P", vital_rate = "g_mu") <- new_fun_form(g_int + g_z + g_slope * ht_1)
 #'
 #' kernel_formulae(proto, kernel = "stay_discrete") <- new_fun_form(g_z * d_ht)
-#'
-#' }
 #'
 #' @export
 
@@ -791,8 +784,6 @@ vital_rates.default <- function(object) {
 #' created.
 #' @param value The new vital rate form, wrapped in a call to \code{new_fun_form}.
 #'
-#' @return A modified \code{object}.
-#'
 #' @export
 
 `vital_rates<-` <- function(object, kernel, vital_rate, value) {
@@ -817,6 +808,8 @@ vital_rates.default <- function(object) {
 #'
 #' @param form An expression representing the new vital rate or kernel formula
 #' to insert.
+#'
+#' @export
 
 new_fun_form <- function(form) {
 
@@ -1001,6 +994,8 @@ int_mesh <- function(ipm) {
                              all_nms,
                              default = NULL,
                              inherit = FALSE)
+
+  class(out) <- c("ipmr_mp_mesh", "list")
 
   return(out)
 
