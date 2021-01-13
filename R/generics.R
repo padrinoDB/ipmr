@@ -80,7 +80,9 @@ print.proto_ipm <- function(x, ...) {
       }
 
     }
-    cat("\nDouble check the model definition and 'data_list'!\n")
+    cat("\nThis may be because 'define_domains()' has not yet been called.\n",
+        "If it has been called, then double check the model definition and",
+        "'data_list'.\n")
 
   }
 
@@ -92,11 +94,20 @@ print.proto_ipm <- function(x, ...) {
 
   print(pop_state(x))
 
-  k_row <- .init_iteration(x, TRUE, direction = "right")
-
   cat("\n\nInternally generated model iteration procedure:\n\n")
 
-  print(kernel_formulae(k_row))
+  if(!all(is.na(x$domain))){
+
+    k_row <- .init_iteration(x, TRUE, direction = "right")
+
+    print(kernel_formulae(k_row))
+
+  } else {
+
+    cat("Not enough information to generate an iteration procedure.\n",
+        "define_impl() and define_pop_state() must be called first to generate one.")
+
+  }
 
   # Add more later -----------
 

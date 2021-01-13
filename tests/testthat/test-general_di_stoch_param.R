@@ -535,6 +535,10 @@ iterate_model <- function(env_params,
                     dom_3,
                     dom_4)
 
+  pop_size_t <- sum(pop_list$n_ln_leaf_l[ , iteration],
+                    pop_list$n_sqrt_area[ , iteration],
+                    pop_list$n_d[ , iteration])
+
   n_ln_leaf_l_t_1 <- k_xx_temp %*% pop_list$n_ln_leaf_l[ , iteration] +
                      k_zx_temp %*% pop_list$n_sqrt_area[ , iteration] +
                      k_dx_temp %*% pop_list$n_d[ , iteration]
@@ -548,6 +552,9 @@ iterate_model <- function(env_params,
   pop_list$n_sqrt_area[ , (iteration + 1)] <- n_sqrt_area_t_1
   pop_list$n_d[ , (iteration + 1)]         <- n_d_t_1
 
+  pop_list$lambda[ , iteration] <- sum(n_ln_leaf_l_t_1,
+                                       n_sqrt_area_t_1,
+                                       n_d_t_1) / pop_size_t
 
   kerns_temp <- list(k_xx = k_xx_temp,
                      k_zx = k_zx_temp,
@@ -571,7 +578,8 @@ iterate_model <- function(env_params,
 pop_list <- list(
   n_ln_leaf_l = matrix(NA_real_, nrow = 50, ncol = 101),
   n_sqrt_area = matrix(NA_real_, nrow = 50, ncol = 101),
-  n_d         = matrix(NA_real_, nrow = 1,  ncol = 101)
+  n_d         = matrix(NA_real_, nrow = 1,  ncol = 101),
+  lambda      = matrix(NA_real_, nrow = 1,  ncol = 100)
 )
 
 pop_list$n_ln_leaf_l[ , 1] <- init_pop_vec$ln_leaf_l
@@ -619,9 +627,8 @@ for(i in seq(1, 100, 1)) {
 
 }
 
-pop_list <- list(pop_state = pop_list)
 
-usr_lambdas <- ipmr:::.lambda_pop_size(pop_list, all_lambdas = TRUE)
+usr_lambdas <- as.vector(pop_list$lambda)
 
 ipmr_sub_kernels <- gen_di_stoch_param$sub_kernels
 
@@ -1690,6 +1697,8 @@ test_that("Hierarchical effects work in parameter re-sampled model", {
 
     use_kerns     <- env_params_it[[14]]
     env_params_it <- env_params_it[-c(14)]
+
+
 
     temp <- iterate_model_norm(env_params_it,
                                use_kerns,

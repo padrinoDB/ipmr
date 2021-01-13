@@ -178,6 +178,7 @@ pop_state <- list(ht_cr  = matrix(NA_real_, nrow = n, ncol = n_runs + 1),
 
 pop_state$ht_cr[ , 1]  <- pop_state$ht_co[ , 1]  <- init_pop_vec
 pop_state$b_t_cr[ , 1] <- pop_state$b_t_co[ , 1] <- init_b
+pop_state$lambda_cr <- pop_state$lambda_co <- matrix(0, nrow = 1, ncol = 100)
 
 DD_cr <- K_cr[1 , 1] # dd
 DD_co <- K_co[1 , 1] # dd
@@ -206,13 +207,18 @@ for(i in seq_len(n_runs)) {
   pop_state$ht_co[ , (i + 1)] <- n_t_1_co
   pop_state$b_t_cr[ , (i + 1)] <- b_t_1_cr
   pop_state$b_t_co[ , (i + 1)] <- b_t_1_co
+
+  pop_state$lambda_cr[ , i] <- sum(n_t_1_cr, b_t_1_cr) / sum(pop_state$ht_cr[ , i],
+                                                             b_t_cr)
+  pop_state$lambda_co[ , i] <- sum(n_t_1_co, b_t_1_co) / sum(pop_state$ht_co[ , i],
+                                                             b_t_co)
 }
 
 pop_size_co <- list(pop_state = pop_state[3:4])
 pop_size_cr <- list(pop_state = pop_state[1:2])
 
-lam_s_cr <- ipmr:::.lambda_pop_size(pop_size_cr)
-lam_s_co <- ipmr:::.lambda_pop_size(pop_size_co)
+lam_s_cr <- pop_state$lambda_cr %>% as.vector()
+lam_s_co <- pop_state$lambda_co %>% as.vector()
 
 ## ipmr version --------
 states <- list(c('ht', 'b'))

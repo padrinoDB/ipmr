@@ -497,42 +497,14 @@
     }
     return(out)
 
-  }
-
-  # I don't think this can ever happen - if a model is iterated, it will now
-  # always have a lambda slot. If it is not, then lambda_pop_size makes no sense
-  # either.
-
-  n_its <- dim(pops[[1]])[2]
-  temp  <- numeric(n_its - 1)
-
-  pops <- pops[!lam_ind]
-
-  for(i in seq(2, n_its, 1)) {
-
-    tot_pop_size_t <- lapply(pops, function(x, it) {
-      sum(x[ ,it])
-    },
-    it = (i - 1)) %>%
-      unlist() %>%
-      sum()
-
-    tot_pop_size_t_1 <- lapply(pops, function(x, it) {
-      sum(x[ ,it])
-    },
-    it = i) %>%
-      unlist() %>%
-      sum()
-
-    temp[(i - 1)] <- tot_pop_size_t_1 / tot_pop_size_t
-
-  }
-
-  if(!all_lambdas) {
-    return(temp[length(temp)])
   } else {
-    return(temp)
+
+    warning("NA's detected in lambda slots - returning NA")
+
+    return(NA_real_)
+
   }
+
 
 }
 

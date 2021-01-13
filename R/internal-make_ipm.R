@@ -448,7 +448,7 @@
 
 #' @noRd
 
-.update_param_simple_output <- function(sub_kernels,
+.update_param_output <- function(sub_kernels,
                                         pop_state,
                                         data_envs = NA_character_,
                                         main_env,
@@ -465,13 +465,8 @@
                                tot_iterations    = tot_iterations,
                                current_iteration = current_iteration)
 
-  # make names a bit prettier to help distinguish between iterations
 
-  names(sub_kernels) <- paste(names(sub_kernels),
-                              current_iteration,
-                              sep = "_")
-
-  output$sub_kernels <- purrr::splice(output$sub_kernels, sub_kernels)
+  output$sub_kernels <- c(output$sub_kernels, sub_kernels)
 
   output$pop_state   <- pop_state
 
@@ -481,81 +476,6 @@
 }
 
 
-#' @noRd
-
-.update_param_dd_output <- function(sub_kernels,
-                                    ipm_system,
-                                    pop_state,
-                                    data_envs = NA_character_,
-                                    main_env,
-                                    output,
-                                    tot_iterations,
-                                    current_iteration) {
-
-  # Determine who's a kernel and who's a pop_vector!
-
-  ipm_system <- .flatten_to_depth(ipm_system, 1)
-
-  kern_ind   <- lapply(ipm_system, function(x) dim(x)[2] != 1) %>%
-    unlist()
-
-  iterator   <- ipm_system[kern_ind]
-
-  # make names a bit prettier to help distinguish between iterations
-
-  names(sub_kernels) <- paste(names(sub_kernels),
-                              current_iteration,
-                              sep = "_")
-
-  names(iterator)    <- paste(names(iterator), current_iteration, sep = "_")
-
-  output$sub_kernels <- purrr::splice(output$sub_kernels, sub_kernels)
-  output$iterators   <- purrr::splice(output$iterators, iterator)
-
-  ps_ind             <- lapply(ipm_system, function(x) dim(x)[2] == 1) %>%
-    unlist()
-
-  output$pop_state   <- pop_state
-
-  return(output)
-
-}
-
-#' @noRd
-
-.update_param_general_output <- function(sub_kernels,
-                                         pop_state,
-                                         data_envs,
-                                         main_env,
-                                         output,
-                                         tot_iterations,
-                                         current_iteration) {
-
-  # Updates env_seq and data_environments part of output. env, perhaps confusingly,
-  # refers to environment in both the programming and the biological sense
-
-  output <- .update_env_output(output            = output,
-                               main_env          = main_env,
-                               data_envs         = data_envs,
-                               tot_iterations    = tot_iterations,
-                               current_iteration = current_iteration)
-
-  # The rest differs from update_param_simple in that we don't really have
-  # "iterators" - we just use the formulae in K to relate sub_kernels to pop_state
-  # and solve the system numerically. Thus, iterator slot is NA_real_
-
-  names(sub_kernels) <- paste(names(sub_kernels),
-                              current_iteration,
-                              sep = "_")
-
-  output$sub_kernels <- purrr::splice(output$sub_kernels, sub_kernels)
-
-  output$pop_state   <- pop_state
-
-  return(output)
-
-
-}
 
 # Modifies output in place - updates environmental parameter sequence
 # AND the data_envs list slot. "env" refers to both programming environments
@@ -568,43 +488,47 @@
                                tot_iterations,
                                current_iteration) {
 
-  # Determine if env_state is comprised of functions. If so, get whatever
+  # First, figure out if this is a stoch_param model. If so, then
+  # determine if env_state is comprised of functions. If so, get whatever
   # they returned for that iteration. If not, grab the constants (I think this
   # is more useful for troubleshooting than anyone actually using it - if the
   # environment isn't varying, then they shouldn't be using this method anyway).
 
-  if(!rlang::is_empty(names(output$proto_ipm$env_state[[1]]$env_quos))) {
+  if(any(grepl("stoch_param", class(output$proto_ipm)))){
+    if(!rlang::is_empty(names(output$proto_ipm$env_state[[1]]$env_quos))) {
 
-    env_vars <- names(output$proto_ipm$env_state[[1]]$env_quos)
+      env_vars <- names(output$proto_ipm$env_state[[1]]$env_quos)
 
-  } else {
+    } else {
 
-    env_vars <- names(output$proto_ipm$env_state[[1]]$constants)
+      env_vars <- names(output$proto_ipm$env_state[[1]]$constants)
+    }
+
+
+    env_temp   <- rlang::env_get_list(main_env,
+                                      env_vars,
+                                      default = NA_real_,
+                                      inherit = FALSE) %>%
+      unlist()
+
+    if(current_iteration == 1) {
+
+      env_var_nms <- names(env_temp) %>%
+        strsplit('\\.') %>%
+        vapply(function(x) x[length(x)], character(1L))
+
+
+      output$env_seq <- matrix(NA_real_,
+                               nrow = tot_iterations,
+                               ncol = length(env_temp),
+                               byrow = TRUE,
+                               dimnames = list(c(NULL),
+                                               c(env_var_nms)))
+
+    }
+
+    output$env_seq[current_iteration, ] <-  env_temp
   }
-
-  env_temp   <- rlang::env_get_list(main_env,
-                                    env_vars,
-                                    default = NA_real_,
-                                    inherit = FALSE) %>%
-    unlist()
-
-  if(current_iteration == 1) {
-
-    env_var_nms <- names(env_temp) %>%
-      strsplit('\\.') %>%
-      vapply(function(x) x[length(x)], character(1L))
-
-
-    output$env_seq <- matrix(NA_real_,
-                             nrow = tot_iterations,
-                             ncol = length(env_temp),
-                             byrow = TRUE,
-                             dimnames = list(c(NULL),
-                                             c(env_var_nms)))
-
-  }
-
-  output$env_seq[current_iteration, ] <-  env_temp
 
   # On to the rest of the output
 
@@ -614,7 +538,7 @@
                                     current_iteration,
                                     sep = "_")
 
-    output$sub_kernel_envs <- purrr::splice(output$sub_kernel_envs, data_envs)
+    output$sub_kernel_envs <- c(output$sub_kernel_envs, data_envs)
 
   }
 

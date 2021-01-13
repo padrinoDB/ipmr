@@ -5,6 +5,10 @@ mat_to_df_impl <- function(mat) {
     .Call(`_ipmr_mat_to_df_impl`, mat)
 }
 
+mean_kernel_impl <- function(holder) {
+    .Call(`_ipmr_mean_kernel_impl`, holder)
+}
+
 update_pop_state <- function(holder, current, iter) {
     .Call(`_ipmr_update_pop_state`, holder, current, iter)
 }

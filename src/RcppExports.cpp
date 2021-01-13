@@ -16,6 +16,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// mean_kernel_impl
+List mean_kernel_impl(List holder);
+RcppExport SEXP _ipmr_mean_kernel_impl(SEXP holderSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type holder(holderSEXP);
+    rcpp_result_gen = Rcpp::wrap(mean_kernel_impl(holder));
+    return rcpp_result_gen;
+END_RCPP
+}
 // update_pop_state
 List update_pop_state(List holder, List current, int iter);
 RcppExport SEXP _ipmr_update_pop_state(SEXP holderSEXP, SEXP currentSEXP, SEXP iterSEXP) {
@@ -32,6 +43,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_ipmr_mat_to_df_impl", (DL_FUNC) &_ipmr_mat_to_df_impl, 1},
+    {"_ipmr_mean_kernel_impl", (DL_FUNC) &_ipmr_mean_kernel_impl, 1},
     {"_ipmr_update_pop_state", (DL_FUNC) &_ipmr_update_pop_state, 3},
     {NULL, NULL, 0}
 };

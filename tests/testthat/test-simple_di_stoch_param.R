@@ -214,7 +214,7 @@ ws <- vapply(ks, function(x) Re(eigen(x)$vectors[ , 1]), numeric(100L))
 iterators <- lapply(1:10,
                     function(x, kern_list) {
 
-                      nms <- paste(c("P_", "F_"), x, sep = "")
+                      nms <- paste(c("P_it_", "F_it_"), x, sep = "")
 
                       do.call(`+`, kern_list[nms])
 
