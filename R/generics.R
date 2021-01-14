@@ -834,6 +834,29 @@ print.ipmr_mp_mesh <- function(x, ...) {
 
 }
 
+#' @export
+
+print.ipmr_matrix <- function(x, ...) {
+
+  rng <- range(x)
+
+  msg <- paste("Minimum value: ",
+               round(rng[1], 5),
+               ", maximum value: ",
+               round(rng[2], 5), sep = "")
+
+  pp_tst <- all(x >= 0)
+
+  msg <- c(msg,
+           paste("\nAll entries greater than or equal to 0: ",
+                 pp_tst ,
+                 sep = ""))
+
+  cat("\n", msg, "\n")
+
+  invisible(x)
+}
+
 # Lambda------------
 #' @title Compute the per-capita growth rate for an IPM object
 #' @rdname lambda
