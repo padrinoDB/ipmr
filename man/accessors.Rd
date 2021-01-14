@@ -93,10 +93,8 @@ to insert.}
 called).}
 }
 \value{
-Depending on the class of \code{object}, a numeric vector, or a list
-with types numeric or character. See details on return types for each.
-
-A modified \code{object}.
+Depending on the class of \code{object}, a list
+with types numeric or character.
 }
 \description{
 Functions that access slots of a \code{*_ipm} (including \code{proto_ipm}).
@@ -108,25 +106,21 @@ and the \code{*.proto_ipm} methods correspond to outputs from \code{define_*}.
 When using \code{kernel_formulae<-} and \code{vital_rates<-}, the right
 hand side of the expression must be wrapped in \code{new_fun_form}. See
 examples.
-
-Return types are as follows:
-\itemize{
-  \code{...}
-}
 }
 \examples{
-
-\dontrun{
 
 data(gen_di_det_ex)
 
 proto <- gen_di_det_ex$proto_ipm
 
-vital_rates(gen_di_det_ex)
-kernel_formulae(gen_di_det_ex)
+# Create a new, iterated IPM
+new_ipm <- make_ipm(proto, iterate = TRUE, iterations = 100)
 
-domains(gen_di_det_ex)
-parameters(gen_di_det_ex)
+vital_rates(new_ipm)
+kernel_formulae(new_ipm)
+
+domains(new_ipm)
+parameters(new_ipm)
 
 # Usage is the same for proto_ipm's as *_ipm's
 
@@ -136,8 +130,7 @@ kernel_formulae(proto)
 domains(proto)
 parameters(proto)
 
-
-int_mesh(gen_di_det_ex)g
+int_mesh(new_ipm)
 
 # Setting new parameters, vital rate expressions, and kernel formulae
 # only works on proto_ipm's.
@@ -156,7 +149,5 @@ parameters(proto) <- list(g_z = 2.2)
 vital_rates(proto, kernel = "P", vital_rate = "g_mu") <- new_fun_form(g_int + g_z + g_slope * ht_1)
 
 kernel_formulae(proto, kernel = "stay_discrete") <- new_fun_form(g_z * d_ht)
-
-}
 
 }

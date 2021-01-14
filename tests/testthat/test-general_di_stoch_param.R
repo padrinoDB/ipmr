@@ -623,7 +623,7 @@ for(i in seq(1, 100, 1)) {
   pop_list          <- temp$pop_list
   kerns_temp        <- temp$kernels
   names(kerns_temp) <- paste(names(kerns_temp), i, sep = '_')
-  kernel_holder     <- splice(kernel_holder, kerns_temp)
+  kernel_holder     <- c(kernel_holder, kerns_temp)
 
 }
 
@@ -658,7 +658,50 @@ test_that("other outputs are of the expected form", {
   expect_equal(names(gen_di_stoch_param$env_seq),
                rando_names)
 
-  # Add more
+  gen_di_stoch_param$pop_state$lambda
+
+})
+
+mean_kernel_r <- function(kernel_holder, n_unique) {
+
+  kern_nms <- gsub("_[0-9]$", "", names(kernel_holder)[1:n_unique]) %>%
+    unique()
+
+  out <- list()
+
+  for(i in seq_along(kern_nms)) {
+
+    use_kerns <- kernel_holder[grepl(kern_nms[i], names(kernel_holder))]
+
+    dims <- c(dim(use_kerns[[1]])[1], dim(use_kerns[[1]])[2], length(use_kerns))
+
+    holder <- array(0, dim = dims)
+
+    for(j in seq_along(use_kerns)) {
+
+      holder[, , j] <- use_kerns[[j]]
+
+    }
+
+    out[[i]] <- apply(holder, 1:2, mean)
+
+    names(out)[i] <- paste("mean_", kern_nms[i], sep = "")
+
+  }
+
+  return(out)
+
+}
+
+test_that("mean_kernel works correctly for non-hierarchical models", {
+
+
+  mean_hand_kerns <- mean_kernel_r(kernel_holder, 6)
+
+  mean_ipmr_kerns <- mean_kernel(gen_di_stoch_param)
+
+  expect_equal(mean_hand_kerns, mean_ipmr_kerns)
+
 
 })
 
@@ -1724,5 +1767,11 @@ test_that("Hierarchical effects work in parameter re-sampled model", {
   ipmr_lam <- lambda(gen_di_stoch_param)
 
   expect_equal(hand_lam, ipmr_lam, tolerance = 1e-9)
+
+  mean_hand_kerns <- mean_kernel_r(kernel_holder, 6L)
+  mean_ipmr_kerns <- mean_kernel(gen_di_stoch_param)
+  names(mean_ipmr_kerns) <- gsub("_site", "", names(mean_ipmr_kerns))
+
+  expect_equal(mean_hand_kerns, mean_ipmr_kerns)
 
 })

@@ -1214,6 +1214,52 @@ test_that('normalize pop vec works', {
 
 })
 
+mean_kernel_r <- function(kernel_holder, n_unique) {
+
+  kern_nms <- gsub("whitetop_", "", names(kernel_holder)[1:n_unique]) %>%
+    unique()
+
+  out <- list()
+
+  for(i in seq_along(kern_nms)) {
+
+    use_kerns <- kernel_holder[grepl(kern_nms[i], names(kernel_holder))]
+
+    dims <- c(dim(use_kerns[[1]])[1], dim(use_kerns[[1]])[2], length(use_kerns))
+
+    holder <- array(0, dim = dims)
+
+    for(j in seq_along(use_kerns)) {
+
+      holder[, , j] <- use_kerns[[j]]
+
+    }
+
+    out[[i]] <- apply(holder, 1:2, mean)
+
+    names(out)[i] <- paste("mean_", kern_nms[i], sep = "")
+
+  }
+
+  return(out)
+
+}
+
+test_that("mean_kernel works for fully hierarchical models", {
+
+  mean_ipmr_kernels <- mean_kernel(gen_di_stoch_kern)
+  names(mean_ipmr_kernels) <- gsub("_site", "", names(mean_ipmr_kernels))
+  names(mean_ipmr_kernels) <- gsub("PF", "kern", names(mean_ipmr_kernels))
+
+  kernel_holder <- unlist(models, recursive = FALSE) %>%
+    setNames(gsub("\\.", "_", names(.)))
+
+  mean_hand_kernels <- mean_kernel_r(kernel_holder, 6L)
+
+  expect_equal(mean_hand_kernels, mean_ipmr_kernels)
+
+})
+
 
 test_that('partially stochastic models also work', {
 
@@ -1419,5 +1465,56 @@ test_that('partially stochastic models also work', {
   # version of this kernel and the stochastic model version of it!
 
   expect_equal(leave_discrete_det, leave_discrete_stoch)
+
+  mean_kernel_r <- function(kernel_holder) {
+
+    kern_nms <- gsub("_[0-9]", "", names(kernel_holder)) %>%
+      unique()
+
+    out <- list()
+
+    for(i in seq_along(kern_nms)) {
+
+      use_kerns <- kernel_holder[grepl(kern_nms[i], names(kernel_holder))]
+
+      dims <- c(dim(use_kerns[[1]])[1], dim(use_kerns[[1]])[2], length(use_kerns))
+
+      holder <- array(0, dim = dims)
+
+      for(j in seq_along(use_kerns)) {
+
+        holder[, , j] <- use_kerns[[j]]
+
+      }
+
+      out[[i]] <- apply(holder, 1:2, mean)
+
+      names(out)[i] <- paste("mean_", kern_nms[i], sep = "")
+
+    }
+
+    return(out)
+
+  }
+
+  sub_kerns <- general_stoch_kern_ipm$sub_kernels
+
+  mean_hand_kerns <- mean_kernel_r(sub_kerns)
+  mean_ipmr_kerns <- mean_kernel(general_stoch_kern_ipm) %>%
+    lapply(function(x) {
+      if(inherits(x, "ipmr_matrix")) {
+        unclass(x)
+      } else {
+        x
+      }
+    })
+
+  names(mean_ipmr_kerns) <- gsub("_year", "", names(mean_ipmr_kerns))
+
+  mean_hand_kerns <- mean_hand_kerns[sort(names(mean_hand_kerns))]
+  mean_ipmr_kerns <- mean_ipmr_kerns[sort(names(mean_ipmr_kerns))]
+
+  expect_equal(mean_hand_kerns, mean_ipmr_kerns)
+
 
 })

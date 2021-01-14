@@ -1,14 +1,20 @@
-#' @rdname stoch_helpers
+#' @title Mean kernels for stochastic models
 #'
-#' @title Helpers for stochastic models
-#'
-#' @description Various functions to compute useful quantities for stochastic
-#' models
+#' @description This function computes mean sub-kernels for stochastic
+#' parameter-resampled and kernel resampled models.
 #'
 #' @param ipm A stochastic model created by \code{make_ipm()}.
 #'
-#' @return \code{mean_kernel} returns a list of mean sub-kernels
-#' for the model.
+#' @details For \code{*_stoch_kern} models, this computes the element-wise
+#' mean for each sub-kernel across all the different levels of
+#' \code{levels_hier_effs}. For partially hierarchical models, sub-kernels that
+#' do not have time- or space-varying components are included in the output and
+#' are identical to their input.
+#'
+#' For \code{*_stoch_param} models, this computes the element-wise mean for each
+#' sub-kernel used in the iteration procedure.
+#'
+#' @return A list of mean sub-kernels for the model.
 #'
 #' @export
 
@@ -66,7 +72,7 @@ mean_kernel <- function(ipm) {
 
       use_nm    <- paste("mean_", kern_nm, sep = "")
 
-      mean_kern <- rlang::list2(!!use_nm := sub_kerns[kern_nm])
+      mean_kern <- rlang::list2(!!use_nm := sub_kerns[[kern_nm]])
 
       out       <- c(out, mean_kern)
 
@@ -76,8 +82,10 @@ mean_kernel <- function(ipm) {
     # otherwise - we generate exact names for each set of sub-kernels, extract them
     # from the sub_kernel list, and then compute the point-wise mean.
 
-    levs <- .make_hier_levels(p_row$levels_hier_effs)
+    levs     <- .make_hier_levels(p_row$levels_hier_effs)
+
     kern_nms <- character(length(levs))
+
     to_sub   <- names(p_row$levels_hier_effs[[1]]) %>%
       .[!"to_drop" %in% .] %>%
       paste(collapse = "_")
@@ -158,13 +166,9 @@ mean_kernel <- function(ipm) {
     for(j in seq_along(levs)) {
       kern_nms[j] <- gsub(to_sub, levs[j], kern_nm)
     }
-    use_kerns <- list()
 
-    for(j in seq_along(kern_nms)) {
-      use_kerns <- c(use_kerns,
-                     sub_kerns[grepl(kern_nms[j],
-                               names(sub_kerns))])
-    }
+    use_kerns <- sub_kerns[kern_nms]
+
     mean_kern <- mean_kernel_impl(use_kerns)
 
     names(mean_kern) <- paste("mean_", kern_nm, sep = "")
