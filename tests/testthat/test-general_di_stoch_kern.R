@@ -1254,7 +1254,8 @@ test_that("mean_kernel works for fully hierarchical models", {
   kernel_holder <- unlist(models, recursive = FALSE) %>%
     setNames(gsub("\\.", "_", names(.)))
 
-  mean_hand_kernels <- mean_kernel_r(kernel_holder, 6L)
+  mean_hand_kernels <- mean_kernel_r(kernel_holder, 6L) %>%
+    set_ipmr_classes()
 
   expect_equal(mean_hand_kernels, mean_ipmr_kernels)
 
@@ -1500,14 +1501,9 @@ test_that('partially stochastic models also work', {
   sub_kerns <- general_stoch_kern_ipm$sub_kernels
 
   mean_hand_kerns <- mean_kernel_r(sub_kerns)
+
   mean_ipmr_kerns <- mean_kernel(general_stoch_kern_ipm) %>%
-    lapply(function(x) {
-      if(inherits(x, "ipmr_matrix")) {
-        unclass(x)
-      } else {
-        x
-      }
-    })
+    lapply(unclass)
 
   names(mean_ipmr_kerns) <- gsub("_year", "", names(mean_ipmr_kerns))
 

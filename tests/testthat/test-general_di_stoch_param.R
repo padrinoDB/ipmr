@@ -696,7 +696,8 @@ mean_kernel_r <- function(kernel_holder, n_unique) {
 test_that("mean_kernel works correctly for non-hierarchical models", {
 
 
-  mean_hand_kerns <- mean_kernel_r(kernel_holder, 6)
+  mean_hand_kerns <- mean_kernel_r(kernel_holder, 6) %>%
+    set_ipmr_classes()
 
   mean_ipmr_kerns <- mean_kernel(gen_di_stoch_param)
 
@@ -1768,7 +1769,8 @@ test_that("Hierarchical effects work in parameter re-sampled model", {
 
   expect_equal(hand_lam, ipmr_lam, tolerance = 1e-9)
 
-  mean_hand_kerns <- mean_kernel_r(kernel_holder, 6L)
+  mean_hand_kerns <- mean_kernel_r(kernel_holder, 6L) %>%
+    set_ipmr_classes()
   mean_ipmr_kerns <- mean_kernel(gen_di_stoch_param)
   names(mean_ipmr_kerns) <- gsub("_site", "", names(mean_ipmr_kerns))
 

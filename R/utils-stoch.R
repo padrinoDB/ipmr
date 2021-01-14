@@ -36,8 +36,10 @@ mean_kernel <- function(ipm) {
          call. = FALSE)
   }
 
-  .mean_kernel(ipm)
+  out <- .mean_kernel(ipm) %>%
+    set_ipmr_classes()
 
+  return(out)
 
 }
 
