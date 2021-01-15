@@ -227,14 +227,7 @@ make_ipm.simple_di_det <- function(proto_ipm,
   attr(out$proto_ipm, 'implemented') <- TRUE
   attr(out, "iterated")              <- (iterate && iterations >= 1)
 
-  if(inherits(proto_ipm, "age_x_size")) {
-    a_s_class <- "age_x_size_ipm"
-  } else {
-    a_s_class <- NULL
-  }
-
   class(out)                         <- c('simple_di_det_ipm',
-                                          a_s_class,
                                           'list')
 
   return(out)
@@ -379,14 +372,7 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
   attr(out$proto_ipm, 'implemented') <- TRUE
   attr(out, "iterated")              <- (iterate && iterations >= 1)
 
-  if(inherits(proto_ipm, "age_x_size")) {
-    a_s_class <- "age_x_size_ipm"
-  } else {
-    a_s_class <- NULL
-  }
-
   class(out) <- c('simple_di_stoch_kern_ipm',
-                  a_s_class,
                   'list')
 
   return(out)
@@ -546,13 +532,8 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
   attr(out$proto_ipm, 'implemented') <- TRUE
   attr(out, "iterated")              <- (iterate && iterations >= 1)
-  if(inherits(proto_ipm, "age_x_size")) {
-    a_s_class <- "age_x_size_ipm"
-  } else {
-    a_s_class <- NULL
-  }
+
   class(out) <- c('simple_di_stoch_param_ipm',
-                  a_s_class,
                   'list')
 
   return(out)
@@ -1235,14 +1216,7 @@ make_ipm.simple_dd_det <- function(proto_ipm,
   attr(out$proto_ipm, 'implemented') <- TRUE
   attr(out, "iterated")              <- (iterate && iterations >= 1)
 
-  if(inherits(proto_ipm, "age_x_size")) {
-    a_s_class <- "age_x_size_ipm"
-  } else {
-    a_s_class <- NULL
-  }
-
   class(out)                         <- c('simple_dd_det_ipm',
-                                          a_s_class,
                                           'list')
 
   return(out)
@@ -1442,15 +1416,8 @@ make_ipm.simple_dd_stoch_kern <- function(proto_ipm,
   attr(out$proto_ipm, 'implemented') <- TRUE
   attr(out, "iterated")              <- (iterate && iterations >= 1)
 
-  if(inherits(proto_ipm, "age_x_size")) {
-    a_s_class <- "age_x_size_ipm"
-  } else {
-    a_s_class <- NULL
-  }
-
   class(out)                         <- c('simple_dd_stoch_kern_ipm',
-                                          a_s_class,
-                                          'list')
+                                        'list')
 
   return(out)
 
@@ -1663,14 +1630,7 @@ make_ipm.simple_dd_stoch_param <-function(proto_ipm,
   attr(out$proto_ipm, 'implemented') <- TRUE
   attr(out, "iterated")              <- (iterate && iterations >= 1)
 
-  if(inherits(proto_ipm, "age_x_size")) {
-    a_s_class <- "age_x_size_ipm"
-  } else {
-    a_s_class <- NULL
-  }
-
   class(out)                         <- c('simple_dd_stoch_param_ipm',
-                                          a_s_class,
                                           'list')
 
   return(out)
