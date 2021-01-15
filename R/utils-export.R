@@ -461,7 +461,6 @@ format_mega_matrix.default <- function(ipm, mega_mat, ...) {
 
     }
 
-
     mega_mat <- as.list(temp) %>%
       lapply(function(x) {
         y <- rlang::parse_expr(x)
@@ -469,6 +468,7 @@ format_mega_matrix.default <- function(ipm, mega_mat, ...) {
       })
 
 
+    out_nms <- paste("mega_matrix", out_nms, sep = "_")
 
   } else {
 
