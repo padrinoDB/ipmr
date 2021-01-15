@@ -15,7 +15,6 @@
 \method{print}{simple_di_det_ipm}(
   x,
   comp_lambda = TRUE,
-  comp_method = "eigen",
   type_lambda = "all",
   sig_digits = 3,
   check_conv = TRUE,
@@ -47,11 +46,6 @@
 \item{comp_lambda}{A logical indicating whether or not to calculate lambdas
 for the iteration kernels and display them.}
 
-\item{comp_method}{Either \code{"pop_size"} or \code{"eigen"}. \code{"pop_size"}
-computes lambda as the ratio of population sizes between successive time steps
-and then takes the geometric mean. \code{"eigen"} computes the dominant eigenvalue
-of each iteration kernel. See \code{\link{lambda}} for more details.}
-
 \item{type_lambda}{Either \code{'all'} or \code{'stochastic'}. See
 \code{\link{lambda}} for more details.}
 
@@ -60,8 +54,7 @@ comp_lambda = TRUE}.}
 
 \item{check_conv}{A logical: for \code{general_*} models, check if population state
 has converged to asymptotic dynamics? If \code{TRUE} and the model has not
-converged, a message will be printed. Only applies to \code{*_det}  when
-\code{comp_method = 'pop_size'}}
+converged, a message will be printed.}
 }
 \value{
 \code{x} invisibly.

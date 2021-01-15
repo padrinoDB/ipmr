@@ -292,7 +292,7 @@ test_that('iteration methods work the same as eigenvalue methods', {
 
   K <- it$sub_kernels$F + it$sub_kernels$P
 
-  lambda_it <- lambda(it, comp_method = 'pop_size')
+  lambda_it <- lambda(it)
   lambda_eig <- Re(eigen(K)$values[1])
   names(lambda_eig) <- NULL
   names(lambda_it)  <- NULL
@@ -344,7 +344,7 @@ test_that('normalizing pop vector produces same lambdas as eigen methods', {
 
   K <- it$sub_kernels$F + it$sub_kernels$P
 
-  lambda_it <- lambda(it, type_lambda = 'last', comp_method = 'pop_size')
+  lambda_it <- lambda(it, type_lambda = 'last')
   lambda_eig <- Re(eigen(K)$values[1])
   names(lambda_eig) <- NULL
   names(lambda_it)  <- NULL
@@ -546,7 +546,7 @@ hier_mod <- init_ipm('simple_di_det') %>%
            iterations = 100,
            normalize_pop_size = FALSE)
 
-lambdas_ipmr_pop   <- lambda(hier_mod, comp_method = 'pop_size')
+lambdas_ipmr_pop   <- lambda(hier_mod)
 
 names(lambdas_ipmr_pop) <- paste("K_", 1:5, sep = "")
 

@@ -132,7 +132,6 @@ test_that('print.simple_di_det returns correctly', {
   p <- capture_output(print_str <- print(sim_di_det_1))
 
   print_msg <- capture_output_lines(print(sim_di_det_2,
-                                          comp_method = 'pop_size',
                                           type_lambda = 'all'))
 
   expect_s3_class(print_str,
@@ -145,8 +144,7 @@ test_that('print.simple_di_det returns correctly', {
     )
   )
 
-  wrn_msg    <- catch_cnd(print(sim_di_det_3,
-                                comp_method = 'pop_size'))$message
+  wrn_msg    <- catch_cnd(print(sim_di_det_3))$message
 
   expect_true(
     grepl(
@@ -613,7 +611,6 @@ test_that('print.general_di_det returns correctly', {
   p <- capture_output(print_str <- print(gen_di_det_1))
 
   print_msg <- capture_output_lines(print(gen_di_det_1,
-                                          comp_method = 'pop_size',
                                           type_lambda = 'all'))
 
   expect_s3_class(print_str,
@@ -626,8 +623,7 @@ test_that('print.general_di_det returns correctly', {
     )
   )
 
-  wrn_msg    <- catch_cnd(print(gen_di_det_2,
-                                comp_method = 'pop_size'))$message
+  wrn_msg    <- catch_cnd(print(gen_di_det_2))$message
 
   expect_true(
     grepl(
@@ -970,7 +966,6 @@ test_that('print.general_di_stoch_kern works', {
   p <- capture_output(print_str <- print(gen_di_stoch_kern_1))
 
   print_msg <- capture_output_lines(print(gen_di_stoch_kern_1,
-                                          comp_method = 'pop_size',
                                           type_lambda = 'stochastic'))
 
   expect_s3_class(print_str,
@@ -1319,7 +1314,6 @@ test_that('print.general_di_stoch_param works', {
   p <- capture_output(print_str <- print(gen_di_stoch_param_1))
 
   print_msg <- capture_output_lines(print(gen_di_stoch_param_1,
-                                          comp_method = 'pop_size',
                                           type_lambda = 'stochastic'))
 
   expect_s3_class(print_str,

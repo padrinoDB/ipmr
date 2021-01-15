@@ -352,7 +352,6 @@ pop_sizes_ipmr <- colSums(ipmr_pop_state)
 pop_sizes_test <- colSums(pop_holder)
 
 lambda_generic_lambdas <- lambda(iterated_sys,
-                                 comp_method = 'pop_size',
                                  type_lambda = 'all')
 
 test_that('.iterate_kerns is acting correctly', {
@@ -578,7 +577,6 @@ test_that('normalizing pop vector gets same lambdas as before', {
              kernel_seq = usr_seq)
 
   lambdas_test <- lambda(test_norm_1,
-                         comp_method = 'pop_size',
                          type_lambda = 'all') %>%
     as.vector()
 

@@ -12,49 +12,22 @@
 \usage{
 lambda(ipm, ...)
 
-\method{lambda}{simple_di_det_ipm}(ipm, comp_method = "pop_size", type_lambda = "last", ...)
+\method{lambda}{simple_di_det_ipm}(ipm, type_lambda = "last", ...)
 
-\method{lambda}{simple_di_stoch_kern_ipm}(
-  ipm,
-  comp_method = "pop_size",
-  type_lambda = "stochastic",
-  burn_in = 0.1,
-  ...
-)
+\method{lambda}{simple_di_stoch_kern_ipm}(ipm, type_lambda = "stochastic", burn_in = 0.1, ...)
 
-\method{lambda}{simple_di_stoch_param_ipm}(
-  ipm,
-  comp_method = "pop_size",
-  type_lambda = "stochastic",
-  burn_in = 0.1,
-  ...
-)
+\method{lambda}{simple_di_stoch_param_ipm}(ipm, type_lambda = "stochastic", burn_in = 0.1, ...)
 
-\method{lambda}{general_di_det_ipm}(ipm, comp_method = "pop_size", type_lambda = "last", ...)
+\method{lambda}{general_di_det_ipm}(ipm, type_lambda = "last", ...)
 
-\method{lambda}{general_di_stoch_kern_ipm}(
-  ipm,
-  ...,
-  comp_method = "pop_size",
-  type_lambda = "stochastic",
-  burn_in = 0.1
-)
+\method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
 
-\method{lambda}{general_di_stoch_param_ipm}(
-  ipm,
-  ...,
-  comp_method = "pop_size",
-  type_lambda = "stochastic",
-  burn_in = 0.1
-)
+\method{lambda}{general_di_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
 
 \item{...}{other arguments passed to methods.}
-
-\item{comp_method}{Either \code{"eigen"} or \code{"pop_size"}. \code{"eigen"}
-is only possible for \code{"simple_*"} methods.}
 
 \item{type_lambda}{Either \code{'all'}, \code{'last'},
  or \code{'stochastic'}. \code{'all'}
@@ -74,12 +47,4 @@ to hierarchical effects (if any).
 \description{
 Compute the per-capita growth rate for a given model. Can handle
 stochastic and deterministic models, and has options for thinning.
-}
-\details{
-There are two possible methods for computing \code{lambda} and these
-are controlled by the \code{comp_method} argument. Possible values are
-\code{"eigen"} and \code{"pop_size"}. The first computes the dominant
-eigenvalue of all entries in \code{ipm$iterators} slot of the \code{*_ipm}
-object. Since iteration kernels aren't generated for \code{general_*} methods,
-\code{"pop_size"} is the only possible option for those objects.
 }
