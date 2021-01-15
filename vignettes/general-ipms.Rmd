@@ -12,13 +12,11 @@ vignette: >
 
 ## Simple IPMs vs General IPMs
 
-General IPMs are distinguished from simple ones in that they incorporate multiple state variables and/or include transitions between continuous and discrete states. A more specific defintion is provided in Ellner, Childs & Rees, Chapter 6 (2016). 
-
-`ipmr` handles general IPMs fairly differently from `IPMpack` in that it requires the population state to be defined initially and will compute most quantities via iteration. For almost everything, `ipmr` skips building a mega-matrix (though `left_ev()` methods for general IPMs do require it). If the mega-matrix approach is preferable for some reason, the function `format_mega_matrix` is available to assist with constructing one. An example of how to do that is shown at the end of this vignette.
+In the [introduction vignette](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html), we reviewed some basic IPM theory and worked through examples of simple IPMs, which only model a single, continuously distributed state variable. General IPMs are distinguished from simple ones in that they incorporate multiple state variables and/or include transitions between continuous and discrete states. These state variables could be, for example, a continuous measure of coral colony surface area and a discrete state to denote aspergillosis infection (in [Bruno et al. 2011](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1890/09-1178.1)), a mixture of trees classified by basal diameter and a discrete state for seeds in a seed bank (in [Crandall & Knight 2017](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2664.13020)), or the a mixture of multiple continuous and discrete state (e.g. [Aikens & Roach 2014](https://esajournals.onlinelibrary.wiley.com/doi/pdf/10.1890/13-1478.1)).  A more specific defintion is provided in [Ellner & Rees (2006)](https://pubmed.ncbi.nlm.nih.gov/16673349/) and in Ellner, Childs & Rees, Chapter 6 (2016). 
 
 ## A general, density independent, deterministic IPM
 
-We'll start with the least complicated of the general IPMs and build progressively from there. If you've already covered the [Intro to ipmr](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html), then most of this will look pretty familiar. If not, it is probably best to at least skim the first few sections before proceeding here.
+We'll start with the least complicated of the general IPMs and build progressively from there. If you've already read through the introduction vignette, then most of this will look pretty familiar. If not, it is probably best to at least skim the first few sections before proceeding here.
 
 ### Key differences between simple and general IPMs.
 
@@ -26,19 +24,21 @@ As noted above, we are now working with models that may have multiple continuous
 
 Relative to how we define simple models in `ipmr`, there are now two new bits:
 
-1. Each kernel that has an integration requires that `d_statevariable` get appended to the kernel `formula`. This is equivalent to the "dz" in $\int_L^U K(z',z) n(z,t) \mathrm{dz}$. `ipmr` automatically generates this variable internally, so there is no need to define it in the `data_list` or `define_domains()`, we can just add it any of the formula(s) that we want to. We skipped this step in the simple IPMs because it gets appended automatically. Unfortunately, it is decidedly less easy to infer the correct state variable to `d_z` with for general IPMs where there may be many continuous and/or discrete states.
+1. Each kernel that has an integration requires that `d_statevariable` get appended to the kernel `formula`. This is equivalent to the "dz" in $\int_L^U K(z',z) n(z,t) \mathrm{dz}$. `ipmr` automatically generates this variable internally, so there is no need to define it in the `data_list` or `define_domains()`, we can just add it any of the formula(s) that we want to. We skipped this step in the simple IPMs because it gets appended automatically. Unfortunately, it is less easy to infer the correct state variable to `d_z` with for general IPMs where there may be many continuous and/or discrete states.
 
 2. The implementation arguments list can now have different values in the `state_start` and `state_end` slots. This is demonstrated in a separate chunk below.
 
-This example will use an IPM for _Ligustrum obtusifolium_, a tree species that is now invasive in North America. Data were collected outside of St. Louis, Missouri, and the full model is described in [Levin et al. 2019](https://esajournals.onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1002%2Fecy.2681&file=ecy2681-sup-0002-MetadataS1.pdf). The IPM consists of a single discrete stage (seed bank, abbreviated `b`) and a single continuous state (height, abbreviated `ht`). Reproduction is time-lagged so all seeds must enter the seed bank. They can either germinate in the next year, or they can die (so `stay_discrete` = 0). Thus, the full model takes the following form:
+### Mathematical overview of the example
+
+This example will use an IPM for _Ligustrum obtusifolium_, a tree species that is now invasive in North America. Data were collected outside of St. Louis, Missouri, and the full model is described in [Levin et al. 2019](https://esajournals.onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1002%2Fecy.2681&file=ecy2681-sup-0002-MetadataS1.pdf). The IPM consists of a single discrete stage (seed bank, abbreviated `b`) and a single continuous state (height, abbreviated `ht`/$z,z'$). Reproduction is time-lagged so all seeds must enter the seed bank. They can either germinate in the next year, or they can die (so `stay_discrete` = 0). Thus, the full model takes the following form:
 
 1. $n(z', t + 1) = \int_L^U P(z', z) n(z,t)d\mathrm{z} + b(t) * \int_L^U leave\_discrete(z') \mathrm{dz'}$  
 
 2. $b(t + 1) = \int_L^Ugo\_discrete(z) n(z,t)d\mathrm{z}+ stay\_discrete$
 
-3. $P(z',z) = s * g$
+3. $P(z',z) = s(z) * g(z',z)$
 
-4. $go\_discrete(z) = f_s * f_r * g_i$
+4. $go\_discrete(z) = f_s(z) * f_r(z) * g_i$
 
 5. $leave\_discrete(z') = e_p * f_d(z')$
 
@@ -49,26 +49,40 @@ The vital rates functions and example code to fit them are:
 1. survival (`s`): A logistic regression with a squared term
 
     - Example code: `glm(surv ~ ht_1 + I(ht_1)^2, data = my_surv_data, family = binomial())`
+    
+    - Mathematical form: $Logit(s(z)) = \alpha_s + \beta_{s,1} * z + \beta_{s,2} * z^2$
 
 2. growth (`g`): A linear regression
 
     - example code: `lm(ht_2 ~ ht_1, data = grow_data)`
     
+    - Mathematical form: $mu_g = \alpha_g + \beta_g * z$, $g(z',z) \sim Norm(\mu_g, \sigma_g)$
+    
 3. flowering probability (`f_r`): A logistic regression
 
     - example code: `glm(repro ~ ht_1, data = my_repro_data, family = binomial())`
+    
+    - Mathematical form: $Logit(f_r(z)) = \alpha_{f_r} + \beta_{f_r} * z$
     
 4. seed production (`f_s`): A Poisson regression
 
     - example code: `glm(seeds ~ ht_1, data = my_seed_data, family = poisson())`
     
+    - Mathematical form: $Log(f_s(z)) = \alpha_{f_s} + \beta_{f_s} * z$
+        
 5. Recruit size distribution (`f_d`): A normal distribution with mean `f_d_mu` and standard deviation `f_d_sd`.
 
     - example code: `f_d_mu <- mean(my_recr_data$ht_2, na.rm = TRUE)` and `f_d_sd <- sd(my_rer_data$ht_2, na.rm = TRUE)`.
     
+    - Mathematical form: $f_d(z') \sim Norm(\mu_{f_d}, \sigma_{f_d})$
+    
 6. germination (`g_i`) and establishment (`e_p`) are constants. The code below assumes we have our data in long format (each seed get its own row) and that successful germinations/establishments are coded as 1s, failures are 0s, and seeds we don't know the fate of for whatever reason are `NA`s.
 
     - example code: `g_i <- mean(my_germ_data, na.rm = TRUE)` and `e_p <- mean(my_est_data, na.rm = TRUE)`
+    
+    - Mathematical form: $g_i = 0.5067, e_p = 0.15$
+    
+### Model code
 
 Below is the code to implement this model. First, we define our our parameters in a list.
 
@@ -98,7 +112,7 @@ data_list <- list(
 
 ```
 
-Next, we set up the upper (`U`) and lower (`L`) size bounds for the population, define the number of meshpoints for integration (`n`). We also define initial population vectors for both `b` and `ht`, set up our `states` list, and a couple functions to pass into the model.
+Next, we set up two functions to pass into the model. These perform the inverse logit transformations for the probability of flowering model (`f_r`/$f_r(z)$) and survival model (`s`/$s(z)$).
 
 ```{r eval = FALSE}
 
@@ -157,6 +171,10 @@ general_ipm <- init_ipm("general_di_det") %>%
     f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
     f_s           = exp(f_s_int + f_s_slope * ht_1),
     data_list     = data_list,
+    
+    # Note that here, we add "b" to our list in states, because this kernel
+    # "creates" seeds entering the seedbank
+    
     states        = list(c('ht', "b")),
     has_hier_effs = FALSE
   ) %>%
@@ -171,6 +189,10 @@ general_ipm <- init_ipm("general_di_det") %>%
     # Note that now, family = "DD" becuase it denotes a discrete -> discrete transition
     
     family  = "DD",
+    
+    # The only state variable this operates on is "b", so we can leave "ht"
+    # out of the states list
+    
     states  = list(c('b')),
     evict_cor = FALSE
   ) %>%
@@ -188,6 +210,9 @@ general_ipm <- init_ipm("general_di_det") %>%
     f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
     family        = 'DC',
     data_list     = data_list,
+    
+    # Again, we need to add "b" to the states list
+    
     states        = list(c('ht', "b")),
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
@@ -197,7 +222,33 @@ general_ipm <- init_ipm("general_di_det") %>%
 
 ```
 
-We've now defined all of the kernels, and have to define the implementation details. These also differ somewhat from simple IPMs. The key difference in the implementation arguments list lies in the `state_start` and `state_end` of each kernel, and is related to the `family` argument of each kernel. Kernels that begin with one state and end in a different state (e.g. moving from seed bank to a plant) will have different entries in the `state_start` and `state_end` slots. It is very important to get these correct, as `ipmr` uses this information to generate the model iteration procedure automatically (i.e. code correspond to Equations 1-2).
+We've now defined all of the kernels, next are the implementation details. These also differ somewhat from simple IPMs. The key difference in the implementation arguments list lies in the `state_start` and `state_end` of each kernel, and is related to the `family` argument of each kernel. Kernels that begin with one state and end in a different state (e.g. moving from seed bank to a plant) will have different entries in the `state_start` and `state_end` slots. It is very important to get these correct, as `ipmr` uses this information to generate the model iteration procedure automatically (i.e. code correspond to Equations 1-2).
+
+
+```{r eval = FALSE}
+
+general_ipm <- general_ipm %>%
+  define_impl(
+    list(
+      P              = list(int_rule    = "midpoint",
+                            state_start = "ht",
+                            state_end   = "ht"),
+      go_discrete    = list(int_rule    = "midpoint",
+                            state_start = "ht",
+                            state_end   = "b"),
+      stay_discrete  = list(int_rule    = "midpoint",
+                            state_start = "b",
+                            state_end   = "b"),
+      leave_discrete = list(int_rule    = "midpoint",
+                            state_start = "b",
+                            state_end   = "ht")
+    )
+  )
+
+
+```
+
+An alternative to the list above is to use `make_impl_args_list()`. The chunk above and the chunk below generate equivalent `proto_ipm` objects. 
 
 ```{r eval = FALSE}
 
@@ -213,7 +264,7 @@ general_ipm <- general_ipm %>%
 
 ```
 
-The rest is the same as the simple IPM. We can use our pre-defined functions in `make_ipm`, and we can use pre-defined variables in `define_domains`.
+The rest is the same as the simple IPM. We can use our pre-defined functions in `make_ipm`, and we can use pre-defined variables in `define_domains`. We'll create variables for the upper (`U`) and lower (`L`) size bounds for the population, and the number of meshpoints for integration (`n`). We also define initial population vectors for both `b` and `ht`. 
 
 ```{r eval = FALSE}
 
@@ -248,7 +299,6 @@ general_ipm <- general_ipm %>%
       n_b  = init_seed_bank
     )
   ) %>%
-  # make_ipm() has iterate = TRUE by default for general IPMs.
   make_ipm(iterations = 100,
            usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_2 = inv_logit_2))
@@ -265,11 +315,66 @@ lambda(general_ipm)
 
 is_conv_to_asymptotic(general_ipm, tol = 1e-10)
 
+w <- right_ev(general_ipm)
+v <- left_ev(general_ipm)
+
+
 
 ```
 
-Our model is now built! We can explore the asymptotic population growth rate with the `lambda()` function, which will work on any object made my `make_ipm()`. The same is true for `is_conv_to_asymptotic()`, which is a helper to function to figure out if we've set the number of `iterations` high enough to actually reach asymptotic population dynamics. 
+Our model is now built! We can explore the asymptotic population growth rate with the `lambda()` function, which will work on any object made my `make_ipm()`. The same is true for `is_conv_to_asymptotic()`, which is a helper to function to figure out if we've set the number of `iterations` high enough to actually reach asymptotic population dynamics. `left_ev` and `right_ev` work for general deterministic IPMs as well. Stochastic versions are in the works, but are not yet implemented. 
 
+### Further analysis
+
+Say we wanted to calculate the mean and variance of life span conditional on initial state $z_0$. This requires us to generate the IPM's fundamental operator, $N$, which is computed as follows: $N = (I - P)^{-1}$. The following chunk is a function to compute average lifespan as a function of initial size. Note that we omit the fecundity from these calculations entirely, as our model does not assume that reproduction imposes a cost on survival.
+
+The formula for mean lifespan is given as $\bar{\eta}(z_0) = eN$ (where $e$ is a constant function such that $e(z)\equiv1$), and the formula for its variance is $\sigma^2_\eta(z_0) = e(2N^2-N) - (eN)^2$. Our second function, `sigma_eta`, will make use of `%^%` from `ipmr`, which multiples matrices by themselves, rather than the point-wise power provided by `^`. More details on the math underlying these calculations are provided in Ellner, Childs, & Rees (2016), chapter 3. 
+
+```{r eval = FALSE}
+
+make_N <- function(ipm) {
+  
+  P     <- ipm$sub_kernels$P
+  
+  I     <- diag(nrow(P))
+  N     <- solve(I - P)
+}
+
+eta_bar <- function(ipm) {
+  
+  N     <- make_N(ipm)
+  e_fun <- matrix(1, nrow = 1, ncol = ncol(N))
+
+  out <- e_fun %*% N
+  
+  return(as.vector(out))
+  
+}
+
+sigma_eta <- function(ipm) {
+  
+  N     <- make_N(ipm)  
+  e_fun <- matrix(1, nrow = 1, ncol = ncol(N))
+ 
+  out <- e_fun %*% (2 * N %^% 2L - N) - (e_fun %*% N) ^ 2
+  
+  return(as.vector(out))
+}
+
+mean_l <- eta_bar(general_ipm)
+var_l  <- sigma_eta(general_ipm)
+
+mesh_ps <- int_mesh(general_ipm)$ht_1 %>%
+  unique()
+
+par(mfrow = c(1,2))
+
+plot(mesh_ps, mean_l, type = "l", xlab = expression( "Initial size z"[0]))
+plot(mesh_ps, var_l, type = "l", xlab = expression( "Initial size z"[0]))
+
+```
+
+From prior knowledge, we happen to know that even in the best conditions, _Ligustrum obtusifolium_ individuals usually only live 25-50 years. It appears that our model (wildly) overestimates their average lifespan, and we'd want to think about how to re-parameterize it to more accurately capture mortality events. Our survival model would seem the most likely candidate for re-examination, particularly for young and mid-sized trees. That is a problem for another day though, and so the next section will investigate how to implement general IPMs in discretely varying environments.
 
 ## General models for discretely varying environments
 
@@ -277,34 +382,66 @@ Discretely varying parameters can be used to construct general IPMs with little 
 
 If you've already read the Intro to `ipmr` article and the example above, then there aren't any new concepts to introduce here. Below is an example showing how all of these come together.
 
-We'll use a variation of the model above, simulating some random intercepts for growth and seed production. The vital rate models are below:
+### Mathematical overview of the example
+
+We'll use a variation of the model above, simulating some random year-specific intercepts for growth and seed production. Parameters, functions, and kernels that are now time varying have a subscript, $yr$ appended to them.
+
+1. $n(z', t + 1) = \int_L^U P_{yr}(z', z) n(z,t)d\mathrm{z} + b(t) * \int_L^U leave\_discrete(z') \mathrm{dz'}$  
+
+2. $b(t + 1) = \int_L^Ugo\_discrete_{yr}(z) n(z,t)d\mathrm{z}+ stay\_discrete$
+
+3. $P_{yr}(z',z) = s(z) * g_{yr}(z',z)$
+
+4. $go\_discrete_{yr}(z) = f_{s,yr}(z) * f_r(z) * g_i$
+
+5. $leave\_discrete(z') = e_p * f_d(z')$
+
+6. $stay\_discrete = 0$
+
+The vital rate models are as follows:
 
 1. survival (`s`): A logistic regression
 
     - Example code: `glm(surv ~ ht_1, data = my_surv_data, family = binomial())`
+    
+    - Mathematical form: $Logit(s(z)) = \alpha_s + \beta_{s,1} * z + \beta_{s,2} * z^2$
 
 2. growth (`g`): A linear mixed effects regression
 
     - example code: `lmer(ht_2 ~ ht_1 + (1 | year), data = grow_data)`
     
+    - Mathematical form: $mu_g = \alpha_g + \alpha_{g,yr} + \beta_g * z$, $g(z',z) \sim Norm(\mu_g, \sigma_g)$
+
 3. flowering probability (`f_r`): A logistic regression
 
     - example code: `glm(repro ~ ht_1, data = my_repro_data, family = binomial())`
     
+    - Mathematical form: $Logit(f_r(z)) = \alpha_{f_r} + \beta_{f_r} * z$
+
 4. seed production (`f_s`): A Poisson mixed effects regression
 
     - example code: `glmer(seeds ~ ht_1 + (1 | year), data = my_seed_data, family = poisson())`
-    
+
+    - Mathematical form: $Log(f_s(z)) = \alpha_{f_s} + \alpha_{f_s,yr} + \beta_{f_s} * z$
+
 5. Recruit size distribution (`f_d`): A normal distribution with mean `f_d_mu` and standard deviation `f_d_sd`.
 
     - example code: `f_d_mu <- mean(my_recr_data$ht_2, na.rm = TRUE)` and `f_d_sd <- sd(my_rer_data$ht_2, na.rm = TRUE)`.
     
+    - Mathematical form: $f_d(z') \sim Norm(\mu_{f_d}, \sigma_{f_d})$
+
 6. germination (`g_i`) and establishment (`e_p`) are constants. The code below assumes we have our data in long format (each seed get its own row) and that successful germinations/establishments are coded as 1s, failures are 0s, and seeds we don't know the fate of for whatever reason are `NA`s.
 
     - example code: `g_i <- mean(my_germ_data, na.rm = TRUE)` and `e_p <- mean(my_est_data, na.rm = TRUE)`
 
-In the next chunk, we'll set up the data list with all of our constants and make sure the names are what we want them to be. This example generates intercepts for 5 years of data. This can be altered according to your own needs Then, we'll define a couple functions to make the vital rate expressions easier to write. 
+    - Mathematical form: $g_i = 0.5067, e_p = 0.15$
 
+
+### Model parameterization
+
+In the next chunk, we'll set up the data list with all of our constants and make sure the names are what we want them to be. This example generates intercepts for 5 years of data. This can be altered according to your own needs. Then, we'll define a couple functions to make the vital rate expressions easier to write. 
+
+A key aspect here is setting the names on the time-varying parameters in the `data_list`. We are using the form `"g_int_year"`, and substituting the values that `"year"` can take in for the actual suffix. These don't need to be numbers, they can be words, letters, or some combination of the two. When picking values, it is best to avoid longer words or phrases where words are separated by underscores (e.g. `treatment = c("h_removal", "c_addition"))`, as this may cause problems when values are substituted into expressions. CamelCase is generally safer in these cases (e.g. `treatment = c("hRemoval", "cAddition"))`. For this example, the years will be represented with the values `1:5`. If we wanted to denote the actual years of the censuses, we could switch `1:5` to, for example, `2002:2006`. 
 
 ```{r eval = FALSE}
 
@@ -367,10 +504,13 @@ inv_logit_2 <- function(int, slope, slope_2, sv) {
 
 ```
 
-Next, we will set up our kernels. When writing the expressions for growth and seed production, note that we append a `"_year"` suffix to the intercepts. We'll pass a `list(year = 1:5))` into the `levels_hier_effs` argument of `define_kernel()`, and the rest will take care of itself!
 
+### Suffix syntax introduction
+
+Next, we will set up our sub-kernels. We'll append the `_year` suffix to the kernel `name`, the vital rate expressions and parameter values that have time-varying components (`g_year`, `f_s_year`, `g_int_year`, `f_s_int_year`), and the call to `truncated_distributions` so that the growth kernel is correctly specified. We'll also pass a `list(year = 1:5))` into the `levels_hier_effs` argument of `define_kernel()`. When building the model, `make_ipm()` automatically expands these expressions to create 5 different expressions containing the various levels of `year`. 
 
 ```{r eval = FALSE}
+
 
 general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
   define_kernel(
@@ -395,24 +535,33 @@ general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
     s                = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
     data_list        = all_params,
     states           = list(c('ht')),
+    
+    # We set has_hier_effs to TRUE, signalling that we want to expand these
+    # expressions across all levels of levels_hier_effs.
+    
     has_hier_effs    = TRUE,
     levels_hier_effs = list(year = 1:5),
     evict_cor        = TRUE,
+    
+    # we also add the suffix here, because the paremter modified by truncated_distributions
+    # is time-varying.
+    
     evict_fun        = truncated_distributions('norm',
                                                'g_year')
   ) %>%
   define_kernel(
     
-    # again, we append the sufix to the kernel name, vital rate expressions,
+    # again, we append the suffix to the kernel name, vital rate expressions,
     # and in the model formula.
     
     name          = "go_discrete_year",
-    formula       = f_r * f_s_year * g_i,
-    
-    # Note that now, family = "CD" because it denotes a continuous -> discrete transition
-    
+    formula       = f_r * f_s_year * g_i * d_ht,
     family        = 'CD',
     f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
+    
+    # Again, we modify the left and right hand side of this expression to 
+    # show that there is a time-varying component
+    
     f_s_year      = exp(f_s_int_year + f_s_slope * ht_1),
     data_list     = all_params,
     states        = list(c('ht', "b")),
@@ -420,6 +569,10 @@ general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
     levels_hier_effs = list(year = 1:5)
   ) %>%
   define_kernel(
+    
+    # This kernel has no time-varying parameters, and so does not require a suffix
+    # appended to it.
+    
     name    = 'stay_discrete',
     
     # In this case, seeds in the seed bank either germinate or die, but they 
@@ -440,8 +593,7 @@ general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
   ) %>%
   define_kernel(
 
-    # This also doens't get a suffix, because there are no varying parameters
-    # in the kernel. 
+    # This kernel also doesn't get a suffix, because there are no varying parameters.
     
     name          = 'leave_discrete',
     formula       = e_p * f_d * d_ht,
@@ -456,6 +608,10 @@ general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
   )  %>%
   define_impl(
     make_impl_args_list(
+      
+      # We add suffixes to the kernel names here to make sure they match the names
+      # we specified above.
+      
       kernel_names = c("P_year", "go_discrete_year", "stay_discrete", "leave_discrete"),
       int_rule     = c(rep("midpoint", 4)),
       state_start    = c('ht', "ht", "b", "b"),
@@ -469,67 +625,102 @@ general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
       n_ht = init_pop_vec,
       n_b  = init_seed_bank
   ) %>%
-  
-  # make_ipm() has iterate = TRUE by default for general IPMs.
-  
-  make_ipm(iterations = 100,
-           
-           # We can specify a sequence of kernels to select for the simulation.
-           # This helps others to reproduce what we did,
-           # and lets us keep track of the consequences of different selection
-           # sequences for population dynamics. 
-           
-           kernel_seq = sample(1:5, size = 100, replace = TRUE),
-           usr_funs = list(inv_logit   = inv_logit,
-                           inv_logit_2 = inv_logit_2))
-
-# We can access the order of the kernels from the simulation using the 
-# "env_seq" slot 
-
-general_stoch_kern_ipm$env_seq
+  make_ipm(
+    iterations = 100,
+    
+    # We can specify a sequence of kernels to select for the simulation.
+    # This helps others to reproduce what we did,
+    # and lets us keep track of the consequences of different selection
+    # sequences for population dynamics. 
+    
+    kernel_seq = sample(1:5, size = 100, replace = TRUE),
+    usr_funs = list(inv_logit   = inv_logit,
+                    inv_logit_2 = inv_logit_2)
+  )
 
 ```
 
-100 isn't too many iterations, but hopefully this demonstrates how to set up and implement such a model. 
+100 isn't too many iterations, but hopefully this demonstrates how to set up and implement such a model. There are a number of slots in the output that may be useful for further analyseses.
+
+1. `env_seq`: This contains a character vector which shows the sequence in which levels of the time-varying components were chosen during model iteration. We could use this reproduce the model outputs later. 
+
+2. `pop_state$lambda`: This shows the single timestep per-capita growth rates for the simulation. 
+
+Additionally, there are functions to compute the stochastic population growth rate ($\lambda_s$, computed as `mean(log(pop_state$lambda))` with the first 10% of iterations removed as burn-in), and the mean sub-kernels.
+
+```{r eval = FALSE}
+
+mean_kernels <- mean_kernel(general_stoch_kern_ipm)
+lam_s        <- lambda(general_stoch_kern_ipm)
+
+```
 
 ## General models with continuously varying environments
 
-We can also use continuously varying parameters to construct general IPMs. These are usually the result of multivariate and/or mixed effects models where joint parameter distributions are modeled, or some environmental variation is included in the vital rate models. `ipmr` handles these using `define_env_state()`, which can take both functions and data and generate draws from distributions during each iteration of the model. 
+We can also use continuously varying parameters to construct general IPMs. These are good tools for exploring the consequences of environmental variation on demographic rates. `ipmr` handles these using `define_env_state()`, which can take both functions and data and generate draws from distributions during each iteration of the model. 
 
-We'll use a variation of the parameter resampled model from the [introduction](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html) vignette that will now include a discrete stage. 
+### Mathematical overview
 
-### Vital rate models
+This example includes survival and growth models that make use of environmental covariates. The model can be written as:
 
-The first chunk below initializes the parameters and functions that the model uses. It takes the place of the usual vital rate model fitting process. 
+1. $n(z', t+1) = \int_L^U K(z',z, \theta)n(z,t)dz + B(t) * r_s * r_d * \int_L^Uf_d(z')dz'$
 
-This example uses survival and growth that include environmental covariates. We create a single function to sample the covariates to illustrate how to use continuously varying parameter distributions in `ipmr`. This only uses two models and one function to limit the the complexity of the example - there is no upper limit on the number of parameters or functions we can use in our own models. 
+2. $B(t + 1) = r_e * r_s * \int_L^U f_r(z) * f_s(z)n(z,t)dz + B(t) * r_s * r_r$
 
-The vital rate functions are described here:
+3. $K(z',z,\theta) = P(z',z,\theta) + F(z',z)$
 
-1. survival (`s`): a logistic regression. 
+4. $P(z',z,\theta) = s(z, \theta) * g(z',z,\theta)$
 
-    - example model formula: `glm(survival ~ size_1 + temp + precip, data = my_surv_data, family = binomial())`
+5. $F(z',z) = f_r(z) * f_s(z) * f_d(z') * (1 - r_e)$
+
+$\theta$ is a vector of time-varying environmental parameters. For this example, we'll use a Gaussian distribution for temperature and a Gamma distribution for precipitation:
+
+6. $\theta_t \sim Norm(\mu = 8.9, \sigma = 1.2)$
+
+7. $\theta_p \sim Gamma(k =  1000, \beta = 2)$
+
+Next, we'll write out the actual vital rate functions in the model:
+
+8. survival (`s`/$s(z,\theta)$): a logistic regression. 
+
+    - Example model formula: `glm(survival ~ size_1 + temp + precip, data = my_surv_data, family = binomial())`
     
-2. growth (`g`): a linear regression
-
-    - example model formula: `glm(size_2 ~ size_1 + temp + precip, data = my_grow_data)`
+    - Mathematical form: $Logit(s(z,\theta)) = \alpha_s + \beta_s^z * z + \beta_s^t * temp + \beta_s^p * precip$
     
-3. flower probability (`f_r`): A logistic regression.
+9. growth (`g`, $g(z',z,\theta)$): a linear regression
 
-    - example model formula: `glm(repro ~ size_1, data = my_repro_data, family = binomial())`
+    - Example model formula: `glm(size_2 ~ size_1 + temp + precip, data = my_grow_data)`
     
-4. seed production (`f_s`): a logistic regression.
+    - Mathematical form: 
+        
+      + $g(z',z) \sim Norm(\mu_g(z,\theta), \sigma_g)$
+      
+      + $\mu_g(z, \theta) = \alpha_g + \beta_g^z * z + \beta_g^t * temp + \beta_g^p * precip$
+    
+10. flower probability (`f_r`/$f_r(z)$): A logistic regression.
 
-    - example model formula: `glm(flower_n ~ size_1, data = my_flower_data, family = poisson())`
+    - Example model formula: `glm(repro ~ size_1, data = my_repro_data, family = binomial())`
     
-5. recruit sizes (`f_d`): A normal distribution
+    - Mathematical form: $Logit(f_r(z)) = \alpha_{f_r} + \beta_{f_r} * z$
+    
+11. seed production (`f_s`): a logistic regression.
 
-    - example code: mean (`f_d_mu`) `mean(my_recruit_data$size_2, na.rm = TRUE)` and standard deviation (`f_d_sd`) `sd(my_recruit_data$size_2, na.rm = TRUE)`
+    - Example model formula: `glm(flower_n ~ size_1, data = my_flower_data, family = poisson())`
     
-6. Discrete stage survival (`r_s`), discrete stage entrance probability (`r_e`), discrete stage departure probability conditional on survival (`r_d`), and probability of remaining in discrete stage (`r_r`). 
+    - Mathematical form: $Log(f_s(z)) = \alpha_{f_s} + \beta_{f_s} * z$
+    
+12. recruit sizes (`f_d`): A normal distribution
 
-And the the parameter values are given here:
+    - Example code: mean (`f_d_mu`) `mean(my_recruit_data$size_2, na.rm = TRUE)` and standard deviation (`f_d_sd`) `sd(my_recruit_data$size_2, na.rm = TRUE)`
     
+    - Mathematical form: $f_d(z') \sim Norm(\mu_{f_d}, \sigma_{f_d})$
+    
+13. Constants: Discrete stage survival (`r_s`), discrete stage entrance probability (`r_e`), discrete stage departure probability conditional on survival (`r_d`), and probability of remaining in discrete stage (`r_r`). 
+
+### Model parameterization
+
+First, we'll specify the constant parameters. We keep all values related to demography in the `data_list`.
+
 ```{r eval = FALSE}
 
 library(ipmr)
@@ -557,6 +748,13 @@ constant_params <- list(
   r_r       = 0.2,
   r_s       = 0.2
 )
+
+
+```
+
+In addition to creating the standard `data_list`, we need to create a function to sample the environmental covariates, and a list of parameters that generate the environmental covariates. The function needs to return a named list. The names in the returned list can be referenced in vital rate expressions, kernel formulas, etc. as if we had specified them in the `data_list`. `make_ipm()` only runs the functions in `define_env_state()` once per model iteration. This ensures that parameters from joint distributions can be used consistently across kernels without losing their specified correlations (if they are specified, that is).
+
+```{r eval = FALSE}
 
 # Now, we create a set of environmental covariates. In this example, we use
 # a normal distribution for temperature and a Gamma for precipitation. 
@@ -602,9 +800,9 @@ inv_logit <- function(lin_term) {
 ```
 
 
-### The continuously varying general IPM
+### Model specification
 
-We are now ready to build the model!
+We are now ready to begin implementing the model. This next chunk should look familiar, with the caveat that we have now add the terms `temp` and `precip` to vital rates in the `P` kernel. 
 
 ```{r eval = FALSE}
 
@@ -635,7 +833,7 @@ general_stoch_param_model <- init_ipm("general_di_stoch_param") %>%
     evict_fun     = truncated_distributions("norm", "g")
   ) %>%
   define_kernel(
-    name          = "F_stoch",
+    name          = "F",
     family        = "CC",
     formula       = f_r * f_s * f_d * (1 - r_e) * d_surf_area,
     
@@ -693,17 +891,17 @@ general_stoch_param_model <- init_ipm("general_di_stoch_param") %>%
   define_impl(
     make_impl_args_list(
       kernel_names = c("P_stoch", 
-                       "F_stoch",
+                       "F",
                        "go_discrete", 
                        "stay_discrete", 
                        "leave_discrete"),
       int_rule     = rep("midpoint", 5),
-      state_start    = c("surf_area", 
+      state_start  = c("surf_area", 
                        "surf_area",
                        "surf_area",
                        "sb", 
                        "sb"),
-      state_end      = c("surf_area",
+      state_end    = c("surf_area",
                        "surf_area", 
                        "sb", 
                        "sb", 
@@ -712,11 +910,42 @@ general_stoch_param_model <- init_ipm("general_di_stoch_param") %>%
   ) %>%
   define_domains(
     surf_area = c(0, 10, 100)
+  ) 
+
+```
+
+Now, we need to `define_env_state()`. This consists of two parts - specifying expressions that generate environmental covariates, and supplying the information needed to evaluate those expressions. In this example, we want to use the `env_params` in `sample_env` (i.e. `sample_env(env_params)`). `define_env_state` uses the `data_list` argument to supply the `env_params`, and the call to `sample_env` goes into the `...` portion of the function. Here, we assign the result to `env_covs`. The name `env_covs` isn't important for specifying vital rate expressions and you could call it whatever you want, but it must be named something in order to work properly. The only thing that needs to match are the names in the list that `sample_env` returns, and the names used in the vital rate expressions/kernels.
+
+Note that you can pass the `sample_env` function in either the `data_list` of `define_env_state()`, or the `usr_funs` argument of `make_ipm()`. 
+
+```{r eval = FALSE}
+
+# In the first version, sample_env is provided in the data_list of 
+# define_env_state.
+
+general_stoch_param_ipm <-  define_env_state(
+  proto_ipm  = general_stoch_param_model,
+  env_covs   = sample_env(env_params),
+  data_list  = list(env_params = env_params,
+                    sample_env = sample_env)
+) %>% 
+  define_pop_state(
+    n_surf_area = runif(100),
+    n_sb        = rpois(1, 20)
   ) %>%
-  define_env_state(
-    env_covs   = sample_env(env_params),
-    data_list  = list(env_params = env_params)
-  ) %>% 
+  make_ipm(usr_funs = list(inv_logit  = inv_logit),
+           iterate = TRUE,
+           iterations = 100)
+
+
+# in the second version, sample_env is provided in the usr_funs list of 
+# make_ipm(). These two vesrions are equivalent. 
+
+general_stoch_param_ipm <-  define_env_state(
+  proto_ipm  = general_stoch_param_model,
+  env_covs   = sample_env(env_params),
+  data_list  = list(env_params = env_params)
+) %>% 
   define_pop_state(
     n_surf_area = runif(100),
     n_sb        = rpois(1, 20)
@@ -726,16 +955,28 @@ general_stoch_param_model <- init_ipm("general_di_stoch_param") %>%
            iterate = TRUE,
            iterations = 100)
 
-lambdas <- lambda(general_stoch_param_model, type_lambda = "all")
-
-summary(lambdas)
 
 ```
 
+Stochastic parameter-resampled models also return an `env_seq`, but this time it will be a `data.frame` of parameter draws rather than a character vector. We can also compute mean sub-kernels and $\lambda_s$ as we did in the kernel-resampled models. This time, each mean kernel is computed as the average of each sub-kernel over the course of the simulation (i.e. mean of all `P` kernels). Because the other sub-kernels are not time-varying, they will be numerically equivalent to the sub-kernels stored in the IPM object.
 
-## Code to construct mega-matrices
+```{r eval = FALSE}
 
-Sometimes, we may want to work with our sub-kernels arranged into a single block matrix. This isn't required for any of the code in `ipmr`, except for the `plot` method for `general_di_det` IPMs. Other use cases my arise for analyses not included in this package though, so below is a brief overview of how to generate those.
+env_draws  <- general_stoch_param_ipm$env_seq
+
+mean_kerns <- mean_kernel(general_stoch_param_ipm)
+
+lam_s      <- lambda(general_stoch_param_ipm)
+
+all.equal(mean_kerns$mean_F, 
+          general_stoch_param_ipm$sub_kernels$F_it_1,
+          check.attributes = FALSE)
+
+```
+
+## Code to construct mega-kernels
+
+Sometimes, we may want to work with our sub-kernels arranged into a single block kernel. This isn't required for any of the code in `ipmr`, except for the `plot` method for `general_di_det` IPMs. Other use cases may arise for analyses not included in this package though, so below is a brief overview of how to generate those.
 
 `format_mega_matrix` takes an IPM object and a vector of symbols (for interactive use) or a character version of the expression (for programming) showing where each sub-kernel should go. It works in **ROW MAJOR order**. This example will use the model from the general deterministic example at the top of the article.
 
@@ -864,15 +1105,14 @@ Re(eigen(mega_mat[[1]])$values[1]) - lambda(general_ipm)
 
 ```
 
-Say we wanted to program with this function. Passing bare expression is difficult programatically, and how to do that is not really within the scope of this vignette (though if you're interested in learning how, [this](https://dplyr.tidyverse.org/articles/programming.html) is a good start). `format_mega_matrix` also accepts text strings in the same format as above. 
+Say we wanted to program with this function. Passing bare expression is difficult programatically, and how to do that is not really within the scope of this vignette (though if you're interested in learning how, [this](https://dplyr.tidyverse.org/articles/programming.html) is a good start). `format_mega_matrix()` also accepts text strings in the same format as above. 
 
 ```{r eval = FALSE}
 
 # Get the names of each sub_kernel
 sub_k_nms     <- names(general_ipm$sub_kernels)
 
-mega_mat_text <- paste('c(', sub_k_nms[3], ', ', sub_k_nms[2], ', ',
-                       sub_k_nms[4], ', ', sub_k_nms[1], ')' , sep = "")
+mega_mat_text <- c(sub_k_nms[3], sub_k_nms[2], sub_k_nms[4], sub_k_nms[1])
 
 mega_mat_2 <- format_mega_matrix(general_ipm,
                                  mega_mat_text)
@@ -882,4 +1122,144 @@ identical(mega_mat, mega_mat_2)
 
 ```
 
+`format_mega_matrix()` can also handle cases where you need blocks of 0s or identity matrices. These are specified using `0` for 0s, and `I` for identity matrices. `format_mega_matrix()` automatically works out the correct dimensions internally, so you don't need to worry about specifying those. 
 
+Below is an example that inserts 0s and identity matrices on the off-diagonals with the `P` kernel duplicated along the diagonal. 
+
+```{r eval = FALSE}
+
+mega_mat <- format_mega_matrix(general_ipm,
+                               mega_mat = c(P, 0, 
+                                            I, P))
+
+
+
+
+```
+
+
+Finally, `format_mega_matrix` supports `ipmr`'s suffix syntax as well, enabling us to generate lists of mega-kernels for each level of the grouping variables. We'll re-run the `"general_di_stoch_kern"` example from above to demonstrate this.
+
+```{r eval = FALSE}
+
+all_g_int   <- as.list(rnorm(5, mean = 5.781, sd = 0.9)) 
+all_f_s_int <- as.list(rnorm(5, mean = 2.6204, sd = 0.3))
+
+names(all_g_int)   <- paste("g_int_", 1:5, sep = "")
+names(all_f_s_int) <- paste("f_s_int_", 1:5, sep = "")
+
+constant_list <- list(
+  g_slope   = 0.988,
+  g_sd      = 20.55699,
+  s_int     = -0.352,
+  s_slope   = 0.122,
+  s_slope_2 = -0.000213,
+  f_r_int   = -11.46,
+  f_r_slope = 0.0835,
+  f_s_slope = 0.01256,
+  f_d_mu    = 5.6655,
+  f_d_sd    = 2.0734,
+  e_p       = 0.15,
+  g_i       = 0.5067
+)
+
+all_params <- c(constant_list, all_g_int, all_f_s_int)
+
+L <- 1.02
+U <- 624
+n <- 500
+
+set.seed(2312)
+
+init_pop_vec   <- runif(500)
+init_seed_bank <- 20
+
+inv_logit <- function(int, slope, sv) {
+  1/(1 + exp(-(int + slope * sv)))
+}
+
+inv_logit_2 <- function(int, slope, slope_2, sv) {
+  1/(1 + exp(-(int + slope * sv + slope_2 * sv ^ 2)))
+}
+
+general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
+  define_kernel(
+    name          = "P_year",
+    formula       = s * g_year * d_ht,
+    family        = "CC",
+    g_year           = dnorm(ht_2, g_mu_year, g_sd),
+    g_mu_year        = g_int_year + g_slope * ht_1,
+    s                = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
+    data_list        = all_params,
+    states           = list(c('ht')),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(year = 1:5),
+    evict_cor        = TRUE,
+    evict_fun        = truncated_distributions('norm',
+                                               'g_year')
+  ) %>%
+  define_kernel(
+    name          = "go_discrete_year",
+    formula       = f_r * f_s_year * g_i * d_ht,
+    family        = 'CD',
+    f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
+    f_s_year      = exp(f_s_int_year + f_s_slope * ht_1),
+    data_list     = all_params,
+    states        = list(c('ht', "b")),
+    has_hier_effs    = TRUE,
+    levels_hier_effs = list(year = 1:5)
+  ) %>%
+  define_kernel(
+    name    = 'stay_discrete',
+    formula = 0,
+    family  = "DD",
+    states  = list(c('b')),
+    has_hier_effs = FALSE,
+    evict_cor = FALSE
+  ) %>%
+  define_kernel(
+    name          = 'leave_discrete',
+    formula       = e_p * f_d * d_ht,
+    f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
+    family        = 'DC',
+    data_list     = all_params,
+    states        = list(c('ht', "b")),
+    has_hier_effs = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions('norm',
+                                            'f_d')
+  )  %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P_year", "go_discrete_year", "stay_discrete", "leave_discrete"),
+      int_rule     = c(rep("midpoint", 4)),
+      state_start    = c('ht', "ht", "b", "b"),
+      state_end      = c('ht', "b", "b", 'ht')
+    )
+  ) %>%
+  define_domains(
+    ht = c(L, U, n)
+  ) %>%
+  define_pop_state(
+      n_ht = init_pop_vec,
+      n_b  = init_seed_bank
+  ) %>%
+  make_ipm(
+    iterations = 10,
+    kernel_seq = sample(1:5, size = 10, replace = TRUE),
+    usr_funs = list(inv_logit   = inv_logit,
+                    inv_logit_2 = inv_logit_2)
+  )
+
+```
+
+Next, we call `format_mega_matrix()` using the kernel names like so:
+
+```{r eval = FALSE}
+
+block_list <- format_mega_matrix(general_stoch_kern_ipm,
+                                 mega_mat = c(stay_discrete, go_discrete_year,
+                                              leave_discrete, P_year))
+
+
+```
