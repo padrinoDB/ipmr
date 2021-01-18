@@ -2127,7 +2127,8 @@ test_that("format_mega_matrix can handle hier_effs", {
                     },
                     leaves = leave_discs,
                     gos    = go_discs,
-                    Ps     = Ps)
+                    Ps     = Ps) %>%
+    setNames(paste("mega_matrix_", names(.), sep = ""))
 
   ex_ipm <- list(
     iterators = NA_integer_,
@@ -2154,7 +2155,9 @@ test_that("format_mega_matrix can handle hier_effs", {
                        function(x, actual, pkg_val) {
 
                          isTRUE(
-                           all.equal(actual[[x]], pkg_val[[x]], tolerance = 1e-10)
+                           all.equal(actual[[x]],
+                                     pkg_val[[x]],
+                                     tolerance = 1e-10)
                          )
 
                        },
@@ -2216,7 +2219,7 @@ test_that("format_mega_matrix works w/ multiple hier_effs", {
                     gos    = go_discs,
                     Ps     = Ps)
 
-  names(actuals) <- out_nms
+  names(actuals) <- paste("mega_matrix", out_nms, sep = "_")
 
   ex_ipm <- list(
     iterators = NA_integer_,
@@ -2244,7 +2247,9 @@ test_that("format_mega_matrix works w/ multiple hier_effs", {
                        function(x, actual, pkg_val) {
 
                          isTRUE(
-                           all.equal(actual[[x]], pkg_val[[x]], tolerance = 1e-10)
+                           all.equal(actual[[x]],
+                                     pkg_val[[x]],
+                                     tolerance = 1e-10)
                          )
 
                        },
@@ -2389,7 +2394,7 @@ test_that("format_mega_matrix works w/ drop_levels", {
                     gos    = go_discs,
                     Ps     = Ps)
 
-  names(actuals) <- out_nms
+  names(actuals) <- paste("mega_matrix", out_nms, sep = "_")
 
   ex_ipm <- list(
     iterators = NA_integer_,
@@ -2418,7 +2423,9 @@ test_that("format_mega_matrix works w/ drop_levels", {
                        function(x, actual, pkg_val) {
 
                          isTRUE(
-                           all.equal(actual[[x]], pkg_val[[x]], tolerance = 1e-10)
+                           all.equal(actual[[x]],
+                                     pkg_val[[x]],
+                                     tolerance = 1e-10)
                          )
 
                        },

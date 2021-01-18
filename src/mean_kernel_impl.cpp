@@ -13,17 +13,15 @@ List mean_kernel_impl(List holder) {
 
   NumericMatrix out(n_row, n_col);
 
-  for(int rw = 0; rw < n_row; rw++) {
-    for(int cl = 0; cl < n_col; cl++) {
-      for(int i = 0; i < n_tot; i++) {
 
-        NumericMatrix use_mat = holder[i];
+  for(int i = 0; i < n_tot; i++) {
 
-        out(rw, cl) += use_mat(rw, cl);
+    NumericMatrix use_mat = holder[i];
 
-      }
-    }
+    out += use_mat;
+
   }
+
 
   return List::create(Named("mean_kernel") = out / n_tot);
 }
