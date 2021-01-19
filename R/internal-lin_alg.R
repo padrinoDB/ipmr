@@ -648,7 +648,7 @@ is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
          call. = FALSE)
   }
 
-  if(!attr(ipm, "iterated") && comp_method == 'pop_size') {
+  if(!attr(ipm, "iterated")) {
     stop("ipmr cannot compute lambda for a model that is not yet",
          " iterated.\n",
          "Re-run with make_ipm(iterate = TRUE).",
@@ -782,7 +782,7 @@ is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
          call. = FALSE)
   }
 
-  if(!attr(ipm, "iterated") && comp_method == 'pop_size') {
+  if(!attr(ipm, "iterated")) {
     stop("ipmr cannot compute lambda for a model that is not yet",
          " iterated.\n",
          "Re-run with make_ipm(iterate = TRUE).",

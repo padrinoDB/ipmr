@@ -230,7 +230,7 @@ truncated_distributions <- function(fun,
 discrete_extrema <- function(param, state, ncol = NULL, nrow = NULL) {
 
   if(is.null(ncol) && is.null(nrow)) {
-    ncol <- nrow <- sqrt(length(fun))
+    ncol <- nrow <- sqrt(length(param))
   }
 
   temp <- matrix(param, ncol = ncol, nrow = nrow, byrow = TRUE) * state
