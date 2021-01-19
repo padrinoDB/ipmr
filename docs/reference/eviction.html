@@ -41,8 +41,7 @@
 
 <meta property="og:title" content="Eviction correction — truncated_distributions" />
 <meta property="og:description" content="Various helpers to correct for unintentional eviction (Williams
-et al. 2012). rescale_kernel is an alias for
-truncated_distributions." />
+et al. 2012)." />
 
 
 
@@ -154,20 +153,19 @@ truncated_distributions." />
 
     <div class="ref-description">
     <p>Various helpers to correct for unintentional eviction (Williams
-et al. 2012). <code>rescale_kernel</code> is an alias for
-<code>truncated_distributions</code>.</p>
+et al. 2012).</p>
     </div>
 
     <pre class="usage"><span class='fu'>truncated_distributions</span><span class='op'>(</span><span class='va'>fun</span>, <span class='va'>param</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>discrete_extrema</span><span class='op'>(</span><span class='va'>fun</span>, <span class='va'>state</span>, ncol <span class='op'>=</span> <span class='cn'>NULL</span>, nrow <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+<span class='fu'>discrete_extrema</span><span class='op'>(</span><span class='va'>param</span>, <span class='va'>state</span>, ncol <span class='op'>=</span> <span class='cn'>NULL</span>, nrow <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>fun</th>
-      <td><p>The cumulative density function to use. For example, could be
+      <td><p>The density function to use. For example, could be
 <code>"norm"</code> to correct a Gaussian density function, or <code>"lnorm"</code> to
 correct a log-normal density function.</p></td>
     </tr>
@@ -178,7 +176,7 @@ distribution specified in <code>fun</code> will be recycled.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Only used for internal modification - do not use!</p></td>
+      <td><p>Used internally, do not touch!</p></td>
     </tr>
     <tr>
       <th>state</th>
@@ -195,8 +193,8 @@ class <code>"CC"</code>. <code>make_ipm</code> works out the correct dimensions 
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>For <code>truncated_distributions</code> and <code>rescale_kernel</code>, a
-modified function call with that re-scales the probability density
+    <p>For <code>truncated_distributions</code>, a
+modified function call with that truncates the probability density
 function based on the cumulative density function.</p>
 <p>For <code>discrete_extrema</code>, a numeric vector with modified entries based
 on the discretization process.</p>

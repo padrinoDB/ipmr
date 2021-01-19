@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Accessor functions for (proto_)ipm objects — domains" />
-<meta property="og:description" content="Functions that access slots of a *_ipm (including proto_ipm)." />
+<meta property="og:description" content="Functions that access slots of a *_ipm (including
+ proto_ipm). default methods correspond to *_ipm objects." />
 
 
 
@@ -151,7 +152,8 @@
     </div>
 
     <div class="ref-description">
-    <p>Functions that access slots of a <code>*_ipm</code> (including <code>proto_ipm</code>).</p>
+    <p>Functions that access slots of a <code>*_ipm</code> (including
+ <code>proto_ipm</code>). <code>default</code> methods correspond to <code>*_ipm</code> objects.</p>
     </div>
 
     <pre class="usage"><span class='fu'>domains</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
@@ -223,7 +225,7 @@
     <tr>
       <th>kernel</th>
       <td><p>The name of the kernel to insert the new vital rate expression
-into</p></td>
+into.</p></td>
     </tr>
     <tr>
       <th>vital_rate</th>
@@ -243,7 +245,7 @@ to insert.</p></td>
     </tr>
     <tr>
       <th>ipm</th>
-      <td><p>An object created by <code><a href='make_ipm.html'>make_ipm()</a></code>. This argument only applies
+      <td><p>An object created by <code><a href='make_ipm.html'>make_ipm()</a></code>. This argument only applies to
 <code>int_mesh()</code> (because the mesh is not built until <code><a href='make_ipm.html'>make_ipm()</a></code> is
 called).</p></td>
     </tr>

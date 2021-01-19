@@ -359,8 +359,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful informati
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>proto_ipm</th>
-      <td><p>The proto_ipm. This should be the
-output of <code>define_kernel</code>, <code>define_k</code>, or the <code>define_*</code> functions.</p></td>
+      <td><p>A proto_ipm. This should be the
+output of <code>define_kernel</code>, or the <code>define_*</code> functions.</p></td>
     </tr>
     <tr>
       <th>return_main_env</th>
@@ -375,7 +375,8 @@ other potentially useful variables for subsequent analyses. Default is
 the kernel expressions are evaluated in. These may be useful for some analyses,
 such as regression-level sensitivity/elasticity analyses, but can also rapidly
 increase memory consumption for models with many kernels (e.g. ones with hierarchical
-effects that have many levels). Default is <code>FALSE</code>.</p></td>
+effects that have many levels, or any <code>*_stoch_param</code> model). Default is
+<code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>usr_funs</th>
@@ -396,8 +397,8 @@ the IPM with.</p></td>
     <tr>
       <th>iterate</th>
       <td><p>A logical indicating whether or not iterate the model before exiting
-or just return the iteration kernels. Only applies to density independent, deterministic
-models.</p></td>
+or just return the sub-kernels. Only applies to density-independent, deterministic
+models and density-independent, stochastic kernel resampled models.</p></td>
     </tr>
     <tr>
       <th>iterations</th>
@@ -407,28 +408,25 @@ to simulate.</p></td>
     <tr>
       <th>normalize_pop_size</th>
       <td><p>A logical indicating whether to re-scale the population
-vector to sum before each iteration. Default is <code>TRUE</code> for <code>*_di_*</code>
-methods and <code>FALSE</code> for <code>*_dd_*</code> methods.</p></td>
+vector to sum to 1 before each iteration. Default is <code>TRUE</code> for
+<code>*_di_*</code> methods and <code>FALSE</code> for <code>*_dd_*</code> methods.</p></td>
     </tr>
     <tr>
       <th>iteration_direction</th>
       <td><p>Either <code>"right"</code> (default) or <code>"left"</code>.
 This controls the direction of projection. Right iteration will generate
 the right eigenvector (if it exists), while left iteration generates
-the left eigenvector. These correspond the stable trait distributions, and
+the left eigenvector. These correspond to the stable trait distributions, and
 reproductive values, respectively. This parameter is mostly used internally
-by other functions, and most users probably don't want to change it.</p></td>
+by other functions. Use with care.</p></td>
     </tr>
     <tr>
       <th>kernel_seq</th>
       <td><p>For <code>*_stoch_kern</code> methods, the sequence of kernels
 to use during the simulation process. It should have the same number of entries
 as the number of <code>iterations</code>.
-This can either be a vector of integers corresponding to kernel names (e.g.
-kernels for different years - <code>2011:2018</code>),
-a character vector corresponding to kernel names (e.g. kernels from different
-sites - <code>'a', 'b', 'c'</code>), a Markov chain matrix with
-transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
+This should be a vector containing levels of the hierarchical effects specified
+in <code>levels_hier_effs</code>, or empty. Support for Markov chains will eve
 If it is empty, <code>make_ipm</code> will try to generate a sequence internally using
 a random selection of the <code>levels_hier_effs</code> defined in <code>define_kernel</code>.</p></td>
     </tr>
@@ -445,13 +443,13 @@ methods. Default is <code>FALSE</code>.</p></td>
     <p>The <code>make_ipm.*</code> methods will always return a list of length 6
 containing the following components:</p>
 <ul>
-<li><p><strong>sub_kernels</strong>: a list of sub_kernels specified in <code>define_kernel</code>.</p></li>
+<li><p><strong>sub_kernels</strong>: a list of arrays specified in <code>define_kernel</code>.</p></li>
 <li><p><strong>env_list</strong>: a list containing the evaluation environments of
                            kernel. This will contain the <code>main_env</code> object
                            if <code>return_main_env = TRUE</code>. It will also contain
                            the sub-kernels evaluation environments if
                            <code>return_all_envs = TRUE</code>.</p></li>
-<li><p><strong>env_seq</strong>: a matrix with dimension <code>iterations</code> X 1 of
+<li><p><strong>env_seq</strong>: a character vector with length <code>iterations</code> of
                              kernel indices indicating the order
                              in which kernels are to be/were resampled OR
                              a matrix with as many columns as stochastic parameters
@@ -471,16 +469,6 @@ facilitate <code>print</code>, <code>plot</code>, and <code>lambda</code> method
 a <code>'simple_di_stoch_kern'</code> model will have the class
 <code>'simple_di_stoch_kern_ipm'</code> once it has been implemented using
 <code>make_ipm</code>.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>When <code>kernel_seq</code> is a character vector, names
-are matched using <code><a href='https://rdrr.io/r/base/grep.html'>grepl()</a></code>.
-When it is an integer vector, the vector
-is first checked to make sure they are all present in kernel names. The model
-procedure will stop if thay are not all present.</p>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p>Sam Levin</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

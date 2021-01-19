@@ -194,13 +194,13 @@ discrete to discrete (e.g. stasis in a seedbank).</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>For <code>define_kernel</code>, a set of named expressions that correspond
+      <td><p>A set of named expressions that correspond
 to vital rates in <code>formula</code>. Suffix expansion of hierarchical models is supported.</p></td>
     </tr>
     <tr>
       <th>data_list</th>
-      <td><p>A list of named values that correspond to constants in the formula.
-You do not need to specify vectors corresponding to the domains here.</p></td>
+      <td><p>A list of named values that correspond to constants in the formula
+and vital rate expressions in <code>...</code>.</p></td>
     </tr>
     <tr>
       <th>states</th>
@@ -210,12 +210,9 @@ variable used in the kernel.</p></td>
     <tr>
       <th>has_hier_effs</th>
       <td><p>A logical indicating whether or not the kernel and/or its
-underlying vital rates are structured with hierarchical effects. If so and you
-specify either the functional forms or the exact parameter values you want to use,
-the kernels will be automatically split according to the notation in the vital
-rates and kernel formulae and multiple kernels will be built. See the vignette
-on the syntax for this feature for more details (<code><a href='https://rdrr.io/r/utils/vignette.html'>vignettes(
-'hierarchical-notation', package = 'ipmr')</a></code>).</p></td>
+underlying vital rates are structured with hierarchical effects. See the
+introduction vignette for this feature for more details (<code><a href='https://rdrr.io/r/utils/vignette.html'>vignettes(
+'ipmr-introduction', package = 'ipmr')</a></code>).</p></td>
     </tr>
     <tr>
       <th>levels_hier_effs</th>
@@ -225,9 +222,10 @@ in the vital rate expressions.</p></td>
     </tr>
     <tr>
       <th>levels_ages</th>
-      <td><p>A list with possibly 2 entries: 1. <code>"age"</code>: the range
+      <td><p>If <code><a href='init_ipm.html'>init_ipm(has_age = TRUE)</a></code>, a list with possibly
+2 entries: 1. <code>"age"</code>: the range
 of possible ages in the model and, optionally, 2. <code>"max_age"</code>: the maximum
-age individuals in the model can attain.</p></td>
+age individuals in the model can attain. Otherwise, not used.</p></td>
     </tr>
     <tr>
       <th>evict_cor</th>
@@ -236,36 +234,30 @@ to the kernel.</p></td>
     </tr>
     <tr>
       <th>evict_fun</th>
-      <td><p>If <code>evict_cor== TRUE</code>, then a function that corrects for it.
-Currently, the only implemented function is <code>truncated_distributions</code>.
-This works by modifying the functional form of the vital rate expressions
-<code>...</code>, and so supplying your own function in this slot will be difficult.
-You can also either specify a <code>usr_funs</code> function that performs the correction
-during the implementation of the model itself, or incorporate the correction
-into individual vital rate expressions. In either of those cases,
-set <code>evict_cor</code> to <code>FALSE</code>.</p></td>
+      <td><p>If <code>evict_cor = TRUE</code>, then a function that corrects for it.
+Currently, only <code>truncated_distributions</code> and <code>discrete_extrema</code> are
+possible.</p></td>
     </tr>
     <tr>
       <th>integrate</th>
       <td><p>For <code>simple_*</code> models, this controls whether a <code>"d_z"</code>
 is automatically appended to the <code>formula</code> argument. When <code>TRUE</code>,
-this automatically creates a <code>formula * d_z</code>. There may be some cases where
+this automatically generates <code>formula * d_z</code>. There may be some cases where
 this behavior is not desirable. Set this to <code>FALSE</code> and specify the correct
-math if that happens. The default is <code>TRUE</code>. This argument is ignored for
+form if needed. The default is <code>TRUE</code>. This argument is ignored for
 all <code>general_*</code> models.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>All functions described here return a  <code>proto_ipm</code>.</p>
+    <p>A <code>proto_ipm</code>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Different classes of IPMs may have many or only a few kernels. Each
-one requires its own call to this function, though there are some exceptions,
+one requires its own call to <code>define_kernel</code>, though there are some exceptions,
 namely for kernels derived from hierarchical models (e.g. vital rate models
-fit across plots and years). <code>remove_k</code> is a helper for re-building models
-but with a different <code>K</code> kernel.</p>
+fit across plots and years).</p>
 <p>Internally, <code>ipmr</code> generates the <code>levels_hier_effs</code> using <code>expand.grid</code>.
 This  means that every combination of the values in <code>levels_hier_effs</code>
 must exist in the <code>data_list</code>, or the model will fail with an error along
@@ -277,14 +269,6 @@ collected for <code>sites = c("a", "b", "c")</code>, and <code>years = c(2005:20
 but there is no data from site <code>"a"</code> in <code>2007</code>, we can use
 <code>levels_hier_effs = list(site = c("a", "b", "c"), year = c(2005:2008),
 drop_levels = c("a_2007"))</code>.</p>
-
-<p><code>define_kernel</code> generates most of the information needed to create an IPM
-kernel. There are a few requirements - <code>name</code>, <code>family</code>,
-<code>formula</code>, and <code>states</code> must not be empty. The <code>formula</code> should be an expression
-for how vital rates produce a kernel (e.g. <code>formula = S * G</code>). The
-<code>...</code> should be a set of named expressions that correspond to vital rate
-expressions (e.g. <code>G = dnorm(size_2, mean_size, sd_size)</code>). See the vignettes
-for more information on how to get started.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

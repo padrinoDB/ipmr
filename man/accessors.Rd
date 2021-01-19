@@ -76,7 +76,7 @@ pop_state(object)
 \item{object}{A \code{proto_ipm} or object created by \code{make_ipm()}.}
 
 \item{kernel}{The name of the kernel to insert the new vital rate expression
-into}
+into.}
 
 \item{vital_rate}{The name of the vital rate to replace. If the vital rate
 doesn't already exist in the \code{object}, a new one with this name will be
@@ -88,7 +88,7 @@ to contain all of the parameters, just the ones to update/append.}
 \item{form}{An expression representing the new vital rate or kernel formula
 to insert.}
 
-\item{ipm}{An object created by \code{make_ipm()}. This argument only applies
+\item{ipm}{An object created by \code{make_ipm()}. This argument only applies to
 \code{int_mesh()} (because the mesh is not built until \code{make_ipm()} is
 called).}
 }
@@ -97,7 +97,8 @@ Depending on the class of \code{object}, a list
 with types numeric or character.
 }
 \description{
-Functions that access slots of a \code{*_ipm} (including \code{proto_ipm}).
+Functions that access slots of a \code{*_ipm} (including
+ \code{proto_ipm}). \code{default} methods correspond to \code{*_ipm} objects.
 }
 \details{
 The \code{*.default} method corresponds to output from \code{make_ipm()},

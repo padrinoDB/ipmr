@@ -64,5 +64,6 @@ to hierarchical effects (if any).
 }
 \description{
 Compute the per-capita growth rate for a given model. Can handle
-stochastic and deterministic models, and has options for thinning.
+stochastic and deterministic models, and has the option to discard burn in for
+stochastic models.
 }

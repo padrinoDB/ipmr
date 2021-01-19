@@ -199,8 +199,8 @@ make_ipm(
 )
 }
 \arguments{
-\item{proto_ipm}{The proto_ipm. This should be the
-output of \code{define_kernel}, \code{define_k}, or the \code{define_*} functions.}
+\item{proto_ipm}{A proto_ipm. This should be the
+output of \code{define_kernel}, or the \code{define_*} functions.}
 
 \item{return_main_env}{A logical indicating whether to return the main environment
 for the model. This environment contains the integration mesh, weights, and
@@ -211,7 +211,8 @@ other potentially useful variables for subsequent analyses. Default is
 the kernel expressions are evaluated in. These may be useful for some analyses,
 such as regression-level sensitivity/elasticity analyses, but can also rapidly
 increase memory consumption for models with many kernels (e.g. ones with hierarchical
-effects that have many levels). Default is \code{FALSE}.}
+effects that have many levels, or any \code{*_stoch_param} model). Default is
+\code{FALSE}.}
 
 \item{usr_funs}{An optional list of user-specified functions that are passed
 on to the  model building process. This can help make vital rate expressions
@@ -224,31 +225,28 @@ of the function calls in the \code{...} or \code{formula}.}
 the IPM with.}
 
 \item{iterate}{A logical indicating whether or not iterate the model before exiting
-or just return the iteration kernels. Only applies to density independent, deterministic
-models.}
+or just return the sub-kernels. Only applies to density-independent, deterministic
+models and density-independent, stochastic kernel resampled models.}
 
 \item{iterations}{If \code{iterate} is \code{TRUE}, then the number of iterations
 to simulate.}
 
 \item{normalize_pop_size}{A logical indicating whether to re-scale the population
-vector to sum before each iteration. Default is \code{TRUE} for \code{*_di_*}
-methods and \code{FALSE} for \code{*_dd_*} methods.}
+vector to sum to 1 before each iteration. Default is \code{TRUE} for
+\code{*_di_*} methods and \code{FALSE} for \code{*_dd_*} methods.}
 
 \item{iteration_direction}{Either \code{"right"} (default) or \code{"left"}.
 This controls the direction of projection. Right iteration will generate
 the right eigenvector (if it exists), while left iteration generates
-the left eigenvector. These correspond the stable trait distributions, and
+the left eigenvector. These correspond to the stable trait distributions, and
 reproductive values, respectively. This parameter is mostly used internally
-by other functions, and most users probably don't want to change it.}
+by other functions. Use with care.}
 
 \item{kernel_seq}{For \code{*_stoch_kern} methods, the sequence of kernels
 to use during the simulation process. It should have the same number of entries
 as the number of \code{iterations}.
-This can either be a vector of integers corresponding to kernel names (e.g.
-kernels for different years - \code{2011:2018}),
-a character vector corresponding to kernel names (e.g. kernels from different
-sites - \code{'a', 'b', 'c'}), a Markov chain matrix with
-transition probabilities between given states (NOT YET IMPLEMENTED), or empty.
+This should be a vector containing levels of the hierarchical effects specified
+in \code{levels_hier_effs}, or empty. Support for Markov chains will eve
 If it is empty, \code{make_ipm} will try to generate a sequence internally using
 a random selection of the \code{levels_hier_effs} defined in \code{define_kernel}.}
 
@@ -261,13 +259,13 @@ The \code{make_ipm.*} methods will always return a list of length 6
 containing the following components:
 
 \itemize{
-  \item{\strong{sub_kernels}}{: a list of sub_kernels specified in \code{define_kernel}.}
+  \item{\strong{sub_kernels}}{: a list of arrays specified in \code{define_kernel}.}
   \item{\strong{env_list}}{: a list containing the evaluation environments of
                            kernel. This will contain the \code{main_env} object
                            if \code{return_main_env = TRUE}. It will also contain
                            the sub-kernels evaluation environments if
                            \code{return_all_envs = TRUE}. }
-  \item{\strong{env_seq}}{: a matrix with dimension \code{iterations} X 1 of
+  \item{\strong{env_seq}}{: a character vector with length \code{iterations} of
                              kernel indices indicating the order
                              in which kernels are to be/were resampled OR
                              a matrix with as many columns as stochastic parameters
@@ -293,14 +291,4 @@ The \code{make_ipm.*} methods convert a \code{proto_ipm} into a
 set of discretized kernels and population vectors. Methods have different
 requirements, so be sure to read the parameter documentation. \code{
 vignette('ipmr-introduction', 'ipmr')} also contains helpful information.
-}
-\details{
-When \code{kernel_seq} is a character vector, names
-are matched using \code{grepl()}.
-When it is an integer vector, the vector
-is first checked to make sure they are all present in kernel names. The model
-procedure will stop if thay are not all present.
-}
-\author{
-Sam Levin
 }

@@ -19,7 +19,7 @@ An object with classes \code{"proto_ipm"} and \code{model_class}. If
 \description{
 This is always the first step in constructing an IPM with \code{ipmr}.
 All you need for this is to know what type of IPM you want to construct - the rest comes later
-with \code{define_kernel}, \code{define_k}, \code{make_ipm}, and associated helper functions.
+with \code{define_kernel}, \code{make_ipm}, and associated helper functions.
 }
 \details{
 Combinations of \code{simple} or \code{general}, \code{dd} or \code{di},
@@ -50,12 +50,13 @@ in the \code{vignettes("ipmr-introduction", package = 'ipmr')}.
  }
  \item{and one of}
  \itemize{
-    \item{\code{det}}{: used to denote a deterministic IPM. Use this when you are
-    building a single iteration kernel.}
-    \item{\code{stoch}}{: used to denote a stochastic IPM. Stochasticity can be implemented
-    in two ways in \code{ipmr}: \code{"kern"} resampling, and \code{"param"} resampling.}
+    \item{\code{det}}{: used to denote a deterministic IPM.}
+    \item{\code{stoch}}{: used to denote a stochastic IPM. Stochasticity can
+    be implemented in two ways in \code{ipmr}: \code{"kern"} resampling,
+    and \code{"param"} resampling.}
  }
- \item{If using \code{det}, this should be omitted. If using \code{stoch}, then one of the following: }
+ \item{If using \code{det}, this should be omitted. If using \code{stoch},
+ then one of the following: }
  \itemize{
     \item{\code{kern}}{: used to denote an IPM that uses kernel resampling. Briefly,
     these models build all of the iteration kernels ahead of time and then choose one
@@ -64,12 +65,13 @@ in the \code{vignettes("ipmr-introduction", package = 'ipmr')}.
     is multiplied by the next kernel for the desired number of iterations.}
     \item{\code{param}}{: used to denote parameter resampling. This samples distributions
     for each parameter based on user-specified functions supplied to \code{define_env_state()}.
-    This will be a bit slower than \code{"kern"} resampling because iteration
-    matrices need to be reconstructed from new parameters at every time step.}
+    This will be a bit slower than \code{"kern"} resampling because kernels
+    need to be reconstructed from new parameters at every time step.}
 }
 }
 }
 \references{
-Metcalf et al. (2015). Statistical modelling of annual variation for inference on stochastic
-population dynamics using Integral Projection Models. Methods in Ecology and Evolution, 6: 1007-1017
+Metcalf et al. (2015). Statistical modelling of annual variation
+for inference on stochastic population dynamics using Integral Projection
+Models. Methods in Ecology and Evolution, 6: 1007-1017
 }

@@ -14,7 +14,7 @@ left_mult(kernel, vectr)
 should be a univariate trait distribution.}
 }
 \value{
-\code{left_mult} returns \code{t(vectr) \%*\% kernel}. \code{right_mult}
+\code{left_mult} returns \code{t(kernel) \%*\% vectr}. \code{right_mult}
 returns \code{kernel \%*\% vectr}.
 }
 \description{

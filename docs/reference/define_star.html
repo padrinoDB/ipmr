@@ -156,7 +156,7 @@
 
     <pre class="usage"><span class='fu'>define_impl</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='va'>kernel_impl_list</span><span class='op'>)</span>
 
-<span class='fu'>make_impl_args_list</span><span class='op'>(</span><span class='va'>kernel_names</span>, <span class='va'>int_rule</span>, <span class='va'>state_start</span>, <span class='va'>state_end</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>make_impl_args_list</span><span class='op'>(</span><span class='va'>kernel_names</span>, <span class='va'>int_rule</span>, <span class='va'>state_start</span>, <span class='va'>state_end</span><span class='op'>)</span>
 
 <span class='fu'>define_domains</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='va'>...</span><span class='op'>)</span>
 
@@ -240,14 +240,15 @@ following order:</p>
 </ol>
 
 <p>The order requirement is so that information is correctly matched to each kernel.
-Below are specific details on the way each one takes <code>...</code>.</p>
+Below are specific details on the way each works.</p>
 <p><strong><code>define_impl</code></strong></p>
 <p>This has two arguments - <code>proto_ipm</code> (the model object you wish to work with),
-and the <code>kernel_impl_list</code>. The <code>kernel_impl_list</code> has a very specific format.
-Names of the list should be kernel names, and each kernel should have 3 entries:
+and the <code>kernel_impl_list</code>. The format of the <code>kernel_impl_list</code> is:
+names of the list should be kernel names, and each kernel should have 3 entries:
 <code>int_rule</code>, <code>dom_start</code>, and <code>dom_end</code>. See examples.</p>
 <p><strong><code>define_domains</code></strong></p>
-<p>If the <code>int_rule = "midpoint"</code>, these are vectors of length 3 where the name corresponds to the
+<p>If the <code>int_rule = "midpoint"</code>, the <code>...</code> entries are vectors of
+length 3 where the name corresponds to the
 state variable, the first entry is the lower bound of the domain, the second
 is the upper bound of the domain, and the third entry is the number of
 meshpoints. Other <code>int_rule</code>s are not yet implemented, so for now this is the
@@ -268,8 +269,12 @@ vital rate expressions and/or kernel formulas.</p>
     <pre class="examples"><div class='input'>
 <span class='co'># Example with kernels named "P" and "F", and a domain "z"</span>
 
-<span class='va'>kernel_impl_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>P <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>, state_start <span class='op'>=</span> <span class='st'>"z"</span>, state_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span>,
-                         F <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>, state_start <span class='op'>=</span> <span class='st'>"z"</span>, state_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>kernel_impl_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>P <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>,
+                                  state_start <span class='op'>=</span> <span class='st'>"z"</span>,
+                                  state_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span>,
+                         F <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>,
+                                  state_start <span class='op'>=</span> <span class='st'>"z"</span>,
+                                  state_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># an equivalent version using make_impl_args_list</span>
 
@@ -304,9 +309,9 @@ vital rate expressions and/or kernel formulas.</p>
 <span class='co'># define_env_state. Generates a random draw from a known distribution</span>
 <span class='co'># of temperatures.</span>
 
-<span class='va'>env_sampler</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>temp_mean</span>, <span class='va'>temp_sd</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='va'>env_sampler</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>env_pars</span><span class='op'>)</span> <span class='op'>{</span>
 
-  <span class='va'>temp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='va'>temp_mean</span>, <span class='va'>temp_sd</span><span class='op'>)</span>
+  <span class='va'>temp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='va'>env_pars</span><span class='op'>$</span><span class='va'>temp_mean</span>, <span class='va'>env_pars</span><span class='op'>$</span><span class='va'>temp_sd</span><span class='op'>)</span>
 
   <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>temp <span class='op'>=</span> <span class='va'>temp</span><span class='op'>)</span><span class='op'>)</span>
 
@@ -316,7 +321,7 @@ vital rate expressions and/or kernel formulas.</p>
 
 <span class='fu'>define_env_state</span><span class='op'>(</span>
  <span class='va'>proto_ipm</span>,
- env_values <span class='op'>=</span> <span class='fu'>env_sampler</span><span class='op'>(</span><span class='va'>env_pars</span><span class='op'>$</span><span class='va'>temp_mean</span>, <span class='va'>env_pars</span><span class='op'>$</span><span class='va'>temp_sd</span><span class='op'>)</span>,
+ env_values <span class='op'>=</span> <span class='fu'>env_sampler</span><span class='op'>(</span><span class='va'>env_pars</span><span class='op'>)</span>,
  data_list  <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>env_sampler <span class='op'>=</span> <span class='va'>env_sampler</span>,
                    env_pars    <span class='op'>=</span> <span class='va'>env_pars</span><span class='op'>)</span>
 

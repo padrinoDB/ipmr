@@ -42,7 +42,7 @@
 <meta property="og:title" content="Initialize an IPM — init_ipm" />
 <meta property="og:description" content="This is always the first step in constructing an IPM with ipmr.
 All you need for this is to know what type of IPM you want to construct - the rest comes later
-with define_kernel, define_k, make_ipm, and associated helper functions." />
+with define_kernel, make_ipm, and associated helper functions." />
 
 
 
@@ -155,7 +155,7 @@ with define_kernel, define_k, make_ipm, and associated helper functions." />
     <div class="ref-description">
     <p>This is always the first step in constructing an IPM with <code>ipmr</code>.
 All you need for this is to know what type of IPM you want to construct - the rest comes later
-with <code>define_kernel</code>, <code>define_k</code>, <code>make_ipm</code>, and associated helper functions.</p>
+with <code>define_kernel</code>, <code>make_ipm</code>, and associated helper functions.</p>
     </div>
 
     <pre class="usage"><span class='fu'>init_ipm</span><span class='op'>(</span><span class='va'>model_class</span>, has_age <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
@@ -202,12 +202,13 @@ in the <code><a href='https://rdrr.io/r/utils/vignette.html'>vignettes("ipmr-int
 <li><p><code>di</code>: used to denote a density independent IPM.</p></li>
 </ul></li>
 <li><p>and one of</p><ul>
-<li><p><code>det</code>: used to denote a deterministic IPM. Use this when you are
-    building a single iteration kernel.</p></li>
-<li><p><code>stoch</code>: used to denote a stochastic IPM. Stochasticity can be implemented
-    in two ways in <code>ipmr</code>: <code>"kern"</code> resampling, and <code>"param"</code> resampling.</p></li>
+<li><p><code>det</code>: used to denote a deterministic IPM.</p></li>
+<li><p><code>stoch</code>: used to denote a stochastic IPM. Stochasticity can
+    be implemented in two ways in <code>ipmr</code>: <code>"kern"</code> resampling,
+    and <code>"param"</code> resampling.</p></li>
 </ul></li>
-<li><p>If using <code>det</code>, this should be omitted. If using <code>stoch</code>, then one of the following:</p><ul>
+<li><p>If using <code>det</code>, this should be omitted. If using <code>stoch</code>,
+ then one of the following:</p><ul>
 <li><p><code>kern</code>: used to denote an IPM that uses kernel resampling. Briefly,
     these models build all of the iteration kernels ahead of time and then choose one
     at random or in a user-specified order as they move from iteration to iteration. The
@@ -215,15 +216,16 @@ in the <code><a href='https://rdrr.io/r/utils/vignette.html'>vignettes("ipmr-int
     is multiplied by the next kernel for the desired number of iterations.</p></li>
 <li><p><code>param</code>: used to denote parameter resampling. This samples distributions
     for each parameter based on user-specified functions supplied to <code><a href='define_impl.html'>define_env_state()</a></code>.
-    This will be a bit slower than <code>"kern"</code> resampling because iteration
-    matrices need to be reconstructed from new parameters at every time step.</p></li>
+    This will be a bit slower than <code>"kern"</code> resampling because kernels
+    need to be reconstructed from new parameters at every time step.</p></li>
 </ul></li>
 </ul>
 
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Metcalf et al. (2015). Statistical modelling of annual variation for inference on stochastic
-population dynamics using Integral Projection Models. Methods in Ecology and Evolution, 6: 1007-1017</p>
+    <p>Metcalf et al. (2015). Statistical modelling of annual variation
+for inference on stochastic population dynamics using Integral Projection
+Models. Methods in Ecology and Evolution, 6: 1007-1017</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

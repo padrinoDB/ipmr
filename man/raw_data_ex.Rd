@@ -14,7 +14,7 @@
   \item{log_size}{Log transformed \code{size}.}
   \item{repro}{Either 0 or 1 to indicate whether the plant is reproductive.}
   \item{size_next}{Surface area in square meters of each individual at time \emph{t + 1}.}
-  \item{flower_n_next}{If the plant is reproductive at \emph{t + 1}, the nubmer of
+  \item{flower_n_next}{If the plant is reproductive at \emph{t + 1}, the number of
   flowers it made.}
   \item{survival}{Either 0 or 1 to indicate whether a plant at \emph{t} survives to \emph{t + 1}.}
   \item{log_size_next}{Log transformed \code{size_next}.}

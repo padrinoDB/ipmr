@@ -11,7 +11,7 @@
 \usage{
 define_impl(proto_ipm, kernel_impl_list)
 
-make_impl_args_list(kernel_names, int_rule, state_start, state_end, ...)
+make_impl_args_list(kernel_names, int_rule, state_start, state_end)
 
 define_domains(proto_ipm, ...)
 
@@ -81,18 +81,19 @@ following order:
 }
 
 The order requirement is so that information is correctly matched to each kernel.
-Below are specific details on the way each one takes \code{...}.
+Below are specific details on the way each works.
 
 \strong{\code{define_impl}}
 
 This has two arguments - \code{proto_ipm} (the model object you wish to work with),
-and the \code{kernel_impl_list}. The \code{kernel_impl_list} has a very specific format.
-Names of the list should be kernel names, and each kernel should have 3 entries:
+and the \code{kernel_impl_list}. The format of the \code{kernel_impl_list} is:
+names of the list should be kernel names, and each kernel should have 3 entries:
 \code{int_rule}, \code{dom_start}, and \code{dom_end}. See examples.
 
 \strong{\code{define_domains}}
 
-If the \code{int_rule = "midpoint"}, these are vectors of length 3 where the name corresponds to the
+If the \code{int_rule = "midpoint"}, the \code{...} entries are vectors of
+length 3 where the name corresponds to the
 state variable, the first entry is the lower bound of the domain, the second
 is the upper bound of the domain, and the third entry is the number of
 meshpoints. Other \code{int_rule}s are not yet implemented, so for now this is the
@@ -117,8 +118,12 @@ vital rate expressions and/or kernel formulas.
 
 # Example with kernels named "P" and "F", and a domain "z"
 
-kernel_impl_list <- list(P = list(int_rule = "midpoint", state_start = "z", state_end = "z"),
-                         F = list(int_rule = "midpoint", state_start = "z", state_end = "z"))
+kernel_impl_list <- list(P = list(int_rule = "midpoint",
+                                  state_start = "z",
+                                  state_end = "z"),
+                         F = list(int_rule = "midpoint",
+                                  state_start = "z",
+                                  state_end = "z"))
 
 # an equivalent version using make_impl_args_list
 
@@ -153,9 +158,9 @@ define_pop_state(proto_ipm, pop_vectors = pop_vecs)
 # define_env_state. Generates a random draw from a known distribution
 # of temperatures.
 
-env_sampler <- function(temp_mean, temp_sd) {
+env_sampler <- function(env_pars) {
 
-  temp <- rnorm(1, temp_mean, temp_sd)
+  temp <- rnorm(1, env_pars$temp_mean, env_pars$temp_sd)
 
   return(list(temp = temp))
 
@@ -165,7 +170,7 @@ env_pars <- list(temp_mean = 12, temp_sd = 2)
 
 define_env_state(
  proto_ipm,
- env_values = env_sampler(env_pars$temp_mean, env_pars$temp_sd),
+ env_values = env_sampler(env_pars),
  data_list  = list(env_sampler = env_sampler,
                    env_pars    = env_pars)
 
