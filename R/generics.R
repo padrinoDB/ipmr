@@ -850,7 +850,8 @@ print.ipmr_matrix <- function(x, ...) {
 #' @rdname lambda
 #'
 #' @description Compute the per-capita growth rate for a given model. Can handle
-#' stochastic and deterministic models, and has options for thinning.
+#' stochastic and deterministic models, and has the option to discard burn in for
+#' stochastic models.
 #'
 #' @param ipm An object returned by \code{make_ipm()}.
 #' @param type_lambda Either \code{'all'}, \code{'last'},
@@ -1010,6 +1011,160 @@ lambda.general_di_stoch_param_ipm <- function(ipm,
                                               ...,
                                               type_lambda = 'stochastic',
                                               burn_in     = 0.1) {
+
+  .check_lambda_args(ipm, type_lambda)
+
+  all_lams <- switch(type_lambda,
+                     'all'        = TRUE,
+                     'stochastic' = TRUE,
+                     'last'       = FALSE)
+
+  temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
+
+  if(all_lams) {
+    burn_ind <- seq_len(round(length(temp) * burn_in))
+  }
+
+  return(
+    switch(type_lambda,
+           'all'        = temp,
+           'last'       = temp,
+           'stochastic' = .thin_stoch_lambda(temp, burn_ind))
+  )
+}
+
+#' @rdname lambda
+#' @export
+
+lambda.simple_dd_det_ipm <- function(ipm, type_lambda = "all", ...) {
+
+  .check_lambda_args(ipm, type_lambda)
+
+  all_lams <- switch(type_lambda,
+                     'all'  = TRUE,
+                     'last' = FALSE,
+                     'stochastic' = stop("Cannot compute stochastic lambda for deterministic IPM",
+                                         call. = FALSE))
+
+  out <- .lambda_pop_size(ipm, all_lambdas = all_lams)
+
+  return(out)
+}
+
+#' @rdname lambda
+#' @export
+
+lambda.simple_dd_stoch_kern_ipm <- function(ipm,
+                                             ...,
+                                             type_lambda = 'stochastic',
+                                             burn_in     = 0.1) {
+
+  .check_lambda_args(ipm, type_lambda)
+
+  all_lams <- switch(type_lambda,
+                     'all'        = TRUE,
+                     'stochastic' = TRUE,
+                     'last'       = FALSE)
+
+  temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
+
+  if(all_lams) {
+    burn_ind <- seq_len(round(length(temp) * burn_in))
+  }
+
+  return(
+    switch(type_lambda,
+           'all'        = temp,
+           'last'       = temp,
+           'stochastic' = .thin_stoch_lambda(temp, burn_ind))
+  )
+}
+
+#' @rdname lambda
+#' @export
+
+lambda.simple_dd_stoch_param_ipm <- function(ipm,
+                                             ...,
+                                             type_lambda = 'stochastic',
+                                             burn_in     = 0.1) {
+
+  .check_lambda_args(ipm, type_lambda)
+
+  all_lams <- switch(type_lambda,
+                     'all'        = TRUE,
+                     'stochastic' = TRUE,
+                     'last'       = FALSE)
+
+  temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
+
+  if(all_lams) {
+    burn_ind <- seq_len(round(length(temp) * burn_in))
+  }
+
+  return(
+    switch(type_lambda,
+           'all'        = temp,
+           'last'       = temp,
+           'stochastic' = .thin_stoch_lambda(temp, burn_ind))
+  )
+}
+
+#' @rdname lambda
+#' @export
+
+lambda.general_dd_det_ipm <- function(ipm,
+                                      type_lambda = 'last',
+                                      ...) {
+
+  .check_lambda_args(ipm, type_lambda)
+
+  all_lams <- switch(type_lambda,
+                     'all'  = TRUE,
+                     'last' = FALSE,
+                     'stochastic' = stop("Cannot compute stochastic lambda for deterministic IPM",
+                                         call. = FALSE))
+
+  out <- .lambda_pop_size(ipm, all_lambdas = all_lams)
+
+  return(out)
+}
+
+#' @rdname lambda
+#' @export
+
+lambda.general_dd_stoch_kern_ipm <- function(ipm,
+                                            ...,
+                                            type_lambda = 'stochastic',
+                                            burn_in     = 0.1) {
+
+  .check_lambda_args(ipm, type_lambda)
+
+  all_lams <- switch(type_lambda,
+                     'all'        = TRUE,
+                     'stochastic' = TRUE,
+                     'last'       = FALSE)
+
+  temp <- .lambda_pop_size(ipm, all_lambdas = all_lams)
+
+  if(all_lams) {
+    burn_ind <- seq_len(round(length(temp) * burn_in))
+  }
+
+  return(
+    switch(type_lambda,
+           'all'        = temp,
+           'last'       = temp,
+           'stochastic' = .thin_stoch_lambda(temp, burn_ind))
+  )
+}
+
+#' @rdname lambda
+#' @export
+
+lambda.general_dd_stoch_param_ipm <- function(ipm,
+                                             ...,
+                                             type_lambda = 'stochastic',
+                                             burn_in     = 0.1) {
 
   .check_lambda_args(ipm, type_lambda)
 
@@ -1396,14 +1551,13 @@ plot.general_di_det_ipm <- function(x = NULL, y = NULL,
 #' @title Compute the standardized left and right eigenvectors via iteration
 #'
 #' @param ipm Output from \code{make_ipm()}.
-#' @param ... other arguments passed to methods
 #'
 #' @return A list of named numeric vector(s) corresponding to the stable trait distribution
 #' function (\code{right_ev}) or the reproductive values for each trait (\code{left_ev}).
 #'
 #' @export
 
-right_ev <- function(ipm, ...) {
+right_ev <- function(ipm, iterations) {
 
   UseMethod('right_ev')
 
@@ -1416,8 +1570,7 @@ right_ev <- function(ipm, ...) {
 #' @export
 
 right_ev.simple_di_det_ipm <- function(ipm,
-                                       iterations = 100,
-                                       ...) {
+                                       iterations = 100) {
 
   mod_nm <- deparse(substitute(ipm))
 
@@ -1516,15 +1669,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
       )
     )
 
-    # A model that hasn't been iterated yet. The part below only applies to
-    # simple density independent models that might not have an expression
-    # for iterating the model defined. For simple models, this always
-    # n_sv_t_1 = k %*% n_sv_t, so we can define that internally without
-    # any trouble. Other model classes will error during make_ipm() if they
-    # don't have a pop_state, so this next part will look quite different for
-    # them. Nearly every other model type also requires a minimum of 1 iteration,
-    # so we can also be confident that it'll never reach this point for the
-    # vast majority of cases.
+    # A model that hasn't been iterated yet
 
     # Create variables for internal usage
 
@@ -1575,6 +1720,8 @@ right_ev.simple_di_det_ipm <- function(ipm,
 
   out <- rlang::list2(!! out_nm := (out / sum(out)))
 
+  class(out) <- "ipmr_w"
+
   return(out)
 
 }
@@ -1583,8 +1730,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
 #' @export
 
 right_ev.general_di_det_ipm <- function(ipm,
-                                        iterations = 100,
-                                        ...) {
+                                        iterations = 100) {
 
   mod_nm    <- deparse(substitute(ipm))
 
@@ -1653,6 +1799,7 @@ right_ev.general_di_det_ipm <- function(ipm,
 
   names(out) <- gsub('n_', '', names(out))
   names(out) <- paste(names(out), 'w', sep = '_')
+  class(out) <- "ipmr_w"
 
 
   return(out)
@@ -1663,7 +1810,7 @@ right_ev.general_di_det_ipm <- function(ipm,
 #' @rdname eigenvectors
 #' @export
 
-left_ev <- function(ipm, ...) {
+left_ev <- function(ipm, iterations) {
 
   UseMethod('left_ev')
 
@@ -1673,7 +1820,7 @@ left_ev <- function(ipm, ...) {
 #' @rdname eigenvectors
 #' @importFrom stats runif
 
-left_ev.simple_di_det_ipm <- function(ipm, iterations = 100, ...) {
+left_ev.simple_di_det_ipm <- function(ipm, iterations = 100) {
 
   mod_nm <- deparse(substitute(ipm))
 
@@ -1730,48 +1877,27 @@ left_ev.simple_di_det_ipm <- function(ipm, iterations = 100, ...) {
 # Stuff into a list and standardize
 
   out <- rlang::list2(!! out_nm := (out / sum(out)))
+  class(out) <- "ipmr_v"
 
   return(out)
 }
 
 #' @rdname eigenvectors
 #'
-#' @details If the model has already been iterated, then these functions
-#' will just extract population state of the final iteration and return
-#' that in a named list. Each element of the list is a vector with length
+#' @details For \code{right_ev}, if the model has already been iterated, then
+#' these functions will just extract population state of the final iteration and
+#' return that in a named list. Each element of the list is a vector with length
 #' \code{>= 1} and corresponds each state variable's portion of the eigenvector.
 #'
-#' Note that for \code{*_di_stoch_kern_ipm}'s, these generics will create a mean
-#' matrix and then compute the left/right eigenvectors for that. For
-#' \code{*_di_stoch_param_ipm}'s, it will compute the average environment kernel
-#' (e.g. using the means from the \code{env_seq} slot of the IPM).
-#'
-#' \code{mega_mat} fits the pieces of the model together to create a
-#' a transpose of the model to iterate with. Kernel names/0s should be supplied
-#' in ROW MAJOR order (as in \code{byrow = TRUE}). \code{ipmr} supplies
-#' a helper function for large models \code{format_mega_matrix}
-#' to help with age-size models or ones with a lot of hierarchical effects.
-#'
-#' @examples
-#'
-#' data(gen_di_det_ex)
-#'
-#' # mega matrix is specifed as a row-major vector/matrix of symbols. You can also
-#' # supply a character vector/matrix. mega_vec is done the same way.
-#' # DO NOT supply arguments like nrow or ncol if using \code{matrix(...)}.
-#' # The function expects to work these out on its own.
-#'
-#' ipmr_v <- left_ev(gen_di_det_ex,
-#'                   mega_mat     = c(stay_discrete, go_discrete,
-#'                                    leave_discrete, P),
-#'                   mega_vec = c(b, ht),
-#'                   iterations = 100)
+#' For \code{left_ev}, the transpose iteration (\emph{sensu} Ellner & Rees 2006,
+#' Appendix A) is worked out based on the \code{state_start} and \code{state_end}
+#' in the model's \code{proto_ipm} object. The model is then iterated for
+#' \code{iterations} times to produce a standardized left eigenvector.
 #'
 #' @export
 
 left_ev.general_di_det_ipm <- function(ipm,
-                                       iterations = 100,
-                                       ...) {
+                                       iterations = 100) {
 
   mod_nm    <- deparse(substitute(ipm))
 
@@ -1788,7 +1914,7 @@ left_ev.general_di_det_ipm <- function(ipm,
     make_ipm(iterate    = TRUE,
              iterations = iterations,
              iteration_direction = "left",
-             normalize_pop_size = TRUE)
+             normalize_pop_size = FALSE)
 
   if(is_conv_to_asymptotic(test_conv)) {
 
@@ -1816,6 +1942,7 @@ left_ev.general_di_det_ipm <- function(ipm,
   names(out) <- gsub('n_', '', names(out))
   names(out) <- paste(names(out), 'v', sep = '_')
 
+  class(out) <- "ipmr_v"
 
   return(out)
 }

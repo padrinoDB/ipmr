@@ -771,6 +771,142 @@ is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
 
 }
 
+# check_lambda_args.dd-----------
+
+#' @noRd
+
+.check_lambda_args.simple_dd_det_ipm <- function(ipm, type_lambda) {
+
+  if(!type_lambda %in% c("stochastic", "all", "last")) {
+    stop("'type_lambda' must be one of 'all' or 'last'.",
+         call. = FALSE)
+  }
+
+  if(!attr(ipm, "iterated") && comp_method == 'pop_size') {
+    stop("ipmr cannot compute lambda for a model that is not yet",
+         " iterated.\n",
+         "Re-run with make_ipm(iterate = TRUE).",
+         call. = FALSE)
+  }
+
+  if(type_lambda == 'stochastic') {
+    stop("Cannot compute stochastic lambda for a deterministic IPM.", call. = FALSE)
+  }
+
+  invisible(TRUE)
+
+}
+
+#' @noRd
+
+.check_lambda_args.simple_dd_stoch_kern_ipm <- function(ipm, type_lambda) {
+
+  if(!attr(ipm, 'iterated')) {
+    stop("ipmr cannot compute lambda for a model that is not iterated!",
+         call. = FALSE)
+  }
+
+  if(!type_lambda %in% c("stochastic", "all", "last")) {
+    stop("'type_lambda' must be one of 'stochastic', 'all', or 'last'.",
+         call. = FALSE)
+  }
+
+  invisible(TRUE)
+}
+
+#' @noRd
+
+.check_lambda_args.simple_dd_stoch_param_ipm <- function(ipm, type_lambda) {
+
+  if(!attr(ipm, 'iterated')) {
+    stop("ipmr cannot compute lambda for a model that is not iterated!",
+         call. = FALSE)
+  }
+
+  if(!type_lambda %in% c("stochastic", "all", "last")) {
+    stop("'type_lambda' must be one of 'stochastic', 'all', or 'last'.",
+         call. = FALSE)
+  }
+
+  invisible(TRUE)
+
+}
+
+#' @noRd
+
+.check_lambda_args.general_dd_det_ipm <- function(ipm, type_lambda) {
+
+  if(!type_lambda %in% c("stochastic", "all", "last")) {
+
+    stop("'type_lambda' must be one of 'all' or 'last'.",
+         call. = FALSE)
+
+  } else if(type_lambda == 'stochastic') {
+
+    stop("ipmr cannot compute stochastic lambda for a deterministic IPM.",
+         call. = FALSE)
+  }
+
+  if(!attr(ipm, "iterated")) {
+
+    stop("Cannot compute lambda for a model that is not yet",
+         " iterated.\n",
+         "Re-run with make_ipm(iterate = TRUE).",
+         call. = FALSE)
+  }
+
+  invisible(TRUE)
+
+}
+
+#' @noRd
+
+.check_lambda_args.general_dd_stoch_kern_ipm <- function(ipm, type_lambda) {
+
+  if(!type_lambda %in% c("stochastic", "all", "last")) {
+
+    stop("'type_lambda' must be one of 'stochastic', 'all', or 'last'.",
+         call. = FALSE)
+
+  }
+
+  if(!attr(ipm, "iterated")) {
+
+    stop("Cannot compute lambda by population size for a model that is not yet",
+         " iterated.\n",
+         "Re-run with make_ipm(iterate = TRUE).",
+         call. = FALSE)
+  }
+
+  invisible(TRUE)
+
+}
+
+#' @noRd
+
+.check_lambda_args.general_dd_stoch_param_ipm <- function(ipm, type_lambda) {
+
+  if(!type_lambda %in% c("stochastic", "all", "last")) {
+
+    stop("'type_lambda' must be one of 'stochastic', 'all', or 'last'.",
+         call. = FALSE)
+
+  }
+
+  if(!attr(ipm, "iterated")) {
+
+    stop("Cannot compute lambda for a model that is not yet",
+         " iterated.\n",
+         "Re-run with make_ipm(iterate = TRUE).",
+         call. = FALSE)
+  }
+
+  invisible(TRUE)
+
+}
+
+
+
 # Helper function to handle when burn_in == 0
 #' @noRd
 

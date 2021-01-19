@@ -8,6 +8,12 @@
 \alias{lambda.general_di_det_ipm}
 \alias{lambda.general_di_stoch_kern_ipm}
 \alias{lambda.general_di_stoch_param_ipm}
+\alias{lambda.simple_dd_det_ipm}
+\alias{lambda.simple_dd_stoch_kern_ipm}
+\alias{lambda.simple_dd_stoch_param_ipm}
+\alias{lambda.general_dd_det_ipm}
+\alias{lambda.general_dd_stoch_kern_ipm}
+\alias{lambda.general_dd_stoch_param_ipm}
 \title{Compute the per-capita growth rate for an IPM object}
 \usage{
 lambda(ipm, ...)
@@ -23,6 +29,18 @@ lambda(ipm, ...)
 \method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
 
 \method{lambda}{general_di_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
+
+\method{lambda}{simple_dd_det_ipm}(ipm, type_lambda = "all", ...)
+
+\method{lambda}{simple_dd_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
+
+\method{lambda}{simple_dd_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
+
+\method{lambda}{general_dd_det_ipm}(ipm, type_lambda = "last", ...)
+
+\method{lambda}{general_dd_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
+
+\method{lambda}{general_dd_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}

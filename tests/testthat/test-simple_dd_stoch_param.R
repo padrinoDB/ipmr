@@ -133,7 +133,7 @@ test_stoch_param <- init_ipm('simple_dd_stoch_param') %>%
            normalize_pop_size = FALSE)
 
 pop_state_ipmr <- test_stoch_param$pop_state$n_surf_area
-ipmr_lam       <- test_stoch_param$pop_state$lambda %>%
+ipmr_lam       <- lambda(test_stoch_param, type_lambda = "all") %>%
   as.vector()
 
 # Hand version
@@ -366,7 +366,8 @@ hand_pop_sizes <- colSums(pop_vec)
 ipmr_pop_sizes <- colSums(test_stoch_param$pop_state$n_surf_area)
 
 hand_lams <- hand_pop_sizes[2:11] / hand_pop_sizes[1:10]
-ipmr_lams <- as.vector(test_stoch_param$pop_state$lambda)
+ipmr_lams <- lambda(test_stoch_param, type_lambda = 'all') %>%
+  as.vector()
 
 test_that("parameter resampled hierarchical models work", {
 

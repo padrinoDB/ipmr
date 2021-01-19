@@ -250,7 +250,8 @@ hand_pop_sizes <- lapply(pop_holder_control,
   do.call(what = `+`, args = .)
 
 hand_lams <- hand_pop_sizes[2:51] / hand_pop_sizes[1:50]
-ipmr_lams <- gen_dd_det_co$pop_state[[3]] %>% as.vector()
+ipmr_lams <- lambda(gen_dd_det_co, type_lambda = "all") %>%
+  as.vector()
 
 test_that("general_dd_det computes pop_sizes correctly", {
 
@@ -329,7 +330,8 @@ hand_pop_sizes <- lapply(pop_holder_cr,
   do.call(what = `+`, args = .)
 
 hand_lams <- hand_pop_sizes[2:51] / hand_pop_sizes[1:50]
-ipmr_lams <- gen_dd_det_cr$pop_state[[3]] %>% as.vector()
+ipmr_lams <- lambda(gen_dd_det_cr, type_lambda = "all") %>%
+  as.vector()
 
 test_that("cr model works as well", {
 

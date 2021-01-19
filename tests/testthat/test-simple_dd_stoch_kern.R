@@ -182,7 +182,7 @@ for(i in 2:51) {
 }
 
 
-ipmr_lam <- x$pop_state$lambda
+ipmr_lam <- lambda(x, type_lambda = "all")
 ipmr_pop_sizes <- colSums(x$pop_state$n_size)
 
 hand_lam <- colSums(pop_holder[ , 2:51]) / colSums(pop_holder[ , 1:50])
