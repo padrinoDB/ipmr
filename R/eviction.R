@@ -2,19 +2,18 @@
 #' @rdname eviction
 #'
 #' @description Various helpers to correct for unintentional eviction (Williams
-#' et al. 2012). \code{rescale_kernel} is an alias for
-#' \code{truncated_distributions}.
+#' et al. 2012).
 #'
-#' @param fun The cumulative density function to use. For example, could be
+#' @param fun The density function to use. For example, could be
 #' \code{"norm"} to correct a Gaussian density function, or \code{"lnorm"} to
 #' correct a log-normal density function.
 #' @param param The parameter/vital rate being modified. If this is a vector, the
 #' distribution specified in \code{fun} will be recycled.
 #' @param state The state variable used in the kernel that is being discretized.
-#' @param ... Only used for internal modification - do not use!
+#' @param ... Used internally, do not touch!
 #'
-#' @return For \code{truncated_distributions} and \code{rescale_kernel}, a
-#' modified function call with that re-scales the probability density
+#' @return For \code{truncated_distributions}, a
+#' modified function call with that truncates the probability density
 #' function based on the cumulative density function.
 #'
 #' For \code{discrete_extrema}, a numeric vector with modified entries based
@@ -161,8 +160,7 @@ truncated_distributions <- function(fun,
     )
   )
 
- if(ev_call_nm == 'truncated_distributions' |
-    ev_call_nm == 'rescale_kernel') {
+ if(ev_call_nm == 'truncated_distributions') {
 
     evict_fun <- unlist(proto$evict_fun)[[1]]
 
@@ -229,13 +227,13 @@ truncated_distributions <- function(fun,
 
 #' @export
 
-discrete_extrema <- function(fun, state, ncol = NULL, nrow = NULL) {
+discrete_extrema <- function(param, state, ncol = NULL, nrow = NULL) {
 
   if(is.null(ncol) && is.null(nrow)) {
     ncol <- nrow <- sqrt(length(fun))
   }
 
-  temp <- matrix(fun, ncol = ncol, nrow = nrow, byrow = TRUE) * state
+  temp <- matrix(param, ncol = ncol, nrow = nrow, byrow = TRUE) * state
 
   top_seq <- seq(1, ncol / 2, by = 1)
   bot_seq <- seq(max(top_seq + 1), ncol, by = 1)

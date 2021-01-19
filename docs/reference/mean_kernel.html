@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute the per-capita growth rate for an IPM object — lambda • ipmr</title>
+<title>Mean kernels for stochastic models — mean_kernel • ipmr</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="Compute the per-capita growth rate for an IPM object — lambda" />
-<meta property="og:description" content="Compute the per-capita growth rate for a given model. Can handle
-stochastic and deterministic models, and has options for thinning." />
+<meta property="og:title" content="Mean kernels for stochastic models — mean_kernel" />
+<meta property="og:description" content="This function computes mean sub-kernels for stochastic
+parameter-resampled and kernel resampled models." />
 
 
 
@@ -146,86 +146,39 @@ stochastic and deterministic models, and has options for thinning." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute the per-capita growth rate for an IPM object</h1>
+    <h1>Mean kernels for stochastic models</h1>
     
-    <div class="hidden name"><code>lambda.Rd</code></div>
+    <div class="hidden name"><code>mean_kernel.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Compute the per-capita growth rate for a given model. Can handle
-stochastic and deterministic models, and has options for thinning.</p>
+    <p>This function computes mean sub-kernels for stochastic
+parameter-resampled and kernel resampled models.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"last"</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for simple_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for simple_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"last"</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for general_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
-
-<span class='co'># S3 method for general_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
-
-<span class='co'># S3 method for simple_dd_det_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"all"</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for simple_dd_stoch_kern_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
-
-<span class='co'># S3 method for simple_dd_stoch_param_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
-
-<span class='co'># S3 method for general_dd_det_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"last"</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for general_dd_stoch_kern_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
-
-<span class='co'># S3 method for general_dd_stoch_param_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>mean_kernel</span><span class='op'>(</span><span class='va'>ipm</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>ipm</th>
-      <td><p>An object returned by <code><a href='make_ipm.html'>make_ipm()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>other arguments passed to methods.</p></td>
-    </tr>
-    <tr>
-      <th>type_lambda</th>
-      <td><p>Either <code>'all'</code>, <code>'last'</code>,
- or <code>'stochastic'</code>. <code>'all'</code>
-returns a vector of lambda values for each time step of the simulation (equal
-in length to the <code>iterations</code> argument of <code><a href='make_ipm.html'>make_ipm()</a></code>).
-<code>'last'</code> returns the lambda value for the final timestep.
-<code>'stochastic'</code> returns a single value which is the geometric mean
-of log-per-capita growth rate from each time step.</p></td>
-    </tr>
-    <tr>
-      <th>burn_in</th>
-      <td><p>The proportion of iterations to discard. Default is 0.1
-(i.e. first 10% of iterations in the simulation).</p></td>
+      <td><p>A stochastic model created by <code><a href='make_ipm.html'>make_ipm()</a></code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An array. Rows correspond to time steps, and columns correspond
-to hierarchical effects (if any).</p>
+    <p>A list of mean sub-kernels for the model.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>For <code>*_stoch_kern</code> models, this computes the element-wise
+mean for each sub-kernel across all the different levels of
+<code>levels_hier_effs</code>. For partially hierarchical models, sub-kernels that
+do not have time- or space-varying components are included in the output and
+are identical to their input.</p>
+<p>For <code>*_stoch_param</code> models, this computes the element-wise mean for each
+sub-kernel used in the iteration procedure.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -163,7 +163,6 @@ Generics for IPM classes" />
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span>
   <span class='va'>x</span>,
   comp_lambda <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  comp_method <span class='op'>=</span> <span class='st'>"eigen"</span>,
   type_lambda <span class='op'>=</span> <span class='st'>"all"</span>,
   sig_digits <span class='op'>=</span> <span class='fl'>3</span>,
   check_conv <span class='op'>=</span> <span class='cn'>TRUE</span>,
@@ -209,13 +208,6 @@ Generics for IPM classes" />
 for the iteration kernels and display them.</p></td>
     </tr>
     <tr>
-      <th>comp_method</th>
-      <td><p>Either <code>"pop_size"</code> or <code>"eigen"</code>. <code>"pop_size"</code>
-computes lambda as the ratio of population sizes between successive time steps
-and then takes the geometric mean. <code>"eigen"</code> computes the dominant eigenvalue
-of each iteration kernel. See <code><a href='lambda.html'>lambda</a></code> for more details.</p></td>
-    </tr>
-    <tr>
       <th>type_lambda</th>
       <td><p>Either <code>'all'</code> or <code>'stochastic'</code>. See
 <code><a href='lambda.html'>lambda</a></code> for more details.</p></td>
@@ -229,8 +221,7 @@ comp_lambda = TRUE</code>.</p></td>
       <th>check_conv</th>
       <td><p>A logical: for <code>general_*</code> models, check if population state
 has converged to asymptotic dynamics? If <code>TRUE</code> and the model has not
-converged, a message will be printed. Only applies to <code>*_det</code>  when
-<code>comp_method = 'pop_size'</code></p></td>
+converged, a message will be printed.</p></td>
     </tr>
     </table>
 

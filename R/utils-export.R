@@ -27,18 +27,19 @@
 #' }
 #'
 #' The order requirement is so that information is correctly matched to each kernel.
-#' Below are specific details on the way each one takes \code{...}.
+#' Below are specific details on the way each works.
 #'
 #' \strong{\code{define_impl}}
 #'
 #' This has two arguments - \code{proto_ipm} (the model object you wish to work with),
-#' and the \code{kernel_impl_list}. The \code{kernel_impl_list} has a very specific format.
-#' Names of the list should be kernel names, and each kernel should have 3 entries:
+#' and the \code{kernel_impl_list}. The format of the \code{kernel_impl_list} is:
+#' names of the list should be kernel names, and each kernel should have 3 entries:
 #' \code{int_rule}, \code{dom_start}, and \code{dom_end}. See examples.
 #'
 #' \strong{\code{define_domains}}
 #'
-#' If the \code{int_rule = "midpoint"}, these are vectors of length 3 where the name corresponds to the
+#' If the \code{int_rule = "midpoint"}, the \code{...} entries are vectors of
+#' length 3 where the name corresponds to the
 #' state variable, the first entry is the lower bound of the domain, the second
 #' is the upper bound of the domain, and the third entry is the number of
 #' meshpoints. Other \code{int_rule}s are not yet implemented, so for now this is the
@@ -67,8 +68,12 @@
 #'
 #' # Example with kernels named "P" and "F", and a domain "z"
 #'
-#' kernel_impl_list <- list(P = list(int_rule = "midpoint", state_start = "z", state_end = "z"),
-#'                          F = list(int_rule = "midpoint", state_start = "z", state_end = "z"))
+#' kernel_impl_list <- list(P = list(int_rule = "midpoint",
+#'                                   state_start = "z",
+#'                                   state_end = "z"),
+#'                          F = list(int_rule = "midpoint",
+#'                                   state_start = "z",
+#'                                   state_end = "z"))
 #'
 #' # an equivalent version using make_impl_args_list
 #'
@@ -103,9 +108,9 @@
 #' # define_env_state. Generates a random draw from a known distribution
 #' # of temperatures.
 #'
-#' env_sampler <- function(temp_mean, temp_sd) {
+#' env_sampler <- function(env_pars) {
 #'
-#'   temp <- rnorm(1, temp_mean, temp_sd)
+#'   temp <- rnorm(1, env_pars$temp_mean, env_pars$temp_sd)
 #'
 #'   return(list(temp = temp))
 #'
@@ -115,7 +120,7 @@
 #'
 #' define_env_state(
 #'  proto_ipm,
-#'  env_values = env_sampler(env_pars$temp_mean, env_pars$temp_sd),
+#'  env_values = env_sampler(env_pars),
 #'  data_list  = list(env_sampler = env_sampler,
 #'                    env_pars    = env_pars)
 #'
@@ -243,7 +248,7 @@ use_vr_model <- function(model) {
 #' @param kernel,vectr \code{kernel} should be a bivariate kernel, \code{vectr}
 #' should be a univariate trait distribution.
 #'
-#' @return \code{left_mult} returns \code{t(vectr) \%*\% kernel}. \code{right_mult}
+#' @return \code{left_mult} returns \code{t(kernel) \%*\% vectr}. \code{right_mult}
 #' returns \code{kernel \%*\% vectr}.
 #'
 #'
@@ -620,7 +625,8 @@ domains <- function(object) {
 #' @title Accessor functions for (proto_)ipm objects
 #' @rdname accessors
 #'
-#' @description Functions that access slots of a \code{*_ipm} (including \code{proto_ipm}).
+#' @description Functions that access slots of a \code{*_ipm} (including
+#'  \code{proto_ipm}). \code{default} methods correspond to \code{*_ipm} objects.
 #'
 #' @param object A \code{proto_ipm} or object created by \code{make_ipm()}.
 #'
@@ -778,7 +784,7 @@ vital_rates.default <- function(object) {
 #' @rdname accessors
 #'
 #' @param kernel The name of the kernel to insert the new vital rate expression
-#' into
+#' into.
 #' @param vital_rate The name of the vital rate to replace. If the vital rate
 #' doesn't already exist in the \code{object}, a new one with this name will be
 #' created.
@@ -951,7 +957,7 @@ parameters.default <- function(object) {
 }
 
 #' @rdname accessors
-#' @param ipm An object created by \code{make_ipm()}. This argument only applies
+#' @param ipm An object created by \code{make_ipm()}. This argument only applies to
 #' \code{int_mesh()} (because the mesh is not built until \code{make_ipm()} is
 #' called).
 #' @export

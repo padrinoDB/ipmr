@@ -53,6 +53,7 @@ We'll simulate a 50 year time series using hypothetical parameter values. The fi
 
 ```{r eval = FALSE}
 
+library(ipmr)
 
 data_list = list(
   s_int     = 1.03,
@@ -95,7 +96,9 @@ dd_ipm <- init_ipm("simple_dd_stoch_kern")
 
 ```
 
-Once we've done that, we're ready to begin specifying the kernel forms. These will look very similar to the ones we specified for density-independent models, except that we now include the term `s_dd * sum(n_size_t) * d_size` in the survival expression. `sum(n_size_t) * d_size` is the syntax `ipmr` uses to denote total population size. Further down, there is an example of how to use subsets of the trait distribution. 
+Once we've done that, we're ready to begin specifying the kernel forms. One previously not mentioned aspect of `define_pop_state()` is that, in addition to defining initial conditions, 2 additional helper variables are generated: `n_stateVariable_t` and `n_stateVariable_t_1`. These can be used to reference the population states in vital rate and/or kernel expressions.
+
+These will look very similar to the ones we specified for density-independent models, except that we now include the term `s_dd * sum(n_size_t) * d_size` in the survival expression. `sum(n_size_t) * d_size` is the syntax `ipmr` uses to denote total population size. Further down, there is an example of how to use subsets of the trait distribution. 
 
 ```{r eval = FALSE}
 dd_ipm <- define_kernel(
@@ -142,7 +145,7 @@ dd_ipm <- define_kernel(
 Again, we've add the `f_s_dd * sum(n_size_t) * d_size` to the expression for `f_s_yr`, but otherwise, not much is different from how we've defined density independent models. The rest of the model definition process is unchanged.
 
 ```{r eval = FALSE}
- dd_ipm <-  dd_ipm$proto_ipm %>%
+ dd_ipm <-  dd_ipm %>%
   define_impl(
     make_impl_args_list(
       kernel_names = c("P_yr", "F_yr"),
@@ -163,8 +166,18 @@ Again, we've add the `f_s_dd * sum(n_size_t) * d_size` to the expression for `f_
     kernel_seq = sample(1:5, 50, replace = TRUE)
   )
 
-dd_ipm$pop_state$lambda
 
 ```
 
-More to come soon....
+`lambda` methods are defined for all density-dependent models as well. It is fairly straightforward to plot population sizes for these models by extracting the column sums of the arrays in `pop_state`.  
+
+```{r eval = FALSE}
+time_step_lams <- lambda(dd_ipm, type_lambda = "all")
+stoch_lam      <- lambda(dd_ipm, type_lambda = "stochastic", burn_in = 0.15)
+
+pop_sizes <- colSums(dd_ipm$pop_state$n_size)
+
+plot(pop_sizes, type = "l")
+
+```
+

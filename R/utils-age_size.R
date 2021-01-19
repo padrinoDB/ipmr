@@ -1,21 +1,4 @@
-
-#' @title Age X Size models
-#' @rdname age_x_size
-#'
-#' @description Helper functions for implementing age x size models. These are
-#' only intended for use within \code{define_kernel()}.
-#'
-#' @param expr An expression to compute a sum for.
-#' @param ... Used internally. Modifying this will likely cause models to break.
-#' @param na.rm Not used and ignored.
-#'
-#' @return A modified expression.
-#'
-#' @details Note that these functions do not compute a single number, but rather
-#' expand an expression to compute the trait distribution. This differs from the
-#' usual behavior of the numeric methods for \code{sum, prod} as those
-#' return a single number or \code{NA}.
-#'
+#' @noRd
 
 sum.age_size_expr <- function(expr, ..., na.rm = NA){
 
@@ -24,7 +7,7 @@ sum.age_size_expr <- function(expr, ..., na.rm = NA){
 
 }
 
-#' @rdname age_x_size
+#' @noRd
 
 prod.age_size_expr <- function(expr, ..., na.rm = NA){
 

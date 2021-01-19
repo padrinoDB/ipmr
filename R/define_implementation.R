@@ -54,8 +54,7 @@ define_impl <- function(proto_ipm,
 make_impl_args_list <- function(kernel_names,
                                 int_rule,
                                 state_start,
-                                state_end,
-                                ...) {
+                                state_end) {
 
   ln <- length(kernel_names)
 

@@ -5,7 +5,6 @@
 #' @format A simple deterministic IPM with the following slots:
 #' \describe{
 #'
-#'   \item{iterators}{The computed iteration kernel, named \code{K}.}
 #'   \item{sub_kernels}{The computed sub-kernels, named \code{P} and \code{F}.}
 #'   \item{env_list}{Empty}
 #'   \item{env_seq}{Empty.}
@@ -22,11 +21,10 @@
 #' @format A general deterministic IPM with the following slots:
 #' \describe{
 #'
-#'   \item{iterators}{Empty.}
 #'   \item{sub_kernels}{The computed sub-kernels for the model, named \code{P},
 #'   \code{go_discrete}, \code{stay_discrete}, and \code{leave_discrete}.}
 #'   \item{env_list}{Empty}
-#'   \item{env_seq}{A vector of 1s. Not particularly useful for deterministic IPMs,
+#'   \item{env_seq}{Contains \code{NA}. Not particularly useful for deterministic IPMs,
 #'   but critical for reproducing stochastic ones.}
 #'   \item{pop_state}{A list of length 2, with names \code{n_b} and
 #'   \code{n_ht}.}
@@ -48,7 +46,7 @@
 #'   \item{log_size}{Log transformed \code{size}.}
 #'   \item{repro}{Either 0 or 1 to indicate whether the plant is reproductive.}
 #'   \item{size_next}{Surface area in square meters of each individual at time \emph{t + 1}.}
-#'   \item{flower_n_next}{If the plant is reproductive at \emph{t + 1}, the nubmer of
+#'   \item{flower_n_next}{If the plant is reproductive at \emph{t + 1}, the number of
 #'   flowers it made.}
 #'   \item{survival}{Either 0 or 1 to indicate whether a plant at \emph{t} survives to \emph{t + 1}.}
 #'   \item{log_size_next}{Log transformed \code{size_next}.}

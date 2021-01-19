@@ -251,9 +251,8 @@ called).</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Depending on the class of <code>object</code>, a numeric vector, or a list
-with types numeric or character. See details on return types for each.</p>
-<p>A modified <code>object</code>.</p>
+    <p>Depending on the class of <code>object</code>, a list
+with types numeric or character.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The <code>*.default</code> method corresponds to output from <code><a href='make_ipm.html'>make_ipm()</a></code>,
@@ -261,13 +260,75 @@ and the <code>*.proto_ipm</code> methods correspond to outputs from <code>define
 <p>When using <code>kernel_formulae&lt;-</code> and <code>vital_rates&lt;-</code>, the right
 hand side of the expression must be wrapped in <code>new_fun_form</code>. See
 examples.</p>
-<p>Return types are as follows:</p><ul>
-<li><p><code>...</code></p></li>
-</ul>
-
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"></pre>
+    <pre class="examples"><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gen_di_det_ex</span><span class='op'>)</span>
+
+<span class='va'>proto</span> <span class='op'>&lt;-</span> <span class='va'>gen_di_det_ex</span><span class='op'>$</span><span class='va'>proto_ipm</span>
+
+<span class='co'># Create a new, iterated IPM</span>
+<span class='va'>new_ipm</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_ipm.html'>make_ipm</a></span><span class='op'>(</span><span class='va'>proto</span>, iterate <span class='op'>=</span> <span class='cn'>TRUE</span>, iterations <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
+
+<span class='fu'>vital_rates</span><span class='op'>(</span><span class='va'>new_ipm</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; g: dnorm(ht_2, g_mu, g_sd)
+#&gt; g_mu: g_int + g_slope * ht_1
+#&gt; s: inv_logit_2(s_int, s_slope, s_slope_2, ht_1)
+#&gt; f_r: inv_logit(f_r_int, f_r_slope, ht_1)
+#&gt; f_s: exp(f_s_int + f_s_slope * ht_1)
+#&gt; f_d: dnorm(ht_2, f_d_mu, f_d_sd)</div><div class='input'><span class='fu'>kernel_formulae</span><span class='op'>(</span><span class='va'>new_ipm</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; P: s * g * d_ht
+#&gt; go_discrete: f_r * f_s * g_i * d_ht
+#&gt; stay_discrete: 0
+#&gt; leave_discrete: e_p * f_d * d_ht</div><div class='input'>
+<span class='fu'>domains</span><span class='op'>(</span><span class='va'>new_ipm</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; ht: lower_bound = 1.02, upper_bound = 624, n_meshpoints = 500</div><div class='input'><span class='fu'>parameters</span><span class='op'>(</span><span class='va'>new_ipm</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;      g_int    g_slope       g_sd      s_int    s_slope  s_slope_2    f_r_int 
+#&gt;   5.781000   0.988000  20.556990  -0.352000   0.122000  -0.000213 -11.460000 
+#&gt;  f_r_slope    f_s_int  f_s_slope     f_d_mu     f_d_sd        e_p        g_i 
+#&gt;   0.083500   2.620400   0.012560   5.665500   2.073400   0.150000   0.506700 </div><div class='input'>
+<span class='co'># Usage is the same for proto_ipm's as *_ipm's</span>
+
+<span class='fu'>vital_rates</span><span class='op'>(</span><span class='va'>proto</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; g: dnorm(ht_2, g_mu, g_sd)
+#&gt; g_mu: g_int + g_slope * ht_1
+#&gt; s: inv_logit_2(s_int, s_slope, s_slope_2, ht_1)
+#&gt; f_r: inv_logit(f_r_int, f_r_slope, ht_1)
+#&gt; f_s: exp(f_s_int + f_s_slope * ht_1)
+#&gt; f_d: dnorm(ht_2, f_d_mu, f_d_sd)</div><div class='input'><span class='fu'>kernel_formulae</span><span class='op'>(</span><span class='va'>proto</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; P: s * g * d_ht
+#&gt; go_discrete: f_r * f_s * g_i * d_ht
+#&gt; stay_discrete: 0
+#&gt; leave_discrete: e_p * f_d * d_ht</div><div class='input'>
+<span class='fu'>domains</span><span class='op'>(</span><span class='va'>proto</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; ht: lower_bound = 1.02, upper_bound = 624, n_meshpoints = 500</div><div class='input'><span class='fu'>parameters</span><span class='op'>(</span><span class='va'>proto</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;      g_int    g_slope       g_sd      s_int    s_slope  s_slope_2    f_r_int 
+#&gt;   5.781000   0.988000  20.556990  -0.352000   0.122000  -0.000213 -11.460000 
+#&gt;  f_r_slope    f_s_int  f_s_slope     f_d_mu     f_d_sd        e_p        g_i 
+#&gt;   0.083500   2.620400   0.012560   5.665500   2.073400   0.150000   0.506700 </div><div class='input'>
+<span class='fu'>int_mesh</span><span class='op'>(</span><span class='va'>new_ipm</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; d_ht - 1.24596
+#&gt; ht_1 - Lower bound: 1.64298, Upper bound: 623.37702, # of Meshpoints: 500
+#&gt; ht_2 - Lower bound: 1.64298, Upper bound: 623.37702, # of Meshpoints: 500</div><div class='input'>
+<span class='co'># Setting new parameters, vital rate expressions, and kernel formulae</span>
+<span class='co'># only works on proto_ipm's.</span>
+
+<span class='co'># This replaces the "g_int" parameter and leaves the rest untouched</span>
+
+<span class='fu'>parameters</span><span class='op'>(</span><span class='va'>proto</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>g_int <span class='op'>=</span> <span class='fl'>1.5</span><span class='op'>)</span>
+
+<span class='co'># This creates a new g_z parameter and leaves the rest of parameters untouched</span>
+<span class='fu'>parameters</span><span class='op'>(</span><span class='va'>proto</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>g_z <span class='op'>=</span> <span class='fl'>2.2</span><span class='op'>)</span>
+
+<span class='co'># setting a new vital rate or kernel expression requires wrapping the</span>
+<span class='co'># right-hand side in a call to new_fun_form(). new_fun_form uses expressions</span>
+<span class='co'># with the same format as ... in define_kernel()</span>
+
+<span class='fu'>vital_rates</span><span class='op'>(</span><span class='va'>proto</span>, kernel <span class='op'>=</span> <span class='st'>"P"</span>, vital_rate <span class='op'>=</span> <span class='st'>"g_mu"</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'>new_fun_form</span><span class='op'>(</span><span class='va'>g_int</span> <span class='op'>+</span> <span class='va'>g_z</span> <span class='op'>+</span> <span class='va'>g_slope</span> <span class='op'>*</span> <span class='va'>ht_1</span><span class='op'>)</span>
+
+<span class='fu'>kernel_formulae</span><span class='op'>(</span><span class='va'>proto</span>, kernel <span class='op'>=</span> <span class='st'>"stay_discrete"</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'>new_fun_form</span><span class='op'>(</span><span class='va'>g_z</span> <span class='op'>*</span> <span class='va'>d_ht</span><span class='op'>)</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

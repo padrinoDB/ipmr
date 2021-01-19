@@ -143,7 +143,9 @@
 </ol>
 <p>We’ll simulate a 50 year time series using hypothetical parameter values. The fixed parameter values are created as with a density independent model. The difference is that we now have two more parameters: <code>s_dd</code>, and <code>f_s_dd</code>. These are the coefficients that correspond to <span class="math inline">\(\beta_s^N\)</span> and <span class="math inline">\(\beta_{f_s}^N\)</span>, respectively. The chunk below initializes the data list object, which we name <code>params</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">data_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ipmr</span><span class="op">)</span>
+
+<span class="va">data_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
   s_int     <span class="op">=</span> <span class="fl">1.03</span>,
   s_slope   <span class="op">=</span> <span class="fl">2.2</span>,
   s_dd      <span class="op">=</span> <span class="op">-</span><span class="fl">0.7</span>,
@@ -175,7 +177,8 @@
 <p>Next, we initialize the model using <code>init_ipm</code>. The difference is that the second bit of model class is now changed to <code>"dd"</code> to denote that this is a density dependent model.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dd_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">"simple_dd_stoch_kern"</span><span class="op">)</span> </code></pre></div>
-<p>Once we’ve done that, we’re ready to begin specifying the kernel forms. These will look very similar to the ones we specified for density-independent models, except that we now include the term <code>s_dd * sum(n_size_t) * d_size</code> in the survival expression. <code>sum(n_size_t) * d_size</code> is the syntax <code>ipmr</code> uses to denote total population size. Further down, there is an example of how to use subsets of the trait distribution.</p>
+<p>Once we’ve done that, we’re ready to begin specifying the kernel forms. One previously not mentioned aspect of <code><a href="../reference/define_impl.html">define_pop_state()</a></code> is that, in addition to defining initial conditions, 2 additional helper variables are generated: <code>n_stateVariable_t</code> and <code>n_stateVariable_t_1</code>. These can be used to reference the population states in vital rate and/or kernel expressions.</p>
+<p>These will look very similar to the ones we specified for density-independent models, except that we now include the term <code>s_dd * sum(n_size_t) * d_size</code> in the survival expression. <code>sum(n_size_t) * d_size</code> is the syntax <code>ipmr</code> uses to denote total population size. Further down, there is an example of how to use subsets of the trait distribution.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dd_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
   proto_ipm        <span class="op">=</span> <span class="va">dd_ipm</span>,
@@ -211,7 +214,7 @@
   <span class="op">)</span> </code></pre></div>
 <p>Again, we’ve add the <code>f_s_dd * sum(n_size_t) * d_size</code> to the expression for <code>f_s_yr</code>, but otherwise, not much is different from how we’ve defined density independent models. The rest of the model definition process is unchanged.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"> <span class="va">dd_ipm</span> <span class="op">&lt;-</span>  <span class="va">dd_ipm</span><span class="op">$</span><span class="va">proto_ipm</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"> <span class="va">dd_ipm</span> <span class="op">&lt;-</span>  <span class="va">dd_ipm</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
       kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P_yr"</span>, <span class="st">"F_yr"</span><span class="op">)</span>,
@@ -230,10 +233,15 @@
     iterate <span class="op">=</span> <span class="cn">TRUE</span>,
     iterations <span class="op">=</span> <span class="fl">50</span>,
     kernel_seq <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">50</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-  <span class="op">)</span>
+  <span class="op">)</span></code></pre></div>
+<p><code>lambda</code> methods are defined for all density-dependent models as well. It is fairly straightforward to plot population sizes for these models by extracting the column sums of the arrays in <code>pop_state</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">time_step_lams</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">dd_ipm</span>, type_lambda <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span>
+<span class="va">stoch_lam</span>      <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">dd_ipm</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, burn_in <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span>
 
-<span class="va">dd_ipm</span><span class="op">$</span><span class="va">pop_state</span><span class="op">$</span><span class="va">lambda</span></code></pre></div>
-<p>More to come soon….</p>
+<span class="va">pop_sizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">colSums</a></span><span class="op">(</span><span class="va">dd_ipm</span><span class="op">$</span><span class="va">pop_state</span><span class="op">$</span><span class="va">n_size</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">pop_sizes</span>, type <span class="op">=</span> <span class="st">"l"</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
   </div>

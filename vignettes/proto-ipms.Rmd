@@ -1,6 +1,9 @@
 ---
 title: "proto_ipm Data Structure"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette: 
+    toc: yes
+    toc_depth: 3
 vignette: >
   %\VignetteIndexEntry{proto_ipm Data Structure}
   %\VignetteEngine{knitr::rmarkdown}
@@ -15,15 +18,19 @@ The primary motivation in defining this data structure was to provide a sort of 
 
 # The actual details
 
-The `proto_ipm` data structure powers most of `ipmr`. It represents the minimum amount of information one needs to specify to implement an IPM, and provides a (hopefully) standardized data structure going forward. It is a `data.frame`, and has as many rows as calls to `define_kernel()` + `define_k()` that are used in the model definition pipeline. Each row corresponds to 1 or more kernels (the latter case being when hierarchical effects like age, year, or site are included in the model). The `proto_ipm` will also always contain the following columns:
+The `proto_ipm` data structure powers most of `ipmr`. It represents the minimum amount of information one needs to specify to implement an IPM, and provides a (hopefully) standardized data structure going forward. It haS the following classes: `model_class` (defined in `init_ipm()`), `proto_ipm`, and `data.frame`. It will always have as many rows as calls to `define_kernel()`  that are used in the model definition pipeline. Each row corresponds to 1 or more kernels. 
 
-1. `id`: This is a model ID, and not especially useful for user-defined models. It is included to assist with implementing *Padrino*, a database of Integral Projection Models.
+NB: A row may correspond to more than 1 kernel when hierarchical effects like age, year, or site are included in the model. When this happens, `expand.grid()` is called on the list in `levels_hier_effs`, and all rows are `paste`'d together with `collapse = "_"`. This creates fully crossed levels. Each row that contains the hierarchical effects is then replicated, but with a single level substituted in for the suffix(es). These steps are implemented within `make_ipm()` (and, more specifically `.initialize_kernels()`), and so you will never actually see the results of the suffix expansion when you print `proto_ipm`, only the output from `make_ipm()`. 
 
-2. `kernel_id`: This is the name of each kernel and is a character string. `make_ipm` creates an object with this name from the parameters and functions in the `params` column.
+The `proto_ipm` will also always contain the following columns:
 
-3. `domain`: This is a list column and contains the information that defines the domain for each state variable in the kernel. 
+1. `id`: This is a model ID, and not especially useful for user-defined models. It will always be the same across all rows for a single model. It is included to assist with implementing *Padrino*, a database of Integral Projection Models.
 
-4. `state_var`: a list column. This contains the names of the _continuous_ state variables that the kernel operates on.
+2. `kernel_id`: This is the `name` of each kernel from `define_kernel()` and is a character string. `make_ipm()` creates an object with this name from the parameters and functions in the `params` column. 
+
+3. `domain`: This is a list column and contains the information that defines the domain name, beginning state, and ending state of kernel. These are either numeric vectors of length 3, with smallest value, largest value, and number of values (for continuous state variables), or `NA_real_` (for discrete state variables).
+
+4. `state_var`: a list column. This contains the names of the state variables that the kernel operates on.
 
 5. `int_rule`: A character string. This is the name of the integration rule for the kernel. In the case of a discrete to discrete transition, this is just `NA_character_`.
 
@@ -31,7 +38,7 @@ The `proto_ipm` data structure powers most of `ipmr`. It represents the minimum 
 
 7. `evict_fun`: A list column. If `evict` is `TRUE`, each entry will contain one or more [quosures](https://rlang.r-lib.org/reference/eval_tidy.html). These should be calls that modify one or more vital rate expressions to generate the kernel itself. 
 
-8. `pop_state`: A list column. Contains either a quosure that generates the population state vector(s), or pre-evaluated vectors if passed into the `pop_vectors` slot of `define_pop_state()`.
+8. `pop_state`: A list column. Contains either a quosure that generates the initial population state vector(s), or pre-evaluated vectors if passed into the `pop_vectors` slot of `define_pop_state()`.
 
 9. `env_state`: A list column. This contains quosure(s) that sample a continuous environmental variable, and the data that are needed to evaluate the quosures. If the quosure contains a user-defined function, then the data should also contain a variable pointing to that function's definition (usually in the global environment).
 
@@ -45,18 +52,22 @@ The `proto_ipm` data structure powers most of `ipmr`. It represents the minimum 
 
 14. `params`: A list. This will always have 4 entries. 
 
-    - `formula`: This is the kernel's formula
+    - `formula`: This is the kernel's formula as a text string.
     
-    - `family`: This is the type of transition the kernel describes (e.g. continuous -> continuous, continuous -> discrete, etc.). It can be one of: `c("CC", "CD", "DC", "DD")`. The first letter indicates where the kernel starts, and the second where it ends.
+    - `family`: This is the type of transition the kernel describes (e.g. continuous -> continuous, continuous -> discrete, etc.). It can be one of: `c("CC", "CD", "DC", "DD")`. The first letter indicates what type of state the kernel starts on, and the second what type it ends on.
     
-    - `vr_text`: This is a list of **text strings** that represent vital rates. The name of each entry is the name of the vital rate. Each text string gets processed for hierarchical effects and possibly age, and then parsed prior to evaluation. The conversion from a call to text back to a call lets us implement `ipmr`'s hierarchical syntax. When the text strings are converted to expressions and evaluated, the values these expressions generate are bound to the names in the list.
+    - `vr_text`: This is a named list of text strings that represent vital rates. The name of each entry is the name of the vital rate. Each text string gets processed for hierarchical effects and possibly age, and then parsed prior to evaluation. The conversion from a call to text back to a call lets us implement `ipmr`'s hierarchical syntax. When the text strings are converted to expressions and evaluated, the values these expressions generate are bound to the names of the list.
     
-    - `params`: This contains a named list of all constants used in the kernel's vital rates. These are usually regression coefficients, regression models themselves, or parameters derived from other data sources (e.g. germination rates from a seed sowing experiment). For coefficients and raw parameter values, each name in the list should only correspond to a single value. In the case of regression models themselves, these will generally have a `"flat_protect"` attribute appended to them during the model definition process, and should **not** be "flattened".
+    - `params`: This contains a named list of all constants used in the kernel's vital rates. These are usually regression coefficients, regression models themselves, or parameters derived from other data sources (e.g. germination rates from a seed sowing experiment). For coefficients and raw parameter values, each name in the list should only correspond to a single value. In addition, all values in this list will have a `"flat_protect"` attribute appended to them. See below for more details. 
     
 15. `usr_funs`: A list. If the user has specified their own functions in the call to `make_ipm`, they will get stored here. 
 
 
 ## Additional information
 
-Need to fill this part in.
+### `flat_protect` attribute
+
+`.flatten_to_depth` is an internal function that takes a nested list and "flattens" it to the depth specified in the 2nd argument. Names are preserved at the most nested level of the list. This function is used extensively by functions in `ipmr` to ensure that binding things to evaluation environments goes smoothly. 
+
+The `flat_protect` attribute controls whether `.flatten_to_depth` "flattens" a particular list element or leaves it untouched. This is necessary to prevent it from recursively flattening regression model objects, which themselves are usually lists. `predict` methods require an intact list though, so squashing them down and stripping their classes/other attributes prevents those from working. In general, values in the `data_list` should not have this attribute set to `TRUE` unless they are regression models passed to `predict` methods in the vital rate expressions. `ipmr` sets this attribute internally using `.protect_model` in `define_kernel()`. Adding new model classes requires updating the output from `.supported_models`. 
 

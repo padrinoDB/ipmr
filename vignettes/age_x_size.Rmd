@@ -1,21 +1,109 @@
 ---
 title: "Age-Size IPMs"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette: 
+    toc: yes
+    toc_depth: 3
 vignette: >
   %\VignetteIndexEntry{Age-Size IPMs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
   
-In some cases, we may wish to cross-classify individuals by age and size. This is a special case of the general IPM, and these models need to be implemented slightly differently. The syntax for implementing them is largely the same as for non-age classified hierarchical IPMs, but includes keywords to reference ages algebraically instead of explicitly inserting values (which could be quite repetitive). These words are `minus`, `plus`, and `max_age`. The `max_age` keyword is provided to help define models that include a "grey-beard" class (e.g. no specific maximum age, just really old).
+## Introduction to age $\times$ size classified models  
 
-The rest of this vignette assumes you are familiar with the hierarchical notation that `ipmr` uses. If you haven't already covered this, it would be best to read at least the [intro](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html) before continuing.
+Many species exhibit age-dependent demography in addition to some other continuous measures of size. Long term, age classified data sets aren't nearly as common as non-age classified data sets, but can be exceptionally insightful when available. `ipmr` includes some methods to deal with specifying them. 
+  
+While we may be tempted to think of age as a continuous quantity, it must be a discrete state in a discrete time model. This makes the age $\times$ size IPM a special case of the general IPM. The syntax for implementing them is largely the same as for non-age classified hierarchical IPMs, but includes a couple extra bits that must be specified.
 
-## Example - Soay sheep 
+The rest of this vignette assumes you are familiar with the suffix notation that `ipmr` uses. If you haven't already covered this, it would be best to read at least the [Intro](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html) and [General IPM](https://levisc8.github.io/ipmr/articles/general-ipms.html) vignettes before continuing. We'll model Soay sheep (*Ovis aries*) from St. Kilda using parameters from Chapter 6 of Ellner, Childs, & Rees (2016). 
+
+## Mathematical overview
+
+The deterministic form of an age $\times$ size model is generally:
+
+1. $n_0(z',t+1) = \sum\limits_{a=0}^M \int_L^UF_a(z',z)n_a(z,t)dz$
+
+and
+
+2. $n_a(z',t+1) = \int_L^U P_{a-1}(z',z)n_{a-1}(z,t)dz$ for $a = 1,2,...,M$
+
+$M$ indicates the maximum age beyond which we assume no individuals can survive. If we aren't comfortable with that assumption, then we can add a third equation to specify the number of individuals in the "$M+1$ or older" age class:
+
+3. $n_{M+1}(z',t+1) = \int_L^U[P_M(z',z)n_M(z,t) + P_{M+1}(z',z)n_{M+1}(z,t)]dz$
+
+If we do this, then the upper limit in the sum of Eq 1 must be modified to include $M+1$. The Soay sheep model we are about to work on includes this $M+1$ age group. 
+
+The sub-kernels in this model are formed  using regression models for:
+
+  + survival (`s_age`/$s(z,a)$)
+ 
+  + growth (`g_age`/$g(z',z,a)$)
   
-Below is an example of a deterministic age-size IPM using Soay sheep from St. Kilda. It directly reproduces the model found in Ellner, Rees & Childs (2016), chapter 6.2. The code that implements that version can be found [here](https://github.com/ipmbook/first-edition/tree/master/Rcode/c6). This example will skip the IBM simulation and model fitting and just focus on the new syntax.
+  + probability of adults reproducing (`pb_age`/$p_b(z,a)$)
   
-First, we set up our parameter list and define a couple functions to help out. The `f_fun` is used to wrap `formula` argument in `"F_age"` kernel so that we can concisely express that age-0 individuals do not reproduce.
+  + probability that a recruit survives to the first census (`pr_age`/$p_r(a)$)
+  
+  + recruit size distribution (`rcsz`/$f_d(z',z)$). The recruit size distribution has a maternal effect of parental weight on recruit weight. 
+  
+
+The sub-kernels have the following form:
+
+4. $P_a(z', z, a) = s(z, a) * g(z', z, a)$
+
+5. $F_a(z', z, a) = s(z, a) * p_b(z, a) * p_r(a) * f_d(z', z) * 0.5$ 
+
+    + $F_0 \equiv 0$ so that age-0 recruits cannot reproduce.
+    
+    + This model only tracks females. Assuming an equal sex ratio, we multiply the fecundity kernels by 0.5. We could change the weighting based on observed data.
+
+The vital rates are as follows:
+
+6. Survival (`s_age`/$s(z,a)$): A logistic regression with size and age as fixed effects.
+
+    - Example code: `glm(surv ~ size + age, data = survival_data, family = binomial())`
+    
+    - Mathematical form: $Logit(s(z,a)) = \alpha_s + \beta_s^z * z + \beta_s^a *age$
+    
+7. Growth (`g_age`/$g(z',z,a)$): A linear model with size and age as fixed effects.
+
+    - Example code: `lm(size_next ~ size + age, data = growth data)`
+    
+    - Mathematical form: 
+    
+        + $g(z',z,a) \sim Norm(\mu_g^a(z, a), \sigma_g)$
+        
+        + $\mu_g^a(z, a) = \alpha_g + \beta_g^z * z + \beta_g^a * age$
+        
+8. Probability of reproduction (`pb_age`/$p_b(z,a)$): A logistic regression with size and age as fixed effects.
+
+    - Example code: `glm(repr ~ size + age, data = repr_data, family = binomial())`
+    
+    - Mathematical form: $Logit(p_b(z,a)) = \alpha_{p_b} + \beta_{p_b}^z * z + \beta_{p_b}^a * age)$
+
+9. Probability of recruitment (`pr_age`/$p_r(a)$): A logistic regression with age as a fixed effect.
+
+    - Example code: `glm(recr ~ age, data = recr_data, family = binomial())`
+    
+    - Mathematical form: $Logit(p_r(a)) = \alpha_{p_r} + \beta_{p_r}^a * age$
+
+10. Recruit size distribution (`rcsz`/$f_d(z',z)$): A linear model with parent size as a fixed effect.
+
+    - Example code: `lm(rcsz ~ size, data = rcsz_data)`
+    
+    - Mathematical form: 
+    
+        + $f_d(z',z) \sim Norm(\mu_{f_d}(z), \sigma_{f_d})$
+              
+        + $\mu_{f_d}(z) = \alpha_{f_d} + \beta_{f_d}^z * z$
+        
+
+        
+## Model parameterization
+  
+This example directly reproduces the model found in Ellner, Rees & Childs (2016), chapter 6.2. The code that implements that version can be found [here](https://github.com/ipmbook/first-edition/tree/master/Rcode/c6). This example will skip the IBM simulation and model fitting and just focus on the new syntax (`ipmr` doesn't .
+  
+First, we set up our parameter list and define a couple functions to help out. The `f_fun` is used to wrap `formula` argument in `"F_age"` kernel so that we can concisely express that age-0 individuals do not reproduce. Note that it is not possible to use an `ifelse()` statement instead, because `age` will be a single number, and `ifelse()` always returns a value that is the same length as its input (and we want the return value to be a $100\times100$ matrix).
 
 ```{r eval = FALSE}
 
@@ -56,7 +144,7 @@ f_fun <- function(age, s_age, pb_age, pr_age, recr) {
 
 ```
 
-Next, we begin to initialize our kernels. Note that `init_ipm` now has a second argument - `has_age`. This is a logical and denotes that we are specifying a model with individuals cross-classified by both age and size. The model class is `"general_di_det"` because age-size models are always general IPMs, and we are only working on a deterministic version of this model for now. 
+Next, we begin to initialize our kernels. `init_ipm` now has a second argument - `has_age`. This is a logical and denotes that we are specifying a model with individuals cross-classified by both age and size. The model class is `"general_di_det"` because age-size models are always general IPMs, and we are only working on a deterministic version of this model for now. We'll append the `_age` suffix to every variable that is age dependant. Additionally, we can use `age` as a standalone term - these will be substituted during the model building as well. 
 
 ```{r eval = FALSE}
 
@@ -77,38 +165,26 @@ age_size_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
 
 ```
 
-Note that the kernel name and vital rates all have `"_age"` appended to them, much like we would when defining a hierarchical model. The primary difference in defining this kernel vs any other hierarchical model is that we now specify `has_hier_effs = FALSE`, and pass a list to `levels_ages`. `levels_ages` takes a list with at least one, but possibly two components:
+The primary difference in defining this kernel vs any other hierarchical model is that we now specify `has_hier_effs = FALSE`, and pass a list to `levels_ages`. `levels_ages` takes a list with at least one, but possibly two components:
 
-1. `age`: This is the age range for the model. 
+1. `age`: This is the age range for the model. It should always start from 0 and be a sequence of integers. 
 
-2. Optionally, `max_age`: This is used to denote that while individuals may get older in reality, this value will be the highest that we model. In effect, it creates "very old, but not quite dead", or "greybeard" group.
+2. Optionally, `max_age`: This is used to denote that while individuals may get older in reality, this value will be the highest that we model. In effect, it creates "very old, but not quite dead" group which can survive and remain in the same age class. 
 
 Next, we continue defining the models as we did before.
 
 ```{r eval = FALSE}
 
-age_size_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
+age_size_ipm <- 
   define_kernel(
-    name          = "P_age",
-    family        = "CC",
-    formula       = s_age * g_age * d_wt,
-    s_age         = inv_logit(surv_int + surv_z * wt_1 + surv_a * age),
-    g_age         = dnorm(wt_2, mu_g_age, grow_sd),
-    mu_g_age      = grow_int + grow_z * wt_1 + grow_a * age,
-    data_list     = param_list,
-    states        = list(c("wt")),
-    has_hier_effs = FALSE,
-    levels_ages   = list(age = c(0:20), max_age = 21),
-    evict_cor     = FALSE
-  ) %>%
-  define_kernel(
+    proto_ipm     = age_size_ipm,
     name          = "F_age",
     family        = "CC",
-    formula       = f_fun(age, s_age, pb_age, pr_age, recr) * d_wt,
+    formula       = f_fun(age, s_age, pb_age, pr_age, rcsz) * d_wt,
     s_age         = inv_logit(surv_int + surv_z * wt_1 + surv_a * age),
     pb_age        = inv_logit(repr_int + repr_z * wt_1 + repr_a * age),
     pr_age        = inv_logit(recr_int + recr_a * age),
-    recr          = dnorm(wt_2, rcsz_mu, rcsz_sd),
+    rcsz          = dnorm(wt_2, rcsz_mu, rcsz_sd),
     rcsz_mu       = rcsz_int + rcsz_z * wt_1,
     data_list     = param_list,
     states        = list(c("wt")),
@@ -119,10 +195,9 @@ age_size_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
 
 ```
 
-The `"F_age"` kernel has a custom function in the `formula` slot that allows us to always set fecundity for age-0 individuals to 0. Everything else probably looks familiar.
+The `"F_age"` kernel has a custom function in the `formula` slot that allows us to always set fecundity for age-0 individuals to 0. We also add `_age` suffixes and `age` terms to the appropriate equations.
 
-
-Our call to `define_impl()` will look a little different. This is because we have to make sure that our `P_age` kernels produce `wt_age` individuals, whereas our `F_age` kernels must produce `wt_0` individuals (i.e. only age-0 lambs). We do this using the `state_start` and `state_end` arguments.
+Our call to `define_impl()` will look a little different. In examples in the other vignettes using the suffix syntax, we never added suffixes to `state_start`/`state_end`. However, we need to append them here. This is because we have to make sure that our `P_age` kernels produce `wt_age` individuals, whereas our `F_age` kernels must produce `wt_0` individuals (i.e. only age-0 lambs). We do this using the `state_start` and `state_end` arguments.
 
 ```{r eval = FALSE}
 
@@ -138,15 +213,15 @@ age_size_ipm <- age_size_ipm %>%
 
 ```
 
-All of the steps that come after this are the same for age-size models as they are for other model types. We 
+The rest of the steps are largely similar to previous examples: 
 
-1. `define_domains()`
+1. `define_domains()` is exactly the same.
 
-2. `define_pop_state()`
+2. `define_pop_state()`: we append `_age` suffix again here, because we want to track individual weights within age groups. This will create 22 copies of the `wt` domain, 1 for each `levels_ages`. 
 
 3. Optionally, `define_env_state()` (though not here because it's a deterministic model)
 
-4. `make_ipm()`
+4. `make_ipm()` is exactly the same.
 
 ```{r eval = FALSE}
 
@@ -166,6 +241,64 @@ age_size_ipm <- age_size_ipm %>%
 
 lam <- lambda(age_size_ipm)
 lam
+
+```
+
+## Further analyses
+
+There are a number of other calculations that we can perform using functions provided by `ipmr`. `left_ev()` and `right_ev` also work for age $\times$ size models. We'll extract them and plot their values.
+
+```{r eval = FALSE}
+
+v_a <- left_ev(age_size_ipm, iterations = 100)
+w_a <- right_ev(age_size_ipm, iterations = 100)
+
+par(mfrow = c(1, 2))
+
+plot(1:100, seq(0, max(unlist(w_a)), length.out = 100), type = "n",
+     ylab = expression(paste("w"[a],"(z)")),
+     xlab = "Size bin")
+
+for(i in seq_along(w_a)) {
+  
+  lines(w_a[[i]])
+  
+}
+
+plot(1:100, 
+     seq(0, max(unlist(v_a)), length.out = 100),
+     type = "n",
+     ylab = expression(paste("v"[a], "(z)")),
+     xlab = "Size bin")
+
+for(i in seq_along(v_a)) {
+  
+ lines(v_a[[i]]) 
+  
+}
+
+```
+
+Additionally, we can extract $R_0$ as we did in the Introduction and General IPM vignettes using the following snippet. We first use `ipmr`'s `format_mega_matrix()` method for age $\times$ size IPMs. This will generate a "Leslie-ish" block matrix, with the `f_forms` in the top row, and `name_ps` in the sub-diagonal blocks. If there is a `max_age` in the `levels_ages`, it will insert that `P` kernel into the bottom right corner. 
+
+We then manipulate it a bit to split out the $F$ and $P$ components. Recall from the introduction and general IPM vignettes that $R_0 = \text{dominant eigenvalue of } FN$, where $N = (I-P)^{-1}$. The method in the next snippet is not the fastest, but it will get the job done.
+
+```{r eval = FALSE}
+
+mega <- format_mega_matrix(age_size_ipm, name_ps = "P", f_forms = "F")
+
+Pm <- Fm <- mega$mega_matrix
+
+Fm[101:2200, ] <- 0
+Pm[1:100, ]    <- 0
+
+N <- solve(diag(nrow(Pm)) - Pm)
+
+R <- Fm %*% N
+
+R_0 <- Re(eigen(R)$values[1])
+
+R_0
 
 ```
 

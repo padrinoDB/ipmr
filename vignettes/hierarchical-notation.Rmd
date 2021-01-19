@@ -1,23 +1,20 @@
 ---
 title: "Hierarchical Notation"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette: 
+    toc: yes
+    toc_depth: 3
 vignette: >
   %\VignetteIndexEntry{Hierarchical Notation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
+## Overview
+
 This vignette describes how to write formulas using `ipmr`'s notation for hierarchical models. It is meant to mirror the standard mathematical notation used to represent the models. The examples here will primarily use [lme4](https://github.com/lme4/lme4/) to illustrate how to go from vital rate models to functional forms that you can use in `ipmr`. You are of course free to use whatever model fitting software you like, but the number of different possibilities are far too great to cover in this vignette. 
 
-The `ipmr` notation is meant to make implementing models more concise, as it allows you to avoid re-typing/copy+pasting the same kernel formats and just substituting, for example, plot name or transition year. It works by appending suffixes to kernels, vital rates, and parameters that can take multiple values (e.g. `P` becomes `P_yr`). We then add a named list where the names correspond to the suffix and the entries correspond to the values it can take and pass it to `levels_hier_effs` (i.e. `levels_hier_effs = list(yr = 1:5)`), and set `has_hier_effs = TRUE`. 
-
-## Structure
-
-1. [Quick start guide shows how to go from mathematical form to model formula to `ipmr` code.](#quick)
-
-2. [Worked example with a simple, density independent, stochastic kernel re-sampled model.](#sim_di_s_k)
-
-3. [Worked example with a general, density independent, stochastic parameter resampled model.](#complicated)
+The `ipmr` notation is meant to make implementing models more concise, as it allows you to avoid re-typing/copy+pasting the same kernel formats and just substituting, for example, plot name or transition year. It works by appending suffixes to kernels, vital rates, and parameters that can take multiple values (e.g. `P` becomes `P_yr`). We then add a named list where the names correspond to the suffix and the entries correspond to the values it can take. We pass pass the list to `levels_hier_effs` (i.e. `levels_hier_effs = list(yr = 1:5)`), and set `has_hier_effs = TRUE`. 
 
 ## Quick start guide {#quick}
 
@@ -83,25 +80,26 @@ Internally, `ipmr` generates the various levels using `expand.grid`. This means 
 
 ## Hierarchical models with a single hierarchical variable {#sim_di_s_k}
 
-These models are pretty common in the IPM literature. They encompass cases where a single site has been sampled over many years, or sample many sites across one transition. 
+These models are pretty common in the IPM literature. They encompass cases where a single site has been sampled over many years, or sampled many sites across one transition. 
 
 This example will use a hypothetical study that spans 5 transitions and has 6 consecutive censuses. The temporal variation will be denoted with a suffix/superscript appended to each term that it modifies ($x^{yr}$/`x_yr`). To limit complexity, let's pretend our exploratory analysis and model selection indicated the best overall models included random year-specifc intercepts for growth ($g^{yr}$) and survival ($s^{yr}$), but not probability of reproduction ($f_p$), recruit production ($f_r$), or the recruit size distribution ($f_d$). We will work with a simple model to start (i.e. 1 continuous state variable, no discrete states). This yields the following IPM ($z,z'$ represent size/height/weight at time $t$ and $t+1$, respectively):
 
-1. $K^{yr}(z', z) = P^{yr}(z',z) + F(z',z)$
+1. $n(z', t + 1) = \int_L^U [P^{yr}(z',z) + F(z',z)]n(z,t)dz$
 
 2. $P^{yr}(z', z) = s^{yr}(z) * g^{yr}(z',z)$
 
 3. $F(z',z) = f_p(z) + f_r(z) + f_d(z')$
 
-Note that only the $K$ and $P$ kernels get the $yr$ subscript appended to them - they are the only ones that our model selection process decided had substantial year to year variation. Thus, we can actually write the $F$ kernel the exact same way as we would in a simple IPM when we implement the model in `ipmr`.
+Note that only the $P$ kernel get the $yr$ subscript appended to them - this is the only one that our model selection process decided had substantial year to year variation. Thus, we can actually write the $F$ kernel the exact same way as we would in a simple IPM when we implement the model in `ipmr`.
 
 The vital rate models could be written on paper as follows:
 
 4. Growth
 
-    - $\mu_g = (\alpha_g + \alpha_g^{yr})+ \beta_g * z + e$ 
+    - $\mu_g = (\alpha_g + \alpha_g^{yr})+ \beta_g * z$ 
 
-    - $z' \sim Norm(\mu_g, \sigma_g)$ (where $\sigma_g$ = e in the $\mu_g$ expression)
+    - $z' \sim Norm(\mu_g, \sigma_g)$
+    
 5. Survival
 
     - $logit(s) = (\alpha_s + \alpha_s^{yr}) + \beta_s * z$
@@ -321,21 +319,19 @@ ex_ipm <- init_ipm("simple_di_stoch_kern") %>%
 
 ## Hierarchical models with continuously varying environments {#complicated}
 
-Sometimes, models will have discretely and continuously varying components as functions of different variables. For example, a study could consider multiple sites (discrete component) and spatial and/or temporal fluctations in environment at each site (continuous component). 
+Sometimes, models will have discretely and continuously varying components as functions of different variables. For example, a study could consider multiple sites (discrete component) and spatial and/or temporal fluctations in the environment at each site (continuous component). We'll use a hypothetical study that models demography as a function of environment across multiple sites to illustrate this. 
 
-In these cases, the hierarchical syntax can save a considerable amount of repitition when implementing a model arising from either copy + pasting code and changing variable names to match sites/years, or from wrapping everything in a `for` loop. We'll use a hypothetical study that models demography as a function of environment across multiple sites to illustrate this. 
+We'll implement a general IPM of a perennial plant species. Our data will come from 6 sites, `"A"` - `"F"`, and the vital rate intercepts for the plants will vary across each one. Its seeds can either enter a seed bank or recruit immediately, producing recruits at the next time step. We'll pretend that data from the recruit size distribution was pooled across sites, and so does not vary with space. The seed bank will be age structured and its parameters will be space- and time-invariant. Seeds in the first year can either survive ($s_{{sb}_1}$/`s_sb1`) and recruit ($r_{{sb}_1}$), or survive and become two year old seeds. Two year old seeds can either survive ($s_{{sb}_2}$/`s_sb2`) and recruit ($r_{{sb}_2}$/`r_sb2`) or die.  
 
-We'll implement a general IPM of a perennial plant species. Our data will come from 6 sites, `"A"` - `"F"`, and the vital rate intercepts for the plants will vary across each one. Its seeds can either enter a seed bank or recruit immediately, producing recruits at the next time step. We'll pretend that data from the recruit size distribution was pooled across sites so that the seed bank-related terms are unchanged by space. The seed bank will be age structured and its parameters will be space- and time-invariant. Seeds in the first year can either survive ($s_{{sb}_1}$/`s_sb1`) and recruit ($r_{{sb}_1}$), or survive and become two year old seeds. Two year old seeds can either survive ($s_{{sb}_2}$/`s_sb2`) and recruit ($r_{{sb}_2}$/`r_sb2`) or die.  
-
-The vital rate information fed into our hypothetical regression models are ($s^{site}$/`s_site`), growth ($g^{site}$/`g_site`), probability of reproduction ($f_{p}^{site}$/`f_p_site`), and seed production ($f_{r}^{site}$/`f_r_site`). They are all functions of size (`z`) and environmental covariates ($\theta^{temp}$ and $\theta^{precip}$, denoted together in the kernel formulas as just $\theta$). 
+The vital rate information fed into our hypothetical regression models are ($s^{site}$/`s_site`), growth ($g^{site}$/`g_site`), probability of reproduction ($f_{p}^{site}$/`f_p_site`), and seed production ($f_{r}^{site}$/`f_r_site`). They are all functions of size (`z`) and environmental covariates ($\theta^{t}$ and $\theta^{p}$, denoted together in the kernel formulas as just $\theta$). 
 
 The full IPM looks like this:
 
-1. $n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n(z, t)\mathrm{dz} + \int_L^Us_{{sb}_1} * r_{{sb}_1} * f_d(z')n(sb_1, t)\mathrm{dz} + \int_L^Us_{{sb}_2} * r_{{sb}_2} * f_d(z')n(sb_2, t)\mathrm{dz}$
+1. $n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n(z, t)dz + s_{{sb}_1} * r_{{sb}_1} * sb_1(t) * \int_L^U f_d(z')dz' + s_{{sb}_2} * r_{{sb}_2} * sb_2(t) *\int_L^U f_d(z')dz'$
 
-2. $n(sb_1, t + 1) = (1-r_i) * \int_L^U [f_p^{site}(z, \theta) * f_r^{site}(z,\theta)] n(z, t)\mathrm{dz}$
+2. $sb_1(t + 1) = (1-r_i) * \int_L^U [f_p^{site}(z, \theta) * f_r^{site}(z,\theta)] n(z, t)dz$
 
-3. $n(sb_2, t + 1) = s_{{sb}_1} * (1-r_{{sb}_1}) * n(sb_1, t)$
+3. $sb_2(t + 1) = s_{{sb}_1} * (1-r_{{sb}_1}) * sb_1(t)$
 
 The sub kernels are: 
 
@@ -343,27 +339,27 @@ The sub kernels are:
 
 5. $F^{site}(z',z, \theta) = f_{{p}}^{site}(z, \theta) * f_{r}^{site}(z, \theta) * f_d(z')$
 
-6. $\theta^{temp} \sim Norm(mean^{temp}, SD^{temp})$
+6. $\theta^{t} \sim Norm(mean^{t}, SD^{t})$
 
-7. $\theta^{precip} \sim Gamma(shape^{precip}, rate^{precip})$
+7. $\theta^{p} \sim Gamma(shape^{p}, rate^{p})$
 
 And the size/climate dependent vital rate functions and example R code are:
 
-8. $logit(s^{site}) = (\alpha_s + \alpha_{s}^{site}) + \beta_s^{z} * z + \beta_s^{temp} * \theta^{temp} + \beta_s^{precip} * \theta^{precip}$
+8. $logit(s^{site}) = (\alpha_s + \alpha_{s}^{site}) + \beta_s^{z} * z + \beta_s^{t} * \theta^{t} + \beta_s^{p} * \theta^{p}$
 
   - example R code: `glmer(survival ~ size + temp + precip + (1 | site), data = my_surv_data, family = binomial())`
 
 9. $g^{site} \sim Norm(\mu_g^{site}, \sigma_g)$
 
-10. $\mu_g^{site} = (\alpha_g + \alpha_g^{site}) + \beta_g^{z} * z + \beta_g^{temp} * \theta^{temp} + \beta_g^{precip} * \theta^{precip}$
+10. $\mu_g^{site} = (\alpha_g + \alpha_g^{site}) + \beta_g^{z} * z + \beta_g^{t} * \theta^{t} + \beta_g^{p} * \theta^{p}$
 
   - example R code: `lmer(size_next ~ size + temp + precip + (1 | site), data = my_grow_data)`
 
-11. $logit(f_{p}^{site}) = (\alpha_{f_p} + \alpha_{f_p}^{site}) + \beta_{f_p}^{z} * z + \beta_{f_p}^{temp} * \theta^{temp} + \beta_{f_p}^{precip} * \theta^{precip}$
+11. $logit(f_{p}^{site}) = (\alpha_{f_p} + \alpha_{f_p}^{site}) + \beta_{f_p}^{z} * z + \beta_{f_p}^{t} * \theta^{t} + \beta_{f_p}^{p} * \theta^{p}$
 
   - example R code: `glmer(repro ~ size + temp + precip + (1 | site), data = my_repro_data, family = binomial())`
 
-12. $log(f_{r}^{site}) = (\alpha_{f_r} + \alpha_{f_r}^{site}) + \beta_{f_r}^{site} * z + \beta_{f_r}^{temp} * \theta_{temp} + \beta_{f_r}^{precip} * \theta_{precip}$
+12. $log(f_{r}^{site}) = (\alpha_{f_r} + \alpha_{f_r}^{site}) + \beta_{f_r}^{site} * z + \beta_{f_r}^{t} * \theta_{t} + \beta_{f_r}^{p} * \theta_{p}$
 
   - example R code: `glmer(flower_n ~ size + temp + precip + (1 | site), data = my_flower_data, family = poisson())`
 
@@ -373,7 +369,7 @@ And the size/climate dependent vital rate functions and example R code are:
 
 ### Simulating parameters
 
-We have to simulate some parameters for each site. Additionally, we'll specify the distribution parameters for each $\theta$ and write a function that samples them once.
+Since this example doesn't work with actual data, we need to simulate some parameters for each site. Additionally, we'll specify the distribution parameters for each $\theta$ and write a function that samples them once.
 
 ```{r eval = FALSE}
 
@@ -486,7 +482,7 @@ sample_fun <- function(env_params) {
 
 ### Implementing the model
 
-We've written out our model - now we can implement it! We'll use the general, density independent, stochastic parameter resampled machinery for this.
+We've written out our model - now we can implement it. We'll use the general, density independent, stochastic parameter resampled machinery for this.
 
 
 ```{r eval = FALSE}

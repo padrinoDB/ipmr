@@ -9,22 +9,20 @@
 \alias{left_ev.general_di_det_ipm}
 \title{Compute the standardized left and right eigenvectors via iteration}
 \usage{
-right_ev(ipm, ...)
+right_ev(ipm, iterations)
 
-\method{right_ev}{simple_di_det_ipm}(ipm, iterations = 100, ...)
+\method{right_ev}{simple_di_det_ipm}(ipm, iterations = 100)
 
-\method{right_ev}{general_di_det_ipm}(ipm, iterations = 100, ...)
+\method{right_ev}{general_di_det_ipm}(ipm, iterations = 100)
 
-left_ev(ipm, ...)
+left_ev(ipm, iterations)
 
-\method{left_ev}{simple_di_det_ipm}(ipm, iterations = 100, ...)
+\method{left_ev}{simple_di_det_ipm}(ipm, iterations = 100)
 
-\method{left_ev}{general_di_det_ipm}(ipm, iterations = 100, ...)
+\method{left_ev}{general_di_det_ipm}(ipm, iterations = 100)
 }
 \arguments{
 \item{ipm}{Output from \code{make_ipm()}.}
-
-\item{...}{other arguments passed to methods}
 
 \item{iterations}{The number of times to iterate the model to reach
 convergence. Default is 100.}
@@ -37,35 +35,13 @@ function (\code{right_ev}) or the reproductive values for each trait (\code{left
 Compute the standardized left and right eigenvectors via iteration
 }
 \details{
-If the model has already been iterated, then these functions
-will just extract population state of the final iteration and return
-that in a named list. Each element of the list is a vector with length
+For \code{right_ev}, if the model has already been iterated, then
+these functions will just extract population state of the final iteration and
+return that in a named list. Each element of the list is a vector with length
 \code{>= 1} and corresponds each state variable's portion of the eigenvector.
 
-Note that for \code{*_di_stoch_kern_ipm}'s, these generics will create a mean
-matrix and then compute the left/right eigenvectors for that. For
-\code{*_di_stoch_param_ipm}'s, it will compute the average environment kernel
-(e.g. using the means from the \code{env_seq} slot of the IPM).
-
-\code{mega_mat} fits the pieces of the model together to create a
-a transpose of the model to iterate with. Kernel names/0s should be supplied
-in ROW MAJOR order (as in \code{byrow = TRUE}). \code{ipmr} supplies
-a helper function for large models \code{format_mega_matrix}
-to help with age-size models or ones with a lot of hierarchical effects.
-}
-\examples{
-
-data(gen_di_det_ex)
-
-# mega matrix is specifed as a row-major vector/matrix of symbols. You can also
-# supply a character vector/matrix. mega_vec is done the same way.
-# DO NOT supply arguments like nrow or ncol if using \code{matrix(...)}.
-# The function expects to work these out on its own.
-
-ipmr_v <- left_ev(gen_di_det_ex,
-                  mega_mat     = c(stay_discrete, go_discrete,
-                                   leave_discrete, P),
-                  mega_vec = c(b, ht),
-                  iterations = 100)
-
+For \code{left_ev}, the transpose iteration (\emph{sensu} Ellner & Rees 2006,
+Appendix A) is worked out based on the \code{state_start} and \code{state_end}
+in the model's \code{proto_ipm} object. The model is then iterated for
+\code{iterations} times to produce a standardized left eigenvector.
 }
