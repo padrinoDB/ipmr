@@ -59,46 +59,45 @@ your IPM.
 
 Once all parameters are estimated, the first step of defining a model in
 `ipmr` is to initialize the model using `init_ipm()`. This function has
-two arguments: `model_class`, and `has_age`. We will ignore `has_age`
-for now, because age × size models are a complicated topic and have
-their [own
+five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and
+`has_age`. We will ignore `has_age` for now, because age-size models are
+less common and have their [own
 vignette](https://levisc8.github.io/ipmr/articles/age_x_size.html).
 
-The `model_class` defines the basic infrastructure that will be
-available for subsequent analyses and helps make sure the kernels are
-correctly implemented from the underlying vital rates. `model_class`
-should be a character string with at least 3 (but possibly 4) entries
-separated by underscores (`_`). The possible entries for each position
-are:
+The combination of these arguments defines the type of projection model,
+and makes sure that the machinery for subsequent analyses works
+correctly. The possible entries for each argument are as follows:
 
--   Position 1: `"simple"`/`"general"`
+-   `sim_gen`: `"simple"`/`"general"`
 
     -   A. **simple**: This describes an IPM with a single continuous
         state variable and no discrete stages.
 
-    -   B. **general**: This describes an IPM with either more than one
+    -   B. **general**: This describes and IPM with either more than one
         continuous state variable, one or more discrete stages, or both
         of the above. Basically, anything other than an IPM with a
         single continuous state variable.
 
--   Position 2: `"di"`/`"dd"`
+-   `di_dd`: `"di"`/`"dd"`
 
-    -   A. **di**: This is used to denote a density-independent IPM.
+    -   A. **di**: This is used to denote a **d**ensity-**i**ndependent
+        IPM.
 
-    -   B. **dd**: This is used to denote a density-dependent IPM.
+    -   B. **dd**: This is used to denote a **d**ensity-**d**ependent
+        IPM.
 
--   Position 3: `"det"`/`"stoch"`
+-   `det_stoch`: `"det"`/`"stoch"`
 
     -   A. **det**: This is used to denote a deterministic IPM. If this
-        is used in the third position of `model_class`, there should not
-        be a fourth entry.
+        is the third argument of `init_ipm`, `kern_param` must be left
+        as `NULL`.
 
     -   B. **stoch**: This is used to denote a stochastic IPM. If this
-        is used in the third position of `model_class`, there should
-        always be a fourth entry. The two possibilities for the fourth
-        are described next.
+        is the third argument of `init_ipm`, `kern_param` must be
+        specified. The two possibilities for the fourth are described
+        next.
 
--   Position 4: `"kern"`/`"param"` (Complete definitions found in
+-   `kern_param`: `"kern"`/`"param"` (Complete definitions found in
     [Metcalf et
     al. 2015](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405))
 
@@ -106,27 +105,23 @@ are:
         parameters such that their values are known before the model is
         specified. This is usually the case with models that estimate
         fixed and/or random year/site effects and for which defining a
-        (multivariate joint) distribution to sample parameters from is
-        not desirable/needed. These models can be a bit more
-        computationally efficient than the `param` alternative because
-        all kernels can be constructed before the iteration procedure
-        begins, as opposed to requiring reconstruction for every single
-        iteration.
+        multivariate joint distribution to sample parameters from is not
+        desirable/needed. These models can be a bit more computationally
+        efficient than the `param` alternative because all kernels can
+        be constructed before the iteration procedure begins, as opposed
+        to requiring reconstruction for every single iteration.
 
     -   B. **param**: This describes an IPM with parameters that are
-        re-sampled from some distribution at each iteration of the
-        model. This could be, for example, a multivariate normal defined
-        by co-varying slopes and intercepts, or posterior distributions
-        from a Bayesian model. All that is required is that the
-        parameters for the distribution are specified and that the
-        function that generates the parameters at each iteration returns
-        named lists that correspond to the parameter names in the model.
-        Jump down to the `"simple_di_stoch_param"` example for some
-        inspiration in writing those.
-
-With the type of model selected, the `model_class` becomes a string and
-the call to `init_ipm` is composed like so:
-`init_ipm(model_class = "position1_position_2_position3_position4")`.
+        re-sampled from some distribution at each iteration of the model
+        (usually a multivariate joint distribution). This can be a
+        multivariate normal defined by covarying slopes and intercepts,
+        or posterior distribution from a Bayesian model. All that is
+        required is that the parameters for the distribution are
+        specified and that the function that generates the parameters at
+        each iteration returns named lists that correspond to the
+        parameter names in the model. Jump down to the
+        `"simple_di_stoch_param"` example for some inspiration in
+        writing those.
 
 The following possibilities are currently or will become available in
 `ipmr` (bold text denotes development progress):
@@ -276,8 +271,9 @@ data_list = list(s_int     = 2.2,   # coefficients(my_surv_mod)[1]
                  mu_fd     = 2,     # mean(recruit_data$size_next)
                  sd_fd     = 0.3)   # sd(recruit_data$size_next)
 
-my_simple_ipm <- init_ipm('simple_di_det')
-
+my_simple_ipm <- init_ipm(sim_gen = "simple",
+                          di_dd   = "di",
+                          det_stoch = "det")
 
 my_simple_ipm <- define_kernel(
   

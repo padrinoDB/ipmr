@@ -132,39 +132,38 @@
 <div id="model-classes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#model-classes" class="anchor"></a>Model classes</h2>
-<p>Once all parameters are estimated, the first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function has two arguments: <code>model_class</code>, and <code>has_age</code>. We will ignore <code>has_age</code> for now, because age × size models are a complicated topic and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own vignette</a>.</p>
-<p>The <code>model_class</code> defines the basic infrastructure that will be available for subsequent analyses and helps make sure the kernels are correctly implemented from the underlying vital rates. <code>model_class</code> should be a character string with at least 3 (but possibly 4) entries separated by underscores (<code>_</code>). The possible entries for each position are:</p>
+<p>Once all parameters are estimated, the first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function has five arguments: <code>sim_gen</code>, <code>di_dd</code>, <code>det_stoch</code>, <code>kern_param</code>, and <code>has_age</code>. We will ignore <code>has_age</code> for now, because age-size models are less common and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own vignette</a>.</p>
+<p>The combination of these arguments defines the type of projection model, and makes sure that the machinery for subsequent analyses works correctly. The possible entries for each argument are as follows:</p>
 <ul>
 <li>
-<p>Position 1: <code>"simple"</code>/<code>"general"</code></p>
+<p><code>sim_gen</code>: <code>"simple"</code>/<code>"general"</code></p>
 <ul>
 <li><p>A. <strong>simple</strong>: This describes an IPM with a single continuous state variable and no discrete stages.</p></li>
-<li><p>B. <strong>general</strong>: This describes an IPM with either more than one continuous state variable, one or more discrete stages, or both of the above. Basically, anything other than an IPM with a single continuous state variable.</p></li>
+<li><p>B. <strong>general</strong>: This describes and IPM with either more than one continuous state variable, one or more discrete stages, or both of the above. Basically, anything other than an IPM with a single continuous state variable.</p></li>
 </ul>
 </li>
 <li>
-<p>Position 2: <code>"di"</code>/<code>"dd"</code></p>
+<p><code>di_dd</code>: <code>"di"</code>/<code>"dd"</code></p>
 <ul>
-<li><p>A. <strong>di</strong>: This is used to denote a density-independent IPM.</p></li>
-<li><p>B. <strong>dd</strong>: This is used to denote a density-dependent IPM.</p></li>
+<li><p>A. <strong>di</strong>: This is used to denote a <strong>d</strong>ensity-<strong>i</strong>ndependent IPM.</p></li>
+<li><p>B. <strong>dd</strong>: This is used to denote a <strong>d</strong>ensity-<strong>d</strong>ependent IPM.</p></li>
 </ul>
 </li>
 <li>
-<p>Position 3: <code>"det"</code>/<code>"stoch"</code></p>
+<p><code>det_stoch</code>: <code>"det"</code>/<code>"stoch"</code></p>
 <ul>
-<li><p>A. <strong>det</strong>: This is used to denote a deterministic IPM. If this is used in the third position of <code>model_class</code>, there should not be a fourth entry.</p></li>
-<li><p>B. <strong>stoch</strong>: This is used to denote a stochastic IPM. If this is used in the third position of <code>model_class</code>, there should always be a fourth entry. The two possibilities for the fourth are described next.</p></li>
+<li><p>A. <strong>det</strong>: This is used to denote a deterministic IPM. If this is the third argument of <code>init_ipm</code>, <code>kern_param</code> must be left as <code>NULL</code>.</p></li>
+<li><p>B. <strong>stoch</strong>: This is used to denote a stochastic IPM. If this is the third argument of <code>init_ipm</code>, <code>kern_param</code> must be specified. The two possibilities for the fourth are described next.</p></li>
 </ul>
 </li>
 <li>
-<p>Position 4: <code>"kern"</code>/<code>"param"</code> (Complete definitions found in <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405">Metcalf et al. 2015</a>)</p>
+<p><code>kern_param</code>: <code>"kern"</code>/<code>"param"</code> (Complete definitions found in <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405">Metcalf et al. 2015</a>)</p>
 <ul>
-<li><p>A. <strong>kern</strong>: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and for which defining a (multivariate joint) distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the <code>param</code> alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration.</p></li>
-<li><p>B. <strong>param</strong>: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. This could be, for example, a multivariate normal defined by co-varying slopes and intercepts, or posterior distributions from a Bayesian model. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the <code>"simple_di_stoch_param"</code> example for some inspiration in writing those.</p></li>
+<li><p>A. <strong>kern</strong>: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and for which defining a multivariate joint distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the <code>param</code> alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration.</p></li>
+<li><p>B. <strong>param</strong>: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model (usually a multivariate joint distribution). This can be a multivariate normal defined by covarying slopes and intercepts, or posterior distribution from a Bayesian model. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the <code>"simple_di_stoch_param"</code> example for some inspiration in writing those.</p></li>
 </ul>
 </li>
 </ul>
-<p>With the type of model selected, the <code>model_class</code> becomes a string and the call to <code>init_ipm</code> is composed like so: <code><a href="reference/init_ipm.html">init_ipm(model_class = "position1_position_2_position3_position4")</a></code>.</p>
 <p>The following possibilities are currently or will become available in <code>ipmr</code> (bold text denotes development progress):</p>
 <ul>
 <li>Simple, density independent models: <strong>Completed and ready</strong>
@@ -283,8 +282,9 @@
                  mu_fd     <span class="op">=</span> <span class="fl">2</span>,     <span class="co"># mean(recruit_data$size_next)</span>
                  sd_fd     <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span>   <span class="co"># sd(recruit_data$size_next)</span>
 
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">'simple_di_det'</span><span class="op">)</span>
-
+<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen <span class="op">=</span> <span class="st">"simple"</span>,
+                          di_dd   <span class="op">=</span> <span class="st">"di"</span>,
+                          det_stoch <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span>
 
 <span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
   
