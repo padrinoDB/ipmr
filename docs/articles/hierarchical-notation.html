@@ -257,13 +257,13 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <li>
 <p>Survival</p>
 <ul>
-<li><span class="math inline">\(logit(s) = (\alpha_s + \alpha_s^{yr}) + \beta_s * z\)</span></li>
+<li><span class="math inline">\(Logit(s) = (\alpha_s + \alpha_s^{yr}) + \beta_s * z\)</span></li>
 </ul>
 </li>
 <li>
 <p>Probability of reproducing</p>
 <ul>
-<li><span class="math inline">\(logit(f_p) = \alpha_{f_p} + \beta_{f_p} * z\)</span></li>
+<li><span class="math inline">\(Logit(f_p) = \alpha_{f_p} + \beta_{f_p} * z\)</span></li>
 </ul>
 </li>
 <li>
@@ -279,7 +279,7 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 </ul>
 </li>
 </ol>
-<p>and modelled in R as follows:</p>
+<p>and modeled in R as follows:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/lme4/lme4/">lme4</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ipmr</span><span class="op">)</span>
@@ -325,7 +325,7 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <span class="va">f_d_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>mu_f_d <span class="op">=</span> <span class="va">rcsz_mu</span>, sigma_f_d <span class="op">=</span> <span class="va">rcsz_sd</span><span class="op">)</span>
 
 <span class="va">all_fixed_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">g_list</span>, <span class="va">s_list</span>, <span class="va">f_p_list</span>, <span class="va">f_r_list</span>, <span class="va">f_d_list</span><span class="op">)</span></code></pre></div>
-<p>For the random effects, we probably need to do some a bit more processing, though this really depends on which modelling framework you use and the format of the outputs. For <code>lme4</code>, it looks like this:</p>
+<p>For the random effects, we probably need to do some a bit more processing, though this really depends on which modeling framework you use and the format of the outputs. For <code>lme4</code>, it looks like this:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">g_alpha_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="va">alpha_g_yrs</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">g_alpha_list</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"alpha_g_"</span>, <span class="fl">2001</span><span class="op">:</span><span class="fl">2006</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
@@ -335,9 +335,12 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <p>First, we strip away all of <code>lme4</code>-related attributes with <code><a href="https://rdrr.io/r/base/unlist.html">unlist()</a></code>, then convert it to the flat list format that we need. Next, we set the names. Now, we can combine it with our <code>all_fixed_params</code> list and we have all of the parameters we need for the kernel functions:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">all_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">all_fixed_params</span>, <span class="va">g_alpha_list</span>, <span class="va">s_alpha_list</span><span class="op">)</span></code></pre></div>
-<p>We are now ready to begin implementing the kernels! This model will be a simple, density independent, stochastic kernel-resampled model (<code>"simple_di_stoch_kern"</code> class). The parts where the hierarchical syntax is used are highlighted by comments in the code block:</p>
+<p>We are now ready to begin implementing the kernels! This model will be a simple, density independent, stochastic kernel-resampled model. The parts where the hierarchical syntax is used are highlighted by comments in the code block:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ex_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">"simple_di_stoch_kern"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">ex_ipm</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"simple"</span>,
+                  di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
+                  det_stoch  <span class="op">=</span> <span class="st">"stoch"</span>,
+                  kern_param <span class="op">=</span> <span class="st">"kern"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     
     <span class="co"># _yr is appended as a suffix with an underscore. Notice how the formula</span>
@@ -415,7 +418,7 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <div id="complicated" class="section level2">
 <h2 class="hasAnchor">
 <a href="#complicated" class="anchor"></a>Hierarchical models with continuously varying environments</h2>
-<p>Sometimes, models will have discretely and continuously varying components as functions of different variables. For example, a study could consider multiple sites (discrete component) and spatial and/or temporal fluctations in the environment at each site (continuous component). We’ll use a hypothetical study that models demography as a function of environment across multiple sites to illustrate this.</p>
+<p>Sometimes, models will have discretely and continuously varying components as functions of different variables. For example, a study could consider multiple sites (discrete component) and spatial and/or temporal fluctuations in the environment at each site (continuous component). We’ll use a hypothetical study that models demography as a function of environment across multiple sites to illustrate this.</p>
 <p>We’ll implement a general IPM of a perennial plant species. Our data will come from 6 sites, <code>"A"</code> - <code>"F"</code>, and the vital rate intercepts for the plants will vary across each one. Its seeds can either enter a seed bank or recruit immediately, producing recruits at the next time step. We’ll pretend that data from the recruit size distribution was pooled across sites, and so does not vary with space. The seed bank will be age structured and its parameters will be space- and time-invariant. Seeds in the first year can either survive (<span class="math inline">\(s_{{sb}_1}\)</span>/<code>s_sb1</code>) and recruit (<span class="math inline">\(r_{{sb}_1}\)</span>), or survive and become two year old seeds. Two year old seeds can either survive (<span class="math inline">\(s_{{sb}_2}\)</span>/<code>s_sb2</code>) and recruit (<span class="math inline">\(r_{{sb}_2}\)</span>/<code>r_sb2</code>) or die.</p>
 <p>The vital rate information fed into our hypothetical regression models are (<span class="math inline">\(s^{site}\)</span>/<code>s_site</code>), growth (<span class="math inline">\(g^{site}\)</span>/<code>g_site</code>), probability of reproduction (<span class="math inline">\(f_{p}^{site}\)</span>/<code>f_p_site</code>), and seed production (<span class="math inline">\(f_{r}^{site}\)</span>/<code>f_r_site</code>). They are all functions of size (<code>z</code>) and environmental covariates (<span class="math inline">\(\theta^{t}\)</span> and <span class="math inline">\(\theta^{p}\)</span>, denoted together in the kernel formulas as just <span class="math inline">\(\theta\)</span>).</p>
 <p>The full IPM looks like this:</p>
@@ -433,7 +436,7 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 </ol>
 <p>And the size/climate dependent vital rate functions and example R code are:</p>
 <ol start="8" style="list-style-type: decimal">
-<li><span class="math inline">\(logit(s^{site}) = (\alpha_s + \alpha_{s}^{site}) + \beta_s^{z} * z + \beta_s^{t} * \theta^{t} + \beta_s^{p} * \theta^{p}\)</span></li>
+<li><span class="math inline">\(Logit(s^{site}) = (\alpha_s + \alpha_{s}^{site}) + \beta_s^{z} * z + \beta_s^{t} * \theta^{t} + \beta_s^{p} * \theta^{p}\)</span></li>
 </ol>
 <ul>
 <li>example R code: <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html">glmer(survival ~ size + temp + precip + (1 | site), data = my_surv_data, family = binomial())</a></code>
@@ -448,7 +451,7 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 </li>
 </ul>
 <ol start="11" style="list-style-type: decimal">
-<li><span class="math inline">\(logit(f_{p}^{site}) = (\alpha_{f_p} + \alpha_{f_p}^{site}) + \beta_{f_p}^{z} * z + \beta_{f_p}^{t} * \theta^{t} + \beta_{f_p}^{p} * \theta^{p}\)</span></li>
+<li><span class="math inline">\(Logit(f_{p}^{site}) = (\alpha_{f_p} + \alpha_{f_p}^{site}) + \beta_{f_p}^{z} * z + \beta_{f_p}^{t} * \theta^{t} + \beta_{f_p}^{p} * \theta^{p}\)</span></li>
 </ol>
 <ul>
 <li>example R code: <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html">glmer(repro ~ size + temp + precip + (1 | site), data = my_repro_data, family = binomial())</a></code>
@@ -583,7 +586,10 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <a href="#implementing-the-model" class="anchor"></a>Implementing the model</h3>
 <p>We’ve written out our model - now we can implement it. We’ll use the general, density independent, stochastic parameter resampled machinery for this.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ex_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">"general_di_stoch_param"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">ex_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"general"</span>,
+                   di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
+                   det_stoch  <span class="op">=</span> <span class="st">"stoch"</span>,
+                   kern_param <span class="op">=</span> <span class="st">"param"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     
     name <span class="op">=</span> <span class="st">"P_site"</span>,

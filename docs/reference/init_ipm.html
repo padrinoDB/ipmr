@@ -41,8 +41,9 @@
 
 <meta property="og:title" content="Initialize an IPM — init_ipm" />
 <meta property="og:description" content="This is always the first step in constructing an IPM with ipmr.
-All you need for this is to know what type of IPM you want to construct - the rest comes later
-with define_kernel, make_ipm, and associated helper functions." />
+All you need for this is to know what type of IPM you want to construct - the
+rest comes later with define_kernel, make_ipm, and associated
+helper functions. See Details for complete overview of each option." />
 
 
 
@@ -154,18 +155,34 @@ with define_kernel, make_ipm, and associated helper functions." />
 
     <div class="ref-description">
     <p>This is always the first step in constructing an IPM with <code>ipmr</code>.
-All you need for this is to know what type of IPM you want to construct - the rest comes later
-with <code>define_kernel</code>, <code>make_ipm</code>, and associated helper functions.</p>
+All you need for this is to know what type of IPM you want to construct - the
+rest comes later with <code>define_kernel</code>, <code>make_ipm</code>, and associated
+helper functions. See Details for complete overview of each option.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>init_ipm</span><span class='op'>(</span><span class='va'>model_class</span>, has_age <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>init_ipm</span><span class='op'>(</span><span class='va'>sim_gen</span>, <span class='va'>di_dd</span>, <span class='va'>det_stoch</span>, kern_param <span class='op'>=</span> <span class='cn'>NULL</span>, has_age <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>model_class</th>
-      <td><p>The type of IPM. See <code>Details</code> for more information on classes</p></td>
+      <th>sim_gen</th>
+      <td><p>Either <code>"simple"</code> or <code>"general"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>di_dd</th>
+      <td><p>Either <code>"di"</code> or <code>"dd"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>det_stoch</th>
+      <td><p>Either <code>"det"</code> or <code>"stoch"</code>. If this is <code>"det"</code>,
+then <code>kern_param</code> is ignored. If <code>"stoch"</code>, then <code>kern_param</code>
+must be specified.</p></td>
+    </tr>
+    <tr>
+      <th>kern_param</th>
+      <td><p>If <code>det_stoch = "stoch"</code>, then this should be either
+<code>"kern"</code> or <code>"param"</code>.</p></td>
     </tr>
     <tr>
       <th>has_age</th>
@@ -176,15 +193,17 @@ is <code>FALSE</code></p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object with classes <code>"proto_ipm"</code> and <code>model_class</code>. If
+    <p>An object with classes <code>"proto_ipm"</code> and a combination of
+<code>sim_gen</code>, <code>di_dd</code>, <code>det_stoch</code>, and possibly
+<code>kern_param</code>. If
 <code>has_age = TRUE</code>, then an <code>"age_x_size"</code> class is also added.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Combinations of <code>simple</code> or <code>general</code>, <code>dd</code> or <code>di</code>,
-and <code>det</code> or <code>stoch</code> are separated by an underscore to tell <code>ipmr</code>
-the type of model you will be constructing (e.g. <code>"simple_di_det"</code> for a
-deterministic IPM with a single continuous state variable and no discrete stages
-or density dependence).</p>
+and <code>det</code> or <code>stoch</code> are generated to create 1 of 12 unique IPM classes.
+These are separated by an underscore to tell <code>ipmr</code>
+the type of model you will be constructing. For simplicity, they are specified
+separately and the model class is generated internally.</p>
 <p>Within <code>stoch</code> model types, there are two additional options to append to
 the class: <code>"kern"</code> or <code>"param"</code>. These distinguish between models that
 use kernel resampling vs those that use parameter resampling (<em>sensu</em> Metcalf et al.

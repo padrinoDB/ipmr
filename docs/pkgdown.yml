@@ -1,4 +1,4 @@
-pandoc: 2.11.0.4
+pandoc: 2.11.2
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
@@ -10,7 +10,7 @@ articles:
   hierarchical-notation: hierarchical-notation.html
   ipmr-introduction: ipmr-introduction.html
   proto-ipms: proto-ipms.html
-last_built: 2021-01-19T16:53Z
+last_built: 2021-01-25T15:57Z
 urls:
   reference: https://levisc8.github.io/ipmr/reference
   article: https://levisc8.github.io/ipmr/articles

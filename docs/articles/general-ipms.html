@@ -115,7 +115,7 @@
 <div id="simple-ipms-vs-general-ipms" class="section level2">
 <h2 class="hasAnchor">
 <a href="#simple-ipms-vs-general-ipms" class="anchor"></a>Simple IPMs vs General IPMs</h2>
-<p>In the <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">introduction vignette</a>, we reviewed some basic IPM theory and worked through examples of simple IPMs, which only model a single, continuously distributed state variable. General IPMs are distinguished from simple ones in that they incorporate multiple state variables and/or include transitions between continuous and discrete states. These state variables could be, for example, a continuous measure of coral colony surface area and a discrete state to denote aspergillosis infection (in <a href="https://esajournals.onlinelibrary.wiley.com/doi/full/10.1890/09-1178.1">Bruno et al. 2011</a>), a mixture of trees classified by basal diameter and a discrete state for seeds in a seed bank (in <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2664.13020">Crandall &amp; Knight 2017</a>), or a mixture of multiple continuous and discrete state (e.g. <a href="https://esajournals.onlinelibrary.wiley.com/doi/pdf/10.1890/13-1478.1">Aikens &amp; Roach 2014</a>). A more comprehensive defintion is provided in <a href="https://pubmed.ncbi.nlm.nih.gov/16673349/">Ellner &amp; Rees (2006)</a> and in Ellner, Childs &amp; Rees, Chapter 6 (2016).</p>
+<p>In the <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">introduction vignette</a>, we reviewed some basic IPM theory and worked through examples of simple IPMs, which only model a single, continuously distributed state variable. General IPMs are distinguished from simple ones in that they incorporate multiple state variables and/or include transitions between continuous and discrete states. These state variables could be, for example, a continuous measure of coral colony surface area and a discrete state to denote aspergillosis infection (in <a href="https://esajournals.onlinelibrary.wiley.com/doi/full/10.1890/09-1178.1">Bruno et al. 2011</a>), a mixture of trees classified by basal diameter and a discrete state for seeds in a seed bank (in <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2664.13020">Crandall &amp; Knight 2017</a>), or a mixture of multiple continuous and discrete state (e.g. <a href="https://esajournals.onlinelibrary.wiley.com/doi/pdf/10.1890/13-1478.1">Aikens &amp; Roach 2014</a>). A more comprehensive definition is provided in <a href="https://pubmed.ncbi.nlm.nih.gov/16673349/">Ellner &amp; Rees (2006)</a> and in Ellner, Childs &amp; Rees, Chapter 6 (2016).</p>
 </div>
 <div id="a-general-density-independent-deterministic-ipm" class="section level2">
 <h2 class="hasAnchor">
@@ -181,7 +181,7 @@
 </ul>
 </li>
 <li>
-<p>germination (<code>g_i</code>) and establishment (<code>e_p</code>) are constants. The code below assumes we have our data in long format (each seed get its own row) and that successful germinations/establishments are coded as 1s, failures are 0s, and seeds we don’t know the fate of for whatever reason are <code>NA</code>s.</p>
+<p>germination (<code>g_i</code>) and establishment (<code>e_p</code>) are constants. The code below assumes we have our data in long format (each seed get its own row) and that successful germination/establishment is coded as 1s, failures are 0s, and seeds we don’t know the fate of for whatever reason are <code>NA</code>s.</p>
 <ul>
 <li><p>example code: <code>g_i &lt;- mean(my_germ_data, na.rm = TRUE)</code> and <code>e_p &lt;- mean(my_est_data, na.rm = TRUE)</code></p></li>
 <li><p>Mathematical form: <span class="math inline">\(g_i = 0.5067, e_p = 0.15\)</span></p></li>
@@ -229,7 +229,7 @@
 <span class="op">}</span></code></pre></div>
 <p>Now, we’re ready to begin making the IPM kernels!</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">general_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">"general_di_det"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">general_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen <span class="op">=</span> <span class="st">"general"</span>, di_dd <span class="op">=</span> <span class="st">"di"</span>, det_stoch <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"P"</span>,
     
@@ -574,7 +574,10 @@
 <a href="#suffix-syntax-introduction" class="anchor"></a>Suffix syntax introduction</h3>
 <p>Next, we will set up our sub-kernels. We’ll append the <code>_year</code> suffix to the kernel <code>name</code>, the vital rate expressions and parameter values that have time-varying components (<code>g_year</code>, <code>f_s_year</code>, <code>g_int_year</code>, <code>f_s_int_year</code>), and the call to <code>truncated_distributions</code> so that the growth kernel is correctly specified. We’ll also pass a <code>list(year = 1:5))</code> into the <code>levels_hier_effs</code> argument of <code><a href="../reference/define_kernel.html">define_kernel()</a></code>. When building the model, <code><a href="../reference/make_ipm.html">make_ipm()</a></code> automatically expands these expressions to create 5 different expressions containing the various levels of <code>year</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">general_stoch_kern_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">"general_di_stoch_kern"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">general_stoch_kern_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"general"</span>,
+                                   di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
+                                   det_stoch  <span class="op">=</span> <span class="st">"stoch"</span>,
+                                   kern_param <span class="op">=</span> <span class="st">"kern"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     
     <span class="co"># The kernel name gets a _year added to it to denote that there</span>
@@ -699,7 +702,7 @@
     usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>inv_logit   <span class="op">=</span> <span class="va">inv_logit</span>,
                     inv_logit_2 <span class="op">=</span> <span class="va">inv_logit_2</span><span class="op">)</span>
   <span class="op">)</span></code></pre></div>
-<p>100 isn’t too many iterations, but hopefully this demonstrates how to set up and implement such a model. There are a number of slots in the output that may be useful for further analyseses.</p>
+<p>100 isn’t too many iterations, but hopefully this demonstrates how to set up and implement such a model. There are a number of slots in the output that may be useful for further analyses.</p>
 <ol style="list-style-type: decimal">
 <li><p><code>env_seq</code>: This contains a character vector which shows the sequence in which levels of the time-varying components were chosen during model iteration. We could use this reproduce the model outputs later.</p></li>
 <li><p><code>pop_state$lambda</code>: This shows the single timestep per-capita growth rates for the simulation.</p></li>
@@ -853,7 +856,10 @@
 <a href="#model-specification" class="anchor"></a>Model specification</h3>
 <p>We are now ready to begin implementing the model. This next chunk should look familiar, with the caveat that we have now add the terms <code>temp</code> and <code>precip</code> to vital rates in the <code>P</code> kernel.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">general_stoch_param_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">"general_di_stoch_param"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">general_stoch_param_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"general"</span>,
+                                   di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
+                                   det_stoch  <span class="op">=</span> <span class="st">"stoch"</span>,
+                                   kern_param <span class="op">=</span> <span class="st">"param"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name       <span class="op">=</span> <span class="st">"P_stoch"</span>,
     family     <span class="op">=</span> <span class="st">"CC"</span>,
@@ -1053,7 +1059,9 @@
   <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">int</span> <span class="op">+</span> <span class="va">slope</span> <span class="op">*</span> <span class="va">sv</span> <span class="op">+</span> <span class="va">slope_2</span> <span class="op">*</span> <span class="va">sv</span> <span class="op">^</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span>
 
-<span class="va">general_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">"general_di_det"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">general_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"general"</span>,
+                        di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
+                        det_stoch  <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"P"</span>,
     formula       <span class="op">=</span> <span class="va">s</span> <span class="op">*</span> <span class="va">g</span> <span class="op">*</span> <span class="va">d_ht</span>,
@@ -1188,7 +1196,10 @@
   <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">int</span> <span class="op">+</span> <span class="va">slope</span> <span class="op">*</span> <span class="va">sv</span> <span class="op">+</span> <span class="va">slope_2</span> <span class="op">*</span> <span class="va">sv</span> <span class="op">^</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span>
 
-<span class="va">general_stoch_kern_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">"general_di_stoch_kern"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">general_stoch_kern_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"general"</span>,
+                                   di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
+                                   det_stoch  <span class="op">=</span> <span class="st">"stoch"</span>,
+                                   kern_param <span class="op">=</span> <span class="st">"kern"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"P_year"</span>,
     formula       <span class="op">=</span> <span class="va">s</span> <span class="op">*</span> <span class="va">g_year</span> <span class="op">*</span> <span class="va">d_ht</span>,

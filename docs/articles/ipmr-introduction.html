@@ -116,7 +116,7 @@
 <h2 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h2>
 <p><code>ipmr</code> is a package for implementing integral projection models of varying degrees of complexity. It uses mathematical-ish expressions to build up the iteration kernels from smaller pieces, as well as helpers to ensure that models are implemented correctly. Finally, it provides machinery for stochastic simulations. basic analyses, and model diagnostics. More complicated analysis functions are being implemented in the <a href="https://github.com/levisc8/irage">irage package</a>.</p>
-<p><strong>This package does not help with fitting regression models to demographic data!</strong> This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a much better job of helping you with that than I can. Some of my favorites are <code>lme4</code>, <code>brms</code>, <code>mgcv</code>, and <code>nlme</code>. <code>IPMpack</code> handles the regression modelling and IPM construction, though be forewarned, there are certain types of models that you simply cannot construct with it! <code>IPMpack</code> is no longer on CRAN, but can be installed from the <code>MetaCRAN/IPMpack</code> <a href="https://github.com/cran/IPMpack">Github page</a> or running <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github("CRAN/IPMpack")</a></code>.</p>
+<p><strong>This package does not help with fitting regression models to demographic data!</strong> This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a much better job of helping you with that than I can. Some of my favorites are <code>lme4</code>, <code>brms</code>, <code>mgcv</code>, and <code>nlme</code>. <code>IPMpack</code> handles the regression modeling and IPM construction, though be forewarned, there are certain types of models that you simply cannot construct with it! <code>IPMpack</code> is no longer on CRAN, but can be installed from the <code>MetaCRAN/IPMpack</code> <a href="https://github.com/cran/IPMpack">Github page</a> or running <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github("CRAN/IPMpack")</a></code>.</p>
 <p>Unfortunately, <code>ipmr</code> does not yet have built-in functions for dealing with uncertainty. The goal is to change that soon, but for now, doing this will require <code>for</code> loops and storing the results of each iteration. Some example code is provided at the end of this vignette.</p>
 </div>
 <div id="terminology-and-ipm-construction" class="section level1">
@@ -140,7 +140,7 @@
 <li><p><span class="math inline">\(\mu_g = \alpha_g + \beta_g * z\)</span></p></li>
 </ol>
 <p>Here, we refer to these different scales (parameters (<em>e.g.</em> <span class="math inline">\(\alpha_g,\beta_g\)</span> in Eq 6), regressions (<em>e.g.</em> Eq 4), sub-kernels (<em>e.g.</em> Eq 3), and projection kernels (<em>e.g.</em> Eq 2)) as levels of the <em>model hierarchy</em>. <code>ipmr</code> is intended to help with the last two levels of the model hierarchy.</p>
-<p>Projecting the population state <span class="math inline">\(n(z',t+1)\)</span> requires a solution to the integral in Eq 1. Analytical solutions to the integral in Eq 1 are usually too complicated (or not possible; Ellner &amp; Rees 2006). Numerical approximations of these integrals are usually straightforward using a numerical integration rule. A commonly used rule is the midpoint rule (this is currently the only integration rule available in <code>ipmr</code>, though others should be implemented soon(ish)). The midpoint rule divides the domain <span class="math inline">\([L,U]\)</span> into <span class="math inline">\(m\)</span> artifical size bins <span class="math inline">\(z_i\)</span> with width <span class="math inline">\(h = (U-L) / m\)</span>. The midpoints <span class="math inline">\(z_i = L + (i - 0.5) * h\)</span> for <span class="math inline">\(i = \textrm{1, 2, ...}, m\)</span>. The midpoint rule approximation for Eq 1 then becomes:</p>
+<p>Projecting the population state <span class="math inline">\(n(z',t+1)\)</span> requires a solution to the integral in Eq 1. Analytical solutions to the integral in Eq 1 are usually too complicated (or not possible; Ellner &amp; Rees 2006). Numerical approximations of these integrals are usually straightforward using a numerical integration rule. A commonly used rule is the midpoint rule (this is currently the only integration rule available in <code>ipmr</code>, though others should be implemented soon(ish)). The midpoint rule divides the domain <span class="math inline">\([L,U]\)</span> into <span class="math inline">\(m\)</span> artificial size bins <span class="math inline">\(z_i\)</span> with width <span class="math inline">\(h = (U-L) / m\)</span>. The midpoints <span class="math inline">\(z_i = L + (i - 0.5) * h\)</span> for <span class="math inline">\(i = \textrm{1, 2, ...}, m\)</span>. The midpoint rule approximation for Eq 1 then becomes:</p>
 <ol start="7" style="list-style-type: decimal">
 <li><span class="math inline">\(n(z_j, t+1) = h\sum\limits_{i = 1}^mK(z_j, z_i)n(z_i,t)\)</span></li>
 </ol>
@@ -150,11 +150,11 @@
 <h2 class="hasAnchor">
 <a href="#model-types" class="anchor"></a>Types of models in <code>ipmr</code>
 </h2>
-<p>The first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="../reference/init_ipm.html">init_ipm()</a></code>. This function has two arguments: <code>model_class</code>, and <code>has_age</code>. We will ignore <code>has_age</code> for now, because age-size models are less common and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own vignette</a>.</p>
-<p>The <code>model_class</code> defines the type of projection model (deterministic or stochastic), and makes sure that the machinery for subsequent analyses works correctly. <code>model_class</code> should be a character string with at least 3 (but possibly 4) entries separated by underscores (<code>_</code>). The possible entries for each position are as follows:</p>
+<p>The first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="../reference/init_ipm.html">init_ipm()</a></code>. This function has five arguments: <code>sim_gen</code>, <code>di_dd</code>, <code>det_stoch</code>, <code>kern_param</code>, and <code>has_age</code>. We will ignore <code>has_age</code> for now, because age-size models are less common and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own vignette</a>.</p>
+<p>The combination of these arguments defines the type of projection model, and makes sure that the machinery for subsequent analyses works correctly. The possible entries for each argument are as follows:</p>
 <ul>
 <li>
-<p>Position 1: <code>"simple"</code>/<code>"general"</code></p>
+<p><code>sim_gen</code>: <code>"simple"</code>/<code>"general"</code></p>
 <ul>
 <li><ol style="list-style-type: upper-alpha">
 <li>
@@ -167,28 +167,27 @@
 </ul>
 </li>
 <li>
-<p>Position 2: <code>"di"</code>/<code>"dd"</code></p>
+<p><code>di_dd</code>: <code>"di"</code>/<code>"dd"</code></p>
 <ul>
 <li><p>A. <strong>di</strong>: This is used to denote a <strong>d</strong>ensity-<strong>i</strong>ndependent IPM.</p></li>
 <li><p>B. <strong>dd</strong>: This is used to denote a <strong>d</strong>ensity-<strong>d</strong>ependent IPM.</p></li>
 </ul>
 </li>
 <li>
-<p>Position 3: <code>"det"</code>/<code>"stoch"</code></p>
+<p><code>det_stoch</code>: <code>"det"</code>/<code>"stoch"</code></p>
 <ul>
-<li><p>A. <strong>det</strong>: This is used to denote a deterministic IPM. If this is used in the third position of <code>model_class</code>, there should not be a fourth entry.</p></li>
-<li><p>B. <strong>stoch</strong>: This is used to denote a stochastic IPM. If this is used in the third position of <code>model_class</code>, there should always be a fourth entry. The two possibilities for the fourth are described next.</p></li>
+<li><p>A. <strong>det</strong>: This is used to denote a deterministic IPM. If this is the third argument of <code>init_ipm</code>, <code>kern_param</code> must be left as <code>NULL</code>.</p></li>
+<li><p>B. <strong>stoch</strong>: This is used to denote a stochastic IPM. If this is the third argument of <code>init_ipm</code>, <code>kern_param</code> must be specified. The two possibilities for the fourth are described next.</p></li>
 </ul>
 </li>
 <li>
-<p>Position 4: <code>"kern"</code>/<code>"param"</code> (Complete definitions found in <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405">Metcalf et al. 2015</a>)</p>
+<p><code>kern_param</code>: <code>"kern"</code>/<code>"param"</code> (Complete definitions found in <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405">Metcalf et al. 2015</a>)</p>
 <ul>
 <li><p>A. <strong>kern</strong>: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and for which defining a multivariate joint distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the <code>param</code> alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration.</p></li>
 <li><p>B. <strong>param</strong>: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model (usually a multivariate joint distribution). This can be a multivariate normal defined by covarying slopes and intercepts, or posterior distribution from a Bayesian model. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the <code>"simple_di_stoch_param"</code> example for some inspiration in writing those.</p></li>
 </ul>
 </li>
 </ul>
-<p>With the type of model selected, the <code>model_class</code> becomes a string and the call to <code>init_ipm</code> is composed like so: <code><a href="../reference/init_ipm.html">init_ipm(model_class = "position1_position2_position3_position4")</a></code>.</p>
 <p>The rest of this vignette will deal with simple, density independent IPMs. If you already know that you need a general IPM (i.e. an IPM with discrete stages and/or multiple continuous state variables), I still strongly recommend reading at least one complete example here before you start with <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">those</a>.</p>
 </div>
 <div id="specifying-a-simple-deterministic-ipm-without-density-dependence" class="section level2">
@@ -251,7 +250,7 @@
 <a href="#defining-kernels" class="anchor"></a>Defining kernels</h3>
 <p>The first step is to decide what class of model we want to implement. We have one continuous state variable and no spatial or temporal variation to deal with. Thus, we have a simple, density independent, deterministic IPM. We initialize it with <code><a href="../reference/init_ipm.html">init_ipm()</a></code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">'simple_di_det'</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen <span class="op">=</span> <span class="st">"simple"</span>, di_dd <span class="op">=</span> <span class="st">"di"</span>, det_stoch <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span></code></pre></div>
 <p>The next step is to define the sub-kernels comprising the IPM. This corresponds to equations 3-10. These are defined individually with calls to <code><a href="../reference/define_kernel.html">define_kernel()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
@@ -303,17 +302,17 @@
 <li><p><code>"DC"</code> - a discrete -&gt; continuous transition</p></li>
 <li><p><code>"DD"</code> - a discrete -&gt; discrete transition</p></li>
 </ol>
-<p>These aren’t required for <code>simple_*</code> IPMs, as all transitions are from a continuous state to a continuous state, and so <code>family = "CC"</code> every time. If you forget to specify this for simple models, <code>ipmr</code> will automatically add it for you. However, it will throw an error for general models. As such, it is probably good to get in the habit of specifying it for every kernel.</p>
+<p>These aren’t required for <code>simple</code> IPMs, as all transitions are from a continuous state to a continuous state, and so <code>family = "CC"</code> every time. If you forget to specify this for simple models, <code>ipmr</code> will automatically add it for you. However, it will throw an error for general models. As such, it is probably good to get in the habit of specifying it for every kernel.</p>
 <p>The <code>data_list</code> argument holds the constant parameters (e.g. regression coefficient estimates).</p>
 <p>The <code>states</code> argument is a list containing the names of the state variables in use. <code>ipmr</code> internally appends <code>_1</code> and <code>_2</code> to the names in <code>states</code> list. These correspond the trait values at <span class="math inline">\(t\)</span> and <span class="math inline">\(t+1\)</span>, respectively (distributions, if continuously distributed states, single numbers if discrete traits). They can also be referenced in the vital rate expressions. If they are continuously distributed state variables, <code>ipmr</code> will also generate meshpoints for them that are defined in <code><a href="../reference/define_impl.html">define_domains()</a></code> (see below).</p>
 <p><code>has_hier_effs</code> is a logical indicating whether or not the model contains hierarchical/grouping effects. These usually correspond vital rates that are measured from populations in different years and/or sites. In this example, the model is a simple, deterministic IPM and so this is set to <code>FALSE</code>. There are examples later on that introduce their usage and syntax, so we will ignore it for now.</p>
-<p><code>evict_cor</code> refers to whether or not to correct for eviction in the kernel. If this is set to <code>TRUE</code>, then you must supply a function specifying which expressions need to be corrected and the correction to apply. <code>ipmr</code> provides <code>truncated_distributions</code> for now, though others will eventually be implemented as well. Subsequent additions are mainly to accomodate models in PADRINO, and I very strongly suggest sticking to <code>truncated_distributions</code> for your own models.</p>
+<p><code>evict_cor</code> refers to whether or not to correct for eviction in the kernel. If this is set to <code>TRUE</code>, then you must supply a function specifying which expressions need to be corrected and the correction to apply. <code>ipmr</code> provides <code>truncated_distributions</code> for now, though others will eventually be implemented as well. Subsequent additions are mainly to accommodate models in PADRINO, and I very strongly suggest sticking to <code>truncated_distributions</code> for your own models.</p>
 <p>Finally, <code>ipmr</code> is designed to be <a href="https://magrittr.tidyverse.org/">pipe-friendly</a>. All functions prefixed with <code>define_*</code> take a <code>proto_ipm</code> as their first argument and always return a <code>proto_ipm</code>, meaning operations can be chained together with the <code><a href="../reference/%&gt;%.html">%&gt;%</a></code> operator. This function is included in <code>ipmr</code>, so there is no need to load any other packages to access it (e.g. <code>dplyr</code> or <code>magrittr</code>). The first chunk below is equivalent to the two chunks above.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># the %&gt;% takes the result of the first operation and passes it as the first</span>
 <span class="co"># argument to the second function.</span>
 
-<span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">'simple_di_det'</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+<span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen <span class="op">=</span> <span class="st">"simple"</span>, di_dd <span class="op">=</span> <span class="st">"di"</span>, det_stoch <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name      <span class="op">=</span> <span class="st">"P"</span>,
     formula   <span class="op">=</span>  <span class="va">s</span> <span class="op">*</span> <span class="va">g</span>,
@@ -429,7 +428,7 @@
 <div id="defining-domains-for-state-variables" class="section level3">
 <h3 class="hasAnchor">
 <a href="#defining-domains-for-state-variables" class="anchor"></a>Defining domains for state variables</h3>
-<p>The next step in creating an IPM with <code>ipmr</code> is to define the domain of each continuouse state variable in the <code>states</code> list. This is done with the <code><a href="../reference/define_impl.html">define_domains()</a></code> function. When the <code>int_rule</code> is <code>"midpoint"</code>, this takes a named set of vectors that have 3 entries each. The name corresponds to the <code>state</code> it is associated with, the first entry is the lower bound, the second entry is the upper bound, and the third entry is the number of meshpoints.</p>
+<p>The next step in creating an IPM with <code>ipmr</code> is to define the domain of each continuous state variable in the <code>states</code> list. This is done with the <code><a href="../reference/define_impl.html">define_domains()</a></code> function. When the <code>int_rule</code> is <code>"midpoint"</code>, this takes a named set of vectors that have 3 entries each. The name corresponds to the <code>state</code> it is associated with, the first entry is the lower bound, the second entry is the upper bound, and the third entry is the number of meshpoints.</p>
 <p>Note that for other <code>int_rule</code>s, the vectors associated with each domain will look different. However, those are not yet implemented and so beyond the scope of this vignette for now.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="va">my_ipm</span> <span class="op">%&gt;%</span>
@@ -453,7 +452,7 @@
 <div id="implement-the-ipm" class="section level2">
 <h2 class="hasAnchor">
 <a href="#implement-the-ipm" class="anchor"></a>Implement the IPM</h2>
-<p>The minimal set of information to generate a deterministic IPM is now wrapped up in our <code>proto_ipm</code> and it is time to <code><a href="../reference/make_ipm.html">make_ipm()</a></code>! <code><a href="../reference/make_ipm.html">make_ipm()</a></code> is a generic function and will work for all combinations of <code>model_class</code>.</p>
+<p>The minimal set of information to generate a deterministic IPM is now wrapped up in our <code>proto_ipm</code> and it is time to <code><a href="../reference/make_ipm.html">make_ipm()</a></code>! <code><a href="../reference/make_ipm.html">make_ipm()</a></code> is a generic function and can be used for any type of IPM generated with <code>ipmr</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span><span class="va">my_ipm</span>,
                    iterations <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
@@ -473,8 +472,8 @@
 <div id="using-predict-methods-in-vital-rate-expressions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#using-predict-methods-in-vital-rate-expressions" class="anchor"></a>Using <code>predict()</code> methods in vital rate expressions</h3>
-<p>The vast majority of IPM pipelines entail fitting a statistical models to data to create vital rate functions. Thus, we’re typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or hierarchical effects, and the vital rate expressions are annoying to write out in full. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parameteric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM).</p>
-<p>To deal with this, many regression modelling packages provide a <code>predict</code> method for the class of models that they implement. We can use these in <code>ipmr</code> to take the place of the vital rate expressions (more common) or the kernel formulas (probably not as common).</p>
+<p>The vast majority of IPM pipelines entail fitting a statistical models to data to create vital rate functions. Thus, we’re typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or hierarchical effects, and the vital rate expressions are annoying to write out in full. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parametric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM).</p>
+<p>To deal with this, many regression modeling packages provide a <code>predict</code> method for the class of models that they implement. We can use these in <code>ipmr</code> to take the place of the vital rate expressions (more common) or the kernel formulas (probably not as common).</p>
 <p>We’ll go through a quick example of how to incorporate these expressions into the model building process using a data set for <em>Carpobrotus edulis</em>, an invasive succulent. This is real data collected in Israel and appears in <a href="https://www.biorxiv.org/content/10.1101/2020.12.08.415174v1.full">Bogdan et al. (2020)</a>. The data set is also included in <code>ipmr</code> and can be loaded by running <code><a href="https://rdrr.io/r/utils/data.html">data(iceplant_ex)</a></code>.</p>
 <p>First, we’ll load in the example data set and fit some simple vital rate models. Some notes about the data:</p>
 <ol style="list-style-type: decimal">
@@ -593,7 +592,7 @@
 <span class="va">U</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">iceplant_ex</span><span class="op">$</span><span class="va">log_size</span>, <span class="va">iceplant_ex</span><span class="op">$</span><span class="va">log_size_next</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">*</span> <span class="fl">1.2</span></code></pre></div>
 <p>We now have everything we need to get started. We use almost the same code as the first example to implement the model, but substitute <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> in for the mathematical form of the vital rate expressions. When we do this, we have to make sure that the names of the <code>newdata</code> argument in <code>predict</code> match the names in our model formula, and that the values we put into it are the names of the state variables in our model. These same caveats apply to using <code>predict</code> interactively.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pred_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">"simple_di_det"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">pred_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen <span class="op">=</span> <span class="st">"simple"</span>, di_dd <span class="op">=</span> <span class="st">"di"</span>, det_stoch <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"P"</span>,
     family        <span class="op">=</span> <span class="st">"CC"</span>,
@@ -677,7 +676,7 @@
                flow_n   <span class="op">=</span> <span class="va">flow_n</span><span class="op">)</span>
 
 
-<span class="va">pred_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">"simple_di_det"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">pred_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen <span class="op">=</span> <span class="st">"simple"</span>, di_dd <span class="op">=</span> <span class="st">"di"</span>, det_stoch <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"P"</span>,
     family        <span class="op">=</span> <span class="st">"CC"</span>,
@@ -796,7 +795,7 @@
 </ul>
 </li>
 <li>
-<p>seed production (<code>f_s_site</code>): A poisson regression with a random site intercept (<code>f_s_r_site</code>)</p>
+<p>seed production (<code>f_s_site</code>): A Poisson regression with a random site intercept (<code>f_s_r_site</code>)</p>
 <ul>
 <li>Example model formula: <code>glmer(seed_num ~ size_1 + (1 | site), data = my_surv_data, family = poisson()))</code>
 </li>
@@ -852,7 +851,7 @@
 <span class="va">all_params_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">fixed_list</span>, <span class="va">g_params</span>, <span class="va">s_params</span>, <span class="va">f_s_params</span><span class="op">)</span></code></pre></div>
 <p>We’ve created a list where each entry is named and contains a single parameter value. This is now ready for use in <code><a href="../reference/define_kernel.html">define_kernel()</a></code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">'simple_di_det'</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen <span class="op">=</span> <span class="st">"simple"</span>, di_dd <span class="op">=</span> <span class="st">"di"</span>, det_stoch <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     
     <span class="co"># Our P kernels will vary from site to site, so we append the "_site" suffix</span>
@@ -944,7 +943,7 @@
            iterations <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
   
 <span class="fu"><a href="../reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">my_ipm</span><span class="op">)</span></code></pre></div>
-<p>Aside from appending <code>_site</code> to a number of variables, the code is pretty much the same as the first example. <code>ipmr</code> automatically substitutes 1, 2, 3, 4, and 5 for each occurence of <code>site</code> in the kernel formulas and vital rate expressions. Thus, <code>P_site</code> is expanded to <code>P_1</code>, <code>P_2</code>, <code>P_3</code>, <code>P_4</code>, <code>P_5</code>, <code>s_yr</code> to <code>s_1</code>, <code>s_2</code>, <code>s_3</code>, <code>s_4</code>, and <code>s_5</code>. <code>s_r_site</code> is converted to <code>s_r_1</code>, <code>s_r_2</code>, etc. This is why we needed to make sure the names in <code>all_params_list</code> had the actual numbers appended to them.</p>
+<p>Aside from appending <code>_site</code> to a number of variables, the code is pretty much the same as the first example. <code>ipmr</code> automatically substitutes 1, 2, 3, 4, and 5 for each occurrence of <code>site</code> in the kernel formulas and vital rate expressions. Thus, <code>P_site</code> is expanded to <code>P_1</code>, <code>P_2</code>, <code>P_3</code>, <code>P_4</code>, <code>P_5</code>, <code>s_yr</code> to <code>s_1</code>, <code>s_2</code>, <code>s_3</code>, <code>s_4</code>, and <code>s_5</code>. <code>s_r_site</code> is converted to <code>s_r_1</code>, <code>s_r_2</code>, etc. This is why we needed to make sure the names in <code>all_params_list</code> had the actual numbers appended to them.</p>
 <p>For more complicated models, you may need multiple suffixes. In those cases, you can append them in any order you like to each variable. For example, sites (<code>_site</code>) and years (<code>_yr</code>) could be appended to survival (<code>s_</code>) like so:</p>
 <p><code>s_site_yr = some_expression</code></p>
 <p>The <code>levels_hier_effs</code> list then gets modified like so:</p>
@@ -979,7 +978,7 @@
 </ul>
 </li>
 <li>
-<p>seed production (<code>f_s_yr</code>): A poisson regression with a random year intercept (<code>f_s_r_yr</code>)</p>
+<p>seed production (<code>f_s_yr</code>): A Poisson regression with a random year intercept (<code>f_s_r_yr</code>)</p>
 <ul>
 <li>Example model formula: <code>glmer(seed_num ~ size_1 + (1 | yr), data = my_surv_data, family = poisson()))</code>
 </li>
@@ -1070,9 +1069,12 @@
 <div id="implement-the-ipm-1" class="section level3">
 <h3 class="hasAnchor">
 <a href="#implement-the-ipm-1" class="anchor"></a>Implement the IPM</h3>
-<p>With the functions and parameter values defined, we are now ready to begin composing the model. Each expression’s syntax will look very similar to the deterministic example - the main difference is we are now pretending that our hierarchical effect is year (<code>_yr</code>) as opposed to site, and we change the model class in <code><a href="../reference/init_ipm.html">init_ipm()</a></code>.</p>
+<p>With the functions and parameter values defined, we are now ready to begin composing the model. Each expression’s syntax will look very similar to the deterministic example - the main difference is we are now pretending that our hierarchical effect is year (<code>_yr</code>) as opposed to site, and we change the <code>det_stoch</code> and <code>kern_param</code> arguments in <code><a href="../reference/init_ipm.html">init_ipm()</a></code>.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">'simple_di_stoch_kern'</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"simple"</span>,
+                   di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
+                   det_stoch  <span class="op">=</span> <span class="st">"stoch"</span>,
+                   kern_param <span class="op">=</span> <span class="st">"kern"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name             <span class="op">=</span> <span class="st">'P_yr'</span>,         <span class="co"># P because P_yr</span>
     formula          <span class="op">=</span> <span class="va">s_yr</span> <span class="op">*</span> <span class="va">g_yr</span>,    <span class="co"># g and s become g_yr and s_yr, respectively</span>
@@ -1153,7 +1155,7 @@
 <h2 class="hasAnchor">
 <a href="#simple-ipms-for-continuously-varying-environments" class="anchor"></a>Simple IPMs for continuously varying environments</h2>
 <p>In some cases, it is not desirable to work with single estimates of a random variable, and we would prefer to work with the distributions they come from. Environmental variables like temperature and precipitation may be random with reasonably well known distributions. A stochastic simulation can incorporate this information to help us understand the consequences of this random variability.</p>
-<p>This is where the <code>*_stoch_param</code> methods come in handy. Unfortuntately, the <code>*_stoch_param</code> methods are slightly less computationally efficient than their <code>*_stoch_kern*</code> counterparts because they must rebuild each kernel for every single iteration. However, they are fantastic tools for exploring the consequences of continuous environmental variation.</p>
+<p>This is where the <code>kern_param = "param"</code> methods come in handy. Unfortunately, these methods are slightly less computationally efficient than their <code>kern_param = "kern"</code> counterparts because they must rebuild each kernel for every single iteration. However, they are fantastic tools for exploring the consequences of continuous environmental variation.</p>
 <p>Below is an example that demonstrates how to work with environmental variation. <code>ipmr</code> is careful to only evaluate each expression in <code><a href="../reference/define_impl.html">define_env_state()</a></code> once per iteration, so we can safely work with multivariate distributions using very little additional code. It is important to note that this not necessarily the same thing as incorporating parameter uncertainty into your model. Parameter uncertainty is covered in the final section of this vignette.</p>
 <p>The parameters for the growth and survival functions will be sampled from distributions for temperature and precipitation one time per iteration, and an example of a function to pass to <code><a href="../reference/define_impl.html">define_env_state()</a></code> is included in the first chunk below.</p>
 <div id="defining-initial-conditions" class="section level3">
@@ -1282,7 +1284,10 @@
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">init_pop_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
 
-<span class="va">param_resamp_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">'simple_di_stoch_param'</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">param_resamp_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"simple"</span>,
+                               di_dd      <span class="op">=</span> <span class="st">"di"</span>,
+                               det_stoch  <span class="op">=</span> <span class="st">"stoch"</span>,
+                               kern_param <span class="op">=</span> <span class="st">"param"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name    <span class="op">=</span> <span class="st">'P'</span>,
     formula <span class="op">=</span> <span class="va">s</span> <span class="op">*</span> <span class="va">g</span>,
@@ -1364,7 +1369,10 @@
 <a href="#pre-determined-sequences-of-environmental-covariates" class="anchor"></a>Pre-determined sequences of environmental covariates</h3>
 <p>In some cases, we might want to provide a sequence of environmental values ahead of time, as opposed to sampling them at each iteration. We can do this by re-writing the <code>sample_env</code> function so that it takes the current model iteration as a parameter that selects values from the pre-specified environmental values. <code>ipmr</code> defines the variable <code>t</code> internally, which we can use to access the current model iteration. First, we re-define the model:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">param_resamp_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">'simple_di_stoch_param'</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">param_resamp_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"simple"</span>,
+                               di_dd      <span class="op">=</span> <span class="st">"di"</span>,
+                               det_stoch  <span class="op">=</span> <span class="st">"stoch"</span>,
+                               kern_param <span class="op">=</span> <span class="st">"param"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name    <span class="op">=</span> <span class="st">'P'</span>,
     formula <span class="op">=</span> <span class="va">s</span> <span class="op">*</span> <span class="va">g</span>,
@@ -1444,10 +1452,13 @@
 <div id="modeling-the-environment-directly" class="section level3">
 <h3 class="hasAnchor">
 <a href="#modeling-the-environment-directly" class="anchor"></a>Modeling the environment directly</h3>
-<p>Above, we defined the environment explicitly ahead of time. However, there may be cases where we’d rather incorporate other environmental models direcly into our stochastic IPM (e.g. a specific climate change scenario). We <em>could</em> sample our environmental model ahead of time and simply incorporate those directly into the model, indexing by time, similar to what we did above. However, this may not be convenient for some purposes.</p>
+<p>Above, we defined the environment explicitly ahead of time. However, there may be cases where we’d rather incorporate other environmental models directly into our stochastic IPM (e.g. a specific climate change scenario). We <em>could</em> sample our environmental model ahead of time and simply incorporate those directly into the model, indexing by time, similar to what we did above. However, this may not be convenient for some purposes.</p>
 <p>Below is an example that is similar to above, but includes information on time when drawing environmental covariate values. This simulation will set up a scenario in which temperature increases and precipitation decreases with time, and adds random noise to each draw.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">param_resamp_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">'simple_di_stoch_param'</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">param_resamp_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"simple"</span>,
+                               di_dd      <span class="op">=</span> <span class="st">"di"</span>,
+                               det_stoch  <span class="op">=</span> <span class="st">"stoch"</span>,
+                               kern_param <span class="op">=</span> <span class="st">"param"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name    <span class="op">=</span> <span class="st">'P'</span>,
     formula <span class="op">=</span> <span class="va">s</span> <span class="op">*</span> <span class="va">g</span>,
@@ -1568,7 +1579,9 @@
 <span class="va">L</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">iceplant_ex</span><span class="op">$</span><span class="va">log_size</span>, <span class="va">iceplant_ex</span><span class="op">$</span><span class="va">log_size_next</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">*</span> <span class="fl">1.2</span>
 <span class="va">U</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">iceplant_ex</span><span class="op">$</span><span class="va">log_size</span>, <span class="va">iceplant_ex</span><span class="op">$</span><span class="va">log_size_next</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">*</span> <span class="fl">1.2</span>
 
-<span class="va">obs_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span><span class="st">"simple_di_det"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">obs_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"simple"</span>,
+                    di_dd      <span class="op">=</span> <span class="st">"di"</span>,
+                    det_stoch  <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"P"</span>,
     family        <span class="op">=</span> <span class="st">"CC"</span>,
