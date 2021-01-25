@@ -7,8 +7,7 @@ status](https://www.r-pkg.org/badges/version/ipmr)](https://cran.r-project.org/p
 [![Codecov test
 coverage](https://codecov.io/gh/levisc8/ipmr/branch/master/graph/badge.svg)](https://codecov.io/gh/levisc8/ipmr?branch=master)
 
-ipmr
-====
+# ipmr
 
 `ipmr` is a package for implementing Integral Projection Models (IPMs)
 in *R*. It relies heavily on the mathematical syntax of the models, and
@@ -17,8 +16,7 @@ now relatively stable, though tweaks may be made. Below is a brief
 overview of how `ipmr` classifies different model types followed by
 examples of how to implement those types in this framework.
 
-Installation
-------------
+## Installation
 
 `ipmr` is not yet on CRAN. You can install the development version with
 the snippet below:
@@ -31,8 +29,7 @@ if(!require('remotes', quietly = TRUE)) {
 remotes::install_github("levisc8/ipmr", build_vignettes = TRUE)
 ```
 
-Package scope
--------------
+## Package scope
 
 `ipmr` is intended to assist with IPM implementation and analysis. It is
 important to note that this package **will not** help with the process
@@ -58,8 +55,7 @@ Below is a brief overview of the package and some examples of how to
 implement models with it. A more thorough introduction is available
 [here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
 
-Model classes
--------------
+## Model classes
 
 Once all parameters are estimated, the first step of defining a model in
 `ipmr` is to initialize the model using `init_ipm()`. This function has
@@ -118,8 +114,8 @@ each position.
 -   B. **param**: This describes an IPM with parameters that are
     re-sampled from some distribution at each iteration of the model.
     This could, for example, be a multivariate normal defined by
-    covarying slopes and intercepts, or posterior distribution(s) from a
-    Bayesian model. All that is required is that the parameters/values
+    co-varying slopes and intercepts, or posterior distribution(s) from
+    a Bayesian model. All that is required is that the parameters/values
     for the distribution are specified and that the function that
     generates the parameters at each iteration returns named lists that
     correspond to the parameter names in the model. These are covered in
@@ -178,8 +174,7 @@ A very brief, though incomplete introduction is available
 [here](https://levisc8.github.io/ipmr/articles/density-dependence.html).
 Below is an example implementing a `simple_di_det` IPM.
 
-Quick example of a simple, deterministic IPM
---------------------------------------------
+## Quick example of a simple, deterministic IPM
 
 Here is a simple model implemented with `ipmr`. This is a hypothetical
 plant species where plants can survive and grow (*P*(*z*′, *z*)), and
@@ -405,18 +400,16 @@ w_ipmr      <- right_ev(my_simple_ipm)
 v_ipmr      <- left_ev(my_simple_ipm)
 ```
 
-More complicated models
------------------------
+## More complicated models
 
 Examples of more complicated models are included in the vignettes,
-accesible using either `browseVignettes('ipmr')` or by visiting the
+accessible using either `browseVignettes('ipmr')` or by visiting the
 Articles tab on [project’s webpage](https://levisc8.github.io/ipmr/).
 Please file all bug reports in the Issues tab of this repository or
 contact me via [email](mailto:levisc8@gmail.com) with a reproducible
 example.
 
-Code of Conduct
----------------
+## Code of Conduct
 
 We welcome contributions from other developers. Please note that the
 ipmr project is released with a [Contributor Code of

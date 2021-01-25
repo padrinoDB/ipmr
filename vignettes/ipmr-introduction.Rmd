@@ -14,7 +14,7 @@ vignette: >
   
 `ipmr` is a package for implementing integral projection models of varying degrees of complexity. It uses mathematical-ish expressions to build up the iteration kernels from smaller pieces, as well as helpers to ensure that models are implemented correctly. Finally, it provides machinery for stochastic simulations. basic analyses, and model diagnostics. More complicated analysis functions are being implemented in the [irage package](https://github.com/levisc8/irage).
   
-**This package does not help with fitting regression models to demographic data!** This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a much better job of helping you with that than I can. Some of my favorites are `lme4`, `brms`, `mgcv`, and `nlme`. `IPMpack` handles the regression modelling and IPM construction, though be forewarned, there are certain types of models that you simply cannot construct with it! `IPMpack` is no longer on CRAN, but can be installed from the `MetaCRAN/IPMpack` [Github page](https://github.com/cran/IPMpack) or running `devtools::install_github("CRAN/IPMpack")`.
+**This package does not help with fitting regression models to demographic data!** This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a much better job of helping you with that than I can. Some of my favorites are `lme4`, `brms`, `mgcv`, and `nlme`. `IPMpack` handles the regression modeling and IPM construction, though be forewarned, there are certain types of models that you simply cannot construct with it! `IPMpack` is no longer on CRAN, but can be installed from the `MetaCRAN/IPMpack` [Github page](https://github.com/cran/IPMpack) or running `devtools::install_github("CRAN/IPMpack")`.
 
 Unfortunately, `ipmr` does not yet have built-in functions for dealing with uncertainty. The goal is to change that soon, but for now, doing this will require `for` loops and storing the results of each iteration. Some example code is provided at the end of this vignette.
 
@@ -44,7 +44,7 @@ $P(z',z)$ is a sub-kernel describing transitions due to survival and state value
 
 Here, we refer to these different scales (parameters (_e.g._ $\alpha_g,\beta_g$ in Eq 6), regressions (_e.g._ Eq 4), sub-kernels (_e.g._ Eq 3), and projection kernels (_e.g._ Eq 2)) as levels of the _model hierarchy_. `ipmr` is intended to help with the last two levels of the model hierarchy. 
 
-Projecting the population state $n(z',t+1)$ requires a solution to the integral in Eq 1. Analytical solutions to the integral in Eq 1 are usually too complicated (or not possible; Ellner & Rees 2006). Numerical approximations of these integrals are usually straightforward using a numerical integration rule. A commonly used rule is the midpoint rule (this is currently the only integration rule available in `ipmr`, though others should be implemented soon(ish)). The midpoint rule divides the domain $[L,U]$ into $m$ artifical size bins $z_i$ with width $h = (U-L) / m$. The midpoints $z_i = L + (i - 0.5) * h$ for $i = \textrm{1, 2, ...}, m$. The midpoint rule approximation for Eq 1 then becomes:
+Projecting the population state $n(z',t+1)$ requires a solution to the integral in Eq 1. Analytical solutions to the integral in Eq 1 are usually too complicated (or not possible; Ellner & Rees 2006). Numerical approximations of these integrals are usually straightforward using a numerical integration rule. A commonly used rule is the midpoint rule (this is currently the only integration rule available in `ipmr`, though others should be implemented soon(ish)). The midpoint rule divides the domain $[L,U]$ into $m$ artificial size bins $z_i$ with width $h = (U-L) / m$. The midpoints $z_i = L + (i - 0.5) * h$ for $i = \textrm{1, 2, ...}, m$. The midpoint rule approximation for Eq 1 then becomes:
 
 7. $n(z_j, t+1) = h\sum\limits_{i = 1}^mK(z_j, z_i)n(z_i,t)$
 
@@ -54,35 +54,33 @@ While `ipmr` intends to mimic the notation above as closely as possible, it does
   
 ## Types of models in `ipmr` {#model-types}
   
-The first step of defining a model in `ipmr` is to initialize the model using `init_ipm()`. This function has two arguments: `model_class`, and `has_age`. We will ignore `has_age` for now, because age-size models are less common and have their [own vignette](https://levisc8.github.io/ipmr/articles/age_x_size.html). 
+The first step of defining a model in `ipmr` is to initialize the model using `init_ipm()`. This function has five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and `has_age`. We will ignore `has_age` for now, because age-size models are less common and have their [own vignette](https://levisc8.github.io/ipmr/articles/age_x_size.html). 
 
-The `model_class` defines the type of projection model (deterministic or stochastic), and makes sure that the machinery for subsequent analyses works correctly. `model_class` should be a character string with at least 3 (but possibly 4) entries separated by underscores (`_`). The possible entries for each position are as follows:
+The combination of these arguments defines the type of projection model, and makes sure that the machinery for subsequent analyses works correctly. The possible entries for each argument are as follows:
 
-- Position 1: `"simple"`/`"general"`
+- `sim_gen`: `"simple"`/`"general"`
 
     + A.  **simple**: This describes an IPM with a single continuous state variable and no discrete stages. The model presented in the Terminology section is a simple IPM, because it makes use of one, and only one, continuous state variable ($z$). 
 
     + B.  **general**: This describes and IPM with either more than one continuous state variable, one or more discrete stages, or both of the above. Basically, anything other than an IPM with a single continuous state variable.
 
-- Position 2: `"di"`/`"dd"`
+- `di_dd`: `"di"`/`"dd"`
 
     + A. **di**: This is used to denote a **d**ensity-**i**ndependent IPM.
 
     + B. **dd**: This is used to denote a **d**ensity-**d**ependent IPM.
 
-- Position 3: `"det"`/`"stoch"`
+- `det_stoch`: `"det"`/`"stoch"`
 
-    + A. **det**: This is used to denote a deterministic IPM. If this is used in the third position of `model_class`, there should not be a fourth entry.
+    + A. **det**: This is used to denote a deterministic IPM. If this is the third argument of `init_ipm`, `kern_param` must be left as `NULL`.
 
-    + B. **stoch**: This is used to denote a stochastic IPM. If this is used in the third position of `model_class`, there should always be a fourth entry. The two possibilities for the fourth are described next.
+    + B. **stoch**: This is used to denote a stochastic IPM. If this is the third argument of `init_ipm`, `kern_param` must be specified. The two possibilities for the fourth are described next.
 
-- Position 4: `"kern"`/`"param"` (Complete definitions found in [Metcalf et al. 2015](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405))
+- `kern_param`: `"kern"`/`"param"` (Complete definitions found in [Metcalf et al. 2015](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405))
 
     + A. **kern**: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and for which defining a multivariate joint distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the `param` alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration. 
 
     + B. **param**: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model (usually a multivariate joint distribution). This can be a multivariate normal defined by covarying slopes and intercepts, or posterior distribution from a Bayesian model. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the `"simple_di_stoch_param"` example for some inspiration in writing those.
-
-With the type of model selected, the `model_class` becomes a string and the call to `init_ipm` is composed like so: `init_ipm(model_class = "position1_position2_position3_position4")`. 
 
 The rest of this vignette will deal with simple, density independent IPMs. If you already know that you need a general IPM (i.e. an IPM with discrete stages and/or multiple continuous state variables), I still strongly  recommend reading at least one complete example here before you start with  [those](https://levisc8.github.io/ipmr/articles/general-ipms.html).
 
@@ -142,7 +140,7 @@ The first step is to decide what class of model we want to implement. We have on
 
 ``` {r eval = FALSE}
 
-my_ipm <- init_ipm('simple_di_det')
+my_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det")
 
 
 ```
@@ -207,7 +205,7 @@ The `family` argument refers to the type of transition that the kernel describes
 
 4. `"DD"` - a discrete -> discrete transition
 
-These aren't required for `simple_*` IPMs, as all transitions are from a continuous state to a continuous state, and so `family = "CC"` every time. If you forget to specify this for simple models, `ipmr` will automatically add it for you. However, it will throw an error for general models. As such, it is probably good to get in the habit of specifying it for every kernel. 
+These aren't required for `simple` IPMs, as all transitions are from a continuous state to a continuous state, and so `family = "CC"` every time. If you forget to specify this for simple models, `ipmr` will automatically add it for you. However, it will throw an error for general models. As such, it is probably good to get in the habit of specifying it for every kernel. 
 
 The `data_list` argument holds the constant parameters (e.g. regression coefficient estimates). 
 
@@ -215,7 +213,7 @@ The `states` argument is a list containing the names of the state variables in u
 
 `has_hier_effs` is a logical indicating whether or not the model contains hierarchical/grouping effects. These usually correspond vital rates that are measured from populations in different years and/or sites. In this example, the model is a simple, deterministic IPM and so this is set to `FALSE`. There are examples later on that introduce their usage and syntax, so we will ignore it for now.
 
-`evict_cor` refers to whether or not to correct for eviction in the kernel. If this is set to `TRUE`, then you must supply a function specifying which expressions need to be corrected and the correction to apply. `ipmr` provides `truncated_distributions` for now, though others will eventually be implemented as well. Subsequent additions are mainly to accomodate models in PADRINO, and I very strongly suggest sticking to `truncated_distributions` for your own models.
+`evict_cor` refers to whether or not to correct for eviction in the kernel. If this is set to `TRUE`, then you must supply a function specifying which expressions need to be corrected and the correction to apply. `ipmr` provides `truncated_distributions` for now, though others will eventually be implemented as well. Subsequent additions are mainly to accommodate models in PADRINO, and I very strongly suggest sticking to `truncated_distributions` for your own models.
 
 Finally, `ipmr` is designed to be [pipe-friendly](https://magrittr.tidyverse.org/). All functions prefixed with `define_*` take a `proto_ipm` as their first argument and always return a `proto_ipm`, meaning operations can be chained together with the `%>%` operator. This function is included in `ipmr`, so there is no need to load any other packages to access it (e.g. `dplyr` or `magrittr`). The first chunk below is equivalent to the two chunks above.
 
@@ -225,7 +223,7 @@ Finally, `ipmr` is designed to be [pipe-friendly](https://magrittr.tidyverse.org
 # the %>% takes the result of the first operation and passes it as the first
 # argument to the second function.
 
-my_ipm <- init_ipm('simple_di_det') %>% 
+my_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>% 
   define_kernel(
     name      = "P",
     formula   =  s * g,
@@ -364,7 +362,7 @@ my_ipm <- my_ipm %>%
 
 ### Defining domains for state variables
 
-The next step in creating an IPM with `ipmr` is to define the domain of each continuouse state variable in the `states` list. This is done with the `define_domains()` function. When the `int_rule` is `"midpoint"`, this takes a named set of vectors that have 3 entries each. The name corresponds to the `state` it is associated with, the first entry is the lower bound, the second entry is the upper bound, and the third entry is the number of meshpoints.
+The next step in creating an IPM with `ipmr` is to define the domain of each continuous state variable in the `states` list. This is done with the `define_domains()` function. When the `int_rule` is `"midpoint"`, this takes a named set of vectors that have 3 entries each. The name corresponds to the `state` it is associated with, the first entry is the lower bound, the second entry is the upper bound, and the third entry is the number of meshpoints.
 
 Note that for other `int_rule`s, the vectors associated with each domain will look different. However, those are not yet implemented and so beyond the scope of this vignette for now.
 
@@ -394,7 +392,7 @@ my_ipm <- my_ipm %>%
 
 ## Implement the IPM
 
-The minimal set of information to generate a deterministic IPM is now wrapped up in our `proto_ipm` and it is time to `make_ipm()`! `make_ipm()` is a generic function and will work for all combinations of `model_class`. 
+The minimal set of information to generate a deterministic IPM is now wrapped up in our `proto_ipm` and it is time to `make_ipm()`! `make_ipm()` is a generic function and can be used for any type of IPM generated with `ipmr`. 
 
 ```{r eval = FALSE}
 
@@ -423,9 +421,9 @@ In this example, there are no additional arguments that need to be passed to `ma
 
 ### Using `predict()` methods in vital rate expressions
 
-The vast majority of IPM pipelines entail fitting a statistical models to data to create vital rate functions. Thus, we're typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or hierarchical effects, and the vital rate expressions are annoying to write out in full. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parameteric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM). 
+The vast majority of IPM pipelines entail fitting a statistical models to data to create vital rate functions. Thus, we're typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or hierarchical effects, and the vital rate expressions are annoying to write out in full. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parametric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM). 
 
-To deal with this, many regression modelling packages provide a `predict` method for the class of models that they implement. We can use these in `ipmr` to take the place of the vital rate expressions (more common) or the kernel formulas (probably not as common). 
+To deal with this, many regression modeling packages provide a `predict` method for the class of models that they implement. We can use these in `ipmr` to take the place of the vital rate expressions (more common) or the kernel formulas (probably not as common). 
 
 We'll go through a quick example of how to incorporate these expressions into the model building process using a data set for *Carpobrotus edulis*, an invasive succulent. This is real data collected in Israel and appears in [Bogdan et al. (2020)](https://www.biorxiv.org/content/10.1101/2020.12.08.415174v1.full). The data set is also included in `ipmr` and can be loaded by running `data(iceplant_ex)`.
 
@@ -541,7 +539,7 @@ We now have everything we need to get started. We use almost the same code as th
 
 ```{r eval = FALSE}
 
-pred_ipm <- init_ipm("simple_di_det") %>%
+pred_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
   define_kernel(
     name          = "P",
     family        = "CC",
@@ -632,7 +630,7 @@ params <- list(recr_mu = recr_mu,
                flow_n   = flow_n)
 
 
-pred_ipm <- init_ipm("simple_di_det") %>%
+pred_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
   define_kernel(
     name          = "P",
     family        = "CC",
@@ -747,7 +745,7 @@ For this example, we'll use the following vital rate models. The `(g)lmer` funct
 
     - Example model formula: `glm(flower ~ size_1 , data = my_surv_data, family = binomial()))`
 
-4. seed production (`f_s_site`): A poisson regression with a random site intercept (`f_s_r_site`)
+4. seed production (`f_s_site`): A Poisson regression with a random site intercept (`f_s_r_site`)
 
     - Example model formula: `glmer(seed_num ~ size_1 + (1 | site), data = my_surv_data, family = poisson()))`
     
@@ -814,7 +812,7 @@ We've created a list where each entry is named and contains a single parameter v
 
 ```{r eval = FALSE}
 
-my_ipm <- init_ipm('simple_di_det') %>%
+my_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
   define_kernel(
     
     # Our P kernels will vary from site to site, so we append the "_site" suffix
@@ -910,7 +908,7 @@ lambda(my_ipm)
 
 ```
 
-Aside from appending `_site` to a number of variables, the code is pretty much the same as the first example. `ipmr` automatically substitutes 1, 2, 3, 4, and 5 for each occurence of `site` in the kernel formulas and vital rate expressions. Thus, `P_site` is expanded to `P_1`, `P_2`, `P_3`, `P_4`, `P_5`, `s_yr` to `s_1`, `s_2`, `s_3`, `s_4`, and `s_5`. `s_r_site` is converted to `s_r_1`, `s_r_2`,  etc. This is why we needed to make sure the names in `all_params_list` had the actual numbers appended to them. 
+Aside from appending `_site` to a number of variables, the code is pretty much the same as the first example. `ipmr` automatically substitutes 1, 2, 3, 4, and 5 for each occurrence of `site` in the kernel formulas and vital rate expressions. Thus, `P_site` is expanded to `P_1`, `P_2`, `P_3`, `P_4`, `P_5`, `s_yr` to `s_1`, `s_2`, `s_3`, `s_4`, and `s_5`. `s_r_site` is converted to `s_r_1`, `s_r_2`,  etc. This is why we needed to make sure the names in `all_params_list` had the actual numbers appended to them. 
 
 For more complicated models, you may need multiple suffixes. In those cases, you can append them in any order you like to each variable. For example, sites (`_site`) and years (`_yr`) could be appended to survival (`s_`) like so: 
 
@@ -940,7 +938,7 @@ The vital rate models are as follows:
 
     - Example model formula: `glm(flower ~ size_1 , data = my_surv_data, family = binomial()))`
 
-4. seed production (`f_s_yr`): A poisson regression with a random year intercept (`f_s_r_yr`)
+4. seed production (`f_s_yr`): A Poisson regression with a random year intercept (`f_s_r_yr`)
 
     - Example model formula: `glmer(seed_num ~ size_1 + (1 | yr), data = my_surv_data, family = poisson()))`
     
@@ -1041,11 +1039,14 @@ The only requirement for these functions is that they contain valid R code, and 
 
 ### Implement the IPM
 
-With the functions and parameter values defined, we are now ready to begin composing the model. Each expression's syntax will look very similar to the deterministic example - the main difference is we are now pretending that our hierarchical effect is year (`_yr`) as opposed to site, and we change the model class in `init_ipm()`. 
+With the functions and parameter values defined, we are now ready to begin composing the model. Each expression's syntax will look very similar to the deterministic example - the main difference is we are now pretending that our hierarchical effect is year (`_yr`) as opposed to site, and we change the `det_stoch` and `kern_param` arguments in `init_ipm()`. 
 
 ```{r eval = FALSE}
 
-my_ipm <- init_ipm('simple_di_stoch_kern') %>%
+my_ipm <- init_ipm(sim_gen    = "simple",
+                   di_dd      = "di", 
+                   det_stoch  = "stoch",
+                   kern_param = "kern") %>%
   define_kernel(
     name             = 'P_yr',         # P because P_yr
     formula          = s_yr * g_yr,    # g and s become g_yr and s_yr, respectively
@@ -1131,7 +1132,7 @@ The only major difference between the IPM definition in the first example and th
 
 In some cases, it is not desirable to work with single estimates of a random variable, and we would prefer to work with the distributions they come from. Environmental variables like temperature and precipitation may be random with reasonably well known distributions. A stochastic simulation can incorporate this information to help us understand the consequences of this random variability. 
 
-This is where the `*_stoch_param` methods come in handy. Unfortuntately, the `*_stoch_param` methods are slightly less computationally efficient than their `*_stoch_kern*` counterparts because they must rebuild each kernel for every single iteration. However, they are fantastic tools for exploring the consequences of continuous environmental variation. 
+This is where the `kern_param = "param"` methods come in handy. Unfortunately, these methods are slightly less computationally efficient than their `kern_param = "kern"` counterparts because they must rebuild each kernel for every single iteration. However, they are fantastic tools for exploring the consequences of continuous environmental variation. 
 
 Below is an example that demonstrates how to work with environmental variation. `ipmr` is careful to only evaluate each expression in `define_env_state()` once per iteration, so we can safely work with multivariate distributions using very little additional code. It is important to note that this not necessarily the same thing as incorporating parameter uncertainty into your model. Parameter uncertainty is covered in the final section of this vignette.
 
@@ -1253,7 +1254,10 @@ We now have parameter estimates. Time to build the IPM!
 
 init_pop_vec <- runif(100)
 
-param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
+param_resamp_model <- init_ipm(sim_gen    = "simple",
+                               di_dd      = "di",
+                               det_stoch  = "stoch",
+                               kern_param = "param") %>%
   define_kernel(
     name    = 'P',
     formula = s * g,
@@ -1346,7 +1350,10 @@ In some cases, we might want to provide a sequence of environmental values ahead
 ```{r eval = FALSE}
 
 
-param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
+param_resamp_model <- init_ipm(sim_gen    = "simple",
+                               di_dd      = "di",
+                               det_stoch  = "stoch",
+                               kern_param = "param") %>%
   define_kernel(
     name    = 'P',
     formula = s * g,
@@ -1402,6 +1409,7 @@ env_states <- data.frame(precip = rgamma(10, shape = 1000, rate = 2),
                          temp   = rnorm(10, mean = 8.9, sd = 1.2))
 
 ```
+
 In this case, we are trying to sample these in a specific order - the 1st row first, the 2nd row second, 3rd row third, etc. Instead of writing a function that generates random draws from a distribution, we write one that samples rows from this data frame and creates a named list. `ipmr` generates a helper variable, `t`, that lets us access the current model iteration. Thus, our function to generate the environmental variables at each time step could look like this:
 
 ```{r eval = FALSE}
@@ -1442,14 +1450,17 @@ Notice that we set `iteration = t` in the call to `sample_env`. Otherwise, every
 
 ### Modeling the environment directly
 
-Above, we defined the environment explicitly ahead of time. However, there may be cases where we'd rather incorporate other environmental models direcly into our stochastic IPM (e.g. a specific climate change scenario). We *could* sample our environmental model ahead of time and simply incorporate those directly into the model, indexing by time, similar to what we did above. However, this may not be convenient for some purposes. 
+Above, we defined the environment explicitly ahead of time. However, there may be cases where we'd rather incorporate other environmental models directly into our stochastic IPM (e.g. a specific climate change scenario). We *could* sample our environmental model ahead of time and simply incorporate those directly into the model, indexing by time, similar to what we did above. However, this may not be convenient for some purposes. 
 
 Below is an example that is similar to above, but includes information on time when drawing environmental covariate values. This simulation will set up a scenario in which temperature increases and precipitation decreases with time, and adds random noise to each draw. 
 
 ```{r eval = FALSE}
 
 
-param_resamp_model <- init_ipm('simple_di_stoch_param') %>%
+param_resamp_model <- init_ipm(sim_gen    = "simple",
+                               di_dd      = "di",
+                               det_stoch  = "stoch",
+                               kern_param = "param") %>%
   define_kernel(
     name    = 'P',
     formula = s * g,
@@ -1587,7 +1598,9 @@ params <- list(recr_mu = recr_mu,
 L <- min(c(iceplant_ex$log_size, iceplant_ex$log_size_next), na.rm = TRUE) * 1.2
 U <- max(c(iceplant_ex$log_size, iceplant_ex$log_size_next), na.rm = TRUE) * 1.2
 
-obs_ipm <- init_ipm("simple_di_det") %>%
+obs_ipm <- init_ipm(sim_gen    = "simple",
+                    di_dd      = "di",
+                    det_stoch  = "det") %>%
   define_kernel(
     name          = "P",
     family        = "CC",

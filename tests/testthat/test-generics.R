@@ -28,7 +28,9 @@ inv_logit <- function(int, slope, sv) {
 
 states <- c('dbh', 'dbh')
 
-sim_di_det_1 <- init_ipm('simple_di_det') %>%
+sim_di_det_1 <- init_ipm(sim_gen    = "simple",
+                         di_dd      = "di",
+                         det_stoch  = "det") %>%
   define_kernel("P",
                 formula = s * g,
                 family = "CC",
@@ -60,7 +62,9 @@ sim_di_det_1 <- init_ipm('simple_di_det') %>%
            normalize_pop_size = FALSE)
 
 
-sim_di_det_2 <- init_ipm('simple_di_det') %>%
+sim_di_det_2 <- init_ipm(sim_gen    = "simple",
+                         di_dd      = "di",
+                         det_stoch  = "det") %>%
   define_kernel("P",
                 formula = s * g,
                 family = "CC",
@@ -94,7 +98,9 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
            normalize_pop_size = FALSE)
 
 
-sim_di_det_3 <- init_ipm('simple_di_det') %>%
+sim_di_det_3 <- init_ipm(sim_gen    = "simple",
+                         di_dd      = "di",
+                         det_stoch  = "det") %>%
   define_kernel("P",
                 formula = s * g,
                 family = "CC",
@@ -228,7 +234,10 @@ f_s_params <- list2(!!! f_s_r_int)
 params     <- c(data_list, g_params, s_params, f_s_params)
 
 
-sim_di_stoch_kern <- init_ipm('simple_di_stoch_kern') %>%
+sim_di_stoch_kern <- init_ipm(sim_gen    = "simple",
+                              di_dd      = "di",
+                              det_stoch  = "stoch",
+                              "kern") %>%
   define_kernel(
     name             = 'P_yr',
     formula          = s_yr * g_yr ,
@@ -340,7 +349,10 @@ mvt_wrapper <- function(r_means, r_sigma, nms) {
 
 init_pop_vec <- runif(100, 0, 10)
 
-sim_di_stoch_param <- init_ipm('simple_di_stoch_param') %>%
+sim_di_stoch_param <- init_ipm(sim_gen    = "simple",
+                               di_dd      = "di",
+                               det_stoch  = "stoch",
+                               "param") %>%
   define_kernel(
     'P',
     formula = s * g,
@@ -472,7 +484,9 @@ inv_logit_2 <- function(int, slope, slope_2, sv) {
   1/(1 + exp(-(int + slope * sv + slope_2 * sv ^ 2)))
 }
 
-gen_di_det_1 <- init_ipm("general_di_det") %>%
+gen_di_det_1 <- init_ipm(sim_gen    = "general",
+                         di_dd      = "di",
+                         det_stoch  = "det") %>%
   define_kernel(
     name          = "P",
     formula       = s * g * d_ht,
@@ -540,7 +554,9 @@ gen_di_det_1 <- init_ipm("general_di_det") %>%
 
 # Test unconverged warnings
 
-gen_di_det_2 <- init_ipm("general_di_det") %>%
+gen_di_det_2 <- init_ipm(sim_gen    = "general",
+                         di_dd      = "di",
+                         det_stoch  = "det") %>%
   define_kernel(
     name          = "P",
     formula       = s * g * d_ht,
@@ -797,7 +813,10 @@ init_pop_vec <- list(
   sqrt_area = runif(50)
 )
 
-gen_di_stoch_kern_1 <- init_ipm('general_di_stoch_kern') %>%
+gen_di_stoch_kern_1 <- init_ipm(sim_gen    = "general",
+                                di_dd      = "di",
+                                det_stoch  = "stoch",
+                                "kern") %>%
   define_kernel(
     name             = 'k_xx_site',
     family           = "CC",
@@ -1140,7 +1159,10 @@ init_pop_vec <- list(
 # we're creating the same model. No seeds set, so this test changes slightly
 # every time
 
-gen_di_stoch_param_1 <- init_ipm('general_di_stoch_param') %>%
+gen_di_stoch_param_1 <- init_ipm(sim_gen    = "general",
+                                 di_dd      = "di",
+                                 det_stoch  = "stoch",
+                                 "param") %>%
   define_kernel(
     name             = 'k_xx',
     family           = "CC",
@@ -1413,7 +1435,9 @@ inv_logit <- function(int, slope, sv) {
 
 states <- c('dbh', 'dbh')
 
-sim_di_det_1 <- init_ipm('simple_di_det') %>%
+sim_di_det_1 <- init_ipm(sim_gen    = "simple",
+                         di_dd      = "di",
+                         det_stoch  = "det") %>%
   define_kernel("P",
                 formula = s * g,
                 family = "CC",
@@ -1457,7 +1481,9 @@ test_that('right_ev.simple_di_det iterates un-iterated model correctly', {
 
 })
 
-sim_di_det_2 <- init_ipm('simple_di_det') %>%
+sim_di_det_2 <- init_ipm(sim_gen    = "simple",
+                         di_dd      = "di",
+                         det_stoch  = "det") %>%
   define_kernel("P",
                 formula = s * g,
                 family = "CC",
@@ -1490,7 +1516,9 @@ sim_di_det_2 <- init_ipm('simple_di_det') %>%
            iterations = 200,
            normalize_pop_size = FALSE)
 
-sim_di_det_3 <- init_ipm('simple_di_det') %>%
+sim_di_det_3 <- init_ipm(sim_gen    = "simple",
+                         di_dd      = "di",
+                         det_stoch  = "det") %>%
   define_kernel("P",
                 formula = s * g,
                 family = "CC",
@@ -1678,7 +1706,9 @@ inv_logit_2 <- function(int, slope, slope_2, sv) {
   1/(1 + exp(-(int + slope * sv + slope_2 * sv ^ 2)))
 }
 
-gen_di_det_1 <- init_ipm("general_di_det") %>%
+gen_di_det_1 <- init_ipm(sim_gen    = "general",
+                         di_dd      = "di",
+                         det_stoch  = "det") %>%
   define_kernel(
     name          = "P",
     formula       = s * g * d_ht,
@@ -1764,7 +1794,9 @@ test_that('right_ev.general_di_det returns the same as mega-matrix methods', {
 
 })
 
-gen_di_det_2 <- init_ipm("general_di_det") %>%
+gen_di_det_2 <- init_ipm(sim_gen    = "general",
+                         di_dd      = "di",
+                         det_stoch  = "det") %>%
   define_kernel(
     name          = "P",
     formula       = s * g * d_ht,
@@ -1945,7 +1977,10 @@ test_that("age_size models left/right_ev", {
 
   }
 
-  a_s_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
+  a_s_ipm <- init_ipm(sim_gen    = "general",
+                      di_dd      = "di",
+                      det_stoch  = "det",
+                      has_age = TRUE) %>%
     define_kernel(
       name          = "P_age",
       family        = "CC",

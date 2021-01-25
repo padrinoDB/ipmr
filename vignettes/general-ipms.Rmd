@@ -12,7 +12,7 @@ vignette: >
 
 ## Simple IPMs vs General IPMs
 
-In the [introduction vignette](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html), we reviewed some basic IPM theory and worked through examples of simple IPMs, which only model a single, continuously distributed state variable. General IPMs are distinguished from simple ones in that they incorporate multiple state variables and/or include transitions between continuous and discrete states. These state variables could be, for example, a continuous measure of coral colony surface area and a discrete state to denote aspergillosis infection (in [Bruno et al. 2011](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1890/09-1178.1)), a mixture of trees classified by basal diameter and a discrete state for seeds in a seed bank (in [Crandall & Knight 2017](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2664.13020)), or a mixture of multiple continuous and discrete state (e.g. [Aikens & Roach 2014](https://esajournals.onlinelibrary.wiley.com/doi/pdf/10.1890/13-1478.1)).  A more comprehensive defintion is provided in [Ellner & Rees (2006)](https://pubmed.ncbi.nlm.nih.gov/16673349/) and in Ellner, Childs & Rees, Chapter 6 (2016). 
+In the [introduction vignette](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html), we reviewed some basic IPM theory and worked through examples of simple IPMs, which only model a single, continuously distributed state variable. General IPMs are distinguished from simple ones in that they incorporate multiple state variables and/or include transitions between continuous and discrete states. These state variables could be, for example, a continuous measure of coral colony surface area and a discrete state to denote aspergillosis infection (in [Bruno et al. 2011](https://esajournals.onlinelibrary.wiley.com/doi/full/10.1890/09-1178.1)), a mixture of trees classified by basal diameter and a discrete state for seeds in a seed bank (in [Crandall & Knight 2017](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2664.13020)), or a mixture of multiple continuous and discrete state (e.g. [Aikens & Roach 2014](https://esajournals.onlinelibrary.wiley.com/doi/pdf/10.1890/13-1478.1)).  A more comprehensive definition is provided in [Ellner & Rees (2006)](https://pubmed.ncbi.nlm.nih.gov/16673349/) and in Ellner, Childs & Rees, Chapter 6 (2016). 
 
 ## A general, density independent, deterministic IPM
 
@@ -76,7 +76,7 @@ The vital rates functions and example code to fit them are:
     
     - Mathematical form: $f_d(z') \sim Norm(\mu_{f_d}, \sigma_{f_d})$
     
-6. germination (`g_i`) and establishment (`e_p`) are constants. The code below assumes we have our data in long format (each seed get its own row) and that successful germinations/establishments are coded as 1s, failures are 0s, and seeds we don't know the fate of for whatever reason are `NA`s.
+6. germination (`g_i`) and establishment (`e_p`) are constants. The code below assumes we have our data in long format (each seed get its own row) and that successful germination/establishment is coded as 1s, failures are 0s, and seeds we don't know the fate of for whatever reason are `NA`s.
 
     - example code: `g_i <- mean(my_germ_data, na.rm = TRUE)` and `e_p <- mean(my_est_data, na.rm = TRUE)`
     
@@ -133,7 +133,7 @@ Now, we're ready to begin making the IPM kernels!
 
 ```{r eval = FALSE}
 
-general_ipm <- init_ipm("general_di_det") %>%
+general_ipm <- init_ipm(sim_gen = "general", di_dd = "di", det_stoch = "det") %>%
   define_kernel(
     name          = "P",
     
@@ -509,7 +509,10 @@ Next, we will set up our sub-kernels. We'll append the `_year` suffix to the ker
 ```{r eval = FALSE}
 
 
-general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
+general_stoch_kern_ipm <- init_ipm(sim_gen    = "general",
+                                   di_dd      = "di", 
+                                   det_stoch  = "stoch",
+                                   kern_param = "kern") %>%
   define_kernel(
     
     # The kernel name gets a _year added to it to denote that there
@@ -637,7 +640,7 @@ general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
 
 ```
 
-100 isn't too many iterations, but hopefully this demonstrates how to set up and implement such a model. There are a number of slots in the output that may be useful for further analyseses.
+100 isn't too many iterations, but hopefully this demonstrates how to set up and implement such a model. There are a number of slots in the output that may be useful for further analyses.
 
 1. `env_seq`: This contains a character vector which shows the sequence in which levels of the time-varying components were chosen during model iteration. We could use this reproduce the model outputs later. 
 
@@ -803,7 +806,10 @@ We are now ready to begin implementing the model. This next chunk should look fa
 
 ```{r eval = FALSE}
 
-general_stoch_param_model <- init_ipm("general_di_stoch_param") %>%
+general_stoch_param_model <- init_ipm(sim_gen    = "general",
+                                   di_dd      = "di", 
+                                   det_stoch  = "stoch",
+                                   kern_param = "param") %>%
   define_kernel(
     name       = "P_stoch",
     family     = "CC",
@@ -1019,7 +1025,9 @@ inv_logit_2 <- function(int, slope, slope_2, sv) {
   1/(1 + exp(-(int + slope * sv + slope_2 * sv ^ 2)))
 }
 
-general_ipm <- init_ipm("general_di_det") %>%
+general_ipm <- init_ipm(sim_gen    = "general",
+                        di_dd      = "di", 
+                        det_stoch  = "det") %>%
   define_kernel(
     name          = "P",
     formula       = s * g * d_ht,
@@ -1179,7 +1187,10 @@ inv_logit_2 <- function(int, slope, slope_2, sv) {
   1/(1 + exp(-(int + slope * sv + slope_2 * sv ^ 2)))
 }
 
-general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
+general_stoch_kern_ipm <- init_ipm(sim_gen    = "general",
+                                   di_dd      = "di", 
+                                   det_stoch  = "stoch",
+                                   kern_param = "kern") %>%
   define_kernel(
     name          = "P_year",
     formula       = s * g_year * d_ht,

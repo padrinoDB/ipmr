@@ -164,7 +164,10 @@ init_pop_vec <- list(
 # we're creating the same model. No seeds set, so this test changes slightly
 # every time
 
-gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
+gen_di_stoch_param <- init_ipm(sim_gen    = "general",
+                               di_dd      = "di",
+                               det_stoch  = "stoch",
+                               "param") %>%
   define_kernel(
     name             = 'k_xx',
     family           = "CC",
@@ -781,7 +784,10 @@ iterate_model_norm <- function(env_params,
 test_that('normalize_pop_vec works', {
 
 
-  gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
+  gen_di_stoch_param <- init_ipm(sim_gen    = "general",
+                                 di_dd      = "di",
+                                 det_stoch  = "stoch",
+                                 "param") %>%
     define_kernel(
       name             = 'k_xx',
       family           = "CC",
@@ -1014,7 +1020,10 @@ test_that('normalize_pop_vec works', {
 
 test_that("t variable works as advertised", {
 
-  gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
+  gen_di_stoch_param <- init_ipm(sim_gen    = "general",
+                                 di_dd      = "di",
+                                 det_stoch  = "stoch",
+                                 "param") %>%
     define_kernel(
       name             = 'k_xx',
       family           = "CC",
@@ -1195,7 +1204,10 @@ test_that("t variable works as advertised", {
 
   }
 
-  test_det_seq <- init_ipm('general_di_stoch_param') %>%
+  test_det_seq <- init_ipm(sim_gen    = "general",
+                           di_dd      = "di",
+                           det_stoch  = "stoch",
+                           "param") %>%
     define_kernel(
       name             = 'k_xx',
       family           = "CC",
@@ -1379,7 +1391,10 @@ test_that("Hierarchical effects work in parameter re-sampled model", {
   fixed_params        <- c(fixed_params, hier_vals)
 
 
-  gen_di_stoch_param <- init_ipm('general_di_stoch_param') %>%
+  gen_di_stoch_param <- init_ipm(sim_gen    = "general",
+                                 di_dd      = "di",
+                                 det_stoch  = "stoch",
+                                 "param") %>%
     define_kernel(
       name             = 'k_xx_site',
       family           = "CC",

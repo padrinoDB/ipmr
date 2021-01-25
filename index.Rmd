@@ -62,7 +62,7 @@ The `model_class` defines the basic infrastructure that will be available for su
 
     + A. **kern**: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and for which defining a (multivariate joint) distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the `param` alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration. 
 
-    + B. **param**: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. This could be, for example, a multivariate normal defined by covarying slopes and intercepts, or posterior distributions from a Bayesian model. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the `"simple_di_stoch_param"` example for some inspiration in writing those.
+    + B. **param**: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. This could be, for example, a multivariate normal defined by co-varying slopes and intercepts, or posterior distributions from a Bayesian model. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the `"simple_di_stoch_param"` example for some inspiration in writing those.
 
 With the type of model selected, the `model_class` becomes a string and the call to `init_ipm` is composed like so: `init_ipm(model_class = "position1_position_2_position3_position4")`. 
 
@@ -311,4 +311,4 @@ v_ipmr      <- left_ev(my_simple_ipm)
 
 ```
 
-A more detailed introduction to `ipmr` is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. Help with age $\times$ size models, density dependent models, and the hierarchical notation syntax are also available there. That's all for now, happy modelling!
+A more detailed introduction to `ipmr` is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. Help with age $\times$ size models, density dependent models, and the hierarchical notation syntax are also available there. That's all for now, happy modeling!

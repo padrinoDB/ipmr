@@ -114,7 +114,9 @@ impl_args <- make_impl_args_list(c('P', 'F'),
 
 states <- list(c("dbh"))
 
-sim_di_det_2 <- init_ipm('simple_di_det') %>%
+sim_di_det_2 <- init_ipm(sim_gen    = "simple",
+                         di_dd      = "di",
+                         det_stoch  = "det") %>%
   define_kernel("P",
                 formula = s * g,
                 family = "CC",
@@ -221,9 +223,9 @@ test_that("collapse_pop_state works", {
     unlist() %>%
     round(digits = 6)
 
-  target <- c(seedlings = 0.104561,
-              NRA       = 0.148198,
-              RA        = 0.001998)
+  target <- c(seedlings = 0.104932,
+              NRA       = 0.113471,
+              RA        = 0.000762)
   expect_equal(temp, target)
 
 })

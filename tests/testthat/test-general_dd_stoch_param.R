@@ -42,7 +42,10 @@ env_sampler <- function(mu, sigma, nms) {
 init_pop_vec <- runif(100)
 init_b <- 20
 
-gen_dd_stoch_co <- init_ipm("general_dd_stoch_param") %>%
+gen_dd_stoch_co <- init_ipm(sim_gen    = "general",
+                            di_dd      = "dd",
+                            det_stoch  = "stoch",
+                            "param") %>%
   define_kernel(
     name             = "P",
     family           = "CC",

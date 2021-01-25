@@ -183,7 +183,9 @@ for(i in seq_len(50)) {
 
 # ipmr_version
 
-gen_dd_det_co <- init_ipm("general_dd_det") %>%
+gen_dd_det_co <- init_ipm(sim_gen    = "general",
+                          di_dd      = "dd",
+                          det_stoch  = "det") %>%
   define_kernel(
     name          = "P",
     family        = "CC",
@@ -263,7 +265,9 @@ test_that("general_dd_det computes pop_sizes correctly", {
 })
 
 
-gen_dd_det_cr <- init_ipm("general_dd_det") %>%
+gen_dd_det_cr <- init_ipm(sim_gen    = "general",
+                          di_dd      = "dd",
+                          det_stoch  = "det") %>%
   define_kernel(
     name          = "P",
     family        = "CC",
@@ -353,7 +357,9 @@ f_r_ints <- rnorm(3, sd = 2) %>%
 
 data_list_hier <- c(data_list_control, g_ints, f_r_ints)
 
-gen_dd_det_co <- init_ipm("general_dd_det") %>%
+gen_dd_det_co <- init_ipm(sim_gen    = "general",
+                          di_dd      = "dd",
+                          det_stoch  = "det") %>%
   define_kernel(
     name             = "P_site",
     family           = "CC",

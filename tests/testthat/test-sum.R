@@ -54,7 +54,9 @@ L <- min(c(iceplant_ex$log_size, iceplant_ex$log_size_next), na.rm = TRUE) * 1.2
 U <- max(c(iceplant_ex$log_size, iceplant_ex$log_size_next), na.rm = TRUE) * 1.2
 
 
-pred_ipm <- init_ipm("simple_di_det") %>%
+pred_ipm <- init_ipm(sim_gen    = "simple",
+                     di_dd      = "di",
+                     det_stoch  = "det") %>%
   define_kernel(
     name          = "P",
     family        = "CC",

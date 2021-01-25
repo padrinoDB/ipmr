@@ -496,7 +496,7 @@ format_mega_matrix.default <- function(ipm, mega_mat, ...) {
 
 #' @rdname format_mega_matrix
 #' @param name_ps The prefix(es) for the kernel name that correspond to survival
-#' and growth/maturation of existing individals. For the model
+#' and growth/maturation of existing individuals. For the model
 #' \code{K = P_age + F_age}, this would be \code{"P"}.
 #' @param f_forms The names of the kernels that correspond to production of new
 #' individuals, and possibly, how they are combined. For example, a model that

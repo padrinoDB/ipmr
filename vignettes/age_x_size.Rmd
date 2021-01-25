@@ -144,11 +144,14 @@ f_fun <- function(age, s_age, pb_age, pr_age, recr) {
 
 ```
 
-Next, we begin to initialize our kernels. `init_ipm` now has a second argument - `has_age`. This is a logical and denotes that we are specifying a model with individuals cross-classified by both age and size. The model class is `"general_di_det"` because age-size models are always general IPMs, and we are only working on a deterministic version of this model for now. We'll append the `_age` suffix to every variable that is age dependant. Additionally, we can use `age` as a standalone term - these will be substituted during the model building as well. 
+Next, we begin to initialize our kernels. `init_ipm` now has a fifth argument - `has_age`. This is a logical and denotes that we are specifying a model with individuals cross-classified by both age and size. The `sim_gen` argument is `"general`", because age-size models are always general IPMs, and `det_stoch = "det"` because we are only working on a deterministic version of this model for now. We'll append the `_age` suffix to every variable that is age dependent. Additionally, we can use `age` as a standalone term - these will be substituted during the model building as well. 
 
 ```{r eval = FALSE}
 
-age_size_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
+age_size_ipm <- init_ipm(sim_gen    = "general",
+                         di_dd      = "di", 
+                         det_stoch  = "det",
+                         has_age    = TRUE) %>%
   define_kernel(
     name          = "P_age",
     family        = "CC",

@@ -43,6 +43,12 @@ s_z <- function(z, a, m.par){
   return(p)
 }
 
+s_max_z <- function(z, m.par){
+  linear.p <- m.par["surv.int"] + m.par["surv.z"] * z + m.par["surv.z.2"] * z^2
+  p <- 1/(1+exp(-linear.p))
+  return(p)
+}
+
 ## Reproduction function, logistic regression
 pb_z <- function(z, a, m.par){
   if (a==0) {
@@ -218,6 +224,10 @@ P_z1z <- function (z1, z, a, m.par) {
   return( s_z(z, a, m.par) * g_z1z(z1, z, a, m.par) )
 }
 
+P_max_z1z <- function (z1, z, a, m.par) {
+  return( s_max_z(z, m.par) * g_z1z(z1, z, a, m.par) )
+}
+
 ## Define the reproduction kernel
 F_z1z <- function (z1, z, a, m.par) {
   return( s_z(z, a, m.par) * pb_z(z, a, m.par) * (1/2) * pr_z(a, m.par) * c_z1z(z1, z, m.par) )
@@ -242,6 +252,7 @@ mk_age_IPM <- function(i.par, m.par) {
     for (ia in seq_len(na)) {
       F[[ia]] <- outer(meshpts, meshpts, F_z1z, a = ia-1, m.par = m.par) * h
       P[[ia]] <- outer(meshpts, meshpts, P_z1z, a = ia-1, m.par = m.par) * h
+
     }
     rm(ia)
   })
@@ -279,17 +290,15 @@ nt0[[1]] <- with(i.par, rep(1 / m, m))
 
 # estimate lambda with the true parameters...
 
-hand_time <- system.time({
-  IPM.sys <- mk_age_IPM(i.par, m.par.true)
-  IPM.sim <- with(IPM.sys, {
-    x <- nt0
-    for (i in seq_len(100)) {
-      x1 <- r_iter(x, na, F, P)
-      lam <- sum(unlist(x1))
-      x <- lapply(x1, function(x) x / lam)
-    }
-    list(lambda = lam, x = x)
-  })
+IPM.sys <- mk_age_IPM(i.par, m.par.true)
+IPM.sim <- with(IPM.sys, {
+  x <- nt0
+  for (i in seq_len(100)) {
+    x1 <- r_iter(x, na, F, P)
+    lam <- sum(unlist(x1))
+    x <- lapply(x1, function(x) x / lam)
+  }
+  list(lambda = lam, x = x)
 })
 
 sim_lambda <- IPM.sim$lambda
@@ -313,7 +322,10 @@ f_fun <- function(age, s_age, pb_age, pr_age, recr) {
 
 }
 
-a_s_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
+a_s_ipm <- init_ipm(sim_gen    = "general",
+                    di_dd      = "di",
+                    det_stoch  = "det",
+                    has_age = TRUE) %>%
   define_kernel(
     name          = "P_age",
     family        = "CC",
@@ -420,3 +432,106 @@ test_that("format_mega_matrix.age_x_size_ipm works", {
 
 })
 
+
+# test if we can implement seperate kernels for max_age/age selectively.
+#
+# mk_age_IPM <- function(i.par, m.par) {
+#   within(i.par, {
+#     F <- P <- list()
+#     for (ia in seq_len(na)) {
+#       F[[ia]] <- outer(meshpts, meshpts, F_z1z, a = ia-1, m.par = m.par) * h
+#       if(ia != na) {
+#         P[[ia]] <- outer(meshpts, meshpts, P_z1z, a = ia-1, m.par = m.par) * h
+#       } else {
+#
+#         P[[ia]] <- outer(meshpts, meshpts, P_max_z1z, a = a-1, m.par = m.par) * h
+#
+#       }
+#     }
+#     rm(ia)
+#   })
+# }
+#
+# m.par.true["surv.z.2"] <- -3.2
+#
+# IPM.sys <- mk_age_IPM(i.par, m.par.true)
+# IPM.sim <- with(IPM.sys, {
+#   x <- nt0
+#   for (i in seq_len(100)) {
+#     x1 <- r_iter(x, na, F, P)
+#     lam <- sum(unlist(x1))
+#     x <- lapply(x1, function(x) x / lam)
+#   }
+#   list(lambda = lam, x = x)
+# })
+#
+# sim_lambda <- IPM.sim$lambda
+#
+# param_list <- as.list(m.par.true) %>%
+#   setNames(gsub(pattern = "\\.", replacement = "_", x = names(.)))
+# param_list$surv_max_int <- param_list$surv_int + 1
+#
+#
+# a_s_ipm <- init_ipm(sim_gen    = "general",
+#                     di_dd      = "di",
+#                     det_stoch  = "det",
+#                     has_age = TRUE) %>%
+#   define_kernel(
+#     name          = "P_age",
+#     family        = "CC",
+#     formula       = s_age * g_age * d_wt,
+#     s_age         = inv_logit(surv_int + surv_z * wt_1 + surv_a * age),
+#     g_age         = dnorm(wt_2, mu_g_age, grow_sd),
+#     mu_g_age      = grow_int + grow_z * wt_1 + grow_a * age,
+#     s_max_age     = inv_logit(surv_max_int + surv_z * wt_1 + surv_z_2 * wt_1^2),
+#     data_list     = param_list,
+#     states        = list(c("wt")),
+#     has_hier_effs = FALSE,
+#     levels_ages   = list(age = c(0:20), max_age = 21),
+#     evict_cor     = FALSE
+#   ) %>%
+#   define_kernel(
+#     name          = "F_age",
+#     family        = "CC",
+#     formula       = f_fun(age, s_age, pb_age, pr_age, recr) * d_wt,
+#     s_age         = inv_logit(surv_int + surv_z * wt_1 + surv_a * age),
+#     pb_age        = inv_logit(repr_int + repr_z * wt_1 + repr_a * age),
+#     pr_age        = inv_logit(recr_int + recr_a * age),
+#     recr          = dnorm(wt_2, rcsz_mu, rcsz_sd),
+#     rcsz_mu       = rcsz_int + rcsz_z * wt_1,
+#     data_list     = param_list,
+#     states        = list(c("wt")),
+#     has_hier_effs = FALSE,
+#     levels_ages   = list(age = c(0:20), max_age = 21),
+#     evict_cor     = FALSE
+#   ) %>%
+#   define_impl(
+#     make_impl_args_list(
+#       kernel_names = c("P_age", "F_age"),
+#       int_rule     = rep("midpoint", 2),
+#       state_start    = c("wt_age", "wt_age"),
+#       state_end      = c("wt_age", "wt_0")
+#     )
+#   ) %>%
+#   define_domains(
+#     wt = c(1.6, 3.7, 100)
+#   ) %>%
+#   define_pop_state(
+#     pop_vectors = list(
+#       n_wt_age = runif(100))
+#   ) %>%
+#   make_ipm(
+#     usr_funs = list(inv_logit = plogis,
+#                     f_fun     = f_fun),
+#     iterate  = TRUE,
+#     iterations = 100,
+#     return_all_envs = TRUE
+#   )
+#
+# ipmr_lambda <- lambda(a_s_ipm)
+#
+# test_that("ipmr can handle max-age specific expressions", {
+#
+#   expect_equal(sim_lambda, ipmr_lambda)
+#
+# })

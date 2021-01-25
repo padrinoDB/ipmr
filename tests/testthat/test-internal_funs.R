@@ -31,7 +31,7 @@ test_that("ipm_to_df works properly", {
                                  c(stay_discrete, go_discrete,
                                    leave_discrete, P))[[1]]
 
-  target_df <- expand.grid(t = 1:501, t_1 = 1:501, value = NA_real_) %>% as.list()
+  target_df <- expand.grid(t = 1:201, t_1 = 1:201, value = NA_real_) %>% as.list()
   it <- 1
 
   for(i in seq_len(nrow(temp_big))) {
@@ -85,7 +85,9 @@ test_that('exported is_conv_to_asymptotic works as well', {
     1/(1 + exp(-(int + slope * sv + slope_2 * sv ^ 2)))
   }
 
-  general_ipm <- init_ipm("general_di_det") %>%
+  general_ipm <- init_ipm(sim_gen    = "general",
+                          di_dd      = "di",
+                          det_stoch  = "det") %>%
     define_kernel(
       name          = "P",
       formula       = s * g * d_ht,
@@ -159,7 +161,9 @@ test_that('exported is_conv_to_asymptotic works as well', {
 
   expect_false(is_conv_to_asymptotic(few_iterates))
 
-  my_ipm <- init_ipm('simple_di_det') %>%
+  my_ipm <- init_ipm(sim_gen    = "simple",
+                     di_dd      = "di",
+                     det_stoch  = "det") %>%
     define_kernel(
       name      = "P",
       formula   = s * g,

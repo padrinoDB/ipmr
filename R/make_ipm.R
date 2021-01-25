@@ -70,7 +70,7 @@
 #'   \item{\strong{pop_state}}{: population vectors
 #'                              stored as a list of arrays. The first dimension
 #'                              of each array corresponds to the state variable distribution,
-#'                              and the second dimsension corresponds to time
+#'                              and the second dimension corresponds to time
 #'                              steps.}
 #'   \item{\strong{proto_ipm}}{: the \code{proto_ipm} object used to implement
 #'                              the model.}

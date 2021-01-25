@@ -39,7 +39,10 @@ data_list_hier <- c(data_list_control, g_ints, f_r_ints)
 init_pop_vec <- runif(100)
 init_b <- 20
 
-gen_dd_stoch_co <- init_ipm("general_dd_stoch_kern") %>%
+gen_dd_stoch_co <- init_ipm(sim_gen    = "general",
+                            di_dd      = "dd",
+                            det_stoch  = "stoch",
+                            "kern") %>%
   define_kernel(
     name             = "P_site",
     family           = "CC",

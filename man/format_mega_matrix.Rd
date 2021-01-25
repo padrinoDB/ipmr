@@ -24,7 +24,7 @@ string specifying the call. Hierarchical syntax is supported. When used,
 combinations of \code{levels_hier_effs} in the \code{proto_ipm}.}
 
 \item{name_ps}{The prefix(es) for the kernel name that correspond to survival
-and growth/maturation of existing individals. For the model
+and growth/maturation of existing individuals. For the model
 \code{K = P_age + F_age}, this would be \code{"P"}.}
 
 \item{f_forms}{The names of the kernels that correspond to production of new

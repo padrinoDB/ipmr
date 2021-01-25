@@ -61,7 +61,7 @@ The `model_class` defines the basic infrastructure that will be available for su
 
 + A. **kern**: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and for which defining a (multivariate joint) distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the `param` alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration.  
 
-+ B. **param**: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. This could, for example, be a multivariate normal defined by covarying slopes and intercepts, or posterior distribution(s) from a Bayesian model.  All that is required is that the parameters/values for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. These are covered in greater depth in towards the end of [this article](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
++ B. **param**: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. This could, for example, be a multivariate normal defined by co-varying slopes and intercepts, or posterior distribution(s) from a Bayesian model.  All that is required is that the parameters/values for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. These are covered in greater depth in towards the end of [this article](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
 
 With the type of model selected, the `model_class` becomes a string and the call to `init_ipm` is composed like so: `init_ipm(model_class = "position1_position_2_position3_position4")`. 
 
@@ -310,7 +310,7 @@ v_ipmr      <- left_ev(my_simple_ipm)
 
 ## More complicated models
 
-Examples of more complicated models are included in the vignettes, accesible using either `browseVignettes('ipmr')` or by visiting the Articles tab on [project's webpage](https://levisc8.github.io/ipmr/). Please file all bug reports in the Issues tab of this repository or contact me via [email](mailto:levisc8@gmail.com) with a reproducible example.
+Examples of more complicated models are included in the vignettes, accessible using either `browseVignettes('ipmr')` or by visiting the Articles tab on [project's webpage](https://levisc8.github.io/ipmr/). Please file all bug reports in the Issues tab of this repository or contact me via [email](mailto:levisc8@gmail.com) with a reproducible example.
 
 ## Code of Conduct
 

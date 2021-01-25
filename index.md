@@ -7,8 +7,7 @@ status](https://www.r-pkg.org/badges/version/ipmr)](https://cran.r-project.org/p
 [![Codecov test
 coverage](https://codecov.io/gh/levisc8/ipmr/branch/master/graph/badge.svg)](https://codecov.io/gh/levisc8/ipmr?branch=master)
 
-ipmr
-====
+# ipmr
 
 `ipmr` is a package for implementing Integral Projection Models (IPMs)
 in *R*. It relies heavily on the mathematical syntax of the models, and
@@ -20,8 +19,7 @@ are introduced to successive versions.
 Below is a brief overview of how `ipmr` classifies different model types
 followed by examples of how to implement those types in this framework.
 
-Installation
-------------
+## Installation
 
 `ipmr` is not yet on CRAN. You can install the development version with
 the snippet below:
@@ -34,8 +32,7 @@ if(!require('remotes', quietly = TRUE)) {
 remotes::install_github("levisc8/ipmr", build_vignettes = TRUE)
 ```
 
-Package scope
--------------
+## Package scope
 
 `ipmr` is intended to assist with IPM implementation and analysis. It is
 important to note that this package **will not** help with the process
@@ -58,8 +55,7 @@ here assumes you have some basic understanding of IPM theory,
 parameterized vital rate models, and are now ready to begin implementing
 your IPM.
 
-Model classes
--------------
+## Model classes
 
 Once all parameters are estimated, the first step of defining a model in
 `ipmr` is to initialize the model using `init_ipm()`. This function has
@@ -120,7 +116,7 @@ are:
     -   B. **param**: This describes an IPM with parameters that are
         re-sampled from some distribution at each iteration of the
         model. This could be, for example, a multivariate normal defined
-        by covarying slopes and intercepts, or posterior distributions
+        by co-varying slopes and intercepts, or posterior distributions
         from a Bayesian model. All that is required is that the
         parameters for the distribution are specified and that the
         function that generates the parameters at each iteration returns
@@ -182,8 +178,7 @@ A very brief, though incomplete introduction is available
 Keep reading below for examples of how to implement various IPMs in this
 framework.
 
-Examples for simple IPM classes
--------------------------------
+## Examples for simple IPM classes
 
 Here is a simple model implemented with `ipmr`. This is a hypothetical
 plant species where plants can survive and grow (*P*(*z*′, *z*)), and
@@ -414,4 +409,4 @@ article on this page. General IPM (ones with multiple continuous and/or
 discrete states) tutorials are also available there under the General
 IPMs article. Help with age × size models, density dependent models, and
 the hierarchical notation syntax are also available there. That’s all
-for now, happy modelling!
+for now, happy modeling!

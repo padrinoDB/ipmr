@@ -102,11 +102,11 @@ The vital rate models could be written on paper as follows:
     
 5. Survival
 
-    - $logit(s) = (\alpha_s + \alpha_s^{yr}) + \beta_s * z$
+    - $Logit(s) = (\alpha_s + \alpha_s^{yr}) + \beta_s * z$
     
 6. Probability of reproducing
 
-    - $logit(f_p) = \alpha_{f_p} + \beta_{f_p} * z$
+    - $Logit(f_p) = \alpha_{f_p} + \beta_{f_p} * z$
     
 7. Recruit production
 
@@ -116,7 +116,7 @@ The vital rate models could be written on paper as follows:
 
     - $f_d \sim Norm(\mu_{f_d}, \sigma_{f_d})$
 
-and modelled in R as follows:
+and modeled in R as follows:
 
 ```{r eval = FALSE}
 
@@ -183,7 +183,7 @@ all_fixed_params <- c(g_list, s_list, f_p_list, f_r_list, f_d_list)
 
 ```
 
-For the random effects, we probably need to do some a bit more processing, though this really depends on which modelling framework you use and the format of the outputs. For `lme4`, it looks like this:
+For the random effects, we probably need to do some a bit more processing, though this really depends on which modeling framework you use and the format of the outputs. For `lme4`, it looks like this:
 
 ```{r eval = FALSE}
 
@@ -234,12 +234,15 @@ s_alpha_list <- as.list(rnorm(6)) %>%
 all_params <- c(all_fixed_params, g_alpha_list, s_alpha_list)
 
 ```
-We are now ready to begin implementing the kernels! This model will be a simple, density independent, stochastic kernel-resampled model (`"simple_di_stoch_kern"` class). The parts where the hierarchical syntax is used are highlighted by comments in the code block:
+We are now ready to begin implementing the kernels! This model will be a simple, density independent, stochastic kernel-resampled model. The parts where the hierarchical syntax is used are highlighted by comments in the code block:
 
 
 ```{r eval = FALSE}
 
-ex_ipm <- init_ipm("simple_di_stoch_kern") %>%
+ex_ipm <-init_ipm(sim_gen    = "simple",
+                  di_dd      = "di", 
+                  det_stoch  = "stoch",
+                  kern_param = "kern") %>%
   define_kernel(
     
     # _yr is appended as a suffix with an underscore. Notice how the formula
@@ -319,7 +322,7 @@ ex_ipm <- init_ipm("simple_di_stoch_kern") %>%
 
 ## Hierarchical models with continuously varying environments {#complicated}
 
-Sometimes, models will have discretely and continuously varying components as functions of different variables. For example, a study could consider multiple sites (discrete component) and spatial and/or temporal fluctations in the environment at each site (continuous component). We'll use a hypothetical study that models demography as a function of environment across multiple sites to illustrate this. 
+Sometimes, models will have discretely and continuously varying components as functions of different variables. For example, a study could consider multiple sites (discrete component) and spatial and/or temporal fluctuations in the environment at each site (continuous component). We'll use a hypothetical study that models demography as a function of environment across multiple sites to illustrate this. 
 
 We'll implement a general IPM of a perennial plant species. Our data will come from 6 sites, `"A"` - `"F"`, and the vital rate intercepts for the plants will vary across each one. Its seeds can either enter a seed bank or recruit immediately, producing recruits at the next time step. We'll pretend that data from the recruit size distribution was pooled across sites, and so does not vary with space. The seed bank will be age structured and its parameters will be space- and time-invariant. Seeds in the first year can either survive ($s_{{sb}_1}$/`s_sb1`) and recruit ($r_{{sb}_1}$), or survive and become two year old seeds. Two year old seeds can either survive ($s_{{sb}_2}$/`s_sb2`) and recruit ($r_{{sb}_2}$/`r_sb2`) or die.  
 
@@ -345,7 +348,7 @@ The sub kernels are:
 
 And the size/climate dependent vital rate functions and example R code are:
 
-8. $logit(s^{site}) = (\alpha_s + \alpha_{s}^{site}) + \beta_s^{z} * z + \beta_s^{t} * \theta^{t} + \beta_s^{p} * \theta^{p}$
+8. $Logit(s^{site}) = (\alpha_s + \alpha_{s}^{site}) + \beta_s^{z} * z + \beta_s^{t} * \theta^{t} + \beta_s^{p} * \theta^{p}$
 
   - example R code: `glmer(survival ~ size + temp + precip + (1 | site), data = my_surv_data, family = binomial())`
 
@@ -355,7 +358,7 @@ And the size/climate dependent vital rate functions and example R code are:
 
   - example R code: `lmer(size_next ~ size + temp + precip + (1 | site), data = my_grow_data)`
 
-11. $logit(f_{p}^{site}) = (\alpha_{f_p} + \alpha_{f_p}^{site}) + \beta_{f_p}^{z} * z + \beta_{f_p}^{t} * \theta^{t} + \beta_{f_p}^{p} * \theta^{p}$
+11. $Logit(f_{p}^{site}) = (\alpha_{f_p} + \alpha_{f_p}^{site}) + \beta_{f_p}^{z} * z + \beta_{f_p}^{t} * \theta^{t} + \beta_{f_p}^{p} * \theta^{p}$
 
   - example R code: `glmer(repro ~ size + temp + precip + (1 | site), data = my_repro_data, family = binomial())`
 
@@ -487,7 +490,10 @@ We've written out our model - now we can implement it. We'll use the general, de
 
 ```{r eval = FALSE}
 
-ex_ipm <- init_ipm("general_di_stoch_param") %>%
+ex_ipm <- init_ipm(sim_gen    = "general",
+                   di_dd      = "di", 
+                   det_stoch  = "stoch",
+                   kern_param = "param") %>%
   define_kernel(
     
     name = "P_site",

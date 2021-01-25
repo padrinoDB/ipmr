@@ -90,7 +90,9 @@ k_kern <- p_kern + f_kern
 lambda_hand <- Re(eigen(k_kern)$values[1])
 
 
-pred_ipm <- init_ipm("simple_di_det") %>%
+pred_ipm <- init_ipm(sim_gen    = "simple",
+                     di_dd      = "di",
+                     det_stoch  = "det") %>%
   define_kernel(
     name          = "P",
     family        = "CC",
@@ -156,7 +158,9 @@ protected_params <- list(recr_mu = recr_mu,
 
 
 
-prot_ipm <- init_ipm("simple_di_det") %>%
+prot_ipm <- init_ipm(sim_gen    = "simple",
+                     di_dd      = "di",
+                     det_stoch  = "det") %>%
   define_kernel(
     name          = "P",
     family        = "CC",
@@ -254,7 +258,9 @@ lambda_hand <- Re(eigen(k_kern)$values[1])
 # params$flow_n <- sum(predict(seed_mod, data.frame(log_size = unique(doms$d1)), type = 'response'))
 params$flow_n <- NULL
 
-sum_ipm <- init_ipm("simple_di_det") %>%
+sum_ipm <- init_ipm(sim_gen    = "simple",
+                    di_dd      = "di",
+                    det_stoch  = "det") %>%
   define_kernel(
     name          = "P",
     family        = "CC",

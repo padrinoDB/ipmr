@@ -78,7 +78,10 @@ mvt_wrapper <- function(r_means, r_sigma, nms) {
   return(out)
 }
 
-test_stoch_param <- init_ipm('simple_dd_stoch_param') %>%
+test_stoch_param <- init_ipm(sim_gen    = "simple",
+                             di_dd      = "dd",
+                             det_stoch  = "stoch",
+                             "param") %>%
   define_kernel(
     'P',
     formula = s * g,
@@ -214,7 +217,10 @@ f_r_int_effs <- rnorm(3) %>%
 data_list <- c(data_list, g_int_effs, f_r_int_effs)
 
 
-test_stoch_param <- init_ipm('simple_dd_stoch_param') %>%
+test_stoch_param <- init_ipm(sim_gen    = "simple",
+                             di_dd      = "dd",
+                             det_stoch  = "stoch",
+                             "param") %>%
   define_kernel(
     'P_site',
     formula = s * g_site,

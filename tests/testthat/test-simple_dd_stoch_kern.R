@@ -30,7 +30,10 @@ names(f_s_r_int) <- paste("f_s_", nms, sep = "")
 
 params     <- c(data_list, g_r_int, s_r_int, f_s_r_int)
 
-x <- init_ipm("simple_dd_stoch_kern") %>%
+x <- init_ipm(sim_gen    = "simple",
+              di_dd      = "dd",
+              det_stoch  = "stoch",
+              "kern") %>%
   define_kernel(
     name             = "P_yr",
     formula          = s_yr * g_yr,

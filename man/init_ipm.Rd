@@ -4,29 +4,41 @@
 \alias{init_ipm}
 \title{Initialize an IPM}
 \usage{
-init_ipm(model_class, has_age = FALSE)
+init_ipm(sim_gen, di_dd, det_stoch, kern_param = NULL, has_age = FALSE)
 }
 \arguments{
-\item{model_class}{The type of IPM. See \code{Details} for more information on classes}
+\item{sim_gen}{Either \code{"simple"} or \code{"general"}.}
+
+\item{di_dd}{Either \code{"di"} or \code{"dd"}.}
+
+\item{det_stoch}{Either \code{"det"} or \code{"stoch"}. If this is \code{"det"},
+then \code{kern_param} is ignored. If \code{"stoch"}, then \code{kern_param}
+must be specified.}
+
+\item{kern_param}{If \code{det_stoch = "stoch"}, then this should be either
+\code{"kern"} or \code{"param"}.}
 
 \item{has_age}{A logical indicating whether the model has age structure. Default
 is \code{FALSE}}
 }
 \value{
-An object with classes \code{"proto_ipm"} and \code{model_class}. If
+An object with classes \code{"proto_ipm"} and a combination of
+\code{sim_gen}, \code{di_dd}, \code{det_stoch}, and possibly
+\code{kern_param}. If
 \code{has_age = TRUE}, then an \code{"age_x_size"} class is also added.
 }
 \description{
 This is always the first step in constructing an IPM with \code{ipmr}.
-All you need for this is to know what type of IPM you want to construct - the rest comes later
-with \code{define_kernel}, \code{make_ipm}, and associated helper functions.
+All you need for this is to know what type of IPM you want to construct - the
+rest comes later with \code{define_kernel}, \code{make_ipm}, and associated
+helper functions. See Details for complete overview of each option.
 }
 \details{
 Combinations of \code{simple} or \code{general}, \code{dd} or \code{di},
-and \code{det} or \code{stoch} are separated by an underscore to tell \code{ipmr}
-the type of model you will be constructing (e.g. \code{"simple_di_det"} for a
-deterministic IPM with a single continuous state variable and no discrete stages
-or density dependence).
+and \code{det} or \code{stoch} are generated to create 1 of 12 unique IPM classes.
+These are separated by an underscore to tell \code{ipmr}
+the type of model you will be constructing. For simplicity, they are specified
+separately and the model class is generated internally.
 
 Within \code{stoch} model types, there are two additional options to append to
 the class: \code{"kern"} or \code{"param"}. These distinguish between models that

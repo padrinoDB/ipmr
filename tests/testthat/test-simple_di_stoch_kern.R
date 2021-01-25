@@ -232,7 +232,10 @@ pois_r <- function(sv, int, slope, r_eff) {
 }
 
 
-monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
+monocarp_sys <- init_ipm(sim_gen    = "simple",
+                         di_dd      = "di",
+                         det_stoch  = "stoch",
+                         kern_param = "kern") %>%
   define_kernel(
 
     name             = 'P_yr',
@@ -389,7 +392,10 @@ test_that('classes are correctly set', {
 
 test_that("order of kernel definition doesn't matter", {
 
-  test_order_1 <- init_ipm('simple_di_stoch_kern') %>%
+  test_order_1 <- init_ipm(sim_gen    = "simple",
+                           di_dd      = "di",
+                           det_stoch  = "stoch",
+                           kern_param = "kern") %>%
     define_kernel(
       name             = "F_yr",
       formula          = f_r * f_s_yr * f_d,
@@ -464,7 +470,10 @@ test_that("order of kernel definition doesn't matter", {
 
 test_that("return_all gets all of the environments back", {
 
-  test_order_1 <- init_ipm('simple_di_stoch_kern') %>%
+  test_order_1 <- init_ipm(sim_gen    = "simple",
+                           di_dd      = "di",
+                           det_stoch  = "stoch",
+                           kern_param = "kern") %>%
     define_kernel(
       name             = "F_yr",
       formula          = f_r * f_s_yr * f_d,
@@ -524,7 +533,10 @@ test_that('normalizing pop vector gets same lambdas as before', {
   init_pop <- runif(100)
   usr_seq  <- sample(1:5, size = 100, replace = TRUE)
 
-  test_norm_1 <- init_ipm('simple_di_stoch_kern') %>%
+  test_norm_1 <- init_ipm(sim_gen    = "simple",
+                          di_dd      = "di",
+                          det_stoch  = "stoch",
+                          kern_param = "kern") %>%
     define_kernel(
       name             = "F_yr",
       formula          = f_r * f_s_yr * f_d,
@@ -661,7 +673,10 @@ test_that("drop_levels works in hier_effs", {
   usr_seq  <- sample(levels, size = 100, replace = TRUE)
 
 
-  test_drop <- init_ipm('simple_di_stoch_kern') %>%
+  test_drop <- init_ipm(sim_gen    = "simple",
+                        di_dd      = "di",
+                        det_stoch  = "stoch",
+                        kern_param = "kern") %>%
     define_kernel(
       name             = "F_yr_site",
       formula          = f_r * f_s_yr_site * f_d,

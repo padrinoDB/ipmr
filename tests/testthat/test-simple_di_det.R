@@ -86,7 +86,9 @@ impl_args <- make_impl_args_list(c('P', 'F'),
 
 states <- c('dbh', 'dbh')
 
-x <- init_ipm('simple_di_det') %>%
+x <- init_ipm(sim_gen    = "simple",
+              di_dd      = "di",
+              det_stoch  = "det") %>%
   define_kernel("P",
                 formula = s * g,
                 family = "CC",
@@ -207,7 +209,9 @@ test_that('define_impl() can handle mismatched argument lengths', {
 
 test_that("order of kernel_definition doesn't matter", {
 
-  y <- init_ipm('simple_di_det') %>%
+  y <- init_ipm(sim_gen    = "simple",
+                di_dd      = "di",
+                det_stoch  = "det") %>%
     define_kernel('F',
                   formula = f_r * f_s * f_d,
                   family = 'CC',
@@ -255,7 +259,9 @@ test_that("order of kernel_definition doesn't matter", {
 
 test_that('iteration methods work the same as eigenvalue methods', {
 
-  it <- init_ipm('simple_di_det') %>%
+  it <- init_ipm(sim_gen    = "simple",
+                 di_dd      = "di",
+                 det_stoch  = "det") %>%
     define_kernel("P",
                   formula = s * g,
                   family = "CC",
@@ -307,7 +313,9 @@ test_that('iteration methods work the same as eigenvalue methods', {
 
 test_that('normalizing pop vector produces same lambdas as eigen methods', {
 
-  it <- init_ipm('simple_di_det') %>%
+  it <- init_ipm(sim_gen    = "simple",
+                 di_dd      = "di",
+                 det_stoch  = "det") %>%
     define_kernel("P",
                   formula = s * g,
                   family = "CC",
@@ -509,7 +517,9 @@ inv_logit <- function(int, slope, sv) {
   1 / (1 + exp(-(int + slope * sv)))
 }
 
-hier_mod <- init_ipm('simple_di_det') %>%
+hier_mod <- init_ipm(sim_gen    = "simple",
+                     di_dd      = "di",
+                     det_stoch  = "det") %>%
   define_kernel("P_yr",
                 formula = s_yr * g_yr,
                 family = "CC",
@@ -662,7 +672,9 @@ test_that("discrete_extrema_works for simple models", {
 
   states <- c('dbh')
 
-  x <- init_ipm('simple_di_det') %>%
+  x <- init_ipm(sim_gen    = "simple",
+                di_dd      = "di",
+                det_stoch  = "det") %>%
     define_kernel("P",
                   formula = s * g,
                   family = "CC",

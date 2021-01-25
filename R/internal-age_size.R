@@ -232,7 +232,7 @@
 
   } else {
 
-    out <- init_ipm(class(proto_ipm)[1])
+    out <- .init_ipm(class(proto_ipm)[1])
 
   }
 

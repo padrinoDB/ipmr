@@ -85,7 +85,10 @@ mvt_wrapper <- function(r_means, r_sigma, nms) {
   return(out)
 }
 
-test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
+test_stoch_param <- init_ipm(sim_gen    = "simple",
+                             di_dd      = "di",
+                             det_stoch  = "stoch",
+                             kern_param = "param") %>%
   define_kernel(
     'P',
     formula = s * g,
@@ -272,7 +275,10 @@ test_that('classes are correctly set', {
 
 test_that('normalize pop_vectors works as it should', {
 
-  test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
+  test_stoch_param <- init_ipm(sim_gen    = "simple",
+                               di_dd      = "di",
+                               det_stoch  = "stoch",
+                               kern_param = "param") %>%
     define_kernel(
       'P',
       formula = s * g,
@@ -402,7 +408,10 @@ test_that('normalize pop_vectors works as it should', {
 
 test_that("t helper variable works as advertised", {
 
-  test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
+  test_stoch_param <- init_ipm(sim_gen    = "simple",
+                               di_dd      = "di",
+                               det_stoch  = "stoch",
+                               kern_param = "param") %>%
     define_kernel(
       'P',
       formula = s * g,
@@ -472,7 +481,10 @@ test_that("t helper variable works as advertised", {
     return(temp)
   }
 
-  test_det_seq <- init_ipm('simple_di_stoch_param') %>%
+  test_det_seq <- init_ipm(sim_gen    = "simple",
+                           di_dd      = "di",
+                           det_stoch  = "stoch",
+                           kern_param = "param") %>%
     define_kernel(
       'P',
       formula = s * g,
@@ -585,7 +597,10 @@ test_that("stoch_param can handle Hier_effs", {
     return(out)
   }
 
-  test_stoch_param <- init_ipm('simple_di_stoch_param') %>%
+  test_stoch_param <- init_ipm(sim_gen    = "simple",
+                               di_dd      = "di",
+                               det_stoch  = "stoch",
+                               kern_param = "param") %>%
     define_kernel(
       'P_yr',
       formula = s_yr * g,

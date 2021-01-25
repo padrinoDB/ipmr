@@ -10,7 +10,9 @@ L <- 100
 U <- 500
 n_mesh_p <- 1000
 
-single_state <- init_ipm('simple_di_det') %>%
+single_state <- init_ipm(sim_gen    = "simple",
+                         di_dd      = "di",
+                         det_stoch  = "det") %>%
   define_kernel("P",
                 formula = s * g,
                 family = "CC",
@@ -53,7 +55,9 @@ impl_args_2 <- make_impl_args_list(c('P_1',"P_2", 'F'),
                                    state_start = c("ht", "dbh", "dbh"),
                                    state_end = c("dbh", "dbh", 'ht'))
 
-two_state <- init_ipm('simple_di_det') %>%
+two_state <- init_ipm(sim_gen    = "simple",
+                      di_dd      = "di",
+                      det_stoch  = "det") %>%
   define_kernel("P_1",
                 formula = s * g, # make helper for double transposes
                 family = "CC",

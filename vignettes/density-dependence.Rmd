@@ -88,12 +88,11 @@ params     <- c(data_list, g_r_int, s_r_int, f_s_r_int)
 ```
 
 
-Next, we initialize the model using `init_ipm`. The difference is that the second bit of model class is now changed to `"dd"` to denote that this is a density dependent model.
+Next, we initialize the model using `init_ipm`. The difference is that the second argument is now changed to `"dd"` to denote that this is a density dependent model.
 
 ```{r eval = FALSE}
 
-dd_ipm <- init_ipm("simple_dd_stoch_kern") 
-
+dd_ipm <- init_ipm(sim_gen = "simple", di_dd = "dd", det_stoch = "det")
 ```
 
 Once we've done that, we're ready to begin specifying the kernel forms. One previously not mentioned aspect of `define_pop_state()` is that, in addition to defining initial conditions, 2 additional helper variables are generated: `n_stateVariable_t` and `n_stateVariable_t_1`. These can be used to reference the population states in vital rate and/or kernel expressions.

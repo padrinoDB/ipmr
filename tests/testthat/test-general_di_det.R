@@ -231,7 +231,9 @@ inv_logit_2 <- function(int, slope, slope_2, sv) {
   1/(1 + exp(-(int + slope * sv + slope_2 * sv ^ 2)))
 }
 
-ipmr_cr <- init_ipm("general_di_det") %>%
+ipmr_cr <- init_ipm(sim_gen    = "general",
+                    di_dd      = "di",
+                    det_stoch  = "det") %>%
   define_kernel(
     name          = "P",
     formula       = s * g * d_ht,
@@ -335,7 +337,9 @@ test_that('classes are correctly set', {
 
 test_that("kernel definition order doesn't matter", {
 
-  test_order <- init_ipm("general_di_det")  %>%
+  test_order <- init_ipm(sim_gen    = "general",
+                         di_dd      = "di",
+                         det_stoch  = "det")  %>%
     define_kernel(
       name          = "go_discrete",
       formula       = f_r * f_s * g_i,
@@ -414,7 +418,9 @@ test_that("kernel definition order doesn't matter", {
 test_that('normalize pop vec works the right way', {
 
 
-  ipmr_cr <- init_ipm("general_di_det") %>%
+  ipmr_cr <- init_ipm(sim_gen    = "general",
+                      di_dd      = "di",
+                      det_stoch  = "det") %>%
     define_kernel(
       name          = "P",
       formula       = s * g * d_ht,
@@ -641,7 +647,9 @@ ws_hand <- apply(ws_hand, 2, function(x) x / sum(x))
 # ipmr definition
 
 
-ipmr_control <- init_ipm("general_di_det") %>%
+ipmr_control <- init_ipm(sim_gen    = "general",
+                         di_dd      = "di",
+                         det_stoch  = "det") %>%
   define_kernel(
     name             = "P_site",
     formula          = s_site * g_site * d_ht,
@@ -756,7 +764,9 @@ test_that("DC/CD transitions without size-dependence work", {
     d       = 1
   )
 
-  general_ipm <- init_ipm("general_di_det") %>%
+  general_ipm <- init_ipm(sim_gen    = "general",
+                          di_dd      = "di",
+                          det_stoch  = "det") %>%
     define_kernel(
       name          = "P",
       formula       = s * g * (1-m) * d_size,

@@ -16,7 +16,9 @@ state_list <- list(c("dbh"))
 
 # set.seed(1231241)
 
-x <- init_ipm('simple_dd_det') %>%
+x <- init_ipm(sim_gen    = "simple",
+              di_dd      = "dd",
+              det_stoch  = "det") %>%
   define_kernel("P",
                 formula = s * g,
                 family = "CC",
@@ -172,7 +174,9 @@ state_list <- list(c("dbh"))
 
 # set.seed(1231241)
 
-x_sub <- init_ipm('simple_dd_det') %>%
+x_sub <- init_ipm(sim_gen    = "simple",
+                  di_dd      = "dd",
+                  det_stoch  = "det") %>%
   define_kernel("P",
                 formula = s * g,
                 family = "CC",
@@ -323,7 +327,9 @@ state_list <- list(c("dbh"))
 
 # set.seed(1231241)
 
-hier_mod <- init_ipm('simple_dd_det') %>%
+hier_mod <- init_ipm(sim_gen    = "simple",
+                     di_dd      = "dd",
+                     det_stoch  = "det") %>%
   define_kernel("P_yr",
                 formula = s_yr * g_yr,
                 family = "CC",

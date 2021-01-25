@@ -522,7 +522,10 @@ actual_lambdas <- pop_holder$lambda[ , -1]
 # And now, for the ipmr version.
 
 
-gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
+gen_di_stoch_kern <- init_ipm(sim_gen    = "general",
+                              di_dd      = "di",
+                              det_stoch  = "stoch",
+                              'kern') %>%
   define_kernel(
     name             = 'PF_xx_site',
     family           = "CC",
@@ -991,7 +994,10 @@ test_that('normalize pop vec works', {
 
   usr_seq <- sample(hier_effs$site, size = 100, replace = TRUE)
 
-  gen_di_stoch_kern <- init_ipm('general_di_stoch_kern') %>%
+  gen_di_stoch_kern <- init_ipm(sim_gen    = "general",
+                                di_dd      = "di",
+                                det_stoch  = "stoch",
+                                'kern') %>%
     define_kernel(
       name             = 'PF_xx_site',
       family           = "CC",
@@ -1322,7 +1328,10 @@ test_that('partially stochastic models also work', {
   }
 
 
-  general_stoch_kern_ipm <- init_ipm("general_di_stoch_kern") %>%
+  general_stoch_kern_ipm <- init_ipm(sim_gen    = "general",
+                                     di_dd      = "di",
+                                     det_stoch  = "stoch",
+                                     'kern') %>%
     define_kernel(
       name             = "P_year",
       formula          = s * g_year * d_ht,
@@ -1392,7 +1401,9 @@ test_that('partially stochastic models also work', {
 
   states <- list(c('ht', 'b'))
 
-  det_version <- init_ipm("general_di_det") %>%
+  det_version <- init_ipm(sim_gen    = "general",
+                          di_dd      = "di",
+                          det_stoch  = "det") %>%
     define_kernel(
       name          = "P",
       formula       = s * g * d_ht,
