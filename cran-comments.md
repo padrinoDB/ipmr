@@ -1,8 +1,8 @@
 ## Test environments
-* local R installation, Windows 10, R 4.0.0
-* ubuntu 14.04.05 (on travis-ci), devel, release, and oldrelease
-* macOS High Sierra 10.13.6, release and oldrelease
-* Windows (Appveyor), devel, release, and oldrelease
+* local R installation, Windows 10, R 4.0.2
+* ubuntu 20.04.1 (GitHub Actions), devel, release, and oldrelease
+* macOS Catalina 10.15.7 (GitHub Actions), release and oldrelease
+* Windows (Github Actions), devel, release, and oldrelease
 
 ## R CMD check results
 
