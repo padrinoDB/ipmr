@@ -119,9 +119,8 @@ correctly. The possible entries for each argument are as follows:
         required is that the parameters for the distribution are
         specified and that the function that generates the parameters at
         each iteration returns named lists that correspond to the
-        parameter names in the model. Jump down to the
-        `"simple_di_stoch_param"` example for some inspiration in
-        writing those.
+        parameter names in the model. Examples of this are available in
+        the Introduction and General IPM vignettes.
 
 The following possibilities are currently or will become available in
 `ipmr` (bold text denotes development progress):
