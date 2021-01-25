@@ -26,7 +26,7 @@ impl_args <- make_impl_args_list(c('P', 'F'),
 
 states <- c('dbh', 'dbh')
 
-sim_di_det_ex <- init_ipm('simple_di_det') %>%
+sim_di_det_ex <- init_ipm('simple', 'di', 'det') %>%
   define_kernel("P",
                 formula = s * g,
                 family = "CC",
@@ -64,7 +64,7 @@ sim_di_det_ex <- init_ipm('simple_di_det') %>%
 # Create a general deterministic ipm
 
 
-init_pop_vec   <- runif(500)
+init_pop_vec   <- runif(200)
 init_seed_bank <- 20
 
 data_list <- list(
@@ -89,7 +89,7 @@ data_list <- list(
 
 L <- 1.02
 U <- 624
-n <- 500
+n <- 200
 
 # Initialize the state list and add some helper functions. The survival function
 # in this model is a quadratic function.
@@ -104,7 +104,7 @@ inv_logit_2 <- function(int, slope, slope_2, sv) {
   1/(1 + exp(-(int + slope * sv + slope_2 * sv ^ 2)))
 }
 
-gen_di_det_ex <- init_ipm("general_di_det") %>%
+gen_di_det_ex <- init_ipm("general", "di", "det") %>%
   define_kernel(
     name          = "P",
     formula       = s * g * d_ht,

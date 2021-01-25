@@ -16,6 +16,7 @@
 ^appveyor\.yml$
 ^bug_reports/*$
 ^vignettes/generic-progress\.Rmd$
+^vignettes/generic-funs\.Rmd$
 ^profiling/*$
 ^tests/sim_tests$
 ^CODE_OF_CONDUCT\.md$
