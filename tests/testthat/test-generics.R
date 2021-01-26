@@ -1107,7 +1107,7 @@ fixed_params <- lapply(fixed_params,
                        function(x) x$mu)
 
 rando_means  <- vapply(all_params[ind_rand],
-                       function(x) x$mu,
+                       function(x) x$mu + 1,
                        numeric(1L))
 
 rando_sigs  <- vapply(all_params[ind_rand],

@@ -153,7 +153,7 @@
     names(out)[i] <- proto$kernel_id[i]
 
     if(return_envs) {
-      env_list                 <- purrr::splice(env_list, list(kern_env))
+      env_list                 <- c(env_list, list(kern_env))
       names(env_list)[(i + 1)] <- proto$kernel_id[i]
     }
 
@@ -803,9 +803,17 @@
                                           family,
                                           pos) {
 
-  sub_kernel_list[[pos]]        <- rlang::env_get(kernel_env, kernel_id)
+  out <- rlang::env_get(kernel_env, kernel_id)
+
+  # Checks for negative/NA entries
+
+  out <- .valid_it_mat(out, kernel_id)
+
+  sub_kernel_list[[pos]]        <- out
   names(sub_kernel_list)[pos]   <- kernel_id
   class(sub_kernel_list[[pos]]) <- family
+
+
 
   return(sub_kernel_list)
 }
@@ -1250,9 +1258,55 @@
 
   }
 
+
   class(out) <- c(fun_cls, class(out))
 
   return(out)
+
+}
+
+#' @noRd
+
+.valid_it_mat <- function(mat, kern_name) {
+
+  # Finally, we need to check for floating point errors that generate
+  # entries slightly less than 0, and correct those.
+
+  if(any(mat < 0)) {
+
+    min_0 <- min(mat[mat < 0])
+    max_0 <- max(mat[mat < 0])
+
+    if(isTRUE(all.equal(min_0, 0, tolerance = 1e-15)) &&
+       isTRUE(all.equal(max_0, 0, tolerance = 1e-15))) {
+
+      mat[mat < 0] <- 0
+
+    } else {
+
+      msg <- paste("Negative numbers greater than expected due",
+                   " to  floating point error generated building: ",
+                   kern_name,". Double check model parameteriztion.",
+                   sep = "")
+
+      stop(msg, call. = FALSE)
+
+    }
+
+  }
+
+
+  if(any(is.na(mat))) {
+
+    msg <- paste("NAs detected in kernel: ", kern_name,
+                 ". Check kernel definition and model parameters.",
+                 sep = "")
+
+    stop(msg, call. = FALSE)
+
+  }
+
+  return(mat)
 
 }
 
