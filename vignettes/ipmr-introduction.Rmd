@@ -243,7 +243,7 @@ my_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm", 
-                                            param = "g")
+                                            target =  "g")
   )
 
 ```
@@ -566,7 +566,7 @@ pred_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm", 
-                                            param = "g")
+                                            target =  "g")
   ) %>%
   define_kernel(
     name          = "F",
@@ -590,7 +590,7 @@ pred_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm",
-                                            param = "f_d")
+                                            target =  "f_d")
   ) %>%
   define_impl(
     make_impl_args_list(
@@ -1627,7 +1627,7 @@ obs_ipm <- init_ipm(sim_gen    = "simple",
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm", 
-                                            param = "g")
+                                            target =  "g")
   ) %>%
   define_kernel(
     name          = "F",
@@ -1651,7 +1651,7 @@ obs_ipm <- init_ipm(sim_gen    = "simple",
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm",
-                                            param = "f_d")
+                                            target =  "f_d")
   ) %>%
   define_impl(
     make_impl_args_list(

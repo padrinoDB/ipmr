@@ -543,11 +543,11 @@ general_stoch_kern_ipm <- init_ipm(sim_gen    = "general",
     levels_hier_effs = list(year = 1:5),
     evict_cor        = TRUE,
     
-    # we also add the suffix here, because the paremter modified by truncated_distributions
-    # is time-varying.
+    # we also add the suffix to `target` here, because the value modified by 
+    # truncated_distributions is time-varying.
     
     evict_fun        = truncated_distributions('norm',
-                                               'g_year')
+                                               target = 'g_year')
   ) %>%
   define_kernel(
     

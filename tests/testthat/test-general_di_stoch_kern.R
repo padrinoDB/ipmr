@@ -983,7 +983,7 @@ test_that('evict_fun warnings are correctly generated', {
     )
 
   test_text <-
-    "length of 'fun' in 'truncated_distributions()' is not equal to length of 'param'. Recycling 'fun'."
+    "length of 'fun' in 'truncated_distributions()' is not equal to length of 'target'. Recycling 'fun'."
 
   expect_equal(wrngs[1], test_text)
 

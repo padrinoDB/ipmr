@@ -7,7 +7,7 @@
 #' @param fun The density function to use. For example, could be
 #' \code{"norm"} to correct a Gaussian density function, or \code{"lnorm"} to
 #' correct a log-normal density function.
-#' @param param The parameter/vital rate being modified. If this is a vector, the
+#' @param target The parameter/vital rate being modified. If this is a vector, the
 #' distribution specified in \code{fun} will be recycled.
 #' @param state The state variable used in the kernel that is being discretized.
 #' @param ... Used internally, do not touch!
@@ -31,16 +31,16 @@
 #' @export
 
 truncated_distributions <- function(fun,
-                                    param,
+                                    target,
                                     ...) {
 
   proto <- ..1
 
-  for(i in seq_along(param)) {
+  for(i in seq_along(target)) {
 
-    if(length(fun) != length(param)) {
+    if(length(fun) != length(target)) {
       warning("length of 'fun' in 'truncated_distributions()' is not equal to ",
-              "length of 'param'. Recycling 'fun'.",
+              "length of 'target'. Recycling 'fun'.",
               call. = FALSE)
 
       use_fun <- fun
@@ -48,11 +48,11 @@ truncated_distributions <- function(fun,
       use_fun <- fun[i]
     }
 
-    LU    <- .get_bounds_from_proto(param[i], proto)
+    LU    <- .get_bounds_from_proto(target[i], proto)
     L     <- LU[1]
     U     <- LU[2]
 
-    proto <- .sub_new_param_call(use_fun, param[i], L, U, proto)
+    proto <- .sub_new_target_call(use_fun, target[i], L, U, proto)
   }
 
   return(proto)
@@ -64,19 +64,19 @@ truncated_distributions <- function(fun,
 #' @noRd
 #' @importFrom rlang call_args
 
-.sub_new_param_call <- function(fun, param, L, U, proto) {
+.sub_new_target_call <- function(fun, target, L, U, proto) {
 
   fun <- paste('p', fun, sep = "")
-  param_form   <- .get_param_form(param, proto)
-  fixed_params <- rlang::call_args(rlang::parse_expr(param_form))[-1] %>%
+  target_form   <- .get_target_form(target, proto)
+  fixed_targets <- rlang::call_args(rlang::parse_expr(target_form))[-1] %>%
     unlist() %>%
     as.character() %>%
     paste(collapse = ', ')
 
-  denom_1 <- paste(fun, '(', U, ', ', fixed_params, ')', sep = "")
-  denom_2 <- paste(fun, '(', L, ', ', fixed_params, ')', sep = "")
+  denom_1 <- paste(fun, '(', U, ', ', fixed_targets, ')', sep = "")
+  denom_2 <- paste(fun, '(', L, ', ', fixed_targets, ')', sep = "")
 
-  final_form <- paste(param_form,
+  final_form <- paste(target_form,
                       ' / ',
                       '(',
                       denom_1,
@@ -85,15 +85,15 @@ truncated_distributions <- function(fun,
                       ')',
                       sep = "")
 
-  out <- .insert_final_form(param, final_form, proto)
+  out <- .insert_final_form(target, final_form, proto)
 
   return(out)
 
 }
 
-.insert_final_form <- function(param, final_form, proto) {
+.insert_final_form <- function(target, final_form, proto) {
 
-  ind <- which(names(proto$params[[1]]$vr_text) == param)
+  ind <- which(names(proto$params[[1]]$vr_text) == target)
 
   proto$params[[1]]$vr_text[ind] <- final_form
 
@@ -102,7 +102,7 @@ truncated_distributions <- function(fun,
 
 #' @noRd
 
-.get_bounds_from_proto <- function(param, proto) {
+.get_bounds_from_proto <- function(target, proto) {
 
   # Get state variable and the names corresponding to its bounds
 
@@ -124,23 +124,23 @@ truncated_distributions <- function(fun,
 
 #' @noRd
 
-.get_param_form <- function(param, proto) {
+.get_target_form <- function(target, proto) {
 
-  all_params <- .flatten_to_depth(proto$params, 1)
+  all_targets <- .flatten_to_depth(proto$params, 1)
 
-  ind <- which(names(all_params) %in% param)
+  ind <- which(names(all_targets) %in% target)
 
   if(length(ind) == 1) {
 
-    param_form <- all_params[[ind]]
+    target_form <- all_targets[[ind]]
 
   } else{
 
-    param_form <- all_params[ind]
+    target_form <- all_targets[ind]
 
   }
 
-  return(param_form)
+  return(target_form)
 
 }
 
@@ -227,13 +227,13 @@ truncated_distributions <- function(fun,
 
 #' @export
 
-discrete_extrema <- function(param, state, ncol = NULL, nrow = NULL) {
+discrete_extrema <- function(target, state, ncol = NULL, nrow = NULL) {
 
   if(is.null(ncol) && is.null(nrow)) {
-    ncol <- nrow <- sqrt(length(param))
+    ncol <- nrow <- sqrt(length(target))
   }
 
-  temp <- matrix(param, ncol = ncol, nrow = nrow, byrow = TRUE) * state
+  temp <- matrix(target, ncol = ncol, nrow = nrow, byrow = TRUE) * state
 
   top_seq <- seq(1, ncol / 2, by = 1)
   bot_seq <- seq(max(top_seq + 1), ncol, by = 1)

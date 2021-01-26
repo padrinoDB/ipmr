@@ -228,8 +228,8 @@ my_simple_ipm <- define_kernel(
   # vital rate that it acts on.
   
   evict_cor = TRUE,
-  evict_fun = truncated_distributions('norm',
-                                      'g')
+  evict_fun = truncated_distributions(fun    = 'norm',
+                                      target = 'g')
   ) 
 
 my_simple_ipm <- define_kernel(
@@ -260,8 +260,8 @@ my_simple_ipm <- define_kernel(
   # truncating the normal distribution.
   
   evict_cor = TRUE,
-  evict_fun = truncated_distributions('norm',
-                                      'f_d')
+  evict_fun = truncated_distributions(fun    = 'norm',
+                                      target = 'f_d')
 ) 
 
 # Next, we have to define the implementation details for the model. 
