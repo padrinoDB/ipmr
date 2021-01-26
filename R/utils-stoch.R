@@ -89,7 +89,7 @@ mean_kernel <- function(ipm) {
     kern_nms <- character(length(levs))
 
     to_sub   <- names(p_row$levels_hier_effs[[1]]) %>%
-      .[!"to_drop" %in% .] %>%
+      .[!. %in% "to_drop"] %>%
       paste(collapse = "_")
 
     for(j in seq_along(levs)) {

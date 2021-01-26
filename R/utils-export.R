@@ -1242,3 +1242,127 @@ ipm_to_df.default <- function(ipm, ..., mega_mat, name_ps = NULL, f_forms = NULL
   return(out)
 
 }
+
+#' @title Create iteration kernels from an IPM object
+#'
+#' @description Creates iteration kernels for IPMs. \code{ipmr} does not create
+#' these to iterate models, but they may be useful for further analyses.
+#'
+#' @inheritParams format_mega_matrix
+#'
+#' @details \code{ipmr} does not generate complete iteration kernels, and uses
+#' sub-kernels to iterate models. However, some further analyses are just easier
+#' to code with a complete iteration kernel. This handles constructing those for
+#' simple and general models of all forms. For general models, this is really
+#' just a thin wrapper around \code{format_mega_matrix}.
+#'
+#' @return A list of iteration kernels. For simple and general models without
+#' \code{hier_effs}, then a list of length 1, with a slot named
+#' \code{"mega_matrix"}. For models with \code{hier_effs}, the slot names will have
+#' the \code{levels_hier_effs} pasted onto the \code{"mega_matrix"}.
+#'
+#' @export
+
+make_iter_kernel <- function(ipm,
+                             mega_mat = NULL,
+                             name_ps = NULL,
+                             f_forms = NULL) {
+
+  cls_switch <- as.character(grepl("simple", class(ipm)[1]))
+
+  k_cls <- switch(cls_switch,
+                  "TRUE"  = "simple_ipm",
+                  "FALSE" = "general_ipm")
+
+  class(ipm) <- c(k_cls, class(ipm))
+
+  mega_mat <- rlang::enquo(mega_mat)
+
+  out <- .make_iter_kernel(ipm,
+                           mega_mat = !! mega_mat,
+                           name_ps = name_ps,
+                           f_forms = f_forms)
+
+}
+
+.make_iter_kernel <- function(ipm, ...) {
+
+  UseMethod(".make_iter_kernel")
+
+}
+
+#' @noRd
+
+.make_iter_kernel.simple_ipm <- function(ipm, ...) {
+
+  proto <- ipm$proto_ipm
+
+  base_nms <- proto$kernel_id
+
+  all_kerns <- ipm$sub_kernels
+
+  # Check for grouping effects
+  if(any(proto$has_hier_effs)) {
+
+    # First, generate the base_expr for evaluation. In the simple_ipm case, this
+    # always just the sum of all sub-kernels. Once we have that, we can sub the
+    # hier_effs levels, then use args_from_txt to get exact names for evaluating
+    # the subbed expression.
+
+    base_expr <- paste(base_nms, collapse = " + ")
+
+    all_effs  <- .flatten_to_depth(proto$levels_hier_effs, 1L) %>%
+      .[!duplicated(names(.))] %>%
+      .[!names(.) %in% c("levels", "to_drop")]
+
+    levs      <- .make_hier_levels(all_effs)
+
+    to_sub    <- paste(names(all_effs), collapse = "_")
+
+    all_args <- lapply(levs,
+                       function(x, base_expr, to_sub) {
+                         temp <- gsub(to_sub, x, base_expr)
+
+                         .args_from_txt(temp)
+
+                       },
+                       base_expr = base_expr,
+                       to_sub = to_sub)
+
+    out <- list()
+
+    for(i in seq_along(all_args)) {
+
+      kern_nms <- all_args[[i]]
+
+      out[[i]] <- do.call(`+`, all_kerns[kern_nms])
+
+      names(out)[i] <- paste("mega_matrix_", levs[i], sep = "")
+    }
+
+  } else {
+
+    use_kerns <- ipm$sub_kernels
+
+    out <- list(mega_matrix = do.call(`+`, all_kerns))
+  }
+  return(out)
+
+}
+
+
+#' @noRd
+
+.make_iter_kernel.general_ipm <- function(ipm,
+                                          ...,
+                                          mega_mat,
+                                          name_ps = NULL,
+                                          f_forms = NULL) {
+
+  mega_mat <- rlang::enquo(mega_mat)
+
+  out <- format_mega_matrix(ipm, !! mega_mat, name_ps, f_forms)
+
+  return(out)
+
+}

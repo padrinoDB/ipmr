@@ -283,18 +283,22 @@ monocarp_sys <- init_ipm(sim_gen    = "simple",
            iterate = TRUE,
            iterations = 100)
 
-Ks <- lapply(1:5,
-             function(x, kern_list) {
-               nms <- paste(c("P", "F"), x, sep = "_")
+# Ks <- lapply(1:5,
+#              function(x, kern_list) {
+#                nms <- paste(c("P", "F"), x, sep = "_")
+#
+#                out <- do.call(`+`, kern_list[nms])
+#
+#                return(out)
+#              }, kern_list = monocarp_sys$sub_kernels)
 
-               out <- do.call(`+`, kern_list[nms])
-
-               return(out)
-             }, kern_list = monocarp_sys$sub_kernels)
+Ks <- make_iter_kernel(monocarp_sys) %>%
+  lapply(unclass)
 
 lambdas_ipmr <- vapply(Ks,
                        function(x) Re(eigen(x)$values[1]),
-                       numeric(1))
+                       numeric(1)) %>%
+  unname()
 
 ws_ipmr <- vapply(Ks,
                   function(x) Re(eigen(x)$vectors[ , 1]),
@@ -308,6 +312,16 @@ test_that('eigenvectors and values are correct', {
   expect_equal(ws_ipmr[ ,3], ws[ ,3], tolerance = 1e-13)
   expect_equal(ws_ipmr[ ,4], ws[ ,4], tolerance = 1e-13)
   expect_equal(ws_ipmr[ ,5], ws[ ,5], tolerance = 1e-13)
+
+})
+
+test_that("make_iter_kernel works as expected", {
+
+  expect_equal(Ks[[1]], K_1)
+  expect_equal(Ks[[2]], K_2)
+  expect_equal(Ks[[3]], K_3)
+  expect_equal(Ks[[4]], K_4)
+  expect_equal(Ks[[5]], K_5)
 
 })
 
@@ -440,18 +454,14 @@ test_that("order of kernel definition doesn't matter", {
                              pois_r      = pois_r),
              normalize_pop_size = FALSE)
 
-  Ks <- lapply(1:5,
-               function(x, kern_list) {
-                 nms <- paste(c("P", "F"), x, sep = "_")
-
-                 out <- do.call(`+`, kern_list[nms])
-
-                 return(out)
-               }, kern_list = test_order_1$sub_kernels)
+  Ks <- make_iter_kernel(test_order_1) %>%
+    lapply(unclass)
 
   lambdas_test <- vapply(Ks,
                          function(x) Re(eigen(x)$values[1]),
-                         numeric(1))
+                         numeric(1)) %>%
+    unname()
+
   ws_test <- vapply(Ks,
                     function(x) Re(eigen(x)$vectors[ , 1]),
                     numeric(100L))

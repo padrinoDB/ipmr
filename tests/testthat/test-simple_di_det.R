@@ -566,6 +566,20 @@ test_that('hierarchical deterministic simulations work', {
 
 })
 
+test_that("make_iter_kernel works", {
+
+  k_list <- make_iter_kernel(hier_mod) %>%
+    lapply(unclass)
+
+  expect_equal(k_list[[1]], K_1)
+  expect_equal(k_list[[2]], K_2)
+  expect_equal(k_list[[3]], K_3)
+  expect_equal(k_list[[4]], K_4)
+  expect_equal(k_list[[5]], K_5)
+
+
+})
+
 
 test_that("discrete_extrema_works for simple models", {
 
