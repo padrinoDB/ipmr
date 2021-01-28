@@ -1,12 +1,32 @@
 Package: ipmr
 Title: Fits IPMs using an Expression Based Framework 
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: c( 
     person(given = "Sam",
            family = "Levin",
            role = c("aut", "cre"),
            email = "levisc8@gmail.com",
-           comment = c(ORCID = "0000-0002-3289-9925")))
+           comment = c(ORCID = "0000-0002-3289-9925")),
+    person(given = "Aldo",
+           family = "Compagnoni",
+           email = "aldo.compagnoni@idiv.de",
+           role = "aut"),
+    person(given = "Dylan",
+           family = "Childs",
+           email = "d.childs@sheffield.ac.uk",
+           role = "aut"),
+    person(given = "Sanne",
+           family = "Evers",
+           email = "sanne.evers@idiv.de",
+           role = "aut"),
+    person(given = "Roberto",
+           family = "Salguero-Gomez",
+           email = "rob.salguero@zoo.ox.ac.uk",
+           role = "aut"),
+    person(given = "Tiffany",
+           family = "Knight",
+           email = "tiffany.knight@idiv.de",
+           role = "aut"))
 Description: Flexibly implements IPMs using an expression based framework. This
   will not abstract away the model selection process, but it will make sure you
   get everything after that correct. It handles density dependence and environmental
@@ -43,3 +63,5 @@ Config/testthat/parallel: true
 Config/testthat/edition: 3
 LinkingTo: 
     Rcpp
+URL: https://levisc8.github.io/ipmr, https://github.com/levisc8/ipmr
+BugReports: https://github.com/levisc8/ipmr/issues
