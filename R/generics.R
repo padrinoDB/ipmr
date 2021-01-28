@@ -39,7 +39,7 @@ print.proto_ipm <- function(x, ...) {
   print(forms)
 
   cat("\n\nVital rates:\n\n")
-  vrs          <- vital_rates(x)
+  vrs          <- vital_rate_exprs(x)
 
   print(vrs)
 
@@ -125,7 +125,7 @@ print.proto_ipm <- function(x, ...) {
     use_proto <- proto[row, ]
     kern_nm   <- proto$kernel_id[row]
 
-    vr_exprs <- vital_rates(use_proto)
+    vr_exprs <- vital_rate_exprs(use_proto)
     params   <- parameters(proto)
 
     # Age x size models and/or hier_effs models need expansion before we
@@ -843,6 +843,62 @@ print.ipmr_matrix <- function(x, ...) {
   cat("\n", msg, "\n")
 
   invisible(x)
+}
+
+#' @export
+print.ipmr_vital_rate_funs <- function(x, ...) {
+
+  if(length(x) == 1 && x == "No vital rates specified") {
+    cat("No vital rates specified\n")
+    invisible(x)
+    return()
+  }
+  vr_nms <- names(x)
+
+  cls    <- vapply(x,
+                   function(x) .mat_cls(x),
+                   character(1L))
+
+  rngs <- vapply(x,
+                 function(y) round(range(y), 4),
+                 numeric(2L))
+
+  out <- vapply(seq_along(cls),
+                function(it, vr_nm, cls, rngs) {
+                  paste(vr_nms[it], cls[it], sep = ": ") %>%
+                    paste(" with minimum value: ", rngs[1, it],
+                          " and maximum value: ", rngs[2, it],
+                          sep = "")
+                },
+                vr_nm = vr_nms, cls = cls, rngs = rngs,
+                FUN.VALUE = character(1L)) %>%
+    paste(., collapse = "\n")
+
+  out <- paste(out, '\n', sep = "")
+
+    cat(out)
+    invisible(x)
+}
+
+.pretty_dim <- function(x) {
+
+  col <- ncol(x)
+  row <- nrow(x)
+
+  cls <- switch(class(x)[1],
+                "CC" = "matrix",
+                "DC" = "column vector",
+                "CD" = "row vector",
+                "DD" = "matrix")
+
+  paste("A", row, "x", col, cls, sep = " ")
+
+}
+
+.mat_cls <- function(x) {
+
+  .pretty_dim(x)
+
 }
 
 # Lambda------------
@@ -1854,7 +1910,7 @@ left_ev.simple_di_det_ipm <- function(ipm, iterations = 100) {
   if(is_conv_to_asymptotic(test_conv)) {
 
     out    <- test_conv$pop_state[[1]][ , (iterations + 1)]
-    out_nm <- paste(pop_nm, 'w', sep = "_")
+    out_nm <- paste(pop_nm, 'v', sep = "_")
 
   } else {
 

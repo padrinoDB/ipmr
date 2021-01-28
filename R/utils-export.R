@@ -636,9 +636,14 @@ domains <- function(object) {
 #' @details The \code{*.default} method corresponds to output from \code{make_ipm()},
 #' and the \code{*.proto_ipm} methods correspond to outputs from \code{define_*}.
 #'
-#' When using \code{kernel_formulae<-} and \code{vital_rates<-}, the right
+#' When using \code{kernel_formulae<-} and \code{vital_rates_exprs<-}, the right
 #' hand side of the expression must be wrapped in \code{new_fun_form}. See
 #' examples.
+#'
+#' Note that when using \code{vital_rate_funs}, unless the vital rate expression
+#' contains an expression for integration, these functions \strong{are not yet
+#' integrated!} This is useful for things like sensitivity and elasticity analysis,
+#' but care must be taken to not use these values incorrectly.
 #'
 #' @examples
 #'
@@ -649,7 +654,7 @@ domains <- function(object) {
 #' # Create a new, iterated IPM
 #' new_ipm <- make_ipm(proto, iterate = TRUE, iterations = 100)
 #'
-#' vital_rates(new_ipm)
+#' vital_rate_exprs(new_ipm)
 #' kernel_formulae(new_ipm)
 #'
 #' domains(new_ipm)
@@ -657,7 +662,7 @@ domains <- function(object) {
 #'
 #' # Usage is the same for proto_ipm's as *_ipm's
 #'
-#' vital_rates(proto)
+#' vital_rate_exprs(proto)
 #' kernel_formulae(proto)
 #'
 #' domains(proto)
@@ -679,7 +684,9 @@ domains <- function(object) {
 #' # right-hand side in a call to new_fun_form(). new_fun_form uses expressions
 #' # with the same format as ... in define_kernel()
 #'
-#' vital_rates(proto, kernel = "P", vital_rate = "g_mu") <- new_fun_form(g_int + g_z + g_slope * ht_1)
+#' vital_rate_exprs(proto,
+#'                  kernel = "P",
+#'                  vital_rate = "g_mu") <- new_fun_form(g_int + g_z + g_slope * ht_1)
 #'
 #' kernel_formulae(proto, kernel = "stay_discrete") <- new_fun_form(g_z * d_ht)
 #'
@@ -737,9 +744,9 @@ domains.default <- function(object) {
 #' @rdname accessors
 #' @export
 
-vital_rates <- function(object) {
+vital_rate_exprs <- function(object) {
 
-  UseMethod("vital_rates")
+  UseMethod("vital_rate_exprs")
 
 }
 
@@ -747,7 +754,7 @@ vital_rates <- function(object) {
 #' @importFrom stats setNames
 #' @export
 
-vital_rates.proto_ipm <- function(object) {
+vital_rate_exprs.proto_ipm <- function(object) {
 
   out <- lapply(object$params, function(x) x$vr_text) %>%
     stats::setNames(c("")) %>%
@@ -775,11 +782,82 @@ vital_rates.proto_ipm <- function(object) {
 #' @rdname accessors
 #' @export
 
-vital_rates.default <- function(object) {
+vital_rate_exprs.default <- function(object) {
 
-  vital_rates(object$proto_ipm)
+  vital_rate_exprs(object$proto_ipm)
 
 }
+
+#' @rdname accessors
+#' @export
+
+vital_rate_funs <- function(ipm, vital_rate = c("all")) {
+
+  proto    <- .initialize_kernels(ipm$proto_ipm, TRUE, "right")$others
+
+  env_list <- ipm$env_list
+
+
+  if(length(env_list) < 2) {
+
+    stop("Cannot find sub-kernel evaluation environments in 'ipm'.",
+         " Re-run 'make_ipm()' with 'return_all_envs = TRUE'.")
+
+  }
+
+  out <- list()
+
+  for(i in seq_len(nrow(proto))) {
+
+    kern_nm <- proto$kernel_id[i]
+
+    kern_vrs <- names(proto$params[[i]]$vr_text)
+
+    if(rlang::is_empty(kern_vrs)) {
+
+      out[[i]] <- "No vital rates specified"
+      names(out)[i] <- kern_nm
+      next
+
+    }
+
+    use_env <- env_list[[kern_nm]]
+
+    out[[i]] <- rlang::env_get_list(env = use_env,
+                                    nms = kern_vrs,
+                                    inherit = FALSE)
+
+    out[[i]] <- lapply(out[[i]],
+                       function(x, kern_cls, start, end, main_env, nm) {
+
+      class(x) <- c(kern_cls, class(x))
+
+      .fun_to_iteration_mat(x, start, end, main_env, nm)
+
+    },
+    kern_cls = proto$params[[i]]$family,
+    start    = names(proto$domain[[i]])[1],
+    end      = names(proto$domain[[i]])[2],
+    main_env = env_list$main_env,
+    nm       = kern_nm
+    )
+
+    names(out)[i] <- kern_nm
+
+  }
+
+  out <- lapply(out,
+                function(x) {
+                  class(x) <- c("ipmr_vital_rate_funs",
+                                class(x))
+
+                  return(x)
+                })
+
+  return(out)
+
+}
+
 
 #' @rdname accessors
 #'
@@ -792,16 +870,16 @@ vital_rates.default <- function(object) {
 #'
 #' @export
 
-`vital_rates<-` <- function(object, kernel, vital_rate, value) {
+`vital_rate_exprs<-` <- function(object, kernel, vital_rate, value) {
 
-  UseMethod("vital_rates<-")
+  UseMethod("vital_rate_exprs<-")
 
 }
 
 #' @rdname accessors
 #' @export
 
-`vital_rates<-.proto_ipm` <- function(object, kernel, vital_rate, value) {
+`vital_rate_exprs<-.proto_ipm` <- function(object, kernel, vital_rate, value) {
 
 
   object$params[[kernel]]$vr_text[[vital_rate]] <- rlang::quo_text(value)
@@ -958,8 +1036,8 @@ parameters.default <- function(object) {
 
 #' @rdname accessors
 #' @param ipm An object created by \code{make_ipm()}. This argument only applies to
-#' \code{int_mesh()} (because the mesh is not built until \code{make_ipm()} is
-#' called).
+#' \code{int_mesh()} and \code{vital_rate_funs} (because these are not built
+#' until \code{make_ipm()} is called).
 #' @export
 
 int_mesh <- function(ipm) {

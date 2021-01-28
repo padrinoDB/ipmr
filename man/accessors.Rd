@@ -4,11 +4,12 @@
 \alias{domains}
 \alias{domains.proto_ipm}
 \alias{domains.default}
-\alias{vital_rates}
-\alias{vital_rates.proto_ipm}
-\alias{vital_rates.default}
-\alias{vital_rates<-}
-\alias{vital_rates<-.proto_ipm}
+\alias{vital_rate_exprs}
+\alias{vital_rate_exprs.proto_ipm}
+\alias{vital_rate_exprs.default}
+\alias{vital_rate_funs}
+\alias{vital_rate_exprs<-}
+\alias{vital_rate_exprs<-.proto_ipm}
 \alias{new_fun_form}
 \alias{kernel_formulae}
 \alias{kernel_formulae.proto_ipm}
@@ -32,15 +33,17 @@ domains(object)
 
 \method{domains}{default}(object)
 
-vital_rates(object)
+vital_rate_exprs(object)
 
-\method{vital_rates}{proto_ipm}(object)
+\method{vital_rate_exprs}{proto_ipm}(object)
 
-\method{vital_rates}{default}(object)
+\method{vital_rate_exprs}{default}(object)
 
-vital_rates(object, kernel, vital_rate) <- value
+vital_rate_funs(ipm, vital_rate = c("all"))
 
-\method{vital_rates}{proto_ipm}(object, kernel, vital_rate) <- value
+vital_rate_exprs(object, kernel, vital_rate) <- value
+
+\method{vital_rate_exprs}{proto_ipm}(object, kernel, vital_rate) <- value
 
 new_fun_form(form)
 
@@ -75,22 +78,22 @@ pop_state(object)
 \arguments{
 \item{object}{A \code{proto_ipm} or object created by \code{make_ipm()}.}
 
-\item{kernel}{The name of the kernel to insert the new vital rate expression
-into.}
+\item{ipm}{An object created by \code{make_ipm()}. This argument only applies to
+\code{int_mesh()} and \code{vital_rate_funs} (because these are not built
+until \code{make_ipm()} is called).}
 
 \item{vital_rate}{The name of the vital rate to replace. If the vital rate
 doesn't already exist in the \code{object}, a new one with this name will be
 created.}
+
+\item{kernel}{The name of the kernel to insert the new vital rate expression
+into.}
 
 \item{value}{A named list of new parameters. The new list does not need
 to contain all of the parameters, just the ones to update/append.}
 
 \item{form}{An expression representing the new vital rate or kernel formula
 to insert.}
-
-\item{ipm}{An object created by \code{make_ipm()}. This argument only applies to
-\code{int_mesh()} (because the mesh is not built until \code{make_ipm()} is
-called).}
 }
 \value{
 Depending on the class of \code{object}, a list
@@ -104,9 +107,14 @@ Functions that access slots of a \code{*_ipm} (including
 The \code{*.default} method corresponds to output from \code{make_ipm()},
 and the \code{*.proto_ipm} methods correspond to outputs from \code{define_*}.
 
-When using \code{kernel_formulae<-} and \code{vital_rates<-}, the right
+When using \code{kernel_formulae<-} and \code{vital_rates_exprs<-}, the right
 hand side of the expression must be wrapped in \code{new_fun_form}. See
 examples.
+
+Note that when using \code{vital_rate_funs}, unless the vital rate expression
+contains an expression for integration, these functions \strong{are not yet
+integrated!} This is useful for things like sensitivity and elasticity analysis,
+but care must be taken to not use these values incorrectly.
 }
 \examples{
 
@@ -117,7 +125,7 @@ proto <- gen_di_det_ex$proto_ipm
 # Create a new, iterated IPM
 new_ipm <- make_ipm(proto, iterate = TRUE, iterations = 100)
 
-vital_rates(new_ipm)
+vital_rate_exprs(new_ipm)
 kernel_formulae(new_ipm)
 
 domains(new_ipm)
@@ -125,7 +133,7 @@ parameters(new_ipm)
 
 # Usage is the same for proto_ipm's as *_ipm's
 
-vital_rates(proto)
+vital_rate_exprs(proto)
 kernel_formulae(proto)
 
 domains(proto)
@@ -147,7 +155,9 @@ parameters(proto) <- list(g_z = 2.2)
 # right-hand side in a call to new_fun_form(). new_fun_form uses expressions
 # with the same format as ... in define_kernel()
 
-vital_rates(proto, kernel = "P", vital_rate = "g_mu") <- new_fun_form(g_int + g_z + g_slope * ht_1)
+vital_rate_exprs(proto,
+                 kernel = "P",
+                 vital_rate = "g_mu") <- new_fun_form(g_int + g_z + g_slope * ht_1)
 
 kernel_formulae(proto, kernel = "stay_discrete") <- new_fun_form(g_z * d_ht)
 

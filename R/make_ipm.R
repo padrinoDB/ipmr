@@ -155,7 +155,7 @@ make_ipm.simple_di_det <- function(proto_ipm,
   main_env     <- .add_pop_state_to_main_env(temp$pop_state,
                                                  main_env)
 
-  # construct the kernels from their function defintions
+  # construct the kernels from their function definitions
 
   env_list      <- list(main_env = main_env)
 

@@ -7,7 +7,7 @@ test_that("exported utils return expected values w general IPMs", {
 
   dom <- domains(prot)
 
-  vr_exprs <- vital_rates(prot)
+  vr_exprs <- vital_rate_exprs(prot)
 
   forms <- kernel_formulae(prot)
 
@@ -27,6 +27,23 @@ test_that("exported utils return expected values w general IPMs", {
 
   expect_true(all(dom_types))
 
+  env_ipm <- make_ipm(prot,
+                      return_all_envs = TRUE)
+
+  vr_funs <- vital_rate_funs(env_ipm)
+
+  expect_s3_class(vr_funs$P$g, "CC")
+  expect_s3_class(vr_funs$P, "ipmr_vital_rate_funs")
+
+  g <- matrix(env_ipm$env_list$P$g,
+              nrow = 200,
+              ncol = 200,
+              byrow = TRUE)
+
+
+  g_vr <- unclass(vr_funs$P$g)
+
+  expect_equal(g, g_vr)
 
 })
 
@@ -39,7 +56,7 @@ test_that("exported utils return expected values w simple IPMs", {
 
   dom <- domains(prot)
 
-  vr_exprs <- vital_rates(prot)
+  vr_exprs <- vital_rate_exprs(prot)
 
   forms <- kernel_formulae(prot)
 
@@ -58,7 +75,7 @@ test_that("exported utils return expected values w simple IPMs", {
 
   expect_true(all(dom_types))
 
-  vr_ipm <- vital_rates(sim_di_det_ex)
+  vr_ipm <- vital_rate_exprs(sim_di_det_ex)
 
   expect_identical(vr_exprs, vr_ipm)
 
@@ -89,6 +106,15 @@ test_that("exported utils return expected values w simple IPMs", {
 
   expect_true(all(is.array(ps_ipm$n_ht), is.array(ps_ipm$n_b)))
   expect_type(ps_ipm, "list")
+
+  env_ipm <- make_ipm(prot,
+                      return_all_envs = TRUE)
+
+  vr_funs <- vital_rate_funs(env_ipm)
+
+  expect_s3_class(vr_funs$P$g, "CC")
+  expect_s3_class(vr_funs$P, "ipmr_vital_rate_funs")
+
 
 })
 

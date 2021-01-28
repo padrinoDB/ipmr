@@ -216,8 +216,8 @@
 
   # Get vital rate names and domain names.
 
-  vr_nms <- names(vital_rates(proto_ipm))
-  vrs    <- vital_rates(proto_ipm)
+  vr_nms <- names(vital_rate_exprs(proto_ipm))
+  vrs    <- vital_rate_exprs(proto_ipm)
   do_nms <- names(domains(proto_ipm))
 
   # Now get argument names from target expression. We'll check to see if
