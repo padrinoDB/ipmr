@@ -16,6 +16,9 @@ List mean_kernel_impl(List holder) {
 
   for(int i = 0; i < n_tot; i++) {
 
+    if(i % 1000 == 0)
+      Rcpp::checkUserInterrupt();
+
     NumericMatrix use_mat = holder[i];
 
     out += use_mat;

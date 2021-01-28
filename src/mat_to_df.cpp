@@ -17,6 +17,8 @@ DataFrame mat_to_df_impl(NumericMatrix mat) {
 
   for(int i = 0; i < rows; i++) {
 
+    Rcpp::checkUserInterrupt();
+
     for(int j = 0; j < cols; j++) {
 
       val(it) = mat(i, j);
