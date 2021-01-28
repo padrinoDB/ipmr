@@ -102,7 +102,7 @@ Simple density-independent deterministic, simple kernel-resampled stochastic, an
 
 ## Quick example of a simple, deterministic IPM
 
-Here is a simple model implemented with `ipmr`. This is a hypothetical plant species where plants can survive and grow ($P(z',z)$), and reproduce sexually ($F(z',z)$). We'll use 4 regressions: survival ($s(z)$), growth ($G(z',z)$), probability of reproducing ($f_r(z)$), and number of seeds produced conditional on flowering ($f_s(z)$). New recruits will be generated with a Gaussian distribution, which requires calculating the mean and standard deviation of new recruits from the data. For simplicity, we'll assume there's no maternal effect on recruit size. First, we'll write out the functional forms for each component of the model:
+Here is a simple model implemented with `ipmr`. This is a hypothetical plant species where plants can survive and grow ($P(z',z)$), and reproduce sexually ($F(z',z)$). We'll use 4 regressions: survival ($s(z)$), growth ($G(z',z)$, $f_g$), probability of reproducing ($r_r(z)$), and number of seeds produced conditional on flowering ($r_s(z)$). New recruits will be generated with a Gaussian distribution ($f_{r_d}$), which requires calculating the mean and standard deviation of new recruits from the data. For simplicity, we'll assume there's no maternal effect on recruit size. First, we'll write out the functional forms for each component of the model:
 
 1. $n(z', t+1) = \int_L^U K(z',z)n(z,t)dz$
 
@@ -112,17 +112,17 @@ Here is a simple model implemented with `ipmr`. This is a hypothetical plant spe
 
 4. $Logit(s(z)) = \alpha_s + \beta_s *z$
 
-5. $G(z',z) \sim Norm(\mu_g, \sigma_g)$
+5. $G(z',z) = f_g(\mu_g, \sigma_g)$
 
 6. $mu_g = \alpha_g + \beta_g * z$
 
-7. $F(z',z) = f_r(z) * f_s(z) * f_d(z')$
+7. $F(z',z) = r_r(z) * r_s(z) * r_d(z')$
 
-8. $Logit(f_r(z)) = \alpha_{f_r} + \beta_{f_r} * z$
+8. $Logit(r_r(z)) = \alpha_{r_r} + \beta_{r_r} * z$
 
-9. $Log(f_s(z)) = \alpha_{f_s} + \beta_{f_s} * z$
+9. $Log(r_s(z)) = \alpha_{r_s} + \beta_{r_s} * z$
 
-10. $f_d(z') \sim Norm(\mu_{f_d}, \sigma_{f_d})$
+10. $r_d(z') = f_{r_d}(\mu_{r_d}, \sigma_{r_d})$
 
 Equation 1 describes how all the vital rates act on the initial trait distribution to produce a new one at $t+1$. Equations 3-6 describe how existing individuals can survive, and if they survive, grow or shrink. Equations 7-10 describe how existing individuals create new individuals. In order to implement this, we need to fit regression models to our data. The following set of generalized linear models are equivalent to the functional forms described above:
 
@@ -136,17 +136,17 @@ Equation 1 describes how all the vital rates act on the initial trait distributi
     - Example model formula: `lm(size_2 ~ size_1, data = my_grow_data)`
     
 
-3. Pr(flowering) ($f_r(z)$ / `f_r`): a generalized linear model w/ a logit link.
+3. Pr(flowering) ($r_r(z)$ / `r_r`): a generalized linear model w/ a logit link.
 
     - Example model formula: `glm(flower ~ size_1, data = my_repro_data, family = binomial())`
     
 
-4. Seed production ($f_s(z)$ / `f_s`): a generalized linear model w/ log link.
+4. Seed production ($r_s(z)$ / `r_s`): a generalized linear model w/ log link.
 
     - Example model formula: `glm(seeds ~ size_1, data = my_flower_data, family = poisson())`
     
 
-5. Recruit size distribution ($f_d(z')$ / `f_d`): a normal distribution w parameters `mu_fd` (mean) and `sd_fd` (standard deviation).
+5. Recruit size distribution ($r_d(z')$ / `r_d`): a normal distribution w parameters `mu_fd` (mean) and `sd_fd` (standard deviation).
 
     - Example computations:
         
@@ -169,10 +169,10 @@ data_list = list(s_int     = 2.2,   # coefficients(my_surv_mod)[1]
                  g_int     = 0.2,   # coefficients(my_grow_mod)[1]
                  g_slope   = 1.02,  # coefficients(my_grow_mod)[2]
                  sd_g      = 0.7,   # sd(resid(my_grow_mod))
-                 f_r_int   = 0.003, # coefficients(my_pr_flower_mod)[1]
-                 f_r_slope = 0.015, # coefficients(my_pr_flower_mod)[2]
-                 f_s_int   = 1.3,   # coefficients(my_seed_mod)[1]
-                 f_s_slope = 0.075, # coefficients(my_seed_mod)[2]
+                 r_r_int   = 0.003, # coefficients(my_pr_flower_mod)[1]
+                 r_r_slope = 0.015, # coefficients(my_pr_flower_mod)[2]
+                 r_s_int   = 1.3,   # coefficients(my_seed_mod)[1]
+                 r_s_slope = 0.075, # coefficients(my_seed_mod)[2]
                  mu_fd     = 2,     # mean(recruit_data$size_next)
                  sd_fd     = 0.3)   # sd(recruit_data$size_next)
 
@@ -235,24 +235,24 @@ my_simple_ipm <- define_kernel(
 my_simple_ipm <- define_kernel(
   proto_ipm = my_simple_ipm,
   name      = 'F_simple',
-  formula   = f_r * f_s * f_d,
+  formula   = r_r * r_s * r_d,
   family    = 'CC',
   
   # Inverse logit transformation for flowering probability
   # (because we used a logistic regression)
   
-  f_r       = plogis(f_r_int + f_r_slope * dbh_1),
+  r_r       = plogis(r_r_int + r_r_slope * dbh_1),
   
   # Exponential function for seed progression 
   # (because we used a Poisson)
   
-  f_s       = exp(f_s_int + f_s_slope * dbh_1),
+  r_s       = exp(r_s_int + r_s_slope * dbh_1),
   
   # The recruit size distribution has no maternal effect for size,
   # so mu_fd and sd_fd are constants. These get passed in the 
   # data_list
   
-  f_d       = dnorm(dbh_2, mu_fd, sd_fd),
+  r_d       = dnorm(dbh_2, mu_fd, sd_fd),
   data_list = data_list,
   states    = list(c('dbh')),
   
@@ -261,7 +261,7 @@ my_simple_ipm <- define_kernel(
   
   evict_cor = TRUE,
   evict_fun = truncated_distributions(fun    = 'norm',
-                                      target = 'f_d')
+                                      target = 'r_d')
 ) 
 
 # Next, we have to define the implementation details for the model. 

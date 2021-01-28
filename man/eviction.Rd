@@ -5,16 +5,16 @@
 \alias{discrete_extrema}
 \title{Eviction correction}
 \usage{
-truncated_distributions(fun, param, ...)
+truncated_distributions(fun, target, ...)
 
-discrete_extrema(param, state, ncol = NULL, nrow = NULL)
+discrete_extrema(target, state, ncol = NULL, nrow = NULL)
 }
 \arguments{
 \item{fun}{The density function to use. For example, could be
 \code{"norm"} to correct a Gaussian density function, or \code{"lnorm"} to
 correct a log-normal density function.}
 
-\item{param}{The parameter/vital rate being modified. If this is a vector, the
+\item{target}{The parameter/vital rate being modified. If this is a vector, the
 distribution specified in \code{fun} will be recycled.}
 
 \item{...}{Used internally, do not touch!}

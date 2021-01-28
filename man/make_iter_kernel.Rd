@@ -26,6 +26,12 @@ this would be \code{"F + C"}. If data come from multiple sites or years,
 then this information is supplied using the suffix syntax (i.e.
 \code{f_forms = "F_yr + C_yr"}).}
 }
+\value{
+A list of iteration kernels. For simple and general models without
+\code{hier_effs}, then a list of length 1, with a slot named
+\code{"mega_matrix"}. For models with \code{hier_effs}, the slot names will have
+the \code{levels_hier_effs} pasted onto the \code{"mega_matrix"}.
+}
 \description{
 Creates iteration kernels for IPMs. \code{ipmr} does not create
 these to iterate models, but they may be useful for further analyses.

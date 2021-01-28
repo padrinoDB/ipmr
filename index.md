@@ -21,8 +21,13 @@ followed by examples of how to implement those types in this framework.
 
 ## Installation
 
-`ipmr` is not yet on CRAN. You can install the development version with
-the snippet below:
+Install from CRAN:
+
+``` r
+install.packages("ipmr")
+```
+
+You can install the development version with the snippet below:
 
 ``` r
 if(!require('remotes', quietly = TRUE)) {
@@ -177,13 +182,14 @@ framework.
 Here is a simple model implemented with `ipmr`. This is a hypothetical
 plant species where plants can survive and grow (*P*(*z*′, *z*)), and
 reproduce sexually (*F*(*z*′, *z*)). We’ll use 4 regressions: survival
-(*s*(*z*)), growth (*G*(*z*′, *z*)), probability of reproducing
-(*f*<sub>*r*</sub>(*z*)), and number of seeds produced conditional on
-flowering (*f*<sub>*s*</sub>(*z*)). New recruits will be generated with
-a Gaussian distribution, which requires calculating the mean and
-standard deviation of new recruits from the data. For simplicity, we’ll
-assume there’s no maternal effect on recruit size. First, we’ll write
-out the functional forms for each component of the model:
+(*s*(*z*)), growth (*G*(*z*′, *z*), *f*<sub>*g*</sub>), probability of
+reproducing (*r*<sub>*r*</sub>(*z*)), and number of seeds produced
+conditional on flowering (*r*<sub>*s*</sub>(*z*)). New recruits will be
+generated with a Gaussian distribution (denoted
+*f*<sub>*r*<sub>*d*</sub></sub>), which requires calculating the mean
+and standard deviation of new recruits from the data. For simplicity,
+we’ll assume there’s no maternal effect on recruit size. First, we’ll
+write out the functional forms for each component of the model:
 
 1.  *n*(*z*′, *t* + 1) = ∫<sub>*L*</sub><sup>*U*</sup>*K*(*z*′, *z*)*n*(*z*, *t*)*d**z*
 
@@ -193,17 +199,17 @@ out the functional forms for each component of the model:
 
 4.  *L**o**g**i**t*(*s*(*z*)) = *α*<sub>*s*</sub> + *β*<sub>*s*</sub> \* *z*
 
-5.  *G*(*z*′, *z*) ∼ *N**o**r**m*(*μ*<sub>*g*</sub>, *σ*<sub>*g*</sub>)
+5.  *G*(*z*′, *z*) = *f*<sub>*g*</sub>(*μ*<sub>*g*</sub>, *σ*<sub>*g*</sub>)
 
 6.  *m**u*<sub>*g*</sub> = *α*<sub>*g*</sub> + *β*<sub>*g*</sub> \* *z*
 
-7.  *F*(*z*′, *z*) = *f*<sub>*r*</sub>(*z*) \* *f*<sub>*s*</sub>(*z*) \* *f*<sub>*d*</sub>(*z*′)
+7.  *F*(*z*′, *z*) = *r*<sub>*r*</sub>(*z*) \* *r*<sub>*s*</sub>(*z*) \* *r*<sub>*d*</sub>(*z*′)
 
-8.  *L**o**g**i**t*(*f*<sub>*r*</sub>(*z*)) = *α*<sub>*f*<sub>*r*</sub></sub> + *β*<sub>*f*<sub>*r*</sub></sub> \* *z*
+8.  *L**o**g**i**t*(*r*<sub>*r*</sub>(*z*)) = *α*<sub>*r*<sub>*r*</sub></sub> + *β*<sub>*r*<sub>*r*</sub></sub> \* *z*
 
-9.  *L**o**g*(*f*<sub>*s*</sub>(*z*)) = *α*<sub>*f*<sub>*s*</sub></sub> + *β*<sub>*f*<sub>*s*</sub></sub> \* *z*
+9.  *L**o**g*(*r*<sub>*s*</sub>(*z*)) = *α*<sub>*r*<sub>*s*</sub></sub> + *β*<sub>*r*<sub>*s*</sub></sub> \* *z*
 
-10. *f*<sub>*d*</sub>(*z*′) ∼ *N**o**r**m*(*μ*<sub>*f*<sub>*d*</sub></sub>, *σ*<sub>*f*<sub>*d*</sub></sub>)
+10. *r*<sub>*d*</sub>(*z*′) = *f*<sub>*r*<sub>*d*</sub></sub>(*μ*<sub>*r*<sub>*d*</sub></sub>, *σ*<sub>*r*<sub>*d*</sub></sub>)
 
 Equation 1 describes how all the vital rates act on the initial trait
 distribution to produce a new one at *t* + 1. Equations 3-6 describe how
@@ -225,27 +231,27 @@ the functional forms described above:
     -   Example model formula:
         `lm(size_2 ~ size_1, data = my_grow_data)`
 
-3.  Pr(flowering) (*f*<sub>*r*</sub>(*z*) / `f_r`): a generalized linear
+3.  Pr(flowering) (*r*<sub>*r*</sub>(*z*) / `r_r`): a generalized linear
     model w/ a logit link.
 
     -   Example model formula:
         `glm(flower ~ size_1, data = my_repro_data, family = binomial())`
 
-4.  Seed production (*f*<sub>*s*</sub>(*z*) / `f_s`): a generalized
+4.  Seed production (*r*<sub>*s*</sub>(*z*) / `r_s`): a generalized
     linear model w/ log link.
 
     -   Example model formula:
         `glm(seeds ~ size_1, data = my_flower_data, family = poisson())`
 
-5.  Recruit size distribution (*f*<sub>*d*</sub>(*z*′) / `f_d`): a
-    normal distribution w parameters `mu_fd` (mean) and `sd_fd`
+5.  Recruit size distribution (*r*<sub>*d*</sub>(*z*′) / `r_d`): a
+    normal distribution w parameters `mu_rd` (mean) and `sd_rd`
     (standard deviation).
 
     -   Example computations:
 
-        -   `mu_fd = mean(seedling_data$size_2)`
+        -   `mu_rd = mean(seedling_data$size_2)`
 
-        -   `sd_fd = sd(seedling_data$size_2)`
+        -   `sd_rd = sd(seedling_data$size_2)`
 
 The example below assumes we’ve already fit our vital rate models from
 the raw data. In this example, the numbers are made up, but code that
@@ -263,12 +269,12 @@ data_list = list(s_int     = 2.2,   # coefficients(my_surv_mod)[1]
                  g_int     = 0.2,   # coefficients(my_grow_mod)[1]
                  g_slope   = 1.02,  # coefficients(my_grow_mod)[2]
                  sd_g      = 0.7,   # sd(resid(my_grow_mod))
-                 f_r_int   = 0.003, # coefficients(my_pr_flower_mod)[1]
-                 f_r_slope = 0.015, # coefficients(my_pr_flower_mod)[2]
-                 f_s_int   = 1.3,   # coefficients(my_seed_mod)[1]
-                 f_s_slope = 0.075, # coefficients(my_seed_mod)[2]
-                 mu_fd     = 2,     # mean(recruit_data$size_next)
-                 sd_fd     = 0.3)   # sd(recruit_data$size_next)
+                 r_r_int   = 0.003, # coefficients(my_pr_flower_mod)[1]
+                 r_r_slope = 0.015, # coefficients(my_pr_flower_mod)[2]
+                 r_s_int   = 1.3,   # coefficients(my_seed_mod)[1]
+                 r_s_slope = 0.075, # coefficients(my_seed_mod)[2]
+                 mu_rd     = 2,     # mean(recruit_data$size_next)
+                 sd_rd     = 0.3)   # sd(recruit_data$size_next)
 
 my_simple_ipm <- init_ipm(sim_gen = "simple",
                           di_dd   = "di",
@@ -328,24 +334,24 @@ my_simple_ipm <- define_kernel(
 my_simple_ipm <- define_kernel(
   proto_ipm = my_simple_ipm,
   name      = 'F_simple',
-  formula   = f_r * f_s * f_d,
+  formula   = r_r * r_s * r_d,
   family    = 'CC',
   
   # Inverse logit transformation for flowering probability
   # (because we used a logistic regression)
   
-  f_r       = plogis(f_r_int + f_r_slope * dbh_1),
+  r_r       = plogis(r_r_int + r_r_slope * dbh_1),
   
   # Exponential function for seed progression 
   # (because we used a Poisson)
   
-  f_s       = exp(f_s_int + f_s_slope * dbh_1),
+  r_s       = exp(r_s_int + r_s_slope * dbh_1),
   
   # The recruit size distribution has no maternal effect for size,
-  # so mu_fd and sd_fd are constants. These get passed in the 
+  # so mu_rd and sd_rd are constants. These get passed in the 
   # data_list
   
-  f_d       = dnorm(dbh_2, mu_fd, sd_fd),
+  r_d       = dnorm(dbh_2, mu_rd, sd_rd),
   data_list = data_list,
   states    = list(c('dbh')),
   
@@ -354,7 +360,7 @@ my_simple_ipm <- define_kernel(
   
   evict_cor = TRUE,
   evict_fun = truncated_distributions(fun    = 'norm',
-                                      target = 'f_d')
+                                      target = 'r_d')
 ) 
 
 # Next, we have to define the implementation details for the model. 

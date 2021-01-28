@@ -32,6 +32,8 @@ Vital rates: subscripts on the coefficients/parameters. For example, $\alpha_g$ 
 
 Hierarchical effects: superscripts on coefficients. For example, $\beta_g^{site}$ for a site specific growth slope.
 
+Probability density functions: these are denoted with $f_p$, where $_p$ is replaced by the vital rate. For example, $f_g(\mu_g, \sigma_g)$ would denote a probability density function for growth.
+
 
 ```{r echo = FALSE}
 
@@ -43,11 +45,11 @@ knitr::kable(
   data.frame(
 
     Math    = c("$\\mu_g^{yr} = \\alpha_g + \\alpha_g^{yr} * \\beta_g * z$",
-                         "$z' \\sim Norm(\\mu_g^{yr}, \\sigma_g)$",
+                         "$g(z',z) = f_g(\\mu_g^{yr}, \\sigma_g)$",
                 "$Logit(\\mu_{s}^{plot,yr}) = \\alpha_s + \\alpha_{s}^{plot,yr} + \\beta * z$",
                 "",
                 "",
-                "$log(\\mu_f^{yr}) = \\alpha_{f} + \\alpha_f^{yr} + (\\beta_f + \\beta_f^{yr}) * z$"),
+                "$log(\\mu_{r}^{yr}) = \\alpha_{r} + \\alpha_r^{yr} + (\\beta_r + \\beta_r^{yr}) * z$"),
     
     
     R = c("`size_2 ~ size_1 + (1 | year), family = gaussian()`",
@@ -63,7 +65,7 @@ knitr::kable(
              "s_**pl**_**yr** = s_int + s_int_**pl**_**yr** + s_slope * z",
              "s_**pl**_**yr** = s_int + s_int_**pl** + s_int_**yr** + s_slope * z",
              "s = inv_logit(s_**pl**_**yr**)",
-             "fec = exp(f_int + f_int_**yr** + (f_slope + f_slope_**yr**) * z)"),
+             "r = exp(r_int + r_int_**yr** + (r_slope + r_slope_**yr**) * z)"),
     Model = c(1, 1, 2, 2, 2, 3)
   ),
   format    = "html",
@@ -78,6 +80,8 @@ knitr::kable(
 
 Internally, `ipmr` generates the various levels using `expand.grid`. This means that every combination of the values in `levels_hier_effs` must exist in the `data_list`, or the model will fail with an error along the lines of (`Error in eval_tidy: object 'x_yz' not found`). In order to exclude levels that do not exist in your data, you can add a vector to the list in `levels_hier_effs` called `drop_levels`. This should contain the values you wish to exclude as a character vector. For example, if data are collected for `sites = c("a", "b", "c")`, and `years = c(2005:2008)`, but there is no data from site `"a"` in 2007, we can use `levels_hier_effs = list(site = c("a", "b", "c"), year = c(2005:2008), drop_levels = c("a_2007"))`.
 
+When picking values to appear in `levels_hier_effs`, it is best to avoid longer words or phrases where words are separated by underscores (e.g. `treatment = c("h_removal", "c_addition")`), as this may cause problems when values are substituted into expressions. CamelCase is generally safer in these cases (e.g. use `treatment = c("hRemoval", "cAddition")` instead of `treatment = c("h_removal", "c_addition")`).
+
 ## Hierarchical models with a single hierarchical variable {#sim_di_s_k}
 
 These models are pretty common in the IPM literature. They encompass cases where a single site has been sampled over many years, or sampled many sites across one transition. 
@@ -88,7 +92,7 @@ This example will use a hypothetical study that spans 5 transitions and has 6 co
 
 2. $P^{yr}(z', z) = s^{yr}(z) * g^{yr}(z',z)$
 
-3. $F(z',z) = f_p(z) + f_r(z) + f_d(z')$
+3. $F(z',z) = r_p(z) + r_r(z) + r_d(z')$
 
 Note that only the $P$ kernel get the $yr$ subscript appended to them - this is the only one that our model selection process decided had substantial year to year variation. Thus, we can actually write the $F$ kernel the exact same way as we would in a simple IPM when we implement the model in `ipmr`.
 
@@ -98,7 +102,7 @@ The vital rate models could be written on paper as follows:
 
     - $\mu_g = (\alpha_g + \alpha_g^{yr})+ \beta_g * z$ 
 
-    - $z' \sim Norm(\mu_g, \sigma_g)$
+    - $g(z',z) = f_g(\mu_g, \sigma_g)$
     
 5. Survival
 
@@ -106,15 +110,15 @@ The vital rate models could be written on paper as follows:
     
 6. Probability of reproducing
 
-    - $Logit(f_p) = \alpha_{f_p} + \beta_{f_p} * z$
+    - $Logit(r_p) = \alpha_{r_p} + \beta_{r_p} * z$
     
 7. Recruit production
 
-    - $log(f_r) = \alpha_{f_r} + \beta_{f_r} * z$
+    - $log(r_r) = \alpha_{r_r} + \beta_{r_r} * z$
     
 8. Recruit size distribution
 
-    - $f_d \sim Norm(\mu_{f_d}, \sigma_{f_d})$
+    - $r_d(z') = f_{r_d}(\mu_{r_d}, \sigma_{r_d})$
 
 and modeled in R as follows:
 
@@ -161,7 +165,7 @@ recr_coef   <- coef(recr_mod)
 
 ```
 
-The next step is to transform these values into something `ipmr` can use. This must always be a **named list** where the names of the list components are the names used in the vital expressions or kernel formula. Transforming the $\beta$s is easier - the output from fixef is always a named vector, so we just use `as.list()` and change the names to whatever we want to use. We then bundle it into one big list with all the fixed coefficients.
+The next step is to transform these values into something `ipmr` can use. This must always be a **named list** where the names of the list components are the names used in the vital expressions or kernel formula. Transforming the $\beta$s is easier - the output from `fixef` is always a named vector, so we just use `as.list()` and change the names to whatever we want to use. We then bundle it into one big list with all the fixed coefficients.
 
 ```{r eval = FALSE}
 
@@ -171,15 +175,15 @@ names(g_list) <- c("alpha_g", "beta_g")
 s_list <- as.list(beta_ss)
 names(s_list) <- c("alpha_s", "beta_s")
 
-f_p_list <- as.list(recr_coef)
-names(f_p_list ) <- c("alpha_f_p", "beta_f_p")
+r_p_list <- as.list(recr_coef)
+names(f_p_list ) <- c("alpha_r_p", "beta_r_p")
 
-f_r_list <- as.list(repr_coef)
-names(f_r_list) <- c("alpha_f_r", "beta_f_r")
+r_r_list <- as.list(repr_coef)
+names(r_r_list) <- c("alpha_r_r", "beta_r_r")
 
-f_d_list <- list(mu_f_d = rcsz_mu, sigma_f_d = rcsz_sd)
+r_d_list <- list(mu_r_d = rcsz_mu, sigma_r_d = rcsz_sd)
 
-all_fixed_params <- c(g_list, s_list, f_p_list, f_r_list, f_d_list)
+all_fixed_params <- c(g_list, s_list, r_p_list, r_r_list, r_d_list)
 
 ```
 
@@ -214,12 +218,12 @@ all_fixed_params <- list(
   sigma_g   = 0.2,
   alpha_s   = -0.1,
   beta_s    = 0.3,
-  alpha_f_p = -1,
-  beta_f_p  = 0.7,
-  alpha_f_r = 0.2,
-  beta_f_r  = 0.2,
-  mu_f_d    = 0.4,
-  sigma_f_d = 0.1
+  alpha_r_p = -1,
+  beta_r_p  = 0.7,
+  alpha_r_r = 0.2,
+  beta_r_r  = 0.2,
+  mu_r_d    = 0.4,
+  sigma_r_d = 0.1
 )
 
 g_alpha_list <- as.list(rnorm(6)) %>%
@@ -234,7 +238,8 @@ s_alpha_list <- as.list(rnorm(6)) %>%
 all_params <- c(all_fixed_params, g_alpha_list, s_alpha_list)
 
 ```
-We are now ready to begin implementing the kernels! This model will be a simple, density independent, stochastic kernel-resampled model. The parts where the hierarchical syntax is used are highlighted by comments in the code block:
+
+We are now ready to begin implementing the kernels. This model will be a simple, density independent, stochastic kernel-resampled model. The parts where the hierarchical syntax is used are highlighted by comments in the code block:
 
 
 ```{r eval = FALSE}
@@ -285,16 +290,16 @@ ex_ipm <-init_ipm(sim_gen    = "simple",
   define_kernel(
     name          = "F",
     family        = "CC",
-    formula       = f_p * f_r * f_d,
-    f_p_lin_p     = alpha_f_p + beta_f_p * z_1,
-    f_p           = 1 / (1 + exp( -f_p_lin_p)),
-    f_r           = exp(alpha_f_r + beta_f_r * z_1),
-    f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
+    formula       = r_p * r_r * r_d,
+    r_p_lin_p     = alpha_r_p + beta_r_p * z_1,
+    r_p           = 1 / (1 + exp( -r_p_lin_p)),
+    r_r           = exp(alpha_r_r + beta_r_r * z_1),
+    r_d           = dnorm(z_2, mu_r_d, sigma_r_d),
     data_list     = all_params,
     states        = list(c("z")),
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
-    evict_fun     = truncated_distributions("norm", "f_d")
+    evict_fun     = truncated_distributions("norm", "r_d")
   ) %>%
   define_impl(
     make_impl_args_list(
@@ -326,13 +331,16 @@ Sometimes, models will have discretely and continuously varying components as fu
 
 We'll implement a general IPM of a perennial plant species. Our data will come from 6 sites, `"A"` - `"F"`, and the vital rate intercepts for the plants will vary across each one. Its seeds can either enter a seed bank or recruit immediately, producing recruits at the next time step. We'll pretend that data from the recruit size distribution was pooled across sites, and so does not vary with space. The seed bank will be age structured and its parameters will be space- and time-invariant. Seeds in the first year can either survive ($s_{{sb}_1}$/`s_sb1`) and recruit ($r_{{sb}_1}$), or survive and become two year old seeds. Two year old seeds can either survive ($s_{{sb}_2}$/`s_sb2`) and recruit ($r_{{sb}_2}$/`r_sb2`) or die.  
 
-The vital rate information fed into our hypothetical regression models are ($s^{site}$/`s_site`), growth ($g^{site}$/`g_site`), probability of reproduction ($f_{p}^{site}$/`f_p_site`), and seed production ($f_{r}^{site}$/`f_r_site`). They are all functions of size (`z`) and environmental covariates ($\theta^{t}$ and $\theta^{p}$, denoted together in the kernel formulas as just $\theta$). 
+The vital rate information fed into our hypothetical regression models are ($s^{site}$/`s_site`), growth ($g^{site}$/`g_site`), probability of reproduction ($c_{p}^{site}$/`c_p_site`), and seed production ($c_{r}^{site}$/`c_r_site`). They are all functions of size (`z`) and environmental covariates ($\theta^{t}$ and $\theta^{p}$, denoted together in the kernel formulas as just $\theta$). 
 
 The full IPM looks like this:
 
-1. $n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n(z, t)dz + s_{{sb}_1} * r_{{sb}_1} * sb_1(t) * \int_L^U f_d(z')dz' + s_{{sb}_2} * r_{{sb}_2} * sb_2(t) *\int_L^U f_d(z')dz'$
+1. 
+$$
+n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n(z, t)dz +\\ s_{{sb}_1} * r_{{sb}_1} * sb_1(t) * \int_L^U c_d(z')dz' + \\s_{{sb}_2} * r_{{sb}_2} * sb_2(t) *\int_L^U c_d(z')dz'
+$$
 
-2. $sb_1(t + 1) = (1-r_i) * \int_L^U [f_p^{site}(z, \theta) * f_r^{site}(z,\theta)] n(z, t)dz$
+2. $sb_1(t + 1) = (1-r_i) * \int_L^U [c_p^{site}(z, \theta) * c_r^{site}(z,\theta)] n(z, t)dz$
 
 3. $sb_2(t + 1) = s_{{sb}_1} * (1-r_{{sb}_1}) * sb_1(t)$
 
@@ -340,35 +348,35 @@ The sub kernels are:
 
 4. $P^{site}(z',z, \theta) = s^{site}(z, \theta) * g^{site}(z',z, \theta)$
 
-5. $F^{site}(z',z, \theta) = f_{{p}}^{site}(z, \theta) * f_{r}^{site}(z, \theta) * f_d(z')$
+5. $F^{site}(z',z, \theta) = c_{{p}}^{site}(z, \theta) * c_{r}^{site}(z, \theta) * c_d(z')$
 
-6. $\theta^{t} \sim Norm(mean^{t}, SD^{t})$
+6. $\theta^{t} \sim Norm(\mu^{t}, \sigma^{t})$
 
-7. $\theta^{p} \sim Gamma(shape^{p}, rate^{p})$
+7. $\theta^{p} \sim Gamma(\alpha^{p}, \beta^{p})$
 
 And the size/climate dependent vital rate functions and example R code are:
 
-8. $Logit(s^{site}) = (\alpha_s + \alpha_{s}^{site}) + \beta_s^{z} * z + \beta_s^{t} * \theta^{t} + \beta_s^{p} * \theta^{p}$
+8. $Logit(s^{site}(z, \theta)) = (\alpha_s + \alpha_{s}^{site}) + \beta_s^{z} * z + \beta_s^{t} * \theta^{t} + \beta_s^{p} * \theta^{p}$
 
-  - example R code: `glmer(survival ~ size + temp + precip + (1 | site), data = my_surv_data, family = binomial())`
+    - example R code: `glmer(survival ~ size + temp + precip + (1 | site), data = my_surv_data, family = binomial())`
 
-9. $g^{site} \sim Norm(\mu_g^{site}, \sigma_g)$
+9. $g^{site}(z',z,\theta) = f_g(\mu_g^{site}(z, \theta), \sigma_g)$
 
-10. $\mu_g^{site} = (\alpha_g + \alpha_g^{site}) + \beta_g^{z} * z + \beta_g^{t} * \theta^{t} + \beta_g^{p} * \theta^{p}$
+10. $\mu_g^{site}(z, \theta) = (\alpha_g + \alpha_g^{site}) + \beta_g^{z} * z + \beta_g^{t} * \theta^{t} + \beta_g^{p} * \theta^{p}$
 
-  - example R code: `lmer(size_next ~ size + temp + precip + (1 | site), data = my_grow_data)`
+    - example R code: `lmer(size_next ~ size + temp + precip + (1 | site), data = my_grow_data)`
 
-11. $Logit(f_{p}^{site}) = (\alpha_{f_p} + \alpha_{f_p}^{site}) + \beta_{f_p}^{z} * z + \beta_{f_p}^{t} * \theta^{t} + \beta_{f_p}^{p} * \theta^{p}$
+11. $Logit(c_{p}^{site}(z, \theta)) = (\alpha_{c_p} + \alpha_{c_p}^{site}) + \beta_{c_p}^{z} * z + \beta_{c_p}^{t} * \theta^{t} + \beta_{c_p}^{p} * \theta^{p}$
 
   - example R code: `glmer(repro ~ size + temp + precip + (1 | site), data = my_repro_data, family = binomial())`
 
-12. $log(f_{r}^{site}) = (\alpha_{f_r} + \alpha_{f_r}^{site}) + \beta_{f_r}^{site} * z + \beta_{f_r}^{t} * \theta_{t} + \beta_{f_r}^{p} * \theta_{p}$
+12. $log(c_{r}^{site}(z, \theta)) = (\alpha_{c_r} + \alpha_{c_r}^{site}) + \beta_{c_r}^{z} * z + \beta_{c_r}^{t} * \theta_{t} + \beta_{c_r}^{p} * \theta_{p}$
 
-  - example R code: `glmer(flower_n ~ size + temp + precip + (1 | site), data = my_flower_data, family = poisson())`
+    - example R code: `glmer(flower_n ~ size + temp + precip + (1 | site), data = my_flower_data, family = poisson())`
 
-13. $f_d \sim Norm(\mu_{f_d}, \sigma_{f_d})$
+13. $c_d(z') = f_{c_d}(\mu_{c_d}, \sigma_{c_d})$
 
-  - example R code: `mean(my_recr_data$size_next); sd(my_recr_data$size_next)`
+    - example R code: `mean(my_recr_data$size_next); sd(my_recr_data$size_next)`
 
 ### Simulating parameters
 
@@ -390,17 +398,21 @@ all_pars <- list(
   r_sb2     = 0.3,
   s_sb1     = 0.4,
   s_sb2     = 0.1,
-  mu_f_d    = 4,
-  sigma_f_d = 0.9,
+  mu_c_d    = 4,
+  sigma_c_d = 0.9,
   sigma_g   = 3, 
+  beta_s_z    = 2.5,
   beta_s_prec = 0.3,
   beta_s_temp = -0.5,
+  beta_g_z    = 0.99,
   beta_g_prec = 0.01,
   beta_g_temp = 0.1,
-  beta_f_p_prec = 0.6,
-  beta_f_p_temp = -0.3,
-  beta_f_r_prec = -0.3,
-  beta_f_r_temp = 0.9
+  beta_c_p_z    = 0.4,
+  beta_c_p_prec = 0.6,
+  beta_c_p_temp = -0.3,
+  beta_c_r_z    = 0.005,
+  beta_c_r_prec = -0.3,
+  beta_c_r_temp = 0.9
 )
 
 g_alphs <- rnorm(6, mean = 4.5, sd = 1) %>%
@@ -409,50 +421,30 @@ g_alphs <- rnorm(6, mean = 4.5, sd = 1) %>%
     paste('alpha_g_', sites, sep = "")
   )
 
-g_betas <- runif(6, 0.85, 1.15) %>%
-  as.list() %>%
-  setNames(
-    paste('beta_g_', sites, sep = "")
-  )
-
 s_alphs <- rnorm(6, mean = -7, sd = 1.5) %>%
   as.list() %>%
   setNames(
     paste('alpha_s_', sites, sep = "")
   )
-s_betas <- runif(6, 2, 3) %>%
+
+c_p_alphs <- rnorm(6, mean = -10, sd = 2)  %>%
   as.list() %>%
   setNames(
-    paste('beta_s_', sites, sep = "")
+    paste('alpha_c_p_', sites, sep = "")
   )
 
-f_p_alphs <- rnorm(6, mean = -10, sd = 2)  %>%
+c_r_alphs <- runif(6, 0.01, 0.1) %>%
   as.list() %>%
   setNames(
-    paste('alpha_f_p_', sites, sep = "")
-  )
-f_p_betas <- runif(6, 0.3, 1) %>%
-  as.list() %>%
-  setNames(
-    paste('beta_f_p_', sites, sep = "")
+    paste('alpha_c_r_', sites, sep = "")
   )
 
-f_r_alphs <- runif(6, 0.01, 0.1) %>%
-  as.list() %>%
-  setNames(
-    paste('alpha_f_r_', sites, sep = "")
-  )
-f_r_betas <- runif(6, 0.0001, 0.01) %>%
-  as.list() %>%
-  setNames(
-    paste('beta_f_r_', sites, sep = "")
-  ) 
 
 all_pars <- c(all_pars,
-              g_alphs, g_betas,
-              s_alphs, s_betas,
-              f_p_alphs, f_p_betas,
-              f_r_alphs, f_r_betas)
+              g_alphs, 
+              s_alphs, 
+              c_p_alphs,
+              c_r_alphs)
 
 # This list contains parameters that define the distributions for environmental
 # covariates
@@ -499,13 +491,19 @@ ex_ipm <- init_ipm(sim_gen    = "general",
     name = "P_site",
     family = "CC",
     
-    # site is appended so that we don't have to write out s_a, s_b, etc.
+    # site is appended so that we don't have to write out s_A, s_B, etc.
     
     formula          = s_site * g_site * d_z,
     
-    s_site_lin       = alpha_s_site + beta_s_site * z_1 + beta_s_prec * prec + beta_s_temp * temp,
+    s_site_lin       = alpha_s_site + 
+                       beta_s_z * z_1 + 
+                       beta_s_prec * prec + 
+                       beta_s_temp * temp,
     s_site           = 1 / (1 + exp(-s_site_lin)),
-    mu_g_site        = alpha_g_site + beta_g_site * z_1 + beta_g_prec * prec + beta_g_temp * temp,
+    mu_g_site        = alpha_g_site +
+                       beta_g_z * z_1 + 
+                       beta_g_prec * prec + 
+                       beta_g_temp * temp,
     g_site           = dnorm(z_2, mu_g_site, sigma_g),
     data_list        = all_pars,
     states           = list(c("z")),
@@ -517,25 +515,37 @@ ex_ipm <- init_ipm(sim_gen    = "general",
   define_kernel(
     name             = "F_site",
     family           = "CC",
-    formula          = f_p_site * f_r_site * f_d * d_z,
-    f_p_site_lin     = alpha_f_p_site + beta_f_p_site * z_1 + beta_f_p_prec * prec + beta_f_p_temp * temp,
-    f_p_site         = 1 / (1 + exp(-f_p_site_lin)),
-    f_r_site         = exp(alpha_f_r_site + beta_f_r_site * z_1 + beta_f_r_prec * prec + beta_f_r_temp * temp),
-    f_d              = dnorm(z_2, mu_f_d, sigma_f_d),
+    formula          = c_p_site * c_r_site * c_d * d_z,
+    c_p_site_lin     = alpha_c_p_site + 
+                       beta_c_p_z * z_1 + 
+                       beta_c_p_prec * prec + 
+                       beta_c_p_temp * temp,
+    c_p_site         = 1 / (1 + exp(-c_p_site_lin)),
+    c_r_site         = exp(alpha_c_r_site + 
+                           beta_c_r_z * z_1 +
+                           beta_c_r_prec * prec +
+                           beta_c_r_temp * temp),
+    c_d              = dnorm(z_2, mu_c_d, sigma_c_d),
     data_list        = all_pars,
     states           = list(c("z", "sb1", "sb2")),
     has_hier_effs    = TRUE,
     levels_hier_effs = list(site = LETTERS[1:6]),
     evict_cor        = TRUE,
-    evict_fun        = truncated_distributions("norm", "f_d")
+    evict_fun        = truncated_distributions("norm", "c_d")
     ) %>%
   define_kernel(
     name             = "go_sb_1_site",
     family           = "CD",
-    formula          = (1 - r_i) * f_p_site * f_r_site * d_z,
-    f_p_site_lin     = alpha_f_p_site + beta_f_p_site * z_1 + beta_f_p_prec * prec + beta_f_p_temp * temp,
-    f_p_site         = 1 / (1 + exp(-f_p_site_lin)),
-    f_r_site         = exp(alpha_f_r_site + beta_f_r_site * z_1 + beta_f_r_prec * prec + beta_f_r_temp * temp),
+    formula          = (1 - r_i) * c_p_site * c_r_site * d_z,
+    c_p_site_lin     = alpha_c_p_site + 
+                       beta_c_p_z * z_1 + 
+                       beta_c_p_prec * prec +
+                       beta_c_p_temp * temp,
+    c_p_site         = 1 / (1 + exp(-c_p_site_lin)),
+    c_r_site         = exp(alpha_c_r_site + 
+                           beta_c_r_z * z_1 + 
+                           beta_c_r_prec * prec + 
+                           beta_c_r_temp * temp),
     data_list        = all_pars,
     states           = list(c("z", "sb1")),
     has_hier_effs    = TRUE,
@@ -554,24 +564,24 @@ ex_ipm <- init_ipm(sim_gen    = "general",
   define_kernel(
     name          = "leave_sb_1",
     family        = "DC",
-    formula       = s_sb1 * r_sb1 * f_d * d_z,
-    f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
+    formula       = s_sb1 * r_sb1 * c_d * d_z,
+    c_d           = dnorm(z_2, mu_c_d, sigma_c_d),
     data_list     = all_pars,
     states        = list(c("z", "sb1")),
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
-    evict_fun     = truncated_distributions("norm", "f_d")
+    evict_fun     = truncated_distributions("norm", "c_d")
   ) %>%
   define_kernel(
     name          = "leave_sb_2",
     family        = "DC",
-    formula       = s_sb2 * r_sb2 * f_d * d_z,
-    f_d           = dnorm(z_2, mu_f_d, sigma_f_d),
+    formula       = s_sb2 * r_sb2 * c_d * d_z,
+    c_d           = dnorm(z_2, mu_c_d, sigma_c_d),
     data_list     = all_pars,
     states        = list(c("z", "sb2")),
     has_hier_effs = FALSE,
     evict_cor     = TRUE,
-    evict_fun     = truncated_distributions("norm", "f_d")
+    evict_fun     = truncated_distributions("norm", "c_d")
   ) %>%
   define_impl(
     make_impl_args_list(

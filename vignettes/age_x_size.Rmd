@@ -44,14 +44,14 @@ The sub-kernels in this model are formed  using regression models for:
   
   + probability that a recruit survives to the first census (`pr_age`/$p_r(a)$)
   
-  + recruit size distribution (`rcsz`/$f_d(z',z)$). The recruit size distribution has a maternal effect of parental weight on recruit weight. 
+  + recruit size distribution (`rcsz`/$c_d(z',z)$). The recruit size distribution has a maternal effect of parental weight on recruit weight. 
   
 
 The sub-kernels have the following form:
 
 4. $P_a(z', z, a) = s(z, a) * g(z', z, a)$
 
-5. $F_a(z', z, a) = s(z, a) * p_b(z, a) * p_r(a) * f_d(z', z) * 0.5$ 
+5. $F_a(z', z, a) = s(z, a) * p_b(z, a) * p_r(a) * c_d(z', z) * 0.5$ 
 
     + $F_0 \equiv 0$ so that age-0 recruits cannot reproduce.
     
@@ -65,13 +65,13 @@ The vital rates are as follows:
     
     - Mathematical form: $Logit(s(z,a)) = \alpha_s + \beta_s^z * z + \beta_s^a *age$
     
-7. Growth (`g_age`/$g(z',z,a)$): A linear model with size and age as fixed effects.
+7. Growth (`g_age`/$g(z',z,a)$): A linear model with size and age as fixed effects. $f_g$ denotes a normal probability density function.
 
     - Example code: `lm(size_next ~ size + age, data = growth data)`
     
     - Mathematical form: 
     
-        + $g(z',z,a) \sim Norm(\mu_g^a(z, a), \sigma_g)$
+        + $g(z',z,a) = f_g(\mu_g^a(z, a), \sigma_g)$
         
         + $\mu_g^a(z, a) = \alpha_g + \beta_g^z * z + \beta_g^a * age$
         
@@ -87,15 +87,15 @@ The vital rates are as follows:
     
     - Mathematical form: $Logit(p_r(a)) = \alpha_{p_r} + \beta_{p_r}^a * age$
 
-10. Recruit size distribution (`rcsz`/$f_d(z',z)$): A linear model with parent size as a fixed effect.
+10. Recruit size distribution (`rcsz`/$c_d(z',z)$): A linear model with parent size as a fixed effect. $f_{c_d}$ denotes a normal probability density function.
 
     - Example code: `lm(rcsz ~ size, data = rcsz_data)`
     
     - Mathematical form: 
     
-        + $f_d(z',z) \sim Norm(\mu_{f_d}(z), \sigma_{f_d})$
+        + $c_d(z',z) = f_{c_d}(\mu_{c_d}(z), \sigma_{c_d})$
               
-        + $\mu_{f_d}(z) = \alpha_{f_d} + \beta_{f_d}^z * z$
+        + $\mu_{c_d}(z) = \alpha_{c_d} + \beta_{c_d}^z * z$
         
 
         
@@ -282,26 +282,7 @@ for(i in seq_along(v_a)) {
 
 ```
 
-Additionally, we can extract $R_0$ as we did in the Introduction and General IPM vignettes using the following snippet. We first use `ipmr`'s `format_mega_matrix()` method for age $\times$ size IPMs. This will generate a "Leslie-ish" block matrix, with the `f_forms` in the top row, and `name_ps` in the sub-diagonal blocks. If there is a `max_age` in the `levels_ages`, it will insert that `P` kernel into the bottom right corner. 
 
-We then manipulate it a bit to split out the $F$ and $P$ components. Recall from the introduction and general IPM vignettes that $R_0 = \text{dominant eigenvalue of } FN$, where $N = (I-P)^{-1}$. The method in the next snippet is not the fastest, but it will get the job done.
 
-```{r eval = FALSE}
 
-mega <- format_mega_matrix(age_size_ipm, name_ps = "P", f_forms = "F")
-
-Pm <- Fm <- mega$mega_matrix
-
-Fm[101:2200, ] <- 0
-Pm[1:100, ]    <- 0
-
-N <- solve(diag(nrow(Pm)) - Pm)
-
-R <- Fm %*% N
-
-R_0 <- Re(eigen(R)$values[1])
-
-R_0
-
-```
 
