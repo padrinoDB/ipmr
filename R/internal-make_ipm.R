@@ -927,7 +927,7 @@
 
   ipm_type <- class(proto_ipm)[1]
 
-  if(grepl('general|_param|dd', ipm_type) & !iterate) {
+  if(grepl('_param|dd', ipm_type) & !iterate) {
     stop("Stochastic, parameter resampled and density dependent models must be\n",
          "iterated! Set 'iterate' to 'TRUE' and re-run.")
   }
@@ -1106,23 +1106,26 @@
   # checks pop_state, env_state, domain definitions
   .check_ipm_definition(proto_ipm, iterate)
 
-  # Split out K from Fothers so it isn't evaluated until we're ready. If it
+  # Split out K from others so it isn't evaluated until we're ready. If it
   # isn't there, then proceed as usual
 
   k_row    <- .init_iteration(proto_ipm, iterate, direction = iter_dir)
 
+  if(iterate){
+    k_row  <- .make_age_k_row(k_row)
+
+    if(any(k_row$has_hier_effs)) {
+
+      k_row  <- .split_hier_effs(k_row)
+
+    }
+  }
+
   others <- .split_sub_kern_ages(proto_ipm)
-  k_row  <- .make_age_k_row(k_row)
 
   if(any(others$has_hier_effs)) {
 
     others <- .split_hier_effs(others)
-
-  }
-
-  if(any(k_row$has_hier_effs)) {
-
-    k_row  <- .split_hier_effs(k_row)
 
   }
 
