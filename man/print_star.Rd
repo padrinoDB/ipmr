@@ -52,7 +52,7 @@ for the iteration kernels and display them.}
 \item{sig_digits}{The number of significant digits to round to if \code{
 comp_lambda = TRUE}.}
 
-\item{check_conv}{A logical: for \code{general_*} models, check if population state
+\item{check_conv}{A logical: for deterministic models, check if population state
 has converged to asymptotic dynamics? If \code{TRUE} and the model has not
 converged, a message will be printed.}
 }

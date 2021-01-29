@@ -52,15 +52,16 @@ lambda(ipm, ...)
 returns a vector of lambda values for each time step of the simulation (equal
 in length to the \code{iterations} argument of \code{make_ipm()}).
 \code{'last'} returns the lambda value for the final timestep.
-\code{'stochastic'} returns a single value which is the geometric mean
-of log-per-capita growth rate from each time step.}
+\code{'stochastic'} returns a single value which is the mean
+of the log'd per-capita growth rate from each time step.}
 
 \item{burn_in}{The proportion of iterations to discard. Default is 0.1
 (i.e. first 10\% of iterations in the simulation).}
 }
 \value{
-An array. Rows correspond to time steps, and columns correspond
-to hierarchical effects (if any).
+When \code{type_lambda = "all"}, an array. Rows correspond to time
+steps, and columns correspond to hierarchical effects (if any). For other types,
+a numeric vector.
 }
 \description{
 Compute the per-capita growth rate for a given model. Can handle

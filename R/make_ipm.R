@@ -4,45 +4,57 @@
 #' @description The \code{make_ipm.*} methods convert a \code{proto_ipm} into a
 #' set of discretized kernels and population vectors. Methods have different
 #' requirements, so be sure to read the parameter documentation. \code{
-#' vignette('ipmr-introduction', 'ipmr')} also contains helpful information.
+#' vignette('ipmr-introduction', 'ipmr')}  a more complete introduction.
 #'
 #' @param proto_ipm A proto_ipm. This should be the
 #' output of \code{define_kernel}, or the \code{define_*} functions.
+#'
 #' @param ... Other arguments passed to methods.
+#'
 #' @param return_main_env A logical indicating whether to return the main environment
 #' for the model. This environment contains the integration mesh, weights, and
 #' other potentially useful variables for subsequent analyses. Default is
 #' \code{TRUE}.
+#'
 #' @param return_all_envs A logical indicating whether to return the environments that
 #' the kernel expressions are evaluated in. These may be useful for some analyses,
 #' such as regression-level sensitivity/elasticity analyses, but can also rapidly
 #' increase memory consumption for models with many kernels (e.g. ones with hierarchical
 #' effects that have many levels, or any \code{*_stoch_param} model). Default is
 #' \code{FALSE}.
+#'
 #' @param domain_list An optional list of new domain information to implement
 #' the IPM with.
+#'
 #' @param usr_funs An optional list of user-specified functions that are passed
 #' on to the  model building process. This can help make vital rate expressions
 #' more concise and expressive. Names in this list should exactly match the names
 #' of the function calls in the \code{...} or \code{formula}.
+#'
 #' @param iterate A logical indicating whether or not iterate the model before exiting
 #' or just return the sub-kernels. Only applies to density-independent, deterministic
-#' models and density-independent, stochastic kernel resampled models.
+#' models and density-independent, stochastic kernel re-sampled models.
+#'
 #' @param iterations If \code{iterate} is \code{TRUE}, then the number of iterations
-#' to simulate.
+#' to run the model for.
+#'
 #' @param normalize_pop_size A logical indicating whether to re-scale the population
 #' vector to sum to 1 before each iteration. Default is \code{TRUE} for
 #' \code{*_di_*} methods and \code{FALSE} for \code{*_dd_*} methods.
+#'
 #' @param kernel_seq For \code{*_stoch_kern} methods, the sequence of kernels
 #' to use during the simulation process. It should have the same number of entries
 #' as the number of \code{iterations}.
 #' This should be a vector containing levels of the hierarchical effects specified
-#' in \code{levels_hier_effs}, or empty. Support for Markov chains will eve
-#' If it is empty, \code{make_ipm} will try to generate a sequence internally using
-#' a random selection of the \code{levels_hier_effs} defined in \code{define_kernel}.
+#' in \code{levels_hier_effs}, or empty. Support for Markov chains will eventually
+#' get implemented. If it is empty, \code{make_ipm} will try to generate a
+#' sequence internally using a random selection of the \code{levels_hier_effs}
+#' defined in \code{define_kernel}.
+#'
 #' @param report_progress A logical indicating whether or not to periodically
 #' report progress for a stochastic simulation. Does not apply to deterministic
 #' methods. Default is \code{FALSE}.
+#'
 #' @param iteration_direction Either \code{"right"} (default) or \code{"left"}.
 #' This controls the direction of projection. Right iteration will generate
 #' the right eigenvector (if it exists), while left iteration generates
@@ -76,12 +88,12 @@
 #'                              the model.}
 #' }
 #'
-#' In addition to the list class, each object will have the class from
-#' \code{model_class} defined in \code{init_ipm} plus \code{'_ipm'}. This is to
-#' facilitate \code{print}, \code{plot}, and \code{lambda} methods. For example,
-#' a \code{'simple_di_stoch_kern'} model will have the class
-#' \code{'simple_di_stoch_kern_ipm'} once it has been implemented using
-#' \code{make_ipm}.
+#' In addition to the list class, each object will have a class comprised of the
+#' arguments from  \code{init_ipm} plus \code{'ipm'} pasted together with
+#' underscores. This is to facilitate \code{print}, \code{plot}, and
+#' \code{lambda} methods. For example, a \code{init_ipm("general", "di", "det")}
+#' model will have the class \code{'general_di_det_ipm'} once it has been
+#' implemented using \code{make_ipm}.
 #'
 #' @export
 

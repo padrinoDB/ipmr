@@ -226,10 +226,10 @@ the IPM with.}
 
 \item{iterate}{A logical indicating whether or not iterate the model before exiting
 or just return the sub-kernels. Only applies to density-independent, deterministic
-models and density-independent, stochastic kernel resampled models.}
+models and density-independent, stochastic kernel re-sampled models.}
 
 \item{iterations}{If \code{iterate} is \code{TRUE}, then the number of iterations
-to simulate.}
+to run the model for.}
 
 \item{normalize_pop_size}{A logical indicating whether to re-scale the population
 vector to sum to 1 before each iteration. Default is \code{TRUE} for
@@ -246,9 +246,10 @@ by other functions. Use with care.}
 to use during the simulation process. It should have the same number of entries
 as the number of \code{iterations}.
 This should be a vector containing levels of the hierarchical effects specified
-in \code{levels_hier_effs}, or empty. Support for Markov chains will eve
-If it is empty, \code{make_ipm} will try to generate a sequence internally using
-a random selection of the \code{levels_hier_effs} defined in \code{define_kernel}.}
+in \code{levels_hier_effs}, or empty. Support for Markov chains will eventually
+get implemented. If it is empty, \code{make_ipm} will try to generate a
+sequence internally using a random selection of the \code{levels_hier_effs}
+defined in \code{define_kernel}.}
 
 \item{report_progress}{A logical indicating whether or not to periodically
 report progress for a stochastic simulation. Does not apply to deterministic
@@ -279,16 +280,16 @@ containing the following components:
                              the model.}
 }
 
-In addition to the list class, each object will have the class from
-\code{model_class} defined in \code{init_ipm} plus \code{'_ipm'}. This is to
-facilitate \code{print}, \code{plot}, and \code{lambda} methods. For example,
-a \code{'simple_di_stoch_kern'} model will have the class
-\code{'simple_di_stoch_kern_ipm'} once it has been implemented using
-\code{make_ipm}.
+In addition to the list class, each object will have a class comprised of the
+arguments from  \code{init_ipm} plus \code{'ipm'} pasted together with
+underscores. This is to facilitate \code{print}, \code{plot}, and
+\code{lambda} methods. For example, a \code{init_ipm("general", "di", "det")}
+model will have the class \code{'general_di_det_ipm'} once it has been
+implemented using \code{make_ipm}.
 }
 \description{
 The \code{make_ipm.*} methods convert a \code{proto_ipm} into a
 set of discretized kernels and population vectors. Methods have different
 requirements, so be sure to read the parameter documentation. \code{
-vignette('ipmr-introduction', 'ipmr')} also contains helpful information.
+vignette('ipmr-introduction', 'ipmr')}  a more complete introduction.
 }

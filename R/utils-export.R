@@ -34,7 +34,7 @@
 #' This has two arguments - \code{proto_ipm} (the model object you wish to work with),
 #' and the \code{kernel_impl_list}. The format of the \code{kernel_impl_list} is:
 #' names of the list should be kernel names, and each kernel should have 3 entries:
-#' \code{int_rule}, \code{dom_start}, and \code{dom_end}. See examples.
+#' \code{int_rule}, \code{state_start}, and \code{state_end}. See examples.
 #'
 #' \strong{\code{define_domains}}
 #'
@@ -173,8 +173,9 @@ define_pop_state <- function(proto_ipm, ..., pop_vectors = list()) {
 }
 
 #' @inheritParams define_pop_state
-#' @param data_list A list of named values that correspond to constants in the formula.
-#' This behaves in the same way as the \code{data_list} argument to \code{define_kernel}.
+#' @param data_list A list of named values that contain data used in the expressions
+#' in \code{...} in \code{define_env_state()}.
+#'
 #' @rdname define_star
 #' @export
 
@@ -321,48 +322,8 @@ mat_power <- function(x, y) {
 
 }
 
-#' @title Format a mega-matrix
-#'
-#' @param ipm Output from \code{make_ipm}.
-#' @param ... Other arguments passed to methods.
-#'
-#' @return A list containing a large matrix or many large matrices (when used with
-#' hierarchical syntax). The names in the former case will be \code{"mega_matrix"}
-#' and in the latter case, the level of the hierarchical effect.
-#'
-#' @details \code{I} and \code{0} represent identity matrices and 0 matrices,
-#' respectively. They can be used to fill in blocks that represent either, without
-#' having to create those separately and append them to the model object. The function
-#' will work out the correct dimensions for both internally, and there is no
-#' restriction on the number that may be used in a given call.
-#'
-#' For \code{age_size_ipm}s, the correct form of \code{mega_mat} is generated
-#' internally by creating sub-diagonal matrices for the \code{name_ps} kernels,
-#' and a top row using the \code{f_forms}. If hierarchical effects are part of the
-#' model, the suffixes should be attached to the \code{name_ps, f_forms} in the
-#' function arguments, and the correct block matrices will be generated internally.
-#'
-#' @examples
-#' data(gen_di_det_ex)
-#'
-#' big_k <- format_mega_matrix(gen_di_det_ex,
-#'                             mega_mat = c(0, go_discrete,
-#'                                          leave_discrete, P))
-#'
-#' char_call <- c(0, "go_discrete", "leave_discrete", "P")
-#'
-#' big_k <- format_mega_matrix(gen_di_det_ex, mega_mat = char_call)
-#'
-#' # Now, with an Identity matrix instead of a 0
-#'
-#' big_k <- format_mega_matrix(gen_di_det_ex,
-#'                             mega_mat = c(I, go_discrete,
-#'                                          leave_discrete, P))
-#'
-#'
-#'
+#' @rdname make_iter_kernel
 #' @export
-#'
 
 format_mega_matrix <- function(ipm, ...) {
 
@@ -370,13 +331,7 @@ format_mega_matrix <- function(ipm, ...) {
 
 }
 
-#' @rdname format_mega_matrix
-#' @param mega_mat A vector with symbols, I's, and/or 0s representing the matrix blocks.
-#' They should be specified in ROW MAJOR order! Can also be a character
-#' string specifying the call. Hierarchical syntax is supported. When used,
-#' \code{format_mega_matrix} will produce as many mega-matrices as there are
-#' combinations of \code{levels_hier_effs} in the \code{proto_ipm}.
-#'
+#' @rdname make_iter_kernel
 #' @export
 
 format_mega_matrix.default <- function(ipm, mega_mat, ...) {
@@ -494,17 +449,7 @@ format_mega_matrix.default <- function(ipm, mega_mat, ...) {
 
 }
 
-#' @rdname format_mega_matrix
-#' @param name_ps The prefix(es) for the kernel name that correspond to survival
-#' and growth/maturation of existing individuals. For the model
-#' \code{K = P_age + F_age}, this would be \code{"P"}.
-#' @param f_forms The names of the kernels that correspond to production of new
-#' individuals, and possibly, how they are combined. For example, a model that
-#' includes sexual (with an "F" kernel) and asexual reproduction (with a "C" kernel),
-#' this would be \code{"F + C"}. If data come from multiple sites or years,
-#' then this information is supplied using the suffix syntax (i.e.
-#' \code{f_forms = "F_yr + C_yr"}).
-#'
+#' @rdname make_iter_kernel
 #' @export
 
 format_mega_matrix.age_x_size_ipm <- function(ipm,
@@ -641,9 +586,10 @@ domains <- function(object) {
 #' examples.
 #'
 #' Note that when using \code{vital_rate_funs}, unless the vital rate expression
-#' contains an expression for integration, these functions \strong{are not yet
-#' integrated!} This is useful for things like sensitivity and elasticity analysis,
-#' but care must be taken to not use these values incorrectly.
+#' explicitly contains an expression for integration, these functions
+#' \strong{are not yet integrated!} This is useful for things like sensitivity
+#' and elasticity analysis, but care must be taken to not use these values
+#' incorrectly.
 #'
 #' @examples
 #'
@@ -652,10 +598,12 @@ domains <- function(object) {
 #' proto <- gen_di_det_ex$proto_ipm
 #'
 #' # Create a new, iterated IPM
-#' new_ipm <- make_ipm(proto, iterate = TRUE, iterations = 100)
+#' new_ipm <- make_ipm(proto, iterate = TRUE,
+#'                     iterations = 100, return_all_envs = TRUE)
 #'
 #' vital_rate_exprs(new_ipm)
 #' kernel_formulae(new_ipm)
+#' vital_rate_funs(new_ipm)
 #'
 #' domains(new_ipm)
 #' parameters(new_ipm)
@@ -791,7 +739,7 @@ vital_rate_exprs.default <- function(object) {
 #' @rdname accessors
 #' @export
 
-vital_rate_funs <- function(ipm, vital_rate = c("all")) {
+vital_rate_funs <- function(ipm) {
 
   proto    <- .initialize_kernels(ipm$proto_ipm, TRUE, "right")$others
 
@@ -815,7 +763,7 @@ vital_rate_funs <- function(ipm, vital_rate = c("all")) {
 
     if(rlang::is_empty(kern_vrs)) {
 
-      out[[i]] <- "No vital rates specified"
+      out[[i]] <- "No vital rate functions specified"
       names(out)[i] <- kern_nm
       next
 
@@ -1036,7 +984,7 @@ parameters.default <- function(object) {
 
 #' @rdname accessors
 #' @param ipm An object created by \code{make_ipm()}. This argument only applies to
-#' \code{int_mesh()} and \code{vital_rate_funs} (because these are not built
+#' \code{int_mesh()} and \code{vital_rate_funs()} (because these are not built
 #' until \code{make_ipm()} is called).
 #' @export
 
@@ -1164,14 +1112,15 @@ pop_state.default <- function(object) {
 #' time step of the model.
 #'
 #' @param ipm An object created by \code{make_ipm}
-#' @param time_step the time step to pull out. Currently only supports single
-#' time steps, see examples for extracting time series.
+#' @param time_step the time step to pull out. Can be a single time step or a
+#' vector of multiple time steps. In the latter case, one value is computed for
+#' each time step.
 #' @param ... Named expressions that provide the threshold information for the
 #' desired classes. The expression should be logicals with a state variable name
 #' on the left side, and a threshold value on the right side.
 #'
-#' @return A named list with summed population sizes. Names are taken from
-#' \code{...}.
+#' @return A named list of numeric vectors containing the summed population
+#' sizes at each requested time step. Names are taken from \code{...}.
 #'
 #' @examples
 #' data(gen_di_det_ex)
@@ -1182,7 +1131,7 @@ pop_state.default <- function(object) {
 #'   make_ipm(iterate = TRUE, iterations = 50, return_main_env = TRUE)
 #'
 #' disc_sizes <- collapse_pop_state(gen_di_det_ex,
-#'                                  time_step = 20,
+#'                                  time_step = 20:25,
 #'                                  seedlings = ht <= 10,
 #'                                  NRA = ht > 10 & ht <= 200,
 #'                                  RA = ht > 200)
@@ -1191,16 +1140,12 @@ pop_state.default <- function(object) {
 #' # (excluding the initial population state) and collapses them according
 #' # to the rules we pass to ...
 #'
-#' time_series <- matrix(0, nrow = 20, ncol = 3)
 #'
-#' for(i in 2:21) {
-#'
-#'   time_series[(i-1), ] <- unlist(collapse_pop_state(gen_di_det_ex,
-#'                                                     time_step = i,
-#'                                                     seedlings = ht <= 10,
-#'                                                     NRA = ht > 10 & ht <= 200,
-#'                                                     RA = ht > 200))
-#' }
+#'  time_series <- collapse_pop_state(gen_di_det_ex,
+#'                                    time_step = 2:21,
+#'                                    seedlings = ht <= 10,
+#'                                    NRA = ht > 10 & ht <= 200,
+#'                                    RA = ht > 200)
 #'
 #' @export
 
@@ -1260,9 +1205,14 @@ collapse_pop_state <- function(ipm, time_step, ...) {
 
     use_ind <- inds[[i]]
 
-    temp <- pops[[use_state]][use_ind , time_step]
+    temp    <- matrix(ncol = length(time_step),
+                      nrow = length(use_ind))
 
-    out[[i]] <- sum(temp)
+    for(j in seq_along(time_step)) {
+      temp[ , j] <- pops[[use_state]][use_ind , time_step[j]]
+
+    }
+    out[[i]] <- apply(temp, 2, sum)
     names(out)[i] <- names(thresh)[i]
   }
 
@@ -1275,7 +1225,7 @@ collapse_pop_state <- function(ipm, time_step, ...) {
 #' @description Converts IPM kernels into long data frames. These are useful for
 #' creating plots using \code{ggplot2}.
 #'
-#' @inheritParams format_mega_matrix
+#' @inheritParams make_iter_kernel
 #'
 #' @return A data frame with 3 columns named \code{"t"}, \code{"t_1"}, and
 #' \code{"value"}.
@@ -1296,6 +1246,7 @@ ipm_to_df <- function(ipm, ...) {
 
 }
 
+#' @rdname ipm_to_df
 #' @export
 
 ipm_to_df.array <- function(ipm, ...) {
@@ -1304,9 +1255,14 @@ ipm_to_df.array <- function(ipm, ...) {
 
 }
 
+#' @rdname ipm_to_df
 #' @export
 
-ipm_to_df.default <- function(ipm, ..., mega_mat, name_ps = NULL, f_forms = NULL) {
+ipm_to_df.default <- function(ipm,
+                              ...,
+                              mega_mat,
+                              name_ps = NULL,
+                              f_forms = NULL) {
 
   mega_mat <- rlang::enquo(mega_mat)
 
@@ -1326,18 +1282,77 @@ ipm_to_df.default <- function(ipm, ..., mega_mat, name_ps = NULL, f_forms = NULL
 #' @description Creates iteration kernels for IPMs. \code{ipmr} does not create
 #' these to iterate models, but they may be useful for further analyses.
 #'
-#' @inheritParams format_mega_matrix
+#' @param ipm Output from \code{make_ipm}.
+#'
+#' @param ... Other arguments passed to methods.
+#'
+#' @param mega_mat A vector with symbols, I's, and/or 0s representing the matrix blocks.
+#' They should be specified in ROW MAJOR order! Can also be a character
+#' string specifying the call. Hierarchical syntax is supported. When used,
+#' \code{format_mega_matrix} will produce as many mega-matrices as there are
+#' combinations of \code{levels_hier_effs} in the \code{proto_ipm}.
+#'
+#' @param name_ps The prefix(es) for the kernel name that correspond to survival
+#' and growth/maturation of existing individuals. For the model
+#' \code{K = P_age + F_age}, this would be \code{"P"}. Only applies to
+#' age X size models. The \code{"_age"} suffix is appended automatically, so
+#' does not need to be supplied.
+#'
+#' @param f_forms The names of the kernels that correspond to production of new
+#' individuals, and possibly, how they are combined. For example, a model that
+#' includes sexual (with an "F" kernel) and asexual reproduction (with a "C" kernel),
+#' this would be \code{"F + C"}. If data come from multiple sites or years,
+#' then this information is supplied using the suffix syntax (i.e.
+#' \code{f_forms = "F_yr + C_yr"}). Only applies to age X size models. The
+#' \code{"_age"} suffix is appended automatically, so does not need to be
+#' supplied.
+#'
+#' @return A list containing a large matrix or many large matrices (when used with
+#' hierarchical syntax). The names in the former case will be \code{"mega_matrix"}
+#' and in the latter case, \code{"mega_matrix_<hier_effs>"} with the levels of the
+#' hierarchical effects substituted in.
 #'
 #' @details \code{ipmr} does not generate complete iteration kernels, and uses
 #' sub-kernels to iterate models. However, some further analyses are just easier
 #' to code with a complete iteration kernel. This handles constructing those for
-#' simple and general models of all forms. For general models, this is really
-#' just a thin wrapper around \code{format_mega_matrix}.
+#' simple and general models of all forms. \code{format_mega_matrix} is used
+#' internally by \code{make_iter_kernel} for general IPMs.
 #'
-#' @return A list of iteration kernels. For simple and general models without
-#' \code{hier_effs}, then a list of length 1, with a slot named
-#' \code{"mega_matrix"}. For models with \code{hier_effs}, the slot names will have
-#' the \code{levels_hier_effs} pasted onto the \code{"mega_matrix"}.
+#' \code{I} and \code{0} represent identity matrices and 0 matrices,
+#' respectively. They can be used to fill in blocks that represent either, without
+#' having to create those separately and append them to the model object. The function
+#' will work out the correct dimensions for both internally, and there is no
+#' restriction on the number that may be used in a given call.
+#'
+#' For \code{age_size_ipm}s, the correct form of \code{mega_mat} is generated
+#' internally by creating sub-diagonal matrices for the \code{name_ps} kernels,
+#' and a top row using the \code{f_forms}. If hierarchical effects are part of the
+#' model, the suffixes should be attached to the \code{name_ps, f_forms} in the
+#' function arguments, and the correct block matrices will be generated internally.
+#'
+#' @examples
+#' data(gen_di_det_ex)
+#'
+#' big_k <- make_iter_kernel(gen_di_det_ex,
+#'                             mega_mat = c(0, go_discrete,
+#'                                          leave_discrete, P))
+#'
+#' char_call <- c(0, "go_discrete", "leave_discrete", "P")
+#'
+#' big_k_c <- make_iter_kernel(gen_di_det_ex, mega_mat = char_call)
+#'
+#' # Now, with an Identity matrix instead of a 0
+#'
+#' big_k <- make_iter_kernel(gen_di_det_ex,
+#'                             mega_mat = c(I, go_discrete,
+#'                                          leave_discrete, P))
+#'
+#' # For simple IPMs with no hierarchical effects, this computes the sum of
+#' # the sub-kernels (i.e. K = P + F)
+#'
+#' data(sim_di_det_ex)
+#'
+#' simple_k <- make_iter_kernel(sim_di_det_ex)
 #'
 #' @export
 
@@ -1373,9 +1388,9 @@ make_iter_kernel <- function(ipm,
 
 .make_iter_kernel.simple_ipm <- function(ipm, ...) {
 
-  proto <- ipm$proto_ipm
+  proto     <- ipm$proto_ipm
 
-  base_nms <- proto$kernel_id
+  base_nms  <- proto$kernel_id
 
   all_kerns <- ipm$sub_kernels
 
@@ -1397,15 +1412,15 @@ make_iter_kernel <- function(ipm,
 
     to_sub    <- paste(names(all_effs), collapse = "_")
 
-    all_args <- lapply(levs,
-                       function(x, base_expr, to_sub) {
-                         temp <- gsub(to_sub, x, base_expr)
+    all_args  <- lapply(levs,
+                        function(x, base_expr, to_sub) {
+                          temp <- gsub(to_sub, x, base_expr)
 
-                         .args_from_txt(temp)
+                          .args_from_txt(temp)
 
-                       },
-                       base_expr = base_expr,
-                       to_sub = to_sub)
+                        },
+                        base_expr = base_expr,
+                        to_sub = to_sub)
 
     out <- list()
 
@@ -1439,7 +1454,10 @@ make_iter_kernel <- function(ipm,
 
   mega_mat <- rlang::enquo(mega_mat)
 
-  out <- format_mega_matrix(ipm, !! mega_mat, name_ps, f_forms)
+  out <- format_mega_matrix(ipm,
+                            mega_mat = !! mega_mat,
+                            name_ps  = name_ps,
+                            f_forms  = f_forms)
 
   return(out)
 

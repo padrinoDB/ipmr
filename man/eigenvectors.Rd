@@ -9,23 +9,25 @@
 \alias{left_ev.general_di_det_ipm}
 \title{Compute the standardized left and right eigenvectors via iteration}
 \usage{
-right_ev(ipm, iterations)
+right_ev(ipm, iterations, tolerance)
 
-\method{right_ev}{simple_di_det_ipm}(ipm, iterations = 100)
+\method{right_ev}{simple_di_det_ipm}(ipm, iterations = 100, tolerance = 1e-10)
 
-\method{right_ev}{general_di_det_ipm}(ipm, iterations = 100)
+\method{right_ev}{general_di_det_ipm}(ipm, iterations = 100, tolerance = 1e-10)
 
-left_ev(ipm, iterations)
+left_ev(ipm, iterations, tolerance)
 
-\method{left_ev}{simple_di_det_ipm}(ipm, iterations = 100)
+\method{left_ev}{simple_di_det_ipm}(ipm, iterations = 100, tolerance = 1e-10)
 
-\method{left_ev}{general_di_det_ipm}(ipm, iterations = 100)
+\method{left_ev}{general_di_det_ipm}(ipm, iterations = 100, tolerance = 1e-10)
 }
 \arguments{
 \item{ipm}{Output from \code{make_ipm()}.}
 
 \item{iterations}{The number of times to iterate the model to reach
 convergence. Default is 100.}
+
+\item{tolerance}{Tolerance to evaluate convergence to asymptotic dynamics.}
 }
 \value{
 A list of named numeric vector(s) corresponding to the stable trait distribution
@@ -35,10 +37,19 @@ function (\code{right_ev}) or the reproductive values for each trait (\code{left
 Compute the standardized left and right eigenvectors via iteration
 }
 \details{
-For \code{right_ev}, if the model has already been iterated, then
-these functions will just extract population state of the final iteration and
-return that in a named list. Each element of the list is a vector with length
-\code{>= 1} and corresponds each state variable's portion of the eigenvector.
+For \code{right_ev}, if the model has already been iterated and has
+converged to asymptotic dynamics, then it will just extract the final
+population state and return that in a named list. Each element of the list
+is a vector with length \code{>= 1} and corresponds each state variable's
+portion of the eigenvector.
+If the model has been iterated, but has not yet converged to asymptotic dynamics,
+\code{right_ev} will try to iterate it further using the final population state
+as the starting point. The default number of iterations is 100, and can be
+adjusted using the \code{iterations} argument.
+If the model hasn't been iterated, then \code{right_ev} will try iterating it
+for \code{iterations} number of time steps and check for convergence. In the
+latter two cases, if the model still has not converged to asymptotic dynamics,
+it will return \code{NA} with a warning.
 
 For \code{left_ev}, the transpose iteration (\emph{sensu} Ellner & Rees 2006,
 Appendix A) is worked out based on the \code{state_start} and \code{state_end}

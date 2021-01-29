@@ -1,7 +1,7 @@
 #' @title Mean kernels for stochastic models
 #'
 #' @description This function computes mean sub-kernels for stochastic
-#' parameter-resampled and kernel resampled models.
+#' parameter re-sampled and stochastic kernel re-sampled models.
 #'
 #' @param ipm A stochastic model created by \code{make_ipm()}.
 #'
@@ -12,7 +12,7 @@
 #' are identical to their input.
 #'
 #' For \code{*_stoch_param} models, this computes the element-wise mean for each
-#' sub-kernel used in the iteration procedure.
+#' sub-kernel created by the iteration procedure.
 #'
 #' @return A list of mean sub-kernels for the model.
 #'

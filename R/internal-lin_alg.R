@@ -347,118 +347,7 @@
 
 }
 
-#' @noRd
-# Evaluates the pop_vec
-
-.make_mega_vec <- function(pop_vec, pop_state) {
-
-  names(pop_state) <- gsub('^n_', "", names(pop_state))
-
-  # if {...} else {...} to handle the case in right_ev where it is working
-  # just with a list of vectors. In general, most instances should be a list
-  # of matrices. This just helps generalize a bit more.
-
-  temp_pop_state   <- lapply(pop_state,
-                             function(x) {
-                               if(is.matrix(x)) {
-                                 x[ , 1]
-                               } else {
-                                 x
-                               }
-                             })
-
-  vec_env          <- rlang::env(!!! temp_pop_state)
-
-  pop_vec          <- rlang::quo_set_env(pop_vec, env = vec_env)
-
-  out              <- rlang::eval_tidy(pop_vec, env = vec_env)
-
-  return(out)
-
-}
-
-.mega_vec_to_list <- function(mega_vec, pop_holder, init_pop_state) {
-
-  # Get the number of cells for each state variable in the mega_vec,
-  # and conver that to the
-
-  n_rows        <- lapply(init_pop_state,
-                          function(x) dim(x)[1])
-
-  names(n_rows) <- gsub('^n_', '', names(n_rows))
-
-  order_ind     <- rlang::eval_tidy(mega_vec, data = n_rows)
-
-  # Convert the call arguments to characters so we can use them
-  # to name the output list
-
-  mega_vec_nm   <- rlang::call_args(mega_vec) %>%
-    vapply(as.character, character(1L))
-
-  out <- list()
-
-
-  # Generate indices for subsetting and set up the new names for the output
-
-  for(i in seq_along(order_ind)) {
-
-    pop_holder_len <- order_ind[i]
-
-    nm             <- paste(mega_vec_nm[i], 'v', sep = '_')
-
-    if(i == 1) {
-
-      # The first sequences always start from 1
-
-      pop_holder_ind <- seq(1, pop_holder_len, by = 1)
-
-    } else {
-
-      # Anything afterwards is index by the sum of the prior
-      # indices + 1, so that we start grabbing values from where the
-      # previous one left off
-
-      pop_holder_start <- sum(order_ind[(1:(i - 1))]) + 1
-
-      pop_holder_end   <- pop_holder_start + order_ind[i] - 1
-
-      pop_holder_ind   <- seq(pop_holder_start,
-                              pop_holder_end,
-                              by = 1)
-    }
-
-    temp_pop <- rlang::list2(!! nm := pop_holder[pop_holder_ind])
-
-    out      <- purrr::splice(out, temp_pop)
-  }
-
-  return(out)
-
-}
-
-
 # Lambda helpers----------
-#' @noRd
-# vec = numeric vector
-
-.geom_mean <- function(vec) {
-
-  if(any(vec <= 0)) {
-
-    warning('vector contains values less than 0, returning "NA".', call. = FALSE)
-    return(NA_real_)
-
-  }
-  if(any(is.na(vec))) {
-
-    warning('Vector contains NAs. They will be removed.', call. = FALSE)
-    vec <- vec[!is.na(vec)]
-
-  }
-
-  exp(mean(log(vec)))
-
-}
 
 #' @noRd
 
@@ -505,28 +394,6 @@
 
   }
 
-
-}
-
-.lambda_eigen <- function(x) {
-
-  eigs <- .det_lambda(x)
-
-  return(eigs)
-
-
-}
-
-#' @noRd
-# x = an object from make_ipm()
-
-.det_lambda <- function(x) {
-
-  return(
-    vapply(x$iterators,
-           function(y) Re(eigen(y)$values[1]),
-           numeric(1L))
-  )
 
 }
 
@@ -618,14 +485,6 @@ is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
     return(NA)
 
   }
-
-  #   pop_state <- ipm$pop_state[!grepl("lambda", names(ipm$pop_state))]
-  #
-  # }
-  #
-  # out <- .is_conv_to_asymptotic(pop_state, tol = tol)
-  #
-  # return(out)
 
 }
 

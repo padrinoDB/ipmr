@@ -24,9 +24,9 @@ define_env_state(proto_ipm, ..., data_list = list())
 
 \item{kernel_impl_list}{A named list. Names correspond to kernel names. Each
 kernel should have 3 slots defined - the \code{int_rule} (integration rule),
-the \code{dom_start} (the domain the kernel begins on), and the \code{dom_end}
-(the domain the kernel ends on). It is safest to use \code{make_impl_args_list}
-to generate this.}
+the \code{state_start} (the domain the kernel begins on), and the \code{state_end}
+(the domain the kernel ends on). For more complicated models, it is usually
+safest to use \code{make_impl_args_list} to generate this.}
 
 \item{kernel_names}{A character vector with the names of the kernels
 that parameters are being defined for.}
@@ -34,16 +34,11 @@ that parameters are being defined for.}
 \item{int_rule}{The integration rule to be used for the kernel. The default is
 "midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.}
 
-\item{state_start}{The name of the state variable for the kernel at time \emph{t}.}
+\item{state_start}{The name of the state variable for the kernel that the
+kernel acts on at time \emph{t}.}
 
-\item{state_end}{The name of the state variable for the kernel at time \emph{t+1}.
-This is usually the same as \code{dom_start}, but general IPMs
-with discrete states or IPMs that move from one state to another (e.g. tree
-seedling going from a height domain at \emph{t} to a DBH domain at \emph{t+1})
-may have another value here. For cases with a discrete stage, kernels moving
-individuals from discrete to continuous should have a state variable entered
-here and an \code{NA} for \code{dom_start}. For kernels moving from continuous
-to discrete, vice versa. For discrete to discrete, both are \code{NA}.}
+\item{state_end}{The name of the state variable that the kernel produces
+at time \emph{t+1}.}
 
 \item{...}{Named expressions. See Details for more information on their usage in
 each \code{define_*} function.}
@@ -52,8 +47,8 @@ each \code{define_*} function.}
 not defined by a function passed to \code{...}), then they can
 be passed as a named list here.}
 
-\item{data_list}{A list of named values that correspond to constants in the formula.
-This behaves in the same way as the \code{data_list} argument to \code{define_kernel}.}
+\item{data_list}{A list of named values that contain data used in the expressions
+in \code{...} in \code{define_env_state()}.}
 }
 \value{
 All \code{define_*} functions return a proto_ipm. \code{make_impl_args_list}
@@ -88,7 +83,7 @@ Below are specific details on the way each works.
 This has two arguments - \code{proto_ipm} (the model object you wish to work with),
 and the \code{kernel_impl_list}. The format of the \code{kernel_impl_list} is:
 names of the list should be kernel names, and each kernel should have 3 entries:
-\code{int_rule}, \code{dom_start}, and \code{dom_end}. See examples.
+\code{int_rule}, \code{state_start}, and \code{state_end}. See examples.
 
 \strong{\code{define_domains}}
 

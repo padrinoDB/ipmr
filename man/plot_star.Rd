@@ -104,7 +104,7 @@ Plot a matrix or an *_ipm object
 \details{
 \code{plot.ipmr_matrix} is intended for internal use only, and it
 is usually safer to use \code{plot.*_ipm} methods for visualizing kernels.
-If a K kernel is overwhelmed by information in say, a fecundity sub-kernel,
+If an IPM kernel is overwhelmed by information in say, a fecundity sub-kernel,
 use the \code{exponent} argument in \code{plot.*_ipm} to make it more visually
 appealing.
 }

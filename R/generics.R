@@ -318,7 +318,7 @@ print.proto_ipm <- function(x, ...) {
 #' comp_lambda = TRUE}.
 #' @param type_lambda Either \code{'all'} or \code{'stochastic'}. See
 #' \code{\link{lambda}} for more details.
-#' @param check_conv A logical: for \code{general_*} models, check if population state
+#' @param check_conv A logical: for deterministic models, check if population state
 #' has converged to asymptotic dynamics? If \code{TRUE} and the model has not
 #' converged, a message will be printed.
 #' @param ... Ignored
@@ -848,7 +848,7 @@ print.ipmr_matrix <- function(x, ...) {
 #' @export
 print.ipmr_vital_rate_funs <- function(x, ...) {
 
-  if(length(x) == 1 && x == "No vital rates specified") {
+  if(length(x) == 1 && x == "No vital rate functions specified") {
     cat("No vital rates specified\n")
     invisible(x)
     return()
@@ -865,7 +865,13 @@ print.ipmr_vital_rate_funs <- function(x, ...) {
 
   out <- vapply(seq_along(cls),
                 function(it, vr_nm, cls, rngs) {
-                  paste(vr_nms[it], cls[it], sep = ": ") %>%
+                  paste(
+                    paste(vr_nms[it],
+                        " (not yet discretized)",
+                        sep = ""),
+                    cls[it],
+                    sep = ": "
+                  ) %>%
                     paste(" with minimum value: ", rngs[1, it],
                           " and maximum value: ", rngs[2, it],
                           sep = "")
@@ -886,7 +892,7 @@ print.ipmr_vital_rate_funs <- function(x, ...) {
   row <- nrow(x)
 
   cls <- switch(class(x)[1],
-                "CC" = "matrix",
+                "CC" = "kernel",
                 "DC" = "column vector",
                 "CD" = "row vector",
                 "DD" = "matrix")
@@ -915,14 +921,15 @@ print.ipmr_vital_rate_funs <- function(x, ...) {
 #' returns a vector of lambda values for each time step of the simulation (equal
 #' in length to the \code{iterations} argument of \code{make_ipm()}).
 #' \code{'last'} returns the lambda value for the final timestep.
-#' \code{'stochastic'} returns a single value which is the geometric mean
-#' of log-per-capita growth rate from each time step.
+#' \code{'stochastic'} returns a single value which is the mean
+#' of the log'd per-capita growth rate from each time step.
 #' @param ... other arguments passed to methods.
 #' @param burn_in The proportion of iterations to discard. Default is 0.1
 #' (i.e. first 10\% of iterations in the simulation).
 #'
-#' @return An array. Rows correspond to time steps, and columns correspond
-#' to hierarchical effects (if any).
+#' @return When \code{type_lambda = "all"}, an array. Rows correspond to time
+#' steps, and columns correspond to hierarchical effects (if any). For other types,
+#' a numeric vector.
 #'
 #' @export
 
@@ -1264,7 +1271,7 @@ lambda.general_dd_stoch_param_ipm <- function(ipm,
 #'
 #' @details \code{plot.ipmr_matrix} is intended for internal use only, and it
 #' is usually safer to use \code{plot.*_ipm} methods for visualizing kernels.
-#' If a K kernel is overwhelmed by information in say, a fecundity sub-kernel,
+#' If an IPM kernel is overwhelmed by information in say, a fecundity sub-kernel,
 #' use the \code{exponent} argument in \code{plot.*_ipm} to make it more visually
 #' appealing.
 #'
@@ -1613,7 +1620,7 @@ plot.general_di_det_ipm <- function(x = NULL, y = NULL,
 #'
 #' @export
 
-right_ev <- function(ipm, iterations) {
+right_ev <- function(ipm, iterations, tolerance) {
 
   UseMethod('right_ev')
 
@@ -1622,11 +1629,13 @@ right_ev <- function(ipm, iterations) {
 #' @rdname eigenvectors
 #' @param iterations The number of times to iterate the model to reach
 #' convergence. Default is 100.
+#' @param tolerance Tolerance to evaluate convergence to asymptotic dynamics.
 #'
 #' @export
 
 right_ev.simple_di_det_ipm <- function(ipm,
-                                       iterations = 100) {
+                                       iterations = 100,
+                                       tolerance = 1e-10) {
 
   mod_nm <- deparse(substitute(ipm))
 
@@ -1641,7 +1650,8 @@ right_ev.simple_di_det_ipm <- function(ipm,
     # get index for population vector of final iteration
     final_it <- dim(ipm$pop_state[[1]])[2]
 
-    if(is_conv_to_asymptotic(ipm)) {
+    if(is_conv_to_asymptotic(ipm,
+                             tol = tolerance)) {
 
       out    <- ipm$pop_state[[1]][ , final_it]
       out_nm <- paste(pop_nm, 'w', sep = "_")
@@ -1682,7 +1692,8 @@ right_ev.simple_di_det_ipm <- function(ipm,
         make_ipm(iterate    = TRUE,
                  iterations = iterations)
 
-      if(is_conv_to_asymptotic(test_conv)) {
+      if(is_conv_to_asymptotic(test_conv,
+                               tol = tolerance)) {
 
         final_it <- dim(test_conv$pop_state[[1]])[2]
 
@@ -1748,7 +1759,8 @@ right_ev.simple_di_det_ipm <- function(ipm,
                iterations = iterations,
                normalize_pop_size = TRUE)
 
-    if(is_conv_to_asymptotic(test_conv)) {
+    if(is_conv_to_asymptotic(test_conv,
+                             tol = tolerance)) {
 
       out    <- test_conv$pop_state[[1]][ , (iterations + 1)]
       out_nm <- paste(pop_nm, 'w', sep = "_")
@@ -1786,13 +1798,15 @@ right_ev.simple_di_det_ipm <- function(ipm,
 #' @export
 
 right_ev.general_di_det_ipm <- function(ipm,
-                                        iterations = 100) {
+                                        iterations = 100,
+                                        tolerance = 1e-10) {
 
   mod_nm    <- deparse(substitute(ipm))
 
   final_it  <- dim(ipm$pop_state[[1]])[2]
 
-  if(is_conv_to_asymptotic(ipm)) {
+  if(is_conv_to_asymptotic(ipm,
+                           tol = tolerance)) {
 
     out <- .extract_conv_ev_general(ipm$pop_state)
 
@@ -1830,7 +1844,8 @@ right_ev.general_di_det_ipm <- function(ipm,
       make_ipm(iterate    = TRUE,
                iterations = iterations)
 
-    if(is_conv_to_asymptotic(test_conv)) {
+    if(is_conv_to_asymptotic(test_conv,
+                             tol = tolerance)) {
 
       out <- .extract_conv_ev_general(test_conv$pop_state)
 
@@ -1866,7 +1881,7 @@ right_ev.general_di_det_ipm <- function(ipm,
 #' @rdname eigenvectors
 #' @export
 
-left_ev <- function(ipm, iterations) {
+left_ev <- function(ipm, iterations, tolerance) {
 
   UseMethod('left_ev')
 
@@ -1876,15 +1891,15 @@ left_ev <- function(ipm, iterations) {
 #' @rdname eigenvectors
 #' @importFrom stats runif
 
-left_ev.simple_di_det_ipm <- function(ipm, iterations = 100) {
+left_ev.simple_di_det_ipm <- function(ipm,
+                                      iterations = 100,
+                                      tolerance = 1e-10) {
 
   mod_nm <- deparse(substitute(ipm))
 
   # Identify state variable name
 
   pop_nm <- .get_pop_nm_simple(ipm)
-
-  # if it's already been iterated to convergence, we don't have much work to do.
 
   # Create variables for internal usage
 
@@ -1907,7 +1922,8 @@ left_ev.simple_di_det_ipm <- function(ipm, iterations = 100) {
              iterations = iterations,
              iteration_direction = "left")
 
-  if(is_conv_to_asymptotic(test_conv)) {
+  if(is_conv_to_asymptotic(test_conv,
+                           tol = tolerance)) {
 
     out    <- test_conv$pop_state[[1]][ , (iterations + 1)]
     out_nm <- paste(pop_nm, 'v', sep = "_")
@@ -1929,21 +1945,30 @@ left_ev.simple_di_det_ipm <- function(ipm, iterations = 100) {
     return(NA_real_)
   }
 
-
 # Stuff into a list and standardize
 
   out <- rlang::list2(!! out_nm := (out / sum(out)))
   class(out) <- "ipmr_v"
 
   return(out)
+
 }
 
 #' @rdname eigenvectors
 #'
-#' @details For \code{right_ev}, if the model has already been iterated, then
-#' these functions will just extract population state of the final iteration and
-#' return that in a named list. Each element of the list is a vector with length
-#' \code{>= 1} and corresponds each state variable's portion of the eigenvector.
+#' @details For \code{right_ev}, if the model has already been iterated and has
+#' converged to asymptotic dynamics, then it will just extract the final
+#' population state and return that in a named list. Each element of the list
+#' is a vector with length \code{>= 1} and corresponds each state variable's
+#' portion of the eigenvector.
+#' If the model has been iterated, but has not yet converged to asymptotic dynamics,
+#' \code{right_ev} will try to iterate it further using the final population state
+#' as the starting point. The default number of iterations is 100, and can be
+#' adjusted using the \code{iterations} argument.
+#' If the model hasn't been iterated, then \code{right_ev} will try iterating it
+#' for \code{iterations} number of time steps and check for convergence. In the
+#' latter two cases, if the model still has not converged to asymptotic dynamics,
+#' it will return \code{NA} with a warning.
 #'
 #' For \code{left_ev}, the transpose iteration (\emph{sensu} Ellner & Rees 2006,
 #' Appendix A) is worked out based on the \code{state_start} and \code{state_end}
@@ -1953,7 +1978,8 @@ left_ev.simple_di_det_ipm <- function(ipm, iterations = 100) {
 #' @export
 
 left_ev.general_di_det_ipm <- function(ipm,
-                                       iterations = 100) {
+                                       iterations = 100,
+                                       tolerance = 1e-10) {
 
   mod_nm    <- deparse(substitute(ipm))
 
@@ -1972,7 +1998,7 @@ left_ev.general_di_det_ipm <- function(ipm,
              iteration_direction = "left",
              normalize_pop_size = FALSE)
 
-  if(is_conv_to_asymptotic(test_conv)) {
+  if(is_conv_to_asymptotic(test_conv, tol = tolerance)) {
 
     out <- .extract_conv_ev_general(test_conv$pop_state)
 

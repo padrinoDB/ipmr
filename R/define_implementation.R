@@ -3,20 +3,19 @@
 #' @inheritParams define_kernel
 #' @param kernel_names A character vector with the names of the kernels
 #' that parameters are being defined for.
+#'
 #' @param kernel_impl_list A named list. Names correspond to kernel names. Each
 #' kernel should have 3 slots defined - the \code{int_rule} (integration rule),
-#' the \code{dom_start} (the domain the kernel begins on), and the \code{dom_end}
-#' (the domain the kernel ends on). It is safest to use \code{make_impl_args_list}
-#' to generate this.
-#' @param state_start The name of the state variable for the kernel at time \emph{t}.
-#' @param state_end The name of the state variable for the kernel at time \emph{t+1}.
-#' This is usually the same as \code{dom_start}, but general IPMs
-#' with discrete states or IPMs that move from one state to another (e.g. tree
-#' seedling going from a height domain at \emph{t} to a DBH domain at \emph{t+1})
-#' may have another value here. For cases with a discrete stage, kernels moving
-#' individuals from discrete to continuous should have a state variable entered
-#' here and an \code{NA} for \code{dom_start}. For kernels moving from continuous
-#' to discrete, vice versa. For discrete to discrete, both are \code{NA}.
+#' the \code{state_start} (the domain the kernel begins on), and the \code{state_end}
+#' (the domain the kernel ends on). For more complicated models, it is usually
+#' safest to use \code{make_impl_args_list} to generate this.
+#'
+#' @param state_start The name of the state variable for the kernel that the
+#' kernel acts on at time \emph{t}.
+#'
+#' @param state_end The name of the state variable that the kernel produces
+#' at time \emph{t+1}.
+#'
 #' @param int_rule The integration rule to be used for the kernel. The default is
 #' "midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.
 #'
@@ -109,7 +108,7 @@ make_impl_args_list <- function(kernel_names,
 
 
 #' @noRd
-.state_to_domain_info <- function(dom_start, dom_end, proto_ipm) {
+.state_to_domain_info <- function(state_start, state_end, proto_ipm) {
 
   # Generate dummy vectors to hold domain information.
 
@@ -117,8 +116,8 @@ make_impl_args_list <- function(kernel_names,
 
   end_state_info <- rep(NA_real_, 3)
 
-  out <- rlang::list2(!!dom_start := start_state_info,
-                      !!dom_end   := end_state_info)
+  out <- rlang::list2(!!state_start := start_state_info,
+                      !!state_end   := end_state_info)
 
   return(out)
 }

@@ -22,39 +22,36 @@
 #'
 #' @details Combinations of \code{simple} or \code{general}, \code{dd} or \code{di},
 #' and \code{det} or \code{stoch} are generated to create 1 of 12 unique IPM classes.
-#' These are separated by an underscore to tell \code{ipmr}
-#' the type of model you will be constructing. For simplicity, they are specified
-#' separately and the model class is generated internally.
 #'
-#' Within \code{stoch} model types, there are two additional options to append to
-#' the class: \code{"kern"} or \code{"param"}. These distinguish between models that
+#' Within \code{stoch} model types, there are two additional options:
+#' \code{"kern"} or \code{"param"}. These distinguish between models that
 #' use kernel resampling vs those that use parameter resampling (\emph{sensu} Metcalf et al.
-#' 2015). Below are quick definitions, more detailed explanations can be found
+#' 2015). Below are quick definitions. More detailed explanations can be found
 #' in the \code{vignettes("ipmr-introduction", package = 'ipmr')}.
 #'
 #' \itemize{
 #'
-#'   \item{One of}
+#'   \item{\code{sim_gen}}
 #'   \itemize{
 #'     \item{\code{simple}}{: an IPM with a single continuous state variable that does not include
 #'     any discrete stages. Simple IPMs can still be stochastic and/or density dependent.}
 #'     \item{\code{general}}{: an IPM with more than one continuous state variable
 #'     and/or a model that includes discrete stages.}
 #'  }
-#'  \item{and one of}
+#'  \item{\code{di_dd}}
 #'  \itemize{
 #'     \item{\code{dd}}{: used to denote a density dependent IPM.}
 #'     \item{\code{di}}{: used to denote a density independent IPM.}
 #'  }
-#'  \item{and one of}
+#'  \item{\code{det_stoch}}
 #'  \itemize{
 #'     \item{\code{det}}{: used to denote a deterministic IPM.}
 #'     \item{\code{stoch}}{: used to denote a stochastic IPM. Stochasticity can
 #'     be implemented in two ways in \code{ipmr}: \code{"kern"} resampling,
 #'     and \code{"param"} resampling.}
 #'  }
-#'  \item{If using \code{det}, this should be omitted. If using \code{stoch},
-#'  then one of the following: }
+#'  \item{\code{kern_param} - if using \code{det}, this should be omitted. If
+#'  using \code{stoch}, then one of the following: }
 #'  \itemize{
 #'     \item{\code{kern}}{: used to denote an IPM that uses kernel resampling. Briefly,
 #'     these models build all of the iteration kernels ahead of time and then choose one

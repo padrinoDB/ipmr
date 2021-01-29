@@ -14,7 +14,7 @@ A list of mean sub-kernels for the model.
 }
 \description{
 This function computes mean sub-kernels for stochastic
-parameter-resampled and kernel resampled models.
+parameter re-sampled and stochastic kernel re-sampled models.
 }
 \details{
 For \code{*_stoch_kern} models, this computes the element-wise
@@ -24,5 +24,5 @@ do not have time- or space-varying components are included in the output and
 are identical to their input.
 
 For \code{*_stoch_param} models, this computes the element-wise mean for each
-sub-kernel used in the iteration procedure.
+sub-kernel created by the iteration procedure.
 }

@@ -39,7 +39,7 @@ vital_rate_exprs(object)
 
 \method{vital_rate_exprs}{default}(object)
 
-vital_rate_funs(ipm, vital_rate = c("all"))
+vital_rate_funs(ipm)
 
 vital_rate_exprs(object, kernel, vital_rate) <- value
 
@@ -79,15 +79,15 @@ pop_state(object)
 \item{object}{A \code{proto_ipm} or object created by \code{make_ipm()}.}
 
 \item{ipm}{An object created by \code{make_ipm()}. This argument only applies to
-\code{int_mesh()} and \code{vital_rate_funs} (because these are not built
+\code{int_mesh()} and \code{vital_rate_funs()} (because these are not built
 until \code{make_ipm()} is called).}
+
+\item{kernel}{The name of the kernel to insert the new vital rate expression
+into.}
 
 \item{vital_rate}{The name of the vital rate to replace. If the vital rate
 doesn't already exist in the \code{object}, a new one with this name will be
 created.}
-
-\item{kernel}{The name of the kernel to insert the new vital rate expression
-into.}
 
 \item{value}{A named list of new parameters. The new list does not need
 to contain all of the parameters, just the ones to update/append.}
@@ -112,9 +112,10 @@ hand side of the expression must be wrapped in \code{new_fun_form}. See
 examples.
 
 Note that when using \code{vital_rate_funs}, unless the vital rate expression
-contains an expression for integration, these functions \strong{are not yet
-integrated!} This is useful for things like sensitivity and elasticity analysis,
-but care must be taken to not use these values incorrectly.
+explicitly contains an expression for integration, these functions
+\strong{are not yet integrated!} This is useful for things like sensitivity
+and elasticity analysis, but care must be taken to not use these values
+incorrectly.
 }
 \examples{
 
@@ -123,10 +124,12 @@ data(gen_di_det_ex)
 proto <- gen_di_det_ex$proto_ipm
 
 # Create a new, iterated IPM
-new_ipm <- make_ipm(proto, iterate = TRUE, iterations = 100)
+new_ipm <- make_ipm(proto, iterate = TRUE,
+                    iterations = 100, return_all_envs = TRUE)
 
 vital_rate_exprs(new_ipm)
 kernel_formulae(new_ipm)
+vital_rate_funs(new_ipm)
 
 domains(new_ipm)
 parameters(new_ipm)

@@ -9,16 +9,17 @@ collapse_pop_state(ipm, time_step, ...)
 \arguments{
 \item{ipm}{An object created by \code{make_ipm}}
 
-\item{time_step}{the time step to pull out. Currently only supports single
-time steps, see examples for extracting time series.}
+\item{time_step}{the time step to pull out. Can be a single time step or a
+vector of multiple time steps. In the latter case, one value is computed for
+each time step.}
 
 \item{...}{Named expressions that provide the threshold information for the
 desired classes. The expression should be logicals with a state variable name
 on the left side, and a threshold value on the right side.}
 }
 \value{
-A named list with summed population sizes. Names are taken from
-\code{...}.
+A named list of numeric vectors containing the summed population
+sizes at each requested time step. Names are taken from \code{...}.
 }
 \description{
 Given a model object, this function computes population sizes
@@ -35,7 +36,7 @@ gen_di_det_ex <- gen_di_det_ex$proto_ipm \%>\%
   make_ipm(iterate = TRUE, iterations = 50, return_main_env = TRUE)
 
 disc_sizes <- collapse_pop_state(gen_di_det_ex,
-                                 time_step = 20,
+                                 time_step = 20:25,
                                  seedlings = ht <= 10,
                                  NRA = ht > 10 & ht <= 200,
                                  RA = ht > 200)
@@ -44,15 +45,11 @@ disc_sizes <- collapse_pop_state(gen_di_det_ex,
 # (excluding the initial population state) and collapses them according
 # to the rules we pass to ...
 
-time_series <- matrix(0, nrow = 20, ncol = 3)
 
-for(i in 2:21) {
-
-  time_series[(i-1), ] <- unlist(collapse_pop_state(gen_di_det_ex,
-                                                    time_step = i,
-                                                    seedlings = ht <= 10,
-                                                    NRA = ht > 10 & ht <= 200,
-                                                    RA = ht > 200))
-}
+ time_series <- collapse_pop_state(gen_di_det_ex,
+                                   time_step = 2:21,
+                                   seedlings = ht <= 10,
+                                   NRA = ht > 10 & ht <= 200,
+                                   RA = ht > 200)
 
 }

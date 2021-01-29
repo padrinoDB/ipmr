@@ -5,7 +5,7 @@
 #'
 #' @param proto_ipm The name of the model.
 #' @param name The name of the new kernel.
-#' @param formula A bare expression specifying the form of the kernel. See Details.
+#' @param formula A bare expression specifying the form of the kernel.
 #' @param family The type of kernel. Options are \code{"CC"} for continuous to continuous
 #' transitions, \code{"DC"} for discrete to continuous (e.g. emergence from a seedbank),
 #' \code{"CD"} for continuous to discrete (e.g. entering a seedbank), and \code{"DD"} for
@@ -46,17 +46,8 @@
 #' namely for kernels derived from hierarchical models (e.g. vital rate models
 #' fit across plots and years).
 #'
-#' Internally, \code{ipmr} generates the \code{levels_hier_effs} using \code{expand.grid}.
-#' This  means that every combination of the values in \code{levels_hier_effs}
-#' must exist in the \code{data_list}, or the model will fail with an error along
-#' the lines of \code{Error in eval_tidy: object 'x_yz' not found}. In order to
-#' exclude levels that do not exist in your data, you can add a vector to the list
-#' in \code{levels_hier_effs} called \code{"drop_levels"}. This should contain the
-#' values you wish to exclude as a character vector. For example, if data are
-#' collected for \code{sites = c("a", "b", "c")}, and \code{years = c(2005:2008)},
-#' but there is no data from site \code{"a"} in \code{2007}, we can use
-#' \code{levels_hier_effs = list(site = c("a", "b", "c"), year = c(2005:2008),
-#' drop_levels = c("a_2007"))}.
+#' A much more complete overview of how to generate kernels is provided in
+#' \code{vignette("ipmr-introduction", "ipmr")}.
 #'
 #' @return A \code{proto_ipm}.
 #'
