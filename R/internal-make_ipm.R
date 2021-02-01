@@ -777,7 +777,7 @@
 
 #' @noRd
 # Generates sequences for the domain of midpoint rule integration (and midpoint
-# rule only!!!!!!!!!). This must be generalized for handling trapezoid, g-l, etc.
+# rule only!!!!!!!!!). This must be generalized for handling bin to bin, cdf, etc.
 
 .make_domain_seqs <- function(dom_vec) {
   if(all(!is.na(dom_vec))) {

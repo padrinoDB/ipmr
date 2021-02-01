@@ -4,6 +4,7 @@
 ^docs$
 ^_pkgdown\.yml$
 ^README\.Rmd$
+^README\.md$
 ^ipmr\.Rproj$
 ^\.Rproj\.user$
 ^\.travis\.yml$

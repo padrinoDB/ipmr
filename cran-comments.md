@@ -8,4 +8,5 @@
 
 0 errors | 0 warnings | 0 notes
 
-* This is a new release.
+This is a resubmission. I have added the Readme to .Rbuildignore. I hope this
+has resolved the problem with the last submission. 

@@ -326,7 +326,7 @@ Because this format is a bit specific, there is a helper function that can be ca
 
 The first argument to the `make_ipml_args_list()` function is `kernel_names`. This is a character vector with kernel names for which the implementation arguments are being supplied. These should be the same as `name` from `define_kernel`.
 
-Next, `int_rule` is a character vector, and currently `'midpoint'` is the only option that is implemented. `'trapezoid'` and `'g-l'` (Gauss-Legendre) are on the to-do list. Additional rules may be added if there is more demand for certain ones (e.g. cumulative density functions like in `IPMpack`). 
+Next, `int_rule` is a character vector, and currently `'midpoint'` is the only option that is implemented. `'b2b'` (bin to bin method) and `'cdf'` (cumulative density function) are on the to-do list. Additional rules may be added if there is more demand for certain ones. 
 
 `state_start` and `state_end` are always the same in `simple_*` IPMs. In `general_*` ones, they may be different as individuals move from, for example, discrete to continuous states or vice versa. These must always match the names provided in the `states` list.
 

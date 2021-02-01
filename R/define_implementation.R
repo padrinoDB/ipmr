@@ -17,7 +17,8 @@
 #' at time \emph{t+1}.
 #'
 #' @param int_rule The integration rule to be used for the kernel. The default is
-#' "midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.
+#' "midpoint". "b2b" (bin to bin) and "cdf" (cumulative density functions) will
+#' be implemented as well.
 #'
 #' @export
 
