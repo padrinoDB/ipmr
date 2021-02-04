@@ -1266,10 +1266,10 @@ ipm_to_df.default <- function(ipm,
 
   mega_mat <- rlang::enquo(mega_mat)
 
-  megas <- format_mega_matrix(ipm,
-                              mega_mat = !! mega_mat,
-                              name_ps = name_ps,
-                              f_forms = f_forms)
+  megas <- make_iter_kernel(ipm,
+                            mega_mat = !! mega_mat,
+                            name_ps = name_ps,
+                            f_forms = f_forms)
 
   out <- lapply(megas, mat_to_df_impl)
 

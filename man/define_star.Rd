@@ -32,7 +32,8 @@ safest to use \code{make_impl_args_list} to generate this.}
 that parameters are being defined for.}
 
 \item{int_rule}{The integration rule to be used for the kernel. The default is
-"midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.}
+"midpoint". "b2b" (bin to bin) and "cdf" (cumulative density functions) will
+be implemented as well.}
 
 \item{state_start}{The name of the state variable for the kernel that the
 kernel acts on at time \emph{t}.}
