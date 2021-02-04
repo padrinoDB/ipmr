@@ -2,6 +2,7 @@
 title: "Supplementary Online Materials for ipmr: Flexibly implement Integral Projection Models in R"
 output:  
   pdf_document
+  
 ---
 
 
@@ -116,7 +117,7 @@ all_pubs$Year <- as.integer(all_pubs$Year)
 
 ```
 
-```{r figure 1, echo = FALSE, fig.height = 8, fig.width = 10, message = FALSE, warning = FALSE, fig.cap = "Figure S1: The usage of integral projection models (IPMs) has increased rapidly since their introduction. Cumulative number of publications using matrix projection models (MPMs, red) and IPMs (black) (A) and number of publications per year for each type of model (B). IPMs have been adopted rapidly since their introduction in 2000. Unfortunately, software packages to assist with their implementation have not kept pace with their theoretical advancements and applications to ever more complex demographic data."}
+```{r, echo = FALSE, fig.height = 8, fig.width = 10, message = FALSE, warning = FALSE, fig.cap = "Figure S1: The usage of integral projection models (IPMs) has increased rapidly since their introduction. Cumulative number of publications using matrix projection models (MPMs, red) and IPMs (black) (A) and number of publications per year for each type of model (B). IPMs have been adopted rapidly since their introduction in 2000. Unfortunately, software packages to assist with their implementation have not kept pace with their theoretical advancements and applications to ever more complex demographic data."}
  
 library(gridExtra)
 library(grid)

@@ -1,6 +1,7 @@
 ---
 title: 'Case Study 1: Bogdan et al. 2020'
 output: pdf_document
+urlcolor: blue
 ---
 
 ## Two versions of a simple model
@@ -15,25 +16,25 @@ The IPM can be written on paper as follows:
 
 2. $K(z',z) = P(z',z) + F(z',z)$
 
-3. $P(z',z) = S(z) * G(z',z)$
+3. $P(z',z) = s(z) * G(z',z)$
 
-4. $F(z',z) = p_f(z) * f_s(z) * p_r * f_d(z')$
+4. $F(z',z) = p_f(z) * r_s(z) * p_r * r_d(z')$
 
 The components of each sub-kernel are either regression models or constants. Their functional forms are given below:
 
-5. $Logit^{-1}(S(z)) = \alpha_s + \beta_s * z$
+5. $Logit(s(z)) = \alpha_s + \beta_s * z$
 
-6. $G(z', z) \sim Norm(\mu_g, \sigma_g)$
+6. $g(z',z) = f_g(z', \mu_g(z), \sigma_g)$
 
-7. $\mu_g = \alpha_g + \beta_g * z$
+7. $\mu_g(z) = \alpha_g + \beta_g * z$
 
-8. $Logit^{-1}(p_f(z)) = \alpha_{p_f} + \beta_{p_f} * z$
+8. $Logit(p_f(z)) = \alpha_{p_f} + \beta_{p_f} * z$
 
-9. $Log(f_s(z)) = \alpha_{f_s} + \beta_{f_s} * z$
+9. $Log(r_s(z)) = \alpha_{r_s} + \beta_{r_s} * z$
 
-10. $f_d(z') \sim Norm(\mu_{f_d}, \sigma_{f_d})$
+10. $r_d(z') = f_{r_d}(z', \mu_{r_d}, \sigma_{r_d})$
 
-$\alpha s$ and $\beta s$ correspond to intercepts and slopes from regression models, respectively. The other parameters are constants derived directly from the data itself. 
+$\alpha s$ and $\beta s$ correspond to intercepts and slopes from regression models, respectively. Here, $f_g$ and $f_{r_d}$ are used to denote normal probability density functions. The other parameters are constants derived directly from the data itself. 
 
 ```{r setup}
 
@@ -119,41 +120,42 @@ n_mesh_p <- 100
 
 We now have the parameter set prepared, and have the boundaries for our domains set up. We are ready to implement the model.
 
-We start with the function `init_ipm()`. This function has two arguments: `model_class` and `has_age`. For now, we will ignore the latter argument, as it is covered in case study 2, and has its own introduction [here](https://levisc8.github.io/ipmr/articles/age_x_size.html). The `model_class` argument specifies the type of IPM we are building and has 3 parts:
+We start with the function `init_ipm()`. This function has five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and `has_age`. For now, we will ignore the last argument, as it is covered in case study 2. The first 4 arguments specify the type of IPM we are building:
 
-1. `simple`/`general`: This determines whether the model is a simple IPM or a general IPM. 
+1. `sim_gen` - `simple`/`general`: This determines whether the model is a simple IPM or a general IPM. 
 
-2. `di`/`dd`: This determines whether the model is density independent (`di`) or density dependent (`dd`). Density dependent models aren't yet implemented, but will hopefully be implemented soon.
+2. `di_dd` - `di`/`dd`: This determines whether the model is density independent (`di`) or density dependent (`dd`).
 
-3. `det`/`stoch`: This determines whether the model is deterministic (`det`) or stochastic (`stoch`). This particular model is deterministic, as there are no data on temporal or spatial changes in vital rates. An introduction to stochastic models is available [here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
+3. `det_stoch` - `det`/`stoch`: This determines whether the model is deterministic (`det`) or stochastic (`stoch`). This particular model is deterministic, as there are no data on temporal or spatial changes in vital rates. An introduction to stochastic models is available [here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html). This example does not make use of the final argument, `kern_param`, because it is not a stochastic model, so we'll ignore it for now.
 
-Once we've decided on the type of model we want, we create the model class by specifying a string with each component separated by underscores (`"_"`). This case study is a simple, density independent, deterministic IPM, so the `model_class = "simple_di_det"`.
+Once we've decided on the type of model we want, we create the model class using one of the two options for each argument. Since there is no stochasticity, we can leave the fourth argument empty (its default is `NULL`). This case study is a simple, density independent, deterministic IPM, so we use the following:
 
 ```{r}
 
-carpobrotus_ipm <- init_ipm('simple_di_det')
+carpobrotus_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det")
 
 ```
 
-After we have initialized our IPM, we need to start adding sub-kernels using the `define_kernel()` function. These correspond to equations 3 and 4 above. We'll start with the `P` kernel. It contains functions that describe survival of individual ramets, and, if they survive, their new sizes. 
+After we have initialized our IPM, we need to start adding sub-kernels using the `define_kernel()` function. These correspond to equations 3 and 4 above. We'll start with the `P` kernel. It contains functions that describe survival of individual ramets, and, if they survive, their new sizes. Note that in `ipmr`, the order in which we define kernels for an IPM makes no difference, so we could also start with the `F` if we wanted to.
 
 1. Survival is modeled with a logistic regression to predict the probability of survival to $t+1$ based on the size of the ramet at $t$ (`surv_mod`). In order to use the coefficients from that model to generate a survival probability, we need to know the inverse logit transformation, or, a function that performs it for us based on the linear predictor. 
 
 2. Size at $t+1$ is modeled with a Gaussian distribution with two parameters: the mean and standard deviation from the mean. The mean value of size at $t+1$ (`mu_g`) is itself a linear function of size at $t$ and is parameterized with coefficients from the linear model (`grow_mod`). The standard deviation is a constant derived from the residual variance from the linear model we fit.
 
-We start providing information on the `P` kernel by giving it a `name`. The name is important because we can use it to reference this kernel in higher level expressions later on. It can have any name we want, but `P` is short, sweet, and consistent with the literature in this field (e.g. Easterling, Ellner & Dixon 2000, Ellner & Rees 2006). Next, we write the `formula`. The `formula` is the form of the kernel, and should look like Equation 3, minus the $z$s and $z'$s. 
+We start providing information on the `P` kernel by giving it a `name`. The name is important because we can use it to reference this kernel in higher level expressions later on. It can have any name we want, but `P` is consistent with the literature in this field (e.g. Easterling, Ellner & Dixon 2000, Ellner & Rees 2006). Next, we write the `formula`. The `formula` is the form of the kernel, and should look like Equation 3, without the $z$ and $z'$ arguments. 
 
 ```{r, eval = FALSE}
 
 carpobrotus_ipm <-  define_kernel(
   proto_ipm = carpobrotus_ipm,
   name      = "P",
-  formula   = S * G
+  formula   = s * G,
+  ...
 )
 
 ```
 
-The `family` comes after formula. It describes the type of transition the kernel is implementing. `family` can be one of 4 options:
+The `family` comes after `formula`. It describes the type of transition the kernel is implementing. `family` can be one of 4 options:
 
 1. `"CC"`: Continuous state -> continuous state. 
 
@@ -170,24 +172,26 @@ Since this is a simple IPM with only 1 continuous state variable and 0 discrete 
 carpobrotus_ipm <-  define_kernel(
   proto_ipm = carpobrotus_ipm,
   name      = "P",
-  formula   = S * G,
-  family    = "CC"
+  formula   = s * G,
+  family    = "CC",
+  ...
 )
 
 ```
 
-We've now reached the `...` section of `define_kernel()`. The `...` part takes a set of named expressions that represent the vital rate functions we described in equations 5-7 above. The names on the left hand side of the `=` should appear either in the `formula` argument, or in other parts of the `...`. The expressions on the right hand side should generate the values that we want to plug in. For example, Equation 5 ($Logit^{-1}(S(z)) = \alpha_s + \beta_s * z$) makes use of the `plogis` function in the `stats` package to compute the survival probabilities from our linear model. The names of the coefficients match the names in the `all_params` object we generated above. Another thing to note is the use of `z_1` and `z_2`. These are place-holders for $z,z'$ in the equations above. `ipmr` will generate values for these internally using information that we provide in some of the next steps. 
+We've now reached the `...` section of `define_kernel()`. The `...` part takes a set of named expressions that represent the vital rate functions we described in equations 5-7 above. The names on the left hand side of the `=` should appear either in the `formula` argument, or in other parts of the `...`. The expressions on the right hand side should generate the values that we want to plug in. For example, Equation 5 ($Logit(s(z)) = \alpha_s + \beta_s * z$) makes use of the `plogis` function in the `stats` package to compute the survival probabilities from our linear model. The names of the coefficients match the names in the `all_params` object we generated above. Another thing to note is the use of `z_1` and `z_2`. These are place-holders for $z,z'$ in the equations above. `ipmr` will generate values for these internally using information that we provide in some of the next steps. 
 
 ```{r, eval = FALSE}
 
 carpobrotus_ipm <-  define_kernel(
   proto_ipm = carpobrotus_ipm,
   name      = "P",
-  formula   = S * G,
+  formula   = s * G,
   family    = "CC",
   G         = dnorm(z_2, mu_g, grow_sdv),
   mu_g      = grow_int + grow_slo * z_1,
-  S         = plogis(surv_int + surv_slo * z_1)
+  s         = plogis(surv_int + surv_slo * z_1),
+  ...
 )
 
 ```
@@ -200,51 +204,51 @@ After setting up our vital rate functions, the next step is to provide a couple 
 
 3. `evict_cor`: Whether or not to correct for eviction (Williams et al. 2012). 
 
-4. `evict_fun`: If we decide to correct for eviction, then a function that will correct it. In this example, we use `ipmr`'s `truncated_distributions` function. It takes two arguments: `fun`, which is the abbreviated form of the probability function family (e.g. "norm" for Gaussian, "lnorm" for log-normal, etc.), and `param`, which is the name in `...` that it modifies. 
+4. `evict_fun`: If we decide to correct for eviction, then a function that will correct it. In this example, we use `ipmr`'s `truncated_distributions` function. It takes two arguments: `fun`, which is the abbreviated form of the probability function family (e.g. "norm" for Gaussian, "lnorm" for log-normal, etc.), and `target`, which is the name in `...` that it modifies. 
 
 ```{r}
 
 carpobrotus_ipm <-  define_kernel(
   proto_ipm = carpobrotus_ipm,
   name      = "P",
-  formula   = S * G,
+  formula   = s * G,
   family    = "CC",
   G         = dnorm(z_2, mu_g, grow_sdv),
   mu_g      = grow_int + grow_slo * z_1,
-  S         = plogis(surv_int + surv_slo * z_1),
+  s         = plogis(surv_int + surv_slo * z_1),
   data_list = all_params,
   states    = list(c("z")),
   evict_cor = TRUE,
-  evict_fun = truncated_distributions(fun   = "norm", 
-                                      param = "G")
+  evict_fun = truncated_distributions(fun    = "norm", 
+                                      target = "G")
 )
 
 ```
 
-We've now defined our first sub-kernel! The next step is to repeat this process for the `F` kernel, which is Equations 4 and 8-10.
+We've now defined our first sub-kernel. The next step is to repeat this process for the `F` kernel, which is Equations 4 and 8-10.
 
 ```{r}
 
 carpobrotus_ipm <-  define_kernel(
   proto_ipm = carpobrotus_ipm,
   name      = "F",
-  formula   = recr_pr * f_s * f_d * p_f,
+  formula   = recr_pr * r_s * r_d * p_f,
   family    = "CC",
-  f_s       = exp(flow_int + flow_slo * z_1),
-  f_d       = dnorm(z_2, recr_mu, recr_sd),
+  r_s       = exp(flow_int + flow_slo * z_1),
+  r_d       = dnorm(z_2, recr_mu, recr_sd),
   p_f       = plogis(repr_int + repr_slo * z_1),
   data_list = all_params,
   states    = list(c("z")),
   evict_cor = TRUE,
-  evict_fun = truncated_distributions(fun   = "norm", 
-                                      param = "f_d")
+  evict_fun = truncated_distributions(fun    = "norm", 
+                                      target =  "r_d")
 ) 
 
 ```
 
 We've defined our sub-kernels. The next step is tell `ipmr` how to implement it numerically, and provide the information needed to generate the correct iteration kernel. To do this, we use `define_impl()`, `define_domains()`, and `define_pop_state()`. 
 
-The first function tells `ipmr` which integration rule to use, which state variable each kernel acts on (`state_start`), and which state variable each kernel produces (`state_end`). The format of the list it takes in the `kernel_impl_list` argument can be tricky to implement right, so the helper function `make_impl_args_list()` makes sure everything is formatted properly. The `kernel_names` argument can be in any order. The `int_rule`, `state_start`, and `state_end` arguments are then matched to kernels in the `proto_ipm` based on the order in the `kernel_names`. Note that, at the moment, the only integration rule that's implemented is `"midpoint"`. `"trapezoid"` and `"gauss_legendre"` are in the works, and others can be implemented by popular demand. 
+The first function tells `ipmr` which integration rule to use, which state variable each kernel acts on (`state_start`), and which state variable each kernel produces (`state_end`). The format of the list it takes in the `kernel_impl_list` argument can be tricky to implement right, so the helper function `make_impl_args_list()` makes sure everything is formatted properly. The `kernel_names` argument can be in any order. The `int_rule`, `state_start`, and `state_end` arguments are then matched to kernels in the `proto_ipm` based on the order in the `kernel_names`. Note that, at the moment, the only integration rule that's implemented is `"midpoint"`. `"b2b"` (bin to bin) and `"cdf"` (cumulative density functions) are in the works, and others can be implemented by popular demand. 
 
 ```{r}
 
@@ -281,7 +285,7 @@ carpobrotus_ipm <-  define_pop_state(
 
 ```
 
-Up until this point, all we've done is add components to the `proto_ipm`. We now have enough information in it to build a model, iterate it, and compute some basic quantities. We'll set `return_main_env = TRUE` because we need the meshpoints and bin width for the analyses we'll do in the [Further Analyses](#further-analysis) section.
+Up until this point, all we've done is add components to the `proto_ipm`. We now have enough information in `proto_ipm` object to build a model, iterate it, and compute some basic quantities. `make_ipm()` is the next function we need. It generates the vital rate functions from the parameters and integration details we provided, and then builds the sub-kernels. At this point, it checks to make sure that everything makes numerical sense (e.g. there are no negative values or `NA`s generated). If we set `iterate = TRUE`, `make_ipm()` also generates expressions for iterating the model internally, and then evaluates those for the number of iterations supplied by `iterations`. There are a number of other arguments to `make_ipm()` that can prove helpful for subsequent analyses. `return_main_env` is one of these. The `main_env` object contains, among other things, the integration mesh and bin width information specified in `define_domains()`. We'll need the meshpoints and bin width for the analyses we'll do in the [Further Analyses](#further-analysis) section, so we'll set `return_main_env = TRUE`.
 
 ```{r}
 
@@ -298,7 +302,60 @@ asymp_grow_rate
 
 ```
 
-We see that the population is projected to shrink slightly. Next, we'll go through an alternative implementation of the model using `predict(surv_mod)` instead of the mathematical form of the linear predictors. After that, we'll explore a couple additional analyses to see what is going on with this population of iceplants. 
+We see that the population is projected to shrink slightly. `ipmr` computes all values by iteration. Our measure of the asymptotic growth rate is the ratio $\frac{N_{t+1}}{N_t}$ for the final iteration of the model. If we are concerned about whether or not we've iterated our model enough to trust this value, we have two options: check for convergence using the helper `is_conv_to_asymptotic()`, or create the full iteration kernel, compute the dominant eigenvalue of that, and compare our estimate with the value obtained by iteration. 
+
+```{r}
+
+# Option 1: is_conv_to_asymptotic
+
+is_conv_to_asymptotic(carpobrotus_ipm)
+
+# Option 2: generate iteration kernel and compute eigenvalues
+
+K <- make_iter_kernel(carpobrotus_ipm)
+
+lam_eigen <- Re(eigen(K$mega_matrix)$values[1])
+
+# If we've iterated our model enough, this should be approximately 0 (though 
+# maybe a little off due to floating point errors).
+
+asymp_grow_rate - lam_eigen
+
+```
+
+We can also inspect our sub-kernels, the time series of the population trait distribution, and make alterations to our model using some helpers from `ipmr`.
+
+```{r}
+
+# Sub-kernels have their own print method to display the range of values 
+# and some diagnotic information.
+
+carpobrotus_ipm$sub_kernels
+
+# Extract the time series of the population state (n_z), 
+# and the n_t+1/n_t values (lambda)
+
+pop_time_series    <- carpobrotus_ipm$pop_state$n_z
+lambda_time_series <- carpobrotus_ipm$pop_state$lambda
+
+# Next, we'll tweak the intercept of the p_f function and re-fit the model.
+
+new_proto_ipm      <- carpobrotus_ipm$proto_ipm
+
+# The parameters setter function takes a list. It can replace single values,
+# create new values, or replace the entire parameter list, depending on how you
+# set up the right hand side of the expression. 
+
+parameters(new_proto_ipm) <- list(repr_int = -0.3)
+
+new_carp_ipm <- make_ipm(new_proto_ipm, 
+                         iterations = 100)
+
+lambda(new_carp_ipm)
+
+```
+
+Next, we'll go through an alternative implementation of the model using `predict(surv_mod)` instead of the mathematical form of the linear predictors. After that, we'll explore a couple additional analyses to see what is going on with this population of iceplants. 
 
 ## Using predict methods instead
 
@@ -321,16 +378,18 @@ pred_par_list <- list(
   recr_pr  = recr_pr
 )
 
-predict_method_carpobrotus <- init_ipm('simple_di_det') %>%
+predict_method_carpobrotus <- init_ipm(sim_gen = "simple", 
+                                       di_dd = "di",
+                                       det_stoch = "det") %>%
   define_kernel(
     name      = "P",
-    formula   = S * G,
+    formula   = s * G,
     family    = "CC",
     G         = dnorm(z_2, mu_g, grow_sdv),
     mu_g      = predict(grow_mod, 
                         newdata = data.frame(log_size = z_1),
                         type = 'response'),
-    S         = predict(surv_mod, 
+    s         = predict(surv_mod, 
                         newdata = data.frame(log_size = z_1),
                         type = "response"),
     data_list = pred_par_list,
@@ -340,19 +399,19 @@ predict_method_carpobrotus <- init_ipm('simple_di_det') %>%
   ) %>%
   define_kernel(
     name      = "F",
-    formula   = recr_pr * f_s * f_d * p_f,
+    formula   = recr_pr * r_s * r_d * p_f,
     family    = "CC",
-    f_s       = predict(flow_mod, 
+    r_s       = predict(flow_mod, 
                         newdata = data.frame(log_size = z_1),
                         type = "response"),
-    f_d       = dnorm(z_2, recr_mu, recr_sd),
+    r_d       = dnorm(z_2, recr_mu, recr_sd),
     p_f       = predict(repr_mod,
                         newdata = data.frame(log_size = z_1),
                         type = "response"),
     data_list = pred_par_list,
     states    = list(c("z")),
     evict_cor = TRUE,
-    evict_fun = truncated_distributions("norm", "f_d")
+    evict_fun = truncated_distributions("norm", "r_d")
   ) %>%
   define_impl(
     make_impl_args_list(
@@ -378,7 +437,11 @@ predict_method_carpobrotus <- init_ipm('simple_di_det') %>%
 
 Many research questions require a bit more than just computing asymptotic growth rate ($\lambda$). Below, we will compute the kernel sensitivity, elasticity, $R_0$, and generation time. First, we will define a couple helper functions. These are not included in `ipmr`, but will eventually be implemented in a separate package that can handle the various classes that `ipmr` works with.
 
-The first is sensitivity of $\lambda$ to perturbations in the projection kernel. Here, we can use the `right_ev` and `left_ev` functions in `ipmr` to get the right and left eigenvectors, and then compute the sensitivity surface. Note that we have a second argument here named `d_z`. This is the width of the integration bins. We'll see how to get that from our IPM below.
+The first is sensitivity of $\lambda$ to perturbations in the projection kernel. Here, we can use the `right_ev` and `left_ev` functions in `ipmr` to get the right and left eigenvectors, and then compute the sensitivity surface. 
+
+**Technical note:** `right_ev` and `left_ev` both compute eigenvectors via iteration. `left_ev` generates a transpose iteration using the `state_start` and `state_end` information contained in the `proto_ipm` object (defined in `define_impl`, for a full overview of transpose iteration, see Ellner & Rees, 2006, Appendix A). Because the form of for left iteration is different from the default of right iteration, `left_ev()` will always have to iterate a model. On the other hand, `right_ev` will always check to see if the model is already iterated. If so, and the population's trait distribution has converged to its asymptotic state, then it will just pull out the final distribution from the `ipm` object, scale it to sum to 1, and then return that without re-iterating anything. If not, it will use the final trait distribution from the `ipm` object as the starting point and iterate the model for 100 iterations (this can be adjusted as needed using the `iterations` argument to `right_ev`). If this fails to converge, it will return `NA` with a warning.
+
+It is also important to note that we have a second argument here named `d_z`. This is the width of the integration bins. We'll see how to get that from our IPM below.
 
 ```{r}
 
@@ -396,12 +459,12 @@ sens <- function(ipm_obj, d_z) {
 
 ```
 
-Next, we can define a function to compute the elasticity $\lambda$ to kernel perturbations. This uses the `sens` function from above, and the `lambda()` function from `ipmr`. 
+Next, we can define a function to compute the elasticity of $\lambda$ to kernel perturbations. This uses the `sens` function from above, and the `lambda()` function from `ipmr`. 
 
 ```{r}
 elas <- function(ipm_obj, d_z) {
   
-  K           <- do.call(`+`, ipm_obj$sub_kernels)
+  K           <- make_iter_kernel(ipm_obj)$mega_matrix
   
   sensitivity <- sens(ipm_obj, d_z)
   
@@ -437,7 +500,7 @@ R_nought <- function(ipm_obj) {
 }
 ```
 
-Finally, generation time is a useful metric in many analyses. Below, we make use of our `R_nought` function with to compute one version of this quantity (though other definitions exist. Covering those is beyond the scope of this case study). 
+Finally, generation time is a useful metric in many analyses. Below, we make use of our `R_nought` function to compute one version of this quantity (though other definitions exist. Covering those is beyond the scope of this case study). 
 
 ```{r}
 gen_time <- function(ipm_obj) {
@@ -452,7 +515,7 @@ gen_time <- function(ipm_obj) {
 
 ```
 
-We need to extract the `d_z` value and meshpoints from the IPM we built. We can extract this information in a list form using the `int_mesh()` function from `ipmr` on our IPM object. The `d_z` in this case will be called `d_z` because we named our domain `"z"` when we implemented the model. However, it will have a different name if the `states` argument in `define_kernel` has different different values. Once we have that, we can begin computing the life history traits of interest.
+We need to extract the `d_z` value and meshpoints from the IPM we built. We can extract this information in a list form using the `int_mesh()` function from `ipmr` on our IPM object. The `d_z` in this case will be called `d_z` because we named our domain `"z"` when we implemented the model. However, it will have a different name if the `states` argument in `define_kernel` has different different values. Once we have that, we can begin computing all the values of interest.
 
 ```{r}
 
@@ -470,7 +533,7 @@ gen_T
 ```
 
 
-We may want to visualize the results of our sensitivity and elasticity analyses. We'll go through two options: one using the `graphics` package and one using the `ggplot2` package. The `ggplot2` method will require us to define a function that transforms our matrix into a `data.frame` with 3 columns. The first two columns contain matrix indices, and the third column contains the actual values. 
+We may want to visualize the results of our sensitivity and elasticity analyses. We'll go through two options: one using the `graphics` package and one using the `ggplot2` package.  
 
 First, the `graphics` package.
 
@@ -483,7 +546,7 @@ x <- y <- seq_len(ncol(sens_mat))
 image(x = x,
       y = y,
       z = t(sens_mat), 
-      main = "Sensitivity", xlab = "T", ylab = "T + 1")
+      main = "Sensitivity", xlab = "t", ylab = "t + 1")
 
 contour(x = x,
         y = y, 
@@ -495,7 +558,7 @@ contour(x = x,
 image(x = x,
       y = y,
       z = t(elas_mat),
-      main = "Elasticity", xlab = "T", ylab = "T + 1",
+      main = "Elasticity", xlab = "t", ylab = "t + 1",
       add = FALSE)
 contour(x = x,
         y = y, 
@@ -508,18 +571,15 @@ contour(x = x,
 
 ```
 
-Now, for the `ggplot2` version. First, we create a long format of the matrix using `ipmr`'s `ipm_to_df` function. Then, get the meshpoints for the model out of the `main_env`. Once we have those, we can use `geom_tile` and `geom_contour` to generate the `ggplot`s, and `grid.arrange` from the `gridExtra` package to put them side by side.
+Now, for the `ggplot2` version. First, we create a long format of the matrix using `ipmr`'s `ipm_to_df` function. `ipm_to_df` can handle either bare matrices, or objects produced by `make_ipm`. The latter case is useful for plotting kernels directly using `ggplot2`. Once we've generated the long format sensitivity and elasticity matrices, we can use `geom_tile` and `geom_contour` to generate the `ggplot`s, and `grid.arrange` from the `gridExtra` package to put them side by side.
 
-```{r, fig.width = 12, fig.height = 5}
+```{r, fig.width = 12, fig.height = 5, warning = FALSE}
 
 library(ggplot2)
 library(gridExtra)
 
-mesh_p <- data.frame(x = mesh_info$z_1,
-                     y = mesh_info$z_2)
-
-sens_df <- cbind(mesh_p, value = ipm_to_df(sens_mat)$value)
-elas_df <- cbind(mesh_p, value = ipm_to_df(elas_mat)$value)
+sens_df <- ipm_to_df(sens_mat)
+elas_df <- ipm_to_df(elas_mat)
 
 # Create a default theme for our plots
 
@@ -549,38 +609,39 @@ def_theme <- theme(
 )
 
 sens_plt <- ggplot(sens_df) +
-  geom_tile(aes(x    = x,
-                y    = y,
+  geom_tile(aes(x    = t,
+                y    = t_1,
                 fill = value)) +
-  geom_contour(aes(x = x,
-                   y = y,
+  geom_contour(aes(x = t,
+                   y = t_1,
                    z = value),
                color = "black",
                size = 0.7) +
   scale_fill_gradient("Value",
                       low = "red",
                       high = "yellow") +
-  scale_x_continuous(name = "T") +
-  scale_y_continuous(name = "T + 1") +
+  scale_x_continuous(name = "t") +
+  scale_y_continuous(name = "t + 1") +
   def_theme +
-  theme(legend.position = "none") +
+  theme(legend.title = element_blank()) +
   ggtitle("Sensitivity")
 
 elas_plt <- ggplot(elas_df) +
-  geom_tile(aes(x    = x,
-                y    = y,
+  geom_tile(aes(x    = t,
+                y    = t_1,
                 fill = value)) +
-  geom_contour(aes(x = x,
-                   y = y,
+  geom_contour(aes(x = t,
+                   y = t_1,
                    z = value),
                color = "black",
                size = 0.7) +
   scale_fill_gradient("Value",
                       low = "red",
                       high = "yellow") +
-  scale_x_continuous(name = "T") +
-  scale_y_continuous(name = "T + 1") +
+  scale_x_continuous(name = "t") +
+  scale_y_continuous(name = "t + 1") +
   def_theme +
+  theme(legend.title = element_blank()) +
   ggtitle("Elasticity")
 
 grid.arrange(sens_plt, elas_plt,
