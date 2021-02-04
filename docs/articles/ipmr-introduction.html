@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -89,7 +89,14 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/levisc8/ipmr/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -105,7 +112,7 @@
       <h1 data-toc-skip>Introduction to ipmr</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/levisc8/ipmr/blob/master/vignettes/ipmr-introduction.Rmd"><code>vignettes/ipmr-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>ipmr-introduction.Rmd</code></div>
 
     </div>
@@ -116,31 +123,31 @@
 <h2 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h2>
 <p><code>ipmr</code> is a package for implementing integral projection models of varying degrees of complexity. It uses mathematical-ish expressions to build up the iteration kernels from smaller pieces, as well as helpers to ensure that models are implemented correctly. Finally, it provides machinery for stochastic simulations. basic analyses, and model diagnostics. More complicated analysis functions are being implemented in the <a href="https://github.com/levisc8/irage">irage package</a>.</p>
-<p><strong>This package does not help with fitting regression models to demographic data!</strong> This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a much better job of helping you with that than I can. Some of my favorites are <code>lme4</code>, <code>brms</code>, <code>mgcv</code>, and <code>nlme</code>. <code>IPMpack</code> handles the regression modeling and IPM construction, though be forewarned, there are certain types of models that you simply cannot construct with it! <code>IPMpack</code> is no longer on CRAN, but can be installed from the <code>MetaCRAN/IPMpack</code> <a href="https://github.com/cran/IPMpack">Github page</a> or running <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github("CRAN/IPMpack")</a></code>.</p>
+<p><strong>This package does not help with fitting regression models to demographic data!</strong> This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a much better job of helping you with that than I can. Some of my favorites are <code>lme4</code>, <code>brms</code>, <code>mgcv</code>, and <code>nlme</code>. <code>IPMpack</code> handles the regression modeling and IPM construction for some, but not all, types of IPMs. <code>IPMpack</code> is no longer on CRAN, but can be installed from the <code>MetaCRAN/IPMpack</code> <a href="https://github.com/cran/IPMpack">Github page</a> or running <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github("CRAN/IPMpack")</a></code>.</p>
 <p>Unfortunately, <code>ipmr</code> does not yet have built-in functions for dealing with uncertainty. The goal is to change that soon, but for now, doing this will require <code>for</code> loops and storing the results of each iteration. Some example code is provided at the end of this vignette.</p>
 </div>
 <div id="terminology-and-ipm-construction" class="section level1">
 <h1 class="hasAnchor">
 <a href="#terminology-and-ipm-construction" class="anchor"></a>Terminology and IPM construction</h1>
 <p>NB: If you are already familiar with how to build IPMs, you can probably skip this part and get straight into the <a href="#model-types">next section</a>.</p>
-<p>An IPM describes how the distribution of trait values (also called <em>state variables</em>/<em>states</em>, and denoted <span class="math inline">\(z\)</span> and <span class="math inline">\(z'\)</span>) for a population changes in discrete time. The distribution of trait values in a population at time <span class="math inline">\(t\)</span> is given by the function <span class="math inline">\(n(z,t)\)</span>, which describes the relative frequency of individuals with trait value <span class="math inline">\(z\)</span> at time <span class="math inline">\(t\)</span>. The IPM for the trait distribution <span class="math inline">\(z'\)</span> at time <span class="math inline">\(t+1\)</span> is then:</p>
+<p>An IPM describes how the abundance and distribution of trait values (also called <em>state variables</em>/<em>states</em>, and denoted <span class="math inline">\(z\)</span> and <span class="math inline">\(z'\)</span>) for a population changes in discrete time. The distribution of trait values in a population at time <span class="math inline">\(t\)</span> is given by the function <span class="math inline">\(n(z,t)\)</span>. A simple IPM for the trait distribution <span class="math inline">\(z'\)</span> at time <span class="math inline">\(t+1\)</span> is then:</p>
 <ol style="list-style-type: decimal">
 <li><span class="math inline">\(n(z', t+1) = \int_L^UK(z',z)n(z,t)\mathrm{dz}\)</span></li>
 </ol>
-<p><span class="math inline">\(K(z',z)\)</span>, known as the <em>projection kernel</em>, describes all possible transitions of existing individuals and recruitment of new individuals from <span class="math inline">\(t\)</span> to <span class="math inline">\(t+1\)</span>, generating a new trait distribution <span class="math inline">\(n(z',t+1)\)</span>. <span class="math inline">\(L,U\)</span> are the lower and upper bounds for values that the trait <span class="math inline">\(z\)</span> can have, and the range between them is called the integration <em>domain</em>. The integral <span class="math inline">\(\int_L^Un(z,t)\mathrm{dz}\)</span> is the total population size at time <span class="math inline">\(t\)</span>.</p>
+<p><span class="math inline">\(K(z',z)\)</span>, known as the <em>projection kernel</em>, describes all possible transitions of existing individuals and recruitment of new individuals from <span class="math inline">\(t\)</span> to <span class="math inline">\(t+1\)</span>, generating a new trait distribution <span class="math inline">\(n(z',t+1)\)</span>. <span class="math inline">\(L,U\)</span> are the lower and upper bounds for values that the trait <span class="math inline">\(z\)</span> can have, which defines the <em>domain</em> over which the integration is performed. The integral <span class="math inline">\(\int_L^Un(z,t)\mathrm{dz}\)</span> gives the total population size at time <span class="math inline">\(t\)</span>.</p>
 <p>To make the model more biologically interpretable, the projection kernel <span class="math inline">\(K(z',z)\)</span> is usually decomposed into <em>sub-kernels</em> (Eq 2). For example, a projection kernel to describe a lifecycle where individuals can survive, transition to different state values, and reproduce via sexual and asexual pathways, can be decomposed as follows:</p>
 <ol start="2" style="list-style-type: decimal">
 <li><span class="math inline">\(K(z',z) = P(z',z) + F(z',z) + C(z',z)\)</span></li>
 </ol>
-<p><span class="math inline">\(P(z',z)\)</span> is a sub-kernel describing transitions due to survival and state values changes of existing individuals, <span class="math inline">\(F(z',z)\)</span> is a sub-kernel describing per-capita sexual contributions of existing individuals to recruitment, and <span class="math inline">\(C(z',z)\)</span> is a sub-kernel describing per-capita asexual contributions of existing individuals to recruitment. The sub-kernels are typically comprised of functions parameterized by regression models that relate an individuals trait value <span class="math inline">\(z\)</span> at time <span class="math inline">\(t\)</span> to a new trait value at <span class="math inline">\(t+1\)</span>. For example, the <span class="math inline">\(P\)</span> kernel for Soay sheep (<em>Ovis aries</em>) on St. Kilda (Eq 3) may contain two regression models: (i) a logistic regression of survival on log body mass (Eq 4), and (ii) a regression of log body mass at <span class="math inline">\(t+1\)</span> on log body mass at <span class="math inline">\(t\)</span> (Eq 5-6). In this example, <span class="math inline">\(\sigma_g\)</span> is the standard deviation of the residuals from the growth regression model.</p>
+<p><span class="math inline">\(P(z',z)\)</span> is a sub-kernel describing transitions due to survival and trait changes of existing individuals, <span class="math inline">\(F(z',z)\)</span> is a sub-kernel describing per-capita sexual contributions of existing individuals to recruitment, and <span class="math inline">\(C(z',z)\)</span> is a sub-kernel describing per-capita asexual contributions of existing individuals to recruitment. The sub-kernels are typically comprised of functions derived from regression models that relate an individuals trait value <span class="math inline">\(z\)</span> at time <span class="math inline">\(t\)</span> to a new trait value at <span class="math inline">\(t+1\)</span>. For example, the <span class="math inline">\(P\)</span> kernel for Soay sheep (<em>Ovis aries</em>) on St. Kilda (Eq 3) may contain two regression models: (i) a logistic regression of survival on log body mass (Eq 4), and (ii) a linear regression of log body mass at <span class="math inline">\(t+1\)</span> on log body mass at <span class="math inline">\(t\)</span> (Eq 5-6). Here, <span class="math inline">\(f_g\)</span> is used to denote a normal probability density function, and <span class="math inline">\(\sigma_g\)</span> is computed as the standard deviation of the residuals of the linear regression.</p>
 <ol start="3" style="list-style-type: decimal">
 <li><p><span class="math inline">\(P(z',z) = s(z) * g(z',z)\)</span></p></li>
 <li><p><span class="math inline">\(Logit(s(z)) = \alpha_s + \beta_s * z\)</span></p></li>
-<li><p><span class="math inline">\(g(z',z) \sim Norm(\mu_g, \sigma_g)\)</span></p></li>
+<li><p><span class="math inline">\(g(z',z) = f_g(\mu_g, \sigma_g)\)</span></p></li>
 <li><p><span class="math inline">\(\mu_g = \alpha_g + \beta_g * z\)</span></p></li>
 </ol>
 <p>Here, we refer to these different scales (parameters (<em>e.g.</em> <span class="math inline">\(\alpha_g,\beta_g\)</span> in Eq 6), regressions (<em>e.g.</em> Eq 4), sub-kernels (<em>e.g.</em> Eq 3), and projection kernels (<em>e.g.</em> Eq 2)) as levels of the <em>model hierarchy</em>. <code>ipmr</code> is intended to help with the last two levels of the model hierarchy.</p>
-<p>Projecting the population state <span class="math inline">\(n(z',t+1)\)</span> requires a solution to the integral in Eq 1. Analytical solutions to the integral in Eq 1 are usually too complicated (or not possible; Ellner &amp; Rees 2006). Numerical approximations of these integrals are usually straightforward using a numerical integration rule. A commonly used rule is the midpoint rule (this is currently the only integration rule available in <code>ipmr</code>, though others should be implemented soon(ish)). The midpoint rule divides the domain <span class="math inline">\([L,U]\)</span> into <span class="math inline">\(m\)</span> artificial size bins <span class="math inline">\(z_i\)</span> with width <span class="math inline">\(h = (U-L) / m\)</span>. The midpoints <span class="math inline">\(z_i = L + (i - 0.5) * h\)</span> for <span class="math inline">\(i = \textrm{1, 2, ...}, m\)</span>. The midpoint rule approximation for Eq 1 then becomes:</p>
+<p>Projecting the population state <span class="math inline">\(n(z',t+1)\)</span> requires a solution to the integral in Eq 1. Analytical solutions to the integral in Eq 1 are usually not possible (Ellner &amp; Rees 2006). However, numerical approximations of these integrals can be constructed using a numerical integration rule. A commonly used rule is the midpoint rule (this is currently the only integration rule available in <code>ipmr</code>, though others should be implemented soon(ish)). The midpoint rule divides the domain <span class="math inline">\([L,U]\)</span> into <span class="math inline">\(m\)</span> artificial size bins centered at <span class="math inline">\(z_i\)</span> with width <span class="math inline">\(h = (U-L) / m\)</span>. The midpoints <span class="math inline">\(z_i = L + (i - 0.5) * h\)</span> for <span class="math inline">\(i = \textrm{1, 2, ...}, m\)</span>. The midpoint rule approximation for Eq 1 then becomes:</p>
 <ol start="7" style="list-style-type: decimal">
 <li><span class="math inline">\(n(z_j, t+1) = h\sum\limits_{i = 1}^mK(z_j, z_i)n(z_i,t)\)</span></li>
 </ol>
@@ -151,7 +158,7 @@
 <a href="#model-types" class="anchor"></a>Types of models in <code>ipmr</code>
 </h2>
 <p>The first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="../reference/init_ipm.html">init_ipm()</a></code>. This function has five arguments: <code>sim_gen</code>, <code>di_dd</code>, <code>det_stoch</code>, <code>kern_param</code>, and <code>has_age</code>. We will ignore <code>has_age</code> for now, because age-size models are less common and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own vignette</a>.</p>
-<p>The combination of these arguments defines the type of projection model, and makes sure that the machinery for subsequent analyses works correctly. The possible entries for each argument are as follows:</p>
+<p>The combination of these arguments defines the type of IPM, and makes sure that the machinery for subsequent analyses works correctly. The possible entries for each argument are as follows:</p>
 <ul>
 <li>
 <p><code>sim_gen</code>: <code>"simple"</code>/<code>"general"</code></p>
@@ -183,8 +190,8 @@
 <li>
 <p><code>kern_param</code>: <code>"kern"</code>/<code>"param"</code> (Complete definitions found in <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405">Metcalf et al. 2015</a>)</p>
 <ul>
-<li><p>A. <strong>kern</strong>: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and for which defining a multivariate joint distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the <code>param</code> alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration.</p></li>
-<li><p>B. <strong>param</strong>: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model (usually a multivariate joint distribution). This can be a multivariate normal defined by covarying slopes and intercepts, or posterior distribution from a Bayesian model. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the <code>"simple_di_stoch_param"</code> example for some inspiration in writing those.</p></li>
+<li><p>A. <strong>kern</strong>: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and we do not wish to sample from parameter distributions. These models can be a bit more computationally efficient than the <code>param</code> alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration.</p></li>
+<li><p>B. <strong>param</strong>: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. This could be a multivariate normal defined by covarying slopes and intercepts, or distributions of environmental variables that change from time to time. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the <code>"simple_di_stoch_param"</code> example for some inspiration in writing those.</p></li>
 </ul>
 </li>
 </ul>
@@ -194,20 +201,20 @@
 <h2 class="hasAnchor">
 <a href="#specifying-a-simple-deterministic-ipm-without-density-dependence" class="anchor"></a>Specifying a simple deterministic IPM without density dependence</h2>
 <p>This is the simplest model that <code>ipmr</code> works with. It is an IPM with a single continuous state variable and no density dependent functions. We’ll walk through the steps required to implement such an IPM before getting into more complex models.</p>
-<p>The model that we are going to implement here is similar to the one above, except there is not asexual reproduction (i.e. no <span class="math inline">\(C(z', z)\)</span>). It looks like this on paper:</p>
+<p>The model that we are going to implement here is similar to the one above, except there is not asexual reproduction (i.e. no <span class="math inline">\(C(z', z)\)</span>). It can be written like this:</p>
 <ol style="list-style-type: decimal">
 <li><p><span class="math inline">\(n(z',t+1) = \int_L^U K(z',z)n(z,t)dz\)</span></p></li>
 <li><p><span class="math inline">\(K(z',z) = P(z',z) + F(z',z)\)</span></p></li>
 <li><p><span class="math inline">\(P(z',z) = s(z) * g(z',z)\)</span></p></li>
 <li><p><span class="math inline">\(Logit(s(z)) = \alpha_s + \beta_s * z\)</span></p></li>
-<li><p><span class="math inline">\(g(z',z) \sim Norm(\mu_g, \sigma_g)\)</span></p></li>
+<li><p><span class="math inline">\(g(z',z) = f_g(\mu_g, \sigma_g)\)</span></p></li>
 <li><p><span class="math inline">\(\mu_g = \alpha_g + \beta_g * z\)</span></p></li>
-<li><p><span class="math inline">\(F(z',z) = f_r(z) * f_s(z) * f_d(z')\)</span></p></li>
-<li><p><span class="math inline">\(Logit(f_r(z)) = \alpha_{f_r} + \beta_{f_r} * z\)</span></p></li>
-<li><p><span class="math inline">\(Log(f_s(z)) = \alpha_{f_s} + \beta_{f_s} * z\)</span></p></li>
-<li><p><span class="math inline">\(f_d(z') \sim Norm(\mu_{f_d}, \sigma_{f_d})\)</span></p></li>
+<li><p><span class="math inline">\(F(z',z) = r_r(z) * r_s(z) * r_d(z')\)</span></p></li>
+<li><p><span class="math inline">\(Logit(r_r(z)) = \alpha_{r_r} + \beta_{r_r} * z\)</span></p></li>
+<li><p><span class="math inline">\(Log(r_s(z)) = \alpha_{r_s} + \beta_{r_s} * z\)</span></p></li>
+<li><p><span class="math inline">\(r_d(z') = f_{r_d}(\mu_{r_d}, \sigma_{r_d})\)</span></p></li>
 </ol>
-<p>The vital rate functions and code that might be used to generate models corresponding to them are below.</p>
+<p><span class="math inline">\(f_{r_d}\)</span> and <span class="math inline">\(f_g\)</span> denote normal probability density functions. The vital rate functions and code that might be used to generate models corresponding to them are below.</p>
 <ol style="list-style-type: decimal">
 <li>
 <p>Survival (<span class="math inline">\(s(z)\)</span>/<code>s</code>): a generalized linear model w/ a logit link.</p>
@@ -217,28 +224,28 @@
 </ul>
 </li>
 <li>
-<p>Growth (<span class="math inline">\(g(z',z)\)</span>/<code>g</code>): a linear model with a Normal error distribution.</p>
+<p>Growth (<span class="math inline">\(g(z',z)\)</span>/<code>g</code>): a linear model with a normal error distribution.</p>
 <ul>
 <li>Example model formula: <code><a href="https://rdrr.io/r/stats/lm.html">lm(size_2 ~ size_1, data = my_grow_data)</a></code>
 </li>
 </ul>
 </li>
 <li>
-<p>Pr(flowering) (<span class="math inline">\(f_r(z)\)</span>/<code>f_r</code>): a generalized linear model w/ a logit link.</p>
+<p>Pr(flowering) (<span class="math inline">\(r_r(z)\)</span>/<code>r_r</code>): a generalized linear model w/ a logit link.</p>
 <ul>
 <li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(flower ~ size_1, data = my_repro_data, family = binomial())</a></code>
 </li>
 </ul>
 </li>
 <li>
-<p>Seed production (<span class="math inline">\(f_s(z)\)</span>/<code>f_s</code>): a generalized linear model w/ log link.</p>
+<p>Seed production (<span class="math inline">\(r_s(z)\)</span>/<code>r_s</code>): a generalized linear model w/ log link.</p>
 <ul>
 <li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(seeds ~ size_1, data = my_flower_data, family = poisson())</a></code>
 </li>
 </ul>
 </li>
 <li>
-<p>Recruit size distribution (<span class="math inline">\(f_d(z')\)</span>/<code>f_d</code>): a normal distribution w parameters <code>mu_fd</code> (mean) and <code>sd_fd</code> (standard deviation).</p>
+<p>Recruit size distribution (<span class="math inline">\(r_d(z')\)</span>/<code>r_d</code>): a normal distribution w parameters <code>mu_rd</code> (mean) and <code>sd_rd</code> (standard deviation).</p>
 <ul>
 <li>Example code: <code>mu_fd = mean(my_recr_data$size_2, na.rm = TRUE)</code> and <code>sd_fd = sd(my_recr_data$size_2, na.rm = TRUE)</code>
 </li>
@@ -332,7 +339,7 @@
     has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span>fun   <span class="op">=</span> <span class="st">"norm"</span>, 
-                                            param <span class="op">=</span> <span class="st">"g"</span><span class="op">)</span>
+                                            target <span class="op">=</span>  <span class="st">"g"</span><span class="op">)</span>
   <span class="op">)</span></code></pre></div>
 <p>We’ll now continue with specifying Eqs 7-10, which comprise the sexual reproduction portion of the IPM.</p>
 <p>The rest of the model definition sequence in this example will use the <code><a href="../reference/%&gt;%.html">%&gt;%</a></code> operator. <em>It is not a requirement</em> - you can assign a value to <code>my_ipm</code> at each step and the model will be identical. Choose which ever process is more comfortable for you!</p>
@@ -340,30 +347,30 @@
 <code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="va">my_ipm</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name      <span class="op">=</span> <span class="st">"F"</span>,
-    formula   <span class="op">=</span> <span class="va">f_r</span> <span class="op">*</span> <span class="va">f_s</span> <span class="op">*</span> <span class="va">f_d</span>, <span class="co"># Eq 7</span>
+    formula   <span class="op">=</span> <span class="va">r_r</span> <span class="op">*</span> <span class="va">r_s</span> <span class="op">*</span> <span class="va">r_d</span>, <span class="co"># Eq 7</span>
     family    <span class="op">=</span> <span class="st">"CC"</span>,
     
     <span class="co"># Eq 8. Again, we use the inverse logit transformation to compute pr(flowering)</span>
-    f_r       <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">f_r_int</span> <span class="op">+</span> <span class="va">f_r_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
+    r_r       <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">r_r_int</span> <span class="op">+</span> <span class="va">r_r_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
     
     <span class="co"># Eq 9. We exponentiate this because of the log link in our seed production model</span>
-    f_s       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">f_s_int</span> <span class="op">+</span> <span class="va">f_s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>,
+    r_s       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">r_s_int</span> <span class="op">+</span> <span class="va">r_s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>,
     
     <span class="co"># Eq 10. In this case, both the mean and standard deviation are constants</span>
-    
-    f_d       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">f_d_mu</span>, <span class="va">f_d_sd</span><span class="op">)</span>,
+  
+    r_d       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">r_d_mu</span>, <span class="va">r_d_sd</span><span class="op">)</span>,
     data_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
-      f_r_int   <span class="op">=</span> <span class="op">-</span><span class="fl">5</span>,   <span class="co"># coef(my_flower_mod)[1]</span>
-      f_r_slope <span class="op">=</span> <span class="fl">0.1</span>,   <span class="co"># coef(my_flower_mod)[2]</span>
-      f_s_int   <span class="op">=</span> <span class="op">-</span><span class="fl">3</span>,   <span class="co"># coef(my_seed_mod)[1]</span>
-      f_s_slope <span class="op">=</span> <span class="fl">0.03</span>,  <span class="co"># coef(my_seed_mod)[2]</span>
-      f_d_mu    <span class="op">=</span> <span class="fl">1.2</span>,   <span class="co"># mean(my_recr_data$size_2, na.rm = TRUE)</span>
-      f_d_sd    <span class="op">=</span> <span class="fl">0.7</span>    <span class="co"># sd(my_recr_data$size_2, na.rm = TRUE)</span>
+      r_r_int   <span class="op">=</span> <span class="op">-</span><span class="fl">5</span>,   <span class="co"># coef(my_flower_mod)[1]</span>
+      r_r_slope <span class="op">=</span> <span class="fl">0.1</span>,   <span class="co"># coef(my_flower_mod)[2]</span>
+      r_s_int   <span class="op">=</span> <span class="op">-</span><span class="fl">3</span>,   <span class="co"># coef(my_seed_mod)[1]</span>
+      r_s_slope <span class="op">=</span> <span class="fl">0.03</span>,  <span class="co"># coef(my_seed_mod)[2]</span>
+      r_d_mu    <span class="op">=</span> <span class="fl">1.2</span>,   <span class="co"># mean(my_recr_data$size_2, na.rm = TRUE)</span>
+      r_d_sd    <span class="op">=</span> <span class="fl">0.7</span>    <span class="co"># sd(my_recr_data$size_2, na.rm = TRUE)</span>
     <span class="op">)</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,
     has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
-    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
+    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"r_d"</span><span class="op">)</span>
   <span class="op">)</span></code></pre></div>
 <p>We are now ready to describe how to implement the model numerically.</p>
 </div>
@@ -395,7 +402,7 @@
   <span class="op">)</span></code></pre></div>
 <p>Because this format is a bit specific, there is a helper function that can be called within <code>define_impl</code> or called before initializing the IPM to make sure everything is formatted correctly - <code>make_ipml_args_list()</code>.</p>
 <p>The first argument to the <code>make_ipml_args_list()</code> function is <code>kernel_names</code>. This is a character vector with kernel names for which the implementation arguments are being supplied. These should be the same as <code>name</code> from <code>define_kernel</code>.</p>
-<p>Next, <code>int_rule</code> is a character vector, and currently <code>'midpoint'</code> is the only option that is implemented. <code>'trapezoid'</code> and <code>'g-l'</code> (Gauss-Legendre) are on the to-do list. Additional rules may be added if there is more demand for certain ones (e.g. cumulative density functions like in <code>IPMpack</code>).</p>
+<p>Next, <code>int_rule</code> is a character vector, and currently <code>'midpoint'</code> is the only option that is implemented. <code>'b2b'</code> (bin to bin method) and <code>'cdf'</code> (cumulative density function) are on the to-do list. Additional rules may be added if there is more demand for certain ones.</p>
 <p><code>state_start</code> and <code>state_end</code> are always the same in <code>simple_*</code> IPMs. In <code>general_*</code> ones, they may be different as individuals move from, for example, discrete to continuous states or vice versa. These must always match the names provided in the <code>states</code> list.</p>
 <p>Elements of each vector in each argument in <code><a href="../reference/define_impl.html">make_impl_args_list()</a></code> are matched by position. Thus, if you specify <code>"P"</code> as the first entry in <code>kernel_names</code>, then the first entries of <code>int_rule</code>, <code>state_start</code>, and <code>state_end</code> should all correspond to the <code>P</code> kernel. If you specify <code>"F"</code> as the second entry, the second entries in <code>int_rule</code>, <code>state_start</code>, and <code>state_end</code> should be the rules that correspond to the <code>F</code> kernel, and so on.</p>
 <p>It is important to note that <code>make_impl_args_list</code> <em>does not return a <code>proto_ipm</code></em>. Thus, it must either be called before beginning the model definition, or inside of <code>define_impl</code>!</p>
@@ -443,7 +450,7 @@
 <div id="defining-the-initial-population-state" class="section level3">
 <h3 class="hasAnchor">
 <a href="#defining-the-initial-population-state" class="anchor"></a>Defining the initial population state</h3>
-<p><code>ipmr</code> computes all values by iterating models (as opposed to eigenvalue methods). This means we have to specify the initial conditions for each simulation. In this case, the only initial condition we need to specify is the initial population state. We can do this using <code><a href="../reference/define_impl.html">define_pop_state()</a></code>. It takes a set of named expressions: the name corresponds to the state variable, and the expression generates values. The name of each state variable should be prefixed with an <code>n_</code>. The resulting vector should be the same length as the number of meshpoints for the state variable. This chunk generates a uniform distribution to represent the initial population state.</p>
+<p><code>ipmr</code> computes all values by iterating models (as opposed to eigenvalue methods). This means we have to specify the initial conditions for each simulation. In this case, the only initial condition we need to specify is the initial population state. We do this using <code><a href="../reference/define_impl.html">define_pop_state()</a></code>. It takes a set of named expressions: the name corresponds to the state variable, and the expression generates values. The name of each state variable should be prefixed with an <code>n_</code>. The resulting vector should be the same length as the number of meshpoints for the state variable. This chunk generates a uniform distribution to represent the initial population state.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="va">my_ipm</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_pop_state</a></span><span class="op">(</span>n_dbh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">200</span>, <span class="fl">200</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -452,7 +459,7 @@
 <div id="implement-the-ipm" class="section level2">
 <h2 class="hasAnchor">
 <a href="#implement-the-ipm" class="anchor"></a>Implement the IPM</h2>
-<p>The minimal set of information to generate a deterministic IPM is now wrapped up in our <code>proto_ipm</code> and it is time to <code><a href="../reference/make_ipm.html">make_ipm()</a></code>! <code><a href="../reference/make_ipm.html">make_ipm()</a></code> is a generic function and can be used for any type of IPM generated with <code>ipmr</code>.</p>
+<p>The minimal set of information to generate a deterministic IPM is now wrapped up in our <code>proto_ipm</code> and it is time to run the model. <code><a href="../reference/make_ipm.html">make_ipm()</a></code> is a generic function and can be used for any type of <code>proto_ipm</code> generated with <code>ipmr</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span><span class="va">my_ipm</span>,
                    iterations <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
@@ -472,7 +479,7 @@
 <div id="using-predict-methods-in-vital-rate-expressions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#using-predict-methods-in-vital-rate-expressions" class="anchor"></a>Using <code>predict()</code> methods in vital rate expressions</h3>
-<p>The vast majority of IPM pipelines entail fitting a statistical models to data to create vital rate functions. Thus, we’re typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or hierarchical effects, and the vital rate expressions are annoying to write out in full. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parametric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM).</p>
+<p>The vast majority of IPM pipelines entail fitting a statistical models to data to create vital rate functions. Thus, we’re typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or hierarchical effects, and the vital rate expressions are complicated to write out. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parametric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM).</p>
 <p>To deal with this, many regression modeling packages provide a <code>predict</code> method for the class of models that they implement. We can use these in <code>ipmr</code> to take the place of the vital rate expressions (more common) or the kernel formulas (probably not as common).</p>
 <p>We’ll go through a quick example of how to incorporate these expressions into the model building process using a data set for <em>Carpobrotus edulis</em>, an invasive succulent. This is real data collected in Israel and appears in <a href="https://www.biorxiv.org/content/10.1101/2020.12.08.415174v1.full">Bogdan et al. (2020)</a>. The data set is also included in <code>ipmr</code> and can be loaded by running <code><a href="https://rdrr.io/r/utils/data.html">data(iceplant_ex)</a></code>.</p>
 <p>First, we’ll load in the example data set and fit some simple vital rate models. Some notes about the data:</p>
@@ -481,12 +488,12 @@
 <li><p><code>repro</code> indicates whether or not a plant flowered and is either 0 or 1</p></li>
 <li><p><code>flower_n</code> indicates the number of flowers a reproductive plant made, so is either a positive integer or <code>NA</code>.</p></li>
 </ol>
-<p>The vital rates models and the IPM variable names are as follows (<code>vital_rate_model</code>, <code>IPM_variable_name</code>):</p>
+<p><span class="math inline">\(f_G\)</span> and <span class="math inline">\(f_{r_d}\)</span> denote normal probability density functions. The vital rates models and the IPM variable names are as follows (<code>vital_rate_model</code>, <code>IPM_variable_name</code>):</p>
 <ol style="list-style-type: decimal">
 <li>Growth (<code>grow_mod</code>, <code>g</code>)</li>
 </ol>
 <ul>
-<li><p><span class="math inline">\(G(z',z) \sim Norm(\mu_g, \sigma_g)\)</span></p></li>
+<li><p><span class="math inline">\(G(z',z) = f_G(\mu_g, \sigma_g)\)</span></p></li>
 <li><p><span class="math inline">\(\mu_g = \alpha_g + \beta_g * z\)</span></p></li>
 </ul>
 <ol start="2" style="list-style-type: decimal">
@@ -496,16 +503,16 @@
 <li><span class="math inline">\(Logit(s(z)) = \alpha_s + \beta_s * z\)</span></li>
 </ul>
 <ol start="3" style="list-style-type: decimal">
-<li>Probability of flowering (<code>repr_mod</code>, <code>f_p</code>)</li>
+<li>Probability of flowering (<code>repr_mod</code>, <code>r_p</code>)</li>
 </ol>
 <ul>
-<li><span class="math inline">\(Logit(f_p(z)) = \alpha_{f_p} + \beta_{f_p} * z\)</span></li>
+<li><span class="math inline">\(Logit(r_p(z)) = \alpha_{r_p} + \beta_{r_p} * z\)</span></li>
 </ul>
 <ol start="4" style="list-style-type: decimal">
-<li>Number of flowers for flowering plants (<code>seed_mod</code>, <code>f_s</code>)</li>
+<li>Number of flowers for flowering plants (<code>seed_mod</code>, <code>r_s</code>)</li>
 </ol>
 <ul>
-<li><span class="math inline">\(Log(f_s(z)) = \alpha_{f_s} + \beta_{f_s} * z\)</span></li>
+<li><span class="math inline">\(Log(r_s(z)) = \alpha_{r_s} + \beta_{r_s} * z\)</span></li>
 </ul>
 <ol start="5" style="list-style-type: decimal">
 <li>Total number of new recruits at <span class="math inline">\(t + 1\)</span> (<code>recr_n</code>, <code>recr_n</code>)</li>
@@ -517,22 +524,22 @@
 <li>Total number of flowers at <span class="math inline">\(t\)</span> (<code>flow_n</code>, <code>flow_n</code>)</li>
 </ol>
 <ul>
-<li><span class="math inline">\(N_f = \int_L^Uf_s(z)dz\)</span></li>
+<li><span class="math inline">\(N_f = \int_L^Ur_s(z)dz\)</span></li>
 </ul>
 <ol start="7" style="list-style-type: decimal">
-<li>The number of new recruits at <span class="math inline">\(t+1\)</span> per flower at <span class="math inline">\(t\)</span> (<code>NA</code>, <code>f_r</code>)</li>
+<li>The number of new recruits at <span class="math inline">\(t+1\)</span> per flower at <span class="math inline">\(t\)</span> (<code>NA</code>, <code>r_r</code>)</li>
 </ol>
 <ul>
 <li><span class="math inline">\(\frac{N_r}{N_f}\)</span></li>
 </ul>
 <ol start="8" style="list-style-type: decimal">
-<li>Recruit size distribution (<code>recr_mu, recr_sd</code>, <code>f_d</code>)</li>
+<li>Recruit size distribution (<code>recr_mu, recr_sd</code>, <code>r_d</code>)</li>
 </ol>
 <ul>
-<li><span class="math inline">\(f_d(z') \sim Norm(\mu_{f_d}, \sigma_{f_d})\)</span></li>
+<li><span class="math inline">\(r_d(z') = f_{r_d}(\mu_{r_d}, \sigma_{r_d})\)</span></li>
 </ul>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ipmr</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">iceplant_ex</span><span class="op">)</span>
 
@@ -619,31 +626,31 @@
     has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span>fun   <span class="op">=</span> <span class="st">"norm"</span>, 
-                                            param <span class="op">=</span> <span class="st">"g"</span><span class="op">)</span>
+                                            target <span class="op">=</span>  <span class="st">"g"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"F"</span>,
     family        <span class="op">=</span> <span class="st">"CC"</span>,
-    formula       <span class="op">=</span> <span class="va">f_p</span> <span class="op">*</span> <span class="va">f_s</span> <span class="op">*</span> <span class="va">f_d</span> <span class="op">*</span> <span class="va">f_r</span>,
+    formula       <span class="op">=</span> <span class="va">r_p</span> <span class="op">*</span> <span class="va">r_s</span> <span class="op">*</span> <span class="va">r_d</span> <span class="op">*</span> <span class="va">r_r</span>,
     
     <span class="co"># As above, we use predict(model_object). We make sure the names of the "newdata"</span>
     <span class="co"># match the names in the vital rate model formulas, and the values match the </span>
     <span class="co"># names of domains they use.</span>
     
-    f_p           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">repr_mod</span>,
+    r_p           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">repr_mod</span>,
                             newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>log_size <span class="op">=</span> <span class="va">sa_1</span><span class="op">)</span>,
                             type    <span class="op">=</span> <span class="st">'response'</span><span class="op">)</span>,
-    f_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">seed_mod</span>, 
+    r_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">seed_mod</span>, 
                             newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>log_size <span class="op">=</span> <span class="va">sa_1</span><span class="op">)</span>, 
                             type    <span class="op">=</span> <span class="st">'response'</span><span class="op">)</span>,
-    f_r           <span class="op">=</span> <span class="va">recr_n</span> <span class="op">/</span> <span class="va">flow_n</span>,
-    f_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">sa_2</span>, <span class="va">recr_mu</span>, <span class="va">recr_sd</span><span class="op">)</span>,
+    r_r           <span class="op">=</span> <span class="va">recr_n</span> <span class="op">/</span> <span class="va">flow_n</span>,
+    r_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">sa_2</span>, <span class="va">recr_mu</span>, <span class="va">recr_sd</span><span class="op">)</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"sa"</span><span class="op">)</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">params</span>,
     has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span>fun   <span class="op">=</span> <span class="st">"norm"</span>,
-                                            param <span class="op">=</span> <span class="st">"f_d"</span><span class="op">)</span>
+                                            target <span class="op">=</span>  <span class="st">"r_d"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
@@ -661,7 +668,7 @@
   <span class="fu"><a href="../reference/define_impl.html">define_pop_state</a></span><span class="op">(</span>n_sa <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>iterate <span class="op">=</span> <span class="cn">TRUE</span>,
            iterations <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></code></pre></div>
-<p><code><a href="../reference/make_ipm.html">make_ipm()</a></code> can handle most types of widely used model classes without any additional effort (e.g. <code>lm</code>, <code>glm</code>, <code>lme4</code>, <code>brms</code>, <code>nlme</code>, <code>stanfit</code>, <code>betareg</code>). The list of method available in <code>ipmr</code> is not exhaustive though, and sometimes there will be errors.</p>
+<p><code><a href="../reference/make_ipm.html">make_ipm()</a></code> can handle most types of widely used model classes without any additional effort (e.g. <code>lm</code>, <code>glm</code>, <code>lme4</code>, <code>brms</code>, <code>nlme</code>,<code>betareg</code>). The list of method available in <code>ipmr</code> is not exhaustive though, and sometimes there will be errors.</p>
 <p>If you are sure that a <code>predict</code> method exists for your model type, but you get errors along the lines of <code>Element &lt;some number&gt; of '.x' must be a vector, not a call</code>, this usually means that I forgot to add the class of model that you’re trying to use to <code>ipmr</code>. We can get around this by wrapping those model objects in <code><a href="../reference/use_vr_model.html">use_vr_model()</a></code>. Please also create an <a href="https://github.com/levisc8/ipmr/issues">Issue here</a> describing the model class you’re trying to work with so it can be added to future versions.</p>
 <p>Say our growth model isn’t recognized by <code>ipmr</code>. We try to <code><a href="../reference/make_ipm.html">make_ipm()</a></code>, and get our obscure error message about <code>.x</code>. The snippet below shows how to rectify this. We wrap our model objects in <code><a href="../reference/use_vr_model.html">use_vr_model()</a></code> when creating the <code>data_list</code>, and then re-run it with the exact same code as above. <code><a href="../reference/use_vr_model.html">use_vr_model()</a></code> tells <code>ipmr</code> that this object is a model object, not a raw parameter value. As the package (hopefully) gets used more widely, this issue should disappear, and <code><a href="../reference/use_vr_model.html">use_vr_model()</a></code> will (hopefully) become obsolete.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -697,20 +704,20 @@
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"F"</span>,
     family        <span class="op">=</span> <span class="st">"CC"</span>,
-    formula       <span class="op">=</span> <span class="va">f_p</span> <span class="op">*</span> <span class="va">f_s</span> <span class="op">*</span> <span class="va">f_d</span> <span class="op">*</span> <span class="va">f_r</span>,
-    f_p           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">repr_mod</span>,
+    formula       <span class="op">=</span> <span class="va">r_p</span> <span class="op">*</span> <span class="va">r_s</span> <span class="op">*</span> <span class="va">r_d</span> <span class="op">*</span> <span class="va">r_r</span>,
+    r_p           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">repr_mod</span>,
                             newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>log_size <span class="op">=</span> <span class="va">sa_1</span><span class="op">)</span>,
                             type <span class="op">=</span> <span class="st">'response'</span><span class="op">)</span>,
-    f_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">seed_mod</span>, 
+    r_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">seed_mod</span>, 
                             newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>log_size <span class="op">=</span> <span class="va">sa_1</span><span class="op">)</span>, 
                             type <span class="op">=</span> <span class="st">'response'</span><span class="op">)</span>,
-    f_r           <span class="op">=</span> <span class="va">recr_n</span> <span class="op">/</span> <span class="va">flow_n</span>,
-    f_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">sa_2</span>, <span class="va">recr_mu</span>, <span class="va">recr_sd</span><span class="op">)</span>,
+    r_r           <span class="op">=</span> <span class="va">recr_n</span> <span class="op">/</span> <span class="va">flow_n</span>,
+    r_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">sa_2</span>, <span class="va">recr_mu</span>, <span class="va">recr_sd</span><span class="op">)</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"sa"</span><span class="op">)</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">params</span>,
     has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
-    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
+    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"r_d"</span><span class="op">)</span>
   <span class="op">)</span>  <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
@@ -728,7 +735,7 @@
   <span class="fu"><a href="../reference/define_impl.html">define_pop_state</a></span><span class="op">(</span>n_sa <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>iterate <span class="op">=</span> <span class="cn">TRUE</span>,
            iterations <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></code></pre></div>
-<p>Usually, we want a bit more out of our model than just these three quantities. Here is a quick example of how to compute generation time (<span class="math inline">\(T\)</span>) and the per-generation growth rate (<span class="math inline">\(R_0\)</span>). We’ll write two functions to help out. These are not part of <code>ipmr</code>, but will eventually be incorporated into a separate package for life history analyses with IPMs which is designed to work with <code>ipmr</code>’s models.</p>
+<p>Usually, we want a bit more out of our model than just the eigenvalues and eigenvectors. Here is a quick example of how to compute generation time (<span class="math inline">\(T\)</span>) and the per-generation growth rate (<span class="math inline">\(R_0\)</span>). We’ll write two functions to help out. These are not part of <code>ipmr</code>, but will eventually be incorporated into a separate package for life history analyses with IPMs which is designed to work with <code>ipmr</code>’s models.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">R_0</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ipm</span><span class="op">)</span> <span class="op">{</span>
   
@@ -769,7 +776,7 @@
 <div id="hier-effs-det" class="section level3">
 <h3 class="hasAnchor">
 <a href="#hier-effs-det" class="anchor"></a>Deterministic simulations with hierarchical models</h3>
-<p>Say we have multiple sites sampled in the same year, but are only interested in their asymptotic dynamics (perhaps to compare performance across space). <code>ipmr</code> uses a syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the examples above.</p>
+<p>Say we have multiple sites sampled in the same year, but are only interested in each site’s asymptotic dynamics (perhaps to compare performance across space). <code>ipmr</code> uses a syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the examples above.</p>
 <p>The general idea is to append a suffix to each variable that is modified, and supply a list of values that the suffix can actually take in the <code>levels_hier_effs</code> slot of <code><a href="../reference/define_kernel.html">define_kernel()</a></code>. There is a longer vignette dedicated to translating math to R code to the <code>ipmr</code> syntax <a href="https://levisc8.github.io/ipmr/articles/hierarchical-notation.html">here</a>.</p>
 <p>For this example, we’ll use the following vital rate models. The <code>(g)lmer</code> functions are from the <code>lme4</code> package.</p>
 <ol style="list-style-type: decimal">
@@ -795,17 +802,17 @@
 </ul>
 </li>
 <li>
-<p>seed production (<code>f_s_site</code>): A Poisson regression with a random site intercept (<code>f_s_r_site</code>)</p>
+<p>seed production (<code>r_s_site</code>): A Poisson regression with a random site intercept (<code>r_s_r_site</code>)</p>
 <ul>
 <li>Example model formula: <code>glmer(seed_num ~ size_1 + (1 | site), data = my_surv_data, family = poisson()))</code>
 </li>
 </ul>
 </li>
-<li><p>recruit size distribution (<code>f_d</code>): A normal distribution with two constant parameters, the mean (<code>mu_fd</code>) and standard deviation (<code>sd_fd</code>).</p></li>
+<li><p>recruit size distribution (<code>r_d</code>): A normal distribution with two constant parameters, the mean (<code>mu_rd</code>) and standard deviation (<code>sd_rd</code>).</p></li>
 </ol>
 <p>The chunk below takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of <code>fixef(some_vital_rate_model</code> and <code><a href="https://rdrr.io/pkg/lme4/man/ranef.html">ranef(some_vital_rate_model)</a></code>)).</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ipmr</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
 
 <span class="co"># Define some fixed parameters</span>
 
@@ -815,40 +822,40 @@
   g_int     <span class="op">=</span> <span class="fl">3.7</span>,    <span class="co"># fixef(my_grow_mod)[1]</span>
   g_slope   <span class="op">=</span> <span class="fl">0.92</span>,   <span class="co"># fixef(my_grow_mod)[2]</span>
   sd_g      <span class="op">=</span> <span class="fl">0.9</span>,    <span class="co"># sd(resid(my_grow_mod))</span>
-  f_r_int   <span class="op">=</span> <span class="fl">0.09</span>,   <span class="co"># coef(my_repro_mod)[1] - uses coef because there are no random effects in this model</span>
-  f_r_slope <span class="op">=</span> <span class="fl">0.05</span>,   <span class="co"># coef(my_repro_mod)[2]</span>
-  f_s_int   <span class="op">=</span> <span class="fl">0.1</span>,    <span class="co"># fixef(my_flower_mod)[1]</span>
-  f_s_slope <span class="op">=</span> <span class="fl">0.005</span>,  <span class="co"># fixef(my_flower_mod)[2]</span>
-  mu_fd     <span class="op">=</span> <span class="fl">9</span>,      <span class="co"># mean(my_recr_data$size_2, na.rm = TRUE)</span>
-  sd_fd     <span class="op">=</span> <span class="fl">2</span>       <span class="co"># sd(my_recr_data$size_2, na.rm = TRUE)</span>
+  r_r_int   <span class="op">=</span> <span class="fl">0.09</span>,   <span class="co"># coef(my_repro_mod)[1] - uses coef because there are no random effects in this model</span>
+  r_r_slope <span class="op">=</span> <span class="fl">0.05</span>,   <span class="co"># coef(my_repro_mod)[2]</span>
+  r_s_int   <span class="op">=</span> <span class="fl">0.1</span>,    <span class="co"># fixef(my_flower_mod)[1]</span>
+  r_s_slope <span class="op">=</span> <span class="fl">0.005</span>,  <span class="co"># fixef(my_flower_mod)[2]</span>
+  mu_rd     <span class="op">=</span> <span class="fl">9</span>,      <span class="co"># mean(my_recr_data$size_2, na.rm = TRUE)</span>
+  sd_rd     <span class="op">=</span> <span class="fl">2</span>       <span class="co"># sd(my_recr_data$size_2, na.rm = TRUE)</span>
 <span class="op">)</span></code></pre></div>
 <p>We’ve defined a <code>fixed_list</code> that holds all of the fixed parameters in our model. Next, we’ll make up some random site specific intercepts, and add those to the <code>fixed_list</code>, naming it <code>all_params_list</code>. You don’t necessarily need to rename anything, this is just for disambiguation.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Now, simulate some random intercepts for growth (g_), survival (s_), </span>
-<span class="co"># and offspring production (f_s_). This part is for the purpose of the example.</span>
+<span class="co"># and offspring production (r_s_). This part is for the purpose of the example.</span>
 
 <span class="co"># First, we create vector of values that each random component can take.</span>
 
 <span class="va">g_r_int</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.3</span><span class="op">)</span> <span class="co"># unlist(ranef(my_grow_mod)) for an lme4 output</span>
 <span class="va">s_r_int</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.7</span><span class="op">)</span> <span class="co"># unlist(ranef(my_surv_mod)) for an lme4 output</span>
-<span class="va">f_s_r_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.2</span><span class="op">)</span> <span class="co"># unlist(ranef(my_flower_mod)) for an lme4 output</span>
+<span class="va">r_s_r_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.2</span><span class="op">)</span> <span class="co"># unlist(ranef(my_flower_mod)) for an lme4 output</span>
 
 <span class="va">nms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"r_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">g_r_int</span><span class="op">)</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'g_'</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">s_r_int</span><span class="op">)</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'s_'</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">f_s_r_int</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'f_s_'</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">r_s_r_int</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'r_s_'</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
 
 <span class="co"># Each set of parameters is converted to a named list. The names should match</span>
 <span class="co"># the variables referenced in each define_kernel() call.</span>
 
 <span class="va">g_params</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">g_r_int</span><span class="op">)</span>
 <span class="va">s_params</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">s_r_int</span><span class="op">)</span>
-<span class="va">f_s_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">f_s_r_int</span><span class="op">)</span>
+<span class="va">r_s_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">r_s_r_int</span><span class="op">)</span>
 
 <span class="co"># add them all together using c()</span>
 
-<span class="va">all_params_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">fixed_list</span>, <span class="va">g_params</span>, <span class="va">s_params</span>, <span class="va">f_s_params</span><span class="op">)</span></code></pre></div>
+<span class="va">all_params_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">fixed_list</span>, <span class="va">g_params</span>, <span class="va">s_params</span>, <span class="va">r_s_params</span><span class="op">)</span></code></pre></div>
 <p>We’ve created a list where each entry is named and contains a single parameter value. This is now ready for use in <code><a href="../reference/define_kernel.html">define_kernel()</a></code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen <span class="op">=</span> <span class="st">"simple"</span>, di_dd <span class="op">=</span> <span class="st">"di"</span>, det_stoch <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -898,19 +905,19 @@
     <span class="co"># The F kernel also varies from site to site</span>
     
     name             <span class="op">=</span> <span class="st">"F_site"</span>,             
-    formula          <span class="op">=</span> <span class="va">f_r</span> <span class="op">*</span> <span class="va">f_s_site</span> <span class="op">*</span> <span class="va">f_d</span>,
+    formula          <span class="op">=</span> <span class="va">r_r</span> <span class="op">*</span> <span class="va">r_s_site</span> <span class="op">*</span> <span class="va">r_d</span>,
     family           <span class="op">=</span> <span class="st">"CC"</span>,
     
     <span class="co"># In this example, we didn't include a site level effect for probability</span>
     <span class="co"># of flowering, only seed production. Thus, this expression is NOT modified.</span>
     
-    f_r_lin          <span class="op">=</span> <span class="va">f_r_int</span> <span class="op">+</span> <span class="va">f_r_slope</span> <span class="op">*</span> <span class="va">ht_1</span>,
-    f_r              <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span> <span class="va">f_r_lin</span><span class="op">)</span><span class="op">)</span>,
+    r_r_lin          <span class="op">=</span> <span class="va">r_r_int</span> <span class="op">+</span> <span class="va">r_r_slope</span> <span class="op">*</span> <span class="va">ht_1</span>,
+    r_r              <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span> <span class="va">r_r_lin</span><span class="op">)</span><span class="op">)</span>,
     
     <span class="co"># We modify the seed production expression with the site effect</span>
     
-    f_s_site         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">f_s_int</span> <span class="op">+</span> <span class="va">f_s_r_site</span> <span class="op">+</span> <span class="va">f_s_slope</span> <span class="op">*</span> <span class="va">ht_1</span><span class="op">)</span>,
-    f_d              <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">ht_2</span>, mean <span class="op">=</span> <span class="va">mu_fd</span>, sd <span class="op">=</span> <span class="va">sd_fd</span><span class="op">)</span>,
+    r_s_site         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">r_s_int</span> <span class="op">+</span> <span class="va">r_s_r_site</span> <span class="op">+</span> <span class="va">r_s_slope</span> <span class="op">*</span> <span class="va">ht_1</span><span class="op">)</span>,
+    r_d              <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">ht_2</span>, mean <span class="op">=</span> <span class="va">mu_rd</span>, sd <span class="op">=</span> <span class="va">sd_rd</span><span class="op">)</span>,
     data_list        <span class="op">=</span> <span class="va">all_params_list</span>,
     states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span><span class="op">)</span><span class="op">)</span>,
     
@@ -920,7 +927,7 @@
     has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
     levels_hier_effs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>site <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,
     evict_cor        <span class="op">=</span> <span class="cn">TRUE</span>,
-    evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
+    evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"r_d"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
@@ -978,17 +985,17 @@
 </ul>
 </li>
 <li>
-<p>seed production (<code>f_s_yr</code>): A Poisson regression with a random year intercept (<code>f_s_r_yr</code>)</p>
+<p>seed production (<code>r_s_yr</code>): A Poisson regression with a random year intercept (<code>r_s_r_yr</code>)</p>
 <ul>
 <li>Example model formula: <code>glmer(seed_num ~ size_1 + (1 | yr), data = my_surv_data, family = poisson()))</code>
 </li>
 </ul>
 </li>
-<li><p>recruit size distribution (<code>f_d</code>): A normal distribution with two constant parameters, the mean (<code>mu_fd</code>) and standard deviation (<code>sd_fd</code>).</p></li>
+<li><p>recruit size distribution (<code>r_d</code>): A normal distribution with two constant parameters, the mean (<code>mu_rd</code>) and standard deviation (<code>sd_rd</code>).</p></li>
 </ol>
 <p>The chunk below takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of <code>coef(some_vital_rate_model</code>)).</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ipmr</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
 
 <span class="co"># Define some fixed parameters</span>
 
@@ -998,40 +1005,40 @@
   g_int     <span class="op">=</span> <span class="fl">3.7</span>,    <span class="co"># fixef(my_grow_mod)[1]</span>
   g_slope   <span class="op">=</span> <span class="fl">0.92</span>,   <span class="co"># fixef(my_grow_mod)[2]</span>
   sd_g      <span class="op">=</span> <span class="fl">0.9</span>,    <span class="co"># sd(resid(my_grow_mod))</span>
-  f_r_int   <span class="op">=</span> <span class="fl">0.09</span>,   <span class="co"># coef(my_repro_mod)[1] - uses coef because there are no random effects in this model</span>
-  f_r_slope <span class="op">=</span> <span class="fl">0.05</span>,   <span class="co"># coef(my_repro_mod)[2]</span>
-  f_s_int   <span class="op">=</span> <span class="fl">0.1</span>,    <span class="co"># fixef(my_flower_mod)[1]</span>
-  f_s_slope <span class="op">=</span> <span class="fl">0.005</span>,  <span class="co"># fixef(my_flower_mod)[2]</span>
+  r_r_int   <span class="op">=</span> <span class="fl">0.09</span>,   <span class="co"># coef(my_repro_mod)[1] - uses coef because there are no random effects in this model</span>
+  r_r_slope <span class="op">=</span> <span class="fl">0.05</span>,   <span class="co"># coef(my_repro_mod)[2]</span>
+  r_s_int   <span class="op">=</span> <span class="fl">0.1</span>,    <span class="co"># fixef(my_flower_mod)[1]</span>
+  r_s_slope <span class="op">=</span> <span class="fl">0.005</span>,  <span class="co"># fixef(my_flower_mod)[2]</span>
   mu_fd     <span class="op">=</span> <span class="fl">9</span>,      <span class="co"># mean(my_recr_data$size_2, na.rm = TRUE)</span>
   sd_fd     <span class="op">=</span> <span class="fl">2</span>       <span class="co"># sd(my_recr_data$size_2, na.rm = TRUE)</span>
 <span class="op">)</span></code></pre></div>
 <p>We’ve defined a <code>fixed_list</code> that holds all of the fixed parameters in our model. Next, we’ll make up some random year specific intercepts, and add those to the <code>fixed_list</code>, naming it <code>all_params_list</code>. You don’t necessarily need to rename anything, this is just for disambiguation.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Now, simulate some random intercepts for growth (g_), survival (s_), </span>
-<span class="co"># and offspring production (f_s_). This part is for the purpose of the example.</span>
+<span class="co"># and offspring production (r_s_). This part is for the purpose of the example.</span>
 
 <span class="co"># First, we create vector of values corresponding to </span>
 
 <span class="va">g_r_int</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.3</span><span class="op">)</span> <span class="co"># unlist(ranef(my_grow_mod)) for an lme4 output</span>
 <span class="va">s_r_int</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.7</span><span class="op">)</span> <span class="co"># unlist(ranef(my_surv_mod)) for an lme4 output</span>
-<span class="va">f_s_r_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.2</span><span class="op">)</span> <span class="co"># unlist(ranef(my_flower_mod)) for an lme4 output</span>
+<span class="va">r_s_r_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.2</span><span class="op">)</span> <span class="co"># unlist(ranef(my_flower_mod)) for an lme4 output</span>
 
 <span class="va">nms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"r_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">g_r_int</span><span class="op">)</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'g_'</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">s_r_int</span><span class="op">)</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'s_'</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">f_s_r_int</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'f_s_'</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">r_s_r_int</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'r_s_'</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
 
 <span class="co"># Each set of parameters is converted to a named list. The names should match</span>
 <span class="co"># the variables referenced in each define_kernel() call.</span>
 
 <span class="va">g_params</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">g_r_int</span><span class="op">)</span>
 <span class="va">s_params</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">s_r_int</span><span class="op">)</span>
-<span class="va">f_s_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">f_s_r_int</span><span class="op">)</span>
+<span class="va">r_s_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">r_s_r_int</span><span class="op">)</span>
 
 <span class="co"># add them all together using c()</span>
 
-<span class="va">all_params_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">fixed_list</span>, <span class="va">g_params</span>, <span class="va">s_params</span>, <span class="va">f_s_params</span><span class="op">)</span></code></pre></div>
+<span class="va">all_params_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">fixed_list</span>, <span class="va">g_params</span>, <span class="va">s_params</span>, <span class="va">r_s_params</span><span class="op">)</span></code></pre></div>
 <p>We’ve created a list where each entry is named and contains a single parameter value. This is now ready for use in <code><a href="../reference/define_kernel.html">define_kernel()</a></code></p>
 </div>
 <div id="defining-custom-functions-to-pass-to-the-building-process" class="section level3">
@@ -1104,17 +1111,17 @@
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name             <span class="op">=</span> <span class="st">"F_yr"</span>,             <span class="co"># Update the names as we did for the P kernel</span>
-    formula          <span class="op">=</span> <span class="va">f_r</span> <span class="op">*</span> <span class="va">f_s_yr</span> <span class="op">*</span> <span class="va">f_d</span>,
+    formula          <span class="op">=</span> <span class="va">r_r</span> <span class="op">*</span> <span class="va">r_s_yr</span> <span class="op">*</span> <span class="va">r_d</span>,
     family           <span class="op">=</span> <span class="st">"CC"</span>,
-    f_r              <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">ht_1</span>, <span class="va">f_r_int</span>, <span class="va">f_r_slope</span><span class="op">)</span>,
-    f_s_yr           <span class="op">=</span> <span class="fu">pois_r</span><span class="op">(</span><span class="va">ht_1</span>, <span class="va">f_s_int</span>, <span class="va">f_s_slope</span>, <span class="va">f_s_r_yr</span><span class="op">)</span>,
-    f_d              <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">ht_2</span>, mean <span class="op">=</span> <span class="va">mu_fd</span>, sd <span class="op">=</span> <span class="va">sd_fd</span><span class="op">)</span>,
+    r_r              <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">ht_1</span>, <span class="va">r_r_int</span>, <span class="va">r_r_slope</span><span class="op">)</span>,
+    r_s_yr           <span class="op">=</span> <span class="fu">pois_r</span><span class="op">(</span><span class="va">ht_1</span>, <span class="va">r_s_int</span>, <span class="va">r_s_slope</span>, <span class="va">r_s_r_yr</span><span class="op">)</span>,
+    r_d              <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">ht_2</span>, mean <span class="op">=</span> <span class="va">mu_fd</span>, sd <span class="op">=</span> <span class="va">sd_fd</span><span class="op">)</span>,
     data_list        <span class="op">=</span> <span class="va">all_params_list</span>,
     states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span><span class="op">)</span><span class="op">)</span>,
     has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
     levels_hier_effs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>yr <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,
     evict_cor        <span class="op">=</span> <span class="cn">TRUE</span>,
-    evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
+    evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"r_d"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
@@ -1155,25 +1162,25 @@
 <h2 class="hasAnchor">
 <a href="#simple-ipms-for-continuously-varying-environments" class="anchor"></a>Simple IPMs for continuously varying environments</h2>
 <p>In some cases, it is not desirable to work with single estimates of a random variable, and we would prefer to work with the distributions they come from. Environmental variables like temperature and precipitation may be random with reasonably well known distributions. A stochastic simulation can incorporate this information to help us understand the consequences of this random variability.</p>
-<p>This is where the <code>kern_param = "param"</code> methods come in handy. Unfortunately, these methods are slightly less computationally efficient than their <code>kern_param = "kern"</code> counterparts because they must rebuild each kernel for every single iteration. However, they are fantastic tools for exploring the consequences of continuous environmental variation.</p>
+<p>This is where the <code>kern_param = "param"</code> methods come in handy. Unfortunately, these methods are less computationally efficient than their <code>kern_param = "kern"</code> counterparts because they must rebuild each kernel for every single iteration. However, they are fantastic tools for exploring the consequences of continuous environmental variation.</p>
 <p>Below is an example that demonstrates how to work with environmental variation. <code>ipmr</code> is careful to only evaluate each expression in <code><a href="../reference/define_impl.html">define_env_state()</a></code> once per iteration, so we can safely work with multivariate distributions using very little additional code. It is important to note that this not necessarily the same thing as incorporating parameter uncertainty into your model. Parameter uncertainty is covered in the final section of this vignette.</p>
 <p>The parameters for the growth and survival functions will be sampled from distributions for temperature and precipitation one time per iteration, and an example of a function to pass to <code><a href="../reference/define_impl.html">define_env_state()</a></code> is included in the first chunk below.</p>
 <div id="defining-initial-conditions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#defining-initial-conditions" class="anchor"></a>Defining initial conditions</h3>
-<p>Stochastic simulations require specification of the initial conditions. <code>ipmr</code> aims to make this straightforward for you by providing two helpers - <code><a href="../reference/define_impl.html">define_pop_state()</a></code> and <code><a href="../reference/define_impl.html">define_env_state()</a></code>. We introduce <code><a href="../reference/define_impl.html">define_pop_state()</a></code> above, and will now cover <code><a href="../reference/define_impl.html">define_env_state()</a></code>.</p>
+<p>Stochastic simulations require specification of the initial conditions. <code>ipmr</code> aims to make this straightforward for you by providing two helpers - <code><a href="../reference/define_impl.html">define_pop_state()</a></code> and <code><a href="../reference/define_impl.html">define_env_state()</a></code>. We were introduced <code><a href="../reference/define_impl.html">define_pop_state()</a></code> above, and will now cover <code><a href="../reference/define_impl.html">define_env_state()</a></code>.</p>
 <div id="define_env_state" class="section level4">
 <h4 class="hasAnchor">
 <a href="#define_env_state" class="anchor"></a><code>define_env_state()</code>
 </h4>
-<p><code><a href="../reference/define_impl.html">define_env_state()</a></code> takes a named set of expressions in the <code>...</code> and then a data list, much like how <code><a href="../reference/define_kernel.html">define_kernel()</a></code> takes them. The values created need to be in a list that has names corresponding to the parameter names in the vital rate expressions. In this example, they are called <code>temp</code> and <code>precip</code>. The <code>data_list</code> in this section should contain any variables used in the function we define (in this example, <code>sample_env()</code>). we can reference the names in list that <code>sample_env</code> returns in the vital rate expressions in each kernel definition as if they were in the <code>data_list</code> of <code>define_kernel</code>.</p>
+<p><code><a href="../reference/define_impl.html">define_env_state()</a></code> takes a named set of expressions in the <code>...</code> and then a data list, much like how <code><a href="../reference/define_kernel.html">define_kernel()</a></code> takes them. The values created need to be in a list that has names corresponding to the parameter names in the vital rate expressions. In this example, they are called <code>temp</code> and <code>precip</code>. The <code>data_list</code> in <code><a href="../reference/define_impl.html">define_env_state()</a></code> should contain any variables used in the function we define (in this example, <code>sample_env()</code>). we can reference the names in list that <code>sample_env</code> returns in the vital rate expressions in each kernel definition as if they were in the <code>data_list</code> of <code>define_kernel</code>.</p>
 </div>
 </div>
 <div id="vital-rate-models" class="section level3">
 <h3 class="hasAnchor">
 <a href="#vital-rate-models" class="anchor"></a>Vital rate models</h3>
 <p>The first chunk below initializes the parameters and functions that the model uses. It takes the place of the usual vital rate model fitting process.</p>
-<p>This example uses models for survival and growth that include environmental covariates. To limit complexity, we won’t include an interaction term, but you are free to include as many as you want in your own models. We define a single function to sample the environmental distributions to illustrate how to use continuously varying parameter distributions in <code>ipmr</code>. This only uses two models and one function to limit the the complexity of the example - there is no upper limit on the number of parameters or functions you can use in your own models.</p>
+<p>This example uses models for survival and growth that include environmental covariates. To limit complexity, we won’t include an interaction term, but you are free to include as many as you want in your own models. We define a single function to sample the environmental distributions to illustrate how to use continuously varying parameter distributions in <code>ipmr</code>. This only uses two models and one function to limit the the complexity of the example, however there is no upper limit on the number of parameters or functions you can use in your own models.</p>
 <p>The vital rate functions are described here:</p>
 <ol style="list-style-type: decimal">
 <li>
@@ -1186,35 +1193,35 @@
 <li>
 <p>growth (<code>g</code>): a linear regression</p>
 <ul>
-<li>example model formula: <code>brm(size_2 ~ size_1 + temp + precip, data = my_grow_data)</code>
+<li>example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(size_2 ~ size_1 + temp + precip, data = my_grow_data)</a></code>
 </li>
 </ul>
 </li>
 <li>
-<p>flower probability (<code>f_r</code>): A logistic regression.</p>
+<p>flower probability (<code>r_r</code>): A logistic regression.</p>
 <ul>
 <li>example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(repro ~ size_1, data = my_repro_data, family = binomial())</a></code>
 </li>
 </ul>
 </li>
 <li>
-<p>seed production (<code>f_s</code>): a logistic regression.</p>
+<p>seed production (<code>r_s</code>): a logistic regression.</p>
 <ul>
 <li>example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(flower_n ~ size_1, data = my_flower_data, family = poisson())</a></code>
 </li>
 </ul>
 </li>
 <li>
-<p>recruit sizes (<code>f_d</code>): A normal distribution</p>
+<p>recruit sizes (<code>r_d</code>): A normal distribution</p>
 <ul>
-<li>example code: mean (<code>f_d_mu</code>) <code><a href="https://rdrr.io/r/base/mean.html">mean(my_recruit_data$size_2, na.rm = TRUE)</a></code> and standard deviation (<code>f_d_sd</code>) <code><a href="https://rdrr.io/r/stats/sd.html">sd(my_recruit_data$size_2, na.rm = TRUE)</a></code>
+<li>example code: mean (<code>r_d_mu</code>) <code><a href="https://rdrr.io/r/base/mean.html">mean(my_recruit_data$size_2, na.rm = TRUE)</a></code> and standard deviation (<code>r_d_sd</code>) <code><a href="https://rdrr.io/r/stats/sd.html">sd(my_recruit_data$size_2, na.rm = TRUE)</a></code>
 </li>
 </ul>
 </li>
 </ol>
 <p>And the the parameter values are given here:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ipmr</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
 
 <span class="co"># Define the fixed parameters in a list. The temperature and precipitation</span>
 <span class="co"># coefficients are defined as s_temp, s_precip, g_temp, and g_precip.</span>
@@ -1229,12 +1236,12 @@
   g_sd      <span class="op">=</span> <span class="fl">1.2</span>,
   g_temp    <span class="op">=</span> <span class="op">-</span><span class="fl">0.002</span>,
   g_precip  <span class="op">=</span> <span class="fl">0.004</span>,
-  f_r_int   <span class="op">=</span> <span class="op">-</span><span class="fl">3.2</span>,
-  f_r_slope <span class="op">=</span> <span class="fl">0.55</span>,
-  f_s_int   <span class="op">=</span> <span class="op">-</span><span class="fl">0.4</span>,
-  f_s_slope <span class="op">=</span> <span class="fl">0.5</span>,
-  f_d_mu    <span class="op">=</span> <span class="fl">1.1</span>,
-  f_d_sd    <span class="op">=</span> <span class="fl">0.1</span>
+  r_r_int   <span class="op">=</span> <span class="op">-</span><span class="fl">3.2</span>,
+  r_r_slope <span class="op">=</span> <span class="fl">0.55</span>,
+  r_s_int   <span class="op">=</span> <span class="op">-</span><span class="fl">0.4</span>,
+  r_s_slope <span class="op">=</span> <span class="fl">0.5</span>,
+  r_d_mu    <span class="op">=</span> <span class="fl">1.1</span>,
+  r_d_sd    <span class="op">=</span> <span class="fl">0.1</span>
 <span class="op">)</span>
 
 <span class="co"># Now, we create a set of environmental covariates. In this example, we use</span>
@@ -1310,17 +1317,17 @@
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">'F'</span>,
-    formula       <span class="op">=</span> <span class="va">f_r</span> <span class="op">*</span> <span class="va">f_s</span> <span class="op">*</span> <span class="va">f_d</span>,
+    formula       <span class="op">=</span> <span class="va">r_r</span> <span class="op">*</span> <span class="va">r_s</span> <span class="op">*</span> <span class="va">r_d</span>,
     family        <span class="op">=</span> <span class="st">'CC'</span>,
-    f_r_lin_p     <span class="op">=</span> <span class="va">f_r_int</span> <span class="op">+</span> <span class="va">f_r_slope</span> <span class="op">*</span> <span class="va">surf_area_1</span>,
-    f_r           <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">f_r_lin_p</span><span class="op">)</span>,
-    f_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">f_s_int</span> <span class="op">+</span> <span class="va">f_s_slope</span> <span class="op">*</span> <span class="va">surf_area_1</span><span class="op">)</span>,
-    f_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">surf_area_2</span>, <span class="va">f_d_mu</span>, <span class="va">f_d_sd</span><span class="op">)</span>,
+    r_r_lin_p     <span class="op">=</span> <span class="va">r_r_int</span> <span class="op">+</span> <span class="va">r_r_slope</span> <span class="op">*</span> <span class="va">surf_area_1</span>,
+    r_r           <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">r_r_lin_p</span><span class="op">)</span>,
+    r_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">r_s_int</span> <span class="op">+</span> <span class="va">r_s_slope</span> <span class="op">*</span> <span class="va">surf_area_1</span><span class="op">)</span>,
+    r_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">surf_area_2</span>, <span class="va">r_d_mu</span>, <span class="va">r_d_sd</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">constant_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'surf_area'</span><span class="op">)</span><span class="op">)</span>,
     has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
-    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
+    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"r_d"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
@@ -1395,18 +1402,18 @@
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">'F'</span>,
-    formula       <span class="op">=</span> <span class="va">f_r</span> <span class="op">*</span> <span class="va">f_s</span> <span class="op">*</span> <span class="va">f_d</span>,
+    formula       <span class="op">=</span> <span class="va">r_r</span> <span class="op">*</span> <span class="va">r_s</span> <span class="op">*</span> <span class="va">r_d</span>,
     family        <span class="op">=</span> <span class="st">'CC'</span>,
-    f_r_lin_p     <span class="op">=</span> <span class="va">f_r_int</span> <span class="op">+</span> <span class="va">f_r_slope</span> <span class="op">*</span> <span class="va">surf_area_1</span>,
-    f_r           <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">f_r_lin_p</span><span class="op">)</span>,
-    f_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">f_s_int</span> <span class="op">+</span> <span class="va">f_s_slope</span> <span class="op">*</span> <span class="va">surf_area_1</span><span class="op">)</span>,
-    f_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">surf_area_2</span>, <span class="va">f_d_mu</span>, <span class="va">f_d_sd</span><span class="op">)</span>,
+    r_r_lin_p     <span class="op">=</span> <span class="va">r_r_int</span> <span class="op">+</span> <span class="va">r_r_slope</span> <span class="op">*</span> <span class="va">surf_area_1</span>,
+    r_r           <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">r_r_lin_p</span><span class="op">)</span>,
+    r_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">r_s_int</span> <span class="op">+</span> <span class="va">r_s_slope</span> <span class="op">*</span> <span class="va">surf_area_1</span><span class="op">)</span>,
+    r_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">surf_area_2</span>, <span class="va">r_d_mu</span>, <span class="va">r_d_sd</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">constant_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'surf_area'</span><span class="op">)</span><span class="op">)</span>,
     has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
-    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
-  <span class="op">)</span>  <span class="op">%&gt;%</span>
+    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"r_d"</span><span class="op">)</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
       kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P"</span>, <span class="st">"F"</span><span class="op">)</span>,
@@ -1481,17 +1488,17 @@
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">'F'</span>,
-    formula       <span class="op">=</span> <span class="va">f_r</span> <span class="op">*</span> <span class="va">f_s</span> <span class="op">*</span> <span class="va">f_d</span>,
+    formula       <span class="op">=</span> <span class="va">r_r</span> <span class="op">*</span> <span class="va">r_s</span> <span class="op">*</span> <span class="va">r_d</span>,
     family        <span class="op">=</span> <span class="st">'CC'</span>,
-    f_r_lin_p     <span class="op">=</span> <span class="va">f_r_int</span> <span class="op">+</span> <span class="va">f_r_slope</span> <span class="op">*</span> <span class="va">surf_area_1</span>,
-    f_r           <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">f_r_lin_p</span><span class="op">)</span>,
-    f_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">f_s_int</span> <span class="op">+</span> <span class="va">f_s_slope</span> <span class="op">*</span> <span class="va">surf_area_1</span><span class="op">)</span>,
-    f_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">surf_area_2</span>, <span class="va">f_d_mu</span>, <span class="va">f_d_sd</span><span class="op">)</span>,
+    r_r_lin_p     <span class="op">=</span> <span class="va">r_r_int</span> <span class="op">+</span> <span class="va">r_r_slope</span> <span class="op">*</span> <span class="va">surf_area_1</span>,
+    r_r           <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">r_r_lin_p</span><span class="op">)</span>,
+    r_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">r_s_int</span> <span class="op">+</span> <span class="va">r_s_slope</span> <span class="op">*</span> <span class="va">surf_area_1</span><span class="op">)</span>,
+    r_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">surf_area_2</span>, <span class="va">r_d_mu</span>, <span class="va">r_d_sd</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">constant_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'surf_area'</span><span class="op">)</span><span class="op">)</span>,
     has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
-    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
+    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"r_d"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
@@ -1549,7 +1556,7 @@
 <p>For the purpose of this example, we’ll use the iceplant data set and do a bootstrapping procedure on the raw data. At each iteration of the bootstrap, we’ll re-run the regression models, and then re-build the IPM. We’ll store the lambda values for each one, and then repeat the procedure 50 times to keep the example short. Normally, many more re-samplings would be required to obtain reasonable confidence intervals.</p>
 <p>First, we construct our vital rate models and IPM from the observed data.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ipmr</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">iceplant_ex</span><span class="op">)</span>
 
@@ -1608,31 +1615,31 @@
     has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span>fun   <span class="op">=</span> <span class="st">"norm"</span>, 
-                                            param <span class="op">=</span> <span class="st">"g"</span><span class="op">)</span>
+                                            target <span class="op">=</span>  <span class="st">"g"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"F"</span>,
     family        <span class="op">=</span> <span class="st">"CC"</span>,
-    formula       <span class="op">=</span> <span class="va">f_p</span> <span class="op">*</span> <span class="va">f_s</span> <span class="op">*</span> <span class="va">f_d</span> <span class="op">*</span> <span class="va">f_r</span>,
+    formula       <span class="op">=</span> <span class="va">r_p</span> <span class="op">*</span> <span class="va">r_s</span> <span class="op">*</span> <span class="va">r_d</span> <span class="op">*</span> <span class="va">r_r</span>,
     
     <span class="co"># As above, we use predict(model_object). We make sure the names of the "newdata"</span>
     <span class="co"># match the names in the vital rate model formulas, and the values match the </span>
     <span class="co"># names of domains they use.</span>
     
-    f_p           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">repr_mod</span>,
+    r_p           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">repr_mod</span>,
                             newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>log_size <span class="op">=</span> <span class="va">sa_1</span><span class="op">)</span>,
                             type    <span class="op">=</span> <span class="st">'response'</span><span class="op">)</span>,
-    f_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">seed_mod</span>, 
+    r_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">seed_mod</span>, 
                             newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>log_size <span class="op">=</span> <span class="va">sa_1</span><span class="op">)</span>, 
                             type    <span class="op">=</span> <span class="st">'response'</span><span class="op">)</span>,
-    f_r           <span class="op">=</span> <span class="va">recr_n</span> <span class="op">/</span> <span class="va">flow_n</span>,
-    f_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">sa_2</span>, <span class="va">recr_mu</span>, <span class="va">recr_sd</span><span class="op">)</span>,
+    r_r           <span class="op">=</span> <span class="va">recr_n</span> <span class="op">/</span> <span class="va">flow_n</span>,
+    r_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">sa_2</span>, <span class="va">recr_mu</span>, <span class="va">recr_sd</span><span class="op">)</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"sa"</span><span class="op">)</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">params</span>,
     has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span>fun   <span class="op">=</span> <span class="st">"norm"</span>,
-                                            param <span class="op">=</span> <span class="st">"f_d"</span><span class="op">)</span>
+                                            target <span class="op">=</span>  <span class="st">"r_d"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
@@ -1661,7 +1668,7 @@
 <span class="va">adults</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">iceplant_ex</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">log_size</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">use_proto</span> <span class="op">&lt;-</span> <span class="va">obs_ipm</span><span class="op">$</span><span class="va">proto_ipm</span></code></pre></div>
-<p>Now, we refit the vital rate models, and use the <code>parameters</code> function to update the original <code>proto_ipm</code> object with the new vital rate models. This saves us from re-typing the whole model pipeline again. Normally, we would bootstrap more than 50 times, but for the sake of this example and saving time, we will only do 50.</p>
+<p>Now, we refit the vital rate models, and use the <code>parameters&lt;-</code> setter function to update the original <code>proto_ipm</code> object with the new vital rate models. This saves us from re-typing the whole model pipeline again. Normally, we would bootstrap more than 50 times, but for the sake of this example and saving time, we will only do 50.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span> <span class="op">{</span>
 
@@ -1733,7 +1740,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://github.com/levisc8">Sam Levin</a>.</p>
+  <p>Developed by <a href="https://github.com/levisc8">Sam Levin</a>, Aldo Compagnoni, Dylan Childs, Sanne Evers, Roberto Salguero-Gomez, Tiffany Knight.</p>
 </div>
 
 <div class="pkgdown">

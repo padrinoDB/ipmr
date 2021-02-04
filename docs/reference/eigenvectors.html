@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -131,7 +131,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/levisc8/ipmr/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -146,7 +151,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Compute the standardized left and right eigenvectors via iteration</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/levisc8/ipmr/blob/master/R/generics.R'><code>R/generics.R</code></a></small>
     <div class="hidden name"><code>eigenvectors.Rd</code></div>
     </div>
 
@@ -154,21 +159,21 @@
     <p>Compute the standardized left and right eigenvectors via iteration</p>
     </div>
 
-    <pre class="usage"><span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>iterations</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>iterations</span>, <span class='va'>tolerance</span><span class='op'>)</span>
 
 <span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
+<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, tolerance <span class='op'>=</span> <span class='fl'>1e-10</span><span class='op'>)</span>
 
 <span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
+<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, tolerance <span class='op'>=</span> <span class='fl'>1e-10</span><span class='op'>)</span>
 
-<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>iterations</span><span class='op'>)</span>
+<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>iterations</span>, <span class='va'>tolerance</span><span class='op'>)</span>
 
 <span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
+<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, tolerance <span class='op'>=</span> <span class='fl'>1e-10</span><span class='op'>)</span>
 
 <span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span></pre>
+<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, tolerance <span class='op'>=</span> <span class='fl'>1e-10</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -182,6 +187,10 @@
       <td><p>The number of times to iterate the model to reach
 convergence. Default is 100.</p></td>
     </tr>
+    <tr>
+      <th>tolerance</th>
+      <td><p>Tolerance to evaluate convergence to asymptotic dynamics.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -190,10 +199,19 @@ convergence. Default is 100.</p></td>
 function (<code>right_ev</code>) or the reproductive values for each trait (<code>left_ev</code>).</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>For <code>right_ev</code>, if the model has already been iterated, then
-these functions will just extract population state of the final iteration and
-return that in a named list. Each element of the list is a vector with length
-<code>&gt;= 1</code> and corresponds each state variable's portion of the eigenvector.</p>
+    <p>For <code>right_ev</code>, if the model has already been iterated and has
+converged to asymptotic dynamics, then it will just extract the final
+population state and return that in a named list. Each element of the list
+is a vector with length <code>&gt;= 1</code> and corresponds each state variable's
+portion of the eigenvector.
+If the model has been iterated, but has not yet converged to asymptotic dynamics,
+<code>right_ev</code> will try to iterate it further using the final population state
+as the starting point. The default number of iterations is 100, and can be
+adjusted using the <code>iterations</code> argument.
+If the model hasn't been iterated, then <code>right_ev</code> will try iterating it
+for <code>iterations</code> number of time steps and check for convergence. In the
+latter two cases, if the model still has not converged to asymptotic dynamics,
+it will return <code>NA</code> with a warning.</p>
 <p>For <code>left_ev</code>, the transpose iteration (<em>sensu</em> Ellner &amp; Rees 2006,
 Appendix A) is worked out based on the <code>state_start</code> and <code>state_end</code>
 in the model's <code>proto_ipm</code> object. The model is then iterated for
@@ -210,7 +228,7 @@ in the model's <code>proto_ipm</code> object. The model is then iterated for
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>.</p>
+  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>, Aldo Compagnoni, Dylan Childs, Sanne Evers, Roberto Salguero-Gomez, Tiffany Knight.</p>
 </div>
 
 <div class="pkgdown">

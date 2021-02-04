@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -89,7 +89,14 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/levisc8/ipmr/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -105,7 +112,7 @@
       <h1 data-toc-skip>Hierarchical Notation</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/levisc8/ipmr/blob/master/vignettes/hierarchical-notation.Rmd"><code>vignettes/hierarchical-notation.Rmd</code></a></small>
       <div class="hidden name"><code>hierarchical-notation.Rmd</code></div>
 
     </div>
@@ -130,6 +137,7 @@
 <p>Coefficients/parameters: <span class="math inline">\(\alpha\)</span> - intercept, <span class="math inline">\(\beta\)</span> - slope, <span class="math inline">\(\mu\)</span> - mean, <span class="math inline">\(\sigma\)</span> standard deviation.</p>
 <p>Vital rates: subscripts on the coefficients/parameters. For example, <span class="math inline">\(\alpha_g\)</span> for the intercept of a growth model.</p>
 <p>Hierarchical effects: superscripts on coefficients. For example, <span class="math inline">\(\beta_g^{site}\)</span> for a site specific growth slope.</p>
+<p>Probability density functions: these are denoted with <span class="math inline">\(f_p\)</span>, where <span class="math inline">\(_p\)</span> is replaced by the vital rate. For example, <span class="math inline">\(f_g(\mu_g, \sigma_g)\)</span> would denote a probability density function for growth.</p>
 <table class="table">
 <caption>
 Math Formula corresponds to the mathematical notation for the model. R Formula corresponds to how one could write the model using R’s model formula syntax (think <code>lm</code>, <code>glm</code>, <code>lmer</code>). ipmr shows an equivalent way to write this model in kernel formula or vital rate expression. Model Number indicates which rows are grouped together, as some models have too many terms to cleanly fit on a line, or have multiple equivalent representations.
@@ -165,7 +173,7 @@ mu_g_<strong>yr</strong> = g_int + g_int_<strong>yr</strong> + g_slope * z
 </tr>
 <tr>
 <td style="text-align:left;">
-<span class="math inline">\(z' \sim Norm(\mu_g^{yr}, \sigma_g)\)</span>
+<span class="math inline">\(g(z',z) = f_g(\mu_g^{yr}, \sigma_g)\)</span>
 </td>
 <td style="text-align:left;">
 </td>
@@ -217,13 +225,13 @@ s = inv_logit(s_<strong>pl</strong>_<strong>yr</strong>)
 </tr>
 <tr>
 <td style="text-align:left;">
-<span class="math inline">\(log(\mu_f^{yr}) = \alpha_{f} + \alpha_f^{yr} + (\beta_f + \beta_f^{yr}) * z\)</span>
+<span class="math inline">\(log(\mu_{r}^{yr}) = \alpha_{r} + \alpha_r^{yr} + (\beta_r + \beta_r^{yr}) * z\)</span>
 </td>
 <td style="text-align:left;">
 <code>fec ~ size_1 + (size_1 | year), family = poisson()</code>
 </td>
 <td style="text-align:left;">
-fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</strong>) * z)
+r = exp(r_int + r_int_<strong>yr</strong> + (r_slope + r_slope_<strong>yr</strong>) * z)
 </td>
 <td style="text-align:right;">
 3
@@ -232,6 +240,7 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 </tbody>
 </table>
 <p>Internally, <code>ipmr</code> generates the various levels using <code>expand.grid</code>. This means that every combination of the values in <code>levels_hier_effs</code> must exist in the <code>data_list</code>, or the model will fail with an error along the lines of (<code>Error in eval_tidy: object 'x_yz' not found</code>). In order to exclude levels that do not exist in your data, you can add a vector to the list in <code>levels_hier_effs</code> called <code>drop_levels</code>. This should contain the values you wish to exclude as a character vector. For example, if data are collected for <code>sites = c("a", "b", "c")</code>, and <code>years = c(2005:2008)</code>, but there is no data from site <code>"a"</code> in 2007, we can use <code>levels_hier_effs = list(site = c("a", "b", "c"), year = c(2005:2008), drop_levels = c("a_2007"))</code>.</p>
+<p>When picking values to appear in <code>levels_hier_effs</code>, it is best to avoid longer words or phrases where words are separated by underscores (e.g. <code>treatment = c("h_removal", "c_addition")</code>), as this may cause problems when values are substituted into expressions. CamelCase is generally safer in these cases (e.g. use <code>treatment = c("hRemoval", "cAddition")</code> instead of <code>treatment = c("h_removal", "c_addition")</code>).</p>
 </div>
 </div>
 <div id="sim_di_s_k" class="section level2">
@@ -242,7 +251,7 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <ol style="list-style-type: decimal">
 <li><p><span class="math inline">\(n(z', t + 1) = \int_L^U [P^{yr}(z',z) + F(z',z)]n(z,t)dz\)</span></p></li>
 <li><p><span class="math inline">\(P^{yr}(z', z) = s^{yr}(z) * g^{yr}(z',z)\)</span></p></li>
-<li><p><span class="math inline">\(F(z',z) = f_p(z) + f_r(z) + f_d(z')\)</span></p></li>
+<li><p><span class="math inline">\(F(z',z) = r_p(z) + r_r(z) + r_d(z')\)</span></p></li>
 </ol>
 <p>Note that only the <span class="math inline">\(P\)</span> kernel get the <span class="math inline">\(yr\)</span> subscript appended to them - this is the only one that our model selection process decided had substantial year to year variation. Thus, we can actually write the <span class="math inline">\(F\)</span> kernel the exact same way as we would in a simple IPM when we implement the model in <code>ipmr</code>.</p>
 <p>The vital rate models could be written on paper as follows:</p>
@@ -251,7 +260,7 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <p>Growth</p>
 <ul>
 <li><p><span class="math inline">\(\mu_g = (\alpha_g + \alpha_g^{yr})+ \beta_g * z\)</span></p></li>
-<li><p><span class="math inline">\(z' \sim Norm(\mu_g, \sigma_g)\)</span></p></li>
+<li><p><span class="math inline">\(g(z',z) = f_g(\mu_g, \sigma_g)\)</span></p></li>
 </ul>
 </li>
 <li>
@@ -263,26 +272,26 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <li>
 <p>Probability of reproducing</p>
 <ul>
-<li><span class="math inline">\(Logit(f_p) = \alpha_{f_p} + \beta_{f_p} * z\)</span></li>
+<li><span class="math inline">\(Logit(r_p) = \alpha_{r_p} + \beta_{r_p} * z\)</span></li>
 </ul>
 </li>
 <li>
 <p>Recruit production</p>
 <ul>
-<li><span class="math inline">\(log(f_r) = \alpha_{f_r} + \beta_{f_r} * z\)</span></li>
+<li><span class="math inline">\(log(r_r) = \alpha_{r_r} + \beta_{r_r} * z\)</span></li>
 </ul>
 </li>
 <li>
 <p>Recruit size distribution</p>
 <ul>
-<li><span class="math inline">\(f_d \sim Norm(\mu_{f_d}, \sigma_{f_d})\)</span></li>
+<li><span class="math inline">\(r_d(z') = f_{r_d}(\mu_{r_d}, \sigma_{r_d})\)</span></li>
 </ul>
 </li>
 </ol>
 <p>and modeled in R as follows:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/lme4/lme4/">lme4</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ipmr</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
 
 <span class="va">grow_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html">lmer</a></span><span class="op">(</span><span class="va">size_2</span> <span class="op">~</span> <span class="va">size_1</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">year</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">grow_data</span><span class="op">)</span>
 
@@ -308,7 +317,7 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <code class="sourceCode R"><span class="va">repr_coef</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">repr_mod</span><span class="op">)</span>
 
 <span class="va">recr_coef</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">recr_mod</span><span class="op">)</span></code></pre></div>
-<p>The next step is to transform these values into something <code>ipmr</code> can use. This must always be a <strong>named list</strong> where the names of the list components are the names used in the vital expressions or kernel formula. Transforming the <span class="math inline">\(\beta\)</span>s is easier - the output from fixef is always a named vector, so we just use <code><a href="https://rdrr.io/r/base/list.html">as.list()</a></code> and change the names to whatever we want to use. We then bundle it into one big list with all the fixed coefficients.</p>
+<p>The next step is to transform these values into something <code>ipmr</code> can use. This must always be a <strong>named list</strong> where the names of the list components are the names used in the vital expressions or kernel formula. Transforming the <span class="math inline">\(\beta\)</span>s is easier - the output from <code>fixef</code> is always a named vector, so we just use <code><a href="https://rdrr.io/r/base/list.html">as.list()</a></code> and change the names to whatever we want to use. We then bundle it into one big list with all the fixed coefficients.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">g_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">beta_gs</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">g_list</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"alpha_g"</span>, <span class="st">"beta_g"</span><span class="op">)</span>
@@ -316,15 +325,15 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <span class="va">s_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">beta_ss</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">s_list</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"alpha_s"</span>, <span class="st">"beta_s"</span><span class="op">)</span>
 
-<span class="va">f_p_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">recr_coef</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">f_p_list</span> <span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"alpha_f_p"</span>, <span class="st">"beta_f_p"</span><span class="op">)</span>
+<span class="va">r_p_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">recr_coef</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">f_p_list</span> <span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"alpha_r_p"</span>, <span class="st">"beta_r_p"</span><span class="op">)</span>
 
-<span class="va">f_r_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">repr_coef</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">f_r_list</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"alpha_f_r"</span>, <span class="st">"beta_f_r"</span><span class="op">)</span>
+<span class="va">r_r_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="va">repr_coef</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">r_r_list</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"alpha_r_r"</span>, <span class="st">"beta_r_r"</span><span class="op">)</span>
 
-<span class="va">f_d_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>mu_f_d <span class="op">=</span> <span class="va">rcsz_mu</span>, sigma_f_d <span class="op">=</span> <span class="va">rcsz_sd</span><span class="op">)</span>
+<span class="va">r_d_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>mu_r_d <span class="op">=</span> <span class="va">rcsz_mu</span>, sigma_r_d <span class="op">=</span> <span class="va">rcsz_sd</span><span class="op">)</span>
 
-<span class="va">all_fixed_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">g_list</span>, <span class="va">s_list</span>, <span class="va">f_p_list</span>, <span class="va">f_r_list</span>, <span class="va">f_d_list</span><span class="op">)</span></code></pre></div>
+<span class="va">all_fixed_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">g_list</span>, <span class="va">s_list</span>, <span class="va">r_p_list</span>, <span class="va">r_r_list</span>, <span class="va">r_d_list</span><span class="op">)</span></code></pre></div>
 <p>For the random effects, we probably need to do some a bit more processing, though this really depends on which modeling framework you use and the format of the outputs. For <code>lme4</code>, it looks like this:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">g_alpha_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="va">alpha_g_yrs</span><span class="op">)</span><span class="op">)</span>
@@ -335,7 +344,7 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <p>First, we strip away all of <code>lme4</code>-related attributes with <code><a href="https://rdrr.io/r/base/unlist.html">unlist()</a></code>, then convert it to the flat list format that we need. Next, we set the names. Now, we can combine it with our <code>all_fixed_params</code> list and we have all of the parameters we need for the kernel functions:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">all_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">all_fixed_params</span>, <span class="va">g_alpha_list</span>, <span class="va">s_alpha_list</span><span class="op">)</span></code></pre></div>
-<p>We are now ready to begin implementing the kernels! This model will be a simple, density independent, stochastic kernel-resampled model. The parts where the hierarchical syntax is used are highlighted by comments in the code block:</p>
+<p>We are now ready to begin implementing the kernels. This model will be a simple, density independent, stochastic kernel-resampled model. The parts where the hierarchical syntax is used are highlighted by comments in the code block:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ex_ipm</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"simple"</span>,
                   di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
@@ -383,16 +392,16 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"F"</span>,
     family        <span class="op">=</span> <span class="st">"CC"</span>,
-    formula       <span class="op">=</span> <span class="va">f_p</span> <span class="op">*</span> <span class="va">f_r</span> <span class="op">*</span> <span class="va">f_d</span>,
-    f_p_lin_p     <span class="op">=</span> <span class="va">alpha_f_p</span> <span class="op">+</span> <span class="va">beta_f_p</span> <span class="op">*</span> <span class="va">z_1</span>,
-    f_p           <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span> <span class="op">-</span><span class="va">f_p_lin_p</span><span class="op">)</span><span class="op">)</span>,
-    f_r           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">alpha_f_r</span> <span class="op">+</span> <span class="va">beta_f_r</span> <span class="op">*</span> <span class="va">z_1</span><span class="op">)</span>,
-    f_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">z_2</span>, <span class="va">mu_f_d</span>, <span class="va">sigma_f_d</span><span class="op">)</span>,
+    formula       <span class="op">=</span> <span class="va">r_p</span> <span class="op">*</span> <span class="va">r_r</span> <span class="op">*</span> <span class="va">r_d</span>,
+    r_p_lin_p     <span class="op">=</span> <span class="va">alpha_r_p</span> <span class="op">+</span> <span class="va">beta_r_p</span> <span class="op">*</span> <span class="va">z_1</span>,
+    r_p           <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span> <span class="op">-</span><span class="va">r_p_lin_p</span><span class="op">)</span><span class="op">)</span>,
+    r_r           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">alpha_r_r</span> <span class="op">+</span> <span class="va">beta_r_r</span> <span class="op">*</span> <span class="va">z_1</span><span class="op">)</span>,
+    r_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">z_2</span>, <span class="va">mu_r_d</span>, <span class="va">sigma_r_d</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">all_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"z"</span><span class="op">)</span><span class="op">)</span>,
     has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
-    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
+    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"r_d"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
@@ -420,63 +429,67 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 <a href="#complicated" class="anchor"></a>Hierarchical models with continuously varying environments</h2>
 <p>Sometimes, models will have discretely and continuously varying components as functions of different variables. For example, a study could consider multiple sites (discrete component) and spatial and/or temporal fluctuations in the environment at each site (continuous component). We’ll use a hypothetical study that models demography as a function of environment across multiple sites to illustrate this.</p>
 <p>We’ll implement a general IPM of a perennial plant species. Our data will come from 6 sites, <code>"A"</code> - <code>"F"</code>, and the vital rate intercepts for the plants will vary across each one. Its seeds can either enter a seed bank or recruit immediately, producing recruits at the next time step. We’ll pretend that data from the recruit size distribution was pooled across sites, and so does not vary with space. The seed bank will be age structured and its parameters will be space- and time-invariant. Seeds in the first year can either survive (<span class="math inline">\(s_{{sb}_1}\)</span>/<code>s_sb1</code>) and recruit (<span class="math inline">\(r_{{sb}_1}\)</span>), or survive and become two year old seeds. Two year old seeds can either survive (<span class="math inline">\(s_{{sb}_2}\)</span>/<code>s_sb2</code>) and recruit (<span class="math inline">\(r_{{sb}_2}\)</span>/<code>r_sb2</code>) or die.</p>
-<p>The vital rate information fed into our hypothetical regression models are (<span class="math inline">\(s^{site}\)</span>/<code>s_site</code>), growth (<span class="math inline">\(g^{site}\)</span>/<code>g_site</code>), probability of reproduction (<span class="math inline">\(f_{p}^{site}\)</span>/<code>f_p_site</code>), and seed production (<span class="math inline">\(f_{r}^{site}\)</span>/<code>f_r_site</code>). They are all functions of size (<code>z</code>) and environmental covariates (<span class="math inline">\(\theta^{t}\)</span> and <span class="math inline">\(\theta^{p}\)</span>, denoted together in the kernel formulas as just <span class="math inline">\(\theta\)</span>).</p>
+<p>The vital rate information fed into our hypothetical regression models are (<span class="math inline">\(s^{site}\)</span>/<code>s_site</code>), growth (<span class="math inline">\(g^{site}\)</span>/<code>g_site</code>), probability of reproduction (<span class="math inline">\(c_{p}^{site}\)</span>/<code>c_p_site</code>), and seed production (<span class="math inline">\(c_{r}^{site}\)</span>/<code>c_r_site</code>). They are all functions of size (<code>z</code>) and environmental covariates (<span class="math inline">\(\theta^{t}\)</span> and <span class="math inline">\(\theta^{p}\)</span>, denoted together in the kernel formulas as just <span class="math inline">\(\theta\)</span>).</p>
 <p>The full IPM looks like this:</p>
 <ol style="list-style-type: decimal">
-<li><p><span class="math inline">\(n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n(z, t)dz + s_{{sb}_1} * r_{{sb}_1} * sb_1(t) * \int_L^U f_d(z')dz' + s_{{sb}_2} * r_{{sb}_2} * sb_2(t) *\int_L^U f_d(z')dz'\)</span></p></li>
-<li><p><span class="math inline">\(sb_1(t + 1) = (1-r_i) * \int_L^U [f_p^{site}(z, \theta) * f_r^{site}(z,\theta)] n(z, t)dz\)</span></p></li>
+<li><p><span class="math display">\[
+n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n(z, t)dz +\\ s_{{sb}_1} * r_{{sb}_1} * sb_1(t) * \int_L^U c_d(z')dz' + \\s_{{sb}_2} * r_{{sb}_2} * sb_2(t) *\int_L^U c_d(z')dz'
+\]</span></p></li>
+<li><p><span class="math inline">\(sb_1(t + 1) = (1-r_i) * \int_L^U [c_p^{site}(z, \theta) * c_r^{site}(z,\theta)] n(z, t)dz\)</span></p></li>
 <li><p><span class="math inline">\(sb_2(t + 1) = s_{{sb}_1} * (1-r_{{sb}_1}) * sb_1(t)\)</span></p></li>
 </ol>
 <p>The sub kernels are:</p>
 <ol start="4" style="list-style-type: decimal">
 <li><p><span class="math inline">\(P^{site}(z',z, \theta) = s^{site}(z, \theta) * g^{site}(z',z, \theta)\)</span></p></li>
-<li><p><span class="math inline">\(F^{site}(z',z, \theta) = f_{{p}}^{site}(z, \theta) * f_{r}^{site}(z, \theta) * f_d(z')\)</span></p></li>
-<li><p><span class="math inline">\(\theta^{t} \sim Norm(mean^{t}, SD^{t})\)</span></p></li>
-<li><p><span class="math inline">\(\theta^{p} \sim Gamma(shape^{p}, rate^{p})\)</span></p></li>
+<li><p><span class="math inline">\(F^{site}(z',z, \theta) = c_{{p}}^{site}(z, \theta) * c_{r}^{site}(z, \theta) * c_d(z')\)</span></p></li>
+<li><p><span class="math inline">\(\theta^{t} \sim Norm(\mu^{t}, \sigma^{t})\)</span></p></li>
+<li><p><span class="math inline">\(\theta^{p} \sim Gamma(\alpha^{p}, \beta^{p})\)</span></p></li>
 </ol>
 <p>And the size/climate dependent vital rate functions and example R code are:</p>
 <ol start="8" style="list-style-type: decimal">
-<li><span class="math inline">\(Logit(s^{site}) = (\alpha_s + \alpha_{s}^{site}) + \beta_s^{z} * z + \beta_s^{t} * \theta^{t} + \beta_s^{p} * \theta^{p}\)</span></li>
-</ol>
+<li>
+<p><span class="math inline">\(Logit(s^{site}(z, \theta)) = (\alpha_s + \alpha_{s}^{site}) + \beta_s^{z} * z + \beta_s^{t} * \theta^{t} + \beta_s^{p} * \theta^{p}\)</span></p>
 <ul>
 <li>example R code: <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html">glmer(survival ~ size + temp + precip + (1 | site), data = my_surv_data, family = binomial())</a></code>
 </li>
 </ul>
-<ol start="9" style="list-style-type: decimal">
-<li><p><span class="math inline">\(g^{site} \sim Norm(\mu_g^{site}, \sigma_g)\)</span></p></li>
-<li><p><span class="math inline">\(\mu_g^{site} = (\alpha_g + \alpha_g^{site}) + \beta_g^{z} * z + \beta_g^{t} * \theta^{t} + \beta_g^{p} * \theta^{p}\)</span></p></li>
-</ol>
+</li>
+<li><p><span class="math inline">\(g^{site}(z',z,\theta) = f_g(\mu_g^{site}(z, \theta), \sigma_g)\)</span></p></li>
+<li>
+<p><span class="math inline">\(\mu_g^{site}(z, \theta) = (\alpha_g + \alpha_g^{site}) + \beta_g^{z} * z + \beta_g^{t} * \theta^{t} + \beta_g^{p} * \theta^{p}\)</span></p>
 <ul>
 <li>example R code: <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html">lmer(size_next ~ size + temp + precip + (1 | site), data = my_grow_data)</a></code>
 </li>
 </ul>
-<ol start="11" style="list-style-type: decimal">
-<li><span class="math inline">\(Logit(f_{p}^{site}) = (\alpha_{f_p} + \alpha_{f_p}^{site}) + \beta_{f_p}^{z} * z + \beta_{f_p}^{t} * \theta^{t} + \beta_{f_p}^{p} * \theta^{p}\)</span></li>
+</li>
+<li><p><span class="math inline">\(Logit(c_{p}^{site}(z, \theta)) = (\alpha_{c_p} + \alpha_{c_p}^{site}) + \beta_{c_p}^{z} * z + \beta_{c_p}^{t} * \theta^{t} + \beta_{c_p}^{p} * \theta^{p}\)</span></p></li>
 </ol>
 <ul>
 <li>example R code: <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html">glmer(repro ~ size + temp + precip + (1 | site), data = my_repro_data, family = binomial())</a></code>
 </li>
 </ul>
 <ol start="12" style="list-style-type: decimal">
-<li><span class="math inline">\(log(f_{r}^{site}) = (\alpha_{f_r} + \alpha_{f_r}^{site}) + \beta_{f_r}^{site} * z + \beta_{f_r}^{t} * \theta_{t} + \beta_{f_r}^{p} * \theta_{p}\)</span></li>
-</ol>
+<li>
+<p><span class="math inline">\(log(c_{r}^{site}(z, \theta)) = (\alpha_{c_r} + \alpha_{c_r}^{site}) + \beta_{c_r}^{z} * z + \beta_{c_r}^{t} * \theta_{t} + \beta_{c_r}^{p} * \theta_{p}\)</span></p>
 <ul>
 <li>example R code: <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html">glmer(flower_n ~ size + temp + precip + (1 | site), data = my_flower_data, family = poisson())</a></code>
 </li>
 </ul>
-<ol start="13" style="list-style-type: decimal">
-<li><span class="math inline">\(f_d \sim Norm(\mu_{f_d}, \sigma_{f_d})\)</span></li>
-</ol>
+</li>
+<li>
+<p><span class="math inline">\(c_d(z') = f_{c_d}(\mu_{c_d}, \sigma_{c_d})\)</span></p>
 <ul>
 <li>example R code: <code><a href="https://rdrr.io/r/base/mean.html">mean(my_recr_data$size_next); sd(my_recr_data$size_next)</a></code>
 </li>
 </ul>
+</li>
+</ol>
 <div id="simulating-parameters" class="section level3">
 <h3 class="hasAnchor">
 <a href="#simulating-parameters" class="anchor"></a>Simulating parameters</h3>
 <p>Since this example doesn’t work with actual data, we need to simulate some parameters for each site. Additionally, we’ll specify the distribution parameters for each <span class="math inline">\(\theta\)</span> and write a function that samples them once.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ipmr</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">51</span><span class="op">)</span>
 
@@ -490,17 +503,21 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
   r_sb2     <span class="op">=</span> <span class="fl">0.3</span>,
   s_sb1     <span class="op">=</span> <span class="fl">0.4</span>,
   s_sb2     <span class="op">=</span> <span class="fl">0.1</span>,
-  mu_f_d    <span class="op">=</span> <span class="fl">4</span>,
-  sigma_f_d <span class="op">=</span> <span class="fl">0.9</span>,
+  mu_c_d    <span class="op">=</span> <span class="fl">4</span>,
+  sigma_c_d <span class="op">=</span> <span class="fl">0.9</span>,
   sigma_g   <span class="op">=</span> <span class="fl">3</span>, 
+  beta_s_z    <span class="op">=</span> <span class="fl">2.5</span>,
   beta_s_prec <span class="op">=</span> <span class="fl">0.3</span>,
   beta_s_temp <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>,
+  beta_g_z    <span class="op">=</span> <span class="fl">0.99</span>,
   beta_g_prec <span class="op">=</span> <span class="fl">0.01</span>,
   beta_g_temp <span class="op">=</span> <span class="fl">0.1</span>,
-  beta_f_p_prec <span class="op">=</span> <span class="fl">0.6</span>,
-  beta_f_p_temp <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span>,
-  beta_f_r_prec <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span>,
-  beta_f_r_temp <span class="op">=</span> <span class="fl">0.9</span>
+  beta_c_p_z    <span class="op">=</span> <span class="fl">0.4</span>,
+  beta_c_p_prec <span class="op">=</span> <span class="fl">0.6</span>,
+  beta_c_p_temp <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span>,
+  beta_c_r_z    <span class="op">=</span> <span class="fl">0.005</span>,
+  beta_c_r_prec <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span>,
+  beta_c_r_temp <span class="op">=</span> <span class="fl">0.9</span>
 <span class="op">)</span>
 
 <span class="va">g_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">6</span>, mean <span class="op">=</span> <span class="fl">4.5</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -509,50 +526,30 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
     <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'alpha_g_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
   <span class="op">)</span>
 
-<span class="va">g_betas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">0.85</span>, <span class="fl">1.15</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'beta_g_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
-  <span class="op">)</span>
-
 <span class="va">s_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">6</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">7</span>, sd <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span>
     <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'alpha_s_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
   <span class="op">)</span>
-<span class="va">s_betas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span> <span class="op">%&gt;%</span>
+
+<span class="va">c_p_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">6</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>  <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'beta_s_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'alpha_c_p_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
   <span class="op">)</span>
 
-<span class="va">f_p_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">6</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>  <span class="op">%&gt;%</span>
+<span class="va">c_r_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">0.01</span>, <span class="fl">0.1</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'alpha_f_p_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
-  <span class="op">)</span>
-<span class="va">f_p_betas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">0.3</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'beta_f_p_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'alpha_c_r_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
   <span class="op">)</span>
 
-<span class="va">f_r_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">0.01</span>, <span class="fl">0.1</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'alpha_f_r_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
-  <span class="op">)</span>
-<span class="va">f_r_betas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">0.0001</span>, <span class="fl">0.01</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'beta_f_r_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
-  <span class="op">)</span> 
 
 <span class="va">all_pars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">all_pars</span>,
-              <span class="va">g_alphs</span>, <span class="va">g_betas</span>,
-              <span class="va">s_alphs</span>, <span class="va">s_betas</span>,
-              <span class="va">f_p_alphs</span>, <span class="va">f_p_betas</span>,
-              <span class="va">f_r_alphs</span>, <span class="va">f_r_betas</span><span class="op">)</span>
+              <span class="va">g_alphs</span>, 
+              <span class="va">s_alphs</span>, 
+              <span class="va">c_p_alphs</span>,
+              <span class="va">c_r_alphs</span><span class="op">)</span>
 
 <span class="co"># This list contains parameters that define the distributions for environmental</span>
 <span class="co"># covariates</span>
@@ -595,13 +592,19 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
     name <span class="op">=</span> <span class="st">"P_site"</span>,
     family <span class="op">=</span> <span class="st">"CC"</span>,
     
-    <span class="co"># site is appended so that we don't have to write out s_a, s_b, etc.</span>
+    <span class="co"># site is appended so that we don't have to write out s_A, s_B, etc.</span>
     
     formula          <span class="op">=</span> <span class="va">s_site</span> <span class="op">*</span> <span class="va">g_site</span> <span class="op">*</span> <span class="va">d_z</span>,
     
-    s_site_lin       <span class="op">=</span> <span class="va">alpha_s_site</span> <span class="op">+</span> <span class="va">beta_s_site</span> <span class="op">*</span> <span class="va">z_1</span> <span class="op">+</span> <span class="va">beta_s_prec</span> <span class="op">*</span> <span class="va">prec</span> <span class="op">+</span> <span class="va">beta_s_temp</span> <span class="op">*</span> <span class="va">temp</span>,
+    s_site_lin       <span class="op">=</span> <span class="va">alpha_s_site</span> <span class="op">+</span> 
+                       <span class="va">beta_s_z</span> <span class="op">*</span> <span class="va">z_1</span> <span class="op">+</span> 
+                       <span class="va">beta_s_prec</span> <span class="op">*</span> <span class="va">prec</span> <span class="op">+</span> 
+                       <span class="va">beta_s_temp</span> <span class="op">*</span> <span class="va">temp</span>,
     s_site           <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">s_site_lin</span><span class="op">)</span><span class="op">)</span>,
-    mu_g_site        <span class="op">=</span> <span class="va">alpha_g_site</span> <span class="op">+</span> <span class="va">beta_g_site</span> <span class="op">*</span> <span class="va">z_1</span> <span class="op">+</span> <span class="va">beta_g_prec</span> <span class="op">*</span> <span class="va">prec</span> <span class="op">+</span> <span class="va">beta_g_temp</span> <span class="op">*</span> <span class="va">temp</span>,
+    mu_g_site        <span class="op">=</span> <span class="va">alpha_g_site</span> <span class="op">+</span>
+                       <span class="va">beta_g_z</span> <span class="op">*</span> <span class="va">z_1</span> <span class="op">+</span> 
+                       <span class="va">beta_g_prec</span> <span class="op">*</span> <span class="va">prec</span> <span class="op">+</span> 
+                       <span class="va">beta_g_temp</span> <span class="op">*</span> <span class="va">temp</span>,
     g_site           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">z_2</span>, <span class="va">mu_g_site</span>, <span class="va">sigma_g</span><span class="op">)</span>,
     data_list        <span class="op">=</span> <span class="va">all_pars</span>,
     states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"z"</span><span class="op">)</span><span class="op">)</span>,
@@ -613,25 +616,37 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name             <span class="op">=</span> <span class="st">"F_site"</span>,
     family           <span class="op">=</span> <span class="st">"CC"</span>,
-    formula          <span class="op">=</span> <span class="va">f_p_site</span> <span class="op">*</span> <span class="va">f_r_site</span> <span class="op">*</span> <span class="va">f_d</span> <span class="op">*</span> <span class="va">d_z</span>,
-    f_p_site_lin     <span class="op">=</span> <span class="va">alpha_f_p_site</span> <span class="op">+</span> <span class="va">beta_f_p_site</span> <span class="op">*</span> <span class="va">z_1</span> <span class="op">+</span> <span class="va">beta_f_p_prec</span> <span class="op">*</span> <span class="va">prec</span> <span class="op">+</span> <span class="va">beta_f_p_temp</span> <span class="op">*</span> <span class="va">temp</span>,
-    f_p_site         <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">f_p_site_lin</span><span class="op">)</span><span class="op">)</span>,
-    f_r_site         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">alpha_f_r_site</span> <span class="op">+</span> <span class="va">beta_f_r_site</span> <span class="op">*</span> <span class="va">z_1</span> <span class="op">+</span> <span class="va">beta_f_r_prec</span> <span class="op">*</span> <span class="va">prec</span> <span class="op">+</span> <span class="va">beta_f_r_temp</span> <span class="op">*</span> <span class="va">temp</span><span class="op">)</span>,
-    f_d              <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">z_2</span>, <span class="va">mu_f_d</span>, <span class="va">sigma_f_d</span><span class="op">)</span>,
+    formula          <span class="op">=</span> <span class="va">c_p_site</span> <span class="op">*</span> <span class="va">c_r_site</span> <span class="op">*</span> <span class="va">c_d</span> <span class="op">*</span> <span class="va">d_z</span>,
+    c_p_site_lin     <span class="op">=</span> <span class="va">alpha_c_p_site</span> <span class="op">+</span> 
+                       <span class="va">beta_c_p_z</span> <span class="op">*</span> <span class="va">z_1</span> <span class="op">+</span> 
+                       <span class="va">beta_c_p_prec</span> <span class="op">*</span> <span class="va">prec</span> <span class="op">+</span> 
+                       <span class="va">beta_c_p_temp</span> <span class="op">*</span> <span class="va">temp</span>,
+    c_p_site         <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">c_p_site_lin</span><span class="op">)</span><span class="op">)</span>,
+    c_r_site         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">alpha_c_r_site</span> <span class="op">+</span> 
+                           <span class="va">beta_c_r_z</span> <span class="op">*</span> <span class="va">z_1</span> <span class="op">+</span>
+                           <span class="va">beta_c_r_prec</span> <span class="op">*</span> <span class="va">prec</span> <span class="op">+</span>
+                           <span class="va">beta_c_r_temp</span> <span class="op">*</span> <span class="va">temp</span><span class="op">)</span>,
+    c_d              <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">z_2</span>, <span class="va">mu_c_d</span>, <span class="va">sigma_c_d</span><span class="op">)</span>,
     data_list        <span class="op">=</span> <span class="va">all_pars</span>,
     states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="st">"sb1"</span>, <span class="st">"sb2"</span><span class="op">)</span><span class="op">)</span>,
     has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
     levels_hier_effs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>site <span class="op">=</span> <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span>,
     evict_cor        <span class="op">=</span> <span class="cn">TRUE</span>,
-    evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
+    evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"c_d"</span><span class="op">)</span>
     <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name             <span class="op">=</span> <span class="st">"go_sb_1_site"</span>,
     family           <span class="op">=</span> <span class="st">"CD"</span>,
-    formula          <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">r_i</span><span class="op">)</span> <span class="op">*</span> <span class="va">f_p_site</span> <span class="op">*</span> <span class="va">f_r_site</span> <span class="op">*</span> <span class="va">d_z</span>,
-    f_p_site_lin     <span class="op">=</span> <span class="va">alpha_f_p_site</span> <span class="op">+</span> <span class="va">beta_f_p_site</span> <span class="op">*</span> <span class="va">z_1</span> <span class="op">+</span> <span class="va">beta_f_p_prec</span> <span class="op">*</span> <span class="va">prec</span> <span class="op">+</span> <span class="va">beta_f_p_temp</span> <span class="op">*</span> <span class="va">temp</span>,
-    f_p_site         <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">f_p_site_lin</span><span class="op">)</span><span class="op">)</span>,
-    f_r_site         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">alpha_f_r_site</span> <span class="op">+</span> <span class="va">beta_f_r_site</span> <span class="op">*</span> <span class="va">z_1</span> <span class="op">+</span> <span class="va">beta_f_r_prec</span> <span class="op">*</span> <span class="va">prec</span> <span class="op">+</span> <span class="va">beta_f_r_temp</span> <span class="op">*</span> <span class="va">temp</span><span class="op">)</span>,
+    formula          <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">r_i</span><span class="op">)</span> <span class="op">*</span> <span class="va">c_p_site</span> <span class="op">*</span> <span class="va">c_r_site</span> <span class="op">*</span> <span class="va">d_z</span>,
+    c_p_site_lin     <span class="op">=</span> <span class="va">alpha_c_p_site</span> <span class="op">+</span> 
+                       <span class="va">beta_c_p_z</span> <span class="op">*</span> <span class="va">z_1</span> <span class="op">+</span> 
+                       <span class="va">beta_c_p_prec</span> <span class="op">*</span> <span class="va">prec</span> <span class="op">+</span>
+                       <span class="va">beta_c_p_temp</span> <span class="op">*</span> <span class="va">temp</span>,
+    c_p_site         <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">c_p_site_lin</span><span class="op">)</span><span class="op">)</span>,
+    c_r_site         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">alpha_c_r_site</span> <span class="op">+</span> 
+                           <span class="va">beta_c_r_z</span> <span class="op">*</span> <span class="va">z_1</span> <span class="op">+</span> 
+                           <span class="va">beta_c_r_prec</span> <span class="op">*</span> <span class="va">prec</span> <span class="op">+</span> 
+                           <span class="va">beta_c_r_temp</span> <span class="op">*</span> <span class="va">temp</span><span class="op">)</span>,
     data_list        <span class="op">=</span> <span class="va">all_pars</span>,
     states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="st">"sb1"</span><span class="op">)</span><span class="op">)</span>,
     has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -650,24 +665,24 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"leave_sb_1"</span>,
     family        <span class="op">=</span> <span class="st">"DC"</span>,
-    formula       <span class="op">=</span> <span class="va">s_sb1</span> <span class="op">*</span> <span class="va">r_sb1</span> <span class="op">*</span> <span class="va">f_d</span> <span class="op">*</span> <span class="va">d_z</span>,
-    f_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">z_2</span>, <span class="va">mu_f_d</span>, <span class="va">sigma_f_d</span><span class="op">)</span>,
+    formula       <span class="op">=</span> <span class="va">s_sb1</span> <span class="op">*</span> <span class="va">r_sb1</span> <span class="op">*</span> <span class="va">c_d</span> <span class="op">*</span> <span class="va">d_z</span>,
+    c_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">z_2</span>, <span class="va">mu_c_d</span>, <span class="va">sigma_c_d</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">all_pars</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="st">"sb1"</span><span class="op">)</span><span class="op">)</span>,
     has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
-    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
+    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"c_d"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"leave_sb_2"</span>,
     family        <span class="op">=</span> <span class="st">"DC"</span>,
-    formula       <span class="op">=</span> <span class="va">s_sb2</span> <span class="op">*</span> <span class="va">r_sb2</span> <span class="op">*</span> <span class="va">f_d</span> <span class="op">*</span> <span class="va">d_z</span>,
-    f_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">z_2</span>, <span class="va">mu_f_d</span>, <span class="va">sigma_f_d</span><span class="op">)</span>,
+    formula       <span class="op">=</span> <span class="va">s_sb2</span> <span class="op">*</span> <span class="va">r_sb2</span> <span class="op">*</span> <span class="va">c_d</span> <span class="op">*</span> <span class="va">d_z</span>,
+    c_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">z_2</span>, <span class="va">mu_c_d</span>, <span class="va">sigma_c_d</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">all_pars</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="st">"sb2"</span><span class="op">)</span><span class="op">)</span>,
     has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
-    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
+    evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"c_d"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
@@ -717,7 +732,7 @@ fec = exp(f_int + f_int_<strong>yr</strong> + (f_slope + f_slope_<strong>yr</str
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://github.com/levisc8">Sam Levin</a>.</p>
+  <p>Developed by <a href="https://github.com/levisc8">Sam Levin</a>, Aldo Compagnoni, Dylan Childs, Sanne Evers, Roberto Salguero-Gomez, Tiffany Knight.</p>
 </div>
 
 <div class="pkgdown">

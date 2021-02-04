@@ -43,7 +43,7 @@
 <meta property="og:description" content="The make_ipm.* methods convert a proto_ipm into a
 set of discretized kernels and population vectors. Methods have different
 requirements, so be sure to read the parameter documentation. 
-vignette('ipmr-introduction', 'ipmr') also contains helpful information." />
+vignette('ipmr-introduction', 'ipmr')  a more complete introduction." />
 
 
 
@@ -75,7 +75,7 @@ vignette('ipmr-introduction', 'ipmr') also contains helpful information." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -134,7 +134,12 @@ vignette('ipmr-introduction', 'ipmr') also contains helpful information." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/levisc8/ipmr/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -149,7 +154,7 @@ vignette('ipmr-introduction', 'ipmr') also contains helpful information." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Methods to implement an IPM</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/levisc8/ipmr/blob/master/R/make_ipm.R'><code>R/make_ipm.R</code></a></small>
     <div class="hidden name"><code>make_ipm.Rd</code></div>
     </div>
 
@@ -157,7 +162,7 @@ vignette('ipmr-introduction', 'ipmr') also contains helpful information." />
     <p>The <code>make_ipm.*</code> methods convert a <code>proto_ipm</code> into a
 set of discretized kernels and population vectors. Methods have different
 requirements, so be sure to read the parameter documentation. <code><a href='../articles/ipmr-introduction.html'>
-vignette('ipmr-introduction', 'ipmr')</a></code> also contains helpful information.</p>
+vignette('ipmr-introduction', 'ipmr')</a></code>  a more complete introduction.</p>
     </div>
 
     <pre class="usage"><span class='fu'>make_ipm</span><span class='op'>(</span>
@@ -398,12 +403,12 @@ the IPM with.</p></td>
       <th>iterate</th>
       <td><p>A logical indicating whether or not iterate the model before exiting
 or just return the sub-kernels. Only applies to density-independent, deterministic
-models and density-independent, stochastic kernel resampled models.</p></td>
+models and density-independent, stochastic kernel re-sampled models.</p></td>
     </tr>
     <tr>
       <th>iterations</th>
       <td><p>If <code>iterate</code> is <code>TRUE</code>, then the number of iterations
-to simulate.</p></td>
+to run the model for.</p></td>
     </tr>
     <tr>
       <th>normalize_pop_size</th>
@@ -426,9 +431,10 @@ by other functions. Use with care.</p></td>
 to use during the simulation process. It should have the same number of entries
 as the number of <code>iterations</code>.
 This should be a vector containing levels of the hierarchical effects specified
-in <code>levels_hier_effs</code>, or empty. Support for Markov chains will eve
-If it is empty, <code>make_ipm</code> will try to generate a sequence internally using
-a random selection of the <code>levels_hier_effs</code> defined in <code>define_kernel</code>.</p></td>
+in <code>levels_hier_effs</code>, or empty. Support for Markov chains will eventually
+get implemented. If it is empty, <code>make_ipm</code> will try to generate a
+sequence internally using a random selection of the <code>levels_hier_effs</code>
+defined in <code>define_kernel</code>.</p></td>
     </tr>
     <tr>
       <th>report_progress</th>
@@ -463,12 +469,12 @@ containing the following components:</p>
                              the model.</p></li>
 </ul>
 
-<p>In addition to the list class, each object will have the class from
-<code>model_class</code> defined in <code>init_ipm</code> plus <code>'_ipm'</code>. This is to
-facilitate <code>print</code>, <code>plot</code>, and <code>lambda</code> methods. For example,
-a <code>'simple_di_stoch_kern'</code> model will have the class
-<code>'simple_di_stoch_kern_ipm'</code> once it has been implemented using
-<code>make_ipm</code>.</p>
+<p>In addition to the list class, each object will have a class comprised of the
+arguments from  <code>init_ipm</code> plus <code>'ipm'</code> pasted together with
+underscores. This is to facilitate <code>print</code>, <code>plot</code>, and
+<code>lambda</code> methods. For example, a <code><a href='init_ipm.html'>init_ipm("general", "di", "det")</a></code>
+model will have the class <code>'general_di_det_ipm'</code> once it has been
+implemented using <code>make_ipm</code>.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -481,7 +487,7 @@ a <code>'simple_di_stoch_kern'</code> model will have the class
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>.</p>
+  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>, Aldo Compagnoni, Dylan Childs, Sanne Evers, Roberto Salguero-Gomez, Tiffany Knight.</p>
 </div>
 
 <div class="pkgdown">

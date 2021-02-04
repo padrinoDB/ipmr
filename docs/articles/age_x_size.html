@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -89,7 +89,14 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/levisc8/ipmr/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -105,7 +112,7 @@
       <h1 data-toc-skip>Age-Size IPMs</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/levisc8/ipmr/blob/master/vignettes/age_x_size.Rmd"><code>vignettes/age_x_size.Rmd</code></a></small>
       <div class="hidden name"><code>age_x_size.Rmd</code></div>
 
     </div>
@@ -143,13 +150,13 @@
 <li><p>growth (<code>g_age</code>/<span class="math inline">\(g(z',z,a)\)</span>)</p></li>
 <li><p>probability of adults reproducing (<code>pb_age</code>/<span class="math inline">\(p_b(z,a)\)</span>)</p></li>
 <li><p>probability that a recruit survives to the first census (<code>pr_age</code>/<span class="math inline">\(p_r(a)\)</span>)</p></li>
-<li><p>recruit size distribution (<code>rcsz</code>/<span class="math inline">\(f_d(z',z)\)</span>). The recruit size distribution has a maternal effect of parental weight on recruit weight.</p></li>
+<li><p>recruit size distribution (<code>rcsz</code>/<span class="math inline">\(c_d(z',z)\)</span>). The recruit size distribution has a maternal effect of parental weight on recruit weight.</p></li>
 </ul>
 <p>The sub-kernels have the following form:</p>
 <ol start="4" style="list-style-type: decimal">
 <li><p><span class="math inline">\(P_a(z', z, a) = s(z, a) * g(z', z, a)\)</span></p></li>
 <li>
-<p><span class="math inline">\(F_a(z', z, a) = s(z, a) * p_b(z, a) * p_r(a) * f_d(z', z) * 0.5\)</span></p>
+<p><span class="math inline">\(F_a(z', z, a) = s(z, a) * p_b(z, a) * p_r(a) * c_d(z', z) * 0.5\)</span></p>
 <ul>
 <li><p><span class="math inline">\(F_0 \equiv 0\)</span> so that age-0 recruits cannot reproduce.</p></li>
 <li><p>This model only tracks females. Assuming an equal sex ratio, we multiply the fecundity kernels by 0.5. We could change the weighting based on observed data.</p></li>
@@ -166,13 +173,13 @@
 </ul>
 </li>
 <li>
-<p>Growth (<code>g_age</code>/<span class="math inline">\(g(z',z,a)\)</span>): A linear model with size and age as fixed effects.</p>
+<p>Growth (<code>g_age</code>/<span class="math inline">\(g(z',z,a)\)</span>): A linear model with size and age as fixed effects. <span class="math inline">\(f_g\)</span> denotes a normal probability density function.</p>
 <ul>
 <li><p>Example code: <code>lm(size_next ~ size + age, data = growth data)</code></p></li>
 <li>
 <p>Mathematical form:</p>
 <ul>
-<li><p><span class="math inline">\(g(z',z,a) \sim Norm(\mu_g^a(z, a), \sigma_g)\)</span></p></li>
+<li><p><span class="math inline">\(g(z',z,a) = f_g(\mu_g^a(z, a), \sigma_g)\)</span></p></li>
 <li><p><span class="math inline">\(\mu_g^a(z, a) = \alpha_g + \beta_g^z * z + \beta_g^a * age\)</span></p></li>
 </ul>
 </li>
@@ -193,14 +200,14 @@
 </ul>
 </li>
 <li>
-<p>Recruit size distribution (<code>rcsz</code>/<span class="math inline">\(f_d(z',z)\)</span>): A linear model with parent size as a fixed effect.</p>
+<p>Recruit size distribution (<code>rcsz</code>/<span class="math inline">\(c_d(z',z)\)</span>): A linear model with parent size as a fixed effect. <span class="math inline">\(f_{c_d}\)</span> denotes a normal probability density function.</p>
 <ul>
 <li><p>Example code: <code><a href="https://rdrr.io/r/stats/lm.html">lm(rcsz ~ size, data = rcsz_data)</a></code></p></li>
 <li>
 <p>Mathematical form:</p>
 <ul>
-<li><p><span class="math inline">\(f_d(z',z) \sim Norm(\mu_{f_d}(z), \sigma_{f_d})\)</span></p></li>
-<li><p><span class="math inline">\(\mu_{f_d}(z) = \alpha_{f_d} + \beta_{f_d}^z * z\)</span></p></li>
+<li><p><span class="math inline">\(c_d(z',z) = f_{c_d}(\mu_{c_d}(z), \sigma_{c_d})\)</span></p></li>
+<li><p><span class="math inline">\(\mu_{c_d}(z) = \alpha_{c_d} + \beta_{c_d}^z * z\)</span></p></li>
 </ul>
 </li>
 </ul>
@@ -213,7 +220,7 @@
 <p>This example directly reproduces the model found in Ellner, Rees &amp; Childs (2016), chapter 6.2. The code that implements that version can be found <a href="https://github.com/ipmbook/first-edition/tree/master/Rcode/c6">here</a>. This example will skip the IBM simulation and model fitting and just focus on the new syntax (<code>ipmr</code> doesn’t .</p>
 <p>First, we set up our parameter list and define a couple functions to help out. The <code>f_fun</code> is used to wrap <code>formula</code> argument in <code>"F_age"</code> kernel so that we can concisely express that age-0 individuals do not reproduce. Note that it is not possible to use an <code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code> statement instead, because <code>age</code> will be a single number, and <code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code> always returns a value that is the same length as its input (and we want the return value to be a <span class="math inline">\(100\times100\)</span> matrix).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ipmr</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
 
 <span class="va">param_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
   surv_int <span class="op">=</span> <span class="op">-</span><span class="fl">17</span>, 
@@ -357,23 +364,6 @@
  <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html">lines</a></span><span class="op">(</span><span class="va">v_a</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> 
   
 <span class="op">}</span></code></pre></div>
-<p>Additionally, we can extract <span class="math inline">\(R_0\)</span> as we did in the Introduction and General IPM vignettes using the following snippet. We first use <code>ipmr</code>’s <code><a href="../reference/format_mega_matrix.html">format_mega_matrix()</a></code> method for age <span class="math inline">\(\times\)</span> size IPMs. This will generate a “Leslie-ish” block matrix, with the <code>f_forms</code> in the top row, and <code>name_ps</code> in the sub-diagonal blocks. If there is a <code>max_age</code> in the <code>levels_ages</code>, it will insert that <code>P</code> kernel into the bottom right corner.</p>
-<p>We then manipulate it a bit to split out the <span class="math inline">\(F\)</span> and <span class="math inline">\(P\)</span> components. Recall from the introduction and general IPM vignettes that <span class="math inline">\(R_0 = \text{dominant eigenvalue of } FN\)</span>, where <span class="math inline">\(N = (I-P)^{-1}\)</span>. The method in the next snippet is not the fastest, but it will get the job done.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mega</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/format_mega_matrix.html">format_mega_matrix</a></span><span class="op">(</span><span class="va">age_size_ipm</span>, name_ps <span class="op">=</span> <span class="st">"P"</span>, f_forms <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span>
-
-<span class="va">Pm</span> <span class="op">&lt;-</span> <span class="va">Fm</span> <span class="op">&lt;-</span> <span class="va">mega</span><span class="op">$</span><span class="va">mega_matrix</span>
-
-<span class="va">Fm</span><span class="op">[</span><span class="fl">101</span><span class="op">:</span><span class="fl">2200</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span>
-<span class="va">Pm</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="op">]</span>    <span class="op">&lt;-</span> <span class="fl">0</span>
-
-<span class="va">N</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html">solve</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Pm</span><span class="op">)</span><span class="op">)</span> <span class="op">-</span> <span class="va">Pm</span><span class="op">)</span>
-
-<span class="va">R</span> <span class="op">&lt;-</span> <span class="va">Fm</span> <span class="op">%*%</span> <span class="va">N</span>
-
-<span class="va">R_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/complex.html">Re</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span><span class="op">(</span><span class="va">R</span><span class="op">)</span><span class="op">$</span><span class="va">values</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>
-
-<span class="va">R_0</span></code></pre></div>
 </div>
   </div>
 
@@ -388,7 +378,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://github.com/levisc8">Sam Levin</a>.</p>
+  <p>Developed by <a href="https://github.com/levisc8">Sam Levin</a>, Aldo Compagnoni, Dylan Childs, Sanne Evers, Roberto Salguero-Gomez, Tiffany Knight.</p>
 </div>
 
 <div class="pkgdown">

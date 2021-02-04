@@ -73,7 +73,7 @@ et al. 2012)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -132,7 +132,12 @@ et al. 2012)." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/levisc8/ipmr/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -147,7 +152,7 @@ et al. 2012)." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Eviction correction</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/levisc8/ipmr/blob/master/R/eviction.R'><code>R/eviction.R</code></a></small>
     <div class="hidden name"><code>eviction.Rd</code></div>
     </div>
 
@@ -156,9 +161,9 @@ et al. 2012)." />
 et al. 2012).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>truncated_distributions</span><span class='op'>(</span><span class='va'>fun</span>, <span class='va'>param</span>, <span class='va'>...</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>truncated_distributions</span><span class='op'>(</span><span class='va'>fun</span>, <span class='va'>target</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>discrete_extrema</span><span class='op'>(</span><span class='va'>param</span>, <span class='va'>state</span>, ncol <span class='op'>=</span> <span class='cn'>NULL</span>, nrow <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+<span class='fu'>discrete_extrema</span><span class='op'>(</span><span class='va'>target</span>, <span class='va'>state</span>, ncol <span class='op'>=</span> <span class='cn'>NULL</span>, nrow <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -170,7 +175,7 @@ et al. 2012).</p>
 correct a log-normal density function.</p></td>
     </tr>
     <tr>
-      <th>param</th>
+      <th>target</th>
       <td><p>The parameter/vital rate being modified. If this is a vector, the
 distribution specified in <code>fun</code> will be recycled.</p></td>
     </tr>
@@ -219,7 +224,7 @@ from integral projection models.Ecology 93(9): 2008-2014.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>.</p>
+  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>, Aldo Compagnoni, Dylan Childs, Sanne Evers, Roberto Salguero-Gomez, Tiffany Knight.</p>
 </div>
 
 <div class="pkgdown">

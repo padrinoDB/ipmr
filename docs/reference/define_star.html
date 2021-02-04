@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -131,7 +131,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/levisc8/ipmr/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -146,7 +151,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Helpers for IPM construction</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/levisc8/ipmr/blob/master/R/define_implementation.R'><code>R/define_implementation.R</code></a>, <a href='https://github.com/levisc8/ipmr/blob/master/R/utils-dom-states.R'><code>R/utils-dom-states.R</code></a>, <a href='https://github.com/levisc8/ipmr/blob/master/R/utils-export.R'><code>R/utils-export.R</code></a></small>
     <div class="hidden name"><code>define_star.Rd</code></div>
     </div>
 
@@ -175,9 +180,9 @@
       <th>kernel_impl_list</th>
       <td><p>A named list. Names correspond to kernel names. Each
 kernel should have 3 slots defined - the <code>int_rule</code> (integration rule),
-the <code>dom_start</code> (the domain the kernel begins on), and the <code>dom_end</code>
-(the domain the kernel ends on). It is safest to use <code>make_impl_args_list</code>
-to generate this.</p></td>
+the <code>state_start</code> (the domain the kernel begins on), and the <code>state_end</code>
+(the domain the kernel ends on). For more complicated models, it is usually
+safest to use <code>make_impl_args_list</code> to generate this.</p></td>
     </tr>
     <tr>
       <th>kernel_names</th>
@@ -187,22 +192,18 @@ that parameters are being defined for.</p></td>
     <tr>
       <th>int_rule</th>
       <td><p>The integration rule to be used for the kernel. The default is
-"midpoint". "trapezoid" and "g-l" (Gauss-Legendre) will be implemented as well.</p></td>
+"midpoint". "b2b" (bin to bin) and "cdf" (cumulative density functions) will
+be implemented as well.</p></td>
     </tr>
     <tr>
       <th>state_start</th>
-      <td><p>The name of the state variable for the kernel at time <em>t</em>.</p></td>
+      <td><p>The name of the state variable for the kernel that the
+kernel acts on at time <em>t</em>.</p></td>
     </tr>
     <tr>
       <th>state_end</th>
-      <td><p>The name of the state variable for the kernel at time <em>t+1</em>.
-This is usually the same as <code>dom_start</code>, but general IPMs
-with discrete states or IPMs that move from one state to another (e.g. tree
-seedling going from a height domain at <em>t</em> to a DBH domain at <em>t+1</em>)
-may have another value here. For cases with a discrete stage, kernels moving
-individuals from discrete to continuous should have a state variable entered
-here and an <code>NA</code> for <code>dom_start</code>. For kernels moving from continuous
-to discrete, vice versa. For discrete to discrete, both are <code>NA</code>.</p></td>
+      <td><p>The name of the state variable that the kernel produces
+at time <em>t+1</em>.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -217,8 +218,8 @@ be passed as a named list here.</p></td>
     </tr>
     <tr>
       <th>data_list</th>
-      <td><p>A list of named values that correspond to constants in the formula.
-This behaves in the same way as the <code>data_list</code> argument to <code>define_kernel</code>.</p></td>
+      <td><p>A list of named values that contain data used in the expressions
+in <code>...</code> in <code>define_env_state()</code>.</p></td>
     </tr>
     </table>
 
@@ -245,7 +246,7 @@ Below are specific details on the way each works.</p>
 <p>This has two arguments - <code>proto_ipm</code> (the model object you wish to work with),
 and the <code>kernel_impl_list</code>. The format of the <code>kernel_impl_list</code> is:
 names of the list should be kernel names, and each kernel should have 3 entries:
-<code>int_rule</code>, <code>dom_start</code>, and <code>dom_end</code>. See examples.</p>
+<code>int_rule</code>, <code>state_start</code>, and <code>state_end</code>. See examples.</p>
 <p><strong><code>define_domains</code></strong></p>
 <p>If the <code>int_rule = "midpoint"</code>, the <code>...</code> entries are vectors of
 length 3 where the name corresponds to the
@@ -341,7 +342,7 @@ vital rate expressions and/or kernel formulas.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>.</p>
+  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>, Aldo Compagnoni, Dylan Childs, Sanne Evers, Roberto Salguero-Gomez, Tiffany Knight.</p>
 </div>
 
 <div class="pkgdown">

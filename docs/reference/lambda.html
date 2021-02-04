@@ -74,7 +74,7 @@ stochastic models." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -133,7 +133,12 @@ stochastic models." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/levisc8/ipmr/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -148,7 +153,7 @@ stochastic models." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Compute the per-capita growth rate for an IPM object</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/levisc8/ipmr/blob/master/R/generics.R'><code>R/generics.R</code></a></small>
     <div class="hidden name"><code>lambda.Rd</code></div>
     </div>
 
@@ -214,8 +219,8 @@ stochastic models.</p>
 returns a vector of lambda values for each time step of the simulation (equal
 in length to the <code>iterations</code> argument of <code><a href='make_ipm.html'>make_ipm()</a></code>).
 <code>'last'</code> returns the lambda value for the final timestep.
-<code>'stochastic'</code> returns a single value which is the geometric mean
-of log-per-capita growth rate from each time step.</p></td>
+<code>'stochastic'</code> returns a single value which is the mean
+of the log'd per-capita growth rate from each time step.</p></td>
     </tr>
     <tr>
       <th>burn_in</th>
@@ -226,8 +231,9 @@ of log-per-capita growth rate from each time step.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An array. Rows correspond to time steps, and columns correspond
-to hierarchical effects (if any).</p>
+    <p>When <code>type_lambda = "all"</code>, an array. Rows correspond to time
+steps, and columns correspond to hierarchical effects (if any). For other types,
+a numeric vector.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -240,7 +246,7 @@ to hierarchical effects (if any).</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>.</p>
+  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>, Aldo Compagnoni, Dylan Childs, Sanne Evers, Roberto Salguero-Gomez, Tiffany Knight.</p>
 </div>
 
 <div class="pkgdown">

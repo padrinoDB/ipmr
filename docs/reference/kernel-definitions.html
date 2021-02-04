@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -131,7 +131,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/levisc8/ipmr/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -146,7 +151,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Functions to initialize and define IPM kernels</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/levisc8/ipmr/blob/master/R/define_kernel.R'><code>R/define_kernel.R</code></a></small>
     <div class="hidden name"><code>kernel-definitions.Rd</code></div>
     </div>
 
@@ -183,7 +188,7 @@
     </tr>
     <tr>
       <th>formula</th>
-      <td><p>A bare expression specifying the form of the kernel. See Details.</p></td>
+      <td><p>A bare expression specifying the form of the kernel.</p></td>
     </tr>
     <tr>
       <th>family</th>
@@ -258,17 +263,8 @@ all <code>general_*</code> models.</p></td>
 one requires its own call to <code>define_kernel</code>, though there are some exceptions,
 namely for kernels derived from hierarchical models (e.g. vital rate models
 fit across plots and years).</p>
-<p>Internally, <code>ipmr</code> generates the <code>levels_hier_effs</code> using <code>expand.grid</code>.
-This  means that every combination of the values in <code>levels_hier_effs</code>
-must exist in the <code>data_list</code>, or the model will fail with an error along
-the lines of <code>Error in eval_tidy: object 'x_yz' not found</code>. In order to
-exclude levels that do not exist in your data, you can add a vector to the list
-in <code>levels_hier_effs</code> called <code>"drop_levels"</code>. This should contain the
-values you wish to exclude as a character vector. For example, if data are
-collected for <code>sites = c("a", "b", "c")</code>, and <code>years = c(2005:2008)</code>,
-but there is no data from site <code>"a"</code> in <code>2007</code>, we can use
-<code>levels_hier_effs = list(site = c("a", "b", "c"), year = c(2005:2008),
-drop_levels = c("a_2007"))</code>.</p>
+<p>A much more complete overview of how to generate kernels is provided in
+<code><a href='../articles/ipmr-introduction.html'>vignette("ipmr-introduction", "ipmr")</a></code>.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -281,7 +277,7 @@ drop_levels = c("a_2007"))</code>.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>.</p>
+  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>, Aldo Compagnoni, Dylan Childs, Sanne Evers, Roberto Salguero-Gomez, Tiffany Knight.</p>
 </div>
 
 <div class="pkgdown">

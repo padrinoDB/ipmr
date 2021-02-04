@@ -75,7 +75,7 @@ helper functions. See Details for complete overview of each option." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -134,7 +134,12 @@ helper functions. See Details for complete overview of each option." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/levisc8/ipmr/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -149,7 +154,7 @@ helper functions. See Details for complete overview of each option." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Initialize an IPM</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/levisc8/ipmr/blob/master/R/init_ipm.R'><code>R/init_ipm.R</code></a></small>
     <div class="hidden name"><code>init_ipm.Rd</code></div>
     </div>
 
@@ -200,34 +205,31 @@ is <code>FALSE</code></p></td>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Combinations of <code>simple</code> or <code>general</code>, <code>dd</code> or <code>di</code>,
-and <code>det</code> or <code>stoch</code> are generated to create 1 of 12 unique IPM classes.
-These are separated by an underscore to tell <code>ipmr</code>
-the type of model you will be constructing. For simplicity, they are specified
-separately and the model class is generated internally.</p>
-<p>Within <code>stoch</code> model types, there are two additional options to append to
-the class: <code>"kern"</code> or <code>"param"</code>. These distinguish between models that
+and <code>det</code> or <code>stoch</code> are generated to create 1 of 12 unique IPM classes.</p>
+<p>Within <code>stoch</code> model types, there are two additional options:
+<code>"kern"</code> or <code>"param"</code>. These distinguish between models that
 use kernel resampling vs those that use parameter resampling (<em>sensu</em> Metcalf et al.
-2015). Below are quick definitions, more detailed explanations can be found
+2015). Below are quick definitions. More detailed explanations can be found
 in the <code><a href='https://rdrr.io/r/utils/vignette.html'>vignettes("ipmr-introduction", package = 'ipmr')</a></code>.</p>
 <ul>
-<li><p>One of</p><ul>
+<li><p><code>sim_gen</code></p><ul>
 <li><p><code>simple</code>: an IPM with a single continuous state variable that does not include
     any discrete stages. Simple IPMs can still be stochastic and/or density dependent.</p></li>
 <li><p><code>general</code>: an IPM with more than one continuous state variable
     and/or a model that includes discrete stages.</p></li>
 </ul></li>
-<li><p>and one of</p><ul>
+<li><p><code>di_dd</code></p><ul>
 <li><p><code>dd</code>: used to denote a density dependent IPM.</p></li>
 <li><p><code>di</code>: used to denote a density independent IPM.</p></li>
 </ul></li>
-<li><p>and one of</p><ul>
+<li><p><code>det_stoch</code></p><ul>
 <li><p><code>det</code>: used to denote a deterministic IPM.</p></li>
 <li><p><code>stoch</code>: used to denote a stochastic IPM. Stochasticity can
     be implemented in two ways in <code>ipmr</code>: <code>"kern"</code> resampling,
     and <code>"param"</code> resampling.</p></li>
 </ul></li>
-<li><p>If using <code>det</code>, this should be omitted. If using <code>stoch</code>,
- then one of the following:</p><ul>
+<li><p><code>kern_param</code> - if using <code>det</code>, this should be omitted. If
+ using <code>stoch</code>, then one of the following:</p><ul>
 <li><p><code>kern</code>: used to denote an IPM that uses kernel resampling. Briefly,
     these models build all of the iteration kernels ahead of time and then choose one
     at random or in a user-specified order as they move from iteration to iteration. The
@@ -257,7 +259,7 @@ Models. Methods in Ecology and Evolution, 6: 1007-1017</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>.</p>
+  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>, Aldo Compagnoni, Dylan Childs, Sanne Evers, Roberto Salguero-Gomez, Tiffany Knight.</p>
 </div>
 
 <div class="pkgdown">

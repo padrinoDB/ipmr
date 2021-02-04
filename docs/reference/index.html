@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
@@ -130,7 +130,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/levisc8/ipmr/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -170,7 +175,7 @@
       <tr>
         
         <td>
-          <p><code><a href="accessors.html">domains()</a></code> <code><a href="accessors.html">vital_rates()</a></code> <code><a href="accessors.html">`vital_rates&lt;-`()</a></code> <code><a href="accessors.html">new_fun_form()</a></code> <code><a href="accessors.html">kernel_formulae()</a></code> <code><a href="accessors.html">`kernel_formulae&lt;-`()</a></code> <code><a href="accessors.html">parameters()</a></code> <code><a href="accessors.html">`parameters&lt;-`()</a></code> <code><a href="accessors.html">int_mesh()</a></code> <code><a href="accessors.html">pop_state()</a></code> </p>
+          <p><code><a href="accessors.html">domains()</a></code> <code><a href="accessors.html">vital_rate_exprs()</a></code> <code><a href="accessors.html">vital_rate_funs()</a></code> <code><a href="accessors.html">`vital_rate_exprs&lt;-`()</a></code> <code><a href="accessors.html">new_fun_form()</a></code> <code><a href="accessors.html">kernel_formulae()</a></code> <code><a href="accessors.html">`kernel_formulae&lt;-`()</a></code> <code><a href="accessors.html">parameters()</a></code> <code><a href="accessors.html">`parameters&lt;-`()</a></code> <code><a href="accessors.html">int_mesh()</a></code> <code><a href="accessors.html">pop_state()</a></code> </p>
         </td>
         <td><p>Accessor functions for (proto_)ipm objects</p></td>
       </tr><tr>
@@ -203,12 +208,6 @@
           <p><code><a href="eviction.html">truncated_distributions()</a></code> <code><a href="eviction.html">discrete_extrema()</a></code> </p>
         </td>
         <td><p>Eviction correction</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="format_mega_matrix.html">format_mega_matrix()</a></code> </p>
-        </td>
-        <td><p>Format a mega-matrix</p></td>
       </tr><tr>
         
         <td>
@@ -245,6 +244,12 @@
           <p><code><a href="make_ipm.html">make_ipm()</a></code> </p>
         </td>
         <td><p>Methods to implement an IPM</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="make_iter_kernel.html">format_mega_matrix()</a></code> <code><a href="make_iter_kernel.html">make_iter_kernel()</a></code> </p>
+        </td>
+        <td><p>Create iteration kernels from an IPM object</p></td>
       </tr><tr>
         
         <td>
@@ -308,7 +313,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>.</p>
+  <p>Developed by <a href='https://github.com/levisc8'>Sam Levin</a>, Aldo Compagnoni, Dylan Childs, Sanne Evers, Roberto Salguero-Gomez, Tiffany Knight.</p>
 </div>
 
 <div class="pkgdown">

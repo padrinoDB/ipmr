@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Convert ipmr matrix to long data frame — ipm_to_df • ipmr</title>
+<title>Create iteration kernels from an IPM object — format_mega_matrix • ipmr</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="Convert ipmr matrix to long data frame — ipm_to_df" />
-<meta property="og:description" content="Converts IPM kernels into long data frames. These are useful for
-creating plots using ggplot2." />
+<meta property="og:title" content="Create iteration kernels from an IPM object — format_mega_matrix" />
+<meta property="og:description" content="Creates iteration kernels for IPMs. ipmr does not create
+these to iterate models, but they may be useful for further analyses." />
 
 
 
@@ -151,23 +151,25 @@ creating plots using ggplot2." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Convert ipmr matrix to long data frame</h1>
+    <h1>Create iteration kernels from an IPM object</h1>
     <small class="dont-index">Source: <a href='https://github.com/levisc8/ipmr/blob/master/R/utils-export.R'><code>R/utils-export.R</code></a></small>
-    <div class="hidden name"><code>ipm_to_df.Rd</code></div>
+    <div class="hidden name"><code>make_iter_kernel.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Converts IPM kernels into long data frames. These are useful for
-creating plots using <code>ggplot2</code>.</p>
+    <p>Creates iteration kernels for IPMs. <code>ipmr</code> does not create
+these to iterate models, but they may be useful for further analyses.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ipm_to_df</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S3 method for array</span>
-<span class='fu'>ipm_to_df</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>format_mega_matrix</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for default</span>
-<span class='fu'>ipm_to_df</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, <span class='va'>mega_mat</span>, name_ps <span class='op'>=</span> <span class='cn'>NULL</span>, f_forms <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+<span class='fu'>format_mega_matrix</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>mega_mat</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for age_x_size_ipm</span>
+<span class='fu'>format_mega_matrix</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>name_ps</span>, <span class='va'>f_forms</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>ipm</span>, mega_mat <span class='op'>=</span> <span class='cn'>NULL</span>, name_ps <span class='op'>=</span> <span class='cn'>NULL</span>, f_forms <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -211,16 +213,51 @@ supplied.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frame with 3 columns named <code>"t"</code>, <code>"t_1"</code>, and
-<code>"value"</code>.</p>
+    <p>A list containing a large matrix or many large matrices (when used with
+hierarchical syntax). The names in the former case will be <code>"mega_matrix"</code>
+and in the latter case, <code>"mega_matrix_&lt;hier_effs&gt;"</code> with the levels of the
+hierarchical effects substituted in.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>ipmr</code> does not generate complete iteration kernels, and uses
+sub-kernels to iterate models. However, some further analyses are just easier
+to code with a complete iteration kernel. This handles constructing those for
+simple and general models of all forms. <code>format_mega_matrix</code> is used
+internally by <code>make_iter_kernel</code> for general IPMs.</p>
+<p><code>I</code> and <code>0</code> represent identity matrices and 0 matrices,
+respectively. They can be used to fill in blocks that represent either, without
+having to create those separately and append them to the model object. The function
+will work out the correct dimensions for both internally, and there is no
+restriction on the number that may be used in a given call.</p>
+<p>For <code>age_size_ipm</code>s, the correct form of <code>mega_mat</code> is generated
+internally by creating sub-diagonal matrices for the <code>name_ps</code> kernels,
+and a top row using the <code>f_forms</code>. If hierarchical effects are part of the
+model, the suffixes should be attached to the <code>name_ps, f_forms</code> in the
+function arguments, and the correct block matrices will be generated internally.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gen_di_det_ex</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gen_di_det_ex</span><span class='op'>)</span>
 
-<span class='va'>big_mat_df</span> <span class='op'>&lt;-</span> <span class='fu'>ipm_to_df</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>,
-                        mega_mat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>stay_discrete</span>, <span class='va'>go_discrete</span>,
-                                     <span class='va'>leave_discrete</span>, <span class='va'>P</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>big_k</span> <span class='op'>&lt;-</span> <span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>,
+                            mega_mat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='va'>go_discrete</span>,
+                                         <span class='va'>leave_discrete</span>, <span class='va'>P</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>char_call</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='st'>"go_discrete"</span>, <span class='st'>"leave_discrete"</span>, <span class='st'>"P"</span><span class='op'>)</span>
+
+<span class='va'>big_k_c</span> <span class='op'>&lt;-</span> <span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>, mega_mat <span class='op'>=</span> <span class='va'>char_call</span><span class='op'>)</span>
+
+<span class='co'># Now, with an Identity matrix instead of a 0</span>
+
+<span class='va'>big_k</span> <span class='op'>&lt;-</span> <span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>,
+                            mega_mat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>I</span>, <span class='va'>go_discrete</span>,
+                                         <span class='va'>leave_discrete</span>, <span class='va'>P</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'># For simple IPMs with no hierarchical effects, this computes the sum of</span>
+<span class='co'># the sub-kernels (i.e. K = P + F)</span>
+
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sim_di_det_ex</span><span class='op'>)</span>
+
+<span class='va'>simple_k</span> <span class='op'>&lt;-</span> <span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>sim_di_det_ex</span><span class='op'>)</span>
 
 </div></pre>
   </div>

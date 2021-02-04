@@ -22,9 +22,6 @@
     <loc>https://levisc8.github.io/ipmr/reference/eviction.html</loc>
   </url>
   <url>
-    <loc>https://levisc8.github.io/ipmr/reference/format_mega_matrix.html</loc>
-  </url>
-  <url>
     <loc>https://levisc8.github.io/ipmr/reference/gen_di_det.html</loc>
   </url>
   <url>
@@ -41,6 +38,9 @@
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/make_ipm.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/reference/make_iter_kernel.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/matrix-power.html</loc>
