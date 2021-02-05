@@ -33,10 +33,10 @@ to pass to \code{define_kernel}.
 }
 \examples{
 
-\dontrun{
+data(iceplant_ex)
 
-grow_mod <- lm(size_next ~ size, data = grow_data)
-surv_mod <- glm(surv ~ size, data = surv_data, family = binomial())
+grow_mod <- lm(log_size_next ~ log_size, data = iceplant_ex)
+surv_mod <- glm(survival ~ log_size, data = iceplant_ex, family = binomial())
 
 data_list <- list(
   grow_mod = use_vr_model(grow_mod),
@@ -44,5 +44,5 @@ data_list <- list(
   recruit_mean = 20,
   recruit_sd   = 5
 )
-}
+
 }

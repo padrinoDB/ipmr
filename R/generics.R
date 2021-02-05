@@ -1324,7 +1324,6 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
 
   if(do_legend) {
     l.y = seq(min(A), max(A),length = 100)
-    par(mar = c(6, 2, 3, 1))
     graphics::image(list(x = 1:2,
                          y = l.y,
                          z = rbind(l.y, l.y)),
@@ -1357,10 +1356,8 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
 
   dots <- list(...)
 
-  old_par <- graphics::par('mar', "mfrow")
+  old_par <- graphics::par(no.readonly = TRUE)
   on.exit(par(old_par))
-
-  if(do_legend) graphics::layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
 
   # This is used so that users can just say plot(my_model) instead of
   # plot(ipm = my_model). ipmr_matrix expects x and y to both be NULL
@@ -1370,10 +1367,6 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
     x   <- NULL
   }
 
-  old_par <- par('mar', "mfrow")
-  on.exit(par(old_par))
-
-  dots <- list(...)
 
   plot_list <- ipm$sub_kernels
 
@@ -1381,14 +1374,24 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
 
   canvas_dims <- .ncol_nrow(plt_seq)
 
-  graphics::par(mar = c(6, 5, 3, 2),
-                mfrow = c(canvas_dims$nrow,
-                          canvas_dims$ncol))
+  if(do_legend) {
 
-  for(i in seq_along(ipm$sub_kernels)){
+    graphics::layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
+    par(mar = c(6, 2, 3, 1))
 
-    use_kern <- ipm$sub_kernels[[i]]
-    nm       <- names(ipm$sub_kernels)[i]
+  } else {
+
+
+    graphics::par(mar = c(6, 5, 3, 2),
+                  mfrow = c(canvas_dims$nrow,
+                            canvas_dims$ncol))
+  }
+
+
+  for(i in seq_along(plot_list)){
+
+    use_kern <- plot_list[[i]]
+    nm       <- names(plot_list)[i]
 
     plot.ipmr_matrix(x = x,
                      y = y,
@@ -1418,10 +1421,8 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
 
   dots <- list(...)
 
-  old_par <- graphics::par('mar', "mfrow")
+  old_par <- graphics::par(no.readonly = TRUE)
   on.exit(par(old_par))
-
-  if(do_legend) graphics::layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
 
   # This is used so that users can just say plot(my_model) instead of
   # plot(ipm = my_model). ipmr_matrix expects x and y to both be NULL
@@ -1431,10 +1432,6 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
     x   <- NULL
   }
 
-  old_par <- par('mar', "mfrow")
-  on.exit(par(old_par))
-
-  dots <- list(...)
 
   plot_list <- ipm$sub_kernels
 
@@ -1442,14 +1439,24 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
 
   canvas_dims <- .ncol_nrow(plt_seq)
 
-  graphics::par(mar = c(6, 5, 3, 2),
-                mfrow = c(canvas_dims$nrow,
-                          canvas_dims$ncol))
+  if(do_legend) {
 
-  for(i in seq_along(ipm$sub_kernels)){
+    graphics::layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
+    par(mar = c(6, 2, 3, 1))
 
-    use_kern <- ipm$sub_kernels[[i]]
-    nm       <- names(ipm$sub_kernels)[i]
+  } else {
+
+
+    graphics::par(mar = c(6, 5, 3, 2),
+                  mfrow = c(canvas_dims$nrow,
+                            canvas_dims$ncol))
+  }
+
+
+  for(i in seq_along(plot_list)){
+
+    use_kern <- plot_list[[i]]
+    nm       <- names(plot_list)[i]
 
     plot.ipmr_matrix(x = x,
                      y = y,
@@ -1477,12 +1484,11 @@ plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
                                           do_legend = FALSE,
                                           exponent = 1,
                                           ...) {
+
   dots <- list(...)
 
-  old_par <- graphics::par('mar', "mfrow")
+  old_par <- graphics::par(no.readonly = TRUE)
   on.exit(par(old_par))
-
-  if(do_legend) graphics::layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
 
   # This is used so that users can just say plot(my_model) instead of
   # plot(ipm = my_model). ipmr_matrix expects x and y to both be NULL
@@ -1492,25 +1498,31 @@ plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
     x   <- NULL
   }
 
-  old_par <- par('mar', "mfrow")
-  on.exit(par(old_par))
 
-  dots <- list(...)
+  plot_list   <- ipm$sub_kernels
 
-  plot_list <- ipm$sub_kernels
-
-  plt_seq   <- seq_along(plot_list)
+  plt_seq     <- seq_along(plot_list)
 
   canvas_dims <- .ncol_nrow(plt_seq)
 
-  graphics::par(mar = c(6, 5, 3, 2),
-                mfrow = c(canvas_dims$nrow,
-                          canvas_dims$ncol))
+  if(do_legend) {
 
-  for(i in seq_along(ipm$sub_kernels)){
+    graphics::layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
+    par(mar = c(6, 2, 3, 1))
 
-    use_kern <- ipm$sub_kernels[[i]]
-    nm       <- names(ipm$sub_kernels)[i]
+  } else {
+
+
+    graphics::par(mar = c(6, 5, 3, 2),
+                  mfrow = c(canvas_dims$nrow,
+                            canvas_dims$ncol))
+  }
+
+
+  for(i in seq_along(plot_list)){
+
+    use_kern <- plot_list[[i]]
+    nm       <- names(plot_list)[i]
 
     plot.ipmr_matrix(x = x,
                      y = y,
@@ -1535,12 +1547,18 @@ plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
 plot.general_di_det_ipm <- function(x = NULL, y = NULL,
                                     ipm = NULL,
                                     mega_mat = NA_character_,
-                                    col = NA_character_,
+                                    col = rainbow(100,
+                                                  start = 0.67,
+                                                  end = 0),
                                     bw = FALSE,
                                     do_contour = FALSE,
                                     do_legend = FALSE,
                                     exponent = 1,
                                     ...) {
+  dots <- list(...)
+
+  old_par <- graphics::par(no.readonly = TRUE)
+  on.exit(par(old_par))
 
   # This is used so that users can just say plot(my_model) instead of
   # plot(ipm = my_model). ipmr_matrix expects x and y to both be NULL
@@ -1558,21 +1576,22 @@ plot.general_di_det_ipm <- function(x = NULL, y = NULL,
          "Please specify an expression for the 'mega_mat' argument.")
   }
 
-  if(is.na(col)) {
-    col <- rainbow(100,
-                   start = 0.67,
-                   end = 0,
-                   alpha = NULL)
-  }
-
-  old_par <- par('mar')
-  on.exit(par(old_par))
-
-  dots <- list(...)
-
   plot_list <- format_mega_matrix(ipm, mega_mat = !! mega_mat)
   plt_seq   <- seq_along(plot_list)
   canvas_dims <- .ncol_nrow(plt_seq)
+
+  if(do_legend) {
+
+    graphics::layout(mat = cbind(matrix(1, 5, 5), rep(2, 5)))
+    par(mar = c(6, 2, 3, 1))
+
+  } else {
+
+
+    graphics::par(mar = c(6, 5, 3, 2),
+                  mfrow = c(canvas_dims$nrow,
+                            canvas_dims$ncol))
+  }
 
   lapply(plot_list, function(ipm) plot.ipmr_matrix(x = x,
                                                    y = y,

@@ -9,4 +9,6 @@
 #' @export
 #' @importFrom magrittr %>%
 #' @usage lhs \%>\% rhs
+#' @return The value of the final expression in the pipe chain.
+#'
 NULL

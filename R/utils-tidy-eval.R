@@ -14,4 +14,5 @@
 #' @export   sym ensym syms ensyms
 #' @export   expr enexpr enexprs
 #' @export   .data
+#' @return These functions return quosures, symbols, and expressions.
 NULL

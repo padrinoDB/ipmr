@@ -60,7 +60,7 @@
   y = NULL,
   ipm = NULL,
   mega_mat = NA_character_,
-  col = NA_character_,
+  col = rainbow(100, start = 0.67, end = 0),
   bw = FALSE,
   do_contour = FALSE,
   do_legend = FALSE,

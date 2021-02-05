@@ -1,5 +1,5 @@
 Package: ipmr
-Title: Fits IPMs Using an Expression Based Framework 
+Title: Fits Integral Projection Models Using an Expression Based Framework 
 Version: 0.0.1
 Authors@R: c( 
     person(given = "Sam",
@@ -27,12 +27,19 @@ Authors@R: c(
            family = "Knight",
            email = "tiffany.knight@idiv.de",
            role = "aut"))
-Description: Flexibly implements IPMs using an expression based framework. This
-  will not abstract away the model selection process, but it will make sure you
-  get everything after that correct. It handles density dependence and environmental
-  stochasticity, with a couple of options for implementing the latter. Additionally,
-  provides model diagnostic tools, plotting functionality, stochastic/deterministic
-  simulations, and analysis tools.
+Description: Flexibly implements Integral Projection Models using an expression 
+  based framework. This will not abstract away the model selection process, 
+  but it will make sure you get everything after that correct. It handles density
+  dependence and environmental stochasticity, with a couple of options for 
+  implementing the latter. In addition, provides functions to avoid unintentional
+  eviction of individuals from models. Additionally, provides model diagnostic tools, 
+  plotting functionality, stochastic/deterministic simulations, and analysis tools.
+  Integral projection models are described in depth by Easterling et al. (2000) 
+  <doi:10.1890/0012-9658(2000)081[0694:SSSAAN]2.0.CO;2>, Merow et al. (2013) 
+  <doi:10.1111/2041-210X.12146>, Rees et al. (2014) <doi:10.1111/1365-2656.12178>,
+  and Metcalf et al. (2015) <doi:10.1111/2041-210X.12405>. 
+  Williams et al. (2012) <doi:10.1890/11-2147.1> discuss the problem of 
+  unintentional eviction.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

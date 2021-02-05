@@ -17,6 +17,9 @@
 \alias{enexprs}
 \alias{.data}
 \title{Tidy eval helpers}
+\value{
+These functions return quosures, symbols, and expressions.
+}
 \description{
 Re-exported tidy eval helpers
 }

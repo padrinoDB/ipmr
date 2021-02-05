@@ -130,13 +130,16 @@ kernel_impl_list <- make_impl_args_list(
      state_end    = c("z", "z")
 )
 
+data(sim_di_det_ex)
+
+proto_ipm <- sim_di_det_ex$proto_ipm
+
 # define_domains
 
 lower_bound <- 1
 upper_bound <- 100
 n_meshpoints <- 50
 
-\dontrun{
 
 define_domains(proto_ipm, c(lower_bound, upper_bound, n_meshpoints))
 
@@ -172,6 +175,5 @@ define_env_state(
 
 )
 
-}
 
 }

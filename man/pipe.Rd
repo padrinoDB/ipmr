@@ -6,6 +6,9 @@
 \usage{
 lhs \%>\% rhs
 }
+\value{
+The value of the final expression in the pipe chain.
+}
 \description{
 See vignette at \url{https://CRAN.R-project.org/package=magrittr}.
 }

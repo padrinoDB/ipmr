@@ -84,13 +84,16 @@
 #'      state_end    = c("z", "z")
 #' )
 #'
+#' data(sim_di_det_ex)
+#'
+#' proto_ipm <- sim_di_det_ex$proto_ipm
+#'
 #' # define_domains
 #'
 #' lower_bound <- 1
 #' upper_bound <- 100
 #' n_meshpoints <- 50
 #'
-#' \dontrun{
 #'
 #' define_domains(proto_ipm, c(lower_bound, upper_bound, n_meshpoints))
 #'
@@ -126,7 +129,6 @@
 #'
 #' )
 #'
-#' }
 #'
 #' @rdname define_star
 #' @importFrom rlang is_empty
@@ -218,10 +220,10 @@ define_env_state <- function(proto_ipm, ..., data_list = list()) {
 #'
 #' @examples
 #'
-#' \dontrun{
+#' data(iceplant_ex)
 #'
-#' grow_mod <- lm(size_next ~ size, data = grow_data)
-#' surv_mod <- glm(surv ~ size, data = surv_data, family = binomial())
+#' grow_mod <- lm(log_size_next ~ log_size, data = iceplant_ex)
+#' surv_mod <- glm(survival ~ log_size, data = iceplant_ex, family = binomial())
 #'
 #' data_list <- list(
 #'   grow_mod = use_vr_model(grow_mod),
@@ -229,7 +231,7 @@ define_env_state <- function(proto_ipm, ..., data_list = list()) {
 #'   recruit_mean = 20,
 #'   recruit_sd   = 5
 #' )
-#'}
+#'
 #' @export
 
 use_vr_model <- function(model) {
