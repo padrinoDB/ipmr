@@ -18,8 +18,15 @@ examples of how to implement those types in this framework.
 
 ## Installation
 
-`ipmr` is not yet on CRAN. You can install the development version with
-the snippet below:
+`ipmr` is available on CRAN and can be installed with the following
+snippet:
+
+``` r
+install.packages("ipmr")
+```
+
+You can also install the development version from GitHub with the
+snippet below:
 
 ``` r
 if(!require('remotes', quietly = TRUE)) {

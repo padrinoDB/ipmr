@@ -14,7 +14,15 @@ output:
 
 ## Installation
 
-`ipmr` is not yet on CRAN. You can install the development version with the snippet below:
+`ipmr` is available on CRAN and can be installed with the following snippet:
+
+```{r eval = FALSE}
+
+install.packages("ipmr")
+
+```
+
+You can also install the development version from GitHub with the snippet below:
 
 ```{r eval = FALSE}
 
