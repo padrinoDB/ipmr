@@ -1257,7 +1257,7 @@
 
   if(fun_cls %in% c("DC", "CD")) {
 
-    out <- .check_it_mat(out, fun_cls, kern_name)
+    out <- .check_vec(out, fun_cls, kern_name)
 
   }
 
@@ -1318,7 +1318,7 @@
 # size dependent. When this happens, the kernel is a vector of constants, but
 # NA's get inserted after the first entry by default by matrix(fun,...).
 
-.check_it_mat <- function(it_mat, cls, kern_name) {
+.check_vec <- function(it_mat, cls, kern_name) {
 
   if(any(is.na(it_mat))) {
 

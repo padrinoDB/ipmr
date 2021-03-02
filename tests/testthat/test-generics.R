@@ -2058,6 +2058,14 @@ test_that("age_size models left/right_ev", {
   expect_equal(target_w, ipmr_w)
   expect_equal(target_v, ipmr_v)
 
+  vr_texts <- vital_rate_exprs(a_s_ipm$proto_ipm)
+
+  cat_out  <- capture_output_lines(print(vr_texts))[1:5]
+
+  test_ind <- grepl("<age>", cat_out)
+
+  expect_true(all(test_ind))
+
 })
 
 

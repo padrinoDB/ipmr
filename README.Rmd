@@ -3,14 +3,15 @@ output:
   md_document:
     variant: gfm
 ---
-[![R build status](https://github.com/levisc8/ipmr/workflows/R-CMD-check/badge.svg)](https://github.com/levisc8/ipmr/actions)
-[![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
-[![CRAN status](https://www.r-pkg.org/badges/version/ipmr)](https://cran.r-project.org/package=ipmr)
+
+[![R build status](https://github.com/levisc8/ipmr/workflows/R-CMD-check/badge.svg)](https://github.com/levisc8/ipmr/actions) 
+[![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing) 
+[![CRAN status](https://www.r-pkg.org/badges/version/ipmr)](https://cran.r-project.org/package=ipmr) 
 [![Codecov test coverage](https://codecov.io/gh/levisc8/ipmr/branch/master/graph/badge.svg)](https://codecov.io/gh/levisc8/ipmr?branch=master)
 
 # ipmr
 
-`ipmr` is a package for implementing Integral Projection Models (IPMs) in _R_. It relies heavily on the mathematical syntax of the models, and does not try to abstract over the process of fitting vital rates. It is now relatively stable, though tweaks may be made. Below is a brief overview of how `ipmr` classifies different model types followed by examples of how to implement those types in this framework. 
+`ipmr` is a package for implementing Integral Projection Models (IPMs) in *R*. It relies heavily on the mathematical syntax of the models, and does not try to abstract over the process of fitting vital rates. It is now relatively stable, though tweaks may be made. Below is a brief overview of how `ipmr` classifies different model types followed by examples of how to implement those types in this framework.
 
 ## Installation
 
@@ -36,134 +37,127 @@ remotes::install_github("levisc8/ipmr", build_vignettes = TRUE)
 
 ## Package scope
 
-`ipmr` is intended to assist with IPM implementation and analysis. It is important to note that this package **will not** help with the process of fitting regression models for vital rates at all! That is a sufficiently different (and vast) topic that we decided it was not within the scope of this project. This will only help you turn those regression models into an IPM without shooting yourself in the foot. Furthermore, most of the documentation assumes a basic knowledge of IPM theory and construction. For those that are totally new to IPMs, it is strongly recommended to read a theoretical overview of the models first. Some favorites are [Easterling et al. 2000](https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658%282000%29081%5B0694%3ASSSAAN%5D2.0.CO%3B2), [Merow et al. 2013](https://doi.org/10.1111/2041-210X.12146), and [Rees et al. 2014](https://doi.org/10.1111/1365-2656.12178). The [Introduction to ipmr vignette](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html) also contains a brief overview of IPM theory as well as a far more detailed introduction to this package. Thus, everything that follows assumes you have basic understanding of IPM theory, parameterized vital rate models, and are now ready to begin implementing your IPM. 
+`ipmr` is intended to assist with IPM implementation and analysis. It is important to note that this package **will not** help with the process of fitting regression models for vital rates at all! That is a sufficiently different (and vast) topic that we decided it was not within the scope of this project. This will only help you turn those regression models into an IPM without shooting yourself in the foot. Furthermore, most of the documentation assumes a basic knowledge of IPM theory and construction. For those that are totally new to IPMs, it is strongly recommended to read a theoretical overview of the models first. Some favorites are [Easterling et al. 2000](https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658%282000%29081%5B0694%3ASSSAAN%5D2.0.CO%3B2), [Merow et al. 2013](https://doi.org/10.1111/2041-210X.12146), and [Rees et al. 2014](https://doi.org/10.1111/1365-2656.12178). The [Introduction to ipmr vignette](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html) also contains a brief overview of IPM theory as well as a far more detailed introduction to this package. Thus, everything that follows assumes you have basic understanding of IPM theory, parameterized vital rate models, and are now ready to begin implementing your IPM.
 
 Below is a brief overview of the package and some examples of how to implement models with it. A more thorough introduction is available [here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
 
 ## Model classes
 
-Once all parameters are estimated, the first step of defining a model in `ipmr` is to initialize the model using `init_ipm()`. This function has five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and `has_age`. We will ignore `has_age` for now, because age-size models are less common and have their [own vignette](https://levisc8.github.io/ipmr/articles/age_x_size.html). 
+Once all parameters are estimated, the first step of defining a model in `ipmr` is to initialize the model using `init_ipm()`. This function has five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and `has_age`. We will ignore `has_age` for now, because age-size models are less common and have their [own vignette](https://levisc8.github.io/ipmr/articles/age_x_size.html).
 
 The combination of these arguments defines the type of projection model, and makes sure that the machinery for subsequent analyses works correctly. The possible entries for each argument are as follows:
 
 - `sim_gen`: `"simple"`/`"general"`
 
-    + A. **simple**: This describes an IPM with a single continuous state variable and no discrete stages. 
+    -   A. **simple**: This describes an IPM with a single continuous state variable and no discrete stages.
 
-    + B. **general**: This describes and IPM with either more than one continuous state variable, one or more discrete stages, or both of the above. Basically, anything other than an IPM with a single continuous state variable.
+    -   B. **general**: This describes and IPM with either more than one continuous state variable, one or more discrete stages, or both of the above. Basically, anything other than an IPM with a single continuous state variable.
 
 - `di_dd`: `"di"`/`"dd"`
 
-    + A. **di**: This is used to denote a **d**ensity-**i**ndependent IPM.
-  
-    + B. **dd**: This is used to denote a **d**ensity-**d**ependent IPM.
+    -   A. **di**: This is used to denote a **d**ensity-**i**ndependent IPM.
+
+    -   B. **dd**: This is used to denote a **d**ensity-**d**ependent IPM.
 
 - `det_stoch`: `"det"`/`"stoch"`
 
-    + A. **det**: This is used to denote a deterministic IPM. If this is the third argument of `init_ipm`, `kern_param` must be left as `NULL`.
+    -   A. **det**: This is used to denote a deterministic IPM. If this is the third argument of `init_ipm`, `kern_param` must be left as `NULL`.
 
-    + B. **stoch**: This is used to denote a stochastic IPM. If this is the third argument of `init_ipm`, `kern_param` must be specified. The two possibilities for the fourth are described next.
+    -   B. **stoch**: This is used to denote a stochastic IPM. If this is the third argument of `init_ipm`, `kern_param` must be specified. The two possibilities for the fourth are described next.
 
 - `kern_param`: `"kern"`/`"param"` (Complete definitions found in [Metcalf et al. 2015](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405))
 
-    + A. **kern**: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and for which defining a multivariate joint distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the `param` alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration. 
+    -   A. **kern**: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and for which defining a multivariate joint distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the `param` alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration.
 
-    + B. **param**: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. This could be a multivariate normal defined by covarying slopes and intercepts, or distributions of environmental variables that change from time to time. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Examples of this are available in the Introduction and General IPM vignettes. 
+    -   B. **param**: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. This could be a multivariate normal defined by covarying slopes and intercepts, or distributions of environmental variables that change from time to time. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Examples of this are available in the Introduction and General IPM vignettes.
 
 The following possibilities are currently or will become available in `ipmr` (bold text denotes development progress):
 
-- Simple, density independent models: **Completed and ready**
+-   Simple, density independent models: **Completed and ready**
 
-1. `"simple_di_det"`
+1.  `"simple_di_det"`
 
-2. `"simple_di_stoch_kern"`
+2.  `"simple_di_stoch_kern"`
 
-3. `"simple_di_stoch_param"`
+3.  `"simple_di_stoch_param"`
 
-- Simple, density dependent models: **Completed, likely stable**
+-   Simple, density dependent models: **Completed, likely stable**
 
-4. `"simple_dd_det"`
+1.  `"simple_dd_det"`
 
-5. `"simple_dd_stoch_kern"`
+2.  `"simple_dd_stoch_kern"`
 
-6. `"simple_dd_stoch_param"`
+3.  `"simple_dd_stoch_param"`
 
-- General, density independent models: **Completed and ready**
+-   General, density independent models: **Completed and ready**
 
-7. `"general_di_det"`
+1.  `"general_di_det"`
 
-8. `"general_di_stoch_kern"`
+2.  `"general_di_stoch_kern"`
 
-9. `"general_di_stoch_param"`
+3.  `"general_di_stoch_param"`
 
--
-General, density dependent models: **Completed, likely stable**
+-   General, density dependent models: **Completed, likely stable**
 
-10. `"general_dd_det"`
+1.  `"general_dd_det"`
 
-11. `"general_dd_stoch_kern"`
+2.  `"general_dd_stoch_kern"`
 
-12. `"general_dd_stoch_param"`
-
+3.  `"general_dd_stoch_param"`
 
 Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (`simple_di_det`, `simple_di_stoch_kern`, `simple_di_stoch_param`) are described in detail [here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html). The `general_*` versions of these are described [here](https://levisc8.github.io/ipmr/articles/general-ipms.html). Density dependent versions are completed for simple and general models, and are probably stable, but have not been tested enough to be certain. A very brief, though incomplete introduction is available [here](https://levisc8.github.io/ipmr/articles/density-dependence.html). Below is an example implementing a `simple_di_det` IPM.
 
 ## Quick example of a simple, deterministic IPM
 
-Here is a simple model implemented with `ipmr`. This is a hypothetical plant species where plants can survive and grow ($P(z',z)$), and reproduce sexually ($F(z',z)$). We'll use 4 regressions: survival ($s(z)$), growth ($G(z',z)$, $f_g$), probability of reproducing ($r_r(z)$), and number of seeds produced conditional on flowering ($r_s(z)$). New recruits will be generated with a Gaussian distribution ($f_{r_d}$), which requires calculating the mean and standard deviation of new recruits from the data. For simplicity, we'll assume there's no maternal effect on recruit size. First, we'll write out the functional forms for each component of the model:
+Here is a simple model implemented with `ipmr`. This is a hypothetical plant species where plants can survive and grow ($P(z',z)$), and reproduce sexually ($F(z',z)$). We'll use 4 regressions: survival ($s(z)$), growth ($G(z',z)$, $f_g$), probability of reproducing ($r_r(z)$), and number of seeds produced conditional on flowering ($r_s(z)$). New recruits will be generated with a Gaussian distribution ($f\_{r_d}$), which requires calculating the mean and standard deviation of new recruits from the data. For simplicity, we'll assume there's no maternal effect on recruit size. First, we'll write out the functional forms for each component of the model:
 
-1. $n(z', t+1) = \int_L^U K(z',z)n(z,t)dz$
+1.  $n(z', t+1) = \int_L^U K(z',z)n(z,t)dz$
 
-2. $K(z',z) = P(z',z) + F(z',z)$
+2.  $K(z',z) = P(z',z) + F(z',z)$
 
-3. $P(z',z) = s(z) * G(z',z)$
+3.  $P(z',z) = s(z) * G(z',z)$
 
-4. $Logit(s(z)) = \alpha_s + \beta_s *z$
+4.  $Logit(s(z)) = \alpha_s + \beta_s *z$
 
-5. $G(z',z) = f_g(\mu_g, \sigma_g)$
+5.  $G(z',z) = f_g(\mu_g, \sigma_g)$
 
-6. $\mu_g = \alpha_g + \beta_g * z$
+6.  $\mu_g = \alpha_g + \beta_g * z$
 
-7. $F(z',z) = r_r(z) * r_s(z) * r_d(z')$
+7.  $F(z',z) = r_r(z) * r_s(z) * r_d(z')$
 
-8. $Logit(r_r(z)) = \alpha_{r_r} + \beta_{r_r} * z$
+8.  $Logit(r_r(z)) = \alpha_{r_r} + \beta_{r_r} * z$
 
-9. $Log(r_s(z)) = \alpha_{r_s} + \beta_{r_s} * z$
+9.  $Log(r_s(z)) = \alpha_{r_s} + \beta_{r_s} * z$
 
 10. $r_d(z') = f_{r_d}(\mu_{r_d}, \sigma_{r_d})$
 
 Equation 1 describes how all the vital rates act on the initial trait distribution to produce a new one at $t+1$. Equations 3-6 describe how existing individuals can survive, and if they survive, grow or shrink. Equations 7-10 describe how existing individuals create new individuals. In order to implement this, we usually fit regression models to our data. The following set of generalized linear models correspond to the functional forms described above:
 
-1. Survival ($s(z)$ / `s`): a generalized linear model w/ a logit link.
+1.  Survival ($s(z)$ / `s`): a generalized linear model w/ a logit link.
 
-    - Example model formula: `glm(surv ~ size_1, data = my_surv_data, family = binomial())`
-    
+    -   Example model formula: `glm(surv ~ size_1, data = my_surv_data, family = binomial())`
 
-2. Growth ($G(z',z)$ / `g`): a linear model with a Normal error distribution.
+2.  Growth ($G(z',z)$ / `g`): a linear model with a Normal error distribution.
 
-    - Example model formula: `lm(size_2 ~ size_1, data = my_grow_data)`
-    
+    -   Example model formula: `lm(size_2 ~ size_1, data = my_grow_data)`
 
-3. Pr(flowering) ($r_r(z)$ / `r_r`): a generalized linear model w/ a logit link.
+3.  Pr(flowering) ($r_r(z)$ / `r_r`): a generalized linear model w/ a logit link.
 
-    - Example model formula: `glm(flower ~ size_1, data = my_repro_data, family = binomial())`
-    
+    -   Example model formula: `glm(flower ~ size_1, data = my_repro_data, family = binomial())`
 
-4. Seed production ($r_s(z)$ / `r_s`): a generalized linear model w/ log link.
+4.  Seed production ($r_s(z)$ / `r_s`): a generalized linear model w/ log link.
 
-    - Example model formula: `glm(seeds ~ size_1, data = my_flower_data, family = poisson())`
-    
+    -   Example model formula: `glm(seeds ~ size_1, data = my_flower_data, family = poisson())`
 
-5. Recruit size distribution ($r_d(z')$ / `r_d`): a normal distribution w parameters `mu_fd` (mean) and `sd_fd` (standard deviation).
+5.  Recruit size distribution ($r_d(z')$ / `r_d`): a normal distribution w parameters `mu_fd` (mean) and `sd_fd` (standard deviation).
 
-    - Example computations:
-        
-        - `mu_fd = mean(seedling_data$size_2)`
-        
-        - `sd_fd = sd(seedling_data$size_2)`
+    -   Example computations:
+
+        -   `mu_fd = mean(seedling_data$size_2)`
+
+        -   `sd_fd = sd(seedling_data$size_2)`
 
 The example below assumes we've already fit our vital rate models from the raw data. In this example, the numbers are made up, but code that extracts the values you need from a real regression model is provided in comments.
-
 
 ```{r eval = FALSE}
 

@@ -185,11 +185,11 @@ reproduce sexually (*F*(*z*′, *z*)). We’ll use 4 regressions: survival
 (*s*(*z*)), growth (*G*(*z*′, *z*), *f*<sub>*g*</sub>), probability of
 reproducing (*r*<sub>*r*</sub>(*z*)), and number of seeds produced
 conditional on flowering (*r*<sub>*s*</sub>(*z*)). New recruits will be
-generated with a Gaussian distribution
-(*f*<sub>*r*<sub>*d*</sub></sub>), which requires calculating the mean
-and standard deviation of new recruits from the data. For simplicity,
-we’ll assume there’s no maternal effect on recruit size. First, we’ll
-write out the functional forms for each component of the model:
+generated with a Gaussian distribution (*f*\_*r*<sub>*d*</sub>), which
+requires calculating the mean and standard deviation of new recruits
+from the data. For simplicity, we’ll assume there’s no maternal effect
+on recruit size. First, we’ll write out the functional forms for each
+component of the model:
 
 1.  *n*(*z*′, *t* + 1) = ∫<sub>*L*</sub><sup>*U*</sup>*K*(*z*′, *z*)*n*(*z*, *t*)*d**z*
 
