@@ -134,6 +134,7 @@
 #' @importFrom rlang is_empty
 #' @export
 
+
 define_pop_state <- function(proto_ipm, ..., pop_vectors = list()) {
 
   pop_quos            <- rlang::enquos(...)
