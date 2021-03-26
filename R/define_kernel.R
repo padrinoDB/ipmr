@@ -43,7 +43,7 @@
 #' @details
 #' Different classes of IPMs may have many or only a few kernels. Each
 #' one requires its own call to \code{define_kernel}, though there are some exceptions,
-#' namely for kernels derived from hierarchical models (e.g. vital rate models
+#' namely for kernels derived for models with grouping effects (e.g. vital rate models
 #' fit across plots and years).
 #'
 #' A much more complete overview of how to generate kernels is provided in

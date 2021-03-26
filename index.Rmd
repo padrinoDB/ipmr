@@ -317,4 +317,4 @@ v_ipmr      <- left_ev(my_simple_ipm)
 
 ```
 
-A more detailed introduction to `ipmr` is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. Help with age $\times$ size models, density dependent models, and the hierarchical notation syntax are also available there. That's all for now, happy modeling!
+A more detailed introduction to `ipmr` is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. Help with age $\times$ size models, density dependent models, and the suffix syntax are also available there. That's all for now, happy modeling!

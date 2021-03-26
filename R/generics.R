@@ -928,7 +928,7 @@ print.ipmr_vital_rate_funs <- function(x, ...) {
 #' (i.e. first 10\% of iterations in the simulation).
 #'
 #' @return When \code{type_lambda = "all"}, an array. Rows correspond to time
-#' steps, and columns correspond to hierarchical effects (if any). For other types,
+#' steps, and columns correspond to grouping effects (if any). For other types,
 #' a numeric vector.
 #'
 #' @export

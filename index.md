@@ -409,5 +409,5 @@ A more detailed introduction to `ipmr` is available in the Intro to ipmr
 article on this page. General IPM (ones with multiple continuous and/or
 discrete states) tutorials are also available there under the General
 IPMs article. Help with age × size models, density dependent models, and
-the hierarchical notation syntax are also available there. That’s all
-for now, happy modeling!
+the suffix syntax are also available there. That’s all for now, happy
+modeling!

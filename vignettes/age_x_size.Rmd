@@ -14,7 +14,7 @@ vignette: >
 
 Many species exhibit age-dependent demography in addition to some other continuous measures of size. Long term, age classified data sets aren't nearly as common as non-age classified data sets, but can be exceptionally insightful when available. `ipmr` includes some methods to deal with specifying them. 
   
-While we may be tempted to think of age as a continuous quantity, it must be a discrete state in a discrete time model. This makes the age $\times$ size IPM a special case of the general IPM. The syntax for implementing them is largely the same as for non-age classified hierarchical IPMs, but includes a couple extra bits that must be specified.
+While we may be tempted to think of age as a continuous quantity, it must be a discrete state in a discrete time model. This makes the age $\times$ size IPM a special case of the general IPM. This also uses the suffix syntax, and it is largely the same as for other, non-age structured IPMs, but includes a couple extra bits that must be specified.
 
 The rest of this vignette assumes you are familiar with the suffix notation that `ipmr` uses. If you haven't already covered this, it would be best to read at least the [Intro](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html) and [General IPM](https://levisc8.github.io/ipmr/articles/general-ipms.html) vignettes before continuing. We'll model Soay sheep (*Ovis aries*) from St. Kilda using parameters from Chapter 6 of Ellner, Childs, & Rees (2016). 
 
@@ -168,7 +168,7 @@ age_size_ipm <- init_ipm(sim_gen    = "general",
 
 ```
 
-The primary difference in defining this kernel vs any other hierarchical model is that we now specify `has_hier_effs = FALSE`, and pass a list to `levels_ages`. `levels_ages` takes a list with at least one, but possibly two components:
+The primary difference in defining this kernel vs any other "suffixed" model is that we now specify `has_hier_effs = FALSE`, and pass a list to `levels_ages`. `levels_ages` takes a list with at least one, but possibly two components:
 
 1. `age`: This is the age range for the model. It should always start from 0 and be a sequence of integers. 
 

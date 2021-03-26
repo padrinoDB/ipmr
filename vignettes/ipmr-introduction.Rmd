@@ -425,7 +425,7 @@ In this example, there are no additional arguments that need to be passed to `ma
 
 ### Using `predict()` methods in vital rate expressions
 
-The vast majority of IPM pipelines entail fitting a statistical models to data to create vital rate functions. Thus, we're typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or hierarchical effects, and the vital rate expressions are complicated to write out. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parametric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM). 
+The vast majority of IPM pipelines entail fitting a statistical models to data to create vital rate functions. Thus, we're typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or discrete grouping effects, and the vital rate expressions are complicated to write out. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parametric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM). 
 
 To deal with this, many regression modeling packages provide a `predict` method for the class of models that they implement. We can use these in `ipmr` to take the place of the vital rate expressions (more common) or the kernel formulas (probably not as common). 
 
@@ -733,7 +733,7 @@ In the example above, we created a model with a single, deterministic kernel def
 
 Say we have multiple sites sampled in the same year, but are only interested in each site's asymptotic dynamics (perhaps to compare performance across space). `ipmr` uses a syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the examples above. 
 
-The general idea is to append a suffix to each variable that is modified, and supply a list of values that the suffix can actually take in the `levels_hier_effs` slot of `define_kernel()`. There is a longer vignette dedicated to translating math to R code to the `ipmr` syntax [here](https://levisc8.github.io/ipmr/articles/hierarchical-notation.html).
+The general idea is to append a suffix to each variable that is modified, and supply a list of values that the suffix can actually take in the `levels_hier_effs` slot of `define_kernel()`. There is a longer vignette dedicated to translating math to R code to the `ipmr` syntax [here](https://levisc8.github.io/ipmr/articles/suffix-notation.html).
 
 For this example, we'll use the following vital rate models. The `(g)lmer` functions are from the `lme4` package.
 
@@ -843,7 +843,7 @@ my_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
     data_list        = all_params_list,
     states           = list(c('ht')),
     
-    # Here, we tell ipmr that the model has some hierarchical variable, and 
+    # Here, we tell ipmr that the model has some grouping variable, and 
     # provide a list describing the values it can take. The values in 
     # levels_hier_effs are substituted for "site" everywhere in the model, except
     # for the data list. This is why we had to make sure that the names there
@@ -879,8 +879,8 @@ my_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
     data_list        = all_params_list,
     states           = list(c('ht')),
     
-    # As in the P kernel, we specify the levels the hierarchical variable
-    # can take, and modify the eviction function.
+    # As in the P kernel, we specify the levels the grouping variable
+    # can take.
     
     has_hier_effs    = TRUE,
     levels_hier_effs = list(site = 1:5),
@@ -926,7 +926,7 @@ The `levels_hier_effs` list then gets modified like so:
 
 In the examples above, we first created a model with a single, deterministic kernel defined by a single state variable. Then we modeled multiple sites with deterministic kernels that varied from site to site. Next, we'll go through an example showing how to build stochastic models from kernels that are constructed from discretely varying parameter estimates.
 
-The example below is the same as the last example, except that this time, we call our hierarchical effect is "year" (suffixed `_yr`) and we'll run a simulation by randomly choosing a year's kernel at each iteration ("kernel resampling" _sensu_ [Metcalf et al. 2015](https://besjournals.onlinelibrary.wiley.com/doi/pdf/10.1111/2041-210X.12405)). Along the way, we'll also learn how to pass custom functions to the model.
+The example below is the same as the last example, except that this time, we call our grouping effect "year" (suffixed `_yr`) and we'll run a simulation by randomly choosing a year's kernel at each iteration ("kernel resampling" _sensu_ [Metcalf et al. 2015](https://besjournals.onlinelibrary.wiley.com/doi/pdf/10.1111/2041-210X.12405)). Along the way, we'll also learn how to pass custom functions to the model.
 
 The vital rate models are as follows:
 
@@ -1043,7 +1043,7 @@ The only requirement for these functions is that they contain valid R code, and 
 
 ### Implement the IPM
 
-With the functions and parameter values defined, we are now ready to begin composing the model. Each expression's syntax will look very similar to the deterministic example - the main difference is we are now pretending that our hierarchical effect is year (`_yr`) as opposed to site, and we change the `det_stoch` and `kern_param` arguments in `init_ipm()`. 
+With the functions and parameter values defined, we are now ready to begin composing the model. Each expression's syntax will look very similar to the deterministic example - the main difference is we are now pretending that our grouping effect is year (`_yr`) as opposed to site, and we change the `det_stoch` and `kern_param` arguments in `init_ipm()`. 
 
 ```{r eval = FALSE}
 

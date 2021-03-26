@@ -1,11 +1,11 @@
 ---
-title: "Hierarchical Notation"
+title: "Suffix Notation in `ipmr`"
 output:
   rmarkdown::html_vignette: 
     toc: yes
     toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{Hierarchical Notation}
+  %\VignetteIndexEntry{Suffix Notation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -82,7 +82,7 @@ Internally, `ipmr` generates the various levels using `expand.grid`. This means 
 
 When picking values to appear in `levels_hier_effs`, it is best to avoid longer words or phrases where words are separated by underscores (e.g. `treatment = c("h_removal", "c_addition")`), as this may cause problems when values are substituted into expressions. CamelCase is generally safer in these cases (e.g. use `treatment = c("hRemoval", "cAddition")` instead of `treatment = c("h_removal", "c_addition")`).
 
-## Hierarchical models with a single hierarchical variable {#sim_di_s_k}
+## Models with a single grouping variable {#sim_di_s_k}
 
 These models are pretty common in the IPM literature. They encompass cases where a single site has been sampled over many years, or sampled many sites across one transition. 
 
@@ -239,7 +239,7 @@ all_params <- c(all_fixed_params, g_alpha_list, s_alpha_list)
 
 ```
 
-We are now ready to begin implementing the kernels. This model will be a simple, density independent, stochastic kernel-resampled model. The parts where the hierarchical syntax is used are highlighted by comments in the code block:
+We are now ready to begin implementing the kernels. This model will be a simple, density independent, stochastic kernel-resampled model. The parts where the suffix syntax is used are highlighted by comments in the code block:
 
 
 ```{r eval = FALSE}
@@ -272,7 +272,7 @@ ex_ipm <-init_ipm(sim_gen    = "simple",
     data_list        = all_params,
     states           = list(c("z")),
     
-    # We signal that the kernel has hierarchical effects
+    # We signal that the kernel has grouping effects
     
     has_hier_effs    = TRUE,
     

@@ -1290,7 +1290,7 @@ ipm_to_df.default <- function(ipm,
 #'
 #' @param mega_mat A vector with symbols, I's, and/or 0s representing the matrix blocks.
 #' They should be specified in ROW MAJOR order! Can also be a character
-#' string specifying the call. Hierarchical syntax is supported. When used,
+#' string specifying the call. Suffix syntax is supported. When used,
 #' \code{format_mega_matrix} will produce as many mega-matrices as there are
 #' combinations of \code{levels_hier_effs} in the \code{proto_ipm}.
 #'
@@ -1310,9 +1310,9 @@ ipm_to_df.default <- function(ipm,
 #' supplied.
 #'
 #' @return A list containing a large matrix or many large matrices (when used with
-#' hierarchical syntax). The names in the former case will be \code{"mega_matrix"}
+#' suffix syntax). The names in the former case will be \code{"mega_matrix"}
 #' and in the latter case, \code{"mega_matrix_<hier_effs>"} with the levels of the
-#' hierarchical effects substituted in.
+#' grouping effects substituted in.
 #'
 #' @details \code{ipmr} does not generate complete iteration kernels, and uses
 #' sub-kernels to iterate models. However, some further analyses are just easier
@@ -1328,7 +1328,7 @@ ipm_to_df.default <- function(ipm,
 #'
 #' For \code{age_size_ipm}s, the correct form of \code{mega_mat} is generated
 #' internally by creating sub-diagonal matrices for the \code{name_ps} kernels,
-#' and a top row using the \code{f_forms}. If hierarchical effects are part of the
+#' and a top row using the \code{f_forms}. If grouping effects are part of the
 #' model, the suffixes should be attached to the \code{name_ps, f_forms} in the
 #' function arguments, and the correct block matrices will be generated internally.
 #'
@@ -1349,7 +1349,7 @@ ipm_to_df.default <- function(ipm,
 #'                             mega_mat = c(I, go_discrete,
 #'                                          leave_discrete, P))
 #'
-#' # For simple IPMs with no hierarchical effects, this computes the sum of
+#' # For simple IPMs with no grouping effects, this computes the sum of
 #' # the sub-kernels (i.e. K = P + F)
 #'
 #' data(sim_di_det_ex)

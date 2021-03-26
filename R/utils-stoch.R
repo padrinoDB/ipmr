@@ -7,7 +7,7 @@
 #'
 #' @details For \code{*_stoch_kern} models, this computes the element-wise
 #' mean for each sub-kernel across all the different levels of
-#' \code{levels_hier_effs}. For partially hierarchical models, sub-kernels that
+#' \code{levels_hier_effs}. For partially grouped models, sub-kernels that
 #' do not have time- or space-varying components are included in the output and
 #' are identical to their input.
 #'

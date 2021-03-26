@@ -20,7 +20,7 @@ The primary motivation in defining this data structure was to provide a sort of 
 
 The `proto_ipm` data structure powers most of `ipmr`. It represents the minimum amount of information one needs to specify to implement an IPM, and provides a (hopefully) standardized data structure going forward. It haS the following classes: `model_class` (defined in `init_ipm()`), `proto_ipm`, and `data.frame`. It will always have as many rows as calls to `define_kernel()`  that are used in the model definition pipeline. Each row corresponds to 1 or more kernels. 
 
-NB: A row may correspond to more than 1 kernel when hierarchical effects like age, year, or site are included in the model. When this happens, `expand.grid()` is called on the list in `levels_hier_effs`, and all rows are `paste`'d together with `collapse = "_"`. This creates fully crossed levels. Each row that contains the hierarchical effects is then replicated, but with a single level substituted in for the suffix(es). These steps are implemented within `make_ipm()` (and, more specifically `.initialize_kernels()`), and so you will never actually see the results of the suffix expansion when you print `proto_ipm`, only the output from `make_ipm()`. 
+NB: A row may correspond to more than 1 kernel when grouping effects like age, year, or site are included in the model. When this happens, `expand.grid()` is called on the list in `levels_hier_effs`, and all rows are `paste`'d together with `collapse = "_"`. This creates fully crossed levels. Each row that contains the grouping effects is then replicated, but with a single level substituted in for the suffix(es). These steps are implemented within `make_ipm()` (and, more specifically `.initialize_kernels()`), and so you will never actually see the results of the suffix expansion when you print `proto_ipm`, only the output from `make_ipm()`. 
 
 The `proto_ipm` will also always contain the following columns:
 
@@ -42,7 +42,7 @@ The `proto_ipm` will also always contain the following columns:
 
 9. `env_state`: A list column. This contains quosure(s) that sample a continuous environmental variable, and the data that are needed to evaluate the quosures. If the quosure contains a user-defined function, then the data should also contain a variable pointing to that function's definition (usually in the global environment).
 
-10. `has_hier_effs`: Either `TRUE` or `FALSE`. This indicates whether to check all of the names in the model for hierarchical effects. If `TRUE`, `.split_hier_effs` is called inside of `make_ipm`. 
+10. `has_hier_effs`: Either `TRUE` or `FALSE`. This indicates whether to check all of the names in the model for grouping effects. If `TRUE`, `.split_hier_effs` is called inside of `make_ipm`. 
 
 11. `levels_hier_effs`: A list. If `has_hier_effs` is `TRUE`, then this will contain a list of integer or character vectors. The names in the list should correspond to the suffixes used in vital rate expressions/variable names, and the values in the list should correspond to the values the suffix can take on (e.g. `list(site = c("A", "B", "C"), yr = 1:5)`).
 
@@ -56,7 +56,7 @@ The `proto_ipm` will also always contain the following columns:
     
     - `family`: This is the type of transition the kernel describes (e.g. continuous -> continuous, continuous -> discrete, etc.). It can be one of: `c("CC", "CD", "DC", "DD")`. The first letter indicates what type of state the kernel starts on, and the second what type it ends on.
     
-    - `vr_text`: This is a named list of text strings that represent vital rates. The name of each entry is the name of the vital rate. Each text string gets processed for hierarchical effects and possibly age, and then parsed prior to evaluation. The conversion from a call to text back to a call lets us implement `ipmr`'s hierarchical syntax. When the text strings are converted to expressions and evaluated, the values these expressions generate are bound to the names of the list.
+    - `vr_text`: This is a named list of text strings that represent vital rates. The name of each entry is the name of the vital rate. Each text string gets processed for grouping effects and possibly age, and then parsed prior to evaluation. The conversion from a call to text back to a call lets us implement `ipmr`'s suffix syntax. When the text strings are converted to expressions and evaluated, the values these expressions generate are bound to the names of the list.
     
     - `params`: This contains a named list of all constants used in the kernel's vital rates. These are usually regression coefficients, regression models themselves, or parameters derived from other data sources (e.g. germination rates from a seed sowing experiment). For coefficients and raw parameter values, each name in the list should only correspond to a single value. In addition, all values in this list will have a `"flat_protect"` attribute appended to them. See below for more details. 
     

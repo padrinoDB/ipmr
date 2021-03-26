@@ -210,7 +210,7 @@ other potentially useful variables for subsequent analyses. Default is
 \item{return_all_envs}{A logical indicating whether to return the environments that
 the kernel expressions are evaluated in. These may be useful for some analyses,
 such as regression-level sensitivity/elasticity analyses, but can also rapidly
-increase memory consumption for models with many kernels (e.g. ones with hierarchical
+increase memory consumption for models with many kernels (e.g. ones with grouping
 effects that have many levels, or any \code{*_stoch_param} model). Default is
 \code{FALSE}.}
 
@@ -245,7 +245,7 @@ by other functions. Use with care.}
 \item{kernel_seq}{For \code{*_stoch_kern} methods, the sequence of kernels
 to use during the simulation process. It should have the same number of entries
 as the number of \code{iterations}.
-This should be a vector containing levels of the hierarchical effects specified
+This should be a vector containing levels of the grouping effects specified
 in \code{levels_hier_effs}, or empty. Support for Markov chains will eventually
 get implemented. If it is empty, \code{make_ipm} will try to generate a
 sequence internally using a random selection of the \code{levels_hier_effs}
