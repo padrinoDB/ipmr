@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.9000</span>
       </span>
     </div>
 
@@ -62,7 +62,7 @@
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
+      <a href="../articles/suffix-notation.html">Suffix Notation</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -123,7 +123,7 @@
 <h2 class="hasAnchor">
 <a href="#introduction-to-age-times-size-classified-models" class="anchor"></a>Introduction to age <span class="math inline">\(\times\)</span> size classified models</h2>
 <p>Many species exhibit age-dependent demography in addition to some other continuous measures of size. Long term, age classified data sets aren’t nearly as common as non-age classified data sets, but can be exceptionally insightful when available. <code>ipmr</code> includes some methods to deal with specifying them.</p>
-<p>While we may be tempted to think of age as a continuous quantity, it must be a discrete state in a discrete time model. This makes the age <span class="math inline">\(\times\)</span> size IPM a special case of the general IPM. The syntax for implementing them is largely the same as for non-age classified hierarchical IPMs, but includes a couple extra bits that must be specified.</p>
+<p>While we may be tempted to think of age as a continuous quantity, it must be a discrete state in a discrete time model. This makes the age <span class="math inline">\(\times\)</span> size IPM a special case of the general IPM. This also uses the suffix syntax, and it is largely the same as for other, non-age structured IPMs, but includes a couple extra bits that must be specified.</p>
 <p>The rest of this vignette assumes you are familiar with the suffix notation that <code>ipmr</code> uses. If you haven’t already covered this, it would be best to read at least the <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">Intro</a> and <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">General IPM</a> vignettes before continuing. We’ll model Soay sheep (<em>Ovis aries</em>) from St. Kilda using parameters from Chapter 6 of Ellner, Childs, &amp; Rees (2016).</p>
 </div>
 <div id="mathematical-overview" class="section level2">
@@ -272,7 +272,7 @@
     levels_ages   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>, max_age <span class="op">=</span> <span class="fl">21</span><span class="op">)</span>,
     evict_cor     <span class="op">=</span> <span class="cn">FALSE</span>
   <span class="op">)</span></code></pre></div>
-<p>The primary difference in defining this kernel vs any other hierarchical model is that we now specify <code>has_hier_effs = FALSE</code>, and pass a list to <code>levels_ages</code>. <code>levels_ages</code> takes a list with at least one, but possibly two components:</p>
+<p>The primary difference in defining this kernel vs any other “suffixed” model is that we now specify <code>has_hier_effs = FALSE</code>, and pass a list to <code>levels_ages</code>. <code>levels_ages</code> takes a list with at least one, but possibly two components:</p>
 <ol style="list-style-type: decimal">
 <li><p><code>age</code>: This is the age range for the model. It should always start from 0 and be a sequence of integers.</p></li>
 <li><p>Optionally, <code>max_age</code>: This is used to denote that while individuals may get older in reality, this value will be the highest that we model. In effect, it creates “very old, but not quite dead” group which can survive and remain in the same age class.</p></li>

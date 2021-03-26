@@ -7,10 +7,10 @@ articles:
   general-ipms: general-ipms.html
   generic-funs: generic-funs.html
   generic-progress: generic-progress.html
-  hierarchical-notation: hierarchical-notation.html
   ipmr-introduction: ipmr-introduction.html
   proto-ipms: proto-ipms.html
-last_built: 2021-02-04T11:26Z
+  suffix-notation: suffix-notation.html
+last_built: 2021-03-26T10:09Z
 urls:
   reference: https://levisc8.github.io/ipmr/reference
   article: https://levisc8.github.io/ipmr/articles

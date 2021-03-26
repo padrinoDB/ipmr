@@ -75,7 +75,7 @@ vignette('ipmr-introduction', 'ipmr')  a more complete introduction." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.9000</span>
       </span>
     </div>
 
@@ -106,7 +106,7 @@ vignette('ipmr-introduction', 'ipmr')  a more complete introduction." />
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
+      <a href="../articles/suffix-notation.html">Suffix Notation</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -379,7 +379,7 @@ other potentially useful variables for subsequent analyses. Default is
       <td><p>A logical indicating whether to return the environments that
 the kernel expressions are evaluated in. These may be useful for some analyses,
 such as regression-level sensitivity/elasticity analyses, but can also rapidly
-increase memory consumption for models with many kernels (e.g. ones with hierarchical
+increase memory consumption for models with many kernels (e.g. ones with grouping
 effects that have many levels, or any <code>*_stoch_param</code> model). Default is
 <code>FALSE</code>.</p></td>
     </tr>
@@ -430,7 +430,7 @@ by other functions. Use with care.</p></td>
       <td><p>For <code>*_stoch_kern</code> methods, the sequence of kernels
 to use during the simulation process. It should have the same number of entries
 as the number of <code>iterations</code>.
-This should be a vector containing levels of the hierarchical effects specified
+This should be a vector containing levels of the grouping effects specified
 in <code>levels_hier_effs</code>, or empty. Support for Markov chains will eventually
 get implemented. If it is empty, <code>make_ipm</code> will try to generate a
 sequence internally using a random selection of the <code>levels_hier_effs</code>

@@ -1,5 +1,5 @@
 ---
-title: "Suffix Notation in `ipmr`"
+title: "Suffix Notation"
 output:
   rmarkdown::html_vignette: 
     toc: yes

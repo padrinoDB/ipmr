@@ -73,7 +73,7 @@ these to iterate models, but they may be useful for further analyses." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.9000</span>
       </span>
     </div>
 
@@ -104,7 +104,7 @@ these to iterate models, but they may be useful for further analyses." />
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
+      <a href="../articles/suffix-notation.html">Suffix Notation</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -186,7 +186,7 @@ these to iterate models, but they may be useful for further analyses.</p>
       <th>mega_mat</th>
       <td><p>A vector with symbols, I's, and/or 0s representing the matrix blocks.
 They should be specified in ROW MAJOR order! Can also be a character
-string specifying the call. Hierarchical syntax is supported. When used,
+string specifying the call. Suffix syntax is supported. When used,
 <code>format_mega_matrix</code> will produce as many mega-matrices as there are
 combinations of <code>levels_hier_effs</code> in the <code>proto_ipm</code>.</p></td>
     </tr>
@@ -214,9 +214,9 @@ supplied.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A list containing a large matrix or many large matrices (when used with
-hierarchical syntax). The names in the former case will be <code>"mega_matrix"</code>
+suffix syntax). The names in the former case will be <code>"mega_matrix"</code>
 and in the latter case, <code>"mega_matrix_&lt;hier_effs&gt;"</code> with the levels of the
-hierarchical effects substituted in.</p>
+grouping effects substituted in.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><code>ipmr</code> does not generate complete iteration kernels, and uses
@@ -231,7 +231,7 @@ will work out the correct dimensions for both internally, and there is no
 restriction on the number that may be used in a given call.</p>
 <p>For <code>age_size_ipm</code>s, the correct form of <code>mega_mat</code> is generated
 internally by creating sub-diagonal matrices for the <code>name_ps</code> kernels,
-and a top row using the <code>f_forms</code>. If hierarchical effects are part of the
+and a top row using the <code>f_forms</code>. If grouping effects are part of the
 model, the suffixes should be attached to the <code>name_ps, f_forms</code> in the
 function arguments, and the correct block matrices will be generated internally.</p>
 
@@ -252,7 +252,7 @@ function arguments, and the correct block matrices will be generated internally.
                             mega_mat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>I</span>, <span class='va'>go_discrete</span>,
                                          <span class='va'>leave_discrete</span>, <span class='va'>P</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='co'># For simple IPMs with no hierarchical effects, this computes the sum of</span>
+<span class='co'># For simple IPMs with no grouping effects, this computes the sum of</span>
 <span class='co'># the sub-kernels (i.e. K = P + F)</span>
 
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sim_di_det_ex</span><span class='op'>)</span>

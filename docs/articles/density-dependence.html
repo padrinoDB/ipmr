@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.9000</span>
       </span>
     </div>
 
@@ -62,7 +62,7 @@
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
+      <a href="../articles/suffix-notation.html">Suffix Notation</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -134,21 +134,21 @@
 <li><p><span class="math inline">\(K(z', z, N) = P(z', z, N, \theta) + F(z', z, N, \theta)\)</span></p></li>
 </ol>
 <p>Here, <span class="math inline">\(N\)</span> represents the total population size, and <span class="math inline">\(\theta\)</span> denotes the year specific intercepts. The kernel values fluctuate as a function of these at each iteration of the model.</p>
-<p>The <span class="math inline">\(P(z', z, N)\)</span> kernel is comprised of a density independent function for growth (Eq 6-7) and a density dependent function for survival (Eq 5):</p>
+<p>The <span class="math inline">\(P(z', z, N)\)</span> kernel is comprised of a density independent function for growth (Eq 6-7) and a density dependent function for survival (Eq 5). <span class="math inline">\(f_g\)</span> denotes a Gaussian probability density function:</p>
 <ol start="4" style="list-style-type: decimal">
 <li><p><span class="math inline">\(P(z', z, N) = s(z, N) * g(z', z)\)</span></p></li>
 <li><p><span class="math inline">\(Logit(s(z, N)) = \alpha_s + \alpha_s^{yr} + \beta_s^z * z + \beta_s^{N} * N\)</span></p></li>
-<li><p><span class="math inline">\(g(z', z, \theta) \sim Norm(\mu_g(z, \theta), \sigma_g)\)</span></p></li>
+<li><p><span class="math inline">\(g(z', z, \theta) = f_g(z', \mu_g(z, \theta), \sigma_g)\)</span></p></li>
 <li><p><span class="math inline">\(\mu_g(z, \theta) = \alpha_g + \alpha_g^{yr} + \beta_g^z * z\)</span></p></li>
 </ol>
-<p>The <span class="math inline">\(F(z',z, N, \theta)\)</span> kernel is comprised of a density independent function for recruit size (Eq 10) and probability of reproducing (Eq 9), and a density dependent function for number of recruits produced by parents (Eq 11).</p>
+<p>The <span class="math inline">\(F(z',z, N, \theta)\)</span> kernel is comprised of a density independent function for recruit size (Eq 10) and probability of reproducing (Eq 9), and a density dependent function for number of recruits produced by parents (Eq 11). <span class="math inline">\(f_{r_d}\)</span> denotes a Gaussian probability density function:</p>
 <ol start="8" style="list-style-type: decimal">
-<li><p><span class="math inline">\(F(z', z, N, \theta) = f_r(z) * f_s(z, N, \theta) + f_d(z')\)</span></p></li>
-<li><p><span class="math inline">\(Logit(f_r(z)) = \alpha_{f_r} + \beta_{f_r}^z * z\)</span></p></li>
-<li><p><span class="math inline">\(f_d(z') \sim Norm(\mu_{f_d}, \sigma_{f_d})\)</span></p></li>
-<li><p><span class="math inline">\(Log(f_s(z, N, \theta)) = \alpha_{f_s} + \alpha_{f_s}^{yr} + \beta_{f_s}^z * z + \beta_{f_s}^N * N\)</span></p></li>
+<li><p><span class="math inline">\(F(z', z, N, \theta) = r_r(z) * r_s(z, N, \theta) + r_d(z')\)</span></p></li>
+<li><p><span class="math inline">\(Logit(r_r(z)) = \alpha_{r_r} + \beta_{r_r}^z * z\)</span></p></li>
+<li><p><span class="math inline">\(r_d(z') = f_{r_d}(z', \mu_{r_d}, \sigma_{r_d})\)</span></p></li>
+<li><p><span class="math inline">\(Log(r_s(z, N, \theta)) = \alpha_{r_s} + \alpha_{r_s}^{yr} + \beta_{r_s}^z * z + \beta_{r_s}^N * N\)</span></p></li>
 </ol>
-<p>We’ll simulate a 50 year time series using hypothetical parameter values. The fixed parameter values are created as with a density independent model. The difference is that we now have two more parameters: <code>s_dd</code>, and <code>f_s_dd</code>. These are the coefficients that correspond to <span class="math inline">\(\beta_s^N\)</span> and <span class="math inline">\(\beta_{f_s}^N\)</span>, respectively. The chunk below initializes the data list object, which we name <code>params</code>.</p>
+<p>We’ll simulate a 50 year time series using hypothetical parameter values. The fixed parameter values are created as with a density independent model. The difference is that we now have two more parameters: <code>s_dd</code>, and <code>r_s_dd</code>. These are the coefficients that correspond to <span class="math inline">\(\beta_s^N\)</span> and <span class="math inline">\(\beta_{r_s}^N\)</span>, respectively. The chunk below initializes the data list object, which we name <code>params</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
 
@@ -159,31 +159,34 @@
   g_int     <span class="op">=</span> <span class="fl">8</span>,
   g_slope   <span class="op">=</span> <span class="fl">0.92</span>,
   sd_g      <span class="op">=</span> <span class="fl">0.9</span>,
-  f_r_int   <span class="op">=</span> <span class="fl">0.09</span>,
-  f_r_slope <span class="op">=</span> <span class="fl">0.05</span>,
-  f_s_int   <span class="op">=</span> <span class="fl">0.1</span>,
-  f_s_slope <span class="op">=</span> <span class="fl">0.005</span>,
-  f_s_dd    <span class="op">=</span> <span class="op">-</span><span class="fl">0.03</span>,
-  mu_fd     <span class="op">=</span> <span class="fl">9</span>,
-  sd_fd     <span class="op">=</span> <span class="fl">2</span>
+  r_r_int   <span class="op">=</span> <span class="fl">0.09</span>,
+  r_r_slope <span class="op">=</span> <span class="fl">0.05</span>,
+  r_s_int   <span class="op">=</span> <span class="fl">0.1</span>,
+  r_s_slope <span class="op">=</span> <span class="fl">0.005</span>,
+  r_s_dd    <span class="op">=</span> <span class="op">-</span><span class="fl">0.03</span>,
+  mu_rd     <span class="op">=</span> <span class="fl">9</span>,
+  sd_rd     <span class="op">=</span> <span class="fl">2</span>
 <span class="op">)</span>
 
 <span class="co"># Now, simulate some random intercepts for growth, survival, and offspring production</span>
 
 <span class="va">g_r_int</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.3</span><span class="op">)</span>
 <span class="va">s_r_int</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.7</span><span class="op">)</span>
-<span class="va">f_s_r_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.2</span><span class="op">)</span>
+<span class="va">r_s_r_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0.2</span><span class="op">)</span>
 
 <span class="va">nms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"r_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">g_r_int</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"g_"</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">s_r_int</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"s_"</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">f_s_r_int</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"f_s_"</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">r_s_r_int</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"r_s_"</span>, <span class="va">nms</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
 
-<span class="va">params</span>     <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">data_list</span>, <span class="va">g_r_int</span>, <span class="va">s_r_int</span>, <span class="va">f_s_r_int</span><span class="op">)</span></code></pre></div>
+<span class="va">params</span>     <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">data_list</span>, <span class="va">g_r_int</span>, <span class="va">s_r_int</span>, <span class="va">r_s_r_int</span><span class="op">)</span></code></pre></div>
 <p>Next, we initialize the model using <code>init_ipm</code>. The difference is that the second argument is now changed to <code>"dd"</code> to denote that this is a density dependent model.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">dd_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen <span class="op">=</span> <span class="st">"simple"</span>, di_dd <span class="op">=</span> <span class="st">"dd"</span>, det_stoch <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">dd_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen <span class="op">=</span> <span class="st">"simple"</span>,
+                   di_dd <span class="op">=</span> <span class="st">"dd"</span>, 
+                   det_stoch <span class="op">=</span> <span class="st">"stoch"</span>, 
+                   kern_param <span class="op">=</span> <span class="st">"kern"</span><span class="op">)</span></code></pre></div>
 <p>Once we’ve done that, we’re ready to begin specifying the kernel forms. One previously not mentioned aspect of <code><a href="../reference/define_impl.html">define_pop_state()</a></code> is that, in addition to defining initial conditions, 2 additional helper variables are generated: <code>n_stateVariable_t</code> and <code>n_stateVariable_t_1</code>. These can be used to reference the population states in vital rate and/or kernel expressions.</p>
 <p>These will look very similar to the ones we specified for density-independent models, except that we now include the term <code>s_dd * sum(n_size_t) * d_size</code> in the survival expression. <code>sum(n_size_t) * d_size</code> is the syntax <code>ipmr</code> uses to denote total population size. Further down, there is an example of how to use subsets of the trait distribution.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -207,17 +210,17 @@
 <code class="sourceCode R"><span class="va">dd_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
   proto_ipm        <span class="op">=</span> <span class="va">dd_ipm</span>,
   name             <span class="op">=</span> <span class="st">"F_yr"</span>,
-  formula          <span class="op">=</span> <span class="va">f_r</span> <span class="op">*</span> <span class="va">f_s_yr</span> <span class="op">*</span> <span class="va">f_d</span>,
+  formula          <span class="op">=</span> <span class="va">r_r</span> <span class="op">*</span> <span class="va">r_s_yr</span> <span class="op">*</span> <span class="va">r_d</span>,
   family           <span class="op">=</span> <span class="st">"CC"</span>,
-  f_r              <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html">plogis</a></span><span class="op">(</span><span class="va">f_r_int</span> <span class="op">+</span> <span class="va">f_r_slope</span> <span class="op">*</span> <span class="va">size_1</span><span class="op">)</span>,
-  f_s_yr           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">f_s_int</span> <span class="op">+</span> <span class="va">f_s_r_yr</span> <span class="op">+</span> <span class="va">f_s_slope</span> <span class="op">*</span> <span class="va">size_1</span> <span class="op">+</span> <span class="va">f_s_dd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">n_size_t</span><span class="op">)</span> <span class="op">*</span> <span class="va">d_size</span><span class="op">)</span>,
-  f_d              <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">size_2</span>, <span class="va">mu_fd</span>, <span class="va">sd_fd</span><span class="op">)</span>,
+  r_r              <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html">plogis</a></span><span class="op">(</span><span class="va">r_r_int</span> <span class="op">+</span> <span class="va">r_r_slope</span> <span class="op">*</span> <span class="va">size_1</span><span class="op">)</span>,
+  r_s_yr           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">r_s_int</span> <span class="op">+</span> <span class="va">r_s_r_yr</span> <span class="op">+</span> <span class="va">r_s_slope</span> <span class="op">*</span> <span class="va">size_1</span> <span class="op">+</span> <span class="va">r_s_dd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">n_size_t</span><span class="op">)</span> <span class="op">*</span> <span class="va">d_size</span><span class="op">)</span>,
+  r_d              <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">size_2</span>, <span class="va">mu_rd</span>, <span class="va">sd_rd</span><span class="op">)</span>,
   data_list        <span class="op">=</span> <span class="va">params</span>,
   states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"size"</span><span class="op">)</span><span class="op">)</span>,
   has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
   levels_hier_effs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>yr <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,
   evict_cor        <span class="op">=</span> <span class="cn">TRUE</span>,
-  evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"f_d"</span><span class="op">)</span>
+  evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"r_d"</span><span class="op">)</span>
   <span class="op">)</span> </code></pre></div>
 <p>Again, we’ve add the <code>f_s_dd * sum(n_size_t) * d_size</code> to the expression for <code>f_s_yr</code>, but otherwise, not much is different from how we’ve defined density independent models. The rest of the model definition process is unchanged.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">

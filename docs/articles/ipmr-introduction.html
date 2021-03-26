@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.9000</span>
       </span>
     </div>
 
@@ -62,7 +62,7 @@
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
+      <a href="../articles/suffix-notation.html">Suffix Notation</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -479,7 +479,7 @@
 <div id="using-predict-methods-in-vital-rate-expressions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#using-predict-methods-in-vital-rate-expressions" class="anchor"></a>Using <code>predict()</code> methods in vital rate expressions</h3>
-<p>The vast majority of IPM pipelines entail fitting a statistical models to data to create vital rate functions. Thus, we’re typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or hierarchical effects, and the vital rate expressions are complicated to write out. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parametric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM).</p>
+<p>The vast majority of IPM pipelines entail fitting a statistical models to data to create vital rate functions. Thus, we’re typically working with model objects rather than just parameter values. Sometimes the models have many terms, including interactions and/or discrete grouping effects, and the vital rate expressions are complicated to write out. Furthermore, the flexibility of IPMs means our vital rate models may be semi- or fully non-parametric, and writing out the functional form may not even be possible prior to the model fitting exercise (e.g. a GAM).</p>
 <p>To deal with this, many regression modeling packages provide a <code>predict</code> method for the class of models that they implement. We can use these in <code>ipmr</code> to take the place of the vital rate expressions (more common) or the kernel formulas (probably not as common).</p>
 <p>We’ll go through a quick example of how to incorporate these expressions into the model building process using a data set for <em>Carpobrotus edulis</em>, an invasive succulent. This is real data collected in Israel and appears in <a href="https://www.biorxiv.org/content/10.1101/2020.12.08.415174v1.full">Bogdan et al. (2020)</a>. The data set is also included in <code>ipmr</code> and can be loaded by running <code><a href="https://rdrr.io/r/utils/data.html">data(iceplant_ex)</a></code>.</p>
 <p>First, we’ll load in the example data set and fit some simple vital rate models. Some notes about the data:</p>
@@ -777,7 +777,7 @@
 <h3 class="hasAnchor">
 <a href="#hier-effs-det" class="anchor"></a>Deterministic simulations with hierarchical models</h3>
 <p>Say we have multiple sites sampled in the same year, but are only interested in each site’s asymptotic dynamics (perhaps to compare performance across space). <code>ipmr</code> uses a syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the examples above.</p>
-<p>The general idea is to append a suffix to each variable that is modified, and supply a list of values that the suffix can actually take in the <code>levels_hier_effs</code> slot of <code><a href="../reference/define_kernel.html">define_kernel()</a></code>. There is a longer vignette dedicated to translating math to R code to the <code>ipmr</code> syntax <a href="https://levisc8.github.io/ipmr/articles/hierarchical-notation.html">here</a>.</p>
+<p>The general idea is to append a suffix to each variable that is modified, and supply a list of values that the suffix can actually take in the <code>levels_hier_effs</code> slot of <code><a href="../reference/define_kernel.html">define_kernel()</a></code>. There is a longer vignette dedicated to translating math to R code to the <code>ipmr</code> syntax <a href="https://levisc8.github.io/ipmr/articles/suffix-notation.html">here</a>.</p>
 <p>For this example, we’ll use the following vital rate models. The <code>(g)lmer</code> functions are from the <code>lme4</code> package.</p>
 <ol style="list-style-type: decimal">
 <li>
@@ -810,7 +810,7 @@
 </li>
 <li><p>recruit size distribution (<code>r_d</code>): A normal distribution with two constant parameters, the mean (<code>mu_rd</code>) and standard deviation (<code>sd_rd</code>).</p></li>
 </ol>
-<p>The chunk below takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of <code>fixef(some_vital_rate_model</code> and <code><a href="https://rdrr.io/pkg/lme4/man/ranef.html">ranef(some_vital_rate_model)</a></code>)).</p>
+<p>The chunk below takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of <code>fixef(some_vital_rate_model</code> and <code>ranef(some_vital_rate_model)</code>)).</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
 
@@ -885,7 +885,7 @@
     data_list        <span class="op">=</span> <span class="va">all_params_list</span>,
     states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span><span class="op">)</span><span class="op">)</span>,
     
-    <span class="co"># Here, we tell ipmr that the model has some hierarchical variable, and </span>
+    <span class="co"># Here, we tell ipmr that the model has some grouping variable, and </span>
     <span class="co"># provide a list describing the values it can take. The values in </span>
     <span class="co"># levels_hier_effs are substituted for "site" everywhere in the model, except</span>
     <span class="co"># for the data list. This is why we had to make sure that the names there</span>
@@ -921,8 +921,8 @@
     data_list        <span class="op">=</span> <span class="va">all_params_list</span>,
     states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span><span class="op">)</span><span class="op">)</span>,
     
-    <span class="co"># As in the P kernel, we specify the levels the hierarchical variable</span>
-    <span class="co"># can take, and modify the eviction function.</span>
+    <span class="co"># As in the P kernel, we specify the levels the grouping variable</span>
+    <span class="co"># can take.</span>
     
     has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
     levels_hier_effs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>site <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,
@@ -960,7 +960,7 @@
 <h3 class="hasAnchor">
 <a href="#disc-varying" class="anchor"></a>Defining a stochastic IPM in a discretely varying environment</h3>
 <p>In the examples above, we first created a model with a single, deterministic kernel defined by a single state variable. Then we modeled multiple sites with deterministic kernels that varied from site to site. Next, we’ll go through an example showing how to build stochastic models from kernels that are constructed from discretely varying parameter estimates.</p>
-<p>The example below is the same as the last example, except that this time, we call our hierarchical effect is “year” (suffixed <code>_yr</code>) and we’ll run a simulation by randomly choosing a year’s kernel at each iteration (“kernel resampling” <em>sensu</em> <a href="https://besjournals.onlinelibrary.wiley.com/doi/pdf/10.1111/2041-210X.12405">Metcalf et al. 2015</a>). Along the way, we’ll also learn how to pass custom functions to the model.</p>
+<p>The example below is the same as the last example, except that this time, we call our grouping effect “year” (suffixed <code>_yr</code>) and we’ll run a simulation by randomly choosing a year’s kernel at each iteration (“kernel resampling” <em>sensu</em> <a href="https://besjournals.onlinelibrary.wiley.com/doi/pdf/10.1111/2041-210X.12405">Metcalf et al. 2015</a>). Along the way, we’ll also learn how to pass custom functions to the model.</p>
 <p>The vital rate models are as follows:</p>
 <ol style="list-style-type: decimal">
 <li>
@@ -1076,7 +1076,7 @@
 <div id="implement-the-ipm-1" class="section level3">
 <h3 class="hasAnchor">
 <a href="#implement-the-ipm-1" class="anchor"></a>Implement the IPM</h3>
-<p>With the functions and parameter values defined, we are now ready to begin composing the model. Each expression’s syntax will look very similar to the deterministic example - the main difference is we are now pretending that our hierarchical effect is year (<code>_yr</code>) as opposed to site, and we change the <code>det_stoch</code> and <code>kern_param</code> arguments in <code><a href="../reference/init_ipm.html">init_ipm()</a></code>.</p>
+<p>With the functions and parameter values defined, we are now ready to begin composing the model. Each expression’s syntax will look very similar to the deterministic example - the main difference is we are now pretending that our grouping effect is year (<code>_yr</code>) as opposed to site, and we change the <code>det_stoch</code> and <code>kern_param</code> arguments in <code><a href="../reference/init_ipm.html">init_ipm()</a></code>.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"simple"</span>,
                    di_dd      <span class="op">=</span> <span class="st">"di"</span>, 

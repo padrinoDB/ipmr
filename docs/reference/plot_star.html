@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.9000</span>
       </span>
     </div>
 
@@ -103,7 +103,7 @@
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/hierarchical-notation.html">Hierarchical Notation</a>
+      <a href="../articles/suffix-notation.html">Suffix Notation</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -216,7 +216,7 @@
   y <span class='op'>=</span> <span class='cn'>NULL</span>,
   ipm <span class='op'>=</span> <span class='cn'>NULL</span>,
   mega_mat <span class='op'>=</span> <span class='cn'>NA_character_</span>,
-  col <span class='op'>=</span> <span class='cn'>NA_character_</span>,
+  col <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/grDevices/palettes.html'>rainbow</a></span><span class='op'>(</span><span class='fl'>100</span>, start <span class='op'>=</span> <span class='fl'>0.67</span>, end <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>,
   bw <span class='op'>=</span> <span class='cn'>FALSE</span>,
   do_contour <span class='op'>=</span> <span class='cn'>FALSE</span>,
   do_legend <span class='op'>=</span> <span class='cn'>FALSE</span>,
@@ -267,7 +267,7 @@ number can help visualize kernels that are overwhelmed by a few very large numbe
       <th>mega_mat</th>
       <td><p>A vector with symbols, I's, and/or 0s representing the matrix blocks.
 They should be specified in ROW MAJOR order! Can also be a character
-string specifying the call. Hierarchical syntax is supported. When used,
+string specifying the call. Suffix syntax is supported. When used,
 <code>format_mega_matrix</code> will produce as many mega-matrices as there are
 combinations of <code>levels_hier_effs</code> in the <code>proto_ipm</code>.</p></td>
     </tr>
