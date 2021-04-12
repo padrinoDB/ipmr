@@ -632,9 +632,9 @@ eigs_1 <- eigen(K_co_1)
 eigs_2 <- eigen(K_co_2)
 eigs_3 <- eigen(K_co_3)
 
-lambdas_hand <- c(lambda_1 = Re(eigs_1$values[1]),
-                  lambda_2 = Re(eigs_2$values[1]),
-                  lambda_3 = Re(eigs_3$values[1]))
+lambdas_hand <- c(Re(eigs_1$values[1]),
+                  Re(eigs_2$values[1]),
+                  Re(eigs_3$values[1]))
 
 ws_hand      <- cbind(
   w_1 = Re(eigs_1$vectors[ , 1]),
@@ -717,9 +717,11 @@ ipmr_control <- init_ipm(sim_gen    = "general",
            return_all_envs = TRUE,
            normalize_pop_size = TRUE)
 
-lambdas_ipmr <- vapply(ipmr_control$pop_state[grepl("lambda", names(ipmr_control$pop_state))],
-                      function(x) x[ , 200],
-                      numeric(1L))
+# lambdas_ipmr <- vapply(ipmr_control$pop_state[grepl("lambda", names(ipmr_control$pop_state))],
+#                       function(x) x[ , 200],
+#                       numeric(1L))
+
+lambdas_ipmr <- lambda(ipmr_control, type_lambda = "last")
 
 ws <- list()
 
@@ -747,6 +749,38 @@ test_that("hierarchical models get the same answers as hand generated models", {
   expect_equal(ws[ , 3], ws_hand[ , 3], tolerance = 1e-10)
 
 })
+
+test_that("make_iter_kernel can handle arithmetic in expressions", {
+
+  f <- matrix(runif(500 * 500), 500, 500)
+
+  k_1 <- rbind(
+    cbind(dd_co, cd_co),
+    cbind(dc_co, P_1 + f)
+  )
+
+  k_2 <- rbind(
+    cbind(dd_co, cd_co),
+    cbind(dc_co, P_2 + f)
+  )
+  k_3 <- rbind(
+    cbind(dd_co, cd_co),
+    cbind(dc_co, P_3 + f)
+  )
+
+  ipmr_control$sub_kernels <- c(ipmr_control$sub_kernels, list(f = f))
+
+  test_ks <- make_iter_kernel(ipmr_control,
+                              mega_mat = c(stay_discrete,  go_discrete,
+                                           leave_discrete, P_site + f))
+
+
+  expect_equal(k_1, test_ks$mega_matrix_1, ignore_attr = "dimnames")
+  expect_equal(k_2, test_ks$mega_matrix_2, ignore_attr = "dimnames")
+  expect_equal(k_3, test_ks$mega_matrix_3, ignore_attr = "dimnames")
+
+})
+
 
 
 test_that("DC/CD transitions without size-dependence work", {

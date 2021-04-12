@@ -27,3 +27,4 @@ paper/SI/Data*
 build_artefacts/*
 *.o
 *.dll
+src-i386/*

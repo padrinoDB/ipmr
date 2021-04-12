@@ -48,21 +48,19 @@
 .make_mega_mat <- function(ipm, mega_mat) {
 
   # Extract names of sub_kernels. We shouldn't need mega-mat after this
-  # because call_args() returns the mega_mat call's arguments in order!
+  # because call_args() returns the mega_mat call's arguments in order.
 
   sub_mats    <- rlang::call_args(mega_mat)
 
-  sub_mat_nms <- Filter(Negate(function(x) .id_or_0(x)), sub_mats)
+  test_ind    <- .args_from_txt(rlang::expr_text(mega_mat))
+
+  sub_mat_nms <- Filter(Negate(function(x) .id_or_0(x)), test_ind)
 
   sub_kernels <- ipm$sub_kernels
 
-  if(!all(as.character(unlist(sub_mat_nms)) %in% names(sub_kernels))) {
+  if(!all(sub_mat_nms %in% names(sub_kernels))) {
 
     stop("names in 'mega_mat' are not all present in 'ipm$sub_kernels'")
-
-  } else if( (sqrt(length(sub_mats)) %% 1L) != 0L) {
-
-    stop('mega_mat is not square!')
 
   }
 
@@ -149,7 +147,7 @@
 
 .id_or_0 <- function(x) {
 
-  x == 0 || x == "I"
+  x == "`0`" || x == "I" || x == "0"
 
 }
 
