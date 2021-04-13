@@ -289,13 +289,23 @@
 .bind_env_exprs <- function(main_env, env_funs) {
 
   nms <- lapply(env_funs, names) %>% unlist()
+  env_funs <- .flatten_to_depth(env_funs, 1L)
 
   for(i in seq_along(nms)) {
 
     # This does the binding so that values are accessible by the names
     # the user gives them.
 
-    temp <- rlang::eval_tidy(env_funs[[1]][[i]])
+    temp <- rlang::eval_tidy(env_funs[[i]])
+
+    # Catches the PADRINO case where the function slips through and requires
+    # direct execution.
+
+    if(rlang::is_function(temp)) {
+
+        temp <- rlang::exec(temp)
+
+    }
 
     rlang::env_bind(main_env, !!! temp)
 
