@@ -775,9 +775,13 @@ test_that("make_iter_kernel can handle arithmetic in expressions", {
                                            leave_discrete, P_site + f))
 
 
-  expect_equal(k_1, test_ks$mega_matrix_1, ignore_attr = "dimnames")
-  expect_equal(k_2, test_ks$mega_matrix_2, ignore_attr = "dimnames")
-  expect_equal(k_3, test_ks$mega_matrix_3, ignore_attr = "dimnames")
+  expect_equal(k_1, test_ks$mega_matrix_1, ignore_attr = c("dimnames", "class"))
+  expect_equal(k_2, test_ks$mega_matrix_2, ignore_attr = c("dimnames", "class"))
+  expect_equal(k_3, test_ks$mega_matrix_3, ignore_attr = c("dimnames", "class"))
+
+  expect_s3_class(test_ks$mega_matrix_1, "ipmr_matrix")
+  expect_s3_class(test_ks$mega_matrix_2, "ipmr_matrix")
+  expect_s3_class(test_ks$mega_matrix_3, "ipmr_matrix")
 
 })
 

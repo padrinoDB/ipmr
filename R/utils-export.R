@@ -1318,7 +1318,12 @@ ipm_to_df.default <- function(ipm,
 #' sub-kernels to iterate models. However, some further analyses are just easier
 #' to code with a complete iteration kernel. This handles constructing those for
 #' simple and general models of all forms. \code{format_mega_matrix} is used
-#' internally by \code{make_iter_kernel} for general IPMs.
+#' internally by \code{make_iter_kernel} for general IPMs. The difference
+#' between these two functions is that \code{make_iter_kernel} always returns
+#' a list of objects with \code{c(ipmr_matrix, array, matrix)} classes,
+#' whereas \code{format_mega_matrix} always returns a list of objects with
+#' \code{c(array, matrix)} classes. The former has \code{plot()} methods while
+#' the latter does not.
 #'
 #' \code{I} and \code{0} represent identity matrices and 0 matrices,
 #' respectively. They can be used to fill in blocks that represent either, without
@@ -1376,7 +1381,10 @@ make_iter_kernel <- function(ipm,
   out <- .make_iter_kernel(ipm,
                            mega_mat = !! mega_mat,
                            name_ps = name_ps,
-                           f_forms = f_forms)
+                           f_forms = f_forms) %>%
+    set_ipmr_classes()
+
+  return(out)
 
 }
 
