@@ -16,6 +16,7 @@
   bw = FALSE,
   do_contour = FALSE,
   do_legend = FALSE,
+  contour_cex = 1,
   ...
 )
 
@@ -83,6 +84,9 @@ is specified as the matrix or IPM object.}
 on the plot}
 
 \item{do_legend}{A logical indicating whether to draw a legend for the plot}
+
+\item{contour_cex}{A numeric specifying how large to make labels for the
+contour lines.}
 
 \item{...}{further arguments passed to legend}
 

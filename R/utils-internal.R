@@ -127,11 +127,7 @@
 .already_iterated <- function(ipm) {
 
   return(
-    ! all(
-      is.na(
-        ipm$pop_state
-      )
-    )
+    attr(ipm, "iterated")
   )
 }
 

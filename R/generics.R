@@ -1264,6 +1264,8 @@ lambda.general_dd_stoch_param_ipm <- function(ipm,
 #' @param bw A logical indicating whether to use a greyscale palette for plotting
 #' @param do_contour A logical indicating whether or not draw contour lines
 #' on the plot
+#' @param contour_cex A numeric specifying how large to make labels for the
+#' contour lines.
 #' @param do_legend A logical indicating whether to draw a legend for the plot
 #' @param ... further arguments passed to legend
 #'
@@ -1286,11 +1288,12 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
                              bw = FALSE,
                              do_contour = FALSE,
                              do_legend = FALSE,
+                             contour_cex = 1,
                              ...) {
 
-
-  if(is.null(x)) x <- seq_len(ncol(A))
-  if(is.null(y)) y <- seq_len(nrow(A))
+  if(missing(A)) A <- x
+  x <- seq_len(ncol(A))
+  y <- seq_len(nrow(A))
 
   nx = length(x)
   ny = length(y)
@@ -1305,11 +1308,7 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
                   xlim     = x1,
                   ylim     = rev(y1),
                   col      = col,
-                  cex.axis = 1.5,
-                  cex.lab  = 1.5,
                   bty      = "u",
-                  xlab     = 't',
-                  ylab     = 't + 1',
                   ...)
 
   graphics::abline(v = range(x1))
@@ -1319,7 +1318,7 @@ plot.ipmr_matrix <- function(x = NULL, y = NULL,
                                    y,
                                    t(A),
                                    nlevels = 5,
-                                   labcex  = 1.2,
+                                   labcex  = contour_cex,
                                    add     = TRUE)
 
   if(do_legend) {
