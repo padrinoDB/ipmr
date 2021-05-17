@@ -8,7 +8,7 @@ urlcolor: blue
 
 The first case study in this manuscript creates a model for _Carpobrotus spp_. The dataset used in this case study was collected in Havatselet Ha'Sharon, a suburb of Tel Aviv, Israel. The data were collected by drones taking aerial imagery of the population in successive years. Images were combined into a single high-resolution orthomosaic and georeferenced so the map from year 2 laid on top of the map from year 1. Flowers on each plant were counted using a point layer, and polygons were drawn around each ramet to estimate sizes and survival from year to year. Plants that had 0 flowers were classified as non-reproductive, and any plant with 1 or more flowers was classified as reproductive. This led to four regression models - survival, growth conditional on survival, probability of flowering, and number of flowers produced conditional on flowering. Finally, plants present in year 2 that were not present in year 1 were considered new recruits. The mean and variance of their sizes were computed, and this was used to model the recruit size distribution. 
 
-The resulting IPM is a simple IPM (i.e. no discrete states, one continuous state variable). The data that the regressions are fit to are included in the `ipmr` package, and can be accessed with `data(iceplant_ex)`. 
+The resulting IPM is a simple IPM (i.e. no discrete states, one continuous state variable). The data that the regressions are fit to are included in the `ipmr` package, and can be accessed with `data(iceplant_ex)` (the name comes from the common name for _Carpobrotus_ species, which is "iceplants"). 
 
 The IPM can be written on paper as follows:
 
@@ -24,9 +24,9 @@ The components of each sub-kernel are either regression models or constants. The
 
 5. $Logit(s(z)) = \alpha_s + \beta_s * z$
 
-6. $g(z',z) = f_g(z', \mu_g(z), \sigma_g)$
+6. $G(z',z) = f_G(z', \mu_G(z), \sigma_G)$
 
-7. $\mu_g(z) = \alpha_g + \beta_g * z$
+7. $\mu_G(z) = \alpha_G + \beta_G * z$
 
 8. $Logit(p_f(z)) = \alpha_{p_f} + \beta_{p_f} * z$
 
@@ -34,7 +34,7 @@ The components of each sub-kernel are either regression models or constants. The
 
 10. $r_d(z') = f_{r_d}(z', \mu_{r_d}, \sigma_{r_d})$
 
-$\alpha s$ and $\beta s$ correspond to intercepts and slopes from regression models, respectively. Here, $f_g$ and $f_{r_d}$ are used to denote normal probability density functions. The other parameters are constants derived directly from the data itself. 
+$\alpha s$ and $\beta s$ correspond to intercepts and slopes from regression models, respectively. Here, $f_G$ and $f_{r_d}$ are used to denote normal probability density functions. The other parameters are constants derived directly from the data itself. 
 
 ```{r setup}
 
@@ -122,11 +122,27 @@ We now have the parameter set prepared, and have the boundaries for our domains 
 
 We start with the function `init_ipm()`. This function has five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and `has_age`. For now, we will ignore the last argument, as it is covered in case study 2. The first 4 arguments specify the type of IPM we are building:
 
-1. `sim_gen` - `simple`/`general`: This determines whether the model is a simple IPM or a general IPM. 
+1. `sim_gen`: `"simple"`/`"general"`
 
-2. `di_dd` - `di`/`dd`: This determines whether the model is density independent (`di`) or density dependent (`dd`).
+    + A. **simple**: This describes an IPM with a single continuous state variable and no discrete stages. 
 
-3. `det_stoch` - `det`/`stoch`: This determines whether the model is deterministic (`det`) or stochastic (`stoch`). This particular model is deterministic, as there are no data on temporal or spatial changes in vital rates. An introduction to stochastic models is available [here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html). This example does not make use of the final argument, `kern_param`, because it is not a stochastic model, so we'll ignore it for now.
+    + B. **general**: This describes and IPM with either more than one continuous state variable, one or more discrete stages, or both of the above. Basically, anything other than an IPM with a single continuous state variable.
+
+
+2. `di_dd`: `"di"`/`"dd"`
+
+    + A. **di**: This is used to denote a **d**ensity-**i**ndependent IPM.
+
+    + B. **dd**: This is used to denote a **d**ensity-**d**ependent IPM.
+
+
+3. `det_stoch`: `"det"`/`"stoch"`
+
+    + A. **det**: This is used to denote a deterministic IPM. If this is the third argument of `init_ipm`, `kern_param` must be left as `NULL`.
+
+    + B. **stoch**: This is used to denote a stochastic IPM. If this is the third argument of `init_ipm`, `kern_param` must be specified. 
+    
+This particular model is deterministic, as there are no data on temporal or spatial changes in vital rates. An introduction to stochastic models is available [here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html). This example does not make use of the final argument, `kern_param`, because it is not a stochastic model, so we'll ignore it for now.
 
 Once we've decided on the type of model we want, we create the model class using one of the two options for each argument. Since there is no stochasticity, we can leave the fourth argument empty (its default is `NULL`). This case study is a simple, density independent, deterministic IPM, so we use the following:
 
@@ -140,7 +156,7 @@ After we have initialized our IPM, we need to start adding sub-kernels using the
 
 1. Survival is modeled with a logistic regression to predict the probability of survival to $t+1$ based on the size of the ramet at $t$ (`surv_mod`). In order to use the coefficients from that model to generate a survival probability, we need to know the inverse logit transformation, or, a function that performs it for us based on the linear predictor. 
 
-2. Size at $t+1$ is modeled with a Gaussian distribution with two parameters: the mean and standard deviation from the mean. The mean value of size at $t+1$ (`mu_g`) is itself a linear function of size at $t$ and is parameterized with coefficients from the linear model (`grow_mod`). The standard deviation is a constant derived from the residual variance from the linear model we fit.
+2. Size at $t+1$ is modeled with a Gaussian distribution with two parameters: the mean and standard deviation from the mean. The mean value of size at $t+1$ (`mu_G`) is itself a linear function of size at $t$ and is parameterized with coefficients from the linear model (`grow_mod`). The standard deviation is a constant derived from the residual variance from the linear model we fit.
 
 We start providing information on the `P` kernel by giving it a `name`. The name is important because we can use it to reference this kernel in higher level expressions later on. It can have any name we want, but `P` is consistent with the literature in this field (e.g. Easterling, Ellner & Dixon 2000, Ellner & Rees 2006). Next, we write the `formula`. The `formula` is the form of the kernel, and should look like Equation 3, without the $z$ and $z'$ arguments. 
 
@@ -361,7 +377,7 @@ Next, we'll go through an alternative implementation of the model using `predict
 
 We can simplify the code a bit more and get rid of the mathematical expressions for each regression model's link function by using `predict()` methods instead. The next chunk shows how to do this. Instead of extracting parameter values, we put the model objects themselves into the `data_list`. Next, we specify the `newdata` object where the name corresponds to the variable name(s) used in the model in question, and the values are the domain you want to evaluate the model on.
 
-Above, we added parts to the `carpobrotus_ipm` object in a stepwise fashion. However, every `define_*` function in `ipmr` takes a `proto_ipm` as the first argument and returns a `proto_ipm` object. Thus, we can also use the `%>%` operator from the `magrittr` package to chain together the model creation pipeline. This example will demonstrate that process as well. 
+Above, we added parts to the `carpobrotus_ipm` object in a stepwise fashion. However, every `define_*` function in `ipmr` takes a `proto_ipm` as the first argument and returns a `proto_ipm` object. Thus, we can also use the `%>%` operator from the `magrittr` package to chain together the model creation pipeline. The `%>%` is included in `ipmr`, so we don't need to load any additional packages to access it. This example will demonstrate that process as well. 
 
 ```{r}
 
@@ -435,7 +451,7 @@ predict_method_carpobrotus <- init_ipm(sim_gen = "simple",
 
 ## Further analyses {#further-analysis}
 
-Many research questions require a bit more than just computing asymptotic growth rate ($\lambda$). Below, we will compute the kernel sensitivity, elasticity, $R_0$, and generation time. First, we will define a couple helper functions. These are not included in `ipmr`, but will eventually be implemented in a separate package that can handle the various classes that `ipmr` works with.
+Many research questions require a bit more than just computing asymptotic growth rate ($\lambda$). Below, we will compute the kernel sensitivity, elasticity, $R_0$, and generation time. First, we will define a couple of helper functions. These are not included in `ipmr`, but will eventually be implemented in a separate package that can handle the various classes that `ipmr` works with.
 
 The first is sensitivity of $\lambda$ to perturbations in the projection kernel. Here, we can use the `right_ev` and `left_ev` functions in `ipmr` to get the right and left eigenvectors, and then compute the sensitivity surface. 
 
@@ -515,7 +531,7 @@ gen_time <- function(ipm_obj) {
 
 ```
 
-We need to extract the `d_z` value and meshpoints from the IPM we built. We can extract this information in a list form using the `int_mesh()` function from `ipmr` on our IPM object. The `d_z` in this case will be called `d_z` because we named our domain `"z"` when we implemented the model. However, it will have a different name if the `states` argument in `define_kernel` has different different values. Once we have that, we can begin computing all the values of interest.
+We need to extract the `d_z` value and meshpoints from the IPM we built. We can extract this information in a list form using the `int_mesh()` function from `ipmr` on our IPM object. The `d_z` in this case will be called `d_z` because we named our domain `"z"` when we implemented the model. However, it will have a different name if the `states` argument in `define_kernel` has different values. Once we have that, we can begin computing all the values of interest. For example, if `states = list(c("dbh", "height"))`, then `int_mesh()` would a return a list with `d_dbh` and `d_height`.
 
 ```{r}
 
@@ -532,40 +548,88 @@ gen_T
 
 ```
 
-
-We may want to visualize the results of our sensitivity and elasticity analyses. We'll go through two options: one using the `graphics` package and one using the `ggplot2` package.  
+We may want to visualize our sub-kernels, iteration kernel, and the results of our sensitivity and elasticity analyses. We'll go through two options: one using the `graphics` package and one using the `ggplot2` package.  
 
 First, the `graphics` package.
 
-```{r}
+```{r, fig.height = 8, fig.width = 8}
 
-par(mfrow = c(1, 2))
+lab_seq  <- round(seq(L, U, length.out = 6), 2)
+tick_seq <- c(1, 20, 40, 60, 80, 100)
 
-x <- y <- seq_len(ncol(sens_mat))
+par(mfrow = c(2, 2))
 
-image(x = x,
-      y = y,
-      z = t(sens_mat), 
-      main = "Sensitivity", xlab = "t", ylab = "t + 1")
+# Sub-kernels - ipmr contains plot methods for sub-kernels 
 
-contour(x = x,
-        y = y, 
-        t(sens_mat),
-        nlevels = 5,
-        labcex = 1.2,
-        add = TRUE)
+plot(carpobrotus_ipm$sub_kernels$P, 
+     do_contour = TRUE,
+     main       = "P",
+     xlab       = "size (t)",
+     ylab       = "size (t + 1)",
+     yaxt       = "none", 
+     xaxt       = "none")
+axis(1, at = tick_seq, labels = as.character(lab_seq))
+axis(2, at = tick_seq, labels = as.character(lab_seq))
 
-image(x = x,
-      y = y,
-      z = t(elas_mat),
-      main = "Elasticity", xlab = "t", ylab = "t + 1",
-      add = FALSE)
-contour(x = x,
-        y = y, 
-        t(elas_mat),
-        nlevels = 5,
-        labcex = 1.2,
-        add = TRUE)
+plot(carpobrotus_ipm$sub_kernels$F,
+     do_contour = TRUE,
+     main       = "F",
+     xlab       = "size (t)",
+     ylab       = "size (t + 1)",
+     yaxt       = "none", 
+     xaxt       = "none")
+axis(1, at = tick_seq, labels = as.character(lab_seq))
+axis(2, at = tick_seq, labels = as.character(lab_seq))
+
+
+
+# Sensitivity and elasticity
+
+class(sens_mat) <- c("ipmr_matrix", class(sens_mat))
+class(elas_mat) <- c("ipmr_matrix", class(elas_mat))
+
+plot(sens_mat, 
+     do_contour = TRUE,
+     main       = "K Sensitivity",
+     xlab       = "size (t)", 
+     ylab       = "size (t + 1)",
+     yaxt       = "none", 
+     xaxt       = "none")
+axis(1, at = tick_seq, labels = as.character(lab_seq))
+axis(2, at = tick_seq, labels = as.character(lab_seq))
+
+
+plot(elas_mat, 
+     do_contour = TRUE,
+     main       = "K Elasticity",
+     xlab       = "size (t)", 
+     ylab       = "size (t + 1)",
+     yaxt       = "none", 
+     xaxt       = "none")
+axis(1, at = tick_seq, labels = as.character(lab_seq))
+axis(2, at = tick_seq, labels = as.character(lab_seq))
+
+
+
+
+```
+
+If we want to plot the iteration kernel, we can use `ipmr`'s `make_iter_kernel()` function to create one, and then the `plot()` method to plot that as well.
+
+```{r, fig.height = 7, fig.width = 7}
+par(mfrow = c(1, 1))
+K <- make_iter_kernel(carpobrotus_ipm)
+
+plot(K$mega_matrix,
+     do_contour = TRUE,
+     main       = "K",
+     xlab       = "size (t)",
+     ylab       = "size (t + 1)",
+     yaxt       = "none", 
+     xaxt       = "none")
+axis(1, at = tick_seq, labels = as.character(lab_seq))
+axis(2, at = tick_seq, labels = as.character(lab_seq))
+
 
 
 
@@ -573,10 +637,14 @@ contour(x = x,
 
 Now, for the `ggplot2` version. First, we create a long format of the matrix using `ipmr`'s `ipm_to_df` function. `ipm_to_df` can handle either bare matrices, or objects produced by `make_ipm`. The latter case is useful for plotting kernels directly using `ggplot2`. Once we've generated the long format sensitivity and elasticity matrices, we can use `geom_tile` and `geom_contour` to generate the `ggplot`s, and `grid.arrange` from the `gridExtra` package to put them side by side.
 
-```{r, fig.width = 12, fig.height = 5, warning = FALSE}
+```{r, fig.width = 15, fig.height = 11, warning = FALSE}
 
 library(ggplot2)
 library(gridExtra)
+
+p_df    <- ipm_to_df(carpobrotus_ipm$sub_kernels$P)
+f_df    <- ipm_to_df(carpobrotus_ipm$sub_kernels$F)
+k_df    <- ipm_to_df(K$mega_matrix)
 
 sens_df <- ipm_to_df(sens_mat)
 elas_df <- ipm_to_df(elas_mat)
@@ -584,29 +652,99 @@ elas_df <- ipm_to_df(elas_mat)
 # Create a default theme for our plots
 
 def_theme <- theme(
-  panel.background = element_blank(),
-  axis.text        = element_blank(),
-  axis.title.x     = element_text(
-    size   = 16,
+  panel.background  = element_blank(),
+  axis.text         = element_text(size = 16),
+  axis.ticks        = element_line(size = 1.5),
+  axis.ticks.length = unit(0.08, "in"),
+  axis.title.x      = element_text(
+    size   = 20,
     margin = margin(
-      t = 20,
+      t = 10,
       r = 0, 
       l = 0, 
       b = 2
     )
   ),
   axis.title.y = element_text(
-    size   = 16,
+    size   = 20,
     margin = margin(
       t = 0,
-      r = 20,
+      r = 10,
       l = 2,
       b = 0
     )
   ),
-  axis.ticks   = element_blank(),
-  legend.title = element_text(size = 16)
+  legend.text = element_text(size = 16)
 )
+
+p_plt <- ggplot(p_df) +
+  geom_tile(aes(x    = t,
+                y    = t_1,
+                fill = value)) +
+  geom_contour(aes(x = t,
+                   y = t_1,
+                   z = value),
+               color = "black",
+               size = 0.7,
+               bins = 5) +
+  scale_fill_gradient("Value",
+                      low = "red",
+                      high = "yellow") +
+  scale_x_continuous(name = "size (t)",
+                     labels = lab_seq,
+                     breaks = tick_seq) +
+  scale_y_continuous(name = "size (t + 1)",
+                     labels = lab_seq,
+                     breaks = tick_seq) +
+  def_theme +
+  theme(legend.title = element_blank()) +
+  ggtitle("P kernel")
+
+f_plt <- ggplot(f_df) +
+  geom_tile(aes(x    = t,
+                y    = t_1,
+                fill = value)) +
+  geom_contour(aes(x = t,
+                   y = t_1,
+                   z = value),
+               color = "black",
+               size = 0.7,
+               bins = 5) +
+  scale_fill_gradient("Value",
+                      low = "red",
+                      high = "yellow") +
+  scale_x_continuous(name = "size (t)",
+                     labels = lab_seq,
+                     breaks = tick_seq) +
+  scale_y_continuous(name = "size (t + 1)",
+                     labels = lab_seq,
+                     breaks = tick_seq) +
+  def_theme +
+  theme(legend.title = element_blank()) +
+  ggtitle("F kernel")
+
+k_plt <- ggplot(k_df) +
+  geom_tile(aes(x    = t,
+                y    = t_1,
+                fill = value)) +
+  geom_contour(aes(x = t,
+                   y = t_1,
+                   z = value),
+               color = "black",
+               size = 0.7,
+               bins = 5) +
+  scale_fill_gradient("Value",
+                      low = "red",
+                      high = "yellow") +
+  scale_x_continuous(name = "size (t)",
+                     labels = lab_seq,
+                     breaks = tick_seq) +
+  scale_y_continuous(name = "size (t + 1)",
+                     labels = lab_seq,
+                     breaks = tick_seq) +
+  def_theme +
+  theme(legend.title = element_blank()) +
+  ggtitle("K kernel")
 
 sens_plt <- ggplot(sens_df) +
   geom_tile(aes(x    = t,
@@ -616,15 +754,20 @@ sens_plt <- ggplot(sens_df) +
                    y = t_1,
                    z = value),
                color = "black",
-               size = 0.7) +
+               size = 0.7,
+               bins = 5) +
   scale_fill_gradient("Value",
                       low = "red",
                       high = "yellow") +
-  scale_x_continuous(name = "t") +
-  scale_y_continuous(name = "t + 1") +
+  scale_x_continuous(name = "size (t)",
+                     labels = lab_seq,
+                     breaks = tick_seq) +
+  scale_y_continuous(name = "size (t + 1)",
+                     labels = lab_seq,
+                     breaks = tick_seq) +
   def_theme +
   theme(legend.title = element_blank()) +
-  ggtitle("Sensitivity")
+  ggtitle("K Sensitivity")
 
 elas_plt <- ggplot(elas_df) +
   geom_tile(aes(x    = t,
@@ -634,20 +777,31 @@ elas_plt <- ggplot(elas_df) +
                    y = t_1,
                    z = value),
                color = "black",
-               size = 0.7) +
+               size = 0.7,
+               bins = 5) +
   scale_fill_gradient("Value",
                       low = "red",
                       high = "yellow") +
-  scale_x_continuous(name = "t") +
-  scale_y_continuous(name = "t + 1") +
+  scale_x_continuous(name = "size (t)",
+                     labels = lab_seq,
+                     breaks = tick_seq) +
+  scale_y_continuous(name = "size (t + 1)",
+                     labels = lab_seq,
+                     breaks = tick_seq) +
   def_theme +
   theme(legend.title = element_blank()) +
-  ggtitle("Elasticity")
+  ggtitle("K Elasticity")
 
-grid.arrange(sens_plt, elas_plt,
-             layout_matrix = matrix(c(1, 2,
-                                      1, 2),
-                                    nrow = 2, 
+
+grid.arrange(
+  p_plt,    f_plt, k_plt,
+  sens_plt, elas_plt,
+             layout_matrix = matrix(c(1, 1, 2, 2,
+                                      NA, 3, 3, NA, 
+                                      4, 4, 5, 5),
+                                    nrow = 3, 
                                     byrow = TRUE))
+
+
 
 ```

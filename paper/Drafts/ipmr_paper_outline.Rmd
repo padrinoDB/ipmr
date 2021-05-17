@@ -38,11 +38,11 @@ Running title - ipmr: Integral projection models in R
 
 # **Abstract**
 
-1. Integral projection models (IPMs) are an important tool for studying the dynamics of populations structured by one or more continuous traits (_e.g._ size, height, color). Researchers use IPMs to investigate questions ranging from linking drivers to plant population dynamics, planning conservation and management strategies, and quantifying selective pressures in natural populations. The popularity of stage-structured population models has been supported by _R_ scripts and packages (_e.g._ `IPMpack`, `popbio`, `popdemo`, `lefko3`) aimed at ecologists, which have introduced a broad repertoire of functionality and outputs. However, pressing ecological, evolutionary, and conservation biology topics require developing more complex IPMs, and considerably more expertise to implement them. Here, we introduce `ipmr`, a flexible _R_ package for building, analyzing, and interpreting IPMs.
+1. Integral projection models (IPMs) are an important tool for studying the dynamics of populations structured by one or more continuous traits (_e.g._ size, height, body mass). Researchers use IPMs to investigate questions ranging from linking drivers to population dynamics, planning conservation and management strategies, and quantifying selective pressures in natural populations. The popularity of stage-structured population models has been supported by _R_ scripts and packages (_e.g._ `IPMpack`, `popbio`, `popdemo`, `lefko3`) aimed at ecologists, which have introduced a broad repertoire of functionality and outputs. However, pressing ecological, evolutionary, and conservation biology topics require developing more complex IPMs, and considerably more expertise to implement them. Here, we introduce `ipmr`, a flexible _R_ package for building, analyzing, and interpreting IPMs.
 
 2. The `ipmr` framework relies on the mathematical notation of the models to express them in code format. Additionally, this package  decouples the model parameterization step from the model implementation step. The latter point substantially increases `ipmr`'s flexibility to model complex life cycles and demographic processes. 
 
-3. `ipmr` can handle a wide variety of models, including density dependence, discretely and continuously varying stochastic environments, and multiple continuous and/or discrete traits. `ipmr` can accommadate models with individuals cross-classified by age and size. Furthermore, the package provides methods for demographic analyses (_e.g._ asymptotic and stochastic growth rates) and visualization (_e.g._ kernel plotting).
+3. `ipmr` can handle a wide variety of models, including those that incorporate density dependence, discretely and continuously varying stochastic environments, and multiple continuous and/or discrete traits. `ipmr` can accommodate models with individuals cross-classified by age and size. Furthermore, the package provides methods for demographic analyses (_e.g._ asymptotic and stochastic growth rates) and visualization (_e.g._ kernel plotting).
 
 4. `ipmr` is a flexible _R_ package for integral projection models. The package substantially reduces the amount of time required to implement general IPMs. We also provide extensive documentation with six vignettes and help files, accessible from an R session and online.
 
@@ -50,7 +50,7 @@ Keywords: elasticity, integral projection model, life history, population dynami
 
 # **Introduction**
 
-Integral projection models (IPMs) are an important and widely used tool for ecologists studying structured population dynamics in discrete time. Since the paper introducing IPMs over two decades ago (Easterling et al., 2000), at least 255 peer-reviewed publications on at least 250 plant species and 60 animal species have used IPMs (Table S1, Fig. S1). These models have addressed questions ranging from invasive species population dynamics (_e.g._ Crandall & Knight, 2017), effect of climate drivers on population persistence (_e.g._ Compagnoni et al., 2020), evolutionary stable strategies (_e.g._ Childs et al., 2004), and rare/endangered species conservation (_e.g._ Ferrer-Cervantes et al., 2012).
+Integral projection models (IPMs) are an important and widely used tool for ecologists studying structured population dynamics in discrete time. Since the paper introducing IPMs was published over two decades ago (Easterling et al., 2000), at least 255 peer-reviewed publications on at least 250 plant species and 60 animal species have used IPMs (Table S1, Fig. S1). These models have addressed questions ranging from invasive species population dynamics (_e.g._ Crandall & Knight, 2017), effect of climate drivers on population persistence (_e.g._ Compagnoni et al., 2020), evolutionary stable strategies (_e.g._ Childs et al., 2004), and rare/endangered species conservation (_e.g._ Ferrer-Cervantes et al., 2012).
 
 The IPM was introduced as alternative to matrix population models, which model populations structured by discrete traits (Caswell, 2001). Some of the advantages of using an IPM include (i) the ability to model populations structured by continuously distributed traits, (ii) the ability to flexibly incorporate discrete and continuous traits in the same model (_e.g._ seeds in a seedbank and a height structured plant population (Crandall & Knight, 2017), or number of females, males, and age-1 recruits for fish species (Erickson et al., 2017)), (iii) efficient parameterization of demographic processes with familiar regression methods (Coulson, 2012), and (iv) the numerical discretization of continuous kernels (see below) means that the tools available for matrix population models are usually also applicable for IPMs. Furthermore, researchers have developed methods to incorporate spatial dynamics (Jongejans et al., 2011), environmental stochasticity (Rees & Ellner, 2009), and density/frequency dependence into IPMs (Adler et al., 2010, Ellner et al., 2016). These developments were accompanied by the creation of software tools and guides to assist with IPM parameterization, implementation, and analysis. These tools range from _R_ scripts with detailed annotations (Coulson, 2012, Merow et al., 2014, Ellner et al., 2016) to _R_ packages (Metcalf et al., 2013, Shefferson et al., 2020).
 
@@ -70,15 +70,15 @@ To make the model more biologically interpretable, the projection kernel $K(z',z
 
 $$K(z',z) = P(z',z) + F(z',z) + C(z',z),$$ {#eq:eqn2}
 
-where $P(z',z)$ is a sub-kernel describing transitions due to survival and trait changes of existing individuals, $F(z',z)$ is a sub-kernel describing per-capita sexual contributions of existing individuals to recruitment, and $C(z',z)$ is a sub-kernel describing per-capita asexual contributions of existing individuals to recruitment. The sub-kernels are typically comprised of functions derived from regression models that relate an individual's trait value $z$ at time $t$ to a new trait value $z'$ at $t+1$. For example, the $P$ kernel for Soay sheep (_Ovis aries_) on St. Kilda (Eq 3) may contain two regression models: (i) a logistic regression of survival on log body mass (Eq 4), and (ii) a linear regression of log body mass at $t+1$ on log body mass at $t$ (Eq 5-6). In this example, $f_g$ is a normal probability density function with $\mu_g$ given by the linear predictor of the mean, and with $\sigma_g$ computed from the standard deviation of the residuals from the linear regression model.
+where $P(z',z)$ is a sub-kernel describing transitions due to survival and trait changes of existing individuals, $F(z',z)$ is a sub-kernel describing per-capita sexual contributions of existing individuals to recruitment, and $C(z',z)$ is a sub-kernel describing per-capita asexual contributions of existing individuals to recruitment. The sub-kernels are typically comprised of functions derived from regression models that relate an individual's trait value $z$ at time $t$ to a new trait value $z'$ at $t+1$. For example, the $P$ kernel for Soay sheep (_Ovis aries_) on St. Kilda (Eq 3) may contain two regression models: (i) a logistic regression of survival on log body mass (Eq 4), and (ii) a linear regression of log body mass at $t+1$ on log body mass at $t$ (Eq 5-6). In this example, $f_G$ is a normal probability density function with $\mu_G$ given by the linear predictor of the mean, and with $\sigma_G$ computed from the standard deviation of the residuals from the linear regression model.
 
-$$P(z',z) = s(z) * g(z',z),$$ {#eq:eqn3}
+$$P(z',z) = s(z) * G(z',z),$$ {#eq:eqn3}
 
 $$Logit(s(z)) = \alpha_s + \beta_s * z,$$ {#eq:eqn4}
 
-$$g(z',z) = f_g(z', \mu_g, \sigma_g),$$ {#eq:eqn5} 
+$$G(z',z) = f_G(z', \mu_G, \sigma_G),$$ {#eq:eqn5} 
 
-$$\mu_g = \alpha_g + \beta_g * z.$$ {#eq:eqn6}
+$$\mu_G = \alpha_G + \beta_G * z.$$ {#eq:eqn6}
 
 Analytical solutions to the integral in Eq 1 are usually not possible (Ellner & Rees, 2006). However, numerical approximations of these integrals can be constructed using a numerical integration rule. A commonly used rule is the midpoint rule (more complicated and precise methods are possible and will be implemented, though are not yet, see Ellner et al., 2016, Chapter 6). The midpoint rule divides the domain $[L,U]$ into $m$ artifical size bins centered at $z_i$ with width $h = (U-L) / m$. The midpoints $z_i = L + (i - 0.5) * h$ for $i = \textrm{1, 2, ...}, m$. The midpoint rule approximation for Eq 1 then becomes:
 
@@ -114,15 +114,15 @@ print(plt)
 
 ## *Case study 1 - A simple IPM*
 
-One use for IPMs is to evaluate potential performance and management of invasive species in their non-native range (_e.g._ Erickson et al., 2017). Calculating sensitivities  and elasticities of $\lambda$ to kernel perturbations can help identify conservation management strategies (de Kroon et al., 1986, Caswell, 2001, Baxter et al., 2006, Ellner et al., 2016). Bogdan et al. (2020) constructed a simple IPM for a *Carpobrotus* species growing north of Tel Aviv, Israel. The model includes four regressions, and an estimated recruit size distribution. Table 1 provides the mathematical formulae, the corresponding R model formula, and the `ipmr` notation for each one. The case study materials also offer an alternative implementation that uses the generic `predict()` function to generate the same output. The final part of the case study provides examples of functions that compute kernel sensitivity and elasticity, the per-generation growth rate, and generation time for the model, as well as how to visualize these results. 
+One use for IPMs is to evaluate potential performance and management of invasive species in their non-native range (_e.g._ Erickson et al., 2017). Calculating sensitivities  and elasticities of the per-capita growth rate ($\lambda$) to kernel perturbations can help identify conservation management strategies (de Kroon et al., 1986, Caswell, 2001, Baxter et al., 2006, Ellner et al., 2016). Bogdan et al. (2021) constructed a simple IPM for a *Carpobrotus* species growing north of Tel Aviv, Israel. The model includes four regressions, and an estimated recruit size distribution. Table 1 provides the mathematical formulae, the corresponding R model formulae, and the `ipmr` notation for each one. The case study materials also offer an alternative implementation that uses the generic `predict()` function to generate the same output. The final part of the case study provides examples of functions that compute kernel sensitivity and elasticity, the per-generation growth rate, and generation time for the model, as well as how to visualize these results. 
 
 ## *Case study 2 - A general age $\times$ size IPM*
 
-We use an age- and size-structured IPM from Ellner et al. (2016) to illustrate how to create general IPMs with `ipmr`. This case study demonstrates is the suffix syntax for vital rate and kernel expressions, which is a key feature of `ipmr` (highlighted in bold in the 'ipmr' column in Table 2). The suffixes appended to each variable name in the `ipmr` formulation correspond to the sub- and/or super-scripts used in the mathematical formulation. `ipmr` internally expands the model expressions and substitutes the range of ages and/or grouping variables in for the suffixes. This allows users to specify their model in a way that closely mirrors its mathematical notation, and saves users from the potentially error-prone process of re-typing model definitions many times or using `for` loops over the range of discrete states. The case study then demonstrates how to couple age-specific survival and fertility with the model outputs.
+We use an age- and size-structured IPM from Ellner et al. (2016) to illustrate how to create general IPMs with `ipmr`. This case study demonstrates the suffix syntax for vital rate and kernel expressions, which is a key feature of `ipmr` (highlighted in bold in the 'ipmr' column in Table 2). The suffixes appended to each variable name in the `ipmr` formulation correspond to the sub- and/or super-scripts used in the mathematical formulation. `ipmr` internally expands the model expressions and substitutes the range of ages and/or grouping variables in for the suffixes. This allows users to specify their model in a way that closely mirrors its mathematical notation, and saves users from the potentially error-prone process of re-typing model definitions many times or using `for` loops over the range of discrete states. The case study then demonstrates how to compute age-specific survival and fertility from the model outputs.
 
 # **Discussion of additional applications**
 
-We have shown above how `ipmr` handles a variety of model implementations that go beyond the capabilities of existing scripts and packages. The underlying implementation based on metaprogramming should be able to readily incorporate future developments in parameterization methods. Regression modeling is a field that is constantly introducing new methods. As long as these new methods have functional forms for their expected value (or a method for `predict()`), `ipmr` should be able to implement IPMs using them. 
+We have shown above how `ipmr` handles a variety of model implementations that go beyond the capabilities of existing scripts and packages. The underlying implementation based on metaprogramming should be able to readily incorporate future developments in parameterization methods. Regression modeling is a field that is constantly introducing new methods. As long as these new methods have functional forms for their expected value (or a function to compute them, such as `predict()`), `ipmr` should be able to implement IPMs using them. 
 
 Finally, one particularly useful aspect of the package is the `proto_ipm` data structure. The `proto_ipm` is the common data structure used to represent every model class in `ipmr` and provides a concise, standardized format for representing IPMs. Furthermore, the `proto_ipm` object is created without any raw data, only functional forms and parameters. We are in the process of creating the PADRINO IPM database using `ipmr` and `proto_ipm`s as an "engine" to re-build published IPMs using only functional forms and parameter estimates. This database could act as an IPM equivalent of the popular COMPADRE and COMADRE matrix population model databases (Salguero-Gómez et al., 2015, Salguero-Gómez et al., 2016). Recent work has highlighted the power of syntheses that harness many structured population models (Adler et al., 2013, Salguero-Gómez et al., 2016, Compagnoni et al., 2020). Despite the wide variety of models that are currently published in the IPM literature, `ipmr`'s functional approach is able to reproduce nearly all of them without requiring any raw data at all.
 
@@ -134,7 +134,7 @@ Finally, one particularly useful aspect of the package is the `proto_ipm` data s
 
 3. Baxter, P.W.J., McCarthy, M.A., Possingham, H.P., Menkhorst, P.W. & McLean, N. (2006). Accounting for management costs in sensitivity analyses of matrix population models. Conservation Biology 20(3): 893-905. https://doi.org/10.1111/j.1523-1739.2006.00378.x
 
-4. Bogdan, A., Levin, S.C., Salguero-Gómez, R., Knight, T.M. (2020). Demographic analysis of Israeli Carpobrotus populations: management strategies and future directions. bioRxiv. https://doi.org/10.1101/2020.12.08.415174
+4. Bogdan, A., Levin, S.C., Salguero-Gómez, R., Knight, T.M. (2021). Demographic analysis of Israeli Carpobrotus populations: management strategies and future directions. PLoS ONE 16(4): e0250879.  https://doi.org/10.1101/2020.12.08.415174
 
 5. Bruno, J.F., Ellner, S.P., Vu, I., Kim, K., & Harvell, C.D. (2011). Impacts of aspergillosis on sea fan coral demography: modeling a moving target. Ecological Monographs 81(1): 123-139. https://doi.org/19.1890/09-1178.1
 
@@ -184,28 +184,27 @@ Finally, one particularly useful aspect of the package is the `proto_ipm` data s
 
 28. Williams, J.L., Miller, T.E.X., & Ellner, S.P. (2012). Avoiding unintentional eviction from integral projection models. Ecology 93(9): 2008-2014. https://doi.org/10.1890/11-2147.1
 
-
 ```{r echo = FALSE}
 
-tab_legend <- "Table 1: Translations between mathematical notation, R's formula notation, and ipmr's notation for the simplified version of Bogdan et al.'s Carpobrotus IPM. The ipmr column contains the expressions used in each kernel's definition. R expressions are not provided for sub-kernels and model iteration procedures because they typically require defining functions separately, and there are many ways to do this step (examples are in the R code for each case study in the appendix). The plogis() function may not be familiar to some users. It is from the 'stats' R package and computes the inverse logit transformation of an expression."
+tab_legend <- "Table 1: Translations between mathematical notation, R's formula notation, and ipmr's notation for the simplified version of Bogdan et al.'s Carpobrotus IPM. The ipmr column contains the expressions used in each kernel's definition. R expressions are not provided for sub-kernels and model iteration procedures because they typically require defining functions separately, and there are many ways to do this step (examples are in the R code for each case study in the appendix). The plogis() function may not be familiar to some users. It is from the 'stats' R package and computes the inverse logit transformation of an expression. $s$ corresponds to survival, $G$ corresponds to change in size conditional on survival, $r_p$ is the probability of reproducing, $r_n$ is the number of propagules produced by reproductive individuals, and $p_r$ is the probability that a propagule becomes a new recruit at $t+1$."
 
 knitr::kable(
   data.frame(
 
-    Math    = c("$\\mu^g = \\alpha^g + \\beta^g * z$",
-                "$g(z',z) = f^g(\\mu^g, \\sigma^g)$",
-                "$logit(s(z)) = \\alpha^s + \\beta^s * z$",
-                "$log(r^n(z)) = \\alpha^{r^n} + \\beta^{r^n} * z$",
-                "$logit(r^p(z)) = \\alpha^{r^p} + \\beta^{r^p} * z$",
-                "$r^d(z') = f^{r^d}(\\mu^{r^d}, \\sigma^{r^d})$",
-                "$p^r = \\frac{\\# Recruits (t+1)}{\\# flowers (t)}$",
-                "$P = s(z) * g(z',z)$",
-                "$F(z',z) = r^p(z) * r^n(z) * r^d(z') * p^r$",
+    Math    = c("$\\mu_G = \\alpha_G + \\beta_G * z$",
+                "$G(z',z) = f_G(\\mu_G, \\sigma_G)$",
+                "$logit(s(z)) = \\alpha_s + \\beta_s * z$",
+                "$log(r_n(z)) = \\alpha_{r_n} + \\beta_{r_n} * z$",
+                "$logit(r_p(z)) = \\alpha_{r_p} + \\beta_{r_p} * z$",
+                "$r_d(z') = f_{r_d}(\\mu_{r_d}, \\sigma_{r_d})$",
+                "$p_r = \\frac{\\# Recruits (t+1)}{\\# flowers (t)}$",
+                "$P = s(z) * G(z',z)$",
+                "$F(z',z) = r_p(z) * r_n(z) * r_d(z') * p_r$",
                 "$n(z', t+1) = \\int_L^U [P(z',z) + F(z',z)] n(z, t)dz$"),
     
     
     R = c("`size_2 ~ size_1, family = gaussian()`",
-          "`g = dnorm(z_2, mu_g, sd_g)`",
+          "`G = dnorm(z_2, mu_G, sd_G)`",
           "`surv ~ size_1, family = binomial()`",
           "`fec ~ size_1, family = poisson()`",
           "`repr ~ size_1, family = binomial()`",
@@ -216,14 +215,14 @@ knitr::kable(
           ""),
     
     
-    ipmr = c("`mu_g = g_int + g_slope * z`",
-             "`g = dnorm(z_2, mu_g, sd_g)`",
+    ipmr = c("`mu_G = G_int + G_slope * z`",
+             "`G = dnorm(z_2, mu_G, sd_G)`",
              "`s = plogis(s_int + s_slope * z)`",
              "`r_n = exp(r_n_int + r_n_slope * z)`",
              "`r_p = plogis(r_p_int + r_p_slope * z)`",
              "`r_d = dnorm(z_2, f_d_mu, f_d_sigma)`",
              "`p_r = n_new / n_flowers`",
-             "`P = s * g`",
+             "`P = s * G`",
              "`F = r_p * r_n * r_d * p_r`",
              "")
   ),
@@ -240,21 +239,21 @@ $n_0(z', t+1) = \sum\limits_{a=0}^{M+1}\int_L^UF_a(z',z)n_a(z,t)dz$
 
 ```{r echo = FALSE}
 
-tab_legend <- "Table 2: Translations between mathematical notation, R's formula notation, and ipmr's notation for Ellner et al. (2016) Ovis aries IPM. The ipmr column contains the expressions used in each kernel's definition. R expressions are not provided for sub-kernels and model iteration procedures because they typically require defining functions separately, and there are many ways to do this step (examples are in the R code for each case study in the appendix). ipmr supports a suffix based syntax to avoid repetitively typing out the levels of discrete grouping variables. These are represented as 'a' in the Math column, 'age' in the R formula column, and are highlighted in bold in the ipmr column."
+tab_legend <- "Table 2: Translations between mathematical notation, R's formula notation, and ipmr's notation for Ellner et al. (2016) Ovis aries IPM. The ipmr column contains the expressions used in each kernel's definition. R expressions are not provided for sub-kernels and model iteration procedures because they typically require defining functions separately, and there are many ways to do this step (examples are in the R code for each case study in the appendix). ipmr supports a suffix based syntax to avoid repetitively typing out the levels of discrete grouping variables. These are represented as 'a' in the Math column, 'age' in the R formula column, and are highlighted in bold in the ipmr column. $s$ corresponds to survival, $G$ corresponds to change in size conditional on survival, $m_p$ is the probability of mating, $r_p$  is the probability that a mating produces a new recruit at $t+1$, and $B$ is the size distribution of new recruits at $t+1$ whose mean depends on parent size at time $t$. $F_a$ is divided by 2 because this IPM only tracks females."
 
 knitr::kable(
   data.frame(
 
     Math    = c(
-      "$Logit(s(z,a)) = \\alpha^s + \\beta^s_z * z + \\beta^s_a * a$",
-      "$g(z',z,a) = f^g(\\mu^g_a, \\sigma^g_a)$",
-      "$\\mu^g(z, a) = \\alpha^g + \\beta^g_z * z + \\beta^g_a * a$",
-      "$Logit(m^p(z,a)) = \\alpha^{m^p} + \\beta^{m^p}_z * z + \\beta^{m^p}_a * a$",
-      "$Logit(r^p(a)) = \\alpha^{r^p} + \\beta^{r^p}_a * a$",
-      "$\\mu^b = \\alpha^b + \\beta^b_z * z$",
-      "$b(z',z) = f^b(\\mu^b, \\sigma^b)$",
-      "$P_a(z',z) = s(z, a) * g(z',z, a)$",
-      "$F_a(z',z) = s(z, a) * m^p(z, a) * r^p(a) * b(z', z) / 2$",
+      "$Logit(s(z,a)) = \\alpha_s + \\beta_{s_z} * z + \\beta_{s_a} * a$",
+      "$G(z',z,a) = f_G(\\mu_{G_a}, \\sigma_{G,a})$",
+      "$\\mu_G(z, a) = \\alpha_G + \\beta_{G_z} * z + \\beta_{G_a} * a$",
+      "$Logit(m_p(z,a)) = \\alpha_{m_p} + \\beta_{m_p,z} * z + \\beta_{m_p,a} * a$",
+      "$Logit(r_p(a)) = \\alpha_{r_p} + \\beta_{r_p,a} * a$",
+      "$\\mu_B = \\alpha_B + \\beta_{B, z} * z$",
+      "$B(z',z) = f_B(z', \\mu_B, \\sigma_B)$",
+      "$P_a(z',z) = s(z, a) * G(z',z, a)$",
+      "$F_a(z',z) = s(z, a) * m_p(z, a) * r_p(a) * B(z', z) / 2$",
       "Insert EQ above table here!",
       "$n_a(z', t + 1) = \\int_L^U P_{a-1}(z',z) n_{a-1}(z,t) dz$",
       "$n_{M+1}(z', t + 1) = \\int_L^U[P_{M+1}(z',z) n_{M+1}(z,t) + P_{M}(z',z)n_{M}(z, t)]dz$"
@@ -263,7 +262,7 @@ knitr::kable(
       
     R = c(
       "`surv ~ size_1 + age, family = binomial()`",
-      "`g = dnorm(size_2, mu_g_age, sigma_g)`",
+      "`G = dnorm(size_2, mu_G_age, sigma_G)`",
       "`size_2 ~ size_1 + age, family = gaussian()`",
       "`repr ~ size_1 + age, family = binomial()`",
       "`recr ~ age, family = binomial()`",
@@ -278,8 +277,8 @@ knitr::kable(
     
     ipmr = c(
       "s_**age** = plogis(s_int + s_z * z_1 + s_a * **age**)",
-      "g_**age** = dnorm(z_2, mu_g_**age**, sigma_g)",
-      "mu_g_**age** = g_int + g_z * z + g_a * **age**",
+      "G_**age** = dnorm(z_2, mu_G_**age**, sigma_G)",
+      "mu_G_**age** = G_int + G_z * z + G_a * **age**",
       "m_p_**age** = plogis(m_p_int + m_p_z * z + m_p_a * **age**)",
       "r_p_**age** = plogis(r_p_int + r_p_a * **age**)",
       "mu_rc_size = rc_size_int + rc_size_z * z",
@@ -298,7 +297,7 @@ knitr::kable(
 
 ```
 
-Author Contributions: All authors contributed to package design. SCL implemented the package. All authors wrote the first draft of the manuscript.
+Author Contributions: All authors contributed to package design. SCL implemented the package. All authors wrote the first draft of the manuscript and contributed to revisions.
 
 
 Funding: R.S-G. was supported by a NERC Independent Research Fellowship (NE/M018458/1). SCL, AC, SE, and TMK were funded by the Alexander von Humboldt Foundation in the framework of the Alexander von Humboldt Professorship of TM Knight endowed by the German Federal Ministry of Education and Research.
