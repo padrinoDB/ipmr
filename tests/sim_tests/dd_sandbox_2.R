@@ -28,7 +28,7 @@ x <- init_ipm('simple_dd_det') %>%
                 # split out implementation details into a separate
                 # function - named lists??
                 states = state_list,
-                has_hier_effs = FALSE,
+                uses_par_sets = FALSE,
                 evict_cor = TRUE,
                 evict_fun = truncated_distributions("norm", "g")) %>%
   define_kernel('F',

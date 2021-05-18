@@ -98,7 +98,7 @@ test_stoch_param <- init_ipm(sim_gen    = "simple",
     g = dnorm(surf_area_2, g_mu, g_sd),
     data_list = data_list,
     states = list(c('surf_area')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'g')
   ) %>%
@@ -111,7 +111,7 @@ test_stoch_param <- init_ipm(sim_gen    = "simple",
     f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
     data_list = data_list,
     states = list(c('surf_area')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'f_d')
   )  %>%
@@ -288,7 +288,7 @@ test_that('normalize pop_vectors works as it should', {
       g = dnorm(surf_area_2, g_mu, g_sd),
       data_list = data_list,
       states = list(c('surf_area')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor = TRUE,
       evict_fun = truncated_distributions('norm', 'g')
     ) %>%
@@ -301,7 +301,7 @@ test_that('normalize pop_vectors works as it should', {
       f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
       data_list = data_list,
       states = list(c('surf_area')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor = TRUE,
       evict_fun = truncated_distributions('norm', 'f_d')
     )  %>%
@@ -421,7 +421,7 @@ test_that("t helper variable works as advertised", {
       g = dnorm(surf_area_2, g_mu, g_sd),
       data_list = data_list,
       states = list(c('surf_area')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor = TRUE,
       evict_fun = truncated_distributions('norm', 'g')
     ) %>%
@@ -434,7 +434,7 @@ test_that("t helper variable works as advertised", {
       f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
       data_list = data_list,
       states = list(c('surf_area')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor = TRUE,
       evict_fun = truncated_distributions('norm', 'f_d')
     ) %>%
@@ -494,7 +494,7 @@ test_that("t helper variable works as advertised", {
       g = dnorm(surf_area_2, g_mu, g_sd),
       data_list = data_list,
       states = list(c('surf_area')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor = TRUE,
       evict_fun = truncated_distributions('norm', 'g')
     ) %>%
@@ -507,7 +507,7 @@ test_that("t helper variable works as advertised", {
       f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
       data_list = data_list,
       states = list(c('surf_area')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor = TRUE,
       evict_fun = truncated_distributions('norm', 'f_d')
     )%>%
@@ -552,8 +552,8 @@ test_that("t helper variable works as advertised", {
 
 test_that("stoch_param can handle Hier_effs", {
 
-  hier_vals <- rnorm(5, 0, 2) %>% as.list
-  names(hier_vals) <- paste("s_int", 2000:2004, sep = "_")
+  par_set_vals <- rnorm(5, 0, 2) %>% as.list
+  names(par_set_vals) <- paste("s_int", 2000:2004, sep = "_")
 
 
   data_list <- list(s_slope = 0.2,
@@ -565,7 +565,7 @@ test_that("stoch_param can handle Hier_effs", {
                     f_d_mu = 2,
                     f_d_sd = 0.75)
 
-  data_list <- c(data_list, hier_vals)
+  data_list <- c(data_list, par_set_vals)
 
   b <- seq(0, 10, length.out = 101)
   d1 <- d2 <- (b[2:101] + b[1:100]) * 0.5
@@ -610,8 +610,8 @@ test_that("stoch_param can handle Hier_effs", {
       g = dnorm(surf_area_2, g_mu, g_sd),
       data_list = data_list,
       states = list(c('surf_area')),
-      has_hier_effs = TRUE,
-      levels_hier_effs = list(yr = 2000:2004),
+      uses_par_sets = TRUE,
+      par_set_indices = list(yr = 2000:2004),
       evict_cor = TRUE,
       evict_fun = truncated_distributions('norm', 'g')
     ) %>%
@@ -624,7 +624,7 @@ test_that("stoch_param can handle Hier_effs", {
       f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
       data_list = data_list,
       states = list(c('surf_area')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor = TRUE,
       evict_fun = truncated_distributions('norm', 'f_d')
     ) %>%
@@ -680,7 +680,7 @@ test_that("stoch_param can handle Hier_effs", {
     yr <- test_stoch_param$env_seq[i , 4]
 
     temp <- c(data_list,  r_ests)
-    s_r_yr <- unlist(hier_vals[grepl(yr, names(hier_vals))])
+    s_r_yr <- unlist(par_set_vals[grepl(yr, names(par_set_vals))])
 
     g_mat <- g(domains$d2, domains$d1,
                params = c(temp$g_int_yr,

@@ -11,24 +11,25 @@
 #' \code{"CD"} for continuous to discrete (e.g. entering a seedbank), and \code{"DD"} for
 #' discrete to discrete (e.g. stasis in a seedbank).
 #' @param ... A set of named expressions that correspond
-#' to vital rates in \code{formula}. Suffix expansion of hierarchical models is supported.
+#' to vital rates in \code{formula}. Parameter set index syntax is supported.
 #' @param data_list A list of named values that correspond to constants in the formula
 #' and vital rate expressions in \code{...}.
 #' @param states A list with character vector containing the names of each state
 #' variable used in the kernel.
-#' @param has_hier_effs A logical indicating whether or not the kernel and/or its
-#' underlying vital rates are structured with hierarchical effects. See the
-#' introduction vignette for this feature for more details (\code{vignettes(
-#' 'ipmr-introduction', package = 'ipmr')}).
-#' @param levels_hier_effs A named list with vectors corresponding to the various levels
-#' the hierarchical variable can take. The names should match the suffixes used
+#' @param uses_par_sets A logical indicating whether or not the parameters in the kernel and/or its
+#' underlying vital rates are derived from sets. See the
+#' introduction vignette for this feature for more details
+#' (\code{vignettes(ipmr-introduction', package = 'ipmr')}, and
+#' \code{vignettes( index-notation', package = 'ipmr')}).
+#' @param par_set_indices A named list with vectors corresponding to the values
+#' the index variable can take. The names should match the suffixes used
 #' in the vital rate expressions.
 #' @param evict_cor A logical indicating whether an eviction correction should be applied
 #' to the kernel.
 #' @param evict_fun If \code{evict_cor = TRUE}, then a function that corrects for it.
 #' Currently, only \code{truncated_distributions} and \code{discrete_extrema} are
 #' possible.
-#' @param levels_ages If \code{init_ipm(has_age = TRUE)}, a list with possibly
+#' @param age_indices If \code{init_ipm(uses_age = TRUE)}, a list with possibly
 #' 2 entries: 1. \code{"age"}: the range
 #' of possible ages in the model and, optionally, 2. \code{"max_age"}: the maximum
 #' age individuals in the model can attain. Otherwise, not used.
@@ -43,8 +44,8 @@
 #' @details
 #' Different classes of IPMs may have many or only a few kernels. Each
 #' one requires its own call to \code{define_kernel}, though there are some exceptions,
-#' namely for kernels derived for models with grouping effects (e.g. vital rate models
-#' fit across plots and years).
+#' namely for kernels derived for models derived from parameter sets (e.g. vital
+#' rate models fit across plots and years).
 #'
 #' A much more complete overview of how to generate kernels is provided in
 #' \code{vignette("ipmr-introduction", "ipmr")}.
@@ -66,9 +67,9 @@ define_kernel <- function(proto_ipm,
                           ...,
                           data_list = list(),
                           states,
-                          has_hier_effs = FALSE,
-                          levels_hier_effs = list(),
-                          levels_ages      = list(),
+                          uses_par_sets = FALSE,
+                          par_set_indices = list(),
+                          age_indices      = list(),
                           evict_cor= FALSE,
                           evict_fun = NULL,
                           integrate = TRUE) {
@@ -113,7 +114,7 @@ define_kernel <- function(proto_ipm,
                      params = data_list,
                      integrate = integrate)
 
-  if(!methods::hasArg(levels_hier_effs)) levels_hier_effs <- list(levels = NA)
+  if(!methods::hasArg(par_set_indices)) par_set_indices <- list(levels = NA)
 
   temp <- data.frame(
     id               = 'A1',
@@ -125,10 +126,10 @@ define_kernel <- function(proto_ipm,
     evict_fun        = I(list(evict_fun)),
     pop_state        = I(list(NA_character_)),
     env_state        = I(list(NA_character_)),
-    has_hier_effs    = has_hier_effs,
-    levels_hier_effs = I(rlang::list2(levels_hier_effs)),
-    has_age          = ifelse(.has_age(proto_ipm), TRUE, FALSE),
-    levels_ages      = I(rlang::list2(levels_ages)),
+    uses_par_sets    = uses_par_sets,
+    par_set_indices = I(rlang::list2(par_set_indices)),
+    uses_age          = ifelse(.uses_age(proto_ipm), TRUE, FALSE),
+    age_indices      = I(rlang::list2(age_indices)),
     params           = I(rlang::list2(!! name := param_tree)),
     usr_funs         = I(list(NA_character_)),
     stringsAsFactors = FALSE
@@ -149,9 +150,9 @@ define_kernel <- function(proto_ipm,
                      ...,
                      data_list = list(),
                      states,
-                     has_hier_effs = FALSE,
-                     levels_hier_effs = list(),
-                     levels_ages      = list(),
+                     uses_par_sets = FALSE,
+                     par_set_indices = list(),
+                     age_indices      = list(),
                      evict_cor = FALSE,
                      evict_fun = NULL,
                      integrate = FALSE) {
@@ -168,8 +169,8 @@ define_kernel <- function(proto_ipm,
                              ...,
                              data_list = list(),
                              states,
-                             has_hier_effs = FALSE,
-                             levels_hier_effs = list(),
+                             uses_par_sets = FALSE,
+                             par_set_indices = list(),
                              evict_cor = FALSE,
                              evict_fun = NULL,
                              integrate = FALSE) {
@@ -214,7 +215,7 @@ define_kernel <- function(proto_ipm,
                      params = data_list,
                      integrate = integrate)
 
-  if(!methods::hasArg(levels_hier_effs)) levels_hier_effs <- list(levels = NA)
+  if(!methods::hasArg(par_set_indices)) par_set_indices <- list(levels = NA)
 
   temp <- data.frame(
     id = 'A1',
@@ -226,10 +227,10 @@ define_kernel <- function(proto_ipm,
     evict_fun        = I(list(evict_fun)),
     pop_state        = I(list(NA_character_)),
     env_state        = I(list(NA_character_)),
-    has_hier_effs    = has_hier_effs,
-    levels_hier_effs = I(rlang::list2(levels_hier_effs)),
-    has_age          = FALSE,
-    levels_ages      = I(list(NA_character_)),
+    uses_par_sets    = uses_par_sets,
+    par_set_indices = I(rlang::list2(par_set_indices)),
+    uses_age          = FALSE,
+    age_indices      = I(list(NA_character_)),
     params           = I(rlang::list2(!! name := param_tree)),
     usr_funs         = I(list(NA_character_)),
     stringsAsFactors = FALSE
@@ -252,9 +253,9 @@ define_kernel <- function(proto_ipm,
                                 ...,
                                 data_list = list(),
                                 states,
-                                has_hier_effs = FALSE,
-                                levels_hier_effs = list(),
-                                levels_ages      = list(),
+                                uses_par_sets = FALSE,
+                                par_set_indices = list(),
+                                age_indices      = list(),
                                 evict_cor = FALSE,
                                 evict_fun = NULL,
                                 integrate = FALSE) {
@@ -298,7 +299,7 @@ define_kernel <- function(proto_ipm,
                      params = data_list,
                      integrate = integrate)
 
-  if(!methods::hasArg(levels_hier_effs)) levels_hier_effs <- list(levels = NA)
+  if(!methods::hasArg(par_set_indices)) par_set_indices <- list(levels = NA)
 
   temp <- data.frame(
     id = 'A1',
@@ -310,10 +311,10 @@ define_kernel <- function(proto_ipm,
     evict_fun        = I(list(evict_fun)),
     pop_state        = I(list(NA_character_)),
     env_state        = I(list(NA_character_)),
-    has_hier_effs    = has_hier_effs,
-    levels_hier_effs = I(rlang::list2(levels_hier_effs)),
-    has_age          = TRUE,
-    levels_ages      = I(rlang::list2(levels_ages)),
+    uses_par_sets    = uses_par_sets,
+    par_set_indices = I(rlang::list2(par_set_indices)),
+    uses_age          = TRUE,
+    age_indices      = I(rlang::list2(age_indices)),
     params           = I(rlang::list2(!! name := param_tree)),
     usr_funs         = I(list(NA_character_)),
     stringsAsFactors = FALSE

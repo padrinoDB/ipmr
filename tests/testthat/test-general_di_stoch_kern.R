@@ -12,7 +12,7 @@ library(purrr)
 
 flatten_to_depth <- ipmr:::.flatten_to_depth
 
-hier_effs <- list(
+par_sets <- list(
   site = c(
     'whitetop',
     'mt_rogers',
@@ -164,7 +164,7 @@ all_params <- list(nr_data_list,
                    dc_data_list)
 
 full_data_list <- rename_data_list(data_list = all_params,
-                                   nms       = unlist(hier_effs)) %>%
+                                   nms       = unlist(par_sets)) %>%
   flatten_to_depth(1)
 
 
@@ -382,8 +382,8 @@ init_pop_vec      <- list(ln_leaf_l = runif(domains$sqrt_area[3]),
 
 n_iterations   <- 100
 
-models         <- vector('list', length(hier_effs$site))
-names(models)  <- hier_effs$site
+models         <- vector('list', length(par_sets$site))
+names(models)  <- par_sets$site
 
 pop_holder     <- list(
   sqrt_area = array(NA_real_, dim = c(50, 101)),
@@ -435,7 +435,7 @@ all_mesh_p <- list(sqrt_area = expand.grid(z_1 = mesh_p$sqrt_area,
                                            x_2 = mesh_p$ln_leaf_l)) %>%
   flatten_to_depth(1L)
 
-k_seq <- sample(hier_effs$site, 100, replace = TRUE)
+k_seq <- sample(par_sets$site, 100, replace = TRUE)
 
 # Everything is initialized. We'll loop over the populations and iterate
 # the model for each one individually, compute lambdas, and store those
@@ -543,8 +543,8 @@ gen_di_stoch_kern <- init_ipm(sim_gen    = "general",
 
     data_list        = full_data_list,
     states           = list(c('ln_leaf_l')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_effs,
+    uses_par_sets    = TRUE,
+    par_set_indices = par_sets,
     evict_cor        =  TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_nn_site')
@@ -573,8 +573,8 @@ gen_di_stoch_kern <- init_ipm(sim_gen    = "general",
 
     data_list    = full_data_list,
     states       = list(c('sqrt_area', 'ln_leaf_l')),
-    has_hier_effs = TRUE,
-    levels_hier_effs = hier_effs,
+    uses_par_sets = TRUE,
+    par_set_indices = par_sets,
     evict_cor = TRUE,
     evict_fun = truncated_distributions(c('norm', 'norm'),
                                         c('gamma_nr_site',
@@ -590,8 +590,8 @@ gen_di_stoch_kern <- init_ipm(sim_gen    = "general",
 
     data_list = full_data_list,
     states = list(c('ln_leaf_l', 'd')),
-    has_hier_effs = TRUE,
-    levels_hier_effs = hier_effs,
+    uses_par_sets = TRUE,
+    par_set_indices = par_sets,
     evict_cor = TRUE,
     evict_fun = truncated_distributions('norm',
                                         'gamma_nd_site')
@@ -615,8 +615,8 @@ gen_di_stoch_kern <- init_ipm(sim_gen    = "general",
 
     data_list        = full_data_list,
     states           = list(c('sqrt_area', 'ln_leaf_l')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_effs,
+    uses_par_sets    = TRUE,
+    par_set_indices = par_sets,
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_rn_site')
@@ -630,8 +630,8 @@ gen_di_stoch_kern <- init_ipm(sim_gen    = "general",
     mu_n_site        = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
     data_list        = full_data_list,
     states           = list(c('ln_leaf_l', 'd')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_effs,
+    uses_par_sets    = TRUE,
+    par_set_indices = par_sets,
     evict_cor        = FALSE
   ) %>%
   define_kernel(
@@ -642,8 +642,8 @@ gen_di_stoch_kern <- init_ipm(sim_gen    = "general",
     mu_r_site         = inv_logit(ra_d_z_int_site, ra_d_z_b_site, sqrt_area_1),
     data_list        = full_data_list,
     states           = list(c('sqrt_area', 'd')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_effs,
+    uses_par_sets    = TRUE,
+    par_set_indices = par_sets,
     evict_cor        = FALSE
   ) %>%
   define_impl(
@@ -715,20 +715,20 @@ test_that('ipmr version matches simulation', {
 
   kern_suffs <- c('xx', 'zx', 'xd', 'xz', 'dx', 'dz')
 
-  for(i in seq_along(hier_effs$site)) {
+  for(i in seq_along(par_sets$site)) {
 
     ind <- seq(i,
                length(gen_di_stoch_kern$sub_kernels),
-               by = length(hier_effs$site))
+               by = length(par_sets$site))
 
     kern_tests[ind] <- compare_kernels('gen_di_stoch_kern',
                                        'models',
                                        nms_ipmr = paste('PF_',
                                                         paste(kern_suffs,
-                                                              hier_effs$site[i],
+                                                              par_sets$site[i],
                                                               sep = "_"),
                                                         sep = ""),
-                                       nms_hand = paste(hier_effs$site[i],
+                                       nms_hand = paste(par_sets$site[i],
                                                         '$kern_',
                                                         kern_suffs,
                                                         sep = ""))
@@ -750,7 +750,7 @@ test_that('ipmr version matches simulation', {
 # machinery correctly). Since we've already verified that the kernels are all identical,
 # there should never be any issues here.
 
-usr_seq <- sample(hier_effs$site,
+usr_seq <- sample(par_sets$site,
                   n_iterations,
                   replace = TRUE)
 
@@ -928,8 +928,8 @@ test_that('evict_fun warnings are correctly generated', {
 
         data_list    = full_data_list,
         states       = list(c('sqrt_area', 'ln_leaf_l')),
-        has_hier_effs = TRUE,
-        levels_hier_effs = hier_effs,
+        uses_par_sets = TRUE,
+        par_set_indices = par_sets,
         evict_cor = TRUE,
         evict_fun = truncated_distributions('norm',
                                             c('gamma_nr_site',
@@ -992,7 +992,7 @@ test_that('evict_fun warnings are correctly generated', {
 
 test_that('normalize pop vec works', {
 
-  usr_seq <- sample(hier_effs$site, size = 100, replace = TRUE)
+  usr_seq <- sample(par_sets$site, size = 100, replace = TRUE)
 
   gen_di_stoch_kern <- init_ipm(sim_gen    = "general",
                                 di_dd      = "di",
@@ -1015,8 +1015,8 @@ test_that('normalize pop vec works', {
 
       data_list        = full_data_list,
       states           = list(c('ln_leaf_l')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_effs,
+      uses_par_sets    = TRUE,
+      par_set_indices = par_sets,
       evict_cor        =  TRUE,
       evict_fun        = truncated_distributions('norm',
                                                  'gamma_nn_site')
@@ -1045,8 +1045,8 @@ test_that('normalize pop vec works', {
 
       data_list    = full_data_list,
       states       = list(c('sqrt_area', 'ln_leaf_l')),
-      has_hier_effs = TRUE,
-      levels_hier_effs = hier_effs,
+      uses_par_sets = TRUE,
+      par_set_indices = par_sets,
       evict_cor = TRUE,
       evict_fun = truncated_distributions(c('norm', 'norm'),
                                           c('gamma_nr_site',
@@ -1062,8 +1062,8 @@ test_that('normalize pop vec works', {
 
       data_list = full_data_list,
       states = list(c('ln_leaf_l', 'd')),
-      has_hier_effs = TRUE,
-      levels_hier_effs = hier_effs,
+      uses_par_sets = TRUE,
+      par_set_indices = par_sets,
       evict_cor = TRUE,
       evict_fun = truncated_distributions('norm',
                                           'gamma_nd_site')
@@ -1087,8 +1087,8 @@ test_that('normalize pop vec works', {
 
       data_list        = full_data_list,
       states           = list(c('sqrt_area', 'ln_leaf_l')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_effs,
+      uses_par_sets    = TRUE,
+      par_set_indices = par_sets,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm',
                                                  'gamma_rn_site')
@@ -1102,8 +1102,8 @@ test_that('normalize pop vec works', {
       mu_n_site        = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
       data_list        = full_data_list,
       states           = list(c('ln_leaf_l', 'd')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_effs,
+      uses_par_sets    = TRUE,
+      par_set_indices = par_sets,
       evict_cor        = FALSE
     ) %>%
     define_kernel(
@@ -1114,8 +1114,8 @@ test_that('normalize pop vec works', {
       mu_r_site         = inv_logit(ra_d_z_int_site, ra_d_z_b_site, sqrt_area_1),
       data_list        = full_data_list,
       states           = list(c('sqrt_area', 'd')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_effs,
+      uses_par_sets    = TRUE,
+      par_set_indices = par_sets,
       evict_cor        = FALSE
     ) %>%
     define_impl(
@@ -1251,7 +1251,7 @@ mean_kernel_r <- function(kernel_holder, n_unique) {
 
 }
 
-test_that("mean_kernel works for fully hierarchical models", {
+test_that("mean_kernel works for fully par_setarchical models", {
 
   mean_ipmr_kernels <- mean_kernel(gen_di_stoch_kern)
   names(mean_ipmr_kernels) <- gsub("_site", "", names(mean_ipmr_kernels))
@@ -1341,8 +1341,8 @@ test_that('partially stochastic models also work', {
       s                = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
       data_list        = all_params,
       states           = list(c('ht')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = list(year = 1:5),
+      uses_par_sets    = TRUE,
+      par_set_indices = list(year = 1:5),
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm',
                                                  'g_year')
@@ -1355,15 +1355,15 @@ test_that('partially stochastic models also work', {
       f_s_year      = exp(f_s_int_year + f_s_slope * ht_1),
       data_list     = all_params,
       states        = list(c('ht', 'b')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = list(year = 1:5)
+      uses_par_sets    = TRUE,
+      par_set_indices = list(year = 1:5)
     ) %>%
     define_kernel(
       name    = 'stay_discrete',
       formula = 0,
       family  = "DD",
       states  = list(c('b')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor = FALSE
     ) %>%
     define_kernel(
@@ -1373,7 +1373,7 @@ test_that('partially stochastic models also work', {
       family        = 'DC',
       data_list     = all_params,
       states        = list(c('ht', 'b')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'f_d')
@@ -1413,7 +1413,7 @@ test_that('partially stochastic models also work', {
       s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
       data_list     = data_list_cr,
       states        = states,
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'g')
@@ -1426,7 +1426,7 @@ test_that('partially stochastic models also work', {
       f_s           = exp(f_s_int + f_s_slope * ht_1),
       data_list     = data_list_cr,
       states        = states,
-      has_hier_effs = FALSE
+      uses_par_sets = FALSE
     ) %>%
     define_kernel(
       name    = 'stay_discrete',
@@ -1442,7 +1442,7 @@ test_that('partially stochastic models also work', {
       family        = 'DC',
       data_list     = data_list_cr,
       states        = states,
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'f_d')
@@ -1472,7 +1472,7 @@ test_that('partially stochastic models also work', {
   leave_discrete_stoch <- general_stoch_kern_ipm$sub_kernels$leave_discrete
   leave_discrete_det   <- det_version$sub_kernels$leave_discrete
 
-  # if partially hierarchical models work the way they should,
+  # if partially par_setarchical models work the way they should,
   # then there should never be an difference between the deterministic model
   # version of this kernel and the stochastic model version of it!
 

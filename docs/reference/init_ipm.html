@@ -106,7 +106,7 @@ helper functions. See Details for complete overview of each option." />
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/suffix-notation.html">Suffix Notation</a>
+      <a href="../articles/index-notation.html">Index Notation in ipmr</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -165,7 +165,7 @@ rest comes later with <code>define_kernel</code>, <code>make_ipm</code>, and ass
 helper functions. See Details for complete overview of each option.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>init_ipm</span><span class='op'>(</span><span class='va'>sim_gen</span>, <span class='va'>di_dd</span>, <span class='va'>det_stoch</span>, kern_param <span class='op'>=</span> <span class='cn'>NULL</span>, has_age <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>init_ipm</span><span class='op'>(</span><span class='va'>sim_gen</span>, <span class='va'>di_dd</span>, <span class='va'>det_stoch</span>, kern_param <span class='op'>=</span> <span class='cn'>NULL</span>, uses_age <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -190,7 +190,7 @@ must be specified.</p></td>
 <code>"kern"</code> or <code>"param"</code>.</p></td>
     </tr>
     <tr>
-      <th>has_age</th>
+      <th>uses_age</th>
       <td><p>A logical indicating whether the model has age structure. Default
 is <code>FALSE</code></p></td>
     </tr>
@@ -201,7 +201,7 @@ is <code>FALSE</code></p></td>
     <p>An object with classes <code>"proto_ipm"</code> and a combination of
 <code>sim_gen</code>, <code>di_dd</code>, <code>det_stoch</code>, and possibly
 <code>kern_param</code>. If
-<code>has_age = TRUE</code>, then an <code>"age_x_size"</code> class is also added.</p>
+<code>uses_age = TRUE</code>, then an <code>"age_x_size"</code> class is also added.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Combinations of <code>simple</code> or <code>general</code>, <code>dd</code> or <code>di</code>,

@@ -16,37 +16,37 @@ Density dependent model classes are now implemented. This vignette will get more
 
 ## Example of a simple, stochastic, kernel-resampled model with density dependence
 
-This example will probably look a lot like the ones from other vignettes. It assumes that density dependence is modeled as a fixed effect in survival and recruit production models, and assumes there is no density dependence in growth or probability of reproducing models. The survival ($s(z, N, \theta)$/`s_yr`), growth ($g(z',z, \theta)$/ `g_yr`), and number of recruit models ($f_s(z, N, \theta)$/`f_s_yr`) have year-specific intercepts as well.
+This example assumes that density dependence is modeled as a fixed effect in survival and recruit production models, and assumes there is no density dependence in growth or probability of reproducing models. The survival ($s(z, N)$/`s_yr`), growth ($G_{yr}(z',z)$/ `g_yr`), and number of recruit models ($r_{s,yr}(z, N)$/`r_s_yr`) have year-specific intercepts as well.
 
 The mathematical form for the IPM is below:
 
-1. $n(z', t+1) = K(z', z, N, \theta)n(z, t)dz$
+1. $n(z', t+1) = K_{yr}(z', z, N)n(z, t)dz$
 
 2. $N = \int_L^Un(z,t)dz$
 
-3. $K(z', z, N) = P(z', z, N, \theta) + F(z', z, N, \theta)$
+3. $K_{yr}(z', z, N) = P_{yr}(z', z, N) + F_{yr}(z', z, N)$
 
-Here, $N$ represents the total population size, and $\theta$ denotes the year specific intercepts. The kernel values fluctuate as a function of these at each iteration of the model.
+Here, $N$ represents the total population size. The kernel values fluctuate as a function of $N$ at each iteration of the model.
 
-The $P(z', z, N)$ kernel is comprised of a density independent function for growth (Eq 6-7) and a density dependent function for survival (Eq 5). $f_g$ denotes a Gaussian probability density function: 
+The $P_{yr}(z', z, N)$ kernel is comprised of a density independent function for growth (Eq 6-7) and a density dependent function for survival (Eq 5). $f_G$ denotes a Gaussian probability density function: 
 
-4. $P(z', z, N) = s(z, N) * g(z', z)$
+4. $P(z', z, N) = s(z, N) * G(z', z)$
 
-5. $Logit(s(z, N)) = \alpha_s + \alpha_s^{yr} + \beta_s^z * z + \beta_s^{N} * N$
+5. $Logit(s(z, N)) = \alpha_s + \alpha_{s,yr} + \beta_s^z * z + \beta_s^{N} * N$
 
-6. $g(z', z, \theta) = f_g(z', \mu_g(z, \theta), \sigma_g)$
+6. $G(z', z, \theta) = f_G(z', \mu_{G,yr}(z), \sigma_G)$
 
-7. $\mu_g(z, \theta) = \alpha_g + \alpha_g^{yr} + \beta_g^z * z$
+7. $\mu_{G,yr}(z) = \alpha_G + \alpha_{G,yr} + \beta_G^z * z$
 
-The $F(z',z, N, \theta)$ kernel is comprised of a density independent function for recruit size (Eq 10) and probability of reproducing (Eq 9), and a density dependent function for number of recruits produced by parents (Eq 11). $f_{r_d}$ denotes a Gaussian probability density function: 
+The $F_{yr}(z',z, N)$ kernel is comprised of a density independent function for recruit size (Eq 10) and probability of reproducing (Eq 9), and a density dependent function for number of recruits produced by parents (Eq 11). $f_{r_d}$ denotes a Gaussian probability density function: 
 
-8. $F(z', z, N, \theta) = r_r(z) * r_s(z, N, \theta) + r_d(z')$
+8. $F_{yr}(z', z, N) = r_r(z) * r_{s,yr}(z, N) + r_d(z')$
 
 9. $Logit(r_r(z)) = \alpha_{r_r} + \beta_{r_r}^z * z$
 
 10. $r_d(z') = f_{r_d}(z', \mu_{r_d}, \sigma_{r_d})$
 
-11. $Log(r_s(z, N, \theta)) = \alpha_{r_s} + \alpha_{r_s}^{yr} + \beta_{r_s}^z * z + \beta_{r_s}^N * N$
+11. $Log(r_{s,yr}(z, N)) = \alpha_{r_s} + \alpha_{{r_s},yr} + \beta_{r_s}^z * z + \beta_{r_s}^N * N$
 
 We'll simulate a 50 year time series using hypothetical parameter values. The fixed parameter values are created as with a density independent model. The difference is that we now have two more parameters: `s_dd`, and `r_s_dd`. These are the coefficients that correspond to $\beta_s^N$ and $\beta_{r_s}^N$, respectively. The chunk below initializes the data list object, which we name `params`.
 
@@ -100,7 +100,7 @@ dd_ipm <- init_ipm(sim_gen = "simple",
 
 Once we've done that, we're ready to begin specifying the kernel forms. One previously not mentioned aspect of `define_pop_state()` is that, in addition to defining initial conditions, 2 additional helper variables are generated: `n_stateVariable_t` and `n_stateVariable_t_1`. These can be used to reference the population states in vital rate and/or kernel expressions.
 
-These will look very similar to the ones we specified for density-independent models, except that we now include the term `s_dd * sum(n_size_t) * d_size` in the survival expression. `sum(n_size_t) * d_size` is the syntax `ipmr` uses to denote total population size. Further down, there is an example of how to use subsets of the trait distribution. 
+These will look very similar to the ones we specified for density-independent models, except that we now include the term `s_dd * sum(n_size_t)` in the survival expression. `sum(n_size_t)` is the syntax `ipmr` uses to denote total population size. Further down, there is an example of how to use subsets of the trait distribution. 
 
 ```{r eval = FALSE}
 dd_ipm <- define_kernel(
@@ -108,20 +108,20 @@ dd_ipm <- define_kernel(
   name             = "P_yr",
   formula          = s_yr * g_yr,
   family           = "CC",
-  s_yr             = plogis(s_int + s_r_yr + s_slope * size_1 + s_dd * sum(n_size_t) * d_size),
+  s_yr             = plogis(s_int + s_r_yr + s_slope * size_1 + s_dd * sum(n_size_t)),
   g_yr             = dnorm(size_2, g_mu_yr, sd_g),
   g_mu_yr          = g_int + g_r_yr + g_slope * size_1,
   data_list        = params,
   states           = list(c("size")),
-  has_hier_effs    = TRUE,
-  levels_hier_effs = list(yr = 1:5),
+  uses_par_sets    = TRUE,
+  par_set_indices = list(yr = 1:5),
   evict_cor        = TRUE,
   evict_fun        = truncated_distributions("norm", "g_yr")
 ) 
   
 ```
 
-Other than the inclusion of the density dependent term in the survival expression, this should look quite similar to the density-independent kernel-resampled models from the Introduction vignette. We are now ready to continue defining the $F(z',z,N,\theta)$ kernel.
+Other than the inclusion of the density dependent term in the survival expression, this should look quite similar to the density-independent kernel-resampled models from the Introduction vignette. We are now ready to continue defining the $F_{yr}(z',z,N)$ kernel.
 
 
 ```{r eval = FALSE}
@@ -132,19 +132,19 @@ dd_ipm <- define_kernel(
   formula          = r_r * r_s_yr * r_d,
   family           = "CC",
   r_r              = plogis(r_r_int + r_r_slope * size_1),
-  r_s_yr           = exp(r_s_int + r_s_r_yr + r_s_slope * size_1 + r_s_dd * sum(n_size_t) * d_size),
+  r_s_yr           = exp(r_s_int + r_s_r_yr + r_s_slope * size_1 + r_s_dd * sum(n_size_t)),
   r_d              = dnorm(size_2, mu_rd, sd_rd),
   data_list        = params,
   states           = list(c("size")),
-  has_hier_effs    = TRUE,
-  levels_hier_effs = list(yr = 1:5),
+  uses_par_sets    = TRUE,
+  par_set_indices = list(yr = 1:5),
   evict_cor        = TRUE,
   evict_fun        = truncated_distributions("norm", "r_d")
   ) 
 
 ```
 
-Again, we've add the `f_s_dd * sum(n_size_t) * d_size` to the expression for `f_s_yr`, but otherwise, not much is different from how we've defined density independent models. The rest of the model definition process is unchanged.
+Again, we've add the `f_s_dd * sum(n_size_t)` to the expression for `f_s_yr`, but otherwise, not much is different from how we've defined density independent models. The rest of the model definition process is unchanged.
 
 ```{r eval = FALSE}
  dd_ipm <-  dd_ipm %>%

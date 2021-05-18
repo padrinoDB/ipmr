@@ -27,7 +27,7 @@ test_that("ipm_to_df works properly", {
 
   data(gen_di_det_ex)
 
-  temp_big <- format_mega_matrix(gen_di_det_ex,
+  temp_big <- format_mega_kernel(gen_di_det_ex,
                                  c(stay_discrete, go_discrete,
                                    leave_discrete, P))[[1]]
 
@@ -97,7 +97,7 @@ test_that('exported is_conv_to_asymptotic works as well', {
       s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
       data_list     = data_list,
       states        = states,
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'g')
@@ -110,7 +110,7 @@ test_that('exported is_conv_to_asymptotic works as well', {
       f_s           = exp(f_s_int + f_s_slope * ht_1),
       data_list     = data_list,
       states        = states,
-      has_hier_effs = FALSE
+      uses_par_sets = FALSE
     ) %>%
     define_kernel(
       name    = 'stay_discrete',
@@ -126,7 +126,7 @@ test_that('exported is_conv_to_asymptotic works as well', {
       family        = 'DC',
       data_list     = data_list,
       states        = states,
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'f_d')
@@ -181,7 +181,7 @@ test_that('exported is_conv_to_asymptotic works as well', {
         g_sd      = 2.2
       ),
       states        = list(c('dbh')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions("norm", "g")
     ) %>%
@@ -201,7 +201,7 @@ test_that('exported is_conv_to_asymptotic works as well', {
         f_d_sd    = 0.7
       ),
       states        = list(c('dbh')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor        = TRUE,
       evict_fun     = truncated_distributions("norm", "f_d")
     ) %>%

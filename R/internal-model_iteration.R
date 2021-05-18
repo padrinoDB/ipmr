@@ -16,15 +16,15 @@
                                          k_row,
                                          normal) {
 
-  # For hierarchical deterministic models, we need to create a determinstic
+  # For par_setarchical deterministic models, we need to create a determinstic
   # simulation for each level of the model
 
-  if(any(proto_ipm$has_hier_effs)) {
+  if(any(proto_ipm$uses_par_sets)) {
 
-    hier_effs <- proto_ipm$levels_hier_effs[proto_ipm$has_hier_effs]
-    hier_effs <- hier_effs[!duplicated(hier_effs)]
+    par_sets <- proto_ipm$par_set_indices[proto_ipm$uses_par_sets]
+    par_sets <- par_sets[!duplicated(par_sets)]
 
-    levs       <- .make_hier_levels(hier_effs)
+    levs       <- .make_par_set_indices(par_sets)
     lambda_nms <- paste("lambda", levs, sep = "_")
 
     pop_state$lambda <- NULL
@@ -47,9 +47,9 @@
 
       use_kerns <- sub_kern_list[grepl(use_lev, names(sub_kern_list))]
 
-      if(!all(proto_ipm$has_hier_effs)) {
+      if(!all(proto_ipm$uses_par_sets)) {
 
-        append    <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+        append    <- proto_ipm$kernel_id[!proto_ipm$uses_par_sets]
         use_kerns <- c(use_kerns, sub_kern_list[append])
 
       }
@@ -127,7 +127,7 @@
 
       pop_state[grepl(use_lev, names(pop_state))] <- use_pop
 
-    } # end hierarchical levels loop
+    } # end par_setarchical levels loop
 
 
   } else {
@@ -135,7 +135,7 @@
 
     for(i in seq_len(iterations)) {
 
-      # Simple model, no hierarchical stuff going on. We can just
+      # Simple model, no par_setarchical stuff going on. We can just
       # stick the kernels and their expressions right into eval_general_det
 
       .bind_iter_var(main_env, i)
@@ -196,9 +196,9 @@
       rlang::env_bind(.env = main_env,
                       !!! pop_list_t_1)
 
-    } # End no hierarchical stuff
+    } # End no par_setarchical stuff
 
-  } # End if(hierarchical){} else {}
+  } # End if(par_setarchical){} else {}
 
   # Remove the NA at 1 - it is a dummy so that purrr::map2 can work
   # properly
@@ -253,9 +253,9 @@
       # In that case, we need to include the ones that don't have them
       # in the use_kerns list every single time!
 
-      if(any(!proto_ipm$has_hier_effs) && any(proto_ipm$has_hier_effs)) {
+      if(any(!proto_ipm$uses_par_sets) && any(proto_ipm$uses_par_sets)) {
 
-        nm_ind <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+        nm_ind <- proto_ipm$kernel_id[!proto_ipm$uses_par_sets]
         to_add <- sub_kern_list[nm_ind]
 
         use_kerns <- c(use_kerns, to_add)
@@ -365,9 +365,9 @@
     # In that case, we need to include the ones that don't have them
     # in the use_kerns list every single time!
 
-    if(any(!proto_ipm$has_hier_effs) && any(proto_ipm$has_hier_effs)) {
+    if(any(!proto_ipm$uses_par_sets) && any(proto_ipm$uses_par_sets)) {
 
-      nm_ind <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+      nm_ind <- proto_ipm$kernel_id[!proto_ipm$uses_par_sets]
       to_add <- sub_kern_list[nm_ind]
 
       use_kerns <- c(use_kerns, to_add)
@@ -459,12 +459,12 @@
                                           normal)  {
 
 
-  if(any(proto_ipm$has_hier_effs)) {
+  if(any(proto_ipm$uses_par_sets)) {
 
-    hier_effs <- proto_ipm$levels_hier_effs[proto_ipm$has_hier_effs]
-    hier_effs <- hier_effs[!duplicated(hier_effs)]
+    par_sets <- proto_ipm$par_set_indices[proto_ipm$uses_par_sets]
+    par_sets <- par_sets[!duplicated(par_sets)]
 
-    levs       <- .make_hier_levels(hier_effs)
+    levs       <- .make_par_set_indices(par_sets)
     lambda_nms <- paste("lambda", levs, sep = "_")
 
     pop_state$lambda <- NULL
@@ -487,9 +487,9 @@
 
       use_kerns <- sub_kern_list[grepl(use_lev, names(sub_kern_list))]
 
-      if(!all(proto_ipm$has_hier_effs)) {
+      if(!all(proto_ipm$uses_par_sets)) {
 
-        append <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+        append <- proto_ipm$kernel_id[!proto_ipm$uses_par_sets]
         use_kerns <- c(use_kerns, sub_kern_list[append])
 
       }
@@ -563,7 +563,7 @@
 
       pop_state[grepl(use_lev, names(pop_state))] <- use_pop
 
-    } # end hierarchical levels loop
+    } # end par_setarchical levels loop
 
 
   } else {
@@ -691,9 +691,9 @@
         # In that case, we need to include the ones that don't have them
         # in the use_kerns list every single time!
 
-        if(any(!proto_ipm$has_hier_effs) && any(proto_ipm$has_hier_effs)) {
+        if(any(!proto_ipm$uses_par_sets) && any(proto_ipm$uses_par_sets)) {
 
-          nm_ind <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+          nm_ind <- proto_ipm$kernel_id[!proto_ipm$uses_par_sets]
           to_add <- sub_kern_list[nm_ind]
 
           use_kerns <- c(use_kerns, to_add)
@@ -805,9 +805,9 @@
       # In that case, we need to include the ones that don't have them
       # in the use_kerns list every single time!
 
-      if(any(!proto_ipm$has_hier_effs) && any(proto_ipm$has_hier_effs)) {
+      if(any(!proto_ipm$uses_par_sets) && any(proto_ipm$uses_par_sets)) {
 
-        nm_ind <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+        nm_ind <- proto_ipm$kernel_id[!proto_ipm$uses_par_sets]
         to_add <- sub_kern_list[nm_ind]
 
         use_kerns <- c(use_kerns, to_add)
@@ -901,15 +901,15 @@
 
   i <- current_iteration
 
-  # For hierarchical deterministic models, we need to create a determinstic
+  # For par_setarchical deterministic models, we need to create a determinstic
   # simulation for each level of the model
 
-  if(any(proto_ipm$has_hier_effs)) {
+  if(any(proto_ipm$uses_par_sets)) {
 
-      hier_effs <- proto_ipm$levels_hier_effs[proto_ipm$has_hier_effs]
-      hier_effs <- hier_effs[!duplicated(hier_effs)]
+      par_sets <- proto_ipm$par_set_indices[proto_ipm$uses_par_sets]
+      par_sets <- par_sets[!duplicated(par_sets)]
 
-      levs       <- .make_hier_levels(hier_effs)
+      levs       <- .make_par_set_indices(par_sets)
 
       # Set up altered lambda list names if first iteration
 
@@ -940,9 +940,9 @@
 
       use_kerns <- sub_kern_list[grepl(use_lev, names(sub_kern_list))]
 
-      if(!all(proto_ipm$has_hier_effs)) {
+      if(!all(proto_ipm$uses_par_sets)) {
 
-        append    <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+        append    <- proto_ipm$kernel_id[!proto_ipm$uses_par_sets]
         use_kerns <- c(use_kerns, sub_kern_list[append])
 
       }
@@ -1016,7 +1016,7 @@
 
       pop_state[grepl(use_lev, names(pop_state))] <- use_pop
 
-    } # end hierarchical levels loop
+    } # end par_setarchical levels loop
 
 
   } else {
@@ -1080,7 +1080,7 @@
                     !!! pop_list_t_1)
 
 
-  } # End if(hierarchical){} else {}
+  } # End if(par_setarchical){} else {}
 
   return(pop_state)
 
@@ -1127,9 +1127,9 @@
       # In that case, we need to include the ones that don't have them
       # in the use_kerns list every single time!
 
-      if(any(!proto_ipm$has_hier_effs) && any(proto_ipm$has_hier_effs)) {
+      if(any(!proto_ipm$uses_par_sets) && any(proto_ipm$uses_par_sets)) {
 
-        nm_ind <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+        nm_ind <- proto_ipm$kernel_id[!proto_ipm$uses_par_sets]
         to_add <- sub_kern_list[nm_ind]
 
         use_kerns <- c(use_kerns, to_add)
@@ -1239,9 +1239,9 @@
       # In that case, we need to include the ones that don't have them
       # in the use_kerns list every single time!
 
-      if(any(!proto_ipm$has_hier_effs) && any(proto_ipm$has_hier_effs)) {
+      if(any(!proto_ipm$uses_par_sets) && any(proto_ipm$uses_par_sets)) {
 
-        nm_ind <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+        nm_ind <- proto_ipm$kernel_id[!proto_ipm$uses_par_sets]
         to_add <- sub_kern_list[nm_ind]
 
         use_kerns <- c(use_kerns, to_add)
@@ -1334,15 +1334,15 @@
 
   i <- current_iteration
 
-  # For hierarchical deterministic models, we need to create a determinstic
+  # For par_setarchical deterministic models, we need to create a determinstic
   # simulation for each level of the model
 
-  if(any(proto_ipm$has_hier_effs)) {
+  if(any(proto_ipm$uses_par_sets)) {
 
-    hier_effs <- proto_ipm$levels_hier_effs[proto_ipm$has_hier_effs]
-    hier_effs <- hier_effs[!duplicated(hier_effs)]
+    par_sets <- proto_ipm$par_set_indices[proto_ipm$uses_par_sets]
+    par_sets <- par_sets[!duplicated(par_sets)]
 
-    levs       <- .make_hier_levels(hier_effs)
+    levs       <- .make_par_set_indices(par_sets)
 
     # Set up altered lambda list names if first iteration
 
@@ -1373,9 +1373,9 @@
 
       use_kerns <- sub_kern_list[grepl(use_lev, names(sub_kern_list))]
 
-      if(!all(proto_ipm$has_hier_effs)) {
+      if(!all(proto_ipm$uses_par_sets)) {
 
-        append    <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+        append    <- proto_ipm$kernel_id[!proto_ipm$uses_par_sets]
         use_kerns <- c(use_kerns, sub_kern_list[append])
 
       }
@@ -1449,7 +1449,7 @@
 
       pop_state[grepl(use_lev, names(pop_state))] <- use_pop
 
-    } # end hierarchical levels loop
+    } # end par_setarchical levels loop
 
 
   } else {
@@ -1513,7 +1513,7 @@
                     !!! pop_list_t_1)
 
 
-  } # End if(hierarchical){} else {}
+  } # End if(par_setarchical){} else {}
 
   return(pop_state)
 
@@ -1558,9 +1558,9 @@
       # In that case, we need to include the ones that don't have them
       # in the use_kerns list every single time!
 
-      if(any(!proto_ipm$has_hier_effs) && any(proto_ipm$has_hier_effs)) {
+      if(any(!proto_ipm$uses_par_sets) && any(proto_ipm$uses_par_sets)) {
 
-        nm_ind <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+        nm_ind <- proto_ipm$kernel_id[!proto_ipm$uses_par_sets]
         to_add <- sub_kern_list[nm_ind]
 
         use_kerns <- c(use_kerns, to_add)
@@ -1671,9 +1671,9 @@
       # In that case, we need to include the ones that don't have them
       # in the use_kerns list every single time!
 
-      if(any(!proto_ipm$has_hier_effs) && any(proto_ipm$has_hier_effs)) {
+      if(any(!proto_ipm$uses_par_sets) && any(proto_ipm$uses_par_sets)) {
 
-        nm_ind <- proto_ipm$kernel_id[!proto_ipm$has_hier_effs]
+        nm_ind <- proto_ipm$kernel_id[!proto_ipm$uses_par_sets]
         to_add <- sub_kern_list[nm_ind]
 
         use_kerns <- c(use_kerns, to_add)

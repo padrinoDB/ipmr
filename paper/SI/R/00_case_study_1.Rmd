@@ -120,7 +120,7 @@ n_mesh_p <- 100
 
 We now have the parameter set prepared, and have the boundaries for our domains set up. We are ready to implement the model.
 
-We start with the function `init_ipm()`. This function has five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and `has_age`. For now, we will ignore the last argument, as it is covered in case study 2. The first 4 arguments specify the type of IPM we are building:
+We start with the function `init_ipm()`. This function has five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and `uses_age`. For now, we will ignore the last argument, as it is covered in case study 2. The first 4 arguments specify the type of IPM we are building:
 
 1. `sim_gen`: `"simple"`/`"general"`
 

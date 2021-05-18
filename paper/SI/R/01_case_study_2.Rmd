@@ -101,17 +101,17 @@ r_fun <- function(age, s_age, pb_age, pr_age, recr) {
 
 ```
 
-Next, we set up the $P_a$ kernels (Equations 4-7 above). Because this is a general, deterministic IPM, we use `init_ipm(sim_gen = "general", di_dd = "di", det_stoch = "det", has_age = TRUE)`. We set `has_age = TRUE` to indicate that our model has age structure as well as size structure. There are 3 key things to note:
+Next, we set up the $P_a$ kernels (Equations 4-7 above). Because this is a general, deterministic IPM, we use `init_ipm(sim_gen = "general", di_dd = "di", det_stoch = "det", uses_age = TRUE)`. We set `uses_age = TRUE` to indicate that our model has age structure as well as size structure. There are 3 key things to note:
 
 1. the use of the suffix `_age` appended to the names of the `"P_age"` kernel and the `mu_g_age` variable.
 
 2. the value `age` used in the vital rate expressions.
 
-3. the list in the `levels_ages` argument.
+3. the list in the `age_indices` argument.
 
-The values in the `levels_ages` list will automatically get substituted in for `"age"` each time it appears in the vital rate expressions and kernels. We add a second variable to this list, `"max_age"`, to indicate that we have a "greybeard" class. If we wanted our model to kill all individuals above age 20, we would simply omit the `"max_age"` slot in the `levels_ages` list.
+The values in the `age_indices` list will automatically get substituted in for `"age"` each time it appears in the vital rate expressions and kernels. We add a second variable to this list, `"max_age"`, to indicate that we have a "greybeard" class. If we wanted our model to kill all individuals above age 20, we would simply omit the `"max_age"` slot in the `age_indices` list.
 
-This single call to `define_kernel()` will result in 22 actual kernels, one for each value of `age` from 0-21. For general IPMs that are not age-structured, we would use `has_hier_effs` and `levels_hier_effs` in the same way we're using `age` below. 
+This single call to `define_kernel()` will result in 22 actual kernels, one for each value of `age` from 0-21. For general IPMs that are not age-structured, we would use `uses_par_sets` and `par_set_indices` in the same way we're using `age` below. 
 
 The `plogis` function is part of the `stats` package in _R_, and performs the inverse logit transformation.
 
@@ -120,7 +120,7 @@ The `plogis` function is part of the `stats` package in _R_, and performs the in
 age_size_ipm <- init_ipm(sim_gen = "general",
                          di_dd = "di", 
                          det_stoch = "det", 
-                         has_age = TRUE) %>%
+                         uses_age = TRUE) %>%
   define_kernel(
     name          = "P_age",
     family        = "CC",
@@ -130,8 +130,8 @@ age_size_ipm <- init_ipm(sim_gen = "general",
     mu_g_age      = grow_int + grow_z * z_1 + grow_a * age,
     data_list     = param_list,
     states        = list(c("z")),
-    has_hier_effs = FALSE,
-    levels_ages   = list(age = c(0:20), max_age = 21),
+    uses_par_sets = FALSE,
+    age_indices   = list(age = c(0:20), max_age = 21),
     evict_cor     = FALSE
   ) 
 
@@ -152,8 +152,8 @@ age_size_ipm <-   define_kernel(
   rcsz_mu       = rcsz_int + rcsz_z * z_1,
   data_list     = param_list,
   states        = list(c("z")),
-  has_hier_effs = FALSE,
-  levels_ages   = list(age = c(0:20), max_age = 21),
+  uses_par_sets = FALSE,
+  age_indices   = list(age = c(0:20), max_age = 21),
   evict_cor     = FALSE
 ) 
 

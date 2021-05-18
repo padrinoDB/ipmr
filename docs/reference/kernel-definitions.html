@@ -103,7 +103,7 @@
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/suffix-notation.html">Suffix Notation</a>
+      <a href="../articles/index-notation.html">Index Notation in ipmr</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -167,9 +167,9 @@
   <span class='va'>...</span>,
   data_list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
   <span class='va'>states</span>,
-  has_hier_effs <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  levels_hier_effs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
-  levels_ages <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  uses_par_sets <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  par_set_indices <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  age_indices <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
   evict_cor <span class='op'>=</span> <span class='cn'>FALSE</span>,
   evict_fun <span class='op'>=</span> <span class='cn'>NULL</span>,
   integrate <span class='op'>=</span> <span class='cn'>TRUE</span>
@@ -200,7 +200,7 @@ discrete to discrete (e.g. stasis in a seedbank).</p></td>
     <tr>
       <th>...</th>
       <td><p>A set of named expressions that correspond
-to vital rates in <code>formula</code>. Suffix expansion of hierarchical models is supported.</p></td>
+to vital rates in <code>formula</code>. Parameter set index syntax is supported.</p></td>
     </tr>
     <tr>
       <th>data_list</th>
@@ -213,21 +213,22 @@ and vital rate expressions in <code>...</code>.</p></td>
 variable used in the kernel.</p></td>
     </tr>
     <tr>
-      <th>has_hier_effs</th>
-      <td><p>A logical indicating whether or not the kernel and/or its
-underlying vital rates are structured with hierarchical effects. See the
-introduction vignette for this feature for more details (<code><a href='https://rdrr.io/r/utils/vignette.html'>vignettes(
-'ipmr-introduction', package = 'ipmr')</a></code>).</p></td>
+      <th>uses_par_sets</th>
+      <td><p>A logical indicating whether or not the parameters in the kernel and/or its
+underlying vital rates are derived from sets. See the
+introduction vignette for this feature for more details
+(<code>vignettes(ipmr-introduction', package = 'ipmr')}, and
+\code{vignettes( index-notation', package = 'ipmr')</code>).</p></td>
     </tr>
     <tr>
-      <th>levels_hier_effs</th>
-      <td><p>A named list with vectors corresponding to the various levels
-the hierarchical variable can take. The names should match the suffixes used
+      <th>par_set_indices</th>
+      <td><p>A named list with vectors corresponding to the values
+the index variable can take. The names should match the suffixes used
 in the vital rate expressions.</p></td>
     </tr>
     <tr>
-      <th>levels_ages</th>
-      <td><p>If <code><a href='init_ipm.html'>init_ipm(has_age = TRUE)</a></code>, a list with possibly
+      <th>age_indices</th>
+      <td><p>If <code><a href='init_ipm.html'>init_ipm(uses_age = TRUE)</a></code>, a list with possibly
 2 entries: 1. <code>"age"</code>: the range
 of possible ages in the model and, optionally, 2. <code>"max_age"</code>: the maximum
 age individuals in the model can attain. Otherwise, not used.</p></td>
@@ -261,8 +262,8 @@ all <code>general_*</code> models.</p></td>
 
     <p>Different classes of IPMs may have many or only a few kernels. Each
 one requires its own call to <code>define_kernel</code>, though there are some exceptions,
-namely for kernels derived for models with grouping effects (e.g. vital rate models
-fit across plots and years).</p>
+namely for kernels derived for models derived from parameter sets (e.g. vital
+rate models fit across plots and years).</p>
 <p>A much more complete overview of how to generate kernels is provided in
 <code><a href='../articles/ipmr-introduction.html'>vignette("ipmr-introduction", "ipmr")</a></code>.</p>
 

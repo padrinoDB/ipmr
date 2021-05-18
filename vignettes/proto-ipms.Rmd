@@ -14,17 +14,17 @@ vignette: >
 
 This vignette provides the technical details underlying the `proto_ipm` data structure. Most users will probably not care about much, if any, of the information in this vignette, and can skip it. It is primarily aimed at those interested in extending the data structure for their own purposes, or those who are just curious how this all works.
 
-The primary motivation in defining this data structure was to provide a sort of middle ground between user-defined models, and ones that are stored in the *Padrino* database. Defining this means we can use the exact same machinery to actually generate the kernels once we've defined the `proto_ipm` itself. This considerably reduces code duplication across tasks. Additionally, the hope is that `ipmr` becomes widely used, and authors can just email us a `proto_ipm` and a few other bits of metadata (or even just put in the supplementary data of their manuscripts), and we can stick it into the database. This last bit may well be a pipe dream, but everyone needs to aspire to something, right?
+The primary motivation in defining this data structure was to provide a sort of middle ground between user-defined models, and ones that are stored in the *PADRINO* database. Defining this means we can use the exact same machinery to actually generate the kernels once we've defined the `proto_ipm` itself. This considerably reduces code duplication across tasks. Additionally, the hope is that `ipmr` becomes widely used, and authors can just email us a `proto_ipm` and a few other bits of metadata (or even just put in the supplementary data of their manuscripts), and we can stick it into the database. This last point may well be a pipe dream, but we all need something to hope for, right?
 
 # The actual details
 
-The `proto_ipm` data structure powers most of `ipmr`. It represents the minimum amount of information one needs to specify to implement an IPM, and provides a (hopefully) standardized data structure going forward. It haS the following classes: `model_class` (defined in `init_ipm()`), `proto_ipm`, and `data.frame`. It will always have as many rows as calls to `define_kernel()`  that are used in the model definition pipeline. Each row corresponds to 1 or more kernels. 
+The `proto_ipm` data structure powers most of `ipmr`. It represents the minimum amount of information one needs to specify to implement an IPM, and provides a (hopefully) standardized data structure going forward. It has the following classes: `model_class` (defined in `init_ipm()`), `proto_ipm`, and `data.frame`. It will always have as many rows as calls to `define_kernel()`  that are used in the model definition pipeline. Each row corresponds to 1 or more kernels. 
 
-NB: A row may correspond to more than 1 kernel when grouping effects like age, year, or site are included in the model. When this happens, `expand.grid()` is called on the list in `levels_hier_effs`, and all rows are `paste`'d together with `collapse = "_"`. This creates fully crossed levels. Each row that contains the grouping effects is then replicated, but with a single level substituted in for the suffix(es). These steps are implemented within `make_ipm()` (and, more specifically `.initialize_kernels()`), and so you will never actually see the results of the suffix expansion when you print `proto_ipm`, only the output from `make_ipm()`. 
+NB: A row may correspond to more than 1 kernel when discrete effects like age, year, or site are included in the model. When this happens, `expand.grid()` is called on the list in `par_set_indices`, and all rows are `paste`'d together with `collapse = "_"`. This creates fully crossed levels. Each row that contains the grouping effects is then replicated, but with a single level substituted in for the suffix(es). These steps are implemented within `make_ipm()` (and, more specifically `.initialize_kernels()`), and so you will never actually see the results of the suffix expansion when you print `proto_ipm`, only the output from `make_ipm()`. 
 
 The `proto_ipm` will also always contain the following columns:
 
-1. `id`: This is a model ID, and not especially useful for user-defined models. It will always be the same across all rows for a single model. It is included to assist with implementing *Padrino*, a database of Integral Projection Models.
+1. `id`: This is a model ID, and not especially useful for user-defined models. It will always be the same across all rows for a single model. It is included to assist with implementing *PADRINO*, a database of Integral Projection Models.
 
 2. `kernel_id`: This is the `name` of each kernel from `define_kernel()` and is a character string. `make_ipm()` creates an object with this name from the parameters and functions in the `params` column. 
 
@@ -42,13 +42,13 @@ The `proto_ipm` will also always contain the following columns:
 
 9. `env_state`: A list column. This contains quosure(s) that sample a continuous environmental variable, and the data that are needed to evaluate the quosures. If the quosure contains a user-defined function, then the data should also contain a variable pointing to that function's definition (usually in the global environment).
 
-10. `has_hier_effs`: Either `TRUE` or `FALSE`. This indicates whether to check all of the names in the model for grouping effects. If `TRUE`, `.split_hier_effs` is called inside of `make_ipm`. 
+10. `uses_par_sets`: Either `TRUE` or `FALSE`. This indicates whether to check all of the names in the model for grouping effects. If `TRUE`, `.split_par_sets` is called inside of `make_ipm`. 
 
-11. `levels_hier_effs`: A list. If `has_hier_effs` is `TRUE`, then this will contain a list of integer or character vectors. The names in the list should correspond to the suffixes used in vital rate expressions/variable names, and the values in the list should correspond to the values the suffix can take on (e.g. `list(site = c("A", "B", "C"), yr = 1:5)`).
+11. `par_set_indices`: A list. If `uses_par_sets` is `TRUE`, then this will contain a list of integer or character vectors. The names in the list should correspond to the suffixes used in vital rate expressions/variable names, and the values in the list should correspond to the values the suffix can take on (e.g. `list(site = c("A", "B", "C"), yr = 1:5)`).
 
-12. `has_age`: Either `TRUE` or `FALSE`. Indicates whether the model has age structure.
+12. `uses_age`: Either `TRUE` or `FALSE`. Indicates whether the model has age structure.
 
-13. `levels_ages`: A list with the age range for the model. Can contain 1 or 2 components: `age` and, optionally, `max_age`. `age` should be an integer vector, and `max_age` should be single integer denoting the maximum age in the model.
+13. `age_indices`: A list with the age range for the model. Can contain 1 or 2 components: `age` and, optionally, `max_age`. `age` should be an integer vector, and `max_age` should be single integer denoting the maximum age in the model.
 
 14. `params`: A list. This will always have 4 entries. 
 

@@ -114,7 +114,7 @@ gen_di_det_ex <- init_ipm("general", "di", "det") %>%
     s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'g')
@@ -127,7 +127,7 @@ gen_di_det_ex <- init_ipm("general", "di", "det") %>%
     f_s           = exp(f_s_int + f_s_slope * ht_1),
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE
+    uses_par_sets = FALSE
   ) %>%
   define_kernel(
     name      = 'stay_discrete',
@@ -143,7 +143,7 @@ gen_di_det_ex <- init_ipm("general", "di", "det") %>%
     family        = 'DC',
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')

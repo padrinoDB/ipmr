@@ -1,0 +1,35 @@
+---
+output: html_document
+---
+
+# To do for resubmission
+
+1. Response to reviewers
+
+  - Update line numbers once co-authors have responded
+
+
+2. Make figure alterations for flow chart
+
+  - DONE
+
+
+3. Acknowledge reviewers and editor comments
+
+
+4. Update citations for preprints
+
+  - Ana's paper!
+    
+    - DONE
+    
+5. To coauthors
+
+  - DONE! wait for response by May 23 :)
+
+6. Low hanging fruit for code changes
+
+  - Change `par_sets` to `suffix`
+  
+  - get `max_age` api updated before resub?
+  

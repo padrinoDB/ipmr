@@ -195,7 +195,7 @@ gen_dd_det_co <- init_ipm(sim_gen    = "general",
     g_mu          = g_int + g_slope * ht_1,
     states        = list(c("ht", "b")),
     data_list     = data_list_control,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>%
@@ -207,7 +207,7 @@ gen_dd_det_co <- init_ipm(sim_gen    = "general",
     f_s = exp(f_s_int + f_s_slope * ht_1 + f_s_dd * sum(n_ht_t)),
     states = list(c("ht","b")),
     data_list = data_list_control,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor = FALSE
   ) %>%
   define_kernel(
@@ -217,7 +217,7 @@ gen_dd_det_co <- init_ipm(sim_gen    = "general",
     f_d = dnorm(ht_2, f_d_mu, f_d_sd),
     states = list(c("ht", "b")),
     data_list = data_list_control,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor = TRUE,
     evict_fun = truncated_distributions("norm", "f_d")
   ) %>%
@@ -277,7 +277,7 @@ gen_dd_det_cr <- init_ipm(sim_gen    = "general",
     g_mu          = g_int + g_slope * ht_1,
     states        = list(c("ht", "b")),
     data_list     = data_list_cr,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>%
@@ -289,7 +289,7 @@ gen_dd_det_cr <- init_ipm(sim_gen    = "general",
     f_s = exp(f_s_int + f_s_slope * ht_1 + f_s_dd * sum(n_ht_t)),
     states = list(c("ht", "b")),
     data_list = data_list_cr,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor = FALSE
   ) %>%
   define_kernel(
@@ -299,7 +299,7 @@ gen_dd_det_cr <- init_ipm(sim_gen    = "general",
     f_d = dnorm(ht_2, f_d_mu, f_d_sd),
     states = list(c("ht", "b")),
     data_list = data_list_cr,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor = TRUE,
     evict_fun = truncated_distributions("norm", "f_d")
   )  %>%
@@ -344,7 +344,7 @@ test_that("cr model works as well", {
 
 })
 
-# hierarchical deterministic models -------------
+# par_setarchical deterministic models -------------
 
 g_ints <- rnorm(3, sd = 4) %>%
   as.list() %>%
@@ -355,7 +355,7 @@ f_r_ints <- rnorm(3, sd = 2) %>%
   as.list() %>%
   setNames(paste("f_r_int_", LETTERS[1:3], sep = ""))
 
-data_list_hier <- c(data_list_control, g_ints, f_r_ints)
+data_list_par_set <- c(data_list_control, g_ints, f_r_ints)
 
 gen_dd_det_co <- init_ipm(sim_gen    = "general",
                           di_dd      = "dd",
@@ -368,9 +368,9 @@ gen_dd_det_co <- init_ipm(sim_gen    = "general",
     g_site           = dnorm(ht_2, g_mu_site, g_sd),
     g_mu_site        = g_int + g_int_site + g_slope * ht_1,
     states           = list(c("ht", "b")),
-    data_list        = data_list_hier,
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(site = LETTERS[1:3]),
+    data_list        = data_list_par_set,
+    uses_par_sets    = TRUE,
+    par_set_indices = list(site = LETTERS[1:3]),
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "g_site")
   ) %>%
@@ -381,9 +381,9 @@ gen_dd_det_co <- init_ipm(sim_gen    = "general",
     f_r_site         = plogis(f_r_int + f_r_int_site + f_r_slope * ht_1),
     f_s              = exp(f_s_int + f_s_slope * ht_1 + f_s_dd * sum(n_ht_site_t)),
     states           = list(c("ht", "b")),
-    data_list        = data_list_hier,
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(site = LETTERS[1:3]),
+    data_list        = data_list_par_set,
+    uses_par_sets    = TRUE,
+    par_set_indices = list(site = LETTERS[1:3]),
     evict_cor        = FALSE
   ) %>%
   define_kernel(
@@ -392,8 +392,8 @@ gen_dd_det_co <- init_ipm(sim_gen    = "general",
     formula = e_p * f_d * d_ht,
     f_d = dnorm(ht_2, f_d_mu, f_d_sd),
     states = list(c("ht", "b")),
-    data_list = data_list_hier,
-    has_hier_effs = FALSE,
+    data_list = data_list_par_set,
+    uses_par_sets = FALSE,
     evict_cor = TRUE,
     evict_fun = truncated_distributions("norm", "f_d")
   )  %>%
@@ -509,7 +509,7 @@ hand_b_pop_size <- lapply(pop_holder_control[3:4], colSums) %>%
 hand_c_pop_size <- lapply(pop_holder_control[5:6], colSums) %>%
   do.call(what = `+`, args = .)
 
-test_that("hierarchical model matches hand implementation", {
+test_that("par_setarchical model matches hand implementation", {
 
   expect_equal(ipmr_a_pop_size, hand_a_pop_size)
   expect_equal(ipmr_b_pop_size, hand_b_pop_size)

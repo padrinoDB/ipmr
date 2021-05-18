@@ -19,9 +19,9 @@ ipm_to_df(ipm, ...)
 
 \item{mega_mat}{A vector with symbols, I's, and/or 0s representing the matrix blocks.
 They should be specified in ROW MAJOR order! Can also be a character
-string specifying the call. Suffix syntax is supported. When used,
-\code{format_mega_matrix} will produce as many mega-matrices as there are
-combinations of \code{levels_hier_effs} in the \code{proto_ipm}.}
+string specifying the call. Parameter set index syntax is supported. When used,
+\code{format_mega_kernel} will produce as many mega-matrices as there are
+combinations of \code{par_set_indices} in the \code{proto_ipm}.}
 
 \item{name_ps}{The prefix(es) for the kernel name that correspond to survival
 and growth/maturation of existing individuals. For the model
@@ -33,9 +33,9 @@ does not need to be supplied.}
 individuals, and possibly, how they are combined. For example, a model that
 includes sexual (with an "F" kernel) and asexual reproduction (with a "C" kernel),
 this would be \code{"F + C"}. If data come from multiple sites or years,
-then this information is supplied using the suffix syntax (i.e.
+then this information is supplied using the index syntax (i.e.
 \code{f_forms = "F_yr + C_yr"}). Only applies to age X size models. The
-\code{"_age"} suffix is appended automatically, so does not need to be
+\code{"_age"} index is appended automatically, so does not need to be
 supplied.}
 }
 \value{

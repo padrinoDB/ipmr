@@ -12,13 +12,13 @@
 #' must be specified.
 #' @param kern_param If \code{det_stoch = "stoch"}, then this should be either
 #' \code{"kern"} or \code{"param"}.
-#' @param has_age A logical indicating whether the model has age structure. Default
+#' @param uses_age A logical indicating whether the model has age structure. Default
 #' is \code{FALSE}
 #'
 #' @return An object with classes \code{"proto_ipm"} and a combination of
 #' \code{sim_gen}, \code{di_dd}, \code{det_stoch}, and possibly
 #' \code{kern_param}. If
-#' \code{has_age = TRUE}, then an \code{"age_x_size"} class is also added.
+#' \code{uses_age = TRUE}, then an \code{"age_x_size"} class is also added.
 #'
 #' @details Combinations of \code{simple} or \code{general}, \code{dd} or \code{di},
 #' and \code{det} or \code{stoch} are generated to create 1 of 12 unique IPM classes.
@@ -75,16 +75,16 @@ init_ipm <- function(sim_gen,
                      di_dd,
                      det_stoch,
                      kern_param = NULL,
-                     has_age = FALSE) {
+                     uses_age = FALSE) {
 
-  .valid_ipm_class(sim_gen, di_dd, det_stoch, kern_param, has_age)
+  .valid_ipm_class(sim_gen, di_dd, det_stoch, kern_param, uses_age)
 
   model_class <- paste(sim_gen, di_dd, det_stoch, kern_param, sep = "_")
 
   # Remove trailing "_" caused by the NULL kern_param
   if(is.null(kern_param)) model_class <- gsub("_$", "", model_class)
 
-  out <- .init_ipm(model_class, has_age)
+  out <- .init_ipm(model_class, uses_age)
 
   return(out)
 }
@@ -95,7 +95,7 @@ init_ipm <- function(sim_gen,
 # suffix syntax initialization.
 
 .init_ipm <- function(model_class,
-                     has_age = FALSE) {
+                     uses_age = FALSE) {
 
   out <- data.frame(
     id               = character(0L),
@@ -107,14 +107,14 @@ init_ipm <- function(sim_gen,
     evict_type       = character(0L),
     pop_state        = character(0L),
     env_state        = character(0L),
-    hier_effs        = logical(0L),
-    levels_hier_effs = character(0L),
-    has_age          = logical(0L),
-    levels_ages      = character(0L),
+    par_sets        = logical(0L),
+    par_set_indices = character(0L),
+    uses_age          = logical(0L),
+    age_indices      = character(0L),
     params           = character(0L)
   )
 
-  if(has_age) model_class <- c(model_class, "age_x_size")
+  if(uses_age) model_class <- c(model_class, "age_x_size")
 
   class(out) <- c(model_class, 'proto_ipm', class(out))
 
@@ -123,7 +123,7 @@ init_ipm <- function(sim_gen,
 
 #' @noRd
 
-.valid_ipm_class <- function(sim_gen, di_dd, det_stoch, kern_param, has_age) {
+.valid_ipm_class <- function(sim_gen, di_dd, det_stoch, kern_param, uses_age) {
 
   if(!sim_gen %in% c("simple", "general")) {
     stop("'sim_gen' must be either 'simple' or 'general'.",

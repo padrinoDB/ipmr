@@ -30,7 +30,7 @@ x <- init_ipm(sim_gen    = "simple",
                 # split out implementation details into a separate
                 # function - named lists??
                 states = state_list,
-                has_hier_effs = FALSE,
+                uses_par_sets = FALSE,
                 evict_cor = TRUE,
                 evict_fun = truncated_distributions("norm", "g")) %>%
   define_kernel('F',
@@ -188,7 +188,7 @@ x_sub <- init_ipm(sim_gen    = "simple",
                 # split out implementation details into a separate
                 # function - named lists??
                 states = state_list,
-                has_hier_effs = FALSE,
+                uses_par_sets = FALSE,
                 evict_cor = TRUE,
                 evict_fun = truncated_distributions("norm", "g")) %>%
   define_kernel('F',
@@ -302,7 +302,7 @@ test_that("asymptotic behavior is preserved at every time step (subsetted models
 
 
 
-# hierarachical density dependent models ----------
+# par_setarachical density dependent models ----------
 
 data_list = list(s_int = 2.2,
                  s_slope = 0.25,
@@ -327,7 +327,7 @@ state_list <- list(c("dbh"))
 
 # set.seed(1231241)
 
-hier_mod <- init_ipm(sim_gen    = "simple",
+par_set_mod <- init_ipm(sim_gen    = "simple",
                      di_dd      = "dd",
                      det_stoch  = "det") %>%
   define_kernel("P_yr",
@@ -338,8 +338,8 @@ hier_mod <- init_ipm(sim_gen    = "simple",
                 mu_g_yr = g_int + g_int_yr + g_slope * dbh_1,
                 data_list = data_list,
                 states = state_list,
-                has_hier_effs = TRUE,
-                levels_hier_effs = list(yr = 1:3),
+                uses_par_sets = TRUE,
+                par_set_indices = list(yr = 1:3),
                 evict_cor = TRUE,
                 evict_fun = truncated_distributions("norm", "g_yr")) %>%
   define_kernel('F_yr',
@@ -350,8 +350,8 @@ hier_mod <- init_ipm(sim_gen    = "simple",
                 f_d = dnorm(dbh_2, mu_fd, sd_fd),
                 data_list = data_list,
                 states = state_list,
-                has_hier_effs = TRUE,
-                levels_hier_effs = list(yr = 1:3),
+                uses_par_sets = TRUE,
+                par_set_indices = list(yr = 1:3),
                 evict_cor = TRUE,
                 evict_fun = truncated_distributions("norm", "f_d")) %>%
   define_impl(
@@ -419,7 +419,7 @@ pop_holder <- lapply(1:3,
                        temp[, 1] <- ps[[x]][ , 1]
                        return(temp)
                      },
-                     ps = hier_mod$pop_state[1:3])
+                     ps = par_set_mod$pop_state[1:3])
 
 names(pop_holder) <- paste("n_dbh_", 1:3, sep = "")
 

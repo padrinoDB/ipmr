@@ -41,15 +41,4 @@ disc_sizes <- collapse_pop_state(gen_di_det_ex,
                                  NRA = ht > 10 & ht <= 200,
                                  RA = ht > 200)
 
-# time series for this model. This extracts the first 20 iterations
-# (excluding the initial population state) and collapses them according
-# to the rules we pass to ...
-
-
- time_series <- collapse_pop_state(gen_di_det_ex,
-                                   time_step = 2:21,
-                                   seedlings = ht <= 10,
-                                   NRA = ht > 10 & ht <= 200,
-                                   RA = ht > 200)
-
 }

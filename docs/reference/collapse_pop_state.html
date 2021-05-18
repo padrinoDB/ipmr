@@ -106,7 +106,7 @@ time step of the model." />
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/suffix-notation.html">Suffix Notation</a>
+      <a href="../articles/index-notation.html">Index Notation in ipmr</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -206,17 +206,6 @@ sizes at each requested time step. Names are taken from <code>...</code>.</p>
                                  seedlings <span class='op'>=</span> <span class='va'>ht</span> <span class='op'>&lt;=</span> <span class='fl'>10</span>,
                                  NRA <span class='op'>=</span> <span class='va'>ht</span> <span class='op'>&gt;</span> <span class='fl'>10</span> <span class='op'>&amp;</span> <span class='va'>ht</span> <span class='op'>&lt;=</span> <span class='fl'>200</span>,
                                  RA <span class='op'>=</span> <span class='va'>ht</span> <span class='op'>&gt;</span> <span class='fl'>200</span><span class='op'>)</span>
-
-<span class='co'># time series for this model. This extracts the first 20 iterations</span>
-<span class='co'># (excluding the initial population state) and collapses them according</span>
-<span class='co'># to the rules we pass to ...</span>
-
-
- <span class='va'>time_series</span> <span class='op'>&lt;-</span> <span class='fu'>collapse_pop_state</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>,
-                                   time_step <span class='op'>=</span> <span class='fl'>2</span><span class='op'>:</span><span class='fl'>21</span>,
-                                   seedlings <span class='op'>=</span> <span class='va'>ht</span> <span class='op'>&lt;=</span> <span class='fl'>10</span>,
-                                   NRA <span class='op'>=</span> <span class='va'>ht</span> <span class='op'>&gt;</span> <span class='fl'>10</span> <span class='op'>&amp;</span> <span class='va'>ht</span> <span class='op'>&lt;=</span> <span class='fl'>200</span>,
-                                   RA <span class='op'>=</span> <span class='va'>ht</span> <span class='op'>&gt;</span> <span class='fl'>200</span><span class='op'>)</span>
 
 </div></pre>
   </div>

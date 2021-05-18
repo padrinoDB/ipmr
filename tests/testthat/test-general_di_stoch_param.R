@@ -185,7 +185,7 @@ gen_di_stoch_param <- init_ipm(sim_gen    = "general",
 
     data_list        = fixed_params,
     states           = list(c('ln_leaf_l')),
-    has_hier_effs    = FALSE,
+    uses_par_sets    = FALSE,
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_nn')
@@ -214,7 +214,7 @@ gen_di_stoch_param <- init_ipm(sim_gen    = "general",
 
     data_list     = fixed_params,
     states        = list(c('sqrt_area', 'ln_leaf_l')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(c('norm', 'norm'),
                                             c('gamma_nr',
@@ -231,7 +231,7 @@ gen_di_stoch_param <- init_ipm(sim_gen    = "general",
     data_list = fixed_params,
     states    = list(c('ln_leaf_l', "d")),
 
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'gamma_nd')
@@ -255,7 +255,7 @@ gen_di_stoch_param <- init_ipm(sim_gen    = "general",
 
     data_list        = fixed_params,
     states           = list(c('sqrt_area', 'ln_leaf_l')),
-    has_hier_effs    = FALSE,
+    uses_par_sets    = FALSE,
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_rn')
@@ -269,7 +269,7 @@ gen_di_stoch_param <- init_ipm(sim_gen    = "general",
     mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
     data_list        = fixed_params,
     states           = list(c('ln_leaf_l', "d")),
-    has_hier_effs    = FALSE,
+    uses_par_sets    = FALSE,
     evict_cor        = FALSE
   ) %>%
   define_kernel(
@@ -280,7 +280,7 @@ gen_di_stoch_param <- init_ipm(sim_gen    = "general",
     mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
     data_list        = fixed_params,
     states           = list(c('sqrt_area', "d")),
-    has_hier_effs    = FALSE,
+    uses_par_sets    = FALSE,
     evict_cor        = FALSE
   ) %>%
   define_impl(
@@ -696,7 +696,7 @@ mean_kernel_r <- function(kernel_holder, n_unique) {
 
 }
 
-test_that("mean_kernel works correctly for non-hierarchical models", {
+test_that("mean_kernel works correctly for non-par_setarchical models", {
 
 
   mean_hand_kerns <- mean_kernel_r(kernel_holder, 6) %>%
@@ -805,7 +805,7 @@ test_that('normalize_pop_vec works', {
 
       data_list        = fixed_params,
       states           = list(c('ln_leaf_l')),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm',
                                                  'gamma_nn')
@@ -834,7 +834,7 @@ test_that('normalize_pop_vec works', {
 
       data_list     = fixed_params,
       states        = list(c('sqrt_area', 'ln_leaf_l')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions(c('norm', 'norm'),
                                               c('gamma_nr',
@@ -851,7 +851,7 @@ test_that('normalize_pop_vec works', {
       data_list = fixed_params,
       states    = list(c('ln_leaf_l', "d")),
 
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'gamma_nd')
@@ -875,7 +875,7 @@ test_that('normalize_pop_vec works', {
 
       data_list        = fixed_params,
       states           = list(c('sqrt_area', 'ln_leaf_l')),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm',
                                                  'gamma_rn')
@@ -889,7 +889,7 @@ test_that('normalize_pop_vec works', {
       mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
       data_list        = fixed_params,
       states           = list(c('ln_leaf_l', "d")),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor        = FALSE
     ) %>%
     define_kernel(
@@ -900,7 +900,7 @@ test_that('normalize_pop_vec works', {
       mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
       data_list        = fixed_params,
       states           = list(c('sqrt_area', "d")),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor        = FALSE
     ) %>%
     define_impl(
@@ -1041,7 +1041,7 @@ test_that("t variable works as advertised", {
 
       data_list        = fixed_params,
       states           = list(c('ln_leaf_l')),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm',
                                                  'gamma_nn')
@@ -1070,7 +1070,7 @@ test_that("t variable works as advertised", {
 
       data_list     = fixed_params,
       states        = list(c('sqrt_area', 'ln_leaf_l')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions(c('norm', 'norm'),
                                               c('gamma_nr',
@@ -1087,7 +1087,7 @@ test_that("t variable works as advertised", {
       data_list = fixed_params,
       states    = list(c('ln_leaf_l', "d")),
 
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'gamma_nd')
@@ -1111,7 +1111,7 @@ test_that("t variable works as advertised", {
 
       data_list        = fixed_params,
       states           = list(c('sqrt_area', 'ln_leaf_l')),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm',
                                                  'gamma_rn')
@@ -1125,7 +1125,7 @@ test_that("t variable works as advertised", {
       mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
       data_list        = fixed_params,
       states           = list(c('ln_leaf_l', "d")),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor        = FALSE
     ) %>%
     define_kernel(
@@ -1136,7 +1136,7 @@ test_that("t variable works as advertised", {
       mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
       data_list        = fixed_params,
       states           = list(c('sqrt_area', "d")),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor        = FALSE
     ) %>%
     define_impl(
@@ -1225,7 +1225,7 @@ test_that("t variable works as advertised", {
 
       data_list        = fixed_params,
       states           = list(c('ln_leaf_l')),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm',
                                                  'gamma_nn')
@@ -1254,7 +1254,7 @@ test_that("t variable works as advertised", {
 
       data_list     = fixed_params,
       states        = list(c('sqrt_area', 'ln_leaf_l')),
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions(c('norm', 'norm'),
                                               c('gamma_nr',
@@ -1271,7 +1271,7 @@ test_that("t variable works as advertised", {
       data_list = fixed_params,
       states    = list(c('ln_leaf_l', 'd')),
 
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'gamma_nd')
@@ -1295,7 +1295,7 @@ test_that("t variable works as advertised", {
 
       data_list        = fixed_params,
       states           = list(c('sqrt_area', 'ln_leaf_l')),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm',
                                                  'gamma_rn')
@@ -1309,7 +1309,7 @@ test_that("t variable works as advertised", {
       mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
       data_list        = fixed_params,
       states           = list(c('ln_leaf_l', 'd')),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor        = FALSE
     ) %>%
     define_kernel(
@@ -1320,7 +1320,7 @@ test_that("t variable works as advertised", {
       mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
       data_list        = fixed_params,
       states           = list(c('sqrt_area', 'd')),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor        = FALSE
     ) %>%
     define_impl(
@@ -1383,12 +1383,12 @@ test_that("t variable works as advertised", {
 
 test_that("Hierarchical effects work in parameter re-sampled model", {
 
-  hier_vals           <- rnorm(5) %>% as.list()
-  names(hier_vals)    <- paste("nr_s_z_int_", 1:5, sep = "")
+  par_set_vals           <- rnorm(5) %>% as.list()
+  names(par_set_vals)    <- paste("nr_s_z_int_", 1:5, sep = "")
   rando_names         <- gsub("nr_s_z_int",
                               "nr_s_z_int_fixed",
                               rando_names)
-  fixed_params        <- c(fixed_params, hier_vals)
+  fixed_params        <- c(fixed_params, par_set_vals)
 
 
   gen_di_stoch_param <- init_ipm(sim_gen    = "general",
@@ -1413,8 +1413,8 @@ test_that("Hierarchical effects work in parameter re-sampled model", {
 
       data_list        = fixed_params,
       states           = list(c('ln_leaf_l')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = list(site = 1:5),
+      uses_par_sets    = TRUE,
+      par_set_indices = list(site = 1:5),
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm',
                                                  'gamma_nn')
@@ -1443,7 +1443,7 @@ test_that("Hierarchical effects work in parameter re-sampled model", {
 
       data_list     = fixed_params,
       states        = list(c('sqrt_area', 'ln_leaf_l')),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions(c('norm', 'norm'),
                                               c('gamma_nr',
@@ -1460,7 +1460,7 @@ test_that("Hierarchical effects work in parameter re-sampled model", {
       data_list = fixed_params,
       states    = list(c('ln_leaf_l', 'd')),
 
-      has_hier_effs = FALSE,
+      uses_par_sets = FALSE,
       evict_cor     = TRUE,
       evict_fun     = truncated_distributions('norm',
                                               'gamma_nd')
@@ -1485,8 +1485,8 @@ test_that("Hierarchical effects work in parameter re-sampled model", {
 
       data_list        = fixed_params,
       states           = list(c('sqrt_area', 'ln_leaf_l')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = list(site = 1:5),
+      uses_par_sets    = TRUE,
+      par_set_indices = list(site = 1:5),
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm',
                                                  'gamma_rn')
@@ -1501,8 +1501,8 @@ test_that("Hierarchical effects work in parameter re-sampled model", {
       mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
       data_list        = fixed_params,
       states           = list(c('ln_leaf_l', 'd')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = list(site = 1:5),
+      uses_par_sets    = TRUE,
+      par_set_indices = list(site = 1:5),
       evict_cor        = FALSE
     ) %>%
     define_kernel(
@@ -1513,7 +1513,7 @@ test_that("Hierarchical effects work in parameter re-sampled model", {
       mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
       data_list        = fixed_params,
       states           = list(c('sqrt_area', 'd')),
-      has_hier_effs    = FALSE,
+      uses_par_sets    = FALSE,
       evict_cor        = FALSE
     ) %>%
     define_impl(

@@ -26,7 +26,10 @@ correctly represented in the \code{data_list}.
 ipmr usually recognizes model objects passed into the \code{data_list} argument
 automatically. Unfortunately, sometimes it'll miss one, and the user will need
 to manually protect it from the standard build process. This function
-provides a wrapper around that process.
+provides a wrapper around that process. Additionally, please file a bug
+report here: \url{https://github.com/levisc8/ipmr/issues} describing what type
+of model you are trying to use so it can be added to later versions of the
+package.
 
 Wrap a model object in \code{use_vr_model} when building the \code{data_list}
 to pass to \code{define_kernel}.

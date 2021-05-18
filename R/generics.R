@@ -6,8 +6,8 @@
 #' @param x An object of class \code{proto_ipm} or produced by \code{make_ipm()}.
 #' @param ... Ignored
 #'
-#' @details For printing \code{proto_ipm} objects, suffixes are wrapped in
-#' \code{<suffix>} to assist with debugging. These are not carried into the model,
+#' @details For printing \code{proto_ipm} objects, indices are wrapped in
+#' \code{<index>} to assist with debugging. These are not carried into the model,
 #' just a visual aid.
 #'
 #' @export
@@ -21,7 +21,7 @@ print.proto_ipm <- function(x, ...) {
   pretty_class <- .pretty_class(cls_switch)
 
 
-  msg          <- paste(ifelse(.has_age(x),
+  msg          <- paste(ifelse(.uses_age(x),
                                "An age structured",
                                "A"),
                         pretty_class,
@@ -128,16 +128,16 @@ print.proto_ipm <- function(x, ...) {
     vr_exprs <- vital_rate_exprs(use_proto)
     params   <- parameters(proto)
 
-    # Age x size models and/or hier_effs models need expansion before we
+    # Age x size models and/or par_sets models need expansion before we
     # we can test whether all parameters are in the model
 
-    if(.has_age(proto) | any(proto$has_hier_effs)) {
+    if(.uses_age(proto) | any(proto$uses_par_sets)) {
 
-      all_levs <- .flatten_to_depth(proto$levels_hier_effs[proto$has_hier_effs],
+      all_levs <- .flatten_to_depth(proto$par_set_indices[proto$uses_par_sets],
                                     1L) %>%
         .[!duplicated(names(.))]
 
-      hier_nms <- names(all_levs)
+      par_set_nms <- names(all_levs)
 
       if(length(all_levs) > 1) {
         lev_df <- expand.grid(all_levs,
@@ -161,16 +161,16 @@ print.proto_ipm <- function(x, ...) {
 
         for(j in seq_len(dim(lev_df)[2])) {
 
-          hier_nm <- names(lev_df)[j]
+          par_set_nm <- names(lev_df)[j]
 
           for(k in seq_len(dim(lev_df)[1])) {
 
             # Replace suffixes in expression and name
-            all_vr_exprs[[it]]      <- gsub(hier_nm,
+            all_vr_exprs[[it]]      <- gsub(par_set_nm,
                                             lev_df[k, j],
                                             base_expr)
 
-            names(all_vr_exprs)[it] <- gsub(hier_nm,
+            names(all_vr_exprs)[it] <- gsub(par_set_nm,
                                             lev_df[k, j],
                                             names(vr_exprs)[i])
 
@@ -255,7 +255,7 @@ print.proto_ipm <- function(x, ...) {
 
 #' @noRd
 
-.has_age <- function(x) {
+.uses_age <- function(x) {
 
   inherits(x, "age_x_size")
 
@@ -640,9 +640,9 @@ print.ipmr_vital_rate_exprs <- function(x, ...) {
 
   proto <- attr(x, "proto")
 
-  if(any(proto$has_hier_effs) | .has_age(proto)) {
+  if(any(proto$uses_par_sets) | .uses_age(proto)) {
 
-    out <- .pretty_print_hier_effs(x, proto)
+    out <- .pretty_print_par_sets(x, proto)
 
   } else {
 
@@ -662,40 +662,40 @@ print.ipmr_vital_rate_exprs <- function(x, ...) {
 
 }
 
-.pretty_print_hier_effs <- function(x, proto) {
+.pretty_print_par_sets <- function(x, proto) {
 
-  nm_hier_effs <- proto$levels_hier_effs %>%
+  nm_par_sets <- proto$par_set_indices %>%
     .flatten_to_depth(1L) %>%
     names() %>%
     unique()
 
-  if(.has_age(proto)) {
+  if(.uses_age(proto)) {
 
-    ages <- proto$levels_ages %>%
+    ages <- proto$age_indices %>%
       .flatten_to_depth(1L) %>%
       names() %>%
       unique()
 
-    nm_hier_effs <- c(nm_hier_effs, ages)
+    nm_par_sets <- c(nm_par_sets, ages)
 
   }
 
-  nm_hier_effs <- nm_hier_effs[!is.na(nm_hier_effs)]
+  nm_par_sets <- nm_par_sets[!is.na(nm_par_sets)]
 
   x <- lapply(x, rlang::expr_text)
 
-  for(i in seq_along(nm_hier_effs)) {
+  for(i in seq_along(nm_par_sets)) {
 
-    to_print <- paste("<", nm_hier_effs[i], ">", sep = "")
+    to_print <- paste("<", nm_par_sets[i], ">", sep = "")
 
     x <- lapply(x,
                 function(y, nm, to_print) {
                   gsub(nm, to_print, y)
                 },
-                nm       = nm_hier_effs[i],
+                nm       = nm_par_sets[i],
                 to_print = to_print)
 
-    names(x) <- gsub(nm_hier_effs[i], to_print, names(x))
+    names(x) <- gsub(nm_par_sets[i], to_print, names(x))
 
   }
 
@@ -708,9 +708,9 @@ print.ipmr_kernel_exprs <- function(x, ...) {
 
   proto <- attr(x, "proto")
 
-  if(any(proto$has_hier_effs) | .has_age(proto)) {
+  if(any(proto$uses_par_sets) | .uses_age(proto)) {
 
-    out <- .pretty_print_hier_effs(x, proto)
+    out <- .pretty_print_par_sets(x, proto)
 
   } else {
 
@@ -928,7 +928,7 @@ print.ipmr_vital_rate_funs <- function(x, ...) {
 #' (i.e. first 10\% of iterations in the simulation).
 #'
 #' @return When \code{type_lambda = "all"}, an array. Rows correspond to time
-#' steps, and columns correspond to grouping effects (if any). For other types,
+#' steps, and columns correspond to parameter sets (if any). For other types,
 #' a numeric vector.
 #'
 #' @export
@@ -1271,8 +1271,7 @@ lambda.general_dd_stoch_param_ipm <- function(ipm,
 #'
 #' @return \code{A} or \code{ipm} invisibly
 #'
-#' @details \code{plot.ipmr_matrix} is intended for internal use only, and it
-#' is usually safer to use \code{plot.*_ipm} methods for visualizing kernels.
+#' @details
 #' If an IPM kernel is overwhelmed by information in say, a fecundity sub-kernel,
 #' use the \code{exponent} argument in \code{plot.*_ipm} to make it more visually
 #' appealing.
@@ -1539,7 +1538,7 @@ plot.simple_di_stoch_kern_ipm <- function(x = NULL, y = NULL,
 }
 
 #' @rdname plot_star
-#' @inheritParams format_mega_matrix
+#' @inheritParams format_mega_kernel
 #'
 #' @export
 
@@ -1575,7 +1574,7 @@ plot.general_di_det_ipm <- function(x = NULL, y = NULL,
          "Please specify an expression for the 'mega_mat' argument.")
   }
 
-  plot_list <- format_mega_matrix(ipm, mega_mat = !! mega_mat)
+  plot_list <- format_mega_kernel(ipm, mega_mat = !! mega_mat)
   plt_seq   <- seq_along(plot_list)
   canvas_dims <- .ncol_nrow(plt_seq)
 

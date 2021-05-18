@@ -104,7 +104,7 @@
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/suffix-notation.html">Suffix Notation</a>
+      <a href="../articles/index-notation.html">Index Notation in ipmr</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -248,8 +248,10 @@ created.</p></td>
     </tr>
     <tr>
       <th>value</th>
-      <td><p>A named list of new parameters. The new list does not need
-to contain all of the parameters, just the ones to update/append.</p></td>
+      <td><p>For <code>parameters&lt;-</code>, a named list of new parameters. The new list does not need
+to contain all of the parameters, just the ones to update/append. For
+<code>vital_rate_exprs&lt;-</code> and <code>kernel_formulae&lt;-</code>, a new functional form.
+The new functional form must be wrapped in a call to <code>new_fun_form</code>.</p></td>
     </tr>
     <tr>
       <th>form</th>

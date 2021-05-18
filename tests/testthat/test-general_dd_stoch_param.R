@@ -55,7 +55,7 @@ gen_dd_stoch_co <- init_ipm(sim_gen    = "general",
     g_mu             = g_int_yr + g_slope * ht_1,
     states           = list(c("ht", "b")),
     data_list        = data_list_control,
-    has_hier_effs    = FALSE,
+    uses_par_sets    = FALSE,
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "g")
   ) %>%
@@ -67,7 +67,7 @@ gen_dd_stoch_co <- init_ipm(sim_gen    = "general",
     f_s              = exp(f_s_int + f_s_slope * ht_1 + f_s_dd * sum(n_ht_t)),
     states           = list(c("ht", "b")),
     data_list        = data_list_control,
-    has_hier_effs    = FALSE,
+    uses_par_sets    = FALSE,
     evict_cor        = FALSE
   ) %>%
   define_kernel(
@@ -77,7 +77,7 @@ gen_dd_stoch_co <- init_ipm(sim_gen    = "general",
     f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
     states        = list(c("ht", "b")),
     data_list     = data_list_control,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
@@ -227,5 +227,5 @@ test_that("models compute population sizes correctly", {
 
 })
 
-# Needs test for hierarchical models
+# Needs test for par_setarchical models
 

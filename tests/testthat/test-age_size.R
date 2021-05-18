@@ -325,7 +325,7 @@ f_fun <- function(age, s_age, pb_age, pr_age, recr) {
 a_s_ipm <- init_ipm(sim_gen    = "general",
                     di_dd      = "di",
                     det_stoch  = "det",
-                    has_age = TRUE) %>%
+                    uses_age = TRUE) %>%
   define_kernel(
     name          = "P_age",
     family        = "CC",
@@ -335,8 +335,8 @@ a_s_ipm <- init_ipm(sim_gen    = "general",
     mu_g_age      = grow_int + grow_z * wt_1 + grow_a * age,
     data_list     = param_list,
     states        = list(c("wt")),
-    has_hier_effs = FALSE,
-    levels_ages   = list(age = c(0:20), max_age = 21),
+    uses_par_sets = FALSE,
+    age_indices   = list(age = c(0:20), max_age = 21),
     evict_cor     = FALSE
   ) %>%
   define_kernel(
@@ -350,8 +350,8 @@ a_s_ipm <- init_ipm(sim_gen    = "general",
     rcsz_mu       = rcsz_int + rcsz_z * wt_1,
     data_list     = param_list,
     states        = list(c("wt")),
-    has_hier_effs = FALSE,
-    levels_ages   = list(age = c(0:20), max_age = 21),
+    uses_par_sets = FALSE,
+    age_indices   = list(age = c(0:20), max_age = 21),
     evict_cor     = FALSE
   ) %>%
   define_impl(
@@ -402,7 +402,7 @@ test_that("age_x_size lambdas are recovered properly", {
 
 })
 
-test_that("format_mega_matrix.age_x_size_ipm works", {
+test_that("format_mega_kernel.age_x_size_ipm works", {
 
   subs <- a_s_ipm$sub_kernels
 
@@ -424,7 +424,7 @@ test_that("format_mega_matrix.age_x_size_ipm works", {
   target <- rbind(target_f, target_p)
   rm(target_f, target_p)
 
-  ipmr_meg <- format_mega_matrix(a_s_ipm,
+  ipmr_meg <- format_mega_kernel(a_s_ipm,
                                  name_ps = "P",
                                  f_forms = "F")$mega_mat
 
@@ -475,7 +475,7 @@ test_that("format_mega_matrix.age_x_size_ipm works", {
 # a_s_ipm <- init_ipm(sim_gen    = "general",
 #                     di_dd      = "di",
 #                     det_stoch  = "det",
-#                     has_age = TRUE) %>%
+#                     uses_age = TRUE) %>%
 #   define_kernel(
 #     name          = "P_age",
 #     family        = "CC",
@@ -486,8 +486,8 @@ test_that("format_mega_matrix.age_x_size_ipm works", {
 #     s_max_age     = inv_logit(surv_max_int + surv_z * wt_1 + surv_z_2 * wt_1^2),
 #     data_list     = param_list,
 #     states        = list(c("wt")),
-#     has_hier_effs = FALSE,
-#     levels_ages   = list(age = c(0:20), max_age = 21),
+#     uses_par_sets = FALSE,
+#     age_indices   = list(age = c(0:20), max_age = 21),
 #     evict_cor     = FALSE
 #   ) %>%
 #   define_kernel(
@@ -501,8 +501,8 @@ test_that("format_mega_matrix.age_x_size_ipm works", {
 #     rcsz_mu       = rcsz_int + rcsz_z * wt_1,
 #     data_list     = param_list,
 #     states        = list(c("wt")),
-#     has_hier_effs = FALSE,
-#     levels_ages   = list(age = c(0:20), max_age = 21),
+#     uses_par_sets = FALSE,
+#     age_indices   = list(age = c(0:20), max_age = 21),
 #     evict_cor     = FALSE
 #   ) %>%
 #   define_impl(

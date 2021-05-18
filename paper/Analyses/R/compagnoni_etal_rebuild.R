@@ -118,8 +118,8 @@ full_mod <- init_ipm(use_padr[[1]]$model_class) %>%
     !!! p_exprs,
     data_list = all_param_list,
     states = list(c('lnsize')),
-    has_hier_effs = TRUE,
-    levels_hier_effs = list2(
+    uses_par_sets = TRUE,
+    par_set_indices = list2(
       !! ref_tab$vr_expr_name := eval_bare(
         parse_expr(ref_tab$range)
       )
@@ -135,8 +135,8 @@ full_mod <- init_ipm(use_padr[[1]]$model_class) %>%
     !!! b1_exprs,
     data_list = all_param_list,
     states = list(c('lnsize')),
-    has_hier_effs = TRUE,
-    levels_hier_effs = list2(
+    uses_par_sets = TRUE,
+    par_set_indices = list2(
       !! ref_tab$vr_expr_name := eval_bare(
         parse_expr(ref_tab$range)
       )
@@ -149,8 +149,8 @@ full_mod <- init_ipm(use_padr[[1]]$model_class) %>%
     !!! b2_exprs,
     data_list = all_param_list,
     states = list(c('lnsize')),
-    has_hier_effs = TRUE,
-    levels_hier_effs = list2(
+    uses_par_sets = TRUE,
+    par_set_indices = list2(
       !! ref_tab$vr_expr_name := eval_bare(
         parse_expr(ref_tab$range)
       )
@@ -163,8 +163,8 @@ full_mod <- init_ipm(use_padr[[1]]$model_class) %>%
     !!! b2c_exprs,
     data_list = all_param_list,
     states = list(c('lnsize')),
-    has_hier_effs = TRUE,
-    levels_hier_effs = list2(
+    uses_par_sets = TRUE,
+    par_set_indices = list2(
       !! ref_tab$vr_expr_name := eval_bare(
         parse_expr(ref_tab$range)
       )
@@ -177,8 +177,8 @@ full_mod <- init_ipm(use_padr[[1]]$model_class) %>%
     !!! b1c_exprs,
     data_list = all_param_list,
     states = list(c('lnsize')),
-    has_hier_effs = TRUE,
-    levels_hier_effs = list2(
+    uses_par_sets = TRUE,
+    par_set_indices = list2(
       !! ref_tab$vr_expr_name := eval_bare(
         parse_expr(ref_tab$range)
       )
@@ -193,8 +193,8 @@ full_mod <- init_ipm(use_padr[[1]]$model_class) %>%
     n_b_1_t_1 = b1_yr %*% n_lnsize_t * d_lnsize,
     n_b_2_t_1 = b2_yr %*% n_b_1_t,
     states = list(c('lnsize')),
-    has_hier_effs = TRUE,
-    levels_hier_effs = list(yr = 2004:2014)
+    uses_par_sets = TRUE,
+    par_set_indices = list(yr = 2004:2014)
   ) %>%
   define_impl(
     make_impl_args_list(

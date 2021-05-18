@@ -89,7 +89,7 @@ math_ipm <- init_ipm("simple_di_det") %>%
     g             = dnorm(sa_2, g_mu, grow_sdv),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm",
                                             param = "g")
@@ -105,7 +105,7 @@ math_ipm <- init_ipm("simple_di_det") %>%
     f_d           = dnorm(sa_2, recr_mu, recr_sd),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm",
                                             param = "f_d")
@@ -116,7 +116,7 @@ math_ipm <- init_ipm("simple_di_det") %>%
     K             = P + F,
     states        = list(c("sa")),
     data_list     = list(),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = FALSE
   ) %>%
   define_impl(
@@ -177,7 +177,7 @@ pred_ipm <- init_ipm("simple_di_det") %>%
     g             = dnorm(sa_2, g_mu, grow_sd),
     states        = list(c("sa")),
     data_list     = models,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm",
                                             param = "g")
@@ -201,7 +201,7 @@ pred_ipm <- init_ipm("simple_di_det") %>%
     f_d           = dnorm(sa_2, recr_mu, recr_sd),
     states        = list(c("sa")),
     data_list     = models,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm",
                                             param = "f_d")
@@ -212,7 +212,7 @@ pred_ipm <- init_ipm("simple_di_det") %>%
     K             = P + F,
     states        = list(c("sa")),
     data_list     = list(),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = FALSE
   ) %>%
   define_impl(

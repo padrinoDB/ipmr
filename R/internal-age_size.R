@@ -3,7 +3,7 @@
 # name/content
 
 # These should only appear in .make_age_k_row(...). "others" object is treated
-# just like any other hierarchical model, for now. This will require modification
+# just like any other par_setarchical model, for now. This will require modification
 # for more complicated models like density dependent and/or time lagged ones
 # where vital rates in the sub-kernels themselves definitely will require the
 # t_minus_1 or n_minus_1 notation.
@@ -49,7 +49,7 @@
 
   forms <- k_row$params[[1]]$formula
 
-  ages  <- k_row$levels_ages %>%
+  ages  <- k_row$age_indices %>%
     .flatten_to_depth(1L)
 
   calls <- vapply(forms,
@@ -61,9 +61,9 @@
                   }, character(1L))
 
   # In the case where we have an n_0 = f_1 %*% n_1 + f_2 %*% n_2 etc,
-  # We need to treat this differently from other hier_effs. Normally, they
-  # get one call per level of the hier_eff. in this case, we need one call
-  # expanded to include all levels of the hier_eff. This is done w/ methods
+  # We need to treat this differently from other par_sets. Normally, they
+  # get one call per level of the par_set_eff. in this case, we need one call
+  # expanded to include all levels of the par_set_eff. This is done w/ methods
   # for generics sum and prod (and maybe others later).
   # On the other hand, we also need to generate one expression
   # for each n_x_t_1 = p_x_minus_1 %*% n_x_minus_1_t
@@ -218,13 +218,13 @@
 
 
 #' @noRd
-# Basically .split_hier_effs, but uses the age column instead of hier_effs column
+# Basically .split_par_sets, but uses the age column instead of par_sets column
 
 .split_sub_kern_ages <- function(proto_ipm) {
 
-  kerns <- which(proto_ipm$has_age)
+  kerns <- which(proto_ipm$uses_age)
 
-  # Create a place to hold the output - either kernels with no hierarchical effects
+  # Create a place to hold the output - either kernels with no parameter sets
   # or a new proto
   if(length(kerns) != dim(proto_ipm)[1]) {
 
@@ -236,11 +236,11 @@
 
   }
 
-  hier_rows <- proto_ipm[kerns, ]
+  par_set_rows <- proto_ipm[kerns, ]
 
-  for(i in seq_len(dim(hier_rows)[1])) {
+  for(i in seq_len(dim(par_set_rows)[1])) {
 
-    levs   <- hier_rows$levels_ages[[i]]
+    levs   <- par_set_rows$age_indices[[i]]
 
     # Combine the max age w/ the others if it is supplied. This only
     # applies to iteration kernel expressions (I think).
@@ -250,7 +250,7 @@
     levels <- lapply(levs, eval) %>%
       expand.grid(stringsAsFactors = FALSE)
 
-    temp   <- .expand_hier_effs(hier_rows[i, ], levels)
+    temp   <- .expand_par_sets(par_set_rows[i, ], levels)
 
     out    <- rbind(out, temp)
 

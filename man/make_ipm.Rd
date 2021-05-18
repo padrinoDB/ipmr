@@ -210,9 +210,9 @@ other potentially useful variables for subsequent analyses. Default is
 \item{return_all_envs}{A logical indicating whether to return the environments that
 the kernel expressions are evaluated in. These may be useful for some analyses,
 such as regression-level sensitivity/elasticity analyses, but can also rapidly
-increase memory consumption for models with many kernels (e.g. ones with grouping
-effects that have many levels, or any \code{*_stoch_param} model). Default is
-\code{FALSE}.}
+increase memory consumption for models with many kernels (e.g. ones with
+parameter set indices that have many levels, or any \code{*_stoch_param} model).
+Default is \code{FALSE}.}
 
 \item{usr_funs}{An optional list of user-specified functions that are passed
 on to the  model building process. This can help make vital rate expressions
@@ -245,10 +245,10 @@ by other functions. Use with care.}
 \item{kernel_seq}{For \code{*_stoch_kern} methods, the sequence of kernels
 to use during the simulation process. It should have the same number of entries
 as the number of \code{iterations}.
-This should be a vector containing levels of the grouping effects specified
-in \code{levels_hier_effs}, or empty. Support for Markov chains will eventually
+This should be a vector containing values of the parameter set indices specified
+in \code{par_set_indices}, or empty. Support for Markov chains will eventually
 get implemented. If it is empty, \code{make_ipm} will try to generate a
-sequence internally using a random selection of the \code{levels_hier_effs}
+sequence internally using a random selection of the \code{par_set_indices}
 defined in \code{define_kernel}.}
 
 \item{report_progress}{A logical indicating whether or not to periodically
@@ -256,7 +256,7 @@ report progress for a stochastic simulation. Does not apply to deterministic
 methods. Default is \code{FALSE}.}
 }
 \value{
-The \code{make_ipm.*} methods will always return a list of length 6
+The \code{make_ipm.*} methods will always return a list of length 5
 containing the following components:
 
 \itemize{

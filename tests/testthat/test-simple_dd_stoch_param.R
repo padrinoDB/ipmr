@@ -91,7 +91,7 @@ test_stoch_param <- init_ipm(sim_gen    = "simple",
     g = dnorm(surf_area_2, g_mu, g_sd),
     data_list = data_list,
     states = list(c('surf_area')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'g')
   ) %>%
@@ -104,7 +104,7 @@ test_stoch_param <- init_ipm(sim_gen    = "simple",
     f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
     data_list = data_list,
     states = list(c('surf_area')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'f_d')
   )  %>%
@@ -230,8 +230,8 @@ test_stoch_param <- init_ipm(sim_gen    = "simple",
     g_site = dnorm(surf_area_2, g_mu_site, g_sd),
     data_list = data_list,
     states = list(c('surf_area')),
-    has_hier_effs = TRUE,
-    levels_hier_effs = list(site = 1:3),
+    uses_par_sets = TRUE,
+    par_set_indices = list(site = 1:3),
     evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'g_site')
   ) %>%
@@ -244,8 +244,8 @@ test_stoch_param <- init_ipm(sim_gen    = "simple",
     f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
     data_list = data_list,
     states = list(c('surf_area')),
-    has_hier_effs = TRUE,
-    levels_hier_effs = list(site = 1:3),
+    uses_par_sets = TRUE,
+    par_set_indices = list(site = 1:3),
     evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'f_d')
   ) %>%
@@ -375,7 +375,7 @@ hand_lams <- hand_pop_sizes[2:11] / hand_pop_sizes[1:10]
 ipmr_lams <- lambda(test_stoch_param, type_lambda = 'all') %>%
   as.vector()
 
-test_that("parameter resampled hierarchical models work", {
+test_that("parameter resampled par_setarchical models work", {
 
 
   expect_equal(hand_pop_sizes, ipmr_pop_sizes)
