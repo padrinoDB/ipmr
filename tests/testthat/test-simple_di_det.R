@@ -517,7 +517,7 @@ inv_logit <- function(int, slope, sv) {
   1 / (1 + exp(-(int + slope * sv)))
 }
 
-hier_mod <- init_ipm(sim_gen    = "simple",
+par_set_mod <- init_ipm(sim_gen    = "simple",
                      di_dd      = "di",
                      det_stoch  = "det") %>%
   define_kernel("P_yr",
@@ -528,8 +528,8 @@ hier_mod <- init_ipm(sim_gen    = "simple",
                 mu_g_yr = g_int + g_r_yr + g_slope * dbh_1,
                 data_list = data_list,
                 states = states,
-                has_hier_effs = TRUE,
-                levels_hier_effs = list(yr = 1:5),
+                uses_par_sets = TRUE,
+                par_set_indices = list(yr = 1:5),
                 evict_cor = TRUE,
                 evict_fun = truncated_distributions('norm',
                                                     'g_yr')
@@ -556,11 +556,11 @@ hier_mod <- init_ipm(sim_gen    = "simple",
            iterations = 100,
            normalize_pop_size = FALSE)
 
-lambdas_ipmr_pop   <- lambda(hier_mod)
+lambdas_ipmr_pop   <- lambda(par_set_mod)
 
 names(lambdas_ipmr_pop) <- paste("K_", 1:5, sep = "")
 
-test_that('hierarchical deterministic simulations work', {
+test_that('par_setarchical deterministic simulations work', {
 
   expect_equal(lambdas_ipmr_pop, lambdas_hand, tolerance = 1e-10)
 
@@ -568,7 +568,7 @@ test_that('hierarchical deterministic simulations work', {
 
 test_that("make_iter_kernel works", {
 
-  k_list <- make_iter_kernel(hier_mod) %>%
+  k_list <- make_iter_kernel(par_set_mod) %>%
     lapply(unclass)
 
   expect_equal(k_list[[1]], K_1)

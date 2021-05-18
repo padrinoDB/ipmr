@@ -65,8 +65,8 @@ your IPM.
 Once all parameters are estimated, the first step of defining a model in
 `ipmr` is to initialize the model using `init_ipm()`. This function has
 five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and
-`has_age`. We will ignore `has_age` for now, because age-size models are
-less common and have their [own
+`uses_age`. We will ignore `uses_age` for now, because age-size models
+are less common and have their [own
 vignette](https://levisc8.github.io/ipmr/articles/age_x_size.html).
 
 The combination of these arguments defines the type of IPM, and makes
@@ -118,14 +118,14 @@ possible entries for each argument are as follows:
 
     -   B. **param**: This describes an IPM with parameters that are
         re-sampled from some distribution at each iteration of the
-        model. This could be a multivariate normal defined by covarying
-        slopes and intercepts, or distributions of environmental
-        variables that change from time to time. All that is required is
-        that the parameters for the distribution are specified and that
-        the function that generates the parameters at each iteration
-        returns named lists that correspond to the parameter names in
-        the model. Examples of this are available in the Introduction
-        and General IPM vignettes.
+        model. For example, these could be a multivariate normal defined
+        by covarying slopes and intercepts, or distributions of
+        environmental variables that change from time to time. All that
+        is required is that the parameters for the distribution are
+        specified and that the function that generates the parameters at
+        each iteration returns named lists that correspond to the
+        parameter names in the model. Examples of this are available in
+        the Introduction and General IPM vignettes.
 
 The following possibilities are currently or will become available in
 `ipmr` (bold text denotes development progress):
@@ -182,7 +182,7 @@ Here is a simple model implemented with `ipmr`. This is a hypothetical
 plant species where plants can survive and grow (*P*(*z*′, *z*)), and
 reproduce sexually (*F*(*z*′, *z*)). There is no seed bank, and so there
 are no discrete traits in the model. We’ll use 4 regressions: survival
-(*s*(*z*)), growth (*G*(*z*′, *z*), *f*<sub>*g*</sub>), probability of
+(*s*(*z*)), growth (*G*(*z*′, *z*), *f*<sub>*G*</sub>), probability of
 reproducing (*r*<sub>*r*</sub>(*z*)), and number of seeds produced
 conditional on flowering (*r*<sub>*s*</sub>(*z*)). New recruits will be
 generated with a Gaussian distribution (denoted
@@ -191,7 +191,7 @@ and standard deviation of new recruits from the data. For simplicity,
 we’ll assume there’s no maternal effect on recruit size. First, we’ll
 write out the functional forms for each component of the model:
 
-1.  *n*(*z*′, *t* + 1) = ∫<sub>*L*</sub><sup>*U*</sup>*K*(*z*′, *z*)*n*(*z*, *t*)*d**z*
+1.  *n*(*z*′, *t* + 1) = ∫<sub>*L*</sub><sup>*U*</sup>*K*(*z*′, *z*)*n*(*z*, *t*)*dz*
 
 2.  *K*(*z*′, *z*) = *P*(*z*′, *z*) + *F*(*z*′, *z*)
 
@@ -199,9 +199,9 @@ write out the functional forms for each component of the model:
 
 4.  *L**o**g**i**t*(*s*(*z*)) = *α*<sub>*s*</sub> + *β*<sub>*s*</sub> \* *z*
 
-5.  *G*(*z*′, *z*) = *f*<sub>*g*</sub>(*μ*<sub>*g*</sub>, *σ*<sub>*g*</sub>)
+5.  *G*(*z*′, *z*) = *f*<sub>*G*</sub>(*μ*<sub>*G*</sub>, *σ*<sub>*G*</sub>)
 
-6.  *μ*<sub>*g*</sub> = *α*<sub>*g*</sub> + *β*<sub>*g*</sub> \* *z*
+6.  *μ*<sub>*G*</sub> = *α*<sub>*G*</sub> + *β*<sub>*G*</sub> \* *z*
 
 7.  *F*(*z*′, *z*) = *r*<sub>*r*</sub>(*z*) \* *r*<sub>*s*</sub>(*z*) \* *r*<sub>*d*</sub>(*z*′)
 
@@ -225,7 +225,7 @@ correspond to the functional forms described above:
     -   Example model formula:
         `glm(surv ~ size_1, data = my_surv_data, family = binomial())`
 
-2.  Growth (*G*(*z*′, *z*) / `g`): a linear model with a normal error
+2.  Growth (*G*(*z*′, *z*) / `G`): a linear model with a normal error
     distribution.
 
     -   Example model formula:
@@ -264,14 +264,14 @@ comments.
 
 library(ipmr)
 
-my_data_list = list(s_int     = -2.2,   # coefficients(my_surv_mod)[1]
+my_data_list = list(s_int     = -2.2,  # coefficients(my_surv_mod)[1]
                     s_slope   = 0.25,  # coefficients(my_surv_mod)[2]
                     g_int     = 0.2,   # coefficients(my_grow_mod)[1]
                     g_slope   = 0.99,  # coefficients(my_grow_mod)[2]
                     sd_g      = 0.7,   # sd(resid(my_grow_mod))
                     r_r_int   = 0.003, # coefficients(my_pr_flower_mod)[1]
                     r_r_slope = 0.015, # coefficients(my_pr_flower_mod)[2]
-                    r_s_int   = 0.45,   # coefficients(my_seed_mod)[1]
+                    r_s_int   = 0.45,  # coefficients(my_seed_mod)[1]
                     r_s_slope = 0.075, # coefficients(my_seed_mod)[2]
                     mu_fd     = 2,     # mean(recruit_data$size_next)
                     sd_fd     = 0.3)   # sd(recruit_data$size_next)
@@ -295,7 +295,7 @@ my_simple_ipm <- define_kernel(
   
   # The formula for the kernel. We dont need to tack on the "z'/z"s here.  
   
-  formula   = s * g,
+  formula   = s * G,
   
   # A named set of expressions for the vital rates it includes. 
   # note the use of user-specified functions here. Additionally, each 
@@ -312,7 +312,7 @@ my_simple_ipm <- define_kernel(
   # The SD is a constant, so we don't need to define that in ... expression, 
   # just the data_list.
   
-  g         = dnorm(dbh_2, mu_g, sd_g),
+  G         = dnorm(dbh_2, mu_g, sd_g),
   mu_g      = g_int + g_slope * dbh_1,
   
   
@@ -328,7 +328,7 @@ my_simple_ipm <- define_kernel(
   
   evict_cor = TRUE,
   evict_fun = truncated_distributions(fun    = 'norm',
-                                      target = 'g')
+                                      target = 'G')
   ) 
 
 my_simple_ipm <- define_kernel(
@@ -409,5 +409,5 @@ A more detailed introduction to `ipmr` is available in the Intro to ipmr
 article on this page. General IPM (ones with multiple continuous and/or
 discrete states) tutorials are also available there under the General
 IPMs article. Help with age × size models, density dependent models, and
-the suffix syntax are also available there. That’s all for now, happy
-modeling!
+the parameter set index syntax are also available there. That’s all for
+now, happy modeling!

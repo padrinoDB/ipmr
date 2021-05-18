@@ -192,7 +192,7 @@ f_fun <- function(age, s_age, pb_age, pr_age, recr) {
 
 # Implement the age x size model
 
-age_size_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
+age_size_ipm <- init_ipm("general_di_det", uses_age = TRUE) %>%
   define_kernel(
     name          = "P_age",
     family        = "CC",
@@ -202,8 +202,8 @@ age_size_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
     mu_g_age      = grow_int + grow_z * z_1 + grow_a * age,
     data_list     = param_list,
     states        = list(c("z")),
-    has_hier_effs = FALSE,
-    levels_ages   = list(age = c(0:20), max_age = 21),
+    uses_par_sets = FALSE,
+    age_indices   = list(age = c(0:20), max_age = 21),
     evict_cor     = FALSE
   ) %>%
   define_kernel(
@@ -217,8 +217,8 @@ age_size_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
     rcsz_mu       = rcsz_int + rcsz_z * z_1,
     data_list     = param_list,
     states        = list(c("z")),
-    has_hier_effs = FALSE,
-    levels_ages   = list(age = c(0:20), max_age = 21),
+    uses_par_sets = FALSE,
+    age_indices   = list(age = c(0:20), max_age = 21),
     evict_cor     = FALSE
   ) %>%
   define_k(
@@ -230,8 +230,8 @@ age_size_ipm <- init_ipm("general_di_det", has_age = TRUE) %>%
       P_max_age_minus_1 %*% n_z_max_age_minus_1_t,
     data_list          = param_list,
     states             = list (c("z")),
-    has_hier_effs      = FALSE,
-    levels_ages        = list(age = c(0:20), max_age = 21),
+    uses_par_sets      = FALSE,
+    age_indices        = list(age = c(0:20), max_age = 21),
     evict_cor          = FALSE
   ) %>%
   define_impl(

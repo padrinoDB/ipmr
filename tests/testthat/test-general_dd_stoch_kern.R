@@ -33,7 +33,7 @@ f_r_ints <- rnorm(3, sd = 2) %>%
   as.list() %>%
   setNames(paste("f_r_int_", LETTERS[1:3], sep = ""))
 
-data_list_hier <- c(data_list_control, g_ints, f_r_ints)
+data_list_par_set <- c(data_list_control, g_ints, f_r_ints)
 
 
 init_pop_vec <- runif(100)
@@ -51,9 +51,9 @@ gen_dd_stoch_co <- init_ipm(sim_gen    = "general",
     g_site           = dnorm(ht_2, g_mu_site, g_sd),
     g_mu_site        = g_int + g_int_site + g_slope * ht_1,
     states           = list(c("ht", "b")),
-    data_list        = data_list_hier,
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(site = LETTERS[1:3]),
+    data_list        = data_list_par_set,
+    uses_par_sets    = TRUE,
+    par_set_indices = list(site = LETTERS[1:3]),
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "g_site")
   ) %>%
@@ -64,9 +64,9 @@ gen_dd_stoch_co <- init_ipm(sim_gen    = "general",
     f_r_site         = plogis(f_r_int + f_r_int_site + f_r_slope * ht_1),
     f_s              = exp(f_s_int + f_s_slope * ht_1 + f_s_dd * sum(n_ht_t)),
     states           = list(c("ht", "b")),
-    data_list        = data_list_hier,
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(site = LETTERS[1:3]),
+    data_list        = data_list_par_set,
+    uses_par_sets    = TRUE,
+    par_set_indices = list(site = LETTERS[1:3]),
     evict_cor        = FALSE
   ) %>%
   define_kernel(
@@ -75,8 +75,8 @@ gen_dd_stoch_co <- init_ipm(sim_gen    = "general",
     formula       = e_p * f_d * d_ht,
     f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
     states        = list(c("ht", "b")),
-    data_list     = data_list_hier,
-    has_hier_effs = FALSE,
+    data_list     = data_list_par_set,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%

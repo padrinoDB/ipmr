@@ -7,9 +7,9 @@
 #'
 #' @details For \code{*_stoch_kern} models, this computes the element-wise
 #' mean for each sub-kernel across all the different levels of
-#' \code{levels_hier_effs}. For partially grouped models, sub-kernels that
-#' do not have time- or space-varying components are included in the output and
-#' are identical to their input.
+#' \code{par_set_indices}. For models where not all sub-kernels contain
+#' parameter set indices, sub-kernels that do not have varying
+#' parameters are included in the output and are identical to their input.
 #'
 #' For \code{*_stoch_param} models, this computes the element-wise mean for each
 #' sub-kernel created by the iteration procedure.
@@ -67,10 +67,10 @@ mean_kernel <- function(ipm) {
     kern_nm <- unique(base_nms)[i]
     p_row   <- proto[proto$kernel_id == kern_nm, ]
 
-    # If there aren't hierarachical effects, then we don't really
+    # If there aren't par_setarachical effects, then we don't really
     # need to compute anything - there's just 1 version of the sub-kernel.
 
-    if(!p_row$has_hier_effs) {
+    if(!p_row$uses_par_sets) {
 
       use_nm    <- paste("mean_", kern_nm, sep = "")
 
@@ -84,11 +84,11 @@ mean_kernel <- function(ipm) {
     # otherwise - we generate exact names for each set of sub-kernels, extract them
     # from the sub_kernel list, and then compute the point-wise mean.
 
-    levs     <- .make_hier_levels(p_row$levels_hier_effs)
+    levs     <- .make_par_set_indices(p_row$par_set_indices)
 
     kern_nms <- character(length(levs))
 
-    to_sub   <- names(p_row$levels_hier_effs[[1]]) %>%
+    to_sub   <- names(p_row$par_set_indices[[1]]) %>%
       .[!. %in% "to_drop"] %>%
       paste(collapse = "_")
 
@@ -129,12 +129,12 @@ mean_kernel <- function(ipm) {
     kern_nm <- unique(base_nms)[i]
     p_row   <- proto[proto$kernel_id == kern_nm, ]
 
-    # If there aren't hierarachical effects, then we still need to compute
+    # If there aren't par_setarachical effects, then we still need to compute
     # the mean of all iterations. The kernels will always have _it_x appended
     # to them to distinguish them from each other, so we create those labels,
     # then subset the kernel list w exact name matching
 
-    if(!p_row$has_hier_effs) {
+    if(!p_row$uses_par_sets) {
 
       use_nm    <- paste("mean_", kern_nm, sep = "")
 
@@ -159,7 +159,7 @@ mean_kernel <- function(ipm) {
                   seq(1, n_its, by = 1),
                   sep = "_")
 
-    to_sub   <- names(p_row$levels_hier_effs[[1]]) %>%
+    to_sub   <- names(p_row$par_set_indices[[1]]) %>%
       .[!"to_drop" %in% .] %>%
       paste(collapse = "_")
 

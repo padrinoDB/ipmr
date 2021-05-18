@@ -103,7 +103,7 @@
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/suffix-notation.html">Suffix Notation</a>
+      <a href="../articles/index-notation.html">Index Notation in ipmr</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -168,6 +168,7 @@
   bw <span class='op'>=</span> <span class='cn'>FALSE</span>,
   do_contour <span class='op'>=</span> <span class='cn'>FALSE</span>,
   do_legend <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  contour_cex <span class='op'>=</span> <span class='fl'>1</span>,
   <span class='va'>...</span>
 <span class='op'>)</span>
 
@@ -255,6 +256,11 @@ on the plot</p></td>
       <td><p>A logical indicating whether to draw a legend for the plot</p></td>
     </tr>
     <tr>
+      <th>contour_cex</th>
+      <td><p>A numeric specifying how large to make labels for the
+contour lines.</p></td>
+    </tr>
+    <tr>
       <th>...</th>
       <td><p>further arguments passed to legend</p></td>
     </tr>
@@ -267,9 +273,9 @@ number can help visualize kernels that are overwhelmed by a few very large numbe
       <th>mega_mat</th>
       <td><p>A vector with symbols, I's, and/or 0s representing the matrix blocks.
 They should be specified in ROW MAJOR order! Can also be a character
-string specifying the call. Suffix syntax is supported. When used,
-<code>format_mega_matrix</code> will produce as many mega-matrices as there are
-combinations of <code>levels_hier_effs</code> in the <code>proto_ipm</code>.</p></td>
+string specifying the call. Parameter set index syntax is supported. When used,
+<code>format_mega_kernel</code> will produce as many mega-matrices as there are
+combinations of <code>par_set_indices</code> in the <code>proto_ipm</code>.</p></td>
     </tr>
     </table>
 
@@ -278,9 +284,7 @@ combinations of <code>levels_hier_effs</code> in the <code>proto_ipm</code>.</p>
     <p><code>A</code> or <code>ipm</code> invisibly</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>plot.ipmr_matrix</code> is intended for internal use only, and it
-is usually safer to use <code>plot.*_ipm</code> methods for visualizing kernels.
-If an IPM kernel is overwhelmed by information in say, a fecundity sub-kernel,
+    <p>If an IPM kernel is overwhelmed by information in say, a fecundity sub-kernel,
 use the <code>exponent</code> argument in <code>plot.*_ipm</code> to make it more visually
 appealing.</p>
 

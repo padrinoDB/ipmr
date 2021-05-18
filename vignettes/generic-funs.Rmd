@@ -32,7 +32,7 @@ knitr::opts_chunk$set(
 
 ## Miscellaneous helpers
 
-- [`format_mega_matrix()`](https://levisc8.github.io/ipmr/reference/format_mega_matrix.html)
+- [`format_mega_kernel()`](https://levisc8.github.io/ipmr/reference/format_mega_kernel.html)
 
 - [`use_vr_model()`](https://levisc8.github.io/ipmr/reference/predict_methods.html)
 

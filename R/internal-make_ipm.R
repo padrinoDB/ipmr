@@ -298,15 +298,6 @@
 
     temp <- rlang::eval_tidy(env_funs[[i]])
 
-    # Catches the PADRINO case where the function slips through and requires
-    # direct execution.
-
-    if(rlang::is_function(temp)) {
-
-        temp <- rlang::exec(temp)
-
-    }
-
     rlang::env_bind(main_env, !!! temp)
 
     # This creates a list containing the same values so that .update_env_output
@@ -314,10 +305,22 @@
 
     ass_nm <- nms[i]
 
-    env_param_list <- rlang::list2(!! ass_nm := temp)
+    env_param_list <- rlang::list2(!! ass_nm := temp) %>%
+      .flatten_to_depth(1L)
 
-    assign(ass_nm, env_param_list, envir = main_env)
+    # This handles binding values when expressions are supplied rather
+    # than functions. This is always the case in PADRINO, and may be the case
+    # for interactive use as well.
 
+    if(all(names(env_funs)[i] %in% names(env_param_list))){
+
+      rlang::env_bind(main_env, !!! env_param_list)
+
+    } else {
+
+      assign(ass_nm, env_param_list, envir = main_env)
+
+    }
   }
 
   return(main_env)
@@ -349,7 +352,7 @@
 
   # Flatten and drop duplicates. Duplication is likely to occur in simple_*
   # ipms because every kernel will have the same population state associated
-  # with it. General IPMs with hierarchical effects, on the other hand, will need
+  # with it. General IPMs with parameter sets, on the other hand, will need
   # different population states for almost every kernel row.
 
   pop_state <- .flatten_to_depth(others$pop_state, 1L)
@@ -680,7 +683,7 @@
   domain_list <- domain_list[ ! rm_ind ]
 
   # This next bit guarantees that d_1 comes before d_2 every time.
-  # testing partially hierarchical models produced a bug where d_2
+  # testing partially par_setarchical models produced a bug where d_2
   # can occur before d_1 in the names of this list in one very specific, but
   # potentially not-uncommon case where the first non-NA domain name in domain_list
   # d_2
@@ -876,10 +879,10 @@
 
 .make_internal_seq <- function(proto, iterations) {
 
-  hier_effs <- proto$levels_hier_effs[proto$has_hier_effs]
-  hier_effs <- hier_effs[!duplicated(hier_effs)]
+  par_sets <- proto$par_set_indices[proto$uses_par_sets]
+  par_sets <- par_sets[!duplicated(par_sets)]
 
-  opts <- .make_hier_levels(hier_effs)
+  opts <- .make_par_set_indices(par_sets)
 
   out  <- sample(opts, size = iterations, replace = TRUE)
 
@@ -908,7 +911,7 @@
 
   nms_test <- logical(length(unique(kernel_seq)))
 
-  pos_ids  <- proto[proto$has_hier_effs, ]
+  pos_ids  <- proto[proto$uses_par_sets, ]
 
   for(i in seq_along(unique(kernel_seq))) {
 
@@ -1067,7 +1070,7 @@
 }
 
 #' @noRd
-# Returns a list with entries others and k_row with hier_effs split out
+# Returns a list with entries others and k_row with par_sets split out
 # Checks ipm definition
 
 .initialize_kernels.default <- function(proto_ipm, iterate, iter_dir) {
@@ -1080,13 +1083,13 @@
 
   k_row <- .init_iteration(proto_ipm, iterate, direction = iter_dir)
 
-  # If vital rates are fit with a hierarchical model of any kind,
+  # If vital rates are fit with a par_setarchical model of any kind,
   # then split those out into their respective years/plots/what-have-you
 
-  if(any(proto_ipm$has_hier_effs)) {
+  if(any(proto_ipm$uses_par_sets)) {
 
-    others <- .split_hier_effs(proto_ipm)
-    k_row  <- .split_hier_effs(k_row)
+    others <- .split_par_sets(proto_ipm)
+    k_row  <- .split_par_sets(k_row)
 
   } else {
 
@@ -1124,18 +1127,18 @@
   if(iterate){
     k_row  <- .make_age_k_row(k_row)
 
-    if(any(k_row$has_hier_effs)) {
+    if(any(k_row$uses_par_sets)) {
 
-      k_row  <- .split_hier_effs(k_row)
+      k_row  <- .split_par_sets(k_row)
 
     }
   }
 
   others <- .split_sub_kern_ages(proto_ipm)
 
-  if(any(others$has_hier_effs)) {
+  if(any(others$uses_par_sets)) {
 
-    others <- .split_hier_effs(others)
+    others <- .split_par_sets(others)
 
   }
 
@@ -1465,14 +1468,14 @@ set_ipmr_classes <- function(to_set, cls = NULL) {
   state_nms <- paste("n_", possible_states, "_t", sep = "")
   to_sub    <- paste("as.vector(pop_state_", possible_states, "_t)", sep = "")
 
-  if(any(proto$has_hier_effs)) {
+  if(any(proto$uses_par_sets)) {
 
-    hier_effs <- proto$levels_hier_effs %>%
+    par_sets <- proto$par_set_indices %>%
       .flatten_to_depth(1L) %>%
       .[!duplicated(names(.))]
 
-    levs <- .make_hier_levels(hier_effs)
-    nms  <- names(hier_effs)[!names(hier_effs) %in% "to_drop"] %>%
+    levs <- .make_par_set_indices(par_sets)
+    nms  <- names(par_sets)[!names(par_sets) %in% "to_drop"] %>%
       paste(collapse = "_")
 
     new_stn <- character()

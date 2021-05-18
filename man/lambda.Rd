@@ -60,7 +60,7 @@ of the log'd per-capita growth rate from each time step.}
 }
 \value{
 When \code{type_lambda = "all"}, an array. Rows correspond to time
-steps, and columns correspond to grouping effects (if any). For other types,
+steps, and columns correspond to parameter sets (if any). For other types,
 a numeric vector.
 }
 \description{

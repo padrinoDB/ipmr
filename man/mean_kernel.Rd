@@ -19,9 +19,9 @@ parameter re-sampled and stochastic kernel re-sampled models.
 \details{
 For \code{*_stoch_kern} models, this computes the element-wise
 mean for each sub-kernel across all the different levels of
-\code{levels_hier_effs}. For partially grouped models, sub-kernels that
-do not have time- or space-varying components are included in the output and
-are identical to their input.
+\code{par_set_indices}. For models where not all sub-kernels contain
+parameter set indices, sub-kernels that do not have varying
+parameters are included in the output and are identical to their input.
 
 For \code{*_stoch_param} models, this computes the element-wise mean for each
 sub-kernel created by the iteration procedure.

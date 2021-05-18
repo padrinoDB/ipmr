@@ -43,8 +43,8 @@ x <- init_ipm(sim_gen    = "simple",
     g_mu_yr          = g_int + g_r_yr + g_slope * size_1,
     data_list        = params,
     states           = list(c("size")),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(yr = 1:5),
+    uses_par_sets    = TRUE,
+    par_set_indices = list(yr = 1:5),
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "g_yr")
   ) %>%
@@ -57,8 +57,8 @@ x <- init_ipm(sim_gen    = "simple",
     f_d              = dnorm(size_2, mu_fd, sd_fd),
     data_list        = params,
     states           = list(c("size")),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(yr = 1:5),
+    uses_par_sets    = TRUE,
+    par_set_indices = list(yr = 1:5),
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "f_d")
   ) %>%

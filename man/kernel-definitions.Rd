@@ -12,9 +12,9 @@ define_kernel(
   ...,
   data_list = list(),
   states,
-  has_hier_effs = FALSE,
-  levels_hier_effs = list(),
-  levels_ages = list(),
+  uses_par_sets = FALSE,
+  par_set_indices = list(),
+  age_indices = list(),
   evict_cor = FALSE,
   evict_fun = NULL,
   integrate = TRUE
@@ -33,7 +33,7 @@ transitions, \code{"DC"} for discrete to continuous (e.g. emergence from a seedb
 discrete to discrete (e.g. stasis in a seedbank).}
 
 \item{...}{A set of named expressions that correspond
-to vital rates in \code{formula}. Suffix expansion of hierarchical models is supported.}
+to vital rates in \code{formula}. Parameter set index syntax is supported.}
 
 \item{data_list}{A list of named values that correspond to constants in the formula
 and vital rate expressions in \code{...}.}
@@ -41,16 +41,17 @@ and vital rate expressions in \code{...}.}
 \item{states}{A list with character vector containing the names of each state
 variable used in the kernel.}
 
-\item{has_hier_effs}{A logical indicating whether or not the kernel and/or its
-underlying vital rates are structured with hierarchical effects. See the
-introduction vignette for this feature for more details (\code{vignettes(
-'ipmr-introduction', package = 'ipmr')}).}
+\item{uses_par_sets}{A logical indicating whether or not the parameters in the kernel and/or its
+underlying vital rates are derived from sets. See the
+introduction vignette for this feature for more details
+(\code{vignettes(ipmr-introduction', package = 'ipmr')}, and
+\code{vignettes( index-notation', package = 'ipmr')}).}
 
-\item{levels_hier_effs}{A named list with vectors corresponding to the various levels
-the hierarchical variable can take. The names should match the suffixes used
+\item{par_set_indices}{A named list with vectors corresponding to the values
+the index variable can take. The names should match the suffixes used
 in the vital rate expressions.}
 
-\item{levels_ages}{If \code{init_ipm(has_age = TRUE)}, a list with possibly
+\item{age_indices}{If \code{init_ipm(uses_age = TRUE)}, a list with possibly
 2 entries: 1. \code{"age"}: the range
 of possible ages in the model and, optionally, 2. \code{"max_age"}: the maximum
 age individuals in the model can attain. Otherwise, not used.}
@@ -78,8 +79,8 @@ Adds a new kernel to the \code{proto_ipm} structure.
 \details{
 Different classes of IPMs may have many or only a few kernels. Each
 one requires its own call to \code{define_kernel}, though there are some exceptions,
-namely for kernels derived for models with grouping effects (e.g. vital rate models
-fit across plots and years).
+namely for kernels derived for models derived from parameter sets (e.g. vital
+rate models fit across plots and years).
 
 A much more complete overview of how to generate kernels is provided in
 \code{vignette("ipmr-introduction", "ipmr")}.

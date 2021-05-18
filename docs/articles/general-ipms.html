@@ -62,7 +62,7 @@
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/suffix-notation.html">Suffix Notation</a>
+      <a href="../articles/index-notation.html">Index Notation in ipmr</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -106,7 +106,7 @@
 
       
 
-      </header><script src="general-ipms_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
+      </header><script src="general-ipms_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>General IPMs</h1>
@@ -141,16 +141,16 @@
 <div id="mathematical-overview-of-the-example" class="section level3">
 <h3 class="hasAnchor">
 <a href="#mathematical-overview-of-the-example" class="anchor"></a>Mathematical overview of the example</h3>
-<p>This example will use an IPM for <em>Ligustrum obtusifolium</em>, a tree species that is now invasive in North America. Data were collected outside of St. Louis, Missouri, and the full model is described in <a href="https://esajournals.onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1002%2Fecy.2681&amp;file=ecy2681-sup-0002-MetadataS1.pdf">Levin et al. 2019</a>. The IPM consists of a single discrete stage (seed bank, abbreviated <code>b</code>) and a single continuous state (height, abbreviated <code>ht</code>/<span class="math inline">\(z,z'\)</span>). Reproduction is time-lagged so all seeds must enter the seed bank. They can either germinate in the next year, or they can die (so <code>stay_discrete</code> = 0). Thus, the full model takes the following form:</p>
+<p>This example will use an IPM for <em>Ligustrum obtusifolium</em>, a tree species that is now invasive in North America. Data were collected outside of St. Louis, Missouri, and the full model is described in <a href="https://esajournals.onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1002%2Fecy.2681&amp;file=ecy2681-sup-0002-MetadataS1.pdf">Levin et al. 2019</a>. The IPM consists of a single discrete stage (seed bank, abbreviated <code>b</code>) and a single continuous state (height, abbreviated <code>ht</code>/<span class="math inline">\(z,z'\)</span>). The census timing was such that all seeds must enter the seed bank. They can either germinate in the next year, or they can die (so <code>stay_discrete</code> = 0). Thus, the full model takes the following form:</p>
 <ol style="list-style-type: decimal">
 <li><p><span class="math inline">\(n(z', t + 1) = \int_L^U P(z', z) n(z,t)d\mathrm{z} + b(t) * \int_L^U leave\_discrete(z') \mathrm{dz'}\)</span></p></li>
 <li><p><span class="math inline">\(b(t + 1) = \int_L^Ugo\_discrete(z) n(z,t)d\mathrm{z}+ stay\_discrete\)</span></p></li>
-<li><p><span class="math inline">\(P(z',z) = s(z) * g(z',z)\)</span></p></li>
+<li><p><span class="math inline">\(P(z',z) = s(z) * G(z',z)\)</span></p></li>
 <li><p><span class="math inline">\(go\_discrete(z) = f_s(z) * f_r(z) * g_i\)</span></p></li>
 <li><p><span class="math inline">\(leave\_discrete(z') = e_p * f_d(z')\)</span></p></li>
 <li><p><span class="math inline">\(stay\_discrete = 0\)</span></p></li>
 </ol>
-<p><span class="math inline">\(f_g\)</span> and <span class="math inline">\(f_{r_d}\)</span> denote normal probability density functions. The vital rates functions and example code to fit them are:</p>
+<p><span class="math inline">\(f_G\)</span> and <span class="math inline">\(f_{r_d}\)</span> denote Normal probability density functions. The vital rates functions and example code to fit them are:</p>
 <ol style="list-style-type: decimal">
 <li>
 <p>survival (<code>s</code>): A logistic regression with a squared term</p>
@@ -166,8 +166,8 @@
 <li>
 <p>Mathematical form:</p>
 <ul>
-<li><p><span class="math inline">\(\mu_g = \alpha_g + \beta_g * z\)</span></p></li>
-<li><p><span class="math inline">\(g(z',z) = f_g(\mu_g, \sigma_g)\)</span></p></li>
+<li><p><span class="math inline">\(\mu_G = \alpha_G + \beta_G * z\)</span></p></li>
+<li><p><span class="math inline">\(G(z',z) = f_G(\mu_G, \sigma_G)\)</span></p></li>
 </ul>
 </li>
 </ul>
@@ -265,7 +265,7 @@
     s             <span class="op">=</span> <span class="fu">inv_logit_2</span><span class="op">(</span><span class="va">s_int</span>, <span class="va">s_slope</span>, <span class="va">s_slope_2</span>, <span class="va">ht_1</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">data_list</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">'norm'</span>,
                                             <span class="st">'g'</span><span class="op">)</span>
@@ -285,7 +285,7 @@
     <span class="co"># "creates" seeds entering the seedbank</span>
     
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name    <span class="op">=</span> <span class="st">'stay_discrete'</span>,
@@ -323,7 +323,7 @@
     <span class="co"># Again, we need to add "b" to the states list</span>
     
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">'norm'</span>,
                                             <span class="st">'r_d'</span><span class="op">)</span>
@@ -423,6 +423,8 @@
   
   <span class="va">I</span>     <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">P</span><span class="op">)</span><span class="op">)</span>
   <span class="va">N</span>     <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html">solve</a></span><span class="op">(</span><span class="va">I</span> <span class="op">-</span> <span class="va">P</span><span class="op">)</span>
+  
+  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span>
 <span class="op">}</span>
 
 <span class="va">eta_bar</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ipm</span><span class="op">)</span> <span class="op">{</span>
@@ -438,7 +440,7 @@
   
   <span class="va">N</span>     <span class="op">&lt;-</span> <span class="fu">make_N</span><span class="op">(</span><span class="va">ipm</span><span class="op">)</span>  
 
-  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">colSums</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="va">N</span> <span class="op">%^%</span> <span class="fl">2L</span> <span class="op">-</span> <span class="va">N</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">colSums</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="op">^</span> <span class="fl">2</span>
+  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">colSums</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="op">(</span><span class="va">N</span> <span class="op">%^%</span> <span class="fl">2L</span><span class="op">)</span> <span class="op">-</span> <span class="va">N</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">colSums</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="op">^</span> <span class="fl">2</span>
   
   <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/vector.html">as.vector</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span>
@@ -460,16 +462,17 @@
 <h2 class="hasAnchor">
 <a href="#general-models-for-discretely-varying-environments" class="anchor"></a>General models for discretely varying environments</h2>
 <p>Discretely varying parameters can be used to construct general IPMs with little additional effort. These are typically the result of fitting a set of fixed effects vital rate models that include both continuous predictors for size/state and categorical variables like treatment or maturation state. They can also result from mixed effects models, for example, working with conditional modes for a random intercept corresponding to year or site.</p>
+<p><code>ipmr</code> refers to these as <em>parameter sets</em>, and abbreviates them <code>par_sets</code>. For example, a random intercept for year may be denoted <span class="math inline">\(\alpha_{yr}\)</span>, where <span class="math inline">\(_{yr}\)</span> provides an index for the different values that <span class="math inline">\(\alpha\)</span> can take on.</p>
 <p>If you’ve already read the Intro to <code>ipmr</code> article and the example above, then there aren’t any new concepts to introduce here. Below is an example showing how all of these come together.</p>
 <div id="mathematical-overview-of-the-example-1" class="section level3">
 <h3 class="hasAnchor">
 <a href="#mathematical-overview-of-the-example-1" class="anchor"></a>Mathematical overview of the example</h3>
-<p>We’ll use a variation of the model above, simulating some random year-specific intercepts for growth and seed production. Parameters, functions, and kernels that are now time varying have a superscript, <span class="math inline">\(yr\)</span> appended to them.</p>
+<p>We’ll use a variation of the model above, simulating some random year-specific intercepts for growth and seed production. Parameters, functions, and kernels that are now time varying have a subscript <span class="math inline">\(x_{yr}\)</span> appended to them.</p>
 <ol style="list-style-type: decimal">
-<li><p><span class="math inline">\(n(z', t + 1) = \int_L^U P^{yr}(z', z) n(z,t)d\mathrm{z} + b(t) * \int_L^U leave\_discrete(z') \mathrm{dz'}\)</span></p></li>
-<li><p><span class="math inline">\(b(t + 1) = \int_L^Ugo\_discrete^{yr}(z) n(z,t)d\mathrm{z}+ stay\_discrete\)</span></p></li>
-<li><p><span class="math inline">\(P^{yr}(z',z) = s(z) * g^{yr}(z',z)\)</span></p></li>
-<li><p><span class="math inline">\(go\_discrete^{yr}(z) = r_s^{yr}(z) * r_r(z) * g_i\)</span></p></li>
+<li><p><span class="math inline">\(n(z', t + 1) = \int_L^U P_{yr}(z', z) n(z,t)d\mathrm{z} + b(t) * \int_L^U leave\_discrete(z') \mathrm{dz'}\)</span></p></li>
+<li><p><span class="math inline">\(b(t + 1) = \int_L^Ugo\_discrete_{yr}(z) n(z,t)d\mathrm{z}+ stay\_discrete\)</span></p></li>
+<li><p><span class="math inline">\(P_{yr}(z',z) = s(z) * G_{yr}(z',z)\)</span></p></li>
+<li><p><span class="math inline">\(go\_discrete_{yr}(z) = r_{s,yr}(z) * r_r(z) * g_i\)</span></p></li>
 <li><p><span class="math inline">\(leave\_discrete(z') = e_p * r_d(z')\)</span></p></li>
 <li><p><span class="math inline">\(stay\_discrete = 0\)</span></p></li>
 </ol>
@@ -483,14 +486,14 @@
 </ul>
 </li>
 <li>
-<p>growth (<code>g</code>): A linear mixed effects regression. <span class="math inline">\(f_g\)</span> denotes a normal probability density function.</p>
+<p>growth (<code>g</code>): A linear mixed effects regression. <span class="math inline">\(f_G\)</span> denotes a normal probability density function.</p>
 <ul>
 <li><p>example code: <code>lmer(ht_2 ~ ht_1 + (1 | year), data = grow_data)</code></p></li>
 <li>
 <p>Mathematical form:</p>
 <ul>
-<li><p><span class="math inline">\(\mu_g^{yr} = \alpha_g + \alpha_{g}^{yr} + \beta_g * z\)</span></p></li>
-<li><p><span class="math inline">\(g^{yr}(z',z) = f_g(\mu_g^{yr}, \sigma_g)\)</span></p></li>
+<li><p><span class="math inline">\(\mu_{G,yr} = \alpha_G + \alpha_{G,yr} + \beta_G * z\)</span></p></li>
+<li><p><span class="math inline">\(G_{yr}(z',z) = f_G(z', \mu_{G,yr}, \sigma_G)\)</span></p></li>
 </ul>
 </li>
 </ul>
@@ -506,14 +509,14 @@
 <p>seed production (<code>r_s</code>): A Poisson mixed effects regression</p>
 <ul>
 <li><p>example code: <code>glmer(seeds ~ ht_1 + (1 | year), data = my_seed_data, family = poisson())</code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(Log(r_s^{yr}(z)) = \alpha_{r_s} + \alpha_{r_s}^{yr} + \beta_{r_s} * z\)</span></p></li>
+<li><p>Mathematical form: <span class="math inline">\(Log(r_{s,yr}(z)) = \alpha_{r_s} + \alpha_{r_s, yr} + \beta_{r_s} * z\)</span></p></li>
 </ul>
 </li>
 <li>
 <p>Recruit size distribution (<code>r_d</code>): A normal distribution (<span class="math inline">\(f_{r_d}\)</span>) with mean <code>r_d_mu</code> and standard deviation <code>r_d_sd</code>.</p>
 <ul>
 <li><p>example code: <code>r_d_mu &lt;- mean(my_recr_data$ht_2, na.rm = TRUE)</code> and <code>r_d_sd &lt;- sd(my_recr_data$ht_2, na.rm = TRUE)</code>.</p></li>
-<li><p>Mathematical form: <span class="math inline">\(r_d(z') = f_{r_d}(\mu_{r_d}, \sigma_{r_d})\)</span></p></li>
+<li><p>Mathematical form: <span class="math inline">\(r_d(z') = f_{r_d}(z', \mu_{r_d}, \sigma_{r_d})\)</span></p></li>
 </ul>
 </li>
 <li>
@@ -529,7 +532,7 @@
 <h3 class="hasAnchor">
 <a href="#model-parameterization" class="anchor"></a>Model parameterization</h3>
 <p>In the next chunk, we’ll set up the data list with all of our constants and make sure the names are what we want them to be. This example generates intercepts for 5 years of data. This can be altered according to your own needs. Then, we’ll define a couple functions to make the vital rate expressions easier to write.</p>
-<p>A key aspect here is setting the names on the time-varying parameters in the <code>data_list</code>. We are using the form <code>"g_int_year"</code>, and substituting the values that <code>"year"</code> can take in for the actual suffix. These don’t need to be numbers, they can be words, letters, or some combination of the two. For this example, the years will be represented with the values <code>1:5</code>. If we wanted to denote the actual years of the censuses, we could switch <code>1:5</code> to, for example, <code>2002:2006</code>.</p>
+<p>A key aspect here is setting the names on the time-varying parameters in the <code>data_list</code>. We are using the form <code>"g_int_year"</code>, and substituting the values that <code>"year"</code> can take in for the actual index. These don’t need to be numbers, they can be words, letters, or some combination of the two. For this example, the years will be represented with the values <code>1:5</code>. If we wanted to denote the actual years of the censuses, we could switch <code>1:5</code> to, for example, <code>2002:2006</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
 
@@ -587,7 +590,7 @@
 <span class="va">inv_logit_2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">int</span>, <span class="va">slope</span>, <span class="va">slope_2</span>, <span class="va">sv</span><span class="op">)</span> <span class="op">{</span>
   <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">int</span> <span class="op">+</span> <span class="va">slope</span> <span class="op">*</span> <span class="va">sv</span> <span class="op">+</span> <span class="va">slope_2</span> <span class="op">*</span> <span class="va">sv</span> <span class="op">^</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<p>Next, we will set up our sub-kernels. We’ll append the <code>_year</code> suffix to the kernel <code>name</code>, the vital rate expressions and parameter values that have time-varying components (<code>g_year</code>, <code>f_s_year</code>, <code>g_int_year</code>, <code>f_s_int_year</code>), and the call to <code>truncated_distributions</code> so that the growth kernel is correctly specified. We’ll also pass a <code>list(year = 1:5))</code> into the <code>levels_hier_effs</code> argument of <code><a href="../reference/define_kernel.html">define_kernel()</a></code>. When building the model, <code><a href="../reference/make_ipm.html">make_ipm()</a></code> automatically expands these expressions to create 5 different expressions containing the various levels of <code>year</code>.</p>
+<p>Next, we will set up our sub-kernels. We’ll append the <code>_year</code> suffix to the kernel <code>name</code>, the vital rate expressions and parameter values that have time-varying components (<code>g_year</code>, <code>f_s_year</code>, <code>g_int_year</code>, <code>f_s_int_year</code>), and the call to <code>truncated_distributions</code> so that the growth kernel is correctly specified. We’ll also pass a <code>list(year = 1:5))</code> into the <code>par_set_indices</code> argument of <code><a href="../reference/define_kernel.html">define_kernel()</a></code>. When building the model, <code><a href="../reference/make_ipm.html">make_ipm()</a></code> automatically expands these expressions to create 5 different expressions containing the various levels of <code>year</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">general_stoch_kern_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"general"</span>,
                                    di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
@@ -595,9 +598,9 @@
                                    kern_param <span class="op">=</span> <span class="st">"kern"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     
-    <span class="co"># The kernel name gets a _year added to it to denote that there</span>
+    <span class="co"># The kernel name gets indexed by _year to denote that there</span>
     <span class="co"># are multiple possible kernels we can build with our parameter set.</span>
-    <span class="co"># The _year gets substituted by the names of the possible levels in the </span>
+    <span class="co"># The _year gets substituted by the values in "par_set_indices" in the </span>
     <span class="co"># output, so in this example we will have P_1, P_2, P_3, P_4, and P_5</span>
     
     name          <span class="op">=</span> <span class="st">"P_year"</span>,
@@ -616,11 +619,11 @@
     data_list        <span class="op">=</span> <span class="va">all_params</span>,
     states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span><span class="op">)</span><span class="op">)</span>,
     
-    <span class="co"># We set has_hier_effs to TRUE, signalling that we want to expand these</span>
-    <span class="co"># expressions across all levels of levels_hier_effs.</span>
+    <span class="co"># We set uses_par_sets to TRUE, signalling that we want to expand these</span>
+    <span class="co"># expressions across all levels of par_set_indices.</span>
     
-    has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
-    levels_hier_effs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,
+    uses_par_sets    <span class="op">=</span> <span class="cn">TRUE</span>,
+    par_set_indices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,
     evict_cor        <span class="op">=</span> <span class="cn">TRUE</span>,
     
     <span class="co"># we also add the suffix to `target` here, because the value modified by </span>
@@ -631,7 +634,7 @@
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     
-    <span class="co"># again, we append the suffix to the kernel name, vital rate expressions,</span>
+    <span class="co"># again, we append the index to the kernel name, vital rate expressions,</span>
     <span class="co"># and in the model formula.</span>
     
     name          <span class="op">=</span> <span class="st">"go_discrete_year"</span>,
@@ -645,13 +648,12 @@
     r_s_year      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">r_s_int_year</span> <span class="op">+</span> <span class="va">r_s_slope</span> <span class="op">*</span> <span class="va">ht_1</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">all_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
-    levels_hier_effs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>
+    uses_par_sets    <span class="op">=</span> <span class="cn">TRUE</span>,
+    par_set_indices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     
-    <span class="co"># This kernel has no time-varying parameters, and so does not require a suffix</span>
-    <span class="co"># appended to it.</span>
+    <span class="co"># This kernel has no time-varying parameters, and so is not indexed.</span>
     
     name    <span class="op">=</span> <span class="st">'stay_discrete'</span>,
     
@@ -668,12 +670,12 @@
     <span class="co"># This kernel has no time-varying parameters, so we don't need to designate</span>
     <span class="co"># it as such.</span>
     
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor <span class="op">=</span> <span class="cn">FALSE</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
 
-    <span class="co"># This kernel also doesn't get a suffix, because there are no varying parameters.</span>
+    <span class="co"># This kernel also doesn't get a index, because there are no varying parameters.</span>
     
     name          <span class="op">=</span> <span class="st">'leave_discrete'</span>,
     formula       <span class="op">=</span> <span class="va">e_p</span> <span class="op">*</span> <span class="va">r_d</span> <span class="op">*</span> <span class="va">d_ht</span>,
@@ -681,7 +683,7 @@
     family        <span class="op">=</span> <span class="st">'DC'</span>,
     data_list     <span class="op">=</span> <span class="va">all_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">'norm'</span>,
                                             <span class="st">'r_d'</span><span class="op">)</span>
@@ -722,10 +724,10 @@
 <li><p><code>env_seq</code>: This contains a character vector which shows the sequence in which levels of the time-varying components were chosen during model iteration. We could use this reproduce the model outputs later.</p></li>
 <li><p><code>pop_state$lambda</code>: This shows the single timestep per-capita growth rates for the simulation.</p></li>
 </ol>
-<p>Additionally, there are functions to compute the stochastic population growth rate (<span class="math inline">\(\lambda_s\)</span>, computed as <code><a href="https://rdrr.io/r/base/mean.html">mean(log(pop_state$lambda))</a></code> with the first 10% of iterations removed as burn-in), and the mean sub-kernels.</p>
+<p>Additionally, there are functions to compute the stochastic population growth rate (<span class="math inline">\(\lambda_s\)</span>, computed as <code><a href="https://rdrr.io/r/base/mean.html">mean(log(pop_state$lambda))</a></code>, burn in can be controlled with the <code>burn_in</code> parameter), and the mean sub-kernels.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mean_kernels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mean_kernel.html">mean_kernel</a></span><span class="op">(</span><span class="va">general_stoch_kern_ipm</span><span class="op">)</span>
-<span class="va">lam_s</span>        <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">general_stoch_kern_ipm</span><span class="op">)</span></code></pre></div>
+<span class="va">lam_s</span>        <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">general_stoch_kern_ipm</span>, burn_in <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span> <span class="co"># Remove first 15% of iterations</span></code></pre></div>
 </div>
 </div>
 <div id="general-models-with-continuously-varying-environments" class="section level2">
@@ -737,10 +739,10 @@
 <a href="#mathematical-overview" class="anchor"></a>Mathematical overview</h3>
 <p>This example includes survival and growth models that make use of environmental covariates. The model can be written as:</p>
 <ol style="list-style-type: decimal">
-<li><p><span class="math inline">\(n(z', t+1) = \int_L^U K(z',z, \theta)n(z,t)dz + B(t) * r_s * r_d * \int_L^Uf_d(z')dz'\)</span></p></li>
+<li><p><span class="math inline">\(n(z', t+1) = \int_L^U K(z',z, \theta)n(z,t)dz + B(t) * r_s * r_d * \int_L^Uf_{c_d}(z')dz'\)</span></p></li>
 <li><p><span class="math inline">\(B(t + 1) = r_e * r_s * \int_L^U c_r(z) * c_s(z)n(z,t)dz + B(t) * r_s * r_r\)</span></p></li>
 <li><p><span class="math inline">\(K(z',z,\theta) = P(z',z,\theta) + F(z',z)\)</span></p></li>
-<li><p><span class="math inline">\(P(z',z,\theta) = s(z, \theta) * g(z',z,\theta)\)</span></p></li>
+<li><p><span class="math inline">\(P(z',z,\theta) = s(z, \theta) * G(z',z,\theta)\)</span></p></li>
 <li><p><span class="math inline">\(F(z',z) = c_r(z) * c_s(z) * c_d(z') * (1 - r_e)\)</span></p></li>
 </ol>
 <p><span class="math inline">\(\theta\)</span> is a vector of time-varying environmental parameters. For this example, we’ll use a Gaussian distribution for temperature and a Gamma distribution for precipitation:</p>
@@ -758,14 +760,14 @@
 </ul>
 </li>
 <li>
-<p>growth (<code>g</code>, <span class="math inline">\(g(z',z,\theta)\)</span>): a linear regression</p>
+<p>growth (<code>g</code>, <span class="math inline">\(G(z',z,\theta)\)</span>): a linear regression with a Normal error distribution (denoted <span class="math inline">\(f_G\)</span>)</p>
 <ul>
 <li><p>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(size_2 ~ size_1 + temp + precip, data = my_grow_data)</a></code></p></li>
 <li>
 <p>Mathematical form:</p>
 <ul>
-<li><p><span class="math inline">\(g(z',z) = f_g(\mu_g(z,\theta), \sigma_g)\)</span></p></li>
-<li><p><span class="math inline">\(\mu_g(z, \theta) = \alpha_g + \beta_g^z * z + \beta_g^t * temp + \beta_g^p * precip\)</span></p></li>
+<li><p><span class="math inline">\(G(z',z) = f_G(z', \mu_G(z,\theta), \sigma_G)\)</span></p></li>
+<li><p><span class="math inline">\(\mu_G(z, \theta) = \alpha_G + \beta_G^z * z + \beta_G^t * temp + \beta_G^p * precip\)</span></p></li>
 </ul>
 </li>
 </ul>
@@ -785,10 +787,10 @@
 </ul>
 </li>
 <li>
-<p>recruit sizes (<code>c_d</code>/<span class="math inline">\(c_d(z')\)</span>): A normal distribution (denoted <span class="math inline">\(f_{c_d}\)</span>)</p>
+<p>recruit sizes (<code>c_d</code>/<span class="math inline">\(c_d(z')\)</span>): A Normal distribution (denoted <span class="math inline">\(f_{c_d}\)</span>)</p>
 <ul>
 <li><p>Example code: mean (<code>c_d_mu</code>) <code><a href="https://rdrr.io/r/base/mean.html">mean(my_recruit_data$size_2, na.rm = TRUE)</a></code> and standard deviation (<code>c_d_sd</code>) <code><a href="https://rdrr.io/r/stats/sd.html">sd(my_recruit_data$size_2, na.rm = TRUE)</a></code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(c_d(z') = f_{c_d}(\mu_{f_d}, \sigma_{f_d})\)</span></p></li>
+<li><p>Mathematical form: <span class="math inline">\(c_d(z') = f_{c_d}(z', \mu_{f_d}, \sigma_{f_d})\)</span></p></li>
 </ul>
 </li>
 <li><p>Constants: Discrete stage survival (<code>r_s</code>), discrete stage entrance probability (<code>r_e</code>), discrete stage departure probability conditional on survival (<code>r_d</code>), and probability of remaining in discrete stage (<code>r_r</code>).</p></li>
@@ -841,23 +843,24 @@
 <span class="va">sample_env</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">env_params</span><span class="op">)</span> <span class="op">{</span>
   
   <span class="co"># We generate one value for each covariate per iteration, and return it </span>
-  <span class="co"># as a named list. We can reference the names in this list in vital rate </span>
-  <span class="co"># expressions.</span>
+  <span class="co"># as a named list. </span>
   
-  <span class="va">temp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">1</span>,
-                <span class="va">env_params</span><span class="op">$</span><span class="va">temp_mu</span>, 
-                <span class="va">env_params</span><span class="op">$</span><span class="va">temp_sd</span><span class="op">)</span>
+  <span class="va">temp_now</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">1</span>,
+                    <span class="va">env_params</span><span class="op">$</span><span class="va">temp_mu</span>, 
+                    <span class="va">env_params</span><span class="op">$</span><span class="va">temp_sd</span><span class="op">)</span>
   
-  <span class="va">precip</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html">rgamma</a></span><span class="op">(</span><span class="fl">1</span>, 
-                   shape <span class="op">=</span> <span class="va">env_params</span><span class="op">$</span><span class="va">precip_shape</span>,
-                   rate <span class="op">=</span> <span class="va">env_params</span><span class="op">$</span><span class="va">precip_rate</span><span class="op">)</span>
+  <span class="va">precip_now</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html">rgamma</a></span><span class="op">(</span><span class="fl">1</span>, 
+                       shape <span class="op">=</span> <span class="va">env_params</span><span class="op">$</span><span class="va">precip_shape</span>,
+                       rate <span class="op">=</span> <span class="va">env_params</span><span class="op">$</span><span class="va">precip_rate</span><span class="op">)</span>
   
-  <span class="va">out</span>        <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>temp <span class="op">=</span> <span class="va">temp</span>, precip <span class="op">=</span> <span class="va">precip</span><span class="op">)</span>
+  <span class="co"># The vital rate expressions can now use the names "temp" and "precip" </span>
+  <span class="co"># as if they were in the data_list.</span>
+  
+  <span class="va">out</span>        <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>temp <span class="op">=</span> <span class="va">temp_now</span>, precip <span class="op">=</span> <span class="va">precip_now</span><span class="op">)</span>
   
   <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span>
   
 <span class="op">}</span>
-
 
 <span class="co"># Again, we can define our own functions and pass them into calls to make_ipm. This</span>
 <span class="co"># isn't strictly necessary, but can make the model code more readable/less error prone.</span>
@@ -872,9 +875,9 @@
 <p>We are now ready to begin implementing the model. This next chunk should look familiar, with the caveat that we have now add the terms <code>temp</code> and <code>precip</code> to vital rates in the <code>P</code> kernel.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">general_stoch_param_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"general"</span>,
-                                   di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
-                                   det_stoch  <span class="op">=</span> <span class="st">"stoch"</span>,
-                                   kern_param <span class="op">=</span> <span class="st">"param"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+                                      di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
+                                      det_stoch  <span class="op">=</span> <span class="st">"stoch"</span>,
+                                      kern_param <span class="op">=</span> <span class="st">"param"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name       <span class="op">=</span> <span class="st">"P_stoch"</span>,
     family     <span class="op">=</span> <span class="st">"CC"</span>,
@@ -896,7 +899,7 @@
    
     data_list     <span class="op">=</span> <span class="va">constant_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"surf_area"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"g"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
@@ -911,7 +914,7 @@
     c_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">surf_area_2</span>, <span class="va">c_d_mu</span>, <span class="va">c_d_sd</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">constant_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"surf_area"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"c_d"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
@@ -930,7 +933,7 @@
     c_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">c_s_int</span> <span class="op">+</span> <span class="va">c_s_slope</span> <span class="op">*</span> <span class="va">surf_area_1</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">constant_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"surf_area"</span>, <span class="st">"sb"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     
     <span class="co"># There is not eviction to correct here, so we can set this to false</span>
     
@@ -942,7 +945,7 @@
     formula       <span class="op">=</span> <span class="va">r_s</span> <span class="op">*</span> <span class="va">r_r</span>,
     data_list     <span class="op">=</span> <span class="va">constant_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"sb"</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">FALSE</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
@@ -952,7 +955,7 @@
     c_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">surf_area_2</span>, <span class="va">c_d_mu</span>, <span class="va">c_d_sd</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">constant_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"surf_area"</span>, <span class="st">"sb"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"c_d"</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
@@ -1001,7 +1004,7 @@
 
 
 <span class="co"># in the second version, sample_env is provided in the usr_funs list of </span>
-<span class="co"># make_ipm(). These two vesrions are equivalent. </span>
+<span class="co"># make_ipm(). These two versions are equivalent. </span>
 
 <span class="va">general_stoch_param_ipm</span> <span class="op">&lt;-</span>  <span class="fu"><a href="../reference/define_impl.html">define_env_state</a></span><span class="op">(</span>
   proto_ipm  <span class="op">=</span> <span class="va">general_stoch_param_model</span>,
@@ -1016,7 +1019,7 @@
                            sample_env <span class="op">=</span> <span class="va">sample_env</span><span class="op">)</span>,
            iterate <span class="op">=</span> <span class="cn">TRUE</span>,
            iterations <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></code></pre></div>
-<p>Stochastic parameter-resampled models also return an <code>env_seq</code>, but this time it will be a <code>data.frame</code> of parameter draws rather than a character vector. We can also compute mean sub-kernels and <span class="math inline">\(\lambda_s\)</span> as we did in the kernel-resampled models. This time, each mean kernel is computed as the average of each sub-kernel over the course of the simulation (i.e. mean of all <code>P</code> kernels). Because the other sub-kernels are not time-varying, they will be numerically equivalent to the sub-kernels stored in the IPM object.</p>
+<p>Stochastic parameter-resampled models also return an <code>env_seq</code>, but this time it will be a <code>data.frame</code> of parameter draws rather than a character vector. We can also compute mean sub-kernels and <span class="math inline">\(\lambda_s\)</span> as we did in the kernel-resampled models. This time, each mean kernel is computed as the average of each sub-kernel over the course of the simulation (i.e. mean of all <code>P</code> kernels). Some sub-kernels in our example are not time-varying - they will be numerically equivalent to the sub-kernels stored in the IPM object.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">env_draws</span>  <span class="op">&lt;-</span> <span class="va">general_stoch_param_ipm</span><span class="op">$</span><span class="va">env_seq</span>
 
@@ -1033,7 +1036,7 @@
 <h2 class="hasAnchor">
 <a href="#code-to-construct-mega-kernels" class="anchor"></a>Code to construct mega-kernels</h2>
 <p>Sometimes, we may want to work with our sub-kernels arranged into a single block kernel. This isn’t required for any of the code in <code>ipmr</code>, except for the <code>plot</code> method for <code>general_di_det</code> IPMs. Other use cases may arise for analyses not included in this package though, so below is a brief overview of how to generate those.</p>
-<p><code><a href="../reference/format_mega_matrix.html">make_iter_kernel()</a></code> takes an IPM object and a vector of symbols (for interactive use) or a character version of the expression (for programming) showing where each sub-kernel should go. It works in <strong>ROW MAJOR order</strong>. This example will use the model from the general deterministic example at the top of the article.</p>
+<p><code><a href="../reference/format_mega_kernel.html">make_iter_kernel()</a></code> takes an IPM object and a vector of symbols (for interactive use) or a character version of the expression (for programming) showing where each sub-kernel should go. It works in <strong>ROW MAJOR order</strong>. This example will use the model from the general deterministic example at the top of the article.</p>
 <p>First, re-run the model to create the IPM object (if you haven’t already).</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">data_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
@@ -1086,7 +1089,7 @@
     s             <span class="op">=</span> <span class="fu">inv_logit_2</span><span class="op">(</span><span class="va">s_int</span>, <span class="va">s_slope</span>, <span class="va">s_slope_2</span>, <span class="va">ht_1</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">data_list</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">'norm'</span>,
                                             <span class="st">'g'</span><span class="op">)</span>
@@ -1099,7 +1102,7 @@
     r_s           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">r_s_int</span> <span class="op">+</span> <span class="va">r_s_slope</span> <span class="op">*</span> <span class="va">ht_1</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">data_list</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name      <span class="op">=</span> <span class="st">'stay_discrete'</span>,
@@ -1115,7 +1118,7 @@
     family        <span class="op">=</span> <span class="st">'DC'</span>,
     data_list     <span class="op">=</span> <span class="va">data_list</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">'norm'</span>,
                                             <span class="st">'r_d'</span><span class="op">)</span>
@@ -1142,7 +1145,7 @@
                            inv_logit_2 <span class="op">=</span> <span class="va">inv_logit_2</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>Now, we specify which kernel belongs where in row major order, using a call to <code><a href="https://rdrr.io/r/base/c.html">c()</a></code>.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mega_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/format_mega_matrix.html">make_iter_kernel</a></span><span class="op">(</span>ipm <span class="op">=</span> <span class="va">general_ipm</span>,
+<code class="sourceCode R"><span class="va">mega_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/format_mega_kernel.html">make_iter_kernel</a></span><span class="op">(</span>ipm <span class="op">=</span> <span class="va">general_ipm</span>,
                              mega_mat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>
                                <span class="va">stay_discrete</span>, <span class="va">go_discrete</span>,
                                <span class="va">leave_discrete</span>, <span class="va">P</span>
@@ -1151,25 +1154,25 @@
 <span class="co"># These values should be almost identical, so this should ~0</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/complex.html">Re</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/eigen.html">eigen</a></span><span class="op">(</span><span class="va">mega_mat</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">values</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">general_ipm</span><span class="op">)</span></code></pre></div>
-<p>Say we wanted to program with this function. Passing bare expression is difficult programatically, and how to do that is not really within the scope of this vignette (though if you’re interested in learning how, <a href="https://dplyr.tidyverse.org/articles/programming.html">this</a> is a good start). <code><a href="../reference/format_mega_matrix.html">make_iter_kernel()</a></code> also accepts text strings in the same format as above.</p>
+<p>Say we wanted to program with this function. Passing bare expression is difficult programatically, and how to do that is not really within the scope of this vignette (though if you’re interested in learning how, <a href="https://dplyr.tidyverse.org/articles/programming.html">this</a> is a good start). <code><a href="../reference/format_mega_kernel.html">make_iter_kernel()</a></code> also accepts text strings in the same format as above.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Get the names of each sub_kernel</span>
 <span class="va">sub_k_nms</span>     <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">general_ipm</span><span class="op">$</span><span class="va">sub_kernels</span><span class="op">)</span>
 
 <span class="va">mega_mat_text</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">sub_k_nms</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, <span class="va">sub_k_nms</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">sub_k_nms</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span>, <span class="va">sub_k_nms</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>
 
-<span class="va">mega_mat_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/format_mega_matrix.html">make_iter_kernel</a></span><span class="op">(</span><span class="va">general_ipm</span>,
+<span class="va">mega_mat_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/format_mega_kernel.html">make_iter_kernel</a></span><span class="op">(</span><span class="va">general_ipm</span>,
                                mega_mat <span class="op">=</span> <span class="va">mega_mat_text</span><span class="op">)</span>
 
 <span class="co"># Should be TRUE</span>
 <span class="fu"><a href="https://rdrr.io/r/base/identical.html">identical</a></span><span class="op">(</span><span class="va">mega_mat</span>, <span class="va">mega_mat_2</span><span class="op">)</span></code></pre></div>
-<p><code><a href="../reference/format_mega_matrix.html">make_iter_kernel()</a></code> can also handle cases where you need blocks of 0s or identity matrices. These are specified using <code>0</code> for 0s, and <code>I</code> for identity matrices. <code><a href="../reference/format_mega_matrix.html">make_iter_kernel()</a></code> automatically works out the correct dimensions internally, so you don’t need to worry about specifying those.</p>
+<p><code><a href="../reference/format_mega_kernel.html">make_iter_kernel()</a></code> can also handle cases where you need blocks of 0s or identity matrices. These are specified using <code>0</code> for 0s, and <code>I</code> for identity matrices. <code><a href="../reference/format_mega_kernel.html">make_iter_kernel()</a></code> automatically works out the correct dimensions internally, so you don’t need to worry about specifying those.</p>
 <p>Below is an example that inserts 0s and identity matrices on the off-diagonals with the <code>P</code> kernel duplicated along the diagonal.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mega_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/format_mega_matrix.html">make_iter_kernel</a></span><span class="op">(</span><span class="va">general_ipm</span>,
+<code class="sourceCode R"><span class="va">mega_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/format_mega_kernel.html">make_iter_kernel</a></span><span class="op">(</span><span class="va">general_ipm</span>,
                                mega_mat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">P</span>, <span class="fl">0</span>, 
                                             <span class="va">I</span>, <span class="va">P</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>Finally, <code>make_iter_kernel</code> supports <code>ipmr</code>’s suffix syntax as well, enabling us to generate lists of mega-kernels for each level of the grouping variables. We’ll re-run the <code>"general_di_stoch_kern"</code> example from above to demonstrate this.</p>
+<p>Finally, <code>make_iter_kernel</code> supports <code>ipmr</code>’s parameter set index syntax as well, enabling us to generate a list of mega-kernels for each combination of parameter set values. We’ll re-run the <code>"general_di_stoch_kern"</code> example from above to demonstrate this.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">all_g_int</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, mean <span class="op">=</span> <span class="fl">5.781</span>, sd <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span><span class="op">)</span> 
 <span class="va">all_f_s_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">5</span>, mean <span class="op">=</span> <span class="fl">2.6204</span>, sd <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span><span class="op">)</span>
@@ -1224,8 +1227,8 @@
     s                <span class="op">=</span> <span class="fu">inv_logit_2</span><span class="op">(</span><span class="va">s_int</span>, <span class="va">s_slope</span>, <span class="va">s_slope_2</span>, <span class="va">ht_1</span><span class="op">)</span>,
     data_list        <span class="op">=</span> <span class="va">all_params</span>,
     states           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
-    levels_hier_effs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,
+    uses_par_sets    <span class="op">=</span> <span class="cn">TRUE</span>,
+    par_set_indices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,
     evict_cor        <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">'norm'</span>,
                                                <span class="st">'g_year'</span><span class="op">)</span>
@@ -1238,15 +1241,15 @@
     f_s_year      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">f_s_int_year</span> <span class="op">+</span> <span class="va">f_s_slope</span> <span class="op">*</span> <span class="va">ht_1</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">all_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs    <span class="op">=</span> <span class="cn">TRUE</span>,
-    levels_hier_effs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>
+    uses_par_sets    <span class="op">=</span> <span class="cn">TRUE</span>,
+    par_set_indices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name    <span class="op">=</span> <span class="st">'stay_discrete'</span>,
     formula <span class="op">=</span> <span class="fl">0</span>,
     family  <span class="op">=</span> <span class="st">"DD"</span>,
     states  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'b'</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor <span class="op">=</span> <span class="cn">FALSE</span>
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
@@ -1256,7 +1259,7 @@
     family        <span class="op">=</span> <span class="st">'DC'</span>,
     data_list     <span class="op">=</span> <span class="va">all_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'ht'</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">'norm'</span>,
                                             <span class="st">'f_d'</span><span class="op">)</span>
@@ -1282,12 +1285,12 @@
     usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>inv_logit   <span class="op">=</span> <span class="va">inv_logit</span>,
                     inv_logit_2 <span class="op">=</span> <span class="va">inv_logit_2</span><span class="op">)</span>
   <span class="op">)</span></code></pre></div>
-<p>Next, we call <code><a href="../reference/format_mega_matrix.html">make_iter_kernel()</a></code> using the kernel names like so:</p>
+<p>Next, we call <code><a href="../reference/format_mega_kernel.html">make_iter_kernel()</a></code> using the kernel names like so:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">block_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/format_mega_matrix.html">make_iter_kernel</a></span><span class="op">(</span><span class="va">general_stoch_kern_ipm</span>,
+<code class="sourceCode R"><span class="va">block_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/format_mega_kernel.html">make_iter_kernel</a></span><span class="op">(</span><span class="va">general_stoch_kern_ipm</span>,
                                  mega_mat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">stay_discrete</span>, <span class="va">go_discrete_year</span>,
                                               <span class="va">leave_discrete</span>, <span class="va">P_year</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><code><a href="../reference/format_mega_matrix.html">make_iter_kernel()</a></code> also works for simple models, but assumes that all sub-kernels are combined additively (i.e. <span class="math inline">\(K(z',z) = P(z',z) + F('z,z)\)</span>). It can handle suffix syntax as well, but does not require the <code>mega_mat</code> argument, and can just be called with an IPM object.</p>
+<p><code><a href="../reference/format_mega_kernel.html">make_iter_kernel()</a></code> also works for simple models, but assumes that all sub-kernels are combined additively (i.e. <span class="math inline">\(K(z',z) = P(z',z) + F('z,z)\)</span>). It can handle parameter set index syntax as well, but does not require the <code>mega_mat</code> argument, and can just be called with an IPM object.</p>
 </div>
   </div>
 

@@ -62,7 +62,7 @@
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/suffix-notation.html">Suffix Notation</a>
+      <a href="../articles/index-notation.html">Index Notation in ipmr</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -106,13 +106,13 @@
 
       
 
-      </header><script src="generic-progress_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
+      </header><script src="generic-progress_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Generic Progress</h1>
                         <h4 class="author">Sam Levin</h4>
             
-            <h4 class="date">2021-03-26</h4>
+            <h4 class="date">2021-05-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/levisc8/ipmr/blob/master/vignettes/generic-progress.Rmd"><code>vignettes/generic-progress.Rmd</code></a></small>
       <div class="hidden name"><code>generic-progress.Rmd</code></div>
@@ -125,8 +125,6 @@
 <h2 class="hasAnchor">
 <a href="#generic-implementation-progress" class="anchor"></a>Generic implementation progress</h2>
 <p>Below is a table indicating which methods are implemented for each class defined in <code>ipmr</code>. If the column has an “X” in it, that means it is ready. Some methods don’t apply to certain types (i.e. <code><a href="../reference/make_ipm.html">make_ipm()</a></code> for IPMs that have already been built).</p>
-<pre><code>## Warning: package 'tibble' was built under R version 4.0.3</code></pre>
-<pre><code>## Warning: package 'kableExtra' was built under R version 4.0.3</code></pre>
 <table class="table">
 <thead><tr class="header">
 <th align="left">Model</th>
@@ -134,7 +132,7 @@
 <th align="center">print</th>
 <th align="center">make_ipm</th>
 <th align="center">lambda</th>
-<th align="center">format_mega_matrix</th>
+<th align="center">make_iter_kernel</th>
 <th align="center">left_ev</th>
 <th align="center">right_ev</th>
 </tr></thead>
@@ -205,7 +203,7 @@
 <td align="center">X</td>
 <td align="center"></td>
 <td align="center">X</td>
-<td align="center"></td>
+<td align="center">X</td>
 <td align="center">X</td>
 <td align="center">X</td>
 </tr>
@@ -215,7 +213,7 @@
 <td align="center">X</td>
 <td align="center"></td>
 <td align="center">X</td>
-<td align="center"></td>
+<td align="center">X</td>
 <td align="center"></td>
 <td align="center"></td>
 </tr>
@@ -225,13 +223,13 @@
 <td align="center">X</td>
 <td align="center"></td>
 <td align="center">X</td>
-<td align="center"></td>
+<td align="center">X</td>
 <td align="center"></td>
 <td align="center"></td>
 </tr>
 <tr class="even">
 <td align="left">general_di_det_ipm</td>
-<td align="center"></td>
+<td align="center">X</td>
 <td align="center">X</td>
 <td align="center"></td>
 <td align="center">X</td>

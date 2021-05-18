@@ -67,8 +67,8 @@ implement models with it. A more thorough introduction is available
 Once all parameters are estimated, the first step of defining a model in
 `ipmr` is to initialize the model using `init_ipm()`. This function has
 five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and
-`has_age`. We will ignore `has_age` for now, because age-size models are
-less common and have their [own
+`uses_age`. We will ignore `uses_age` for now, because age-size models
+are less common and have their [own
 vignette](https://levisc8.github.io/ipmr/articles/age_x_size.html).
 
 The combination of these arguments defines the type of projection model,

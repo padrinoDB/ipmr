@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create iteration kernels from an IPM object — format_mega_matrix • ipmr</title>
+<title>Create iteration kernels from an IPM object — format_mega_kernel • ipmr</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Create iteration kernels from an IPM object — format_mega_matrix" />
+<meta property="og:title" content="Create iteration kernels from an IPM object — format_mega_kernel" />
 <meta property="og:description" content="Creates iteration kernels for IPMs. ipmr does not create
 these to iterate models, but they may be useful for further analyses." />
 
@@ -104,7 +104,7 @@ these to iterate models, but they may be useful for further analyses." />
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/suffix-notation.html">Suffix Notation</a>
+      <a href="../articles/index-notation.html">Index Notation in ipmr</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -161,13 +161,13 @@ these to iterate models, but they may be useful for further analyses." />
 these to iterate models, but they may be useful for further analyses.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>format_mega_matrix</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>format_mega_kernel</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for default</span>
-<span class='fu'>format_mega_matrix</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>mega_mat</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>format_mega_kernel</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>mega_mat</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for age_x_size_ipm</span>
-<span class='fu'>format_mega_matrix</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>name_ps</span>, <span class='va'>f_forms</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>format_mega_kernel</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>name_ps</span>, <span class='va'>f_forms</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>ipm</span>, mega_mat <span class='op'>=</span> <span class='cn'>NULL</span>, name_ps <span class='op'>=</span> <span class='cn'>NULL</span>, f_forms <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
@@ -186,9 +186,9 @@ these to iterate models, but they may be useful for further analyses.</p>
       <th>mega_mat</th>
       <td><p>A vector with symbols, I's, and/or 0s representing the matrix blocks.
 They should be specified in ROW MAJOR order! Can also be a character
-string specifying the call. Suffix syntax is supported. When used,
-<code>format_mega_matrix</code> will produce as many mega-matrices as there are
-combinations of <code>levels_hier_effs</code> in the <code>proto_ipm</code>.</p></td>
+string specifying the call. Parameter set index syntax is supported. When used,
+<code>format_mega_kernel</code> will produce as many mega-matrices as there are
+combinations of <code>par_set_indices</code> in the <code>proto_ipm</code>.</p></td>
     </tr>
     <tr>
       <th>name_ps</th>
@@ -204,9 +204,9 @@ does not need to be supplied.</p></td>
 individuals, and possibly, how they are combined. For example, a model that
 includes sexual (with an "F" kernel) and asexual reproduction (with a "C" kernel),
 this would be <code>"F + C"</code>. If data come from multiple sites or years,
-then this information is supplied using the suffix syntax (i.e.
+then this information is supplied using the index syntax (i.e.
 <code>f_forms = "F_yr + C_yr"</code>). Only applies to age X size models. The
-<code>"_age"</code> suffix is appended automatically, so does not need to be
+<code>"_age"</code> index is appended automatically, so does not need to be
 supplied.</p></td>
     </tr>
     </table>
@@ -215,15 +215,20 @@ supplied.</p></td>
 
     <p>A list containing a large matrix or many large matrices (when used with
 suffix syntax). The names in the former case will be <code>"mega_matrix"</code>
-and in the latter case, <code>"mega_matrix_&lt;hier_effs&gt;"</code> with the levels of the
+and in the latter case, <code>"mega_matrix_&lt;par_sets&gt;"</code> with the levels of the
 grouping effects substituted in.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><code>ipmr</code> does not generate complete iteration kernels, and uses
 sub-kernels to iterate models. However, some further analyses are just easier
 to code with a complete iteration kernel. This handles constructing those for
-simple and general models of all forms. <code>format_mega_matrix</code> is used
-internally by <code>make_iter_kernel</code> for general IPMs.</p>
+simple and general models of all forms. <code>format_mega_kernel</code> is used
+internally by <code>make_iter_kernel</code> for general IPMs. The difference
+between these two functions is that <code>make_iter_kernel</code> always returns
+a list of objects with <code><a href='https://rdrr.io/r/base/c.html'>c(ipmr_matrix, array, matrix)</a></code> classes,
+whereas <code>format_mega_kernel</code> always returns a list of objects with
+<code><a href='https://rdrr.io/r/base/c.html'>c(array, matrix)</a></code> classes. The former has <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot()</a></code> methods while
+the latter does not.</p>
 <p><code>I</code> and <code>0</code> represent identity matrices and 0 matrices,
 respectively. They can be used to fill in blocks that represent either, without
 having to create those separately and append them to the model object. The function
@@ -231,8 +236,8 @@ will work out the correct dimensions for both internally, and there is no
 restriction on the number that may be used in a given call.</p>
 <p>For <code>age_size_ipm</code>s, the correct form of <code>mega_mat</code> is generated
 internally by creating sub-diagonal matrices for the <code>name_ps</code> kernels,
-and a top row using the <code>f_forms</code>. If grouping effects are part of the
-model, the suffixes should be attached to the <code>name_ps, f_forms</code> in the
+and a top row using the <code>f_forms</code>. If parameter set indices are part of the
+model, the indices should be attached to the <code>name_ps, f_forms</code> in the
 function arguments, and the correct block matrices will be generated internally.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>

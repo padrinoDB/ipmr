@@ -182,8 +182,8 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
                 mu_g_yr = g_int + g_slope * ht_1 + g_r_yr,
                 data_list = params,
                 state_list = list(c('ht')),
-                has_hier_effs = TRUE,
-                levels_hier_effs = h_levels,
+                uses_par_sets = TRUE,
+                par_set_indices = h_levels,
                 evict = TRUE,
                 evict_fun = truncated_distributions(g_yr,
                                                     n_mesh_p = 500)) %>%
@@ -195,16 +195,16 @@ monocarp_sys <- init_ipm('simple_di_stoch_kern') %>%
                 f_d = dnorm(ht_2, mean = mu_fd, sd = sd_fd) * cell_size_ht,
                 data_list = params,
                 state_list = list(c('ht')),
-                has_hier_effs = TRUE,
-                levels_hier_effs = h_levels,
+                uses_par_sets = TRUE,
+                par_set_indices = h_levels,
                 evict = FALSE) %>%
   define_kernel('K_yr',
                 formula = P_yr + F_yr,
                 family = "IPM",
                 data_list = params,
                 state_list = list(c("ht")),
-                has_hier_effs = TRUE,
-                levels_hier_effs = h_levels,
+                uses_par_sets = TRUE,
+                par_set_indices = h_levels,
                 evict = FALSE) %>%
   define_domains(ht = c(0.2, 400, 500)) %>%
   make_ipm(return_all = TRUE,

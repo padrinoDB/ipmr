@@ -62,7 +62,7 @@
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/suffix-notation.html">Suffix Notation</a>
+      <a href="../articles/index-notation.html">Index Notation in ipmr</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -106,7 +106,7 @@
 
       
 
-      </header><script src="age_x_size_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
+      </header><script src="age_x_size_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Age-Size IPMs</h1>
@@ -123,7 +123,7 @@
 <h2 class="hasAnchor">
 <a href="#introduction-to-age-times-size-classified-models" class="anchor"></a>Introduction to age <span class="math inline">\(\times\)</span> size classified models</h2>
 <p>Many species exhibit age-dependent demography in addition to some other continuous measures of size. Long term, age classified data sets aren’t nearly as common as non-age classified data sets, but can be exceptionally insightful when available. <code>ipmr</code> includes some methods to deal with specifying them.</p>
-<p>While we may be tempted to think of age as a continuous quantity, it must be a discrete state in a discrete time model. This makes the age <span class="math inline">\(\times\)</span> size IPM a special case of the general IPM. This also uses the suffix syntax, and it is largely the same as for other, non-age structured IPMs, but includes a couple extra bits that must be specified.</p>
+<p>While we may be tempted to think of age as a continuous quantity, it must be a discrete state in a discrete time model. This makes the age <span class="math inline">\(\times\)</span> size IPM a special case of the general IPM. This also uses the parameter index syntax, and it is largely the same as for other, non-age structured IPMs, but includes a couple extra bits that must be specified.</p>
 <p>The rest of this vignette assumes you are familiar with the suffix notation that <code>ipmr</code> uses. If you haven’t already covered this, it would be best to read at least the <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">Intro</a> and <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">General IPM</a> vignettes before continuing. We’ll model Soay sheep (<em>Ovis aries</em>) from St. Kilda using parameters from Chapter 6 of Ellner, Childs, &amp; Rees (2016).</p>
 </div>
 <div id="mathematical-overview" class="section level2">
@@ -147,16 +147,16 @@
 <p>The sub-kernels in this model are formed using regression models for:</p>
 <ul>
 <li><p>survival (<code>s_age</code>/<span class="math inline">\(s(z,a)\)</span>)</p></li>
-<li><p>growth (<code>g_age</code>/<span class="math inline">\(g(z',z,a)\)</span>)</p></li>
+<li><p>growth (<code>g_age</code>/<span class="math inline">\(G(z',z,a)\)</span>)</p></li>
 <li><p>probability of adults reproducing (<code>pb_age</code>/<span class="math inline">\(p_b(z,a)\)</span>)</p></li>
 <li><p>probability that a recruit survives to the first census (<code>pr_age</code>/<span class="math inline">\(p_r(a)\)</span>)</p></li>
-<li><p>recruit size distribution (<code>rcsz</code>/<span class="math inline">\(c_d(z',z)\)</span>). The recruit size distribution has a maternal effect of parental weight on recruit weight.</p></li>
+<li><p>recruit size distribution (<code>rcsz</code>/<span class="math inline">\(C_d(z',z)\)</span>). The recruit size distribution has a maternal effect of parental weight on recruit weight.</p></li>
 </ul>
 <p>The sub-kernels have the following form:</p>
 <ol start="4" style="list-style-type: decimal">
-<li><p><span class="math inline">\(P_a(z', z, a) = s(z, a) * g(z', z, a)\)</span></p></li>
+<li><p><span class="math inline">\(P_a(z', z, a) = s(z, a) * G(z', z, a)\)</span></p></li>
 <li>
-<p><span class="math inline">\(F_a(z', z, a) = s(z, a) * p_b(z, a) * p_r(a) * c_d(z', z) * 0.5\)</span></p>
+<p><span class="math inline">\(F_a(z', z, a) = s(z, a) * p_b(z, a) * p_r(a) * C_d(z', z) * 0.5\)</span></p>
 <ul>
 <li><p><span class="math inline">\(F_0 \equiv 0\)</span> so that age-0 recruits cannot reproduce.</p></li>
 <li><p>This model only tracks females. Assuming an equal sex ratio, we multiply the fecundity kernels by 0.5. We could change the weighting based on observed data.</p></li>
@@ -173,14 +173,14 @@
 </ul>
 </li>
 <li>
-<p>Growth (<code>g_age</code>/<span class="math inline">\(g(z',z,a)\)</span>): A linear model with size and age as fixed effects. <span class="math inline">\(f_g\)</span> denotes a normal probability density function.</p>
+<p>Growth (<code>g_age</code>/<span class="math inline">\(G(z',z,a)\)</span>): A linear model with size and age as fixed effects. <span class="math inline">\(f_G\)</span> denotes a normal probability density function.</p>
 <ul>
 <li><p>Example code: <code>lm(size_next ~ size + age, data = growth data)</code></p></li>
 <li>
 <p>Mathematical form:</p>
 <ul>
-<li><p><span class="math inline">\(g(z',z,a) = f_g(\mu_g^a(z, a), \sigma_g)\)</span></p></li>
-<li><p><span class="math inline">\(\mu_g^a(z, a) = \alpha_g + \beta_g^z * z + \beta_g^a * age\)</span></p></li>
+<li><p><span class="math inline">\(G(z',z,a) = f_G(\mu_G(z, a), \sigma_G)\)</span></p></li>
+<li><p><span class="math inline">\(\mu_G(z, a) = \alpha_G + \beta_G^z * z + \beta_G^a * age\)</span></p></li>
 </ul>
 </li>
 </ul>
@@ -200,14 +200,14 @@
 </ul>
 </li>
 <li>
-<p>Recruit size distribution (<code>rcsz</code>/<span class="math inline">\(c_d(z',z)\)</span>): A linear model with parent size as a fixed effect. <span class="math inline">\(f_{c_d}\)</span> denotes a normal probability density function.</p>
+<p>Recruit size distribution (<code>rcsz</code>/<span class="math inline">\(C_d(z',z)\)</span>): A linear model with parent size as a fixed effect. <span class="math inline">\(f_{C_d}\)</span> denotes a normal probability density function.</p>
 <ul>
 <li><p>Example code: <code><a href="https://rdrr.io/r/stats/lm.html">lm(rcsz ~ size, data = rcsz_data)</a></code></p></li>
 <li>
 <p>Mathematical form:</p>
 <ul>
-<li><p><span class="math inline">\(c_d(z',z) = f_{c_d}(\mu_{c_d}(z), \sigma_{c_d})\)</span></p></li>
-<li><p><span class="math inline">\(\mu_{c_d}(z) = \alpha_{c_d} + \beta_{c_d}^z * z\)</span></p></li>
+<li><p><span class="math inline">\(C_d(z',z) = f_{C_d}(\mu_{C_d}(z), \sigma_{C_d})\)</span></p></li>
+<li><p><span class="math inline">\(\mu_{C_d}(z) = \alpha_{C_d} + \beta_{C_d}^z * z\)</span></p></li>
 </ul>
 </li>
 </ul>
@@ -253,12 +253,12 @@
   <span class="va">s_age</span> <span class="op">*</span> <span class="va">pb_age</span> <span class="op">*</span> <span class="va">pr_age</span> <span class="op">*</span> <span class="va">recr</span> <span class="op">*</span> <span class="fl">0.5</span>
 
 <span class="op">}</span></code></pre></div>
-<p>Next, we begin to initialize our kernels. <code>init_ipm</code> now has a fifth argument - <code>has_age</code>. This is a logical and denotes that we are specifying a model with individuals cross-classified by both age and size. The <code>sim_gen</code> argument is <code>"general</code>", because age-size models are always general IPMs, and <code>det_stoch = "det"</code> because we are only working on a deterministic version of this model for now. We’ll append the <code>_age</code> suffix to every variable that is age dependent. Additionally, we can use <code>age</code> as a standalone term - these will be substituted during the model building as well.</p>
+<p>Next, we begin to initialize our kernels. <code>init_ipm</code> now has a fifth argument - <code>uses_age</code>. This is a logical and denotes that we are specifying a model with individuals cross-classified by both age and size. The <code>sim_gen</code> argument is <code>"general</code>", because age-size models are always general IPMs, and <code>det_stoch = "det"</code> because we are only working on a deterministic version of this model for now. We’ll append the <code>_age</code> index to every variable that is age dependent. Additionally, we can use <code>age</code> as a standalone term - these will be substituted during the model building as well.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"general"</span>,
                          di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
                          det_stoch  <span class="op">=</span> <span class="st">"det"</span>,
-                         has_age    <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span>
+                         uses_age    <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"P_age"</span>,
     family        <span class="op">=</span> <span class="st">"CC"</span>,
@@ -268,11 +268,11 @@
     mu_g_age      <span class="op">=</span> <span class="va">grow_int</span> <span class="op">+</span> <span class="va">grow_z</span> <span class="op">*</span> <span class="va">wt_1</span> <span class="op">+</span> <span class="va">grow_a</span> <span class="op">*</span> <span class="va">age</span>,
     data_list     <span class="op">=</span> <span class="va">param_list</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"wt"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
-    levels_ages   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>, max_age <span class="op">=</span> <span class="fl">21</span><span class="op">)</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
+    age_indices   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>, max_age <span class="op">=</span> <span class="fl">21</span><span class="op">)</span>,
     evict_cor     <span class="op">=</span> <span class="cn">FALSE</span>
   <span class="op">)</span></code></pre></div>
-<p>The primary difference in defining this kernel vs any other “suffixed” model is that we now specify <code>has_hier_effs = FALSE</code>, and pass a list to <code>levels_ages</code>. <code>levels_ages</code> takes a list with at least one, but possibly two components:</p>
+<p>The primary difference in defining this kernel vs any other indexed model is that we now specify <code>uses_par_sets = FALSE</code>, and pass a list to <code>age_indices</code> instead of <code>par_set_indices</code>. <code>age_indices</code> takes a list with at least one, but possibly two components:</p>
 <ol style="list-style-type: decimal">
 <li><p><code>age</code>: This is the age range for the model. It should always start from 0 and be a sequence of integers.</p></li>
 <li><p>Optionally, <code>max_age</code>: This is used to denote that while individuals may get older in reality, this value will be the highest that we model. In effect, it creates “very old, but not quite dead” group which can survive and remain in the same age class.</p></li>
@@ -292,12 +292,12 @@
     rcsz_mu       <span class="op">=</span> <span class="va">rcsz_int</span> <span class="op">+</span> <span class="va">rcsz_z</span> <span class="op">*</span> <span class="va">wt_1</span>,
     data_list     <span class="op">=</span> <span class="va">param_list</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"wt"</span><span class="op">)</span><span class="op">)</span>,
-    has_hier_effs <span class="op">=</span> <span class="cn">FALSE</span>,
-    levels_ages   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>, max_age <span class="op">=</span> <span class="fl">21</span><span class="op">)</span>,
+    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
+    age_indices   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>, max_age <span class="op">=</span> <span class="fl">21</span><span class="op">)</span>,
     evict_cor     <span class="op">=</span> <span class="cn">FALSE</span>
   <span class="op">)</span></code></pre></div>
 <p>The <code>"F_age"</code> kernel has a custom function in the <code>formula</code> slot that allows us to always set fecundity for age-0 individuals to 0. We also add <code>_age</code> suffixes and <code>age</code> terms to the appropriate equations.</p>
-<p>Our call to <code><a href="../reference/define_impl.html">define_impl()</a></code> will look a little different. In examples in the other vignettes using the suffix syntax, we never added suffixes to <code>state_start</code>/<code>state_end</code>. However, we need to append them here. This is because we have to make sure that our <code>P_age</code> kernels produce <code>wt_age</code> individuals, whereas our <code>F_age</code> kernels must produce <code>wt_0</code> individuals (i.e. only age-0 lambs). We do this using the <code>state_start</code> and <code>state_end</code> arguments.</p>
+<p>Our call to <code><a href="../reference/define_impl.html">define_impl()</a></code> will look a little different. In examples in the other vignettes using the index syntax, we never added indices to <code>state_start</code>/<code>state_end</code>. However, we need to append them here. This is because we have to make sure that our <code>P_age</code> kernels produce <code>wt_age</code> individuals, whereas our <code>F_age</code> kernels must produce <code>wt_0</code> individuals (i.e. only age-0 lambs). We do this using the <code>state_start</code> and <code>state_end</code> arguments.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="va">age_size_ipm</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
@@ -311,7 +311,7 @@
 <p>The rest of the steps are largely similar to previous examples:</p>
 <ol style="list-style-type: decimal">
 <li><p><code><a href="../reference/define_impl.html">define_domains()</a></code> is exactly the same.</p></li>
-<li><p><code><a href="../reference/define_impl.html">define_pop_state()</a></code>: we append <code>_age</code> suffix again here, because we want to track individual weights within age groups. This will create 22 copies of the <code>wt</code> domain, 1 for each <code>levels_ages</code>.</p></li>
+<li><p><code><a href="../reference/define_impl.html">define_pop_state()</a></code>: we append <code>_age</code> suffix again here, because we want to track individual weights within age groups. This will create 22 copies of the <code>wt</code> domain, 1 for each <code>age_indices</code>.</p></li>
 <li><p>Optionally, <code><a href="../reference/define_impl.html">define_env_state()</a></code> (though not here because it’s a deterministic model)</p></li>
 <li><p><code><a href="../reference/make_ipm.html">make_ipm()</a></code> is exactly the same.</p></li>
 </ol>

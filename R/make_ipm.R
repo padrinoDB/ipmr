@@ -19,9 +19,9 @@
 #' @param return_all_envs A logical indicating whether to return the environments that
 #' the kernel expressions are evaluated in. These may be useful for some analyses,
 #' such as regression-level sensitivity/elasticity analyses, but can also rapidly
-#' increase memory consumption for models with many kernels (e.g. ones with grouping
-#' effects that have many levels, or any \code{*_stoch_param} model). Default is
-#' \code{FALSE}.
+#' increase memory consumption for models with many kernels (e.g. ones with
+#' parameter set indices that have many levels, or any \code{*_stoch_param} model).
+#' Default is \code{FALSE}.
 #'
 #' @param domain_list An optional list of new domain information to implement
 #' the IPM with.
@@ -45,10 +45,10 @@
 #' @param kernel_seq For \code{*_stoch_kern} methods, the sequence of kernels
 #' to use during the simulation process. It should have the same number of entries
 #' as the number of \code{iterations}.
-#' This should be a vector containing levels of the grouping effects specified
-#' in \code{levels_hier_effs}, or empty. Support for Markov chains will eventually
+#' This should be a vector containing values of the parameter set indices specified
+#' in \code{par_set_indices}, or empty. Support for Markov chains will eventually
 #' get implemented. If it is empty, \code{make_ipm} will try to generate a
-#' sequence internally using a random selection of the \code{levels_hier_effs}
+#' sequence internally using a random selection of the \code{par_set_indices}
 #' defined in \code{define_kernel}.
 #'
 #' @param report_progress A logical indicating whether or not to periodically
@@ -64,7 +64,7 @@
 #'
 #'
 #' @return
-#'  The \code{make_ipm.*} methods will always return a list of length 6
+#'  The \code{make_ipm.*} methods will always return a list of length 5
 #' containing the following components:
 #'
 #' \itemize{
@@ -153,10 +153,10 @@ make_ipm.simple_di_det <- function(proto_ipm,
 
   if(is.null(domain_list)) {
     main_env       <- .make_main_env(others$domain, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
   } else {
     main_env       <- .make_main_env(domain_list, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
     proto_ipm$domain <- I(list(domain_list))
   }
 
@@ -289,10 +289,10 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
 
   if(is.null(domain_list)){
     main_env <- .make_main_env(others$domain, usr_funs,
-                               age_size = .has_age(others))
+                               age_size = .uses_age(others))
   } else {
     main_env <- .make_main_env(domain_list, usr_funs,
-                               age_size = .has_age(others))
+                               age_size = .uses_age(others))
   }
 
   temp       <- .prep_di_output(others, k_row,
@@ -424,10 +424,10 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
   if(is.null(domain_list)) {
     main_env <- .make_main_env(others$domain, usr_funs,
-                               age_size = .has_age(others))
+                               age_size = .uses_age(others))
   } else {
     main_env <- .make_main_env(domain_list, usr_funs,
-                               age_size = .has_age(others))
+                               age_size = .uses_age(others))
   }
 
   # Bind env_exprs, constants, and pop_vectors to main_env so that
@@ -586,10 +586,10 @@ make_ipm.general_di_det <- function(proto_ipm,
   if(is.null(domain_list)) {
     main_env <- .make_main_env(others$domain,
                                usr_funs,
-                               age_size = .has_age(others))
+                               age_size = .uses_age(others))
   } else {
     main_env <- .make_main_env(domain_list, usr_funs,
-                               age_size = .has_age(others))
+                               age_size = .uses_age(others))
   }
 
   # Bind env_exprs, constants, and pop_vectors to main_env so that
@@ -739,12 +739,12 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
   if(is.null(domain_list)) {
 
     main_env <- .make_main_env(others$domain, usr_funs,
-                               age_size = .has_age(others))
+                               age_size = .uses_age(others))
 
   } else {
 
     main_env <- .make_main_env(domain_list, usr_funs,
-                               age_size = .has_age(others))
+                               age_size = .uses_age(others))
 
   }
 
@@ -862,7 +862,7 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
 
   if(iterate &&
      all(is.null(kernel_seq) | is.na(kernel_seq))  &&
-     any(proto_ipm$has_hier_effs)) {
+     any(proto_ipm$uses_par_sets)) {
 
     message("'kernel_seq' not defined. Will generate one internally")
 
@@ -897,10 +897,10 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
 
   if(is.null(domain_list)) {
     main_env <- .make_main_env(others$domain, usr_funs,
-                               age_size = .has_age(others))
+                               age_size = .uses_age(others))
   } else {
     main_env <- .make_main_env(domain_list, usr_funs,
-                               age_size = .has_age(others))
+                               age_size = .uses_age(others))
   }
 
   # Bind env_exprs, constants, and pop_vectors to main_env so that
@@ -1087,10 +1087,10 @@ make_ipm.simple_dd_det <- function(proto_ipm,
 
   if(is.null(domain_list)) {
     main_env       <- .make_main_env(others$domain, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
   } else {
     main_env       <- .make_main_env(domain_list, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
     proto_ipm$domain <- I(list(domain_list))
   }
 
@@ -1282,10 +1282,10 @@ make_ipm.simple_dd_stoch_kern <- function(proto_ipm,
 
   if(is.null(domain_list)) {
     main_env       <- .make_main_env(others$domain, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
   } else {
     main_env       <- .make_main_env(domain_list, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
     proto_ipm$domain <- I(list(domain_list))
   }
 
@@ -1445,7 +1445,7 @@ make_ipm.simple_dd_stoch_param <-function(proto_ipm,
 
   if(iterate &&
      all(is.null(kernel_seq) | is.na(kernel_seq)) &&
-     any(proto_ipm$has_hier_effs)) {
+     any(proto_ipm$uses_par_sets)) {
 
     message("'kernel_seq' not defined. Will generate one internally")
 
@@ -1482,10 +1482,10 @@ make_ipm.simple_dd_stoch_param <-function(proto_ipm,
 
   if(is.null(domain_list)) {
     main_env       <- .make_main_env(others$domain, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
   } else {
     main_env       <- .make_main_env(domain_list, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
     proto_ipm$domain <- I(list(domain_list))
   }
 
@@ -1685,10 +1685,10 @@ make_ipm.general_dd_det <- function(proto_ipm,
 
   if(is.null(domain_list)) {
     main_env       <- .make_main_env(others$domain, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
   } else {
     main_env       <- .make_main_env(domain_list, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
     proto_ipm$domain <- I(list(domain_list))
   }
 
@@ -1900,10 +1900,10 @@ make_ipm.general_dd_stoch_kern <- function(proto_ipm,
 
   if(is.null(domain_list)) {
     main_env       <- .make_main_env(others$domain, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
   } else {
     main_env       <- .make_main_env(domain_list, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
     proto_ipm$domain <- I(list(domain_list))
   }
 
@@ -2070,7 +2070,7 @@ make_ipm.general_dd_stoch_param <-function(proto_ipm,
 
   if(iterate &&
      all(is.null(kernel_seq) | is.na(kernel_seq)) &&
-     any(proto_ipm$has_hier_effs)) {
+     any(proto_ipm$uses_par_sets)) {
 
     message("'kernel_seq' not defined. Will generate one internally")
 
@@ -2107,10 +2107,10 @@ make_ipm.general_dd_stoch_param <-function(proto_ipm,
 
   if(is.null(domain_list)) {
     main_env       <- .make_main_env(others$domain, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
   } else {
     main_env       <- .make_main_env(domain_list, usr_funs,
-                                     age_size = .has_age(others))
+                                     age_size = .uses_age(others))
     proto_ipm$domain <- I(list(domain_list))
   }
 

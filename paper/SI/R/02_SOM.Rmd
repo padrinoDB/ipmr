@@ -1,10 +1,14 @@
 ---
 title: "Supplementary Online Materials for ipmr: Flexibly implement Integral Projection Models in R"
 output:  
-  pdf_document
-  
+  pdf_document:
+    includes:
+      in_header: header_som.tex
+toc: true
 ---
 
+\newpage
+## Figure S1
 
 ```{r echo = FALSE, message = FALSE, warning=FALSE}
 
@@ -117,6 +121,7 @@ all_pubs$Year <- as.integer(all_pubs$Year)
 
 ```
 
+
 ```{r, echo = FALSE, fig.height = 8, fig.width = 10, message = FALSE, warning = FALSE, fig.cap = "Figure S1: The usage of integral projection models (IPMs) has increased rapidly since their introduction. Cumulative number of publications using matrix projection models (MPMs, red) and IPMs (black) (A) and number of publications per year for each type of model (B). IPMs have been adopted rapidly since their introduction in 2000. Unfortunately, software packages to assist with their implementation have not kept pace with their theoretical advancements and applications to ever more complex demographic data."}
  
 library(gridExtra)
@@ -199,6 +204,11 @@ grid.arrange(run_sum_plot, gt)
 
 ```
 
+\newpage
+\pagenumbering{gobble}
+\blandscape
+
+## Table S1
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 
@@ -209,7 +219,16 @@ studies <- read.csv('../../../data-raw/padr-pubs-feb-2021.csv',
                     stringsAsFactors = FALSE) %>%
   select(Species, Kingdom, `Full.citation..APA.`) %>%
   setNames(c("Species", "Kingdom", "Full Citation")) %>%
-  filter(!is.na(Species))
+  filter(!is.na(Species) &
+         !is.na(`Full Citation`) &
+         `Full Citation` != "NA" &
+         `Full Citation` != "") %>% 
+  arrange(`Full Citation`)
+
+studies$Species <- gsub("_", " ", studies$Species)
+studies$Species <- gsub("\\.", "", studies$Species)
+studies$Species <- gsub(" sp$", " spp", studies$Species)
+
 
 sum_tab <- studies %>%
   group_by(Kingdom) %>%
@@ -224,9 +243,11 @@ kbl(studies,
     format = "latex", 
     longtable = TRUE,
     caption = tab_cap) %>%
-  column_spec(1:2, width = "1in", border_left = TRUE) %>%
+  column_spec(1, width = "1.25in", border_left = TRUE) %>%
+  column_spec(2, width = "1in") %>% 
   column_spec(3, width = "5in", border_right = TRUE) %>%
   kable_styling(latex_options = "scale_down")
 
 ```
 
+\elandscape

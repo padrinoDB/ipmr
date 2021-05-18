@@ -89,8 +89,10 @@ into.}
 doesn't already exist in the \code{object}, a new one with this name will be
 created.}
 
-\item{value}{A named list of new parameters. The new list does not need
-to contain all of the parameters, just the ones to update/append.}
+\item{value}{For \code{parameters<-}, a named list of new parameters. The new list does not need
+to contain all of the parameters, just the ones to update/append. For
+\code{vital_rate_exprs<-} and \code{kernel_formulae<-}, a new functional form.
+The new functional form must be wrapped in a call to \code{new_fun_form}.}
 
 \item{form}{An expression representing the new vital rate or kernel formula
 to insert.}

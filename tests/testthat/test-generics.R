@@ -176,7 +176,7 @@ test_that('plot.simple_di_det returns correctly', {
 # simple_di_stoch_kern methods --------------
 
 
-hier_levels <- list(yr = 1:5)
+par_set_indices <- list(yr = 1:5)
 
 # additional usr_funs to be passed into make_ipm()
 
@@ -248,8 +248,8 @@ sim_di_stoch_kern <- init_ipm(sim_gen    = "simple",
     mu_g_yr          = g_int + g_slope * ht_1 + g_r_yr,
     data_list        = params,
     states           = list(c('ht')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_levels,
+    uses_par_sets    = TRUE,
+    par_set_indices = par_set_indices,
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm', 'g_yr')
   ) %>%
@@ -262,8 +262,8 @@ sim_di_stoch_kern <- init_ipm(sim_gen    = "simple",
     f_d              = dnorm(ht_2, mu_fd, sd_fd),
     data_list        = params,
     states           = list(c('ht')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_levels,
+    uses_par_sets    = TRUE,
+    par_set_indices = par_set_indices,
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm', 'f_d')
   ) %>%
@@ -362,7 +362,7 @@ sim_di_stoch_param <- init_ipm(sim_gen    = "simple",
     g = dnorm(surf_area_2, g_mu, g_sd),
     data_list = data_list,
     states = list(c('surf_area')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'g')
   ) %>%
@@ -375,7 +375,7 @@ sim_di_stoch_param <- init_ipm(sim_gen    = "simple",
     f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
     data_list = data_list,
     states = list(c('surf_area')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor = TRUE,
     evict_fun = truncated_distributions('norm', 'f_d')
   )  %>%
@@ -496,7 +496,7 @@ gen_di_det_1 <- init_ipm(sim_gen    = "general",
     s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'g')
@@ -509,7 +509,7 @@ gen_di_det_1 <- init_ipm(sim_gen    = "general",
     f_s           = exp(f_s_int + f_s_slope * ht_1),
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE
+    uses_par_sets = FALSE
   ) %>%
   define_kernel(
     name    = 'stay_discrete',
@@ -525,7 +525,7 @@ gen_di_det_1 <- init_ipm(sim_gen    = "general",
     family        = 'DC',
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
@@ -566,7 +566,7 @@ gen_di_det_2 <- init_ipm(sim_gen    = "general",
     s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'g')
@@ -579,7 +579,7 @@ gen_di_det_2 <- init_ipm(sim_gen    = "general",
     f_s           = exp(f_s_int + f_s_slope * ht_1),
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE
+    uses_par_sets = FALSE
   ) %>%
   define_kernel(
     name    = 'stay_discrete',
@@ -595,7 +595,7 @@ gen_di_det_2 <- init_ipm(sim_gen    = "general",
     family        = 'DC',
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
@@ -653,7 +653,7 @@ test_that('print.general_di_det returns correctly', {
 
 flatten_to_depth <- ipmr:::.flatten_to_depth
 
-hier_effs <- list(
+par_sets <- list(
   site = c(
     'whitetop',
     'mt_rogers',
@@ -805,7 +805,7 @@ all_params <- list(nr_data_list,
                    dc_data_list)
 
 full_data_list <- rename_data_list(data_list = all_params,
-                                   nms       = unlist(hier_effs)) %>%
+                                   nms       = unlist(par_sets)) %>%
   flatten_to_depth(1)
 
 init_pop_vec <- list(
@@ -834,8 +834,8 @@ gen_di_stoch_kern_1 <- init_ipm(sim_gen    = "general",
 
     data_list        = full_data_list,
     states           = list(c('ln_leaf_l')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_effs,
+    uses_par_sets    = TRUE,
+    par_set_indices = par_sets,
     evict_cor        =  TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_nn_site')
@@ -864,8 +864,8 @@ gen_di_stoch_kern_1 <- init_ipm(sim_gen    = "general",
 
     data_list    = full_data_list,
     states       = list(c('sqrt_area', 'ln_leaf_l')),
-    has_hier_effs = TRUE,
-    levels_hier_effs = hier_effs,
+    uses_par_sets = TRUE,
+    par_set_indices = par_sets,
     evict_cor = TRUE,
     evict_fun = truncated_distributions(c('norm', 'norm'),
                                         c('gamma_nr_site',
@@ -881,8 +881,8 @@ gen_di_stoch_kern_1 <- init_ipm(sim_gen    = "general",
 
     data_list = full_data_list,
     states = list(c('ln_leaf_l', "d")),
-    has_hier_effs = TRUE,
-    levels_hier_effs = hier_effs,
+    uses_par_sets = TRUE,
+    par_set_indices = par_sets,
     evict_cor = TRUE,
     evict_fun = truncated_distributions('norm',
                                         'gamma_nd_site')
@@ -906,8 +906,8 @@ gen_di_stoch_kern_1 <- init_ipm(sim_gen    = "general",
 
     data_list        = full_data_list,
     states           = list(c('sqrt_area', 'ln_leaf_l')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_effs,
+    uses_par_sets    = TRUE,
+    par_set_indices = par_sets,
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_rn_site')
@@ -921,8 +921,8 @@ gen_di_stoch_kern_1 <- init_ipm(sim_gen    = "general",
     mu_n_site        = inv_logit(nr_d_z_int_site, nr_d_z_b_site, ln_leaf_l_1),
     data_list        = full_data_list,
     states           = list(c('ln_leaf_l', "d")),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_effs,
+    uses_par_sets    = TRUE,
+    par_set_indices = par_sets,
     evict_cor        = FALSE
   ) %>%
   define_kernel(
@@ -933,8 +933,8 @@ gen_di_stoch_kern_1 <- init_ipm(sim_gen    = "general",
     mu_r_site         = inv_logit(ra_d_z_int_site, ra_d_z_b_site, sqrt_area_1),
     data_list        = full_data_list,
     states           = list(c('sqrt_area', "d")),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_effs,
+    uses_par_sets    = TRUE,
+    par_set_indices = par_sets,
     evict_cor        = FALSE
   ) %>%
   define_impl(
@@ -1180,7 +1180,7 @@ gen_di_stoch_param_1 <- init_ipm(sim_gen    = "general",
 
     data_list        = fixed_params,
     states           = list(c('ln_leaf_l')),
-    has_hier_effs    = FALSE,
+    uses_par_sets    = FALSE,
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_nn')
@@ -1209,7 +1209,7 @@ gen_di_stoch_param_1 <- init_ipm(sim_gen    = "general",
 
     data_list     = fixed_params,
     states        = list(c('sqrt_area', 'ln_leaf_l')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(c('norm', 'norm'),
                                             c('gamma_nr',
@@ -1226,7 +1226,7 @@ gen_di_stoch_param_1 <- init_ipm(sim_gen    = "general",
     data_list = fixed_params,
     states    = list(c('ln_leaf_l', "d")),
 
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'gamma_nd')
@@ -1250,7 +1250,7 @@ gen_di_stoch_param_1 <- init_ipm(sim_gen    = "general",
 
     data_list        = fixed_params,
     states           = list(c('sqrt_area', 'ln_leaf_l')),
-    has_hier_effs    = FALSE,
+    uses_par_sets    = FALSE,
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm',
                                                'gamma_rn')
@@ -1264,7 +1264,7 @@ gen_di_stoch_param_1 <- init_ipm(sim_gen    = "general",
     mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
     data_list        = fixed_params,
     states           = list(c('ln_leaf_l', "d")),
-    has_hier_effs    = FALSE,
+    uses_par_sets    = FALSE,
     evict_cor        = FALSE
   ) %>%
   define_kernel(
@@ -1275,7 +1275,7 @@ gen_di_stoch_param_1 <- init_ipm(sim_gen    = "general",
     mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
     data_list        = fixed_params,
     states           = list(c('sqrt_area', "d")),
-    has_hier_effs    = FALSE,
+    uses_par_sets    = FALSE,
     evict_cor        = FALSE
   ) %>%
   define_impl(
@@ -1718,7 +1718,7 @@ gen_di_det_1 <- init_ipm(sim_gen    = "general",
     s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'g')
@@ -1731,7 +1731,7 @@ gen_di_det_1 <- init_ipm(sim_gen    = "general",
     f_s           = exp(f_s_int + f_s_slope * ht_1),
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE
+    uses_par_sets = FALSE
   ) %>%
   define_kernel(
     name    = 'stay_discrete',
@@ -1747,7 +1747,7 @@ gen_di_det_1 <- init_ipm(sim_gen    = "general",
     family        = 'DC',
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
@@ -1806,7 +1806,7 @@ gen_di_det_2 <- init_ipm(sim_gen    = "general",
     s             = inv_logit_2(s_int, s_slope, s_slope_2, ht_1),
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'g')
@@ -1819,7 +1819,7 @@ gen_di_det_2 <- init_ipm(sim_gen    = "general",
     f_s           = exp(f_s_int + f_s_slope * ht_1),
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE
+    uses_par_sets = FALSE
   ) %>%
   define_kernel(
     name    = 'stay_discrete',
@@ -1835,7 +1835,7 @@ gen_di_det_2 <- init_ipm(sim_gen    = "general",
     family        = 'DC',
     data_list     = data_list,
     states        = states,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions('norm',
                                             'f_d')
@@ -1980,7 +1980,7 @@ test_that("age_size models left/right_ev", {
   a_s_ipm <- init_ipm(sim_gen    = "general",
                       di_dd      = "di",
                       det_stoch  = "det",
-                      has_age = TRUE) %>%
+                      uses_age = TRUE) %>%
     define_kernel(
       name          = "P_age",
       family        = "CC",
@@ -1990,8 +1990,8 @@ test_that("age_size models left/right_ev", {
       mu_g_age      = grow_int + grow_z * wt_1 + grow_a * age,
       data_list     = param_list,
       states        = list(c("wt_age")),
-      has_hier_effs = FALSE,
-      levels_ages   = list(age = c(0:20), max_age = 21),
+      uses_par_sets = FALSE,
+      age_indices   = list(age = c(0:20), max_age = 21),
       evict_cor     = FALSE
     ) %>%
     define_kernel(
@@ -2005,8 +2005,8 @@ test_that("age_size models left/right_ev", {
       rcsz_mu       = rcsz_int + rcsz_z * wt_1,
       data_list     = param_list,
       states        = list(c("wt")),
-      has_hier_effs = FALSE,
-      levels_ages   = list(age = c(0:20), max_age = 21),
+      uses_par_sets = FALSE,
+      age_indices   = list(age = c(0:20), max_age = 21),
       evict_cor     = FALSE
     ) %>%
     define_impl(
@@ -2032,7 +2032,7 @@ test_that("age_size models left/right_ev", {
       return_all_envs = TRUE
     )
 
-  mega <- format_mega_matrix(a_s_ipm,
+  mega <- format_mega_kernel(a_s_ipm,
                              name_ps = "P",
                              f_forms = "F")$mega_matrix
 
@@ -2092,7 +2092,7 @@ test_that('fill_0s is working as it should', {
   ex_ipm <- list(
     iterators = NA_real_,
     sub_kernels = sub_kernels,
-    proto_ipm = data.frame(has_hier_effs = FALSE)
+    proto_ipm = data.frame(uses_par_sets = FALSE)
   )
 
   class(ex_ipm) <- c("simple_di_det_ipm", "list")
@@ -2113,7 +2113,7 @@ test_that('fill_0s is working as it should', {
 
 test_that('format_mega_mat works as advertised', {
 
-  test_mat <- format_mega_matrix(gen_di_det_2,
+  test_mat <- format_mega_kernel(gen_di_det_2,
                                  mega_mat = c(
                                    stay_discrete, go_discrete,
                                    leave_discrete, P
@@ -2132,7 +2132,7 @@ test_that('format_mega_mat works as advertised', {
 })
 
 
-test_that("format_mega_matrix can handle hier_effs", {
+test_that("format_mega_kernel can handle par_sets", {
 
   Ps <- lapply(1:5,
                function(x) {
@@ -2183,14 +2183,14 @@ test_that("format_mega_matrix can handle hier_effs", {
     env_list = list(),
     env_seq  = sample(1:5, 100, replace = TRUE),
     pop_state = list(),
-    proto_ipm = data.frame(has_hier_effs = TRUE,
-                           levels_hier_effs = I(list(site = 1:5)))
+    proto_ipm = data.frame(uses_par_sets = TRUE,
+                           par_set_indices = I(list(site = 1:5)))
   )
 
   class(ex_ipm)           <- c("general_di_det_ipm", 'list')
   class(ex_ipm$proto_ipm) <- c("general_di_det", "proto_ipm", "data.frame")
 
-  ipmr_megas <- format_mega_matrix(ex_ipm,
+  ipmr_megas <- format_mega_kernel(ex_ipm,
                                    c(0, go_disc_site,
                                      leave_disc_site, P_site))
 
@@ -2212,7 +2212,7 @@ test_that("format_mega_matrix can handle hier_effs", {
 
 })
 
-test_that("format_mega_matrix works w/ multiple hier_effs", {
+test_that("format_mega_kernel works w/ multiple par_sets", {
 
 
   nms <- expand.grid(list(site = c("A", "B"),
@@ -2274,15 +2274,15 @@ test_that("format_mega_matrix works w/ multiple hier_effs", {
     env_list = list(),
     env_seq  = sample(out_nms, 100, replace = TRUE),
     pop_state = list(),
-    proto_ipm = data.frame(has_hier_effs = TRUE,
-                           levels_hier_effs = I(list(site = c("A","B"),
+    proto_ipm = data.frame(uses_par_sets = TRUE,
+                           par_set_indices = I(list(site = c("A","B"),
                                                      yr   = 1:3)))
   )
 
   class(ex_ipm)           <- c("general_di_det_ipm", 'list')
   class(ex_ipm$proto_ipm) <- c("general_di_det", "proto_ipm", "data.frame")
 
-  ipmr_megas <- format_mega_matrix(ex_ipm,
+  ipmr_megas <- format_mega_kernel(ex_ipm,
                                    c(0, go_disc_site_yr,
                                      leave_disc_site_yr, P_site_yr))
 
@@ -2306,7 +2306,7 @@ test_that("format_mega_matrix works w/ multiple hier_effs", {
 })
 
 
-test_that('format_mega_matrix can handle character vectors', {
+test_that('format_mega_kernel can handle character vectors', {
 
   x <- matrix(rnorm(25), ncol = 5)
   y <- matrix(rnorm(25), ncol = 5)
@@ -2320,7 +2320,7 @@ test_that('format_mega_matrix can handle character vectors', {
   ipm <- list(sub_kernels = list(x = x, y = y, z = z))
 
 
-  sym_mat <- format_mega_matrix(ipm, mega_mat = c(x , y , z , 0))
+  sym_mat <- format_mega_kernel(ipm, mega_mat = c(x , y , z , 0))
 
   # First, make sure we've fooled the ipm argument
   expect_equal(sym_mat[[1]], target)
@@ -2328,19 +2328,19 @@ test_that('format_mega_matrix can handle character vectors', {
   # now, try with a character vector
   vec_text <- 'c(x , y, z, 0)'
 
-  test_mat <- format_mega_matrix(ipm, vec_text)
+  test_mat <- format_mega_kernel(ipm, vec_text)
 
   expect_equal(sym_mat, test_mat)
 
   test_vec <- c("x", "y", "z", 0)
 
-  test_mat <- format_mega_matrix(ipm, test_vec)
+  test_mat <- format_mega_kernel(ipm, test_vec)
 
   expect_equal(sym_mat, test_mat)
 
 })
 
-test_that("format_mega_matrix can handles identity matrices as advertized", {
+test_that("format_mega_kernel can handles identity matrices as advertized", {
 
   x <- matrix(rnorm(25), ncol = 5)
   y <- matrix(rnorm(25), ncol = 5)
@@ -2354,7 +2354,7 @@ test_that("format_mega_matrix can handles identity matrices as advertized", {
 
   ipm <- list(sub_kernels = list(x = x, y = y, z = z))
 
-  test_mat <- format_mega_matrix(ipm, c(x, y, z, I))
+  test_mat <- format_mega_kernel(ipm, c(x, y, z, I))
 
   expect_equal(test_mat[[1]], target)
 
@@ -2374,7 +2374,7 @@ test_that("We can fill 0s and Identity matrices", {
 
   ipm <- list(sub_kernels = list(x = x, z = z))
 
-  test_mat <- format_mega_matrix(ipm, c(x, 0, z, I))
+  test_mat <- format_mega_kernel(ipm, c(x, 0, z, I))
 
   expect_equal(test_mat[[1]], target)
 
@@ -2383,7 +2383,7 @@ test_that("We can fill 0s and Identity matrices", {
 })
 
 
-test_that("format_mega_matrix works w/ drop_levels", {
+test_that("format_mega_kernel works w/ drop_levels", {
 
 
   nms <- expand.grid(list(site = c("A", "B"),
@@ -2449,8 +2449,8 @@ test_that("format_mega_matrix works w/ drop_levels", {
     env_list = list(),
     env_seq  = sample(out_nms, 100, replace = TRUE),
     pop_state = list(),
-    proto_ipm = data.frame(has_hier_effs = TRUE,
-                           levels_hier_effs = I(list(site = c("A","B"),
+    proto_ipm = data.frame(uses_par_sets = TRUE,
+                           par_set_indices = I(list(site = c("A","B"),
                                                      yr   = 1:3,
                                                      drop_levels = to_drop)))
   )
@@ -2458,7 +2458,7 @@ test_that("format_mega_matrix works w/ drop_levels", {
   class(ex_ipm)           <- c("general_di_det_ipm", 'list')
   class(ex_ipm$proto_ipm) <- c("general_di_det", "proto_ipm", "data.frame")
 
-  ipmr_megas <- format_mega_matrix(ex_ipm,
+  ipmr_megas <- format_mega_kernel(ex_ipm,
                                    c(0, go_disc_site_yr,
                                      leave_disc_site_yr, P_site_yr))
 

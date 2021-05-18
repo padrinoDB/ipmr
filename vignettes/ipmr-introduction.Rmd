@@ -12,7 +12,7 @@ vignette: >
 
 ## Overview
   
-`ipmr` is a package for implementing integral projection models of varying degrees of complexity. It uses mathematical-ish expressions to build up the iteration kernels from smaller pieces, as well as helpers to ensure that models are implemented correctly. Finally, it provides machinery for stochastic simulations. basic analyses, and model diagnostics. More complicated analysis functions are being implemented in the [irage package](https://github.com/levisc8/irage).
+`ipmr` is a package for implementing integral projection models of varying degrees of complexity. It uses mathematical-ish expressions to build up the iteration kernels from smaller pieces, as well as helpers to ensure that models are implemented correctly. Finally, it provides machinery for stochastic simulations. basic analyses, and model diagnostics. More complicated analysis functions are being implemented in a separate package.
   
 **This package does not help with fitting regression models to demographic data!** This is a distinct enough problem that it should not be in the purview of this package - and there are much better tools out there already that can do a much better job of helping you with that than I can. Some of my favorites are `lme4`, `brms`, `mgcv`, and `nlme`. `IPMpack` handles the regression modeling and IPM construction for some, but not all, types of IPMs. `IPMpack` is no longer on CRAN, but can be installed from the `MetaCRAN/IPMpack` [Github page](https://github.com/cran/IPMpack) or running `devtools::install_github("CRAN/IPMpack")`.
 
@@ -32,17 +32,15 @@ To make the model more biologically interpretable, the projection kernel $K(z',z
 
 2. $K(z',z) = P(z',z) + F(z',z) + C(z',z)$
 
-$P(z',z)$ is a sub-kernel describing transitions due to survival and trait changes of existing individuals, $F(z',z)$ is a sub-kernel describing per-capita sexual contributions of existing individuals to recruitment, and $C(z',z)$ is a sub-kernel describing per-capita asexual contributions of existing individuals to recruitment. The sub-kernels are typically comprised of functions derived from regression models that relate an individuals trait value $z$ at time $t$ to a new trait value at $t+1$. For example, the $P$ kernel for Soay sheep (_Ovis aries_) on St. Kilda (Eq 3) may contain two regression models: (i) a logistic regression of survival on log body mass (Eq 4), and (ii) a linear regression of log body mass at $t+1$ on log body mass at $t$ (Eq 5-6). Here, $f_g$ is used to denote a normal probability density function, and $\sigma_g$ is computed as the standard deviation of the residuals of the linear regression.
+$P(z',z)$ is a sub-kernel describing transitions due to survival and trait changes of existing individuals, $F(z',z)$ is a sub-kernel describing per-capita sexual contributions of existing individuals to recruitment, and $C(z',z)$ is a sub-kernel describing per-capita asexual contributions of existing individuals to recruitment. The sub-kernels are typically comprised of functions derived from regression models that relate an individuals trait value $z$ at time $t$ to a new trait value at $t+1$. For example, the $P$ kernel for Soay sheep (_Ovis aries_) on St. Kilda (Eq 3) may contain two regression models: (i) a logistic regression of survival on log body mass (Eq 4), and (ii) a linear regression of log body mass at $t+1$ on log body mass at $t$ (Eq 5-6). Here, $f_G$ is used to denote a normal probability density function, and $\sigma_G$ is computed as the standard deviation of the residuals of the linear regression.
 
-3. $P(z',z) = s(z) * g(z',z)$
+3. $P(z',z) = s(z) * G(z',z)$
 
 4. $Logit(s(z)) = \alpha_s + \beta_s * z$
 
-5. $g(z',z) = f_g(\mu_g, \sigma_g)$ 
+5. $G(z',z) = f_G(z', \mu_G, \sigma_G)$ 
 
-6. $\mu_g = \alpha_g + \beta_g * z$
-
-Here, we refer to these different scales (parameters (_e.g._ $\alpha_g,\beta_g$ in Eq 6), regressions (_e.g._ Eq 4), sub-kernels (_e.g._ Eq 3), and projection kernels (_e.g._ Eq 2)) as levels of the _model hierarchy_. `ipmr` is intended to help with the last two levels of the model hierarchy. 
+6. $\mu_G = \alpha_G + \beta_G * z$
 
 Projecting the population state $n(z',t+1)$ requires a solution to the integral in Eq 1. Analytical solutions to the integral in Eq 1 are usually not possible (Ellner & Rees 2006). However, numerical approximations of these integrals can be constructed using a numerical integration rule. A commonly used rule is the midpoint rule (this is currently the only integration rule available in `ipmr`, though others should be implemented soon(ish)). The midpoint rule divides the domain $[L,U]$ into $m$ artificial size bins centered at $z_i$ with width $h = (U-L) / m$. The midpoints $z_i = L + (i - 0.5) * h$ for $i = \textrm{1, 2, ...}, m$. The midpoint rule approximation for Eq 1 then becomes:
 
@@ -50,11 +48,11 @@ Projecting the population state $n(z',t+1)$ requires a solution to the integral 
 
 In practice, the numerical approximation of the integral converts the continuous projection kernel into a (large) discretized matrix. A matrix multiplication of the discretized projection kernel and the discretized trait distribution then generates a new trait distribution, a process referred to as _model iteration_ (_sensu_ Easterling et al. 2000). 
 
-While `ipmr` intends to mimic the notation above as closely as possible, it does provide some abstraction layers. For example, Equations 1 and 2 are generated internally by `ipmr`, so you will not need to define those. Sub-kernels are the highest level of the hierarchy that you will need to work with when defining the model. 
+While `ipmr` intends to mimic the notation above as closely as possible, it does provide some abstraction layers. For example, Equations 1 and 2 are generated internally by `ipmr`, so you will not need to define those. 
   
 ## Types of models in `ipmr` {#model-types}
   
-The first step of defining a model in `ipmr` is to initialize the model using `init_ipm()`. This function has five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and `has_age`. We will ignore `has_age` for now, because age-size models are less common and have their [own vignette](https://levisc8.github.io/ipmr/articles/age_x_size.html). 
+The first step of defining a model in `ipmr` is to initialize the model using `init_ipm()`. This function has five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and `uses_age`. We will ignore `uses_age` for now, because age-size models are less common and have their [own vignette](https://levisc8.github.io/ipmr/articles/age_x_size.html). 
 
 The combination of these arguments defines the type of IPM, and makes sure that the machinery for subsequent analyses works correctly. The possible entries for each argument are as follows:
 
@@ -78,7 +76,7 @@ The combination of these arguments defines the type of IPM, and makes sure that 
 
 - `kern_param`: `"kern"`/`"param"` (Complete definitions found in [Metcalf et al. 2015](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405))
 
-    + A. **kern**: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and we do not wish to sample from parameter distributions. These models can be a bit more computationally efficient than the `param` alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration. 
+    + A. **kern**: This describes an IPM with discretely varying parameters such that their values are known before the IPM is specified. This is usually the case for vital rate models that estimate discrete fixed and/or random year/site effects and we do not wish to sample from parameter distributions. These models can be a bit more computationally efficient than the `param` alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration. `ipmr` provides a parameter set index syntax to help describe these models quickly and safely. See [below](#par-set-det) for more details on this feature.
 
     + B. **param**: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. This could be a multivariate normal defined by covarying slopes and intercepts, or distributions of environmental variables that change from time to time. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the `"simple_di_stoch_param"` example for some inspiration in writing those.
 
@@ -94,13 +92,13 @@ The model that we are going to implement here is similar to the one above, excep
 
 2. $K(z',z) = P(z',z) + F(z',z)$
 
-3. $P(z',z) = s(z) * g(z',z)$
+3. $P(z',z) = s(z) * G(z',z)$
 
 4. $Logit(s(z)) = \alpha_s + \beta_s * z$
 
-5. $g(z',z) = f_g(\mu_g, \sigma_g)$ 
+5. $G(z',z) = f_G(z', \mu_G, \sigma_G)$ 
 
-6. $\mu_g = \alpha_g + \beta_g * z$
+6. $\mu_G = \alpha_G + \beta_G * z$
 
 7. $F(z',z) = r_r(z) * r_s(z) * r_d(z')$
 
@@ -108,16 +106,16 @@ The model that we are going to implement here is similar to the one above, excep
 
 9. $Log(r_s(z)) = \alpha_{r_s} + \beta_{r_s} * z$
 
-10. $r_d(z') = f_{r_d}(\mu_{r_d}, \sigma_{r_d})$
+10. $r_d(z') = f_{r_d}(z', \mu_{r_d}, \sigma_{r_d})$
 
-$f_{r_d}$ and $f_g$ denote normal probability density functions. The vital rate functions and code that might be used to generate models corresponding to them are below. 
+$f_{r_d}$ and $f_G$ denote normal probability density functions. The vital rate functions and code that might be used to generate models corresponding to them are below. 
 
 1. Survival ($s(z)$/`s`): a generalized linear model w/ a logit link.
 
     - Example model formula: `glm(surv ~ size_1, data = my_surv_data, family = binomial())`
     
 
-2. Growth ($g(z',z)$/`g`): a linear model with a normal error distribution.
+2. Growth ($G(z',z)$/`G`): a linear model with a normal error distribution.
 
     - Example model formula: `lm(size_2 ~ size_1, data = my_grow_data)`
     
@@ -190,7 +188,7 @@ my_ipm <- define_kernel(
   # states should be a list of the state variables that the kernel operates on
   
   states        = list(c('dbh')),
-  has_hier_effs = FALSE,
+  uses_par_sets = FALSE,
   evict_cor     = TRUE,
   evict_fun     = truncated_distributions("norm", "g")
 ) 
@@ -215,7 +213,7 @@ The `data_list` argument holds the constant parameters (e.g. regression coeffici
 
 The `states` argument is a list containing the names of the state variables in use. `ipmr` internally appends `_1` and `_2` to the names in `states` list. These correspond the trait values at $t$ and $t+1$, respectively (distributions, if continuously distributed states, single numbers if discrete traits). They can also be referenced in the vital rate expressions. If they are continuously distributed state variables, `ipmr` will also generate meshpoints for them that are defined in `define_domains()` (see below).
 
-`has_hier_effs` is a logical indicating whether or not the model contains hierarchical/grouping effects. These usually correspond vital rates that are measured from populations in different years and/or sites. In this example, the model is a simple, deterministic IPM and so this is set to `FALSE`. There are examples later on that introduce their usage and syntax, so we will ignore it for now.
+`uses_par_sets` is a logical indicating whether or not some or all of the model parameters have multiple values they can take on. These usually correspond vital rates that are estimated from populations in different years and/or sites. In this example, the model is a simple, deterministic IPM and so this is set to `FALSE`. There are examples later on that introduce their usage and syntax, so we will ignore it for now.
 
 `evict_cor` refers to whether or not to correct for eviction in the kernel. If this is set to `TRUE`, then you must supply a function specifying which expressions need to be corrected and the correction to apply. `ipmr` provides `truncated_distributions` for now, though others will eventually be implemented as well. Subsequent additions are mainly to accommodate models in PADRINO, and I very strongly suggest sticking to `truncated_distributions` for your own models.
 
@@ -244,7 +242,7 @@ my_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
       g_sd      = 2.2
     ),
     states        = list(c('dbh')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm", 
                                             target =  "g")
@@ -283,7 +281,7 @@ my_ipm <- my_ipm %>%
       r_d_sd    = 0.7    # sd(my_recr_data$size_2, na.rm = TRUE)
     ),
     states        = list(c('dbh')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "r_d")
   )
@@ -429,7 +427,7 @@ The vast majority of IPM pipelines entail fitting a statistical models to data t
 
 To deal with this, many regression modeling packages provide a `predict` method for the class of models that they implement. We can use these in `ipmr` to take the place of the vital rate expressions (more common) or the kernel formulas (probably not as common). 
 
-We'll go through a quick example of how to incorporate these expressions into the model building process using a data set for *Carpobrotus edulis*, an invasive succulent. This is real data collected in Israel and appears in [Bogdan et al. (2020)](https://www.biorxiv.org/content/10.1101/2020.12.08.415174v1.full). The data set is also included in `ipmr` and can be loaded by running `data(iceplant_ex)`.
+We'll go through a quick example of how to incorporate these expressions into the model building process using a data set for *Carpobrotus edulis*, an invasive succulent. This is real data collected in Israel and appears in [Bogdan et al. (2021)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0250879). The data set is also included in `ipmr` and can be loaded by running `data(iceplant_ex)`.
 
 First, we'll load in the example data set and fit some simple vital rate models. Some notes about the data:
 
@@ -443,9 +441,9 @@ $f_G$ and $f_{r_d}$ denote normal probability density functions. The vital rates
 
 1. Growth (`grow_mod`, `g`)
 
-  - $G(z',z) = f_G(\mu_g, \sigma_g)$
+  - $G(z',z) = f_G(z', \mu_G, \sigma_G)$
   
-  - $\mu_g = \alpha_g + \beta_g * z$
+  - $\mu_G = \alpha_G + \beta_G * z$
 
 2. Survival (`surv_mod`, `s`)
 
@@ -473,7 +471,7 @@ $f_G$ and $f_{r_d}$ denote normal probability density functions. The vital rates
 
 8. Recruit size distribution (`recr_mu, recr_sd`, `r_d`)
 
-  - $r_d(z') = f_{r_d}(\mu_{r_d}, \sigma_{r_d})$
+  - $r_d(z') = f_{r_d}(z', \mu_{r_d}, \sigma_{r_d})$
 
 
 ```{r eval = FALSE}
@@ -567,7 +565,7 @@ pred_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
     g             = dnorm(sa_2, g_mu, grow_sd),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm", 
                                             target =  "g")
@@ -591,7 +589,7 @@ pred_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
     r_d           = dnorm(sa_2, recr_mu, recr_sd),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm",
                                             target =  "r_d")
@@ -648,7 +646,7 @@ pred_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
     g             = dnorm(sa_2, g_mu, grow_sd),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>%
@@ -666,7 +664,7 @@ pred_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
     r_d           = dnorm(sa_2, recr_mu, recr_sd),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "r_d")
   )  %>%
@@ -729,31 +727,45 @@ gen_T(pred_ipm)
 
 In the example above, we created a model with a single, deterministic kernel defined by a single state variable. Next, we'll go through an example showing how to build kernels that are constructed from discretely varying parameter estimates.
 
-### Deterministic simulations with hierarchical models {#hier-effs-det}
+### Deterministic simulations from parameter sets {#par-set-det}
 
-Say we have multiple sites sampled in the same year, but are only interested in each site's asymptotic dynamics (perhaps to compare performance across space). `ipmr` uses a syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the examples above. 
+Say we have multiple sites sampled in the same year, but are only interested in each site's asymptotic dynamics (perhaps to compare performance across space). `ipmr` uses a syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the examples above. `ipmr` refers to these as _parameter sets_, and abbreviates them `par_sets`. For example, a random intercept for site may be denoted $\alpha_{site}$, where $_{site}$ provides an index for the different values that $\alpha$ can take on.  
 
-The general idea is to append a suffix to each variable that is modified, and supply a list of values that the suffix can actually take in the `levels_hier_effs` slot of `define_kernel()`. There is a longer vignette dedicated to translating math to R code to the `ipmr` syntax [here](https://levisc8.github.io/ipmr/articles/suffix-notation.html).
+The general idea is to append an index suffix to each variable in the code that is modified, and supply a list of values that the index can actually take in the `par_set_indices` slot of `define_kernel()`. In the example below, the $site$ index subscripts are incorporated into the `ipmr` code using the `_site` suffix. There is a longer vignette dedicated to translating math to R code to the `ipmr` syntax [here](https://levisc8.github.io/ipmr/articles/index-notation.html).
 
 For this example, we'll use the following vital rate models. The `(g)lmer` functions are from the `lme4` package.
 
 1. survival (`s_site`): a logistic regression with a random site intercept (`s_r_site`). 
+    
+    - Example mathematical notation: $Logit(s_{site}(z)) = \alpha_{s,site} + \alpha_s + \beta_s * z$
 
     - Example model formula: `glmer(surv ~ size_1 + (1 | site), data = my_surv_data, family = binomial()))`
 
 2. growth (`g_site`): A linear regression random site intercept (`g_r_site`).
 
+    - Example mathematical notation: 
+      
+      + $\mu_G = \alpha_{G,site} + \alpha_G + \beta_G * z$
+      
+      + $G_{site}(z',z) = f_G(z', \mu_{G,site}, \sigma_G)$
+
     - Example model formula: `lmer(size_2 ~ size_1 + (1 | site), data = my_grow_data, family = gaussian()))`
 
 3. pr(flowering) (`p_r`): A logistic regression. This has no random site effect.
 
-    - Example model formula: `glm(flower ~ size_1 , data = my_surv_data, family = binomial()))`
+    - Example mathematical notation: $Logit(p_r(z)) =  \alpha_{r_p} + \beta_{r_p} * z$
+
+    - Example model formula: `glm(flower ~ size_1 , data = my_flower_data, family = binomial()))`
 
 4. seed production (`r_s_site`): A Poisson regression with a random site intercept (`r_s_r_site`)
 
+    - Example mathematical notation: $Log(r_{s_{site}}(z)) = \alpha_{r_s, site} + \alpha_{r_s} + \beta_{r_s} * z$ 
+
     - Example model formula: `glmer(seed_num ~ size_1 + (1 | site), data = my_surv_data, family = poisson()))`
-    
+ 
 5. recruit size distribution (`r_d`): A normal distribution with two constant parameters, the mean (`mu_rd`) and standard deviation (`sd_rd`).
+
+    - Example mathematical notation: $r_d(z') = f_{r_d}(z', \mu_{r_d}, \sigma_{r_d})$
 
 The chunk below takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of `fixef(some_vital_rate_model` and `ranef(some_vital_rate_model)`)).
 
@@ -780,7 +792,7 @@ fixed_list <- list(
 
 ``` 
 
-We've defined a `fixed_list` that holds all of the fixed parameters in our model. Next, we'll make up some random site specific intercepts, and add those to the `fixed_list`, naming it `all_params_list`. You don't necessarily need to rename anything, this is just for disambiguation.
+We've defined a `fixed_list` that holds all of the fixed parameters in our model. Next, we'll make up some random site specific intercepts, and add those to the `fixed_list`, naming it `all_params_list`. You don't necessarily need to rename anything, this is just for disambiguation. 
 
 ```{r eval = FALSE}
 
@@ -792,6 +804,9 @@ We've defined a `fixed_list` that holds all of the fixed parameters in our model
 g_r_int   <- rnorm(5, 0, 0.3) # unlist(ranef(my_grow_mod)) for an lme4 output
 s_r_int   <- rnorm(5, 0, 0.7) # unlist(ranef(my_surv_mod)) for an lme4 output
 r_s_r_int <- rnorm(5, 0, 0.2) # unlist(ranef(my_flower_mod)) for an lme4 output
+
+# We'll call our hypothetical sites 1, 2, 3, 4, and 5. The "r" prefix is to
+# remind us that these are random quantities.
 
 nms <- paste("r_", 1:5, sep = "")
 
@@ -819,19 +834,20 @@ We've created a list where each entry is named and contains a single parameter v
 my_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
   define_kernel(
     
-    # Our P kernels will vary from site to site, so we append the "_site" suffix
-    # to them.
+    # Our P kernels will vary from site to site, so we index it with "_site"
     
     name             = 'P_site',  
     
     # Similarly, our survival and growth functions will vary from site to site
-    # so these are also modified
+    # so these are also indexed
     
     formula          = s_site * g_site,   
     family           = "CC",
     
     # The linear predictor for the survival function can be split out
     # into its own expression as well. This might help keep track of things.
+    # Survival is indexed by site as well.
+    
     s_lin_site       = s_int + s_r_site + s_slope * ht_1,
     s_site           = 1 / (1 + exp(-s_lin_site)),
     
@@ -843,16 +859,16 @@ my_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
     data_list        = all_params_list,
     states           = list(c('ht')),
     
-    # Here, we tell ipmr that the model has some grouping variable, and 
-    # provide a list describing the values it can take. The values in 
-    # levels_hier_effs are substituted for "site" everywhere in the model, except
+    # Here, we tell ipmr that the model has some parameter sets, and 
+    # provide a list describing the values the index can take. The values in 
+    # par_set_indices are substituted for "site" everywhere in the model, except
     # for the data list. This is why we had to make sure that the names there
     # matched the levels we supply here.
     
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(site = 1:5),
+    uses_par_sets    = TRUE,
+    par_set_indices  = list(site = 1:5),
     
-    # We must also modify the variables in the eviction function
+    # We must also index the variables in the eviction function
     
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "g_site")
@@ -867,30 +883,29 @@ my_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
     family           = "CC",
     
     # In this example, we didn't include a site level effect for probability
-    # of flowering, only seed production. Thus, this expression is NOT modified.
+    # of flowering, only seed production. Thus, this expression is NOT indexed.
     
     r_r_lin          = r_r_int + r_r_slope * ht_1,
     r_r              = 1 / (1 + exp(- r_r_lin)),
     
-    # We modify the seed production expression with the site effect
+    # We index the seed production expression with the site effect
     
     r_s_site         = exp(r_s_int + r_s_r_site + r_s_slope * ht_1),
     r_d              = dnorm(ht_2, mean = mu_rd, sd = sd_rd),
     data_list        = all_params_list,
     states           = list(c('ht')),
     
-    # As in the P kernel, we specify the levels the grouping variable
-    # can take.
+    # As in the P kernel, we specify the values the index can have.
     
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(site = 1:5),
+    uses_par_sets    = TRUE,
+    par_set_indices  = list(site = 1:5),
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "r_d")
   ) %>%
   define_impl(
     make_impl_args_list(
       
-      # The impl_args are also modified with the suffix
+      # The impl_args are also modified with the index
       
       kernel_names = c("P_site", "F_site"),
       int_rule     = rep("midpoint", 2),
@@ -901,7 +916,7 @@ my_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
   define_domains(ht = c(0.2, 40, 100)) %>%
   
   # We also append the suffix in define_pop_state(). THis will create a deterministic
-  # simulation for every level of "site"
+  # simulation for every "site"
   
   define_pop_state(n_ht_site = runif(100)) %>%
   make_ipm(iterate  = TRUE,
@@ -912,21 +927,21 @@ lambda(my_ipm)
 
 ```
 
-Aside from appending `_site` to a number of variables, the code is pretty much the same as the first example. `ipmr` automatically substitutes 1, 2, 3, 4, and 5 for each occurrence of `site` in the kernel formulas and vital rate expressions. Thus, `P_site` is expanded to `P_1`, `P_2`, `P_3`, `P_4`, `P_5`, `s_yr` to `s_1`, `s_2`, `s_3`, `s_4`, and `s_5`. `s_r_site` is converted to `s_r_1`, `s_r_2`,  etc. This is why we needed to make sure the names in `all_params_list` had the actual numbers appended to them. 
+Aside from appending the `_site` index to a number of variables, the code is pretty much the same as the first example. `ipmr` automatically substitutes 1, 2, 3, 4, and 5 for each occurrence of `site` in the kernel formulas and vital rate expressions. Thus, `P_site` is expanded to `P_1`, `P_2`, `P_3`, `P_4`, `P_5`, `s_site` to `s_1`, `s_2`, `s_3`, `s_4`, and `s_5`. `s_r_site` is converted to `s_r_1`, `s_r_2`,  etc. This is why we needed to make sure the names in `all_params_list` had the actual numbers appended to them. 
 
-For more complicated models, you may need multiple suffixes. In those cases, you can append them in any order you like to each variable. For example, sites (`_site`) and years (`_yr`) could be appended to survival (`s_`) like so: 
+For more complicated models, you may need multiple indices. In those cases, you can append them in any order you like to each variable. For example, sites (`_site`) and years (`_yr`) could be appended to survival (`s_`) like so: 
 
 `s_site_yr = some_expression` 
 
-The `levels_hier_effs` list then gets modified like so: 
+The `par_set_indices` list then gets modified like so: 
 
-`levels_hier_effs = list(site = c("A", "B", "C"), yr = c(2001:2005))`
+`par_set_indices = list(site = c("A", "B", "C"), yr = c(2001:2005))`
 
 ### Defining a stochastic IPM in a discretely varying environment {#disc-varying}
 
 In the examples above, we first created a model with a single, deterministic kernel defined by a single state variable. Then we modeled multiple sites with deterministic kernels that varied from site to site. Next, we'll go through an example showing how to build stochastic models from kernels that are constructed from discretely varying parameter estimates.
 
-The example below is the same as the last example, except that this time, we call our grouping effect "year" (suffixed `_yr`) and we'll run a simulation by randomly choosing a year's kernel at each iteration ("kernel resampling" _sensu_ [Metcalf et al. 2015](https://besjournals.onlinelibrary.wiley.com/doi/pdf/10.1111/2041-210X.12405)). Along the way, we'll also learn how to pass custom functions to the model.
+The example below is the same as the last example, except that this time, we call our random effect "year" (indexed with `_yr`) and we'll run a simulation by randomly choosing a year's kernel for each model iteration ("kernel resampling" _sensu_ [Metcalf et al. 2015](https://besjournals.onlinelibrary.wiley.com/doi/pdf/10.1111/2041-210X.12405)). Along the way, we'll also learn how to pass custom functions to the model.
 
 The vital rate models are as follows:
 
@@ -948,7 +963,7 @@ The vital rate models are as follows:
     
 5. recruit size distribution (`r_d`): A normal distribution with two constant parameters, the mean (`mu_rd`) and standard deviation (`sd_rd`).
 
-The chunk below takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of `coef(some_vital_rate_model`)).
+The chunk below takes the place of fitting regression models to actual data, so the code that replaces this chunk will look a little different (and probably involve the use of `fixef(some_vital_rate_model)` and/or `ranef(some_vital_rate_model)`).
 
 
 ```{r eval = FALSE}
@@ -1043,7 +1058,7 @@ The only requirement for these functions is that they contain valid R code, and 
 
 ### Implement the IPM
 
-With the functions and parameter values defined, we are now ready to begin composing the model. Each expression's syntax will look very similar to the deterministic example - the main difference is we are now pretending that our grouping effect is year (`_yr`) as opposed to site, and we change the `det_stoch` and `kern_param` arguments in `init_ipm()`. 
+With the functions and parameter values defined, we are now ready to begin composing the model. Each expression's syntax will look very similar to the deterministic example - the main difference is we are now pretending that our expressions are indexed by year (`_yr`) as opposed to site, and we change the `det_stoch` and `kern_param` arguments in `init_ipm()`. 
 
 ```{r eval = FALSE}
 
@@ -1052,7 +1067,7 @@ my_ipm <- init_ipm(sim_gen    = "simple",
                    det_stoch  = "stoch",
                    kern_param = "kern") %>%
   define_kernel(
-    name             = 'P_yr',         # P because P_yr
+    name             = 'P_yr',         # P becomes P_yr
     formula          = s_yr * g_yr,    # g and s become g_yr and s_yr, respectively
     family           = "CC",
     
@@ -1065,12 +1080,12 @@ my_ipm <- init_ipm(sim_gen    = "simple",
     
     # all_params_list contains the named parameters g_r_1, g_r_2, s_r_1, s_r_2, etc.
     # This is the only level where the user is required to fully expand the name
-    # X hier_level combinations. 
+    # X par_set_indices combinations. 
     
     data_list        = all_params_list,
     states           = list(c('ht')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(yr = 1:5),
+    uses_par_sets    = TRUE,
+    par_set_indices  = list(yr = 1:5),
     evict_cor        = TRUE,
     
     # reference to g_yr in evict_fun is also updated
@@ -1087,8 +1102,8 @@ my_ipm <- init_ipm(sim_gen    = "simple",
     r_d              = dnorm(ht_2, mean = mu_fd, sd = sd_fd),
     data_list        = all_params_list,
     states           = list(c('ht')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = list(yr = 1:5),
+    uses_par_sets    = TRUE,
+    par_set_indices = list(yr = 1:5),
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions("norm", "r_d")
   ) %>%
@@ -1224,15 +1239,15 @@ sample_env <- function(env_params) {
   # as a named list. We can reference the names in this list in vital rate 
   # expressions.
   
-  temp <- rnorm(1,
-                env_params$temp_mu, 
-                env_params$temp_sd)
+  temp_now   <- rnorm(1,
+                      env_params$temp_mu, 
+                      env_params$temp_sd)
   
-  precip <- rgamma(1, 
+  precip_now <- rgamma(1, 
                    shape = env_params$precip_shape,
-                   rate = env_params$precip_rate)
+                   rate  = env_params$precip_rate)
   
-  out        <- list(temp = temp, precip = precip)
+  out        <- list(temp = temp_now, precip = precip_now)
   
   return(out)
   
@@ -1278,7 +1293,7 @@ param_resamp_model <- init_ipm(sim_gen    = "simple",
     
     data_list = constant_params,
     states    = list(c('surf_area')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>%
@@ -1292,7 +1307,7 @@ param_resamp_model <- init_ipm(sim_gen    = "simple",
     r_d           = dnorm(surf_area_2, r_d_mu, r_d_sd),
     data_list     = constant_params,
     states        = list(c('surf_area')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "r_d")
   ) %>%
@@ -1373,7 +1388,7 @@ param_resamp_model <- init_ipm(sim_gen    = "simple",
     
     data_list = constant_params,
     states    = list(c('surf_area')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>%
@@ -1387,7 +1402,7 @@ param_resamp_model <- init_ipm(sim_gen    = "simple",
     r_d           = dnorm(surf_area_2, r_d_mu, r_d_sd),
     data_list     = constant_params,
     states        = list(c('surf_area')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "r_d")
   ) %>%
@@ -1481,7 +1496,7 @@ param_resamp_model <- init_ipm(sim_gen    = "simple",
     
     data_list = constant_params,
     states    = list(c('surf_area')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>%
@@ -1495,7 +1510,7 @@ param_resamp_model <- init_ipm(sim_gen    = "simple",
     r_d           = dnorm(surf_area_2, r_d_mu, r_d_sd),
     data_list     = constant_params,
     states        = list(c('surf_area')),
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "r_d")
   ) %>%
@@ -1629,7 +1644,7 @@ obs_ipm <- init_ipm(sim_gen    = "simple",
     g             = dnorm(sa_2, g_mu, grow_sd),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm", 
                                             target =  "g")
@@ -1653,7 +1668,7 @@ obs_ipm <- init_ipm(sim_gen    = "simple",
     r_d           = dnorm(sa_2, recr_mu, recr_sd),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions(fun   = "norm",
                                             target =  "r_d")

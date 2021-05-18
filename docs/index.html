@@ -74,7 +74,7 @@
       <a href="articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="articles/suffix-notation.html">Suffix Notation</a>
+      <a href="articles/index-notation.html">Index Notation in ipmr</a>
     </li>
     <li>
       <a href="articles/age_x_size.html">Age-Size IPMs</a>
@@ -149,7 +149,7 @@
 <div id="model-classes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#model-classes" class="anchor"></a>Model classes</h2>
-<p>Once all parameters are estimated, the first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function has five arguments: <code>sim_gen</code>, <code>di_dd</code>, <code>det_stoch</code>, <code>kern_param</code>, and <code>has_age</code>. We will ignore <code>has_age</code> for now, because age-size models are less common and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own vignette</a>.</p>
+<p>Once all parameters are estimated, the first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function has five arguments: <code>sim_gen</code>, <code>di_dd</code>, <code>det_stoch</code>, <code>kern_param</code>, and <code>uses_age</code>. We will ignore <code>uses_age</code> for now, because age-size models are less common and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own vignette</a>.</p>
 <p>The combination of these arguments defines the type of IPM, and makes sure that the machinery for subsequent analyses works correctly. The possible entries for each argument are as follows:</p>
 <ul>
 <li>
@@ -177,7 +177,7 @@
 <p><code>kern_param</code>: <code>"kern"</code>/<code>"param"</code> (Complete definitions found in <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405">Metcalf et al. 2015</a>)</p>
 <ul>
 <li><p>A. <strong>kern</strong>: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and for which defining a multivariate joint distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the <code>param</code> alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration.</p></li>
-<li><p>B. <strong>param</strong>: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. This could be a multivariate normal defined by covarying slopes and intercepts, or distributions of environmental variables that change from time to time. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Examples of this are available in the Introduction and General IPM vignettes.</p></li>
+<li><p>B. <strong>param</strong>: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. For example, these could be a multivariate normal defined by covarying slopes and intercepts, or distributions of environmental variables that change from time to time. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Examples of this are available in the Introduction and General IPM vignettes.</p></li>
 </ul>
 </li>
 </ul>
@@ -224,14 +224,14 @@
 <div id="examples-for-simple-ipm-classes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#examples-for-simple-ipm-classes" class="anchor"></a>Examples for simple IPM classes</h2>
-<p>Here is a simple model implemented with <code>ipmr</code>. This is a hypothetical plant species where plants can survive and grow (<em>P</em>(<em>z</em>′, <em>z</em>)), and reproduce sexually (<em>F</em>(<em>z</em>′, <em>z</em>)). There is no seed bank, and so there are no discrete traits in the model. We’ll use 4 regressions: survival (<em>s</em>(<em>z</em>)), growth (<em>G</em>(<em>z</em>′, <em>z</em>), <em>f</em><sub><em>g</em></sub>), probability of reproducing (<em>r</em><sub><em>r</em></sub>(<em>z</em>)), and number of seeds produced conditional on flowering (<em>r</em><sub><em>s</em></sub>(<em>z</em>)). New recruits will be generated with a Gaussian distribution (denoted <em>f</em><sub><em>r</em><sub><em>d</em></sub></sub>), which requires calculating the mean and standard deviation of new recruits from the data. For simplicity, we’ll assume there’s no maternal effect on recruit size. First, we’ll write out the functional forms for each component of the model:</p>
+<p>Here is a simple model implemented with <code>ipmr</code>. This is a hypothetical plant species where plants can survive and grow (<em>P</em>(<em>z</em>′, <em>z</em>)), and reproduce sexually (<em>F</em>(<em>z</em>′, <em>z</em>)). There is no seed bank, and so there are no discrete traits in the model. We’ll use 4 regressions: survival (<em>s</em>(<em>z</em>)), growth (<em>G</em>(<em>z</em>′, <em>z</em>), <em>f</em><sub><em>G</em></sub>), probability of reproducing (<em>r</em><sub><em>r</em></sub>(<em>z</em>)), and number of seeds produced conditional on flowering (<em>r</em><sub><em>s</em></sub>(<em>z</em>)). New recruits will be generated with a Gaussian distribution (denoted <em>f</em><sub><em>r</em><sub><em>d</em></sub></sub>), which requires calculating the mean and standard deviation of new recruits from the data. For simplicity, we’ll assume there’s no maternal effect on recruit size. First, we’ll write out the functional forms for each component of the model:</p>
 <ol>
-<li><p><em>n</em>(<em>z</em>′, <em>t</em> + 1) = ∫<sub><em>L</em></sub><sup><em>U</em></sup><em>K</em>(<em>z</em>′, <em>z</em>)<em>n</em>(<em>z</em>, <em>t</em>)*d**z*</p></li>
+<li><p><em>n</em>(<em>z</em>′, <em>t</em> + 1) = ∫<sub><em>L</em></sub><sup><em>U</em></sup><em>K</em>(<em>z</em>′, <em>z</em>)<em>n</em>(<em>z</em>, <em>t</em>)<em>dz</em></p></li>
 <li><p><em>K</em>(<em>z</em>′, <em>z</em>) = <em>P</em>(<em>z</em>′, <em>z</em>) + <em>F</em>(<em>z</em>′, <em>z</em>)</p></li>
 <li><p><em>P</em>(<em>z</em>′, <em>z</em>) = <em>s</em>(<em>z</em>) * <em>G</em>(<em>z</em>′, <em>z</em>)</p></li>
 <li><p><em>L<strong>o</strong>g<strong>i</strong>t</em>(<em>s</em>(<em>z</em>)) = <em>α</em><sub><em>s</em></sub> + <em>β</em><sub><em>s</em></sub> * <em>z</em></p></li>
-<li><p><em>G</em>(<em>z</em>′, <em>z</em>) = <em>f</em><sub><em>g</em></sub>(<em>μ</em><sub><em>g</em></sub>, <em>σ</em><sub><em>g</em></sub>)</p></li>
-<li><p><em>μ</em><sub><em>g</em></sub> = <em>α</em><sub><em>g</em></sub> + <em>β</em><sub><em>g</em></sub> * <em>z</em></p></li>
+<li><p><em>G</em>(<em>z</em>′, <em>z</em>) = <em>f</em><sub><em>G</em></sub>(<em>μ</em><sub><em>G</em></sub>, <em>σ</em><sub><em>G</em></sub>)</p></li>
+<li><p><em>μ</em><sub><em>G</em></sub> = <em>α</em><sub><em>G</em></sub> + <em>β</em><sub><em>G</em></sub> * <em>z</em></p></li>
 <li><p><em>F</em>(<em>z</em>′, <em>z</em>) = <em>r</em><sub><em>r</em></sub>(<em>z</em>) * <em>r</em><sub><em>s</em></sub>(<em>z</em>) * <em>r</em><sub><em>d</em></sub>(<em>z</em>′)</p></li>
 <li><p><em>L<strong>o</strong>g<strong>i</strong>t</em>(<em>r</em><sub><em>r</em></sub>(<em>z</em>)) = <em>α</em><sub><em>r</em><sub><em>r</em></sub></sub> + <em>β</em><sub><em>r</em><sub><em>r</em></sub></sub> * <em>z</em></p></li>
 <li><p><em>L<strong>o</strong>g</em>(<em>r</em><sub><em>s</em></sub>(<em>z</em>)) = <em>α</em><sub><em>r</em><sub><em>s</em></sub></sub> + <em>β</em><sub><em>r</em><sub><em>s</em></sub></sub> * <em>z</em></p></li>
@@ -247,7 +247,7 @@
 </ul>
 </li>
 <li>
-<p>Growth (<em>G</em>(<em>z</em>′, <em>z</em>) / <code>g</code>): a linear model with a normal error distribution.</p>
+<p>Growth (<em>G</em>(<em>z</em>′, <em>z</em>) / <code>G</code>): a linear model with a normal error distribution.</p>
 <ul>
 <li>Example model formula: <code><a href="https://rdrr.io/r/stats/lm.html">lm(size_2 ~ size_1, data = my_grow_data)</a></code>
 </li>
@@ -287,14 +287,14 @@
 
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
 
-<span class="va">my_data_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>s_int     <span class="op">=</span> <span class="op">-</span><span class="fl">2.2</span>,   <span class="co"># coefficients(my_surv_mod)[1]</span>
+<span class="va">my_data_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>s_int     <span class="op">=</span> <span class="op">-</span><span class="fl">2.2</span>,  <span class="co"># coefficients(my_surv_mod)[1]</span>
                     s_slope   <span class="op">=</span> <span class="fl">0.25</span>,  <span class="co"># coefficients(my_surv_mod)[2]</span>
                     g_int     <span class="op">=</span> <span class="fl">0.2</span>,   <span class="co"># coefficients(my_grow_mod)[1]</span>
                     g_slope   <span class="op">=</span> <span class="fl">0.99</span>,  <span class="co"># coefficients(my_grow_mod)[2]</span>
                     sd_g      <span class="op">=</span> <span class="fl">0.7</span>,   <span class="co"># sd(resid(my_grow_mod))</span>
                     r_r_int   <span class="op">=</span> <span class="fl">0.003</span>, <span class="co"># coefficients(my_pr_flower_mod)[1]</span>
                     r_r_slope <span class="op">=</span> <span class="fl">0.015</span>, <span class="co"># coefficients(my_pr_flower_mod)[2]</span>
-                    r_s_int   <span class="op">=</span> <span class="fl">0.45</span>,   <span class="co"># coefficients(my_seed_mod)[1]</span>
+                    r_s_int   <span class="op">=</span> <span class="fl">0.45</span>,  <span class="co"># coefficients(my_seed_mod)[1]</span>
                     r_s_slope <span class="op">=</span> <span class="fl">0.075</span>, <span class="co"># coefficients(my_seed_mod)[2]</span>
                     mu_fd     <span class="op">=</span> <span class="fl">2</span>,     <span class="co"># mean(recruit_data$size_next)</span>
                     sd_fd     <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span>   <span class="co"># sd(recruit_data$size_next)</span>
@@ -318,7 +318,7 @@
   
   <span class="co"># The formula for the kernel. We dont need to tack on the "z'/z"s here.  </span>
   
-  formula   <span class="op">=</span> <span class="va">s</span> <span class="op">*</span> <span class="va">g</span>,
+  formula   <span class="op">=</span> <span class="va">s</span> <span class="op">*</span> <span class="va">G</span>,
   
   <span class="co"># A named set of expressions for the vital rates it includes. </span>
   <span class="co"># note the use of user-specified functions here. Additionally, each </span>
@@ -335,7 +335,7 @@
   <span class="co"># The SD is a constant, so we don't need to define that in ... expression, </span>
   <span class="co"># just the data_list.</span>
   
-  g         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">mu_g</span>, <span class="va">sd_g</span><span class="op">)</span>,
+  G         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">mu_g</span>, <span class="va">sd_g</span><span class="op">)</span>,
   mu_g      <span class="op">=</span> <span class="va">g_int</span> <span class="op">+</span> <span class="va">g_slope</span> <span class="op">*</span> <span class="va">dbh_1</span>,
   
   
@@ -351,7 +351,7 @@
   
   evict_cor <span class="op">=</span> <span class="cn">TRUE</span>,
   evict_fun <span class="op">=</span> <span class="fu"><a href="reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span>fun    <span class="op">=</span> <span class="st">'norm'</span>,
-                                      target <span class="op">=</span> <span class="st">'g'</span><span class="op">)</span>
+                                      target <span class="op">=</span> <span class="st">'G'</span><span class="op">)</span>
   <span class="op">)</span> 
 
 <span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
@@ -426,7 +426,7 @@
 <span class="va">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
 <span class="va">w_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/right_ev.html">right_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
 <span class="va">v_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/right_ev.html">left_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span></code></pre></div>
-<p>A more detailed introduction to <code>ipmr</code> is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. Help with age × size models, density dependent models, and the suffix syntax are also available there. That’s all for now, happy modeling!</p>
+<p>A more detailed introduction to <code>ipmr</code> is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. Help with age × size models, density dependent models, and the parameter set index syntax are also available there. That’s all for now, happy modeling!</p>
 </div>
 </div>
 

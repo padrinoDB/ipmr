@@ -204,10 +204,10 @@ ws      <- vapply(eigen_sys, function(x) Re(x$vectors[ , 1]), numeric(100)) %>%
 
 ## ipmr version
 
-# define the levels of the hierarchical variable and save them in a named
+# define the levels of the par_setarchical variable and save them in a named
 # list that corresponds to the suffix in the kernel notation
 
-hier_levels <- list(yr = 1:5)
+par_set_indices <- list(yr = 1:5)
 
 # additional usr_funs to be passed into make_ipm()
 
@@ -247,8 +247,8 @@ monocarp_sys <- init_ipm(sim_gen    = "simple",
     mu_g_yr          = g_int + g_slope * ht_1 + g_r_yr,
     data_list        = params,
     states           = list(c('ht')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_levels,
+    uses_par_sets    = TRUE,
+    par_set_indices = par_set_indices,
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm', 'g_yr')
   ) %>%
@@ -261,8 +261,8 @@ monocarp_sys <- init_ipm(sim_gen    = "simple",
     f_d              = dnorm(ht_2, mu_fd, sd_fd),
     data_list        = params,
     states           = list(c('ht')),
-    has_hier_effs    = TRUE,
-    levels_hier_effs = hier_levels,
+    uses_par_sets    = TRUE,
+    par_set_indices = par_set_indices,
     evict_cor        = TRUE,
     evict_fun        = truncated_distributions('norm', 'f_d')
   ) %>%
@@ -419,8 +419,8 @@ test_that("order of kernel definition doesn't matter", {
       f_d              = dnorm(ht_2, mu_fd, sd_fd),
       data_list        = params,
       states           = list(c('ht')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_levels,
+      uses_par_sets    = TRUE,
+      par_set_indices = par_set_indices,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'f_d')
     ) %>%
@@ -434,8 +434,8 @@ test_that("order of kernel definition doesn't matter", {
       mu_g_yr          = g_int + g_slope * ht_1 + g_r_yr,
       data_list        = params,
       states           = list(c('ht')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_levels,
+      uses_par_sets    = TRUE,
+      par_set_indices = par_set_indices,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'g_yr')
     ) %>%
@@ -493,8 +493,8 @@ test_that("return_all gets all of the environments back", {
       f_d              = dnorm(ht_2, mu_fd, sd_fd),
       data_list        = params,
       states           = list(c('ht')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_levels,
+      uses_par_sets    = TRUE,
+      par_set_indices = par_set_indices,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'f_d')
     ) %>%
@@ -508,8 +508,8 @@ test_that("return_all gets all of the environments back", {
       mu_g_yr          = g_int + g_slope * ht_1 + g_r_yr,
       data_list        = params,
       states           = list(c('ht')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_levels,
+      uses_par_sets    = TRUE,
+      par_set_indices = par_set_indices,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'g_yr')
     ) %>%
@@ -556,8 +556,8 @@ test_that('normalizing pop vector gets same lambdas as before', {
       f_d              = dnorm(ht_2, mu_fd, sd_fd),
       data_list        = params,
       states           = list(c('ht')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_levels,
+      uses_par_sets    = TRUE,
+      par_set_indices = par_set_indices,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'f_d')
     ) %>%
@@ -571,8 +571,8 @@ test_that('normalizing pop vector gets same lambdas as before', {
       mu_g_yr          = g_int + g_slope * ht_1 + g_r_yr,
       data_list        = params,
       states           = list(c('ht')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_levels,
+      uses_par_sets    = TRUE,
+      par_set_indices = par_set_indices,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'g_yr')
     )  %>%
@@ -631,7 +631,7 @@ test_that('normalizing pop vector gets same lambdas as before', {
 })
 
 
-test_that("drop_levels works in hier_effs", {
+test_that("drop_levels works in par_sets", {
 
   # Define some fixed parameters
   data_list = list(
@@ -654,9 +654,9 @@ test_that("drop_levels works in hier_effs", {
   s_r_int   <- rnorm(8, 0, 0.7)
   f_s_r_int <- rnorm(8, 0, 0.2)
 
-  hier_levels <- list(yr = 1:5, site = c("a", "b"))
+  par_set_indices <- list(yr = 1:5, site = c("a", "b"))
 
-  levels <- expand.grid(hier_levels)
+  levels <- expand.grid(par_set_indices)
 
   levels <- apply(levels, 1, function(x) paste(x[1], x[2], sep = "_"))
 
@@ -670,7 +670,7 @@ test_that("drop_levels works in hier_effs", {
   names(s_r_int)   <- paste('s_', nms, sep = "")
   names(f_s_r_int) <- paste('f_s_', nms, sep = "")
 
-  hier_levels$drop_levels <- to_drop
+  par_set_indices$drop_levels <- to_drop
 
   g_params   <- list2(!!! g_r_int)
   s_params   <- list2(!!! s_r_int)
@@ -696,8 +696,8 @@ test_that("drop_levels works in hier_effs", {
       f_d              = dnorm(ht_2, mu_fd, sd_fd),
       data_list        = params,
       states           = list(c('ht')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_levels,
+      uses_par_sets    = TRUE,
+      par_set_indices = par_set_indices,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'f_d')
     ) %>%
@@ -711,8 +711,8 @@ test_that("drop_levels works in hier_effs", {
       mu_g_yr_site     = g_int + g_slope * ht_1 + g_r_yr_site,
       data_list        = params,
       states           = list(c('ht')),
-      has_hier_effs    = TRUE,
-      levels_hier_effs = hier_levels,
+      uses_par_sets    = TRUE,
+      par_set_indices = par_set_indices,
       evict_cor        = TRUE,
       evict_fun        = truncated_distributions('norm', 'g_yr_site')
     )  %>%

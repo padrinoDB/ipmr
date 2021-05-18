@@ -16,6 +16,7 @@
   bw = FALSE,
   do_contour = FALSE,
   do_legend = FALSE,
+  contour_cex = 1,
   ...
 )
 
@@ -84,6 +85,9 @@ on the plot}
 
 \item{do_legend}{A logical indicating whether to draw a legend for the plot}
 
+\item{contour_cex}{A numeric specifying how large to make labels for the
+contour lines.}
+
 \item{...}{further arguments passed to legend}
 
 \item{exponent}{The exponent to raise each kernel to. Setting this to a low
@@ -91,9 +95,9 @@ number can help visualize kernels that are overwhelmed by a few very large numbe
 
 \item{mega_mat}{A vector with symbols, I's, and/or 0s representing the matrix blocks.
 They should be specified in ROW MAJOR order! Can also be a character
-string specifying the call. Suffix syntax is supported. When used,
-\code{format_mega_matrix} will produce as many mega-matrices as there are
-combinations of \code{levels_hier_effs} in the \code{proto_ipm}.}
+string specifying the call. Parameter set index syntax is supported. When used,
+\code{format_mega_kernel} will produce as many mega-matrices as there are
+combinations of \code{par_set_indices} in the \code{proto_ipm}.}
 }
 \value{
 \code{A} or \code{ipm} invisibly
@@ -102,8 +106,6 @@ combinations of \code{levels_hier_effs} in the \code{proto_ipm}.}
 Plot a matrix or an *_ipm object
 }
 \details{
-\code{plot.ipmr_matrix} is intended for internal use only, and it
-is usually safer to use \code{plot.*_ipm} methods for visualizing kernels.
 If an IPM kernel is overwhelmed by information in say, a fecundity sub-kernel,
 use the \code{exponent} argument in \code{plot.*_ipm} to make it more visually
 appealing.

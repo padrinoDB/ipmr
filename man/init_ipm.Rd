@@ -4,7 +4,7 @@
 \alias{init_ipm}
 \title{Initialize an IPM}
 \usage{
-init_ipm(sim_gen, di_dd, det_stoch, kern_param = NULL, has_age = FALSE)
+init_ipm(sim_gen, di_dd, det_stoch, kern_param = NULL, uses_age = FALSE)
 }
 \arguments{
 \item{sim_gen}{Either \code{"simple"} or \code{"general"}.}
@@ -18,14 +18,14 @@ must be specified.}
 \item{kern_param}{If \code{det_stoch = "stoch"}, then this should be either
 \code{"kern"} or \code{"param"}.}
 
-\item{has_age}{A logical indicating whether the model has age structure. Default
+\item{uses_age}{A logical indicating whether the model has age structure. Default
 is \code{FALSE}}
 }
 \value{
 An object with classes \code{"proto_ipm"} and a combination of
 \code{sim_gen}, \code{di_dd}, \code{det_stoch}, and possibly
 \code{kern_param}. If
-\code{has_age = TRUE}, then an \code{"age_x_size"} class is also added.
+\code{uses_age = TRUE}, then an \code{"age_x_size"} class is also added.
 }
 \description{
 This is always the first step in constructing an IPM with \code{ipmr}.

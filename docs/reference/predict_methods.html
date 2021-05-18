@@ -108,7 +108,7 @@ correctly represented in the data_list." />
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/suffix-notation.html">Suffix Notation</a>
+      <a href="../articles/index-notation.html">Index Notation in ipmr</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -190,7 +190,10 @@ method instead.</p></td>
     <p>ipmr usually recognizes model objects passed into the <code>data_list</code> argument
 automatically. Unfortunately, sometimes it'll miss one, and the user will need
 to manually protect it from the standard build process. This function
-provides a wrapper around that process.</p>
+provides a wrapper around that process. Additionally, please file a bug
+report here: <a href='https://github.com/levisc8/ipmr/issues'>https://github.com/levisc8/ipmr/issues</a> describing what type
+of model you are trying to use so it can be added to later versions of the
+package.</p>
 <p>Wrap a model object in <code>use_vr_model</code> when building the <code>data_list</code>
 to pass to <code>define_kernel</code>.</p>
 

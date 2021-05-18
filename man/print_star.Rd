@@ -65,7 +65,7 @@ Print proto_ipms or *_ipm objects
 Generics for IPM classes
 }
 \details{
-For printing \code{proto_ipm} objects, suffixes are wrapped in
-\code{<suffix>} to assist with debugging. These are not carried into the model,
+For printing \code{proto_ipm} objects, indices are wrapped in
+\code{<index>} to assist with debugging. These are not carried into the model,
 just a visual aid.
 }

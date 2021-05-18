@@ -102,7 +102,7 @@ pred_ipm <- init_ipm(sim_gen    = "simple",
     g             = dnorm(sa_2, g_mu, grow_sd),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>%
@@ -116,7 +116,7 @@ pred_ipm <- init_ipm(sim_gen    = "simple",
     f_d           = dnorm(sa_2, recr_mu, recr_sd),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
@@ -170,7 +170,7 @@ prot_ipm <- init_ipm(sim_gen    = "simple",
     g             = dnorm(sa_2, g_mu, grow_sd),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>%
@@ -184,7 +184,7 @@ prot_ipm <- init_ipm(sim_gen    = "simple",
     f_d           = dnorm(sa_2, recr_mu, recr_sd),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%
@@ -270,7 +270,7 @@ sum_ipm <- init_ipm(sim_gen    = "simple",
     g             = dnorm(sa_2, g_mu, grow_sd),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "g")
   ) %>%
@@ -285,7 +285,7 @@ sum_ipm <- init_ipm(sim_gen    = "simple",
     f_d           = dnorm(sa_2, recr_mu, recr_sd),
     states        = list(c("sa")),
     data_list     = params,
-    has_hier_effs = FALSE,
+    uses_par_sets = FALSE,
     evict_cor     = TRUE,
     evict_fun     = truncated_distributions("norm", "f_d")
   ) %>%

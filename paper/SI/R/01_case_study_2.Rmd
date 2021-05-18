@@ -8,7 +8,11 @@ urlcolor: blue
 
 Many life cycles cannot be described by a single, continuous state variable. For example, some plants are best modeled using height or diameter at breast height (DBH) as a state variable, and may also form a seed bank. Seeds in the seed bank can't have a value for height or DBH, but may lose their viability as they age. Thus, we require a discrete state to capture the dynamics of the seed bank. Models that include discrete states and/or multiple continuous state variables are _general IPMs_. 
 
-Many species exhibit age-dependent demography. Age may interact with a measure of size, for example body mass, resulting in neither single variable reliably predicting demography on its own. Data sets for which individuals are cross-classified by age and size represent an interesting opportunity for demographic research. This case study will use an age and size structured population to illustrate how to implement general IPMs in `ipmr`. 
+Many species exhibit age-dependent demography. Age may interact with a measure of size, for example body mass, resulting in neither single variable reliably predicting demography on its own. Data sets for which individuals are cross-classified by age and size represent an interesting opportunity for demographic research. 
+
+This case study will use an age and size structured population to illustrate how to implement general IPMs in `ipmr`. We will use an age and size structured model from Ellner, Childs, & Rees (2016) to explore how to work with general IPMs in `ipmr`. The data are from a long term study of Soay sheep (_Ovis aries_) on St. Kilda. The population has been studied in detail since 1985 (Clutton-Brock & Pemberton 2004). Individuals are caught, weighed, and tagged shortly after birth, and re-weighed each subsequent year. Maternity can be inferred from field observations, so we can also model the link between parental state and offspring state. More detailed methods are provided in Clutton-Brock & Pemberton (2004) and Childs et al. 2011.
+
+In addition to computing the per-capita growth rate ($\lambda$) and right and left eigenvectors ($w_a(z)$ and $v_a(z)$, respectively), we will also show how to compute age specific survival and fertility for these models.
 
 With size denoted $z,z'$, age denoted $a$, and the maximum age an individual can have denoted $M$, the model can be written as:
 
@@ -20,33 +24,35 @@ In this case, there is also an "greybeard" age class $M+1$ defined as $a \ge M+1
 
 3. $n_{M+1}(z', t+1) = \int_L^U[P_M(z',z)n_M(z,t) + P_{M+1}(z',z)n_{M+1}(z,t)]dz$
 
-Below, $f_g$ and $f_{r_d}$ denote normal probability density functions. The sub-kernel $P_a(z',z)$ is comprised of the following functions:
+Below, $f_G$ and $f_{B}$ denote normal probability density functions. The sub-kernel $P_a(z',z)$ is comprised of the following functions:
 
 4. $P_a(z',z) = s(z,a) * G(z',z, a)$
 
-5. $Logit(s(z,a)) = \alpha_s + \beta_s^z * z + \beta_s^a * a$
+5. Survival: $Logit(s(z,a)) = \alpha_s + \beta_{s,z} * z + \beta_{s,a} * a$
 
-6. $g(z',z, a) = f_g(z', \mu_g(z, a), \sigma_g)$
+6. Growth: $G(z',z, a) = f_G(z', \mu_G(z, a), \sigma_G)$
 
-7. $\mu_g(z,a) = \alpha_g + \beta_g^z * z + \beta_g^a * a$
+7. Mean Growth: $\mu_G(z,a) = \alpha_G + \beta_{G,z} * z + \beta_{G,a} * a$
 
 and the sub-kernel $F_a(z',z)$ is comprised of the following functions:
 
 8. $F_0 = 0$
 
-9. $F_a = s(z,a) * p_b(z,a) * p_r(a) * r_d(z', z) * 0.5$
+9. $F_a = s(z,a) * p_b(z,a) * p_r(a) * B(z', z) * 0.5$
 
-The $F_a$ kernel is multiplied by 0.5 because this model only models the population dynamics of females.
+This model only follows females, and we assume that the population is half female. Thus, we multiply the $F_a$ kernel by 0.5. If needed, we could adjust the sex ratio based on observed data, and update this multiplication accordingly. 
 
-10. $Logit(p_b(z,a)) = \alpha_{p_b} + \beta_{p_b}^z * z + \beta_{p_b}^a * a$
+10. Probability of reproducing: $Logit(p_b(z,a)) = \alpha_{p_b} + \beta_{p_b,z} * z + \beta_{p_b,a} * a$
 
-11. $Logit(p_r(a)) = \alpha_{p_r} + \beta_{p_r}^a * a$
+11. Probability of recruiting: $Logit(p_r(a)) = \alpha_{p_r} + \beta_{p_r,a} * a$
 
-12. $r_d(z', z) = f_{r_d}(z', \mu_{r_d}(z), \sigma_{r_d})$
+12. Recruit size distribution: $B(z', z) = f_{B}(z', \mu_{B}(z), \sigma_{B})$
 
-13. $\mu_{r_d}(z) = \alpha_{r_d} + \beta_{r_d}^z * z$
+13. Mean recruit size: $\mu_{B}(z) = \alpha_{B} + \beta_{B,z} * z$
 
-Equations 5-7 and 10-13 are parameterized from regression models. The parameter values are taken from Ellner, Childs & Rees, Chapter 6 (2016). These can be found [here](https://github.com/levisc8/first-edition/blob/master/Rcode/c6/Ungulate%20Age%20Demog%20Funs.R#L13). In the code from the book, these paramters were used to simulate an IBM to generate a data set. The data were then used to fit regression models and an age$\times$size IPM. We are going to skip the simulation and regression model fitting steps steps and just use the "true" parameter estimates to generate the IPM. 
+Equations 5-7 and 10-13 are parameterized from regression models. The parameter values are taken from Ellner, Childs & Rees, Chapter 6 (2016). These can be found [here](https://github.com/levisc8/first-edition/blob/master/Rcode/c6/Ungulate%20Age%20Demog%20Funs.R#L13). In the code from the book, these parameters were used to simulate an individual based model (IBM) to generate a data set. The data were then used to fit regression models and an age$\times$size IPM. We are going to skip the simulation and regression model fitting steps steps and just use the "true" parameter estimates to generate the IPM. 
+
+## Model Code
 
 First, we will define all the model parameters and a function for the $F_a$ kernels.
 
@@ -95,17 +101,17 @@ r_fun <- function(age, s_age, pb_age, pr_age, recr) {
 
 ```
 
-Next, we set up the $P_a$ kernels (Equations 4-7 above). Because this is a general, deterministic IPM, we use `init_ipm(sim_det = "general", di_dd = "di", det_stoch = "det", has_age = TRUE)`. We set `has_age = TRUE` to indicate that our model has age structure as well as size structure. There are 3 key things to note:
+Next, we set up the $P_a$ kernels (Equations 4-7 above). Because this is a general, deterministic IPM, we use `init_ipm(sim_gen = "general", di_dd = "di", det_stoch = "det", uses_age = TRUE)`. We set `uses_age = TRUE` to indicate that our model has age structure as well as size structure. There are 3 key things to note:
 
 1. the use of the suffix `_age` appended to the names of the `"P_age"` kernel and the `mu_g_age` variable.
 
 2. the value `age` used in the vital rate expressions.
 
-3. the list in the `levels_ages` argument.
+3. the list in the `age_indices` argument.
 
-The values in the `levels_ages` list will automatically get substituted in for `"age"` each time it appears in the vital rate expressions and kernels. We add a second variable to this list, `"max_age"`, to indicate that we have a "greybeard" class. If we wanted our model to kill all individuals above age 20, we would simply omit the `"max_age"` slot in the `levels_ages` list.
+The values in the `age_indices` list will automatically get substituted in for `"age"` each time it appears in the vital rate expressions and kernels. We add a second variable to this list, `"max_age"`, to indicate that we have a "greybeard" class. If we wanted our model to kill all individuals above age 20, we would simply omit the `"max_age"` slot in the `age_indices` list.
 
-This single call to `define_kernel()` will result in 22 actual kernels, one for each value of `age` from 0-21. For general IPMs that are not age-structured, we would use `has_hier_effs` and `levels_hier_effs` in the same way we're using `age` below. 
+This single call to `define_kernel()` will result in 22 actual kernels, one for each value of `age` from 0-21. For general IPMs that are not age-structured, we would use `uses_par_sets` and `par_set_indices` in the same way we're using `age` below. 
 
 The `plogis` function is part of the `stats` package in _R_, and performs the inverse logit transformation.
 
@@ -114,7 +120,7 @@ The `plogis` function is part of the `stats` package in _R_, and performs the in
 age_size_ipm <- init_ipm(sim_gen = "general",
                          di_dd = "di", 
                          det_stoch = "det", 
-                         has_age = TRUE) %>%
+                         uses_age = TRUE) %>%
   define_kernel(
     name          = "P_age",
     family        = "CC",
@@ -124,8 +130,8 @@ age_size_ipm <- init_ipm(sim_gen = "general",
     mu_g_age      = grow_int + grow_z * z_1 + grow_a * age,
     data_list     = param_list,
     states        = list(c("z")),
-    has_hier_effs = FALSE,
-    levels_ages   = list(age = c(0:20), max_age = 21),
+    uses_par_sets = FALSE,
+    age_indices   = list(age = c(0:20), max_age = 21),
     evict_cor     = FALSE
   ) 
 
@@ -146,14 +152,14 @@ age_size_ipm <-   define_kernel(
   rcsz_mu       = rcsz_int + rcsz_z * z_1,
   data_list     = param_list,
   states        = list(c("z")),
-  has_hier_effs = FALSE,
-  levels_ages   = list(age = c(0:20), max_age = 21),
+  uses_par_sets = FALSE,
+  age_indices   = list(age = c(0:20), max_age = 21),
   evict_cor     = FALSE
 ) 
 
 ```
 
-Once we've defined the $P_a$ and $F_a$ kernels, we need to define starting and ending states for each kernel. Age-size structured populations will look a little different from the previous ones, as we need to ensure that all fecundity kernels produce `age-0` individuals, and all survival-growth kernels produce `age` individuals. We define the implementation arguments using `define_impl()`, and set each kernel's `state_start` to `"z_age"`. Because the fecundity kernel produces age-0 individuals, regardless of the starting age, its `state_end` is `"z_0"`.
+Once we've defined the $P_a$ and $F_a$ kernels, we need to define starting and ending states for each kernel. Age-size structured populations will look a little different from other models, as we need to ensure that all fecundity kernels produce `age-0` individuals, and all survival-growth kernels produce `age` individuals. We define the implementation arguments using `define_impl()`, and set each kernel's `state_start` to `"z_age"`. Because the fecundity kernel produces age-0 individuals, regardless of the starting age, its `state_end` is `"z_0"`.
 
 ```{r}
 
@@ -183,7 +189,7 @@ age_size_ipm <- age_size_ipm %>%
 
 ```
 
-Our definition of the initial population state will look a little different though. We want to create 22 copies of the initial population state, one for each age group in the model. We do this by appending `_age` to the `n_z` in the `...` part of `define_pop_state`.
+Our definition of the initial population state will look a little different though. We want to create 22 copies of the initial population state, one for each age group in the model. We do this by appending `_age` to the `n_z` in the `...` part of `define_pop_state`. We'll also set `make_ipm(...,return_all_envs = TRUE)` so we can access the computed values for each vital rate function in the model.
 
 ```{r}
 age_size_ipm <-  define_pop_state(
@@ -193,19 +199,77 @@ age_size_ipm <-  define_pop_state(
   make_ipm(
     usr_funs = list(r_fun = r_fun),
     iterate  = TRUE,
-    iterations = 100
+    iterations = 100,
+    return_all_envs = TRUE
   )
 
+
+```
+
+## Basic analysis
+
+We see that the population is projected to grow by about 1.5% each year. As in Case Study 1, we can check for convergence using the `is_conv_to_asymptotic()` function.
+
+```{r}
 
 lamb <- lambda(age_size_ipm)
 lamb
 
+is_conv_to_asymptotic(age_size_ipm)
+
 ```
 
+For some analyses, we may want to get the actual vital rate function values, rather than the sub-kernels and/or iteration kernels. We can access those with `vital_rate_funs()`. Note that right now, this function always returns a full bivariate form of the vital rate function (i.e. for survival, it returns a *n* X *n* kernel, rather than a 1 x *n* vector, where *n* is the number of meshpoints). It is also important to note that these functions are **not yet discretized**, and so need to be treated as such (i.e. any vital rate with a probability density function will contain probability densities, not probabilities).
+
+
+```{r}
+
+vr_funs <- vital_rate_funs(age_size_ipm)
+
+# Age 0 survival and growth vital rate functions
+
+vr_funs$P_0
+
+# Age 12 fecundity functions
+
+vr_funs$F_12
+
+
+```
+
+We can also update the model to use a new functional form for a vital rate expression. For example, we could add parent size dependence for the probability of recruiting function. This requires 3 steps: extract the `proto_ipm` object, set the new functional form, and update the parameter list. We have to wrap the assignment in `new_fun_form()` to prevent parsing errors. 
+
+
+
+```{r}
+
+
+new_proto <- age_size_ipm$proto_ipm
+
+vital_rate_exprs(new_proto, 
+                 kernel = "F_age", 
+                 vital_rate = "pr_age") <-
+  new_fun_form(plogis(recr_int + recr_z * z_1 + recr_a * age)) 
+
+parameters(new_proto) <- list(recr_z = 0.05)
+
+new_ipm <- make_ipm(new_proto,
+                    return_all_envs = TRUE)
+
+lambda(new_ipm)
+
+```
+
+```{r echo = FALSE}
+
+options(width = 95)
+
+```
+Next, we'll extract and visualize eigenvectors and compute age specific fertility and survival.
 
 # Further analyses
 
-The `right_ev` and `left_ev` functions also work for age $\times$ size models. We can use extract these, and plot them using a call to `lapply`. 
+The `right_ev` and `left_ev` functions also work for age $\times$ size models. We can use extract these, and plot them using a call to `lapply`. We will use the notation from Ellner, Childs, & Rees (2016) to denote the left and right eigenvectors ($v_a(z)$ and $w_a(z)$, respectively).
 
 NB: we assign the `lapply` call to a value here because `lines` returns `NULL` invisibly, and this clogs up the console. You probably don't need to do this for interactive use. We'll also divide the $dz$ value back into each eigenvector so that they are continuous distributions, rather than discretized vectors. 
 
@@ -317,7 +381,7 @@ plot(f_a[1:25], type = 'l',
 
 ```
 
-We can also calculate the age-specific survival probability $p_a$ as $\frac{l_{a+1}}{l_a}$. We'll restrict our calculations to the to 25 years.
+We can also calculate the age-specific survival probability $p_a$ as $\frac{l_{a+1}}{l_a}$. We'll restrict our calculations to the first 25 years of life, as we'll see that almost no sheep live longer than that.
 
 ```{r}
 
@@ -328,5 +392,12 @@ plot(p_a, type = 'l',
      xlab = "Age")
 
 ```
+
+## Citations
+
+Childs DZ, Coulson T, Pemberton JM, Clutton-Brock TH, & Rees M (2011). Predicting trait values and measuring selection in complex life histories: reproductive allocation decisions in Soay sheep. Ecology Letters 14: 985-992.
+
+Clutton-Brock TH & Pemberton JM (2004). Soay Sheep: Dynamics and Selection in an
+Island Population. Cambridge University Press, Cambridge.
 
 

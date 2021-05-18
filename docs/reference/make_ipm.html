@@ -106,7 +106,7 @@ vignette('ipmr-introduction', 'ipmr')  a more complete introduction." />
       <a href="../articles/general-ipms.html">General IPMs</a>
     </li>
     <li>
-      <a href="../articles/suffix-notation.html">Suffix Notation</a>
+      <a href="../articles/index-notation.html">Index Notation in ipmr</a>
     </li>
     <li>
       <a href="../articles/age_x_size.html">Age-Size IPMs</a>
@@ -379,9 +379,9 @@ other potentially useful variables for subsequent analyses. Default is
       <td><p>A logical indicating whether to return the environments that
 the kernel expressions are evaluated in. These may be useful for some analyses,
 such as regression-level sensitivity/elasticity analyses, but can also rapidly
-increase memory consumption for models with many kernels (e.g. ones with grouping
-effects that have many levels, or any <code>*_stoch_param</code> model). Default is
-<code>FALSE</code>.</p></td>
+increase memory consumption for models with many kernels (e.g. ones with
+parameter set indices that have many levels, or any <code>*_stoch_param</code> model).
+Default is <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>usr_funs</th>
@@ -430,10 +430,10 @@ by other functions. Use with care.</p></td>
       <td><p>For <code>*_stoch_kern</code> methods, the sequence of kernels
 to use during the simulation process. It should have the same number of entries
 as the number of <code>iterations</code>.
-This should be a vector containing levels of the grouping effects specified
-in <code>levels_hier_effs</code>, or empty. Support for Markov chains will eventually
+This should be a vector containing values of the parameter set indices specified
+in <code>par_set_indices</code>, or empty. Support for Markov chains will eventually
 get implemented. If it is empty, <code>make_ipm</code> will try to generate a
-sequence internally using a random selection of the <code>levels_hier_effs</code>
+sequence internally using a random selection of the <code>par_set_indices</code>
 defined in <code>define_kernel</code>.</p></td>
     </tr>
     <tr>
@@ -446,7 +446,7 @@ methods. Default is <code>FALSE</code>.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The <code>make_ipm.*</code> methods will always return a list of length 6
+    <p>The <code>make_ipm.*</code> methods will always return a list of length 5
 containing the following components:</p>
 <ul>
 <li><p><strong>sub_kernels</strong>: a list of arrays specified in <code>define_kernel</code>.</p></li>

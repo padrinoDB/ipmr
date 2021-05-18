@@ -212,7 +212,10 @@ define_env_state <- function(proto_ipm, ..., data_list = list()) {
 #' @details ipmr usually recognizes model objects passed into the \code{data_list} argument
 #' automatically. Unfortunately, sometimes it'll miss one, and the user will need
 #' to manually protect it from the standard build process. This function
-#' provides a wrapper around that process.
+#' provides a wrapper around that process. Additionally, please file a bug
+#' report here: \url{https://github.com/levisc8/ipmr/issues} describing what type
+#' of model you are trying to use so it can be added to later versions of the
+#' package.
 #'
 #' Wrap a model object in \code{use_vr_model} when building the \code{data_list}
 #' to pass to \code{define_kernel}.
@@ -327,16 +330,16 @@ mat_power <- function(x, y) {
 #' @rdname make_iter_kernel
 #' @export
 
-format_mega_matrix <- function(ipm, ...) {
+format_mega_kernel <- function(ipm, ...) {
 
-  UseMethod("format_mega_matrix")
+  UseMethod("format_mega_kernel")
 
 }
 
 #' @rdname make_iter_kernel
 #' @export
 
-format_mega_matrix.default <- function(ipm, mega_mat, ...) {
+format_mega_kernel.default <- function(ipm, mega_mat, ...) {
 
   mega_mat    <- rlang::enquo(mega_mat)
 
@@ -359,9 +362,9 @@ format_mega_matrix.default <- function(ipm, mega_mat, ...) {
 
   }
 
-  if(any(ipm$proto_ipm$has_hier_effs)) {
+  if(any(ipm$proto_ipm$uses_par_sets)) {
 
-    levs <- ipm$proto_ipm$levels_hier_effs[ipm$proto_ipm$has_hier_effs] %>%
+    levs <- ipm$proto_ipm$par_set_indices[ipm$proto_ipm$uses_par_sets] %>%
       .flatten_to_depth(1L) %>%
       .[!duplicated(names(.))]
 
@@ -402,7 +405,7 @@ format_mega_matrix.default <- function(ipm, mega_mat, ...) {
 
         it <- it + 1
 
-      } # end single var substitution - reset counter to modify exprs w/ adtl hier_effs if present
+      } # end single var substitution - reset counter to modify exprs w/ adtl par_sets if present
 
       it <- 1
 
@@ -454,7 +457,7 @@ format_mega_matrix.default <- function(ipm, mega_mat, ...) {
 #' @rdname make_iter_kernel
 #' @export
 
-format_mega_matrix.age_x_size_ipm <- function(ipm,
+format_mega_kernel.age_x_size_ipm <- function(ipm,
                                               name_ps,
                                               f_forms,
                                               ...) {
@@ -483,7 +486,7 @@ format_mega_matrix.age_x_size_ipm <- function(ipm,
   # Get all ages. If there's  max age, we'll create an object with that
   # info called add_p. if there isn't then add_p is just a column of 0s
 
-  ages     <- ipm$proto_ipm$levels_ages %>%
+  ages     <- ipm$proto_ipm$age_indices %>%
     .flatten_to_depth(1L) %>%
     .[!duplicated(names(.))]
 
@@ -502,7 +505,7 @@ format_mega_matrix.age_x_size_ipm <- function(ipm,
                ncol = tot_len)
 
   # Next, get the base kernel name. We need this because we only want to modify
-  # age here, not any additional hier_effs (if present). The ps are a bit easier
+  # age here, not any additional par_sets (if present). The ps are a bit easier
   # because there really only should be 1 of those. However, the Fs may have a
   # some additional terms (e.g. F + C), so we have to get both of those, then
   # iterate over each one using the base expression and substituting as needed.
@@ -555,7 +558,7 @@ format_mega_matrix.age_x_size_ipm <- function(ipm,
 
   mega_mat <- as.vector(t(mega_mat))
 
-  out <- format_mega_matrix.default(ipm, mega_mat = mega_mat)
+  out <- format_mega_kernel.default(ipm, mega_mat = mega_mat)
 
   return(out)
 }
@@ -816,7 +819,6 @@ vital_rate_funs <- function(ipm) {
 #' @param vital_rate The name of the vital rate to replace. If the vital rate
 #' doesn't already exist in the \code{object}, a new one with this name will be
 #' created.
-#' @param value The new vital rate form, wrapped in a call to \code{new_fun_form}.
 #'
 #' @export
 
@@ -951,8 +953,10 @@ parameters.default <- function(object) {
 }
 
 #' @rdname accessors
-#' @param value A named list of new parameters. The new list does not need
-#' to contain all of the parameters, just the ones to update/append.
+#' @param value For \code{parameters<-}, a named list of new parameters. The new list does not need
+#' to contain all of the parameters, just the ones to update/append. For
+#' \code{vital_rate_exprs<-} and \code{kernel_formulae<-}, a new functional form.
+#' The new functional form must be wrapped in a call to \code{new_fun_form}.
 #' @export
 
 `parameters<-.proto_ipm` <- function(object, value) {
@@ -1138,17 +1142,6 @@ pop_state.default <- function(object) {
 #'                                  NRA = ht > 10 & ht <= 200,
 #'                                  RA = ht > 200)
 #'
-#' # time series for this model. This extracts the first 20 iterations
-#' # (excluding the initial population state) and collapses them according
-#' # to the rules we pass to ...
-#'
-#'
-#'  time_series <- collapse_pop_state(gen_di_det_ex,
-#'                                    time_step = 2:21,
-#'                                    seedlings = ht <= 10,
-#'                                    NRA = ht > 10 & ht <= 200,
-#'                                    RA = ht > 200)
-#'
 #' @export
 
 collapse_pop_state <- function(ipm, time_step, ...) {
@@ -1290,9 +1283,9 @@ ipm_to_df.default <- function(ipm,
 #'
 #' @param mega_mat A vector with symbols, I's, and/or 0s representing the matrix blocks.
 #' They should be specified in ROW MAJOR order! Can also be a character
-#' string specifying the call. Suffix syntax is supported. When used,
-#' \code{format_mega_matrix} will produce as many mega-matrices as there are
-#' combinations of \code{levels_hier_effs} in the \code{proto_ipm}.
+#' string specifying the call. Parameter set index syntax is supported. When used,
+#' \code{format_mega_kernel} will produce as many mega-matrices as there are
+#' combinations of \code{par_set_indices} in the \code{proto_ipm}.
 #'
 #' @param name_ps The prefix(es) for the kernel name that correspond to survival
 #' and growth/maturation of existing individuals. For the model
@@ -1304,21 +1297,26 @@ ipm_to_df.default <- function(ipm,
 #' individuals, and possibly, how they are combined. For example, a model that
 #' includes sexual (with an "F" kernel) and asexual reproduction (with a "C" kernel),
 #' this would be \code{"F + C"}. If data come from multiple sites or years,
-#' then this information is supplied using the suffix syntax (i.e.
+#' then this information is supplied using the index syntax (i.e.
 #' \code{f_forms = "F_yr + C_yr"}). Only applies to age X size models. The
-#' \code{"_age"} suffix is appended automatically, so does not need to be
+#' \code{"_age"} index is appended automatically, so does not need to be
 #' supplied.
 #'
 #' @return A list containing a large matrix or many large matrices (when used with
 #' suffix syntax). The names in the former case will be \code{"mega_matrix"}
-#' and in the latter case, \code{"mega_matrix_<hier_effs>"} with the levels of the
+#' and in the latter case, \code{"mega_matrix_<par_sets>"} with the levels of the
 #' grouping effects substituted in.
 #'
 #' @details \code{ipmr} does not generate complete iteration kernels, and uses
 #' sub-kernels to iterate models. However, some further analyses are just easier
 #' to code with a complete iteration kernel. This handles constructing those for
-#' simple and general models of all forms. \code{format_mega_matrix} is used
-#' internally by \code{make_iter_kernel} for general IPMs.
+#' simple and general models of all forms. \code{format_mega_kernel} is used
+#' internally by \code{make_iter_kernel} for general IPMs. The difference
+#' between these two functions is that \code{make_iter_kernel} always returns
+#' a list of objects with \code{c(ipmr_matrix, array, matrix)} classes,
+#' whereas \code{format_mega_kernel} always returns a list of objects with
+#' \code{c(array, matrix)} classes. The former has \code{plot()} methods while
+#' the latter does not.
 #'
 #' \code{I} and \code{0} represent identity matrices and 0 matrices,
 #' respectively. They can be used to fill in blocks that represent either, without
@@ -1328,8 +1326,8 @@ ipm_to_df.default <- function(ipm,
 #'
 #' For \code{age_size_ipm}s, the correct form of \code{mega_mat} is generated
 #' internally by creating sub-diagonal matrices for the \code{name_ps} kernels,
-#' and a top row using the \code{f_forms}. If grouping effects are part of the
-#' model, the suffixes should be attached to the \code{name_ps, f_forms} in the
+#' and a top row using the \code{f_forms}. If parameter set indices are part of the
+#' model, the indices should be attached to the \code{name_ps, f_forms} in the
 #' function arguments, and the correct block matrices will be generated internally.
 #'
 #' @examples
@@ -1376,7 +1374,10 @@ make_iter_kernel <- function(ipm,
   out <- .make_iter_kernel(ipm,
                            mega_mat = !! mega_mat,
                            name_ps = name_ps,
-                           f_forms = f_forms)
+                           f_forms = f_forms) %>%
+    set_ipmr_classes()
+
+  return(out)
 
 }
 
@@ -1397,20 +1398,20 @@ make_iter_kernel <- function(ipm,
   all_kerns <- ipm$sub_kernels
 
   # Check for grouping effects
-  if(any(proto$has_hier_effs)) {
+  if(any(proto$uses_par_sets)) {
 
     # First, generate the base_expr for evaluation. In the simple_ipm case, this
     # always just the sum of all sub-kernels. Once we have that, we can sub the
-    # hier_effs levels, then use args_from_txt to get exact names for evaluating
+    # par_sets levels, then use args_from_txt to get exact names for evaluating
     # the subbed expression.
 
     base_expr <- paste(base_nms, collapse = " + ")
 
-    all_effs  <- .flatten_to_depth(proto$levels_hier_effs, 1L) %>%
+    all_effs  <- .flatten_to_depth(proto$par_set_indices, 1L) %>%
       .[!duplicated(names(.))] %>%
       .[!names(.) %in% c("levels", "to_drop")]
 
-    levs      <- .make_hier_levels(all_effs)
+    levs      <- .make_par_set_indices(all_effs)
 
     to_sub    <- paste(names(all_effs), collapse = "_")
 
@@ -1456,7 +1457,7 @@ make_iter_kernel <- function(ipm,
 
   mega_mat <- rlang::enquo(mega_mat)
 
-  out <- format_mega_matrix(ipm,
+  out <- format_mega_kernel(ipm,
                             mega_mat = !! mega_mat,
                             name_ps  = name_ps,
                             f_forms  = f_forms)
