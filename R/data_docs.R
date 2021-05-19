@@ -53,3 +53,24 @@
 #'   \item{repro_next}{Either 0 or 1 to indicate whether a plant is reproductive at \emph{t + 1}.}
 #'}
 'iceplant_ex'
+
+#' @rdname proto_ex
+#' @title A \code{proto_ipm} for a monocarpic perennial
+#'
+#' @format A \code{proto_ipm} for a simple IPM of \emph{Oenothera glazioviana}.
+#' The parameters are from Ellner, Childs, & Rees (2016), Chapter 2, and the data
+#' are from Kachi & Hirose (1985). Parameter values can be accessed with
+#' \code{parameters(monocarp_proto)}, vital rate expressions can be accessed with
+#' \code{vital_rate_exprs(monocarp_proto)}, etc.
+#'
+#'
+#' @references
+#' Kachi, H., & Hirose, T. (1985). Population dynamics of _Oenothera glazioviana_
+#' in a sand-dune system with special reference to the adaptive significance of
+#' size-dependent reproduction. Journal of Ecology 73: 887-901.
+#' https://doi.org/10.2307/2260155
+#'
+#' Ellner, S.P., Childs, D.Z., Rees, M. (2016) Data-driven modelling of
+#' structured populations: a practical guide to the integral projection model.
+#' Basel, Switzerland: Springer International Publishing AG
+"monocarp_proto"

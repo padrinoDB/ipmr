@@ -171,7 +171,55 @@ gen_di_det_ex <- init_ipm("general", "di", "det") %>%
            usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_2 = inv_logit_2))
 
+data_list <- list(
+  s_i  = -0.65, # Intercept of the survival model (Logistic regression)
+  s_z  = 0.75,  # slope of the survival model
+  f_i  = -18,   # Intercept of the probability of flowering model (Logistic regression)
+  f_z  = 6.9,   # Slope of the probability of flowering model
+  G_i  = 0.96,  # Intercept of the growth model (Gaussian regression)
+  G_z  = 0.59,  # Slope of the growth model
+  sd_G = 0.67,  # Standard deviation of residuals of growth model
+  mu_r = -0.08, # mean of the recruit size distribution
+  sd_r = 0.76,  # Standard deviation of the recruit size distribution
+  p_i  = 1,     # Intercept of the seed production model (Poisson regression)
+  p_z  = 2.2,   # Slope of the seed production model
+  e_p  = 0.007  # Establishment probability
+)
 
+monocarp_proto <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
+  define_kernel(
+    name      = "P",
+    formula   = (1 - f_p_z) * s * G,
+    f_p_z     = plogis(f_i + f_z  * z_1),
+    s         = plogis(s_i + s_z * z_1),
+    G         = dnorm(z_2, mu_G, sd_G),
+    mu_G      = G_i + G_z * z_1,
+    data_list = data_list,
+    states    = list(c("z"))
+  ) %>%
+  define_kernel(
+    name      = "F",
+    formula   = f_p_z * p_n_z * r_d * e_p,
+    f_p_z     = plogis(f_i + f_z  * z_1),
+    p_n_z     = exp(p_i + p_z * z_1),
+    r_d       = dnorm(z_2, mu_r, sd_r),
+    data_list = data_list,
+    states    = list(c("z"))
+  ) %>%
+  define_impl(
+    list(
+      P = list(int_rule = "midpoint", state_start = "z", state_end = "z"),
+      F = list(int_rule = "midpoint", state_start = "z", state_end = "z")
+    )
+  ) %>%
+  define_domains(
+    z = c(-2.65, 4.5, 250) # Vector with c(L, U, m), where m is number of meshpoints
+  ) %>%
+  define_pop_state(
+    n_z = rep(1/250, 250)
+  )
+
+usethis::use_data(monocarp_proto, overwrite = TRUE)
 usethis::use_data(sim_di_det_ex, overwrite = TRUE)
 usethis::use_data(gen_di_det_ex, overwrite = TRUE)
 

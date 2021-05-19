@@ -13,7 +13,6 @@ output: html_document
 
   - DONE
 
-
 3. Acknowledge reviewers and editor comments
 
 
@@ -31,5 +30,6 @@ output: html_document
 
   - Change `par_sets` to `suffix`
   
-  - get `max_age` api updated before resub?
+    - DONE
   
+  - get `max_age` api updated before resub?
