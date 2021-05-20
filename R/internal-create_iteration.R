@@ -346,32 +346,61 @@
   if(!"max_age" %in% names(age_indices)) return(expr_list)
 
   # Generate a kernel name for the max age slot. This is the survival/growth
-  # kernel (arbitrarily named) with "max_age_minus_1" tacked on. The trait distribution
-  # it operates on is the
+  # kernel (arbitrarily named) with "max_age_minus_1" tacked on. However,
+  # check to see if max_age kernel is defined separately.
 
-  kerns <- lapply(names(expr_list$out),
-                  function(x) {
-                    grepl("_age_", x)
+  if(!any(grepl("max_age", names(expr_list$out)))) {
+
+    kerns <- lapply(names(expr_list$out),
+                    function(x) {
+                      grepl("_age_", x)
                     }) %>%
-    unlist() %>%
-    expr_list$out[.] %>%
-    lapply(function(y, start_end){
-      args <- rlang::call_args(y)
-      kern <- rlang::expr_text(args$kernel)
-      sv   <- rlang::expr_text(args$vectr)
+      unlist() %>%
+      expr_list$out[.] %>%
+      lapply(function(y, start_end){
+        args <- rlang::call_args(y)
+        kern <- rlang::expr_text(args$kernel)
+        sv   <- rlang::expr_text(args$vectr)
 
-      kern <- c(gsub("age", "max_age", kern), # P_max_age_minus_1 %*% n_max_age_minus_1_t
-               gsub("age_minus_1", "max_age", kern)) # P_max_age %*% n_max_age_t
-      sv   <- c(gsub("age", "max_age", sv),
-               gsub("age_minus_1", "max_age", sv))
+        kern <- c(gsub("age", "max_age", kern), # P_max_age_minus_1 %*% n_max_age_minus_1_t
+                  gsub("age_minus_1", "max_age", kern)) # P_max_age %*% n_max_age_t
+        sv   <- c(gsub("age", "max_age", sv),
+                  gsub("age_minus_1", "max_age", sv))
 
-      out <- list(kern = kern,
-                  sv   = sv)
-      return(out)
-    },
-    start_end = start_end)
+        out <- list(kern = kern,
+                    sv   = sv)
+        return(out)
+      },
+      start_end = start_end)
 
-  end_states <- gsub("_age_", "_max_age_", names(kerns))
+    end_states <- gsub("_age_", "_max_age_", names(kerns))
+
+  } else {
+
+    kerns <- lapply(names(expr_list$out),
+                    function(x) {
+                      grepl("max_age_", x)
+                    }) %>%
+      unlist() %>%
+      expr_list$out[.] %>%
+      lapply(function(y, start_end) {
+        args <- rlang::call_args(y)
+        kern <- rlang::expr_text(args$kernel)
+        sv   <- rlang::expr_text(args$vectr)
+
+        kern <- c(gsub("age_minus_1", "age", kern)) # P_max_age %*% n_max_age_t
+        sv   <- c(gsub("age_minus_1", "age", sv))
+
+        out <- list(kern = kern,
+                    sv   = sv)
+        return(out)
+      },
+      start_end = start_end)
+
+    end_states <- names(kerns)
+
+  }
+
 
   out <- list()
 
