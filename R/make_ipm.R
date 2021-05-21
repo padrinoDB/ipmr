@@ -1016,7 +1016,7 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
 
   out <- list(
     sub_kernels = temp$sub_kernels,
-    env_list    = temp$sub_kernel_envs,
+    env_list    = c(list(main_env = main_env), temp$sub_kernel_envs),
     env_seq     = temp$env_seq,
     pop_state   = temp$pop_state,
     proto_ipm   = proto_ipm

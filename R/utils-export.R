@@ -758,6 +758,87 @@ vital_rate_funs <- function(ipm) {
 
   }
 
+  out <- switch(as.character(grepl("stoch_param|_dd_", class(ipm)[1])),
+                "TRUE"  = .vr_funs_stoch_param(proto, env_list, ipm),
+                "FALSE" = .vr_funs_det_kerns(proto, env_list, ipm))
+
+
+  out <- lapply(out,
+                function(x) {
+                  class(x) <- c("ipmr_vital_rate_funs",
+                                class(x))
+
+                  return(x)
+                })
+
+  return(out)
+
+}
+
+.vr_funs_stoch_param <- function(proto, env_list, ipm) {
+
+  kern_nms <- proto$kernel_id
+
+  if(any(proto$uses_par_sets)) {
+
+    kern_seq <- ipm$env_seq
+
+    if(inherits(kern_seq, "data.frame")) {
+      kern_seq <- as.character(kern_seq$kernel_seq)
+    }
+
+  } else {
+
+    kern_seq <- NULL
+
+  }
+
+  n_its <- ncol(ipm$pop_state[[1]]) - 1
+
+  out <- list()
+
+  for(i in seq_len(n_its)) {
+
+    use_it   <- kern_seq[i]
+    kern_ind <- paste(kern_seq[i], "it", i, sep = "_")
+    kern_ind <- paste("*_", kern_ind, "$", sep = "")
+
+    if(all(is.null(kern_seq))) {
+      kern_ind <- gsub("__","_", kern_ind)
+    }
+
+    use_nm    <- names(ipm$sub_kernels)[grepl(kern_ind, names(ipm$sub_kernels))]
+    use_env   <- env_list[use_nm]
+    kern_ind  <- gsub(paste("_it_", i, sep =""), "", use_nm)
+    pro_ind   <- which(proto$kernel_id %in% kern_ind)
+
+    kern_vrs  <- lapply(proto$params[pro_ind],
+                        function(x) names(x$vr_text))
+
+    out[[i]] <- lapply(seq_along(pro_ind),
+                       function(x, use_env, kern_vrs, proto, env_list, pro_ind)
+                         .get_vr_fun(use_env[[x]],
+                                     kern_vrs[[x]], proto[pro_ind[x], ],
+                                     env_list),
+                       use_env = use_env,
+                       kern_vrs = kern_vrs,
+                       proto = proto,
+                       env_list = env_list,
+                       pro_ind = pro_ind)
+
+    names(out[[i]]) <- use_nm
+
+  }
+
+  out <- .flatten_to_depth(out, 2L)
+
+  return(out)
+
+}
+
+
+.vr_funs_det_kerns <- function(proto, env_list, ipm) {
+
   out <- list()
 
   for(i in seq_len(nrow(proto))) {
@@ -776,41 +857,41 @@ vital_rate_funs <- function(ipm) {
 
     use_env <- env_list[[kern_nm]]
 
-    out[[i]] <- rlang::env_get_list(env = use_env,
-                                    nms = kern_vrs,
-                                    inherit = FALSE)
-
-    out[[i]] <- lapply(out[[i]],
-                       function(x, kern_cls, start, end, main_env, nm) {
-
-      class(x) <- c(kern_cls, class(x))
-
-      .fun_to_iteration_mat(x, start, end, main_env, nm)
-
-    },
-    kern_cls = proto$params[[i]]$family,
-    start    = names(proto$domain[[i]])[1],
-    end      = names(proto$domain[[i]])[2],
-    main_env = env_list$main_env,
-    nm       = kern_nm
-    )
+    out[[i]]      <- .get_vr_fun(use_env, kern_vrs, proto[i, ], env_list)
 
     names(out)[i] <- kern_nm
 
   }
 
-  out <- lapply(out,
-                function(x) {
-                  class(x) <- c("ipmr_vital_rate_funs",
-                                class(x))
+  return(out)
+}
 
-                  return(x)
-                })
+.get_vr_fun <- function(use_env, kern_vrs, proto, env_list) {
+
+  kern_nm <- proto$kernel_id
+
+  out <- rlang::env_get_list(env = use_env,
+                             nms = kern_vrs,
+                             inherit = FALSE)
+
+  out <- lapply(out,
+                function(x, kern_cls, start, end, main_env, nm) {
+
+                  class(x) <- c(kern_cls, class(x))
+
+                  .fun_to_iteration_mat(x, start, end, main_env, nm)
+
+                },
+                kern_cls = proto$params[[1]]$family,
+                start    = names(proto$domain[[1]])[1],
+                end      = names(proto$domain[[1]])[2],
+                main_env = env_list$main_env,
+                nm       = kern_nm
+  )
 
   return(out)
 
 }
-
 
 #' @rdname accessors
 #'

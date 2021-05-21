@@ -547,10 +547,6 @@
 
   if(!all(is.na(data_envs))) {
 
-    names(data_envs)       <- paste(names(data_envs),
-                                    current_iteration,
-                                    sep = "_")
-
     output$sub_kernel_envs <- c(output$sub_kernel_envs, data_envs)
 
   }
