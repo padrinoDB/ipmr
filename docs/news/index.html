@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2.9000</span>
       </span>
     </div>
 
@@ -153,6 +153,20 @@
       <small>Source: <a href='https://github.com/levisc8/ipmr/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="ipmr-002" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.2">
+<a href="#ipmr-002" class="anchor"></a>ipmr 0.0.2<small> Unreleased </small>
+</h1>
+<p>Contains a some tweaks and bug fixes. There is one major API change that renames parameters in <code>define_kernel</code>.</p>
+<ul>
+<li><p>Renames function arguments <code>hier_effs</code> -&gt; <code>par_sets</code>, <code>levels_ages</code>/<code>levels_hier_effs</code> -&gt; <code>age_indices</code>/<code>par_set_indices</code>. The idea was to shift from thinking about these IPMs as resulting from multilevel/hierarchical regresssion models to IPMs constructed from parameter sets (which can be derived from any number of other methods).</p></li>
+<li><p>Corrects some bugs that caused <code><a href="../reference/domains.html">vital_rate_funs()</a></code> to break for <code>stoch_param</code> and density dependent models.</p></li>
+<li><p>Updates the age X size model interface so that <code>max_age</code> kernels can be specified separately if they have different functional forms from their non-<code>max_age</code> versions.</p></li>
+<li><p><code>make_iter_kernel</code> can handle computations passed into <code>mega_mat</code> (e.g. <code>mega_mat = c(P + F, 0, I, C))</code>.</p></li>
+<li><p>Makes <code>plot.ipmr_matrix</code> more flexible, which is now the recommended default <code>plot</code> method for <code>ipm</code> objects.</p></li>
+<li><p>Changes to internal code that won’t affect user experience.</p></li>
+</ul>
+</div>
     <div id="ipmr-001" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.1">
 <a href="#ipmr-001" class="anchor"></a>ipmr 0.0.1<small> 2021-02-10 </small>

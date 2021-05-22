@@ -1,6 +1,6 @@
 Package: ipmr
 Title: Fits Integral Projection Models Using an Expression Based Framework 
-Version: 0.0.2
+Version: 0.0.2.9000
 Authors@R: c( 
     person(given = "Sam",
            family = "Levin",
