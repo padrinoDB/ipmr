@@ -144,9 +144,9 @@ data_list <- list(
   r_n_z = 0.3   # Slope of recruit production model.
 )
 
-# Step 2 in Figure 1. This is how ipmr initializes a model object. All functions
-# prefixed with define_* generate proto_ipm objects. These are converted
-# into IPMs using the make_ipm() function in step 5. 
+# Step 2 in Figure 1. This is how ipmr initializes a model object.
+# All functions prefixed with define_* generate proto_ipm objects. These 
+# are converted into IPMs using the make_ipm() function in step 5. 
 
 example_proto_ipm <- init_ipm(sim_gen   = "simple", 
                               di_dd     = "di", 
@@ -177,9 +177,10 @@ example_proto_ipm <- define_kernel(
 )
 
 # Step 4 in Figure 1. These next 3 functions define:
-# 1. The numerical integration rules and how to iterate the model (define_impl).
+# 1. The numerical integration rules and how to iterate the 
+#    model (define_impl).
 # 2. The range of values the the trait "z" can take on, and the number of
-# meshpoints to use when dividing the interval (define_domains).
+#    meshpoints to use when dividing the interval (define_domains).
 # 3. The initial population state (define_pop_state).
 
 example_proto_ipm <- define_impl(
@@ -297,11 +298,11 @@ knitr::kable(
   data.frame(
 
     Math    = c("$\\mu_G = \\alpha_G + \\beta_G * z$",
-                "$G(z',z) = f_G(\\mu_G, \\sigma_G)$",
+                "$G(z',z) = f_G(z',\\mu_G, \\sigma_G)$",
                 "$logit(s(z)) = \\alpha_s + \\beta_s * z$",
                 "$log(r_n(z)) = \\alpha_{r_n} + \\beta_{r_n} * z$",
                 "$logit(r_p(z)) = \\alpha_{r_p} + \\beta_{r_p} * z$",
-                "$r_d(z') = f_{r_d}(\\mu_{r_d}, \\sigma_{r_d})$",
+                "$r_d(z') = f_{r_d}(z', \\mu_{r_d}, \\sigma_{r_d})$",
                 "$p_r = \\frac{\\# Recruits (t+1)}{\\# flowers (t)}$",
                 "$P = s(z) * G(z',z)$",
                 "$F(z',z) = r_p(z) * r_n(z) * r_d(z') * p_r$",
@@ -350,13 +351,13 @@ knitr::kable(
   data.frame(
 
     Math    = c(
-      "$Logit(s(z,a)) = \\alpha_s + \\beta_{s_z} * z + \\beta_{s_a} * a$",
-      "$G(z',z,a) = f_G(\\mu_{G_a}, \\sigma_{G,a})$",
-      "$\\mu_G(z, a) = \\alpha_G + \\beta_{G_z} * z + \\beta_{G_a} * a$",
+      "$Logit(s(z,a)) = \\alpha_s + \\beta_{s,z} * z + \\beta_{s,a} * a$",
+      "$G(z',z,a) = f_G(z', \\mu_{G}(z, a), \\sigma_{G})$",
+      "$\\mu_G(z, a) = \\alpha_G + \\beta_{G,z} * z + \\beta_{G,a} * a$",
       "$Logit(m_p(z,a)) = \\alpha_{m_p} + \\beta_{m_p,z} * z + \\beta_{m_p,a} * a$",
       "$Logit(r_p(a)) = \\alpha_{r_p} + \\beta_{r_p,a} * a$",
-      "$\\mu_B = \\alpha_B + \\beta_{B, z} * z$",
-      "$B(z',z) = f_B(z', \\mu_B, \\sigma_B)$",
+      "$B(z',z) = f_B(z', \\mu_B(z), \\sigma_B)$",
+      "$\\mu_B(z) = \\alpha_B + \\beta_{B, z} * z$",
       "$P_a(z',z) = s(z, a) * G(z',z, a)$",
       "$F_a(z',z) = s(z, a) * m_p(z, a) * r_p(a) * B(z', z) / 2$",
       "Insert EQ above table here!",
@@ -371,8 +372,8 @@ knitr::kable(
       "`size_2 ~ size_1 + age, family = gaussian()`",
       "`repr ~ size_1 + age, family = binomial()`",
       "`recr ~ age, family = binomial()`",
-      "`rc_size_2 ~ size_1, family = gaussian()`",
       "`b = dnorm(size_2, mu_rc_size, sigma_rc_size)`",
+      "`rc_size_2 ~ size_1, family = gaussian()`",
       "",
       "",
       "",
@@ -386,8 +387,8 @@ knitr::kable(
       "mu_G_**age** = G_int + G_z * z + G_a * **age**",
       "m_p_**age** = plogis(m_p_int + m_p_z * z + m_p_a * **age**)",
       "r_p_**age** = plogis(r_p_int + r_p_a * **age**)",
-      "mu_rc_size = rc_size_int + rc_size_z * z",
       "rc_size = dnorm(z_2, mu_rc_size, sigma_rc_size)",
+      "mu_rc_size = rc_size_int + rc_size_z * z",
       "P_**age** = s_**age** * g_**age** * d_z",
       "F_**age** =   s_**age** * f_p_**age** * r_p_**age** * rc_size / 2",
       "",
@@ -406,3 +407,5 @@ Author Contributions: All authors contributed to package design. SCL implemented
 
 
 Funding: R.S-G. was supported by a NERC Independent Research Fellowship (NE/M018458/1). SCL, AC, SE, and TMK were funded by the Alexander von Humboldt Foundation in the framework of the Alexander von Humboldt Professorship of TM Knight endowed by the German Federal Ministry of Education and Research.
+
+Acknowledgments: We thank the Associate Editor and two anonymous reviewers for comments that greatly improved this manuscript.
