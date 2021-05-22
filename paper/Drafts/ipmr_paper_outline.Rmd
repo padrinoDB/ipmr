@@ -66,7 +66,7 @@ $$n(z', t+1) = \int_L^UK(z',z)n(z,t)dz.$$ {#eq:eqn1}
 
 $K(z',z)$, known as the _projection kernel_, describes all possible transitions of existing individuals and recruitment of new individuals from $t$ to $t+1$, generating a new trait distribution $n(z',t+1)$. $L,U$ are the lower and upper bounds for values that the trait $z$ can have, which defines the _domain_ over which the integration is performed. The integral $\int_L^Un(z,t)dz$ gives the total population size at time $t$. 
 
-To make the model more biologically interpretable, the projection kernel $K(z',z)$ is usually decomposed into _sub-kernels_ (Eq 2). For example, a projection kernel to describe a lifecycle where individuals can survive, transition to different state values, and reproduce via sexual and asexual pathways, can be decomposed as follows
+To make the model more biologically interpretable, the projection kernel $K(z',z)$ is usually split into _sub-kernels_ (Eq 2). For example, a projection kernel to describe a lifecycle where individuals can survive, transition to different state values, and reproduce via sexual and asexual pathways, can be split as follows
 
 $$K(z',z) = P(z',z) + F(z',z) + C(z',z),$$ {#eq:eqn2}
 
@@ -213,7 +213,7 @@ lambda(example_ipm)
 
 *Box 1: Code to implement a simple IPM from parameter estimates in `ipmr`. Because `ipmr` does not include functions to assist with regression modeling, this example skips the step of working with actual data and instead uses hypothetical parameter values. We see that given this set of conditions, if nothing were to change, the population would increase by ~2% each year. The case studies provide details on further use cases and analyses that are possible with `ipmr`.*
 
-The code in Box one substitutes the actual probability density function (`dnorm()`) for $f_G$ and $f_{r_d}$, and uses inverse link functions instead of link functions. Otherwise, the math and the code should look quite similar. 
+The code in Box 1 substitutes the actual probability density function (`dnorm()`) for $f_G$ and $f_{r_d}$, and uses inverse link functions instead of link functions. Otherwise, the math and the code should look quite similar. 
 
 ## *Case study 1 - A simple IPM*
 
