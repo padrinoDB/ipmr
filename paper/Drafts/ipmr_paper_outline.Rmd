@@ -114,7 +114,7 @@ print(plt)
 
 ## *A brief worked example of a simple IPM*
 
-Box 1 shows a brief example of how `ipmr` converts parameter estimates into an IPM. Perhaps the most frequently used metric derived from IPMs is the asymptotic per-capita population growth rate ($\lambda$, Caswell 2001). When $\lambda > 1$, the population is growing, while $\lambda < 1$ indicates population decline. `ipmr` makes deriving estimates of $\lambda$ straightforward. Box 1 demonstrates how to parameterize a simple, deterministic IPM and estimate $\lambda$. The example uses a hypothetical species that can survive and grow, and reproduce sexually (but not asexually, so $C(z',z) = 0$ in Equation 2). 
+Box 1 shows a brief example of how `ipmr` converts parameter estimates into an IPM. Perhaps the most frequently used metric derived from IPMs is the asymptotic per-capita population growth rate ($\lambda$, Caswell 2001). When $\lambda > 1$, the population is growing, while $\lambda < 1$ indicates population decline. `ipmr` makes deriving estimates of $\lambda$ straightforward. Box 1 demonstrates how to parameterize a simple, deterministic IPM and estimate $\lambda$. The example uses a hypothetical species that can survive and grow, and reproduce sexually (but not asexually, so $C(z',z) = 0$ in Equation 2). The population is structured by size, denoted $z$ and $z’$, and there is no seedbank.
 
 The $P(z',z)$ kernel is given by Eq 3, and the vital rates therein by Eq 4-6. The $F(z',z)$ kernel is given Eq 8:
 
@@ -124,13 +124,13 @@ $$r_d(z') = f_{r_d}(z', \mu_{r_d}, \sigma_{r_d}),$$ {#eq:eqn9}
 
 $$Log(r_n(z))  = \alpha_{r_n} + \beta_{r_n} * z.$$ {#eq:eqn10}
 
-Eq 9 is a recruit size distribution (where $f_{r_d}$ denotes a normal probability density function), and Eq 10 describes the number of new recruits produced by adults as a function of size $z$.
+Eq 9 is a recruit size distribution (where $f_{r_d}$ denotes a normal probability density function), and Eq 10 describes the number of new recruits produced by plants as a function of size $z$.
 
 ```{r eval = FALSE}
 
 library(ipmr)
 
-# This section takes the place of Step 1 in Figure 1.
+# This section produces the result of Step 1 in Figure 1.
 
 data_list <- list(
   s_i  = -0.65, # Intercept of the survival model (Logistic regression)
@@ -213,7 +213,7 @@ lambda(example_ipm)
 
 *Box 1: Code to implement a simple IPM from parameter estimates in `ipmr`. Because `ipmr` does not include functions to assist with regression modeling, this example skips the step of working with actual data and instead uses hypothetical parameter values. We see that given this set of conditions, if nothing were to change, the population would increase by ~2% each year. The case studies provide details on further use cases and analyses that are possible with `ipmr`.*
 
-The code in Box one substitutes the actual probability density function (`dnorm()`) for the $f_G$ and $f_{r_d}$, and uses inverse link functions instead of link functions. Otherwise, the math and the code should look quite similar. 
+The code in Box one substitutes the actual probability density function (`dnorm()`) for $f_G$ and $f_{r_d}$, and uses inverse link functions instead of link functions. Otherwise, the math and the code should look quite similar. 
 
 ## *Case study 1 - A simple IPM*
 
