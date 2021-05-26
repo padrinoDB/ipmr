@@ -463,15 +463,16 @@ is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
 
   if(!all(is.na(unlist(lambdas)))) {
 
-    convs <- vapply(lambdas, function(x) {
+    convs <- vapply(lambdas, function(x, tol) {
 
       end <- length(x)
       start <- end - 1
 
-      isTRUE(all.equal(x[start], x[end]))
+      isTRUE(all.equal(x[start], x[end], tolerance = tol))
 
     },
-    logical(1L))
+    logical(1L),
+    tol = tol)
 
     return(convs)
 
