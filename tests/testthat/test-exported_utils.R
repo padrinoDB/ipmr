@@ -609,3 +609,12 @@ test_that("vital_rate_funs returns correctly for stoch_param/dd models", {
   expect_true(all(nms %in% names(vrs)))
 
 })
+
+test_that("conv_plot works correctly", {
+
+  x <- conv_plot(gen_di_stoch_param)
+  expect_s3_class(x, "general_di_stoch_param_ipm")
+
+  x <- conv_plot(gen_di_stoch_param, log = TRUE)
+
+})

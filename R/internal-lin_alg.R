@@ -436,12 +436,17 @@ is_square <- function(x) {
 #' @rdname check_convergence
 #' @title Check for model convergence to asymptotic dynamics
 #'
-#' @param ipm An object returned by \code{make_ipm()}.
-#' @param tol The tolerance for convergence. Convergence is evaluated by making an
-#' element by element comparison  for the population state vectors at time \emph{t}
-#' and \emph{t-1}.
+#' @description Checks for convergence to asymptotic dynamics numerically and
+#' visually. \code{is_conv_to_asymptotic} checks whether
+#' \code{lambda[iterations - 1]} equals \code{lambda[iterations]} within the
+#' specified tolerance, \code{tol}. \code{conv_plot} plots the time series of
+#' \code{lambda} (or \code{log(lambda)}.
 #'
-#' @return Either \code{TRUE} or \code{FALSE}.
+#' @param ipm An object returned by \code{make_ipm()}.
+#' @param tol The tolerance for convergence.
+#'
+#' @return \code{is_conv_to_asymptotic}: Either \code{TRUE} or \code{FALSE}.
+#' \code{conv_plot}: code{ipm} invisibly.
 #' @export
 #'
 

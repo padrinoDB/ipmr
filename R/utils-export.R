@@ -1546,3 +1546,66 @@ make_iter_kernel <- function(ipm,
   return(out)
 
 }
+
+#' @rdname check_convergence
+#' @param log_lam A logical indicating whether log transform \code{lambda}.
+#' @param show_stable A logical indicating whether or not to draw a line indicating
+#' population stability at \code{lambda = 1}.
+#' @param ... Further arguments to \code{plot}.
+#'
+#' @details Plotting can be controlled by passing additional graphing parameters
+#' to \code{...}.
+#'
+#' @examples
+#' data(gen_di_det_ex)
+#'
+#' proto <- gen_di_det_ex$proto_ipm %>%
+#'   define_pop_state(n_ht = runif(200),
+#'                    n_b  = 200000)
+#'
+#' ipm <- make_ipm(proto)
+#'
+#' is_conv_to_asymptotic(ipm, tol = 1e-5)
+#' conv_plot(ipm)
+#'
+#' @export
+
+conv_plot <- function(ipm, log_lam = FALSE, show_stable = TRUE, ...) {
+
+  all_lams <- lambda(ipm, type_lambda = "all")
+  nms      <- colnames(all_lams)
+
+  dots     <- list(...)
+
+  if(!"type" %in% names(dots)) {
+    dots$type <- "l"
+  }
+
+  if(log_lam) {
+    y_nm <- expression(paste("Single Time Step Log(  ", lambda, ")"))
+    nms  <- paste("Log(", nms, ")", sep = "")
+    all_lams <- apply(all_lams, MARGIN = 2, FUN = log)
+  } else {
+    y_nm <- expression(paste("Single Time Step   ", lambda))
+  }
+
+  for(i in seq_len(ncol(all_lams))) {
+
+    all_args <- c(list(x    = all_lams[ , i],
+                       main = nms[i],
+                       xlab = "Transition",
+                       ylab = y_nm),
+                  dots)
+    # plot(all_lams[ , i], main = nms[i], type = type, dots)
+    do.call("plot", all_args)
+
+    if(show_stable) {
+      abline(h = 1, col = "grey40", lty = 2)
+    }
+
+  }
+
+  invisible(ipm)
+
+}
+
