@@ -7,12 +7,15 @@
 \usage{
 is_conv_to_asymptotic(ipm, tol = 1e-10)
 
-conv_plot(ipm, log_lam = FALSE, show_stable = TRUE, ...)
+conv_plot(ipm, iterations = NULL, log_lam = FALSE, show_stable = TRUE, ...)
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
 
 \item{tol}{The tolerance for convergence.}
+
+\item{iterations}{The range of iterations to plot \code{lambda} for. The default
+is every iteration.}
 
 \item{log_lam}{A logical indicating whether log transform \code{lambda}.}
 
@@ -47,5 +50,8 @@ ipm <- make_ipm(proto)
 
 is_conv_to_asymptotic(ipm, tol = 1e-5)
 conv_plot(ipm)
+
+# Plot the last 25 iterations
+conv_plot(ipm, iterations = 25:50)
 
 }

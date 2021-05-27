@@ -1548,6 +1548,8 @@ make_iter_kernel <- function(ipm,
 }
 
 #' @rdname check_convergence
+#' @param iterations The range of iterations to plot \code{lambda} for. The default
+#' is every iteration.
 #' @param log_lam A logical indicating whether log transform \code{lambda}.
 #' @param show_stable A logical indicating whether or not to draw a line indicating
 #' population stability at \code{lambda = 1}.
@@ -1568,14 +1570,25 @@ make_iter_kernel <- function(ipm,
 #' is_conv_to_asymptotic(ipm, tol = 1e-5)
 #' conv_plot(ipm)
 #'
+#' # Plot the last 25 iterations
+#' conv_plot(ipm, iterations = 25:50)
+#'
 #' @export
 
-conv_plot <- function(ipm, log_lam = FALSE, show_stable = TRUE, ...) {
+conv_plot <- function(ipm, iterations = NULL,
+                      log_lam = FALSE, show_stable = TRUE, ...) {
 
   all_lams <- lambda(ipm, type_lambda = "all")
   nms      <- colnames(all_lams)
 
   dots     <- list(...)
+
+  if(is.null(iterations)) {
+
+    iterations <- seq(1, nrow(all_lams), by = 1)
+  }
+
+  all_lams <- all_lams[iterations, , drop = FALSE]
 
   if(!"type" %in% names(dots)) {
     dots$type <- "l"
@@ -1591,7 +1604,8 @@ conv_plot <- function(ipm, log_lam = FALSE, show_stable = TRUE, ...) {
 
   for(i in seq_len(ncol(all_lams))) {
 
-    all_args <- c(list(x    = all_lams[ , i],
+    all_args <- c(list(y    = all_lams[ , i],
+                       x    = iterations,
                        main = nms[i],
                        xlab = "Transition",
                        ylab = y_nm),
