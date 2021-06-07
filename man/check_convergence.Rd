@@ -51,7 +51,4 @@ ipm <- make_ipm(proto)
 is_conv_to_asymptotic(ipm, tol = 1e-5)
 conv_plot(ipm)
 
-# Plot the last 25 iterations
-conv_plot(ipm, iterations = 25:50)
-
 }

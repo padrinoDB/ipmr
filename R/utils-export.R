@@ -60,6 +60,12 @@
 #' functions should return named lists. Names in that list can be referenced in
 #' vital rate expressions and/or kernel formulas.
 #'
+#' \strong{\code{discreizt_pop_vec}}
+#'
+#' This takes a numeric vector of a trait distribution and computes the relative
+#' frequency of trait values. This is helpful for creating an initial population
+#' state vector that corresponds to an observed trait distribution.
+#'
 #' @return All \code{define_*} functions return a proto_ipm. \code{make_impl_args_list}
 #' returns a list, and so must be used within a call to \code{define_impl} or
 #' before initiating the model creation procedure.
@@ -129,6 +135,14 @@
 #'
 #' )
 #'
+#' data(iceplant_ex)
+#'
+#' z <- c(iceplant_ex$log_size, iceplant_ex$log_size_next)
+#'
+#' pop_vecs <- discretize_pop_vec(z,
+#'                                n_mesh = 100,
+#'                                pad_low = 1.2,
+#'                                pad_high = 1.2)
 #'
 #' @rdname define_star
 #' @importFrom rlang is_empty
@@ -1570,9 +1584,6 @@ make_iter_kernel <- function(ipm,
 #' is_conv_to_asymptotic(ipm, tol = 1e-5)
 #' conv_plot(ipm)
 #'
-#' # Plot the last 25 iterations
-#' conv_plot(ipm, iterations = 25:50)
-#'
 #' @export
 
 conv_plot <- function(ipm, iterations = NULL,
@@ -1620,6 +1631,55 @@ conv_plot <- function(ipm, iterations = NULL,
   }
 
   invisible(ipm)
+
+}
+
+
+#' @rdname define_star
+#'
+#' @param trait_distrib A numeric vector of trait values.
+#' @param n_mesh The number of meshpoints to use when integrating the trait
+#' distribution.
+#' @param pad_low The amount to pad the smallest value by, expressed as a
+#' proportion. For example, 0.8 would shrink the smallest value by 20\%.
+#' @param pad_high The amount to pad the largest value by, expressed as a
+#' proportion. For example, 1.2 would increase the largest value by 20\%.
+#' @param normalize A logical indicating whether to normalize the result to sum
+#' to 1.
+#' @param na.rm A logical indicating whether to remove \code{NA}s from
+#' \code{trait_distrib}.
+#'
+#' @export
+#' @importFrom stats density
+
+discretize_pop_vec <- function(trait_distrib,
+                               n_mesh,
+                               pad_low = NULL,
+                               pad_high = NULL,
+                               normalize = TRUE,
+                               na.rm = TRUE) {
+
+  out_nm <- deparse(substitute(trait_distrib))
+
+  out_nm <- paste("n_", out_nm, sep = "")
+
+  out <- density(trait_distrib,
+                from = min(trait_distrib, na.rm = na.rm) * pad_low,
+                to = max(trait_distrib, na.rm = na.rm) * pad_high,
+                n = n_mesh,
+                na.rm = na.rm)
+
+  h <- max(trait_distrib,
+           na.rm = na.rm) - min(trait_distrib,
+                                na.rm = na.rm) / n_mesh
+
+  out$y <- out$y * h
+
+  if(normalize) out$y <- out$y / sum(out$y)
+
+  out <- rlang::list2(!!out_nm := out$y)
+
+  return(out)
 
 }
 

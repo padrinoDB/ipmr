@@ -7,6 +7,7 @@
 \alias{define_domains}
 \alias{define_pop_state}
 \alias{define_env_state}
+\alias{discretize_pop_vec}
 \title{Helpers for IPM construction}
 \usage{
 define_impl(proto_ipm, kernel_impl_list)
@@ -18,6 +19,15 @@ define_domains(proto_ipm, ...)
 define_pop_state(proto_ipm, ..., pop_vectors = list())
 
 define_env_state(proto_ipm, ..., data_list = list())
+
+discretize_pop_vec(
+  trait_distrib,
+  n_mesh,
+  pad_low = NULL,
+  pad_high = NULL,
+  normalize = TRUE,
+  na.rm = TRUE
+)
 }
 \arguments{
 \item{proto_ipm}{The name of the model.}
@@ -50,6 +60,23 @@ be passed as a named list here.}
 
 \item{data_list}{A list of named values that contain data used in the expressions
 in \code{...} in \code{define_env_state()}.}
+
+\item{trait_distrib}{A numeric vector of trait values.}
+
+\item{n_mesh}{The number of meshpoints to use when integrating the trait
+distribution.}
+
+\item{pad_low}{The amount to pad the smallest value by, expressed as a
+proportion. For example, 0.8 would shrink the smallest value by 20\%.}
+
+\item{pad_high}{The amount to pad the largest value by, expressed as a
+proportion. For example, 1.2 would increase the largest value by 20\%.}
+
+\item{normalize}{A logical indicating whether to normalize the result to sum
+to 1.}
+
+\item{na.rm}{A logical indicating whether to remove \code{NA}s from
+\code{trait_distrib}.}
 }
 \value{
 All \code{define_*} functions return a proto_ipm. \code{make_impl_args_list}
@@ -109,6 +136,12 @@ iteration of the model in \code{...}. The \code{data_list} should contain any
 parameters that the function uses, as well as the function itself. The
 functions should return named lists. Names in that list can be referenced in
 vital rate expressions and/or kernel formulas.
+
+\strong{\code{discreizt_pop_vec}}
+
+This takes a numeric vector of a trait distribution and computes the relative
+frequency of trait values. This is helpful for creating an initial population
+state vector that corresponds to an observed trait distribution.
 }
 \examples{
 
@@ -175,5 +208,13 @@ define_env_state(
 
 )
 
+data(iceplant_ex)
+
+z <- c(iceplant_ex$log_size, iceplant_ex$log_size_next)
+
+pop_vecs <- discretize_pop_vec(z,
+                               n_mesh = 100,
+                               pad_low = 1.2,
+                               pad_high = 1.2)
 
 }
