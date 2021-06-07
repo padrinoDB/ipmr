@@ -167,7 +167,16 @@
 
 <span class='fu'>define_pop_state</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='va'>...</span>, pop_vectors <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>define_env_state</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='va'>...</span>, data_list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></pre>
+<span class='fu'>define_env_state</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='va'>...</span>, data_list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='fu'>discretize_pop_vec</span><span class='op'>(</span>
+  <span class='va'>trait_distrib</span>,
+  <span class='va'>n_mesh</span>,
+  pad_low <span class='op'>=</span> <span class='cn'>NULL</span>,
+  pad_high <span class='op'>=</span> <span class='cn'>NULL</span>,
+  normalize <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  na.rm <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -221,6 +230,35 @@ be passed as a named list here.</p></td>
       <td><p>A list of named values that contain data used in the expressions
 in <code>...</code> in <code>define_env_state()</code>.</p></td>
     </tr>
+    <tr>
+      <th>trait_distrib</th>
+      <td><p>A numeric vector of trait values.</p></td>
+    </tr>
+    <tr>
+      <th>n_mesh</th>
+      <td><p>The number of meshpoints to use when integrating the trait
+distribution.</p></td>
+    </tr>
+    <tr>
+      <th>pad_low</th>
+      <td><p>The amount to pad the smallest value by, expressed as a
+proportion. For example, 0.8 would shrink the smallest value by 20%.</p></td>
+    </tr>
+    <tr>
+      <th>pad_high</th>
+      <td><p>The amount to pad the largest value by, expressed as a
+proportion. For example, 1.2 would increase the largest value by 20%.</p></td>
+    </tr>
+    <tr>
+      <th>normalize</th>
+      <td><p>A logical indicating whether to normalize the result to sum
+to 1.</p></td>
+    </tr>
+    <tr>
+      <th>na.rm</th>
+      <td><p>A logical indicating whether to remove <code>NA</code>s from
+<code>trait_distrib</code>.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -265,6 +303,10 @@ iteration of the model in <code>...</code>. The <code>data_list</code> should co
 parameters that the function uses, as well as the function itself. The
 functions should return named lists. Names in that list can be referenced in
 vital rate expressions and/or kernel formulas.</p>
+<p><strong><code>discreizt_pop_vec</code></strong></p>
+<p>This takes a numeric vector of a trait distribution and computes the relative
+frequency of trait values. This is helpful for creating an initial population
+state vector that corresponds to an observed trait distribution.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
@@ -471,7 +513,15 @@ vital rate expressions and/or kernel formulas.</p>
 #&gt; 
 #&gt; n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, 
 #&gt;     vectr = n_dbh_t)</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>iceplant_ex</span><span class='op'>)</span>
 
+<span class='va'>z</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>iceplant_ex</span><span class='op'>$</span><span class='va'>log_size</span>, <span class='va'>iceplant_ex</span><span class='op'>$</span><span class='va'>log_size_next</span><span class='op'>)</span>
+
+<span class='va'>pop_vecs</span> <span class='op'>&lt;-</span> <span class='fu'>discretize_pop_vec</span><span class='op'>(</span><span class='va'>z</span>,
+                               n_mesh <span class='op'>=</span> <span class='fl'>100</span>,
+                               pad_low <span class='op'>=</span> <span class='fl'>1.2</span>,
+                               pad_high <span class='op'>=</span> <span class='fl'>1.2</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in discretize_pop_vec(z, n_mesh = 100, pad_low = 1.2, pad_high = 1.2): could not find function "discretize_pop_vec"</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
