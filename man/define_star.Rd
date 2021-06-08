@@ -7,7 +7,7 @@
 \alias{define_domains}
 \alias{define_pop_state}
 \alias{define_env_state}
-\alias{discretize_pop_vec}
+\alias{discretize_pop_vector}
 \title{Helpers for IPM construction}
 \usage{
 define_impl(proto_ipm, kernel_impl_list)
@@ -20,8 +20,8 @@ define_pop_state(proto_ipm, ..., pop_vectors = list())
 
 define_env_state(proto_ipm, ..., data_list = list())
 
-discretize_pop_vec(
-  trait_distrib,
+discretize_pop_vector(
+  trait_values,
   n_mesh,
   pad_low = NULL,
   pad_high = NULL,
@@ -61,7 +61,7 @@ be passed as a named list here.}
 \item{data_list}{A list of named values that contain data used in the expressions
 in \code{...} in \code{define_env_state()}.}
 
-\item{trait_distrib}{A numeric vector of trait values.}
+\item{trait_values}{A numeric vector of trait values.}
 
 \item{n_mesh}{The number of meshpoints to use when integrating the trait
 distribution.}
@@ -76,7 +76,8 @@ proportion. For example, 1.2 would increase the largest value by 20\%.}
 to 1.}
 
 \item{na.rm}{A logical indicating whether to remove \code{NA}s from
-\code{trait_distrib}.}
+\code{trait_distrib}. If \code{FALSE} and \code{trait_values} contains
+\code{NA}s, returns a \code{NA} with a warning}
 }
 \value{
 All \code{define_*} functions return a proto_ipm. \code{make_impl_args_list}
@@ -137,11 +138,13 @@ parameters that the function uses, as well as the function itself. The
 functions should return named lists. Names in that list can be referenced in
 vital rate expressions and/or kernel formulas.
 
-\strong{\code{discreizt_pop_vec}}
+\strong{\code{discretize_pop_vec}}
 
 This takes a numeric vector of a trait distribution and computes the relative
-frequency of trait values. This is helpful for creating an initial population
-state vector that corresponds to an observed trait distribution.
+frequency of trait values. By default, it integrates the kernel density estimate
+of the trait using the midpoint rule with \code{n_mesh} mesh points.
+This is helpful for creating an initial population state vector that
+corresponds to an observed trait distribution.
 }
 \examples{
 
@@ -212,9 +215,9 @@ data(iceplant_ex)
 
 z <- c(iceplant_ex$log_size, iceplant_ex$log_size_next)
 
-pop_vecs <- discretize_pop_vec(z,
-                               n_mesh = 100,
-                               pad_low = 1.2,
-                               pad_high = 1.2)
+pop_vecs <- discretize_pop_vector(z,
+                                  n_mesh = 100,
+                                  pad_low = 1.2,
+                                  pad_high = 1.2)
 
 }

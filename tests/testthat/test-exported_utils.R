@@ -623,36 +623,28 @@ test_that("conv_plot works correctly", {
 test_that("discretize_pop_vec works correctly", {
 
   data(iceplant_ex)
-  zs <- c(iceplant_ex$log_size, iceplant_ex$log_size_next)
+  zs <- iceplant_ex$log_size
+  pv_ipmr <- discretize_pop_vector(zs,
+                                   100,
+                                   1.2,
+                                   1.2,
+                                   normalize = TRUE)
 
-  h  <- max(zs, na.rm = TRUE) - min(zs, na.rm = TRUE) / 100
+  expect_equal(names(pv_ipmr), c("n_zs", "midpoints_zs"))
 
-  pv <- density(zs,
-                from = min(zs, na.rm = TRUE) * 1.2,
-                to = max(zs, na.rm = TRUE) * 1.2,
-                n = 100,
-                na.rm = TRUE)
+  expect_warning(discretize_pop_vector(zs,
+                                       100,
+                                       1.2,
+                                       1.2,
+                                       na.rm = FALSE))
 
-  pv$y <- pv$y * h
+  temp <- suppressWarnings(discretize_pop_vector(zs,
+                                                 100,
+                                                 1.2,
+                                                 1.2,
+                                                 na.rm = FALSE))
 
-  pv_ipmr <- discretize_pop_vec(zs,
-                                100,
-                                1.2,
-                                1.2,
-                                normalize = FALSE)
-
-  expect_equal(pv_ipmr[[1]], pv$y)
-
-  pv$y <- pv$y / sum(pv$y)
-
-  pv_ipmr <- discretize_pop_vec(zs,
-                                100,
-                                1.2,
-                                1.2,
-                                normalize = TRUE)
-
-  expect_equal(pv_ipmr[[1]], pv$y)
-
-  expect_equal(names(pv_ipmr), "n_zs")
+  expect_equal(temp$n_zs, NA_real_)
+  expect_equal(temp$midpoints_zs, NA_real_)
 
 })

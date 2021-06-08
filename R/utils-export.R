@@ -60,11 +60,13 @@
 #' functions should return named lists. Names in that list can be referenced in
 #' vital rate expressions and/or kernel formulas.
 #'
-#' \strong{\code{discreizt_pop_vec}}
+#' \strong{\code{discretize_pop_vec}}
 #'
 #' This takes a numeric vector of a trait distribution and computes the relative
-#' frequency of trait values. This is helpful for creating an initial population
-#' state vector that corresponds to an observed trait distribution.
+#' frequency of trait values. By default, it integrates the kernel density estimate
+#' of the trait using the midpoint rule with \code{n_mesh} mesh points.
+#' This is helpful for creating an initial population state vector that
+#' corresponds to an observed trait distribution.
 #'
 #' @return All \code{define_*} functions return a proto_ipm. \code{make_impl_args_list}
 #' returns a list, and so must be used within a call to \code{define_impl} or
@@ -139,10 +141,10 @@
 #'
 #' z <- c(iceplant_ex$log_size, iceplant_ex$log_size_next)
 #'
-#' pop_vecs <- discretize_pop_vec(z,
-#'                                n_mesh = 100,
-#'                                pad_low = 1.2,
-#'                                pad_high = 1.2)
+#' pop_vecs <- discretize_pop_vector(z,
+#'                                   n_mesh = 100,
+#'                                   pad_low = 1.2,
+#'                                   pad_high = 1.2)
 #'
 #' @rdname define_star
 #' @importFrom rlang is_empty
@@ -1637,7 +1639,7 @@ conv_plot <- function(ipm, iterations = NULL,
 
 #' @rdname define_star
 #'
-#' @param trait_distrib A numeric vector of trait values.
+#' @param trait_values A numeric vector of trait values.
 #' @param n_mesh The number of meshpoints to use when integrating the trait
 #' distribution.
 #' @param pad_low The amount to pad the smallest value by, expressed as a
@@ -1647,37 +1649,66 @@ conv_plot <- function(ipm, iterations = NULL,
 #' @param normalize A logical indicating whether to normalize the result to sum
 #' to 1.
 #' @param na.rm A logical indicating whether to remove \code{NA}s from
-#' \code{trait_distrib}.
+#' \code{trait_distrib}. If \code{FALSE} and \code{trait_values} contains
+#' \code{NA}s, returns a \code{NA} with a warning
 #'
 #' @export
-#' @importFrom stats density
+#' @importFrom stats na.omit bw.nrd0 dnorm
 
-discretize_pop_vec <- function(trait_distrib,
-                               n_mesh,
-                               pad_low = NULL,
-                               pad_high = NULL,
-                               normalize = TRUE,
-                               na.rm = TRUE) {
+discretize_pop_vector <- function(trait_values,
+                                  n_mesh,
+                                  pad_low = NULL,
+                                  pad_high = NULL,
+                                  normalize = TRUE,
+                                  na.rm = TRUE) {
 
-  out_nm <- deparse(substitute(trait_distrib))
+  hi     <- max(trait_values, na.rm = na.rm) * pad_high
+  lo     <- min(trait_values, na.rm = na.rm) * pad_low
 
-  out_nm <- paste("n_", out_nm, sep = "")
+  nm <- deparse(substitute(trait_values))
+  out_x  <- paste("midpoints_", nm, sep = "")
 
-  out <- density(trait_distrib,
-                from = min(trait_distrib, na.rm = na.rm) * pad_low,
-                to = max(trait_distrib, na.rm = na.rm) * pad_high,
-                n = n_mesh,
-                na.rm = na.rm)
+  out_nm <- paste("n_", nm, sep = "")
 
-  h <- max(trait_distrib,
-           na.rm = na.rm) - min(trait_distrib,
-                                na.rm = na.rm) / n_mesh
+  if(na.rm) {
 
-  out$y <- out$y * h
+    trait_values <- stats::na.omit(trait_values)
 
-  if(normalize) out$y <- out$y / sum(out$y)
+  } else {
+    warning("NAs detected in ", nm, " - returning NA!")
 
-  out <- rlang::list2(!!out_nm := out$y)
+    return(rlang::list2(!!out_nm := NA_real_,
+                        !!out_x  := NA_real_))
+  }
+
+  bs     <- seq(lo, hi, length.out = n_mesh + 1)
+  mesh   <- (bs[2:(n_mesh + 1)] + bs[1:n_mesh]) * 0.5
+  h <- hi - lo / n_mesh
+
+  # stats::density won't get quite the same bin midpoints that ipmr
+  # generates internally. However, we can use Gaussian kernel with
+  # the nrd0 bandwidth to get what we want (I think).
+  # Credit for following to Stephen Ellison:
+  # https://stat.ethz.ch/pipermail/r-help/2011-June/282196.html
+
+  bw     <-  stats::bw.nrd0(trait_values)
+
+  at     <- matrix(mesh, ncol = 1)
+  out    <- apply(at, 1,
+                  FUN = function(a, x, bw) {
+
+                    sum(stats::dnorm(a, x, bw) / length(x))
+
+                  },
+                  x   = trait_values,
+                  bw  = bw)
+
+  out <- out * h
+
+  if(normalize) out <- out / sum(out)
+
+  out <- rlang::list2(!!out_nm := out,
+                      !!out_x  := mesh)
 
   return(out)
 
