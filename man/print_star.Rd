@@ -3,11 +3,17 @@
 \name{print.proto_ipm}
 \alias{print.proto_ipm}
 \alias{print.simple_di_det_ipm}
+\alias{print.simple_dd_det_ipm}
 \alias{print.simple_di_stoch_kern_ipm}
+\alias{print.simple_dd_stoch_kern_ipm}
 \alias{print.simple_di_stoch_param_ipm}
+\alias{print.simple_dd_stoch_param_ipm}
 \alias{print.general_di_det_ipm}
+\alias{print.general_dd_det_ipm}
 \alias{print.general_di_stoch_kern_ipm}
+\alias{print.general_dd_stoch_kern_ipm}
 \alias{print.general_di_stoch_param_ipm}
+\alias{print.general_dd_stoch_param_ipm}
 \title{Print proto_ipms or *_ipm objects}
 \usage{
 \method{print}{proto_ipm}(x, ...)
@@ -15,15 +21,21 @@
 \method{print}{simple_di_det_ipm}(
   x,
   comp_lambda = TRUE,
-  type_lambda = "all",
+  type_lambda = "last",
   sig_digits = 3,
   check_conv = TRUE,
   ...
 )
 
+\method{print}{simple_dd_det_ipm}(x, comp_lambda = TRUE, type_lambda = "last", sig_digits = 3, ...)
+
 \method{print}{simple_di_stoch_kern_ipm}(x, comp_lambda = TRUE, type_lambda = "stochastic", sig_digits = 3, ...)
 
+\method{print}{simple_dd_stoch_kern_ipm}(x, comp_lambda = TRUE, type_lambda = "stochastic", sig_digits = 3, ...)
+
 \method{print}{simple_di_stoch_param_ipm}(x, comp_lambda = TRUE, type_lambda = "stochastic", sig_digits = 3, ...)
+
+\method{print}{simple_dd_stoch_param_ipm}(x, comp_lambda = TRUE, type_lambda = "stochastic", sig_digits = 3, ...)
 
 \method{print}{general_di_det_ipm}(
   x,
@@ -34,9 +46,15 @@
   ...
 )
 
+\method{print}{general_dd_det_ipm}(x, comp_lambda = TRUE, type_lambda = "last", sig_digits = 3, ...)
+
 \method{print}{general_di_stoch_kern_ipm}(x, comp_lambda = TRUE, type_lambda = "stochastic", sig_digits = 3, ...)
 
+\method{print}{general_dd_stoch_kern_ipm}(x, comp_lambda = TRUE, type_lambda = "stochastic", sig_digits = 3, ...)
+
 \method{print}{general_di_stoch_param_ipm}(x, comp_lambda = TRUE, type_lambda = "stochastic", sig_digits = 3, ...)
+
+\method{print}{general_dd_stoch_param_ipm}(x, comp_lambda = TRUE, type_lambda = "stochastic", sig_digits = 3, ...)
 }
 \arguments{
 \item{x}{An object of class \code{proto_ipm} or produced by \code{make_ipm()}.}

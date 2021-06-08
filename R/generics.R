@@ -329,7 +329,7 @@ print.proto_ipm <- function(x, ...) {
 
 print.simple_di_det_ipm <- function(x,
                                     comp_lambda = TRUE,
-                                    type_lambda = 'all',
+                                    type_lambda = 'last',
                                     sig_digits = 3,
                                     check_conv = TRUE,
                                     ...) {
@@ -351,7 +351,7 @@ print.simple_di_det_ipm <- function(x,
     msg    <- c(msg, l_msg)
 
     if(check_conv &&
-       ! .is_conv_to_asymptotic(lambdas)) {
+       !is_conv_to_asymptotic(x)) {
 
       # Captures the name of the model that the user gave rather than
       # just print "x isn't converged"
@@ -378,54 +378,98 @@ print.simple_di_det_ipm <- function(x,
 #' @rdname print_star
 #' @export
 
-print.simple_di_stoch_kern_ipm <- function(x,
-                                           comp_lambda = TRUE,
-                                           type_lambda = 'stochastic',
-                                           sig_digits = 3,
-                                           ...) {
+print.simple_dd_det_ipm <- function(x,
+                                    comp_lambda = TRUE,
+                                    type_lambda = 'last',
+                                    sig_digits = 3,
+                                    ...) {
 
-  mod_nm     <- deparse(substitute(x))
   pretty_cls <- .pretty_class(class(x)[1])
 
   msg <- paste0('A ',
                 pretty_cls,
                 ' IPM with ',
-                length(x$iterators),
-                ' iteration kernel(s) and ',
                 length(x$sub_kernels),
                 ' sub-kernel(s) defined.', sep = "")
 
   if(comp_lambda) {
 
-    all_lams <- lambda(x, type_lambda = type_lambda)
+    lambdas <- lambda(x, type_lambda = type_lambda)
 
-
-    l_msg  <- paste0('\nStochastic lambda for ',
-                     mod_nm,
-                     ' = ',
-                     round(all_lams, sig_digits),
-                     sep = "" )
+    l_msg  <- paste0('\nDeterministic lambda = ', lambdas, sep = "")
 
     det_lam_msg <- paste('\nCall lambda(',
                          mod_nm,
                          ', type_lambda = "all") for deterministic lambdas\n',
                          'from each iteration.',
                          sep = "")
+
     msg <- c(msg, l_msg, det_lam_msg)
   }
+
   cat(msg)
 
   invisible(x)
+
+
 }
 
 #' @rdname print_star
 #' @export
 
+print.simple_di_stoch_kern_ipm <- function(x,
+                                             comp_lambda = TRUE,
+                                             type_lambda = 'stochastic',
+                                             sig_digits = 3,
+                                             ...) {
+
+    mod_nm     <- deparse(substitute(x))
+    pretty_cls <- .pretty_class(class(x)[1])
+
+    msg <- paste0('A ',
+                  pretty_cls,
+                  ' IPM with ',
+                  length(x$iterators),
+                  ' iteration kernel(s) and ',
+                  length(x$sub_kernels),
+                  ' sub-kernel(s) defined.', sep = "")
+
+    if(comp_lambda) {
+
+      all_lams <- lambda(x, type_lambda = type_lambda)
+
+
+      l_msg  <- paste0('\nStochastic lambda for ',
+                       mod_nm,
+                       ' = ',
+                       round(all_lams, sig_digits),
+                       sep = "" )
+
+      det_lam_msg <- paste('\nCall lambda(',
+                           mod_nm,
+                           ', type_lambda = "all") for deterministic lambdas\n',
+                           'from each iteration.',
+                           sep = "")
+      msg <- c(msg, l_msg, det_lam_msg)
+    }
+    cat(msg)
+
+    invisible(x)
+}
+
+#' @rdname print_star
+#' @export
+
+print.simple_dd_stoch_kern_ipm <- print.simple_di_stoch_kern_ipm
+
+#' @rdname print_star
+#' @export
+
 print.simple_di_stoch_param_ipm <- function(x,
-                                            comp_lambda = TRUE,
-                                            type_lambda = 'stochastic',
-                                            sig_digits  = 3,
-                                            ...) {
+                                              comp_lambda = TRUE,
+                                              type_lambda = 'stochastic',
+                                              sig_digits  = 3,
+                                              ...) {
   pretty_cls <- .pretty_class(class(x)[1])
 
   mod_nm     <- deparse(substitute(x))
@@ -461,6 +505,10 @@ print.simple_di_stoch_param_ipm <- function(x,
   invisible(x)
 
 }
+#' @rdname print_star
+#' @export
+
+print.simple_dd_stoch_param_ipm <- print.simple_di_stoch_param_ipm
 
 #' @rdname print_star
 #' @export
@@ -523,11 +571,60 @@ print.general_di_det_ipm <- function(x,
 #' @rdname print_star
 #' @export
 
+print.general_dd_det_ipm <- function(x,
+                                     comp_lambda = TRUE,
+                                     type_lambda = 'last',
+                                     sig_digits  = 3,
+                                     ...) {
+
+  pretty_cls <- .pretty_class(class(x)[1])
+
+  pops <- x$pop_state[!grepl("lambda", names(x$pop_state))]
+
+  msg <- paste0('A ',
+                pretty_cls,
+                ' IPM with ',
+                length(x$sub_kernels),
+                ' sub-kernel(s) and ',
+                length(pops),
+                ' population vectors defined.', sep = "")
+
+  mod_nm <- deparse(substitute(x))
+
+
+  if(comp_lambda) {
+
+    ret_lam <- lambda(x, type_lambda = type_lambda)
+
+    l_msg <- paste('\nLambda for the final time step of the model is: ',
+                   round(ret_lam, sig_digits),
+                   '\nCall lambda(',
+                   mod_nm,
+                   ', type_lambda = "all") for deterministic lambdas\n',
+                   'from each iteration.',
+                   sep = "")
+
+    msg <- c(msg, l_msg)
+
+  }
+
+
+
+
+  cat(msg)
+
+  invisible(x)
+
+}
+
+#' @rdname print_star
+#' @export
+
 print.general_di_stoch_kern_ipm <- function(x,
-                                            comp_lambda = TRUE,
-                                            type_lambda = 'stochastic',
-                                            sig_digits  = 3,
-                                            ...) {
+                                              comp_lambda = TRUE,
+                                              type_lambda = 'stochastic',
+                                              sig_digits  = 3,
+                                              ...) {
 
   pretty_cls <- .pretty_class(class(x)[1])
 
@@ -567,18 +664,20 @@ print.general_di_stoch_kern_ipm <- function(x,
 
   cat(msg)
   invisible(x)
-}
+  }
 
-
+#' @rdname print_star
+#' @export
+print.general_dd_stoch_kern_ipm <- print.general_di_stoch_kern_ipm
 
 #' @rdname print_star
 #' @export
 
-print.general_di_stoch_param_ipm <- function(x,
-                                             comp_lambda = TRUE,
-                                             type_lambda = 'stochastic',
-                                             sig_digits  = 3,
-                                             ...) {
+print.general_di_stoch_param_ipm <-  function(x,
+                                               comp_lambda = TRUE,
+                                               type_lambda = 'stochastic',
+                                               sig_digits  = 3,
+                                               ...) {
 
   pretty_cls <- .pretty_class(class(x)[1])
   mod_nm <- deparse(substitute(x))
@@ -633,6 +732,10 @@ print.general_di_stoch_param_ipm <- function(x,
   cat(msg)
   invisible(x)
 }
+
+#' @rdname print_star
+#' @export
+print.general_dd_stoch_param_ipm <- print.general_di_stoch_param_ipm
 
 #' @export
 
