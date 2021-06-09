@@ -314,9 +314,6 @@ left_mult <- function(kernel, vectr) {
 
   if(!is.integer(y)) {
 
-    warning("`%^%` is coercing second argument to an integer",
-            call. = FALSE)
-
     y <- as.integer(y)
 
   }

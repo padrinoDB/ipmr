@@ -1397,9 +1397,6 @@ test_that("`%^%` is working correctly", {
 
   expect_equal(test_exp_2, target_2)
 
-  wrns <- catch_cnd({test_mat_2 %^% 3})$message
-  expect_true(grepl("coercing second argument to an integer", wrns))
-
   err_mat <- rnorm(6) %>%
     matrix(ncol = 3, nrow = 2)
 
