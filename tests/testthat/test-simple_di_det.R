@@ -122,7 +122,7 @@ x <- init_ipm(sim_gen    = "simple",
            iterations = 200)
 
 
-lambda_ipmr <- lambda(x)
+lambda_ipmr <- unname(lambda(x))
 w_ipmr <- x$pop_state$n_dbh[ , 201] / sum(x$pop_state$n_dbh[ , 201])
 
 init_pop_vec <- x$pop_state$n_dbh[ , 1]
@@ -200,7 +200,7 @@ test_that('define_impl() can handle mismatched argument lengths', {
 
   )
 
-  test_impl_lambda <- lambda(test_impl)
+  test_impl_lambda <- unname(lambda(test_impl))
 
   expect_equal(test_impl_lambda, lambda_ipmr, tolerance = 1e-10)
 
@@ -250,7 +250,7 @@ test_that("order of kernel_definition doesn't matter", {
              normalize_pop_size = FALSE,
              iterate = TRUE)
 
-  lambda_out_of_order <- lambda(y)
+  lambda_out_of_order <- unname(lambda(y))
 
   expect_equal(lambda_ipmr, lambda_out_of_order)
 
@@ -298,11 +298,8 @@ test_that('iteration methods work the same as eigenvalue methods', {
 
   K <- it$sub_kernels$F + it$sub_kernels$P
 
-  lambda_it <- lambda(it)
+  lambda_it <- unname(lambda(it))
   lambda_eig <- Re(eigen(K)$values[1])
-  names(lambda_eig) <- NULL
-  names(lambda_it)  <- NULL
-
 
   expect_equal(lambda_it, lambda_ipmr)
   expect_equal(lambda_it, lambda_eig)
@@ -352,7 +349,7 @@ test_that('normalizing pop vector produces same lambdas as eigen methods', {
 
   K <- it$sub_kernels$F + it$sub_kernels$P
 
-  lambda_it <- lambda(it, type_lambda = 'last')
+  lambda_it <- unname(lambda(it, type_lambda = 'last'))
   lambda_eig <- Re(eigen(K)$values[1])
   names(lambda_eig) <- NULL
   names(lambda_it)  <- NULL

@@ -369,7 +369,7 @@ a_s_ipm <- init_ipm(sim_gen    = "general",
     return_all_envs = TRUE
   )
 
-ipmr_lambda <- lambda(a_s_ipm, type_lambda = 'last')
+ipmr_lambda <- unname(lambda(a_s_ipm, type_lambda = 'last'))
 
 test_that("age_x_size lambdas are recovered properly", {
 
@@ -550,7 +550,7 @@ a_s_ipm <- init_ipm(sim_gen    = "general",
   )
 
 
-ipmr_lambda_max <- lambda(a_s_ipm)
+ipmr_lambda_max <- unname(lambda(a_s_ipm))
 
 test_that("ipmr can handle max-age specific expressions", {
 

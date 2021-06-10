@@ -721,7 +721,7 @@ ipmr_control <- init_ipm(sim_gen    = "general",
 #                       function(x) x[ , 200],
 #                       numeric(1L))
 
-lambdas_ipmr <- lambda(ipmr_control, type_lambda = "last")
+lambdas_ipmr <- unname(lambda(ipmr_control, type_lambda = "last"))
 
 ws <- list()
 

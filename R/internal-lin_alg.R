@@ -381,6 +381,8 @@
 
       dimnames(out) <- list(NULL, names(lams))
 
+    } else {
+      names(out) <- names(lams)
     }
     return(out)
 
