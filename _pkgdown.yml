@@ -8,8 +8,10 @@ template:
   params:
     bootswatch: yeti
 navbar:
-  title: "bayesplot"
+  title: "ipmr"
   left:
+    - icon: fa-home fa-lg
+      href: index.html
     - text: "Functions"
       href: reference/index.html
     - text: "Vignettes"
@@ -28,6 +30,59 @@ navbar:
           href: articles/proto-ipms.html
     - text: "News"
       href: news/index.html
-  right:
-    - icon: fa-github
-      href: https://github.com/levisc8/ipmr
+
+reference:
+  - title: "IPM Construction"
+    desc: >
+      Functions for initializing an IPM, constructing sub-kernels, defining
+      numerical integration, defining initial conditions, defining the
+      environmental state, and handling eviction.
+  - contents:
+      - init_ipm
+      - starts_with("define")
+      - truncated_distributions
+      - use_vr_model
+      - make_ipm
+  - title: "Projection Diagnostics"
+    desc: >
+      Evaluate the behavior of the population projection.
+  - contents:
+      - conv_plot
+  - title: "Access parts of a proto_ipm and IPM objects"
+    desc: >
+      Extract and set various pieces of information from `proto_ipm` and IPM
+      objects.
+  - contents:
+      - domains
+      - collapse_pop_state
+  - title: "Further Analyses"
+    desc: >
+      Functions to for analysis of asymptotic dynamics, and helpers to extract
+      information needed for analysis of stochastic dynamcis.
+  - contents:
+      - lambda
+      - right_ev
+      - make_iter_kernel
+      - mean_kernel
+      - mat_power
+      - right_mult
+  - title: "Printing and Plotting"
+    desc: >
+      Functions to print and plot `proto_ipm` and IPM objects.
+  - contents:
+      - ipm_to_df
+      - starts_with("print")
+      - starts_with("plot")
+  - title: "Exported Data"
+    desc: >
+      Pre-built `proto_ipm`s and a set of raw demographic data for an [Israeli
+      Carpobrotus population](https://doi.org/10.1371/journal.pone.0250879).
+  - contents:
+      - sim_di_det_ex
+      - gen_di_det_ex
+      - iceplant_ex
+      - monocarp_proto
+
+
+
+

@@ -78,6 +78,12 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
+  <a href="../index.html">
+    <span class="fas fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../reference/index.html">Functions</a>
 </li>
 <li class="dropdown">
@@ -113,8 +119,8 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/levisc8/ipmr">
-    <span class="fas fa-github"></span>
+  <a href="https://github.com/levisc8/ipmr/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -145,8 +151,76 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
+          <h2 id="section-ipm-construction" class="hasAnchor"><a href="#section-ipm-construction" class="anchor"></a>IPM Construction</h2>
+          <p class="section-desc"><p>Functions for initializing an IPM, constructing sub-kernels, defining numerical integration, defining initial conditions, defining the environmental state, and handling eviction.</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="init_ipm.html">init_ipm()</a></code> </p>
+        </td>
+        <td><p>Initialize an IPM</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="define_star.html">define_impl()</a></code> <code><a href="define_star.html">make_impl_args_list()</a></code> <code><a href="define_star.html">define_domains()</a></code> <code><a href="define_star.html">define_pop_state()</a></code> <code><a href="define_star.html">define_env_state()</a></code> <code><a href="define_star.html">discretize_pop_vector()</a></code> </p>
+        </td>
+        <td><p>Helpers for IPM construction</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="kernel-definitions.html">define_kernel()</a></code> </p>
+        </td>
+        <td><p>Functions to initialize and define IPM kernels</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="eviction.html">truncated_distributions()</a></code> <code><a href="eviction.html">discrete_extrema()</a></code> </p>
+        </td>
+        <td><p>Eviction correction</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="predict_methods.html">use_vr_model()</a></code> </p>
+        </td>
+        <td><p>Predict methods in ipmr</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="make_ipm.html">make_ipm()</a></code> </p>
+        </td>
+        <td><p>Methods to implement an IPM</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-projection-diagnostics" class="hasAnchor"><a href="#section-projection-diagnostics" class="anchor"></a>Projection Diagnostics</h2>
+          <p class="section-desc"><p>Evaluate the behavior of the population projection.</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="check_convergence.html">is_conv_to_asymptotic()</a></code> <code><a href="check_convergence.html">conv_plot()</a></code> </p>
+        </td>
+        <td><p>Check for model convergence to asymptotic dynamics</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-access-parts-of-a-proto-ipm-and-ipm-objects" class="hasAnchor"><a href="#section-access-parts-of-a-proto-ipm-and-ipm-objects" class="anchor"></a>Access parts of a proto_ipm and IPM objects</h2>
+          <p class="section-desc"><p>Extract and set various pieces of information from <code>proto_ipm</code> and IPM objects.</p></p>
         </th>
       </tr>
       
@@ -163,21 +237,28 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="check_convergence.html">is_conv_to_asymptotic()</a></code> <code><a href="check_convergence.html">conv_plot()</a></code> </p>
-        </td>
-        <td><p>Check for model convergence to asymptotic dynamics</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="collapse_pop_state.html">collapse_pop_state()</a></code> </p>
         </td>
         <td><p>Extract threshold based population size information</p></td>
-      </tr><tr>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-further-analyses" class="hasAnchor"><a href="#section-further-analyses" class="anchor"></a>Further Analyses</h2>
+          <p class="section-desc"><p>Functions to for analysis of asymptotic dynamics, and helpers to extract information needed for analysis of stochastic dynamcis.</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
         
         <td>
-          <p><code><a href="define_star.html">define_impl()</a></code> <code><a href="define_star.html">make_impl_args_list()</a></code> <code><a href="define_star.html">define_domains()</a></code> <code><a href="define_star.html">define_pop_state()</a></code> <code><a href="define_star.html">define_env_state()</a></code> <code><a href="define_star.html">discretize_pop_vector()</a></code> </p>
+          <p><code><a href="lambda.html">lambda()</a></code> </p>
         </td>
-        <td><p>Helpers for IPM construction</p></td>
+        <td><p>Compute the per-capita growth rate for an IPM object</p></td>
       </tr><tr>
         
         <td>
@@ -187,57 +268,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="eviction.html">truncated_distributions()</a></code> <code><a href="eviction.html">discrete_extrema()</a></code> </p>
-        </td>
-        <td><p>Eviction correction</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="gen_di_det.html">gen_di_det_ex</a></code> </p>
-        </td>
-        <td><p>A general deterministic IPM example</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="init_ipm.html">init_ipm()</a></code> </p>
-        </td>
-        <td><p>Initialize an IPM</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="ipm_to_df.html">ipm_to_df()</a></code> </p>
-        </td>
-        <td><p>Convert ipmr matrix to long data frame</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="kernel-definitions.html">define_kernel()</a></code> </p>
-        </td>
-        <td><p>Functions to initialize and define IPM kernels</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="lambda.html">lambda()</a></code> </p>
-        </td>
-        <td><p>Compute the per-capita growth rate for an IPM object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="make_ipm.html">make_ipm()</a></code> </p>
-        </td>
-        <td><p>Methods to implement an IPM</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="make_iter_kernel.html">format_mega_kernel()</a></code> <code><a href="make_iter_kernel.html">make_iter_kernel()</a></code> </p>
         </td>
         <td><p>Create iteration kernels from an IPM object</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="matrix-power.html">`%^%`</a></code> <code><a href="matrix-power.html">mat_power()</a></code> </p>
-        </td>
-        <td><p>Raise a matrix to a power</p></td>
       </tr><tr>
         
         <td>
@@ -247,15 +280,34 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="plot_star.html">plot(<i>&lt;ipmr_matrix&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;simple_di_det_ipm&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;simple_di_stoch_param_ipm&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;simple_di_stoch_kern_ipm&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;general_di_det_ipm&gt;</i>)</a></code> </p>
+          <p><code><a href="matrix-power.html">`%^%`</a></code> <code><a href="matrix-power.html">mat_power()</a></code> </p>
         </td>
-        <td><p>Plot a matrix or an *_ipm object</p></td>
+        <td><p>Raise a matrix to a power</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="predict_methods.html">use_vr_model()</a></code> </p>
+          <p><code><a href="right_mult.html">right_mult()</a></code> <code><a href="right_mult.html">left_mult()</a></code> </p>
         </td>
-        <td><p>Predict methods in ipmr</p></td>
+        <td><p>Right/left multiplication</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-printing-and-plotting" class="hasAnchor"><a href="#section-printing-and-plotting" class="anchor"></a>Printing and Plotting</h2>
+          <p class="section-desc"><p>Functions to print and plot <code>proto_ipm</code> and IPM objects.</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="ipm_to_df.html">ipm_to_df()</a></code> </p>
+        </td>
+        <td><p>Convert ipmr matrix to long data frame</p></td>
       </tr><tr>
         
         <td>
@@ -265,9 +317,34 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="proto_ex.html">monocarp_proto</a></code> </p>
+          <p><code><a href="plot_star.html">plot(<i>&lt;ipmr_matrix&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;simple_di_det_ipm&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;simple_di_stoch_param_ipm&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;simple_di_stoch_kern_ipm&gt;</i>)</a></code> <code><a href="plot_star.html">plot(<i>&lt;general_di_det_ipm&gt;</i>)</a></code> </p>
         </td>
-        <td><p>A <code>proto_ipm</code> for a monocarpic perennial</p></td>
+        <td><p>Plot a matrix or an *_ipm object</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-exported-data" class="hasAnchor"><a href="#section-exported-data" class="anchor"></a>Exported Data</h2>
+          <p class="section-desc"><p>Pre-built <code>proto_ipm</code>s and a set of raw demographic data for an <a href="https://doi.org/10.1371/journal.pone.0250879">Israeli Carpobrotus population</a>.</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="sim_di_det.html">sim_di_det_ex</a></code> </p>
+        </td>
+        <td><p>Simple deterministic IPM example</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="gen_di_det.html">gen_di_det_ex</a></code> </p>
+        </td>
+        <td><p>A general deterministic IPM example</p></td>
       </tr><tr>
         
         <td>
@@ -277,15 +354,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="right_mult.html">right_mult()</a></code> <code><a href="right_mult.html">left_mult()</a></code> </p>
+          <p><code><a href="proto_ex.html">monocarp_proto</a></code> </p>
         </td>
-        <td><p>Right/left multiplication</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sim_di_det.html">sim_di_det_ex</a></code> </p>
-        </td>
-        <td><p>Simple deterministic IPM example</p></td>
+        <td><p>A <code>proto_ipm</code> for a monocarpic perennial</p></td>
       </tr>
     </tbody>
     </table>
