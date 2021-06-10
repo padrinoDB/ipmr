@@ -67,7 +67,7 @@ parameters(object) <- value
 
 \method{parameters}{proto_ipm}(object) <- value
 
-int_mesh(ipm)
+int_mesh(ipm, full_mesh = TRUE)
 
 pop_state(object)
 
@@ -96,6 +96,9 @@ The new functional form must be wrapped in a call to \code{new_fun_form}.}
 
 \item{form}{An expression representing the new vital rate or kernel formula
 to insert.}
+
+\item{full_mesh}{Return the full integration mesh? Default is \code{TRUE}.
+\code{FALSE} returns only unique values for each state variable.}
 }
 \value{
 Depending on the class of \code{object}, a list

@@ -1086,9 +1086,11 @@ parameters.default <- function(object) {
 #' @param ipm An object created by \code{make_ipm()}. This argument only applies to
 #' \code{int_mesh()} and \code{vital_rate_funs()} (because these are not built
 #' until \code{make_ipm()} is called).
+#' @param full_mesh Return the full integration mesh? Default is \code{TRUE}.
+#' \code{FALSE} returns only unique values for each state variable.
 #' @export
 
-int_mesh <- function(ipm) {
+int_mesh <- function(ipm, full_mesh = TRUE) {
 
   if(!"main_env" %in% names(ipm$env_list)) {
     stop("Cannot find the 'main_env' object in the IPM. Do you need to re-run\n",
@@ -1126,6 +1128,10 @@ int_mesh <- function(ipm) {
                              all_nms,
                              default = NULL,
                              inherit = FALSE)
+
+  if(!full_mesh) {
+    out <- lapply(out, unique)
+  }
 
   class(out) <- c("ipmr_mp_mesh", "list")
 

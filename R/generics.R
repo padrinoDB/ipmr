@@ -346,7 +346,9 @@ print.simple_di_det_ipm <- function(x,
 
     lambdas <- lambda(x, type_lambda = type_lambda)
 
-    l_msg  <- paste0('\nDeterministic lambda = ', lambdas, sep = "")
+    l_msg  <- paste0('\nDeterministic lambda = ',
+                     round(lambdas, sig_digits),
+                     sep = "")
 
     msg    <- c(msg, l_msg)
 
@@ -384,6 +386,8 @@ print.simple_dd_det_ipm <- function(x,
                                     sig_digits = 3,
                                     ...) {
 
+  mod_nm <- deparse(substitute(x))
+
   pretty_cls <- .pretty_class(class(x)[1])
 
   msg <- paste0('A ',
@@ -396,7 +400,9 @@ print.simple_dd_det_ipm <- function(x,
 
     lambdas <- lambda(x, type_lambda = type_lambda)
 
-    l_msg  <- paste0('\nDeterministic lambda = ', lambdas, sep = "")
+    l_msg  <- paste('\nLambda for the final time step of the model is: ',
+                    round(lambdas, sig_digits),
+                    sep = "")
 
     det_lam_msg <- paste('\nCall lambda(',
                          mod_nm,

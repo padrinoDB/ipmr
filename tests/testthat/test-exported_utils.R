@@ -185,6 +185,15 @@ test_that("int_mesh works as expected", {
   expect_equal(length(mesh_ps$dbh_1), 10000L)
   expect_equal(length(mesh_ps$d_dbh), 1L)
 
+
+  mesh_ps <- int_mesh(sim_di_det_2, full_mesh = FALSE)
+  dummy_seq <- seq(0, 50, length.out = 101)
+  dummy_z   <- 0.5 * (dummy_seq[2:101] + dummy_seq[1:100])
+
+  expect_equal(mesh_ps$dbh_1, dummy_z)
+  expect_equal(mesh_ps$dbh_2, dummy_z)
+  expect_equal(mesh_ps$d_dbh, dummy_z[2] - dummy_z[1])
+
 })
 
 test_that("parameters gets and sets correctly", {

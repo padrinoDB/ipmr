@@ -7,23 +7,27 @@ authors:
 template:
   params:
     bootswatch: yeti
-articles:
-- title: Introduction to ipmr
-  navbar: Introduction to ipmr
-  contents:
-  - ipmr-introduction
-  - general-ipms
-  - index-notation
-  - age_x_size
-  - density-dependence
-
-- title: Generic Functions
-  navbar: Generic Functions
-  contents:
-  - generic-funs
-  - generic-progress
-- title: proto_ipm Overview
-  navbar: proto_ipm Overview
-  contents:
-  - proto-ipms
-
+navbar:
+  title: "bayesplot"
+  left:
+    - text: "Functions"
+      href: reference/index.html
+    - text: "Vignettes"
+      menu:
+        - text: "Introduction to ipmr"
+          href: articles/ipmr-introduction.html
+        - text: "General IPMs"
+          href: articles/general-ipms.html
+        - text: "Index Notation in ipmr"
+          href: articles/index-notation.html
+        - text: "Age X Size IPMs"
+          href: articles/age_x_size.html
+        - text: "Density/Frequency Dependent IPMs"
+          href: articles/density-dependence.html
+        - text: "proto_ipm Data Structure"
+          href: articles/proto-ipms.html
+    - text: "News"
+      href: news/index.html
+  right:
+    - icon: fa-github
+      href: https://github.com/levisc8/ipmr

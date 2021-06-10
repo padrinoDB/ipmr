@@ -79,23 +79,15 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../reference/index.html">Functions</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
+    Vignettes
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
-    <li class="divider"></li>
-    <li class="dropdown-header">Introduction to ipmr</li>
     <li>
       <a href="../articles/ipmr-introduction.html">Introduction to ipmr</a>
     </li>
@@ -106,34 +98,24 @@
       <a href="../articles/index-notation.html">Index Notation in ipmr</a>
     </li>
     <li>
-      <a href="../articles/age_x_size.html">Age-Size IPMs</a>
+      <a href="../articles/age_x_size.html">Age X Size IPMs</a>
     </li>
     <li>
-      <a href="../articles/density-dependence.html">Density Dependent IPMs</a>
+      <a href="../articles/density-dependence.html">Density/Frequency Dependent IPMs</a>
     </li>
-    <li class="divider"></li>
-    <li class="dropdown-header">Generic Functions</li>
-    <li>
-      <a href="../articles/generic-funs.html">List of Generic and Helper Functions in ipmr</a>
-    </li>
-    <li>
-      <a href="../articles/generic-progress.html">Generic Progress</a>
-    </li>
-    <li class="divider"></li>
-    <li class="dropdown-header">proto_ipm Overview</li>
     <li>
       <a href="../articles/proto-ipms.html">proto_ipm Data Structure</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">Changelog</a>
+  <a href="../news/index.html">News</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/levisc8/ipmr/">
-    <span class="fab fa-github fa-lg"></span>
+  <a href="https://github.com/levisc8/ipmr">
+    <span class="fas fa-github"></span>
      
   </a>
 </li>
@@ -169,8 +151,8 @@
 
 <span class='fu'>define_env_state</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='va'>...</span>, data_list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>discretize_pop_vec</span><span class='op'>(</span>
-  <span class='va'>trait_distrib</span>,
+<span class='fu'>discretize_pop_vector</span><span class='op'>(</span>
+  <span class='va'>trait_values</span>,
   <span class='va'>n_mesh</span>,
   pad_low <span class='op'>=</span> <span class='cn'>NULL</span>,
   pad_high <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -231,7 +213,7 @@ be passed as a named list here.</p></td>
 in <code>...</code> in <code>define_env_state()</code>.</p></td>
     </tr>
     <tr>
-      <th>trait_distrib</th>
+      <th>trait_values</th>
       <td><p>A numeric vector of trait values.</p></td>
     </tr>
     <tr>
@@ -257,7 +239,8 @@ to 1.</p></td>
     <tr>
       <th>na.rm</th>
       <td><p>A logical indicating whether to remove <code>NA</code>s from
-<code>trait_distrib</code>.</p></td>
+<code>trait_distrib</code>. If <code>FALSE</code> and <code>trait_values</code> contains
+<code>NA</code>s, returns a <code>NA</code> with a warning</p></td>
     </tr>
     </table>
 
@@ -303,10 +286,12 @@ iteration of the model in <code>...</code>. The <code>data_list</code> should co
 parameters that the function uses, as well as the function itself. The
 functions should return named lists. Names in that list can be referenced in
 vital rate expressions and/or kernel formulas.</p>
-<p><strong><code>discreizt_pop_vec</code></strong></p>
+<p><strong><code>discretize_pop_vec</code></strong></p>
 <p>This takes a numeric vector of a trait distribution and computes the relative
-frequency of trait values. This is helpful for creating an initial population
-state vector that corresponds to an observed trait distribution.</p>
+frequency of trait values. By default, it integrates the kernel density estimate
+of the trait using the midpoint rule with <code>n_mesh</code> mesh points.
+This is helpful for creating an initial population state vector that
+corresponds to an observed trait distribution.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
@@ -517,10 +502,10 @@ state vector that corresponds to an observed trait distribution.</p>
 
 <span class='va'>z</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>iceplant_ex</span><span class='op'>$</span><span class='va'>log_size</span>, <span class='va'>iceplant_ex</span><span class='op'>$</span><span class='va'>log_size_next</span><span class='op'>)</span>
 
-<span class='va'>pop_vecs</span> <span class='op'>&lt;-</span> <span class='fu'>discretize_pop_vec</span><span class='op'>(</span><span class='va'>z</span>,
-                               n_mesh <span class='op'>=</span> <span class='fl'>100</span>,
-                               pad_low <span class='op'>=</span> <span class='fl'>1.2</span>,
-                               pad_high <span class='op'>=</span> <span class='fl'>1.2</span><span class='op'>)</span>
+<span class='va'>pop_vecs</span> <span class='op'>&lt;-</span> <span class='fu'>discretize_pop_vector</span><span class='op'>(</span><span class='va'>z</span>,
+                                  n_mesh <span class='op'>=</span> <span class='fl'>100</span>,
+                                  pad_low <span class='op'>=</span> <span class='fl'>1.2</span>,
+                                  pad_high <span class='op'>=</span> <span class='fl'>1.2</span><span class='op'>)</span>
 
 </div></pre>
   </div>
