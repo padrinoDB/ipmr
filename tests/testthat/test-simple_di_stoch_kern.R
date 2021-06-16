@@ -279,18 +279,9 @@ monocarp_sys <- init_ipm(sim_gen    = "simple",
   make_ipm(usr_funs = list(inv_logit   = inv_logit,
                            inv_logit_r = inv_logit_r,
                            pois_r      = pois_r),
-           normalize_pop_size = FALSE,
+           normalize_pop_size = TRUE,
            iterate = TRUE,
            iterations = 100)
-
-# Ks <- lapply(1:5,
-#              function(x, kern_list) {
-#                nms <- paste(c("P", "F"), x, sep = "_")
-#
-#                out <- do.call(`+`, kern_list[nms])
-#
-#                return(out)
-#              }, kern_list = monocarp_sys$sub_kernels)
 
 Ks <- make_iter_kernel(monocarp_sys) %>%
   lapply(unclass)
@@ -333,6 +324,9 @@ proto <- monocarp_sys$proto_ipm
 
 init_pop_vec <- runif(100)
 
+init_pop_vec <- init_pop_vec / sum(init_pop_vec)
+
+
 iterated_sys <- proto %>%
   define_pop_state(
     n_ht = init_pop_vec
@@ -343,38 +337,43 @@ iterated_sys <- proto %>%
            kernel_seq = kern_seq,
            iterate = TRUE,
            iterations = 50,
-           normalize_pop_size = FALSE)
+           normalize_pop_size = TRUE)
 
 ipmr_pop_state <- iterated_sys$pop_state$n_ht
 
 pop_holder <- array(NA_real_, dim = c(100, 51))
 
-pop_holder[ , 1] <- init_pop_vec
+pop_holder[ , 1] <- init_pop_vec / sum(init_pop_vec)
 
-pop_size_lambdas <- pop_size_lambdas_ipmr <- numeric(50L)
+
+v_holder <- array(NA_real_, dim = c(51, 100))
+v_holder[1 , ] <- init_pop_vec / sum(init_pop_vec)
+
+pop_size_lambdas <- numeric(50L)
 
 for(i in seq_len(50)) {
 
   k_selector <- kern_seq[i]
   k_temp <- sys[[k_selector]]
 
-  pop_holder[ , (i + 1)] <- k_temp %*% pop_holder[ , i]
+  n_t_1 <- k_temp %*% pop_holder[ , i]
 
-  pop_size_lambdas[i] <- sum(pop_holder[ , (i + 1)]) / sum(pop_holder[ , i])
+  pop_holder[ , (i + 1)] <- n_t_1 / sum(n_t_1)
 
-  pop_size_lambdas_ipmr[i] <- sum(ipmr_pop_state[ , (i + 1)]) / sum(ipmr_pop_state[ , i])
+  pop_size_lambdas[i] <- sum(n_t_1)
+
+  v_t_1 <- left_mult(k_temp, v_holder[i , ])
+
+  v_holder[(i + 1), ] <- v_t_1 / sum(v_t_1)
+
 }
 
-pop_sizes_ipmr <- colSums(ipmr_pop_state)
-pop_sizes_test <- colSums(pop_holder)
-
-lambda_generic_lambdas <- lambda(iterated_sys,
-                                 type_lambda = 'all')
+lambdas_ipmr <- as.vector(lambda(iterated_sys,
+                                 type_lambda = 'all'))
 
 test_that('.iterate_kerns is acting correctly', {
 
-  expect_equal(pop_size_lambdas, pop_size_lambdas_ipmr, tolerance = 1e-10)
-  expect_equal(pop_sizes_test, pop_sizes_ipmr, tolerance = 1e-10)
+  expect_equal(pop_size_lambdas, lambdas_ipmr, tolerance = 1e-10)
 
 })
 
@@ -400,6 +399,22 @@ test_that('classes are correctly set', {
 
   expect_true(all(sub_cls == 'ipmr_matrix'))
   expect_s3_class(monocarp_sys, 'simple_di_stoch_kern_ipm')
+
+})
+
+hand_v <- list(t(v_holder[13:51, ]))
+ipmr_v <- left_ev(iterated_sys, iterations = 50)
+
+hand_w <- list(pop_holder[ , 13:51])
+ipmr_w <- right_ev(iterated_sys)
+
+test_that("left and right_ev work correctly", {
+
+  expect_s3_class(ipmr_v, "ipmr_v")
+  expect_equal(hand_v, ipmr_v, ignore_attr = TRUE)
+
+  expect_s3_class(ipmr_w, "ipmr_w")
+  expect_equal(hand_w, ipmr_w, ignore_attr = TRUE)
 
 })
 
@@ -448,34 +463,25 @@ test_that("order of kernel definition doesn't matter", {
       )
     ) %>%
     define_domains(ht = c(0.2, 40, 100)) %>%
-    define_pop_state(n_ht = runif(100)) %>%
+    define_pop_state(n_ht = init_pop_vec) %>%
     make_ipm(usr_funs = list(inv_logit   = inv_logit,
                              inv_logit_r = inv_logit_r,
                              pois_r      = pois_r),
-             normalize_pop_size = FALSE)
+             kernel_seq = kern_seq,
+             normalize_pop_size = TRUE)
 
   Ks <- make_iter_kernel(test_order_1) %>%
     lapply(unclass)
 
-  lambdas_test <- vapply(Ks,
-                         function(x) Re(eigen(x)$values[1]),
-                         numeric(1)) %>%
-    unname()
+  lambdas_test <- as.vector(lambda(test_order_1, type_lambda = "all"))
 
-  ws_test <- vapply(Ks,
-                    function(x) Re(eigen(x)$vectors[ , 1]),
-                    numeric(100L))
+  w_test <- right_ev(test_order_1)
+  v_test <- left_ev(test_order_1, iterations = 50)
 
 
-    expect_equal(lambdas_ipmr, lambdas_test, tolerance = 1e-10)
-    expect_equal(ws_ipmr[ ,1], ws_test[ ,1], tolerance = 1e-13)
-    expect_equal(ws_ipmr[ ,2], ws_test[ ,2], tolerance = 1e-13)
-    expect_equal(ws_ipmr[ ,3], ws_test[ ,3], tolerance = 1e-13)
-    expect_equal(ws_ipmr[ ,4], ws_test[ ,4], tolerance = 1e-13)
-    expect_equal(ws_ipmr[ ,5], ws_test[ ,5], tolerance = 1e-13)
-
-
-
+  expect_equal(lambdas_ipmr, lambdas_test, tolerance = 1e-10)
+  expect_equal(ipmr_w, w_test)
+  expect_equal(ipmr_v, v_test)
 })
 
 test_that("return_all gets all of the environments back", {

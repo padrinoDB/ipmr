@@ -454,7 +454,7 @@
   )
 
   # instert lambdas back into the pop_state object
-  out$lambda <- lams
+  out <- c(out, lams)
   return(out)
 
 }

@@ -904,13 +904,13 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
   }
 
   # Bind env_exprs, constants, and pop_vectors to main_env so that
-  # we can always find them and avoid that miserable repitition
+  # we can always find them and avoid that miserable repetition
 
   main_env <- .bind_all_constants(env_state   = others$env_state[[1]]$constants,
-                                    env_to_bind = main_env)
+                                  env_to_bind = main_env)
 
-  temp       <- .prep_di_output(others, k_row, proto_ipm, iterations,
-                                normalize_pop_size)
+  temp     <- .prep_di_output(others, k_row, proto_ipm, iterations,
+                              normalize_pop_size)
 
   # initialize the pop_state vectors in main_env so they can be found
   # at evaluation time
@@ -957,9 +957,7 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
     sub_kernels <- sys$ipm_system$sub_kernels
 
     # Generate the pop_state for a single iteration! This is critical to ensuring
-    # env_state_funs are only evaluated once per iteration. kern_seq = NULL
-    # because the environmental parameters are generated on the fly by the
-    # user defined function
+    # env_state_funs are only evaluated once per iteration.
 
     pop_state <- .iterate_model(proto_ipm,
                                 k_row,

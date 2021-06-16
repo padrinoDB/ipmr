@@ -3,31 +3,64 @@
 \name{right_ev}
 \alias{right_ev}
 \alias{right_ev.simple_di_det_ipm}
+\alias{right_ev.simple_di_stoch_kern_ipm}
+\alias{right_ev.simple_di_stoch_param_ipm}
 \alias{right_ev.general_di_det_ipm}
+\alias{right_ev.general_di_stoch_kern_ipm}
+\alias{right_ev.general_di_stoch_param_ipm}
 \alias{left_ev}
 \alias{left_ev.simple_di_det_ipm}
+\alias{left_ev.simple_di_stoch_kern_ipm}
 \alias{left_ev.general_di_det_ipm}
+\alias{left_ev.general_di_stoch_kern_ipm}
+\alias{left_ev.general_di_stoch_param_ipm}
+\alias{left_ev.simple_di_stoch_param_ipm}
 \title{Compute the standardized left and right eigenvectors via iteration}
 \usage{
-right_ev(ipm, iterations, tolerance)
+right_ev(ipm, ...)
 
-\method{right_ev}{simple_di_det_ipm}(ipm, iterations = 100, tolerance = 1e-10)
+\method{right_ev}{simple_di_det_ipm}(ipm, iterations = 100, tolerance = 1e-10, ...)
 
-\method{right_ev}{general_di_det_ipm}(ipm, iterations = 100, tolerance = 1e-10)
+\method{right_ev}{simple_di_stoch_kern_ipm}(ipm, burn_in = 0.25, ...)
 
-left_ev(ipm, iterations, tolerance)
+\method{right_ev}{simple_di_stoch_param_ipm}(ipm, burn_in = 0.25, ...)
 
-\method{left_ev}{simple_di_det_ipm}(ipm, iterations = 100, tolerance = 1e-10)
+\method{right_ev}{general_di_det_ipm}(ipm, iterations = 100, tolerance = 1e-10, ...)
 
-\method{left_ev}{general_di_det_ipm}(ipm, iterations = 100, tolerance = 1e-10)
+\method{right_ev}{general_di_stoch_kern_ipm}(ipm, burn_in = 0.25, ...)
+
+\method{right_ev}{general_di_stoch_param_ipm}(ipm, burn_in = 0.25, ...)
+
+left_ev(ipm, ...)
+
+\method{left_ev}{simple_di_det_ipm}(ipm, iterations = 100, tolerance = 1e-10, ...)
+
+\method{left_ev}{simple_di_stoch_kern_ipm}(ipm, iterations = 10000, burn_in = 0.25, kernel_seq = NULL, ...)
+
+\method{left_ev}{general_di_det_ipm}(ipm, iterations = 100, tolerance = 1e-10, ...)
+
+\method{left_ev}{general_di_stoch_kern_ipm}(ipm, iterations = 10000, burn_in = 0.25, kernel_seq = NULL, ...)
+
+\method{left_ev}{general_di_stoch_param_ipm}(ipm, iterations = 10000, burn_in = 0.25, kernel_seq = NULL, ...)
+
+\method{left_ev}{simple_di_stoch_param_ipm}(ipm, iterations = 10000, burn_in = 0.25, kernel_seq = NULL, ...)
 }
 \arguments{
 \item{ipm}{Output from \code{make_ipm()}.}
+
+\item{...}{Other arguments passed to methods}
 
 \item{iterations}{The number of times to iterate the model to reach
 convergence. Default is 100.}
 
 \item{tolerance}{Tolerance to evaluate convergence to asymptotic dynamics.}
+
+\item{burn_in}{The proportion of early iterations to discard from the
+stochastic simulation}
+
+\item{kernel_seq}{The sequece of parameter set indices used to select kernels
+during the iteration procedure. If \code{NULL}, will use the sequence stored
+in the \code{ipm} object. Should usually be left as \code{NULL}.}
 }
 \value{
 A list of named numeric vector(s) corresponding to the stable trait distribution
@@ -36,8 +69,9 @@ function (\code{right_ev}) or the reproductive values for each trait (\code{left
 \description{
 Compute the standardized left and right eigenvectors via iteration
 }
-\details{
-For \code{right_ev}, if the model has already been iterated and has
+\section{\strong{Deterministic eigenvectors}}{
+
+ For \code{right_ev}, if the model has already been iterated and has
 converged to asymptotic dynamics, then it will just extract the final
 population state and return that in a named list. Each element of the list
 is a vector with length \code{>= 1} and corresponds each state variable's
@@ -56,3 +90,20 @@ Appendix A) is worked out based on the \code{state_start} and \code{state_end}
 in the model's \code{proto_ipm} object. The model is then iterated for
 \code{iterations} times to produce a standardized left eigenvector.
 }
+
+\section{\strong{Stochastic eigenvectors}}{
+
+\code{left_ev} and \code{right_ev} return different things for stochastic models.
+\code{right_ev} returns the trait distribution through time from the stochastic
+simulation (i.e. \code{ipm$pop_state}), and normalizes it such that the
+distribution at each time step integrates to 1 (if it is not already).
+It then discards the first \code{burn_in * iterations} time steps of the
+simulation to eliminate transient dynamics. See Ellner, Childs, & Rees 2016,
+Chapter 7.5 for more details.
+
+\code{left_ev} returns a similar result as \code{right_ev}, except the trait
+distributions are the result of left multiplying the kernel and trait
+ distribution. See Ellner, Childs, & Rees 2016, Chapter 7.5 for more
+details.
+}
+

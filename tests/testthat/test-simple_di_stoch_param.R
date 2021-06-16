@@ -57,11 +57,12 @@ r_sigma <- matrix(r_sigma, nrow = 4)
 
 r_sigma <- r_sigma %*% t(r_sigma) # make symmetrical
 
-iterations <- 10
+iterations <- 100
 
 pop_vec <- matrix(0, ncol = iterations + 1, nrow = length(d1))
 
-pop_vec[ ,1] <- init_pop_vec <- runif(length(d1), 0, 10)
+init_pop_vec <- runif(length(d1), 0, 10)
+pop_vec[ ,1] <- init_pop_vec <- init_pop_vec / sum(init_pop_vec)
 
 ## IPMR Version
 
@@ -140,8 +141,8 @@ test_stoch_param <- init_ipm(sim_gen    = "simple",
   make_ipm(usr_funs = list(inv_logit = inv_logit,
                            mvt_wrapper = mvt_wrapper),
            iterate = TRUE,
-           iterations = 10,
-           normalize_pop_size = FALSE)
+           iterations = 100,
+           normalize_pop_size = TRUE)
 
 pop_state_ipmr <- test_stoch_param$pop_state$n_surf_area
 lambda_ipmr <- lambda(test_stoch_param,
@@ -159,6 +160,8 @@ ps <- list()
 fs <- list()
 
 domains <- expand.grid(list(d2 = d1, d1 = d1))
+
+v_holder <- t(pop_vec)
 
 for(i in seq_len(iterations)) {
 
@@ -205,33 +208,23 @@ for(i in seq_len(iterations)) {
   names(fs)[i] <- nm_f
 
   n_t_1 <- K_temp %*% pop_vec[ , i]
+  v_t_1 <- left_mult(K_temp, v_holder[i, ])
+  v_t_1 <- v_t_1 / sum(v_t_1)
 
-  lambda[i] <- sum(n_t_1)/sum(pop_vec[ , i])
+  lambda[i] <- sum(n_t_1)
 
-  pop_vec[ , (i + 1)] <- n_t_1
+  pop_vec[ , (i + 1)] <- n_t_1 / sum(n_t_1)
+
+  v_holder[(i + 1), ] <- v_t_1
 
 }
 
-ws <- vapply(ks, function(x) Re(eigen(x)$vectors[ , 1]), numeric(100L))
+ws <- list(pop_vec[ , 26:101])
 
-iterators <- lapply(1:10,
-                    function(x, kern_list) {
+ws_ipmr <- right_ev(test_stoch_param)
 
-                      nms <- paste(c("P_it_", "F_it_"), x, sep = "")
-
-                      do.call(`+`, kern_list[nms])
-
-                    },
-                    kern_list = test_stoch_param$sub_kernels)
-
-ws_ipmr <- vapply(iterators,
-                  function(x) Re(eigen(x)$vectors[ , 1]),
-                  numeric(100L))
-
-vs <- vapply(ks, function(x) Re(eigen(t(x))$vectors[ , 1]), numeric(100L))
-vs_ipmr <- vapply(iterators,
-                  function(x) Re(eigen(t(x))$vectors[ , 1]),
-                  numeric(100L))
+vs <- list(t(v_holder[26:101 , ]))
+vs_ipmr <- left_ev(test_stoch_param, iterations = 100, burn_in = 0.25)
 
 test_that('eigenvectors/values are all good', {
 
@@ -239,18 +232,11 @@ test_that('eigenvectors/values are all good', {
   expect_equal(lambda_ipmr, lambda, tolerance = 1e-10)
 
   # Stable stage distributions
-  expect_equal(ws_ipmr[ ,1], ws[ ,1], tolerance = 1e-13)
-  expect_equal(ws_ipmr[ ,2], ws[ ,2], tolerance = 1e-13)
-  expect_equal(ws_ipmr[ ,3], ws[ ,3], tolerance = 1e-13)
-  expect_equal(ws_ipmr[ ,4], ws[ ,4], tolerance = 1e-13)
-  expect_equal(ws_ipmr[ ,5], ws[ ,5], tolerance = 1e-13)
+  expect_equal(ws_ipmr, ws, ignore_attr = TRUE)
 
   # Reproductive values
-  expect_equal(vs_ipmr[ ,1], vs[ ,1], tolerance = 1e-13)
-  expect_equal(vs_ipmr[ ,2], vs[ ,2], tolerance = 1e-13)
-  expect_equal(vs_ipmr[ ,3], vs[ ,3], tolerance = 1e-13)
-  expect_equal(vs_ipmr[ ,4], vs[ ,4], tolerance = 1e-13)
-  expect_equal(vs_ipmr[ ,5], vs[ ,5], tolerance = 1e-13)
+  expect_equal(vs_ipmr, vs, ignore_attr = TRUE)
+
 })
 
 
@@ -408,63 +394,63 @@ test_that('normalize pop_vectors works as it should', {
 
 test_that("t helper variable works as advertised", {
 
-  test_stoch_param <- init_ipm(sim_gen    = "simple",
-                               di_dd      = "di",
-                               det_stoch  = "stoch",
-                               kern_param = "param") %>%
-    define_kernel(
-      'P',
-      formula = s * g,
-      family = 'CC',
-      g_mu = g_int_yr + g_slope * surf_area_1,
-      s = inv_logit(s_int_yr, s_slope, surf_area_1),
-      g = dnorm(surf_area_2, g_mu, g_sd),
-      data_list = data_list,
-      states = list(c('surf_area')),
-      uses_par_sets = FALSE,
-      evict_cor = TRUE,
-      evict_fun = truncated_distributions('norm', 'g')
-    ) %>%
-    define_kernel(
-      'F',
-      formula = f_r * f_s * f_d,
-      family = 'CC',
-      f_r = inv_logit(f_r_int_yr, f_r_slope, surf_area_1),
-      f_s = exp(f_s_int_yr + f_s_slope * surf_area_1),
-      f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
-      data_list = data_list,
-      states = list(c('surf_area')),
-      uses_par_sets = FALSE,
-      evict_cor = TRUE,
-      evict_fun = truncated_distributions('norm', 'f_d')
-    ) %>%
-    define_impl(
-      make_impl_args_list(
-        kernel_names = c('P', "F"),
-        int_rule = rep('midpoint', 2),
-        state_start = rep('surf_area', 2),
-        state_end = rep('surf_area', 2)
-      )
-    ) %>%
-    define_domains(surf_area = c(0, 10, 100)) %>%
-    define_env_state(
-      env_params = mvt_wrapper(r_means, r_sigma, nms = c('s_int_yr',
-                                                         'g_int_yr',
-                                                         'f_r_int_yr',
-                                                         'f_s_int_yr')),
-      data_list = list(
-        r_means = r_means,
-        r_sigma = r_sigma
-      )
-    ) %>%
-    define_pop_state(
-      pop_vectors = list(n_surf_area = init_pop_vec),
-    ) %>%
-    make_ipm(usr_funs = list(inv_logit = inv_logit,
-                             mvt_wrapper = mvt_wrapper),
-             iterate = TRUE,
-             iterations = 10,
-             normalize_pop_size = TRUE)
+  # test_stoch_param <- init_ipm(sim_gen    = "simple",
+  #                              di_dd      = "di",
+  #                              det_stoch  = "stoch",
+  #                              kern_param = "param") %>%
+  #   define_kernel(
+  #     'P',
+  #     formula = s * g,
+  #     family = 'CC',
+  #     g_mu = g_int_yr + g_slope * surf_area_1,
+  #     s = inv_logit(s_int_yr, s_slope, surf_area_1),
+  #     g = dnorm(surf_area_2, g_mu, g_sd),
+  #     data_list = data_list,
+  #     states = list(c('surf_area')),
+  #     uses_par_sets = FALSE,
+  #     evict_cor = TRUE,
+  #     evict_fun = truncated_distributions('norm', 'g')
+  #   ) %>%
+  #   define_kernel(
+  #     'F',
+  #     formula = f_r * f_s * f_d,
+  #     family = 'CC',
+  #     f_r = inv_logit(f_r_int_yr, f_r_slope, surf_area_1),
+  #     f_s = exp(f_s_int_yr + f_s_slope * surf_area_1),
+  #     f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
+  #     data_list = data_list,
+  #     states = list(c('surf_area')),
+  #     uses_par_sets = FALSE,
+  #     evict_cor = TRUE,
+  #     evict_fun = truncated_distributions('norm', 'f_d')
+  #   ) %>%
+  #   define_impl(
+  #     make_impl_args_list(
+  #       kernel_names = c('P', "F"),
+  #       int_rule = rep('midpoint', 2),
+  #       state_start = rep('surf_area', 2),
+  #       state_end = rep('surf_area', 2)
+  #     )
+  #   ) %>%
+  #   define_domains(surf_area = c(0, 10, 100)) %>%
+  #   define_env_state(
+  #     env_params = mvt_wrapper(r_means, r_sigma, nms = c('s_int_yr',
+  #                                                        'g_int_yr',
+  #                                                        'f_r_int_yr',
+  #                                                        'f_s_int_yr')),
+  #     data_list = list(
+  #       r_means = r_means,
+  #       r_sigma = r_sigma
+  #     )
+  #   ) %>%
+  #   define_pop_state(
+  #     pop_vectors = list(n_surf_area = init_pop_vec),
+  #   ) %>%
+  #   make_ipm(usr_funs = list(inv_logit = inv_logit,
+  #                            mvt_wrapper = mvt_wrapper),
+  #            iterate = TRUE,
+  #            iterations = 10,
+  #            normalize_pop_size = TRUE)
 
   env_state <- test_stoch_param$env_seq
 
@@ -533,7 +519,7 @@ test_that("t helper variable works as advertised", {
     ) %>%
     make_ipm(usr_funs = list(inv_logit = inv_logit),
              iterate = TRUE,
-             iterations = 10,
+             iterations = 100,
              normalize_pop_size = TRUE)
 
   det_seq_l <- lambda(test_det_seq)

@@ -333,7 +333,7 @@ gen_di_stoch_param <- init_ipm(sim_gen    = "general",
       mvt_wrapper = mvt_wrapper
     ),
     iterations = 100,
-    normalize_pop_size = FALSE
+    normalize_pop_size = TRUE
   )
 
 
@@ -512,6 +512,7 @@ iterate_model <- function(env_params,
                           dom_3,
                           dom_4,
                           pop_list,
+                          v_holder,
                           iteration) {
 
   k_xx_temp <- k_xx(fixed_params,
@@ -538,9 +539,6 @@ iterate_model <- function(env_params,
                     dom_3,
                     dom_4)
 
-  pop_size_t <- sum(pop_list$n_ln_leaf_l[ , iteration],
-                    pop_list$n_sqrt_area[ , iteration],
-                    pop_list$n_d[ , iteration])
 
   n_ln_leaf_l_t_1 <- k_xx_temp %*% pop_list$n_ln_leaf_l[ , iteration] +
                      k_zx_temp %*% pop_list$n_sqrt_area[ , iteration] +
@@ -551,13 +549,30 @@ iterate_model <- function(env_params,
   n_d_t_1         <- k_xd_temp %*% pop_list$n_ln_leaf_l[ , iteration] +
                      k_zd_temp %*% pop_list$n_sqrt_area[ , iteration]
 
-  pop_list$n_ln_leaf_l[ , (iteration + 1)] <- n_ln_leaf_l_t_1
-  pop_list$n_sqrt_area[ , (iteration + 1)] <- n_sqrt_area_t_1
-  pop_list$n_d[ , (iteration + 1)]         <- n_d_t_1
+  v_x_t1 <- left_mult(k_xx_temp, v_holder$ln_leaf_l[iteration , ]) +
+            left_mult(k_xd_temp, v_holder$d[iteration , ]) +
+            left_mult(k_xz_temp, v_holder$sqrt_area[iteration , ])
+
+  v_z_t1 <- left_mult(k_zx_temp, v_holder$ln_leaf_l[iteration , ]) +
+            left_mult(k_zd_temp, v_holder$d[iteration , ])
+
+  v_d_t1 <- left_mult(k_dx_temp, v_holder$ln_leaf_l[iteration , ])
+
+  pop_size <- sum(n_ln_leaf_l_t_1, n_sqrt_area_t_1, n_d_t_1)
+
+  pop_list$n_ln_leaf_l[ , (iteration + 1)] <- n_ln_leaf_l_t_1 / pop_size
+  pop_list$n_sqrt_area[ , (iteration + 1)] <- n_sqrt_area_t_1 / pop_size
+  pop_list$n_d[ , (iteration + 1)]         <- n_d_t_1 / pop_size
 
   pop_list$lambda[ , iteration] <- sum(n_ln_leaf_l_t_1,
                                        n_sqrt_area_t_1,
-                                       n_d_t_1) / pop_size_t
+                                       n_d_t_1)
+
+  tot_v <- sum(v_x_t1, v_z_t1, v_d_t1)
+
+  v_holder$ln_leaf_l[(iteration + 1), ] <- v_x_t1 / tot_v
+  v_holder$sqrt_area[(iteration + 1), ] <- v_z_t1 / tot_v
+  v_holder$d[(iteration + 1) , ]        <- v_d_t1 / tot_v
 
   kerns_temp <- list(k_xx = k_xx_temp,
                      k_zx = k_zx_temp,
@@ -567,7 +582,8 @@ iterate_model <- function(env_params,
                      k_zd = k_zd_temp)
 
   out_list = list(kernels = kerns_temp,
-                  pop_list = pop_list)
+                  pop_list = pop_list,
+                  v_holder = v_holder)
 
   return(out_list)
 
@@ -585,9 +601,16 @@ pop_list <- list(
   lambda      = matrix(NA_real_, nrow = 1,  ncol = 100)
 )
 
-pop_list$n_ln_leaf_l[ , 1] <- init_pop_vec$ln_leaf_l
-pop_list$n_sqrt_area[ , 1] <- init_pop_vec$sqrt_area
-pop_list$n_d[ , 1]         <- 10
+init_size <- sum(unlist(init_pop_vec), 10)
+
+pop_list$n_ln_leaf_l[ , 1] <- init_pop_vec$ln_leaf_l / init_size
+pop_list$n_sqrt_area[ , 1] <- init_pop_vec$sqrt_area / init_size
+pop_list$n_d[ , 1]         <- 10 / init_size
+
+v_holder <- lapply(pop_list, t) %>%
+  setNames(c("ln_leaf_l", "sqrt_area", "d", "lambda"))
+
+v_holder$lambda <- NULL
 
 sqrt_area_bounds <- seq(0.63 * 0.9,
                         3.87 * 1.1,
@@ -621,10 +644,12 @@ for(i in seq(1, 100, 1)) {
                         domain_list$sqrt_area_1,
                         domain_list$sqrt_area_2,
                         pop_list,
+                        v_holder,
                         iteration = i)
 
   pop_list          <- temp$pop_list
   kerns_temp        <- temp$kernels
+  v_holder          <- temp$v_holder
   names(kerns_temp) <- paste(names(kerns_temp), i, sep = '_')
   kernel_holder     <- c(kernel_holder, kerns_temp)
 
@@ -661,7 +686,18 @@ test_that("other outputs are of the expected form", {
   expect_equal(names(gen_di_stoch_param$env_seq),
                rando_names)
 
-  gen_di_stoch_param$pop_state$lambda
+  ipmr_w <- right_ev(gen_di_stoch_param)
+  hand_w <- lapply(pop_list[1:3], function(x) x[ , 26:101, drop = FALSE])
+
+  expect_equal(ipmr_w, hand_w, ignore_attr = TRUE)
+  expect_s3_class(ipmr_w, "ipmr_w")
+
+  ipmr_v <- left_ev(gen_di_stoch_param, iterations = 100)
+  expect_s3_class(ipmr_v, "ipmr_v")
+
+  hand_v <- lapply(v_holder, function(x) t(x[26:101, ]))
+  expect_equal(ipmr_v, hand_v, ignore_attr = TRUE)
+
 
 })
 

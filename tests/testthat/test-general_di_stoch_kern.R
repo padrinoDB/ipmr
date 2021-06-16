@@ -398,7 +398,7 @@ pop_holder$lambda          <- array(NA_real_, dim = c(1, 101))
 
 tot_size <- sum(unlist(pop_holder), na.rm = TRUE)
 
-pop_holder <- lapply(
+v_holder <- pop_holder <- lapply(
   pop_holder,
   function(x, size) {
 
@@ -408,6 +408,9 @@ pop_holder <- lapply(
   },
   size = tot_size
 )
+
+v_holder <- lapply(v_holder, t)
+v_holder$lambda <- NULL
 
 # Make mesh bounds and mid points. length.out = length + 1 because we are making
 # bounds. when the meshpoints are generated, the resulting length is length(bounds - 1)
@@ -491,6 +494,7 @@ for(i in seq_len(n_iterations)) {
   )
 
 
+
   # These are the full kernel equations from pages 1853-1854.
 
   x_t_1 <- kernels$kern_xx %*% pop_holder$ln_leaf_l[ , i] +
@@ -502,13 +506,29 @@ for(i in seq_len(n_iterations)) {
   d_t_1 <- kernels$kern_xd %*% pop_holder$ln_leaf_l[ , i] +
     kernels$kern_zd %*% pop_holder$sqrt_area[ , i]
 
+
+  v_x_t1 <- left_mult(kernels$kern_xx, v_holder$ln_leaf_l[i , ]) +
+    left_mult(kernels$kern_xd, v_holder$d[i , ]) +
+    left_mult(kernels$kern_xz, v_holder$sqrt_area[i , ])
+
+  v_z_t1 <- left_mult(kernels$kern_zx, v_holder$ln_leaf_l[i , ]) +
+    left_mult(kernels$kern_zd, v_holder$d[i , ])
+
+  v_d_t1 <- left_mult(kernels$kern_dx, v_holder$ln_leaf_l[i , ])
+
   tot_size <- lambda <- sum(x_t_1, z_t_1, d_t_1)
+
+  tot_v    <- sum(v_x_t1, v_z_t1, v_d_t1)
 
   pop_holder$ln_leaf_l[ , (i + 1)] <- x_t_1 / tot_size
   pop_holder$sqrt_area[ , (i + 1)] <- z_t_1 / tot_size
   pop_holder$d[ , (i + 1)]         <- d_t_1 / tot_size
 
-  pop_holder$lambda[ (i + 1) ]       <- lambda
+  v_holder$ln_leaf_l[(i + 1) , ] <- v_x_t1 / tot_v
+  v_holder$sqrt_area[(i + 1) , ] <- v_z_t1 / tot_v
+  v_holder$d[(i + 1) , ]         <- v_d_t1 / tot_v
+
+  pop_holder$lambda[ (i + 1) ]   <- lambda
 
   # Store the kernels for subsequent kernel comparisons
 
@@ -703,13 +723,16 @@ test_that('ipmr version matches simulation', {
 
   # Standardized right eigenvectors
 
-  ipmr_w <- gen_di_stoch_kern$pop_state$n_ln_leaf_l[ , 101] /
-    sum(gen_di_stoch_kern$pop_state$n_ln_leaf_l[ , 101])
+  ipmr_w <- right_ev(gen_di_stoch_kern)
+  expect_s3_class(ipmr_w, "ipmr_w")
 
-  hand_w <- pop_holder$ln_leaf_l[ , 101] /
-    sum(pop_holder$ln_leaf_l[ , 101])
+  hand_w <- lapply(pop_holder, function(x) x[ , 26:101, drop = FALSE]) %>%
+    .[sort(names(.))]
+  hand_w$lambda <- NULL
 
-  expect_equal(ipmr_w, hand_w, tolerance = 1e-10)
+  ipmr_w <- ipmr_w[sort(names(ipmr_w))]
+
+  expect_equal(ipmr_w, hand_w, tolerance = 1e-10, ignore_attr = TRUE)
 
   kern_tests <- logical(length(gen_di_stoch_kern$sub_kernels))
 
@@ -740,6 +763,24 @@ test_that('ipmr version matches simulation', {
 
   expect_true(all(kern_tests))
 
+
+})
+
+test_that("left_ev works on general_di_stoch_kern IPMs", {
+
+  v_ipmr <- left_ev(gen_di_stoch_kern,
+                    iterations = 100,
+                    kernel_seq = k_seq)
+  expect_s3_class(v_ipmr, "ipmr_v")
+
+  v_ipmr <- v_ipmr[sort(names(v_ipmr))]
+
+  v_hand <- lapply(v_holder, function(x) t(x[26:101, , drop = FALSE])) %>%
+    .[sort(names(.))]
+
+  expect_equal(v_ipmr[[1]], v_hand[[1]], ignore_attr = TRUE)
+  expect_equal(v_ipmr[[2]], v_hand[[2]], ignore_attr = TRUE)
+  expect_equal(v_ipmr[[3]], v_hand[[3]], ignore_attr = TRUE)
 
 
 })
