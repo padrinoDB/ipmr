@@ -147,21 +147,45 @@
     <p>Compute the standardized left and right eigenvectors via iteration</p>
     </div>
 
-    <pre class="usage"><span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>iterations</span>, <span class='va'>tolerance</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, tolerance <span class='op'>=</span> <span class='fl'>1e-10</span><span class='op'>)</span>
+<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, tolerance <span class='op'>=</span> <span class='fl'>1e-10</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for simple_di_stoch_kern_ipm</span>
+<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, burn_in <span class='op'>=</span> <span class='fl'>0.25</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for simple_di_stoch_param_ipm</span>
+<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, burn_in <span class='op'>=</span> <span class='fl'>0.25</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, tolerance <span class='op'>=</span> <span class='fl'>1e-10</span><span class='op'>)</span>
+<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, tolerance <span class='op'>=</span> <span class='fl'>1e-10</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>iterations</span>, <span class='va'>tolerance</span><span class='op'>)</span>
+<span class='co'># S3 method for general_di_stoch_kern_ipm</span>
+<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, burn_in <span class='op'>=</span> <span class='fl'>0.25</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for general_di_stoch_param_ipm</span>
+<span class='fu'>right_ev</span><span class='op'>(</span><span class='va'>ipm</span>, burn_in <span class='op'>=</span> <span class='fl'>0.25</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, tolerance <span class='op'>=</span> <span class='fl'>1e-10</span><span class='op'>)</span>
+<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, tolerance <span class='op'>=</span> <span class='fl'>1e-10</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for simple_di_stoch_kern_ipm</span>
+<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>10000</span>, burn_in <span class='op'>=</span> <span class='fl'>0.25</span>, kernel_seq <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, tolerance <span class='op'>=</span> <span class='fl'>1e-10</span><span class='op'>)</span></pre>
+<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>100</span>, tolerance <span class='op'>=</span> <span class='fl'>1e-10</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for general_di_stoch_kern_ipm</span>
+<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>10000</span>, burn_in <span class='op'>=</span> <span class='fl'>0.25</span>, kernel_seq <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for general_di_stoch_param_ipm</span>
+<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>10000</span>, burn_in <span class='op'>=</span> <span class='fl'>0.25</span>, kernel_seq <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for simple_di_stoch_param_ipm</span>
+<span class='fu'>left_ev</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='fl'>10000</span>, burn_in <span class='op'>=</span> <span class='fl'>0.25</span>, kernel_seq <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -169,6 +193,10 @@
     <tr>
       <th>ipm</th>
       <td><p>Output from <code><a href='make_ipm.html'>make_ipm()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Other arguments passed to methods</p></td>
     </tr>
     <tr>
       <th>iterations</th>
@@ -179,15 +207,28 @@ convergence. Default is 100.</p></td>
       <th>tolerance</th>
       <td><p>Tolerance to evaluate convergence to asymptotic dynamics.</p></td>
     </tr>
+    <tr>
+      <th>burn_in</th>
+      <td><p>The proportion of early iterations to discard from the
+stochastic simulation</p></td>
+    </tr>
+    <tr>
+      <th>kernel_seq</th>
+      <td><p>The sequece of parameter set indices used to select kernels
+during the iteration procedure. If <code>NULL</code>, will use the sequence stored
+in the <code>ipm</code> object. Should usually be left as <code>NULL</code>.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A list of named numeric vector(s) corresponding to the stable trait distribution
 function (<code>right_ev</code>) or the reproductive values for each trait (<code>left_ev</code>).</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <h2 class="hasAnchor" id="deterministic-eigenvectors"><a class="anchor" href="#deterministic-eigenvectors"></a><strong>Deterministic eigenvectors</strong></h2>
 
-    <p>For <code>right_ev</code>, if the model has already been iterated and has
+    
+
+<p>For <code>right_ev</code>, if the model has already been iterated and has
 converged to asymptotic dynamics, then it will just extract the final
 population state and return that in a named list. Each element of the list
 is a vector with length <code>&gt;= 1</code> and corresponds each state variable's
@@ -204,6 +245,21 @@ it will return <code>NA</code> with a warning.</p>
 Appendix A) is worked out based on the <code>state_start</code> and <code>state_end</code>
 in the model's <code>proto_ipm</code> object. The model is then iterated for
 <code>iterations</code> times to produce a standardized left eigenvector.</p>
+    <h2 class="hasAnchor" id="stochastic-eigenvectors"><a class="anchor" href="#stochastic-eigenvectors"></a><strong>Stochastic eigenvectors</strong></h2>
+
+    
+
+<p><code>left_ev</code> and <code>right_ev</code> return different things for stochastic models.
+<code>right_ev</code> returns the trait distribution through time from the stochastic
+simulation (i.e. <code>ipm$pop_state</code>), and normalizes it such that the
+distribution at each time step integrates to 1 (if it is not already).
+It then discards the first <code>burn_in * iterations</code> time steps of the
+simulation to eliminate transient dynamics. See Ellner, Childs, &amp; Rees 2016,
+Chapter 7.5 for more details.</p>
+<p><code>left_ev</code> returns a similar result as <code>right_ev</code>, except the trait
+distributions are the result of left multiplying the kernel and trait
+ distribution. See Ellner, Childs, &amp; Rees 2016, Chapter 7.5 for more
+details.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -1,3 +1,23 @@
+# ipmr 0.0.3
+
+Contains a some tweaks and bug fixes, and a few new features:
+
+## Features
+
+  - Implements `right_ev()` and `left_ev()` methods for stochastic models.
+  
+  - Adds a new function, `conv_plot()`, to graphically check for convergence to asymptotic dynamics in deterministic models. 
+  
+  - Adds a new function, `discretize_pop_vector()`, to compute the empirical density function for a population trait distribution given a set of observed trait values.
+  
+  - Adds print methods for density dependent models.
+  
+## Bug fixes
+
+  - Corrects bug where `tol` argument was ignored in `is_conv_to_asymptotic()`.
+  
+  - Gives output from `lambda()` names. Before, outputs from deterministic models with many parameter sets became hard to follow. 
+
 # ipmr 0.0.2
 
 Contains a some tweaks and bug fixes. There is one major API change that renames parameters in `define_kernel`.
