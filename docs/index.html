@@ -215,7 +215,7 @@
 <a href="#examples-for-simple-ipm-classes" class="anchor"></a>Examples for simple IPM classes</h2>
 <p>Here is a simple model implemented with <code>ipmr</code>. This is a hypothetical plant species where plants can survive and grow (<em>P</em>(<em>z</em>′, <em>z</em>)), and reproduce sexually (<em>F</em>(<em>z</em>′, <em>z</em>)). There is no seed bank, and so there are no discrete traits in the model. We’ll use 4 regressions: survival (<em>s</em>(<em>z</em>)), growth (<em>G</em>(<em>z</em>′, <em>z</em>), <em>f</em><sub><em>G</em></sub>), probability of reproducing (<em>r</em><sub><em>r</em></sub>(<em>z</em>)), and number of seeds produced conditional on flowering (<em>r</em><sub><em>s</em></sub>(<em>z</em>)). New recruits will be generated with a Gaussian distribution (denoted <em>f</em><sub><em>r</em><sub><em>d</em></sub></sub>), which requires calculating the mean and standard deviation of new recruits from the data. For simplicity, we’ll assume there’s no maternal effect on recruit size. First, we’ll write out the functional forms for each component of the model:</p>
 <ol>
-<li><p><em>n</em>(<em>z</em>′, <em>t</em> + 1) = ∫<sub><em>L</em></sub><sup><em>U</em></sup><em>K</em>(<em>z</em>′, <em>z</em>)<em>n</em>(<em>z</em>, <em>t</em>)<em>dz</em></p></li>
+<li><p><em>n</em>(<em>z</em>′, <em>t</em> + 1) = ∫<sub><em>L</em></sub><sup><em>U</em></sup><em>K</em>(<em>z</em>′, <em>z</em>)<em>n</em>(<em>z</em>, <em>t</em>)*d**z*</p></li>
 <li><p><em>K</em>(<em>z</em>′, <em>z</em>) = <em>P</em>(<em>z</em>′, <em>z</em>) + <em>F</em>(<em>z</em>′, <em>z</em>)</p></li>
 <li><p><em>P</em>(<em>z</em>′, <em>z</em>) = <em>s</em>(<em>z</em>) * <em>G</em>(<em>z</em>′, <em>z</em>)</p></li>
 <li><p><em>L<strong>o</strong>g<strong>i</strong>t</em>(<em>s</em>(<em>z</em>)) = <em>α</em><sub><em>s</em></sub> + <em>β</em><sub><em>s</em></sub> * <em>z</em></p></li>
@@ -466,6 +466,7 @@
 <li><a href="https://www.tidyverse.org/lifecycle/#maturing"><img src="https://img.shields.io/badge/lifecycle-maturing-blue.svg" alt="Lifecycle: maturing"></a></li>
 <li><a href="https://cran.r-project.org/package=ipmr"><img src="https://www.r-pkg.org/badges/version/ipmr" alt="CRAN status"></a></li>
 <li><a href="https://codecov.io/gh/levisc8/ipmr?branch=master"><img src="https://codecov.io/gh/levisc8/ipmr/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://doi.org/10.5281/zenodo.5076190"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.5076190.svg" alt="DOI"></a></li>
 </ul>
 </div>
 </div>

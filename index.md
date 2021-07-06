@@ -6,6 +6,7 @@ maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www
 status](https://www.r-pkg.org/badges/version/ipmr)](https://cran.r-project.org/package=ipmr)
 [![Codecov test
 coverage](https://codecov.io/gh/levisc8/ipmr/branch/master/graph/badge.svg)](https://codecov.io/gh/levisc8/ipmr?branch=master)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5076190.svg)](https://doi.org/10.5281/zenodo.5076190)
 
 # ipmr
 
@@ -140,27 +141,27 @@ The following possibilities are currently or will become available in
 
 -   Simple, density dependent models: **Completed, likely stable**
 
-1.  `"simple_dd_det"`
+4.  `"simple_dd_det"`
 
-2.  `"simple_dd_stoch_kern"`
+5.  `"simple_dd_stoch_kern"`
 
-3.  `"simple_dd_stoch_param"`
+6.  `"simple_dd_stoch_param"`
 
 -   General, density independent models: **Completed and ready**
 
-1.  `"general_di_det"`
+7.  `"general_di_det"`
 
-2.  `"general_di_stoch_kern"`
+8.  `"general_di_stoch_kern"`
 
-3.  `"general_di_stoch_param"`
+9.  `"general_di_stoch_param"`
 
 -   General, density dependent models: **Completed, likely stable**
 
-1.  `"general_dd_det"`
+10. `"general_dd_det"`
 
-2.  `"general_dd_stoch_kern"`
+11. `"general_dd_stoch_kern"`
 
-3.  `"general_dd_stoch_param"`
+12. `"general_dd_stoch_param"`
 
 Simple density-independent deterministic, simple kernel-resampled
 stochastic, and simple parameter resampled stochastic models
@@ -191,7 +192,7 @@ and standard deviation of new recruits from the data. For simplicity,
 we’ll assume there’s no maternal effect on recruit size. First, we’ll
 write out the functional forms for each component of the model:
 
-1.  *n*(*z*′, *t* + 1) = ∫<sub>*L*</sub><sup>*U*</sup>*K*(*z*′, *z*)*n*(*z*, *t*)*dz*
+1.  *n*(*z*′, *t* + 1) = ∫<sub>*L*</sub><sup>*U*</sup>*K*(*z*′, *z*)*n*(*z*, *t*)*d**z*
 
 2.  *K*(*z*′, *z*) = *P*(*z*′, *z*) + *F*(*z*′, *z*)
 
