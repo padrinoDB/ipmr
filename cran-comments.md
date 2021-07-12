@@ -1,4 +1,4 @@
-This is an update to ipmr. The first version was submitted in early February.
+This is an update to ipmr. The last update was submitted in mid May.
 
 ## Test environments
 * local R installation, Windows 10, R 4.1.0
@@ -19,9 +19,9 @@ This is an update to ipmr. The first version was submitted in early February.
 
 checking installed package size ... NOTE
 
->  installed size is 5.1Mb
->  sub-directories of 1Mb or more:
->  doc 1.5Mb
->  libs 2.5Mb
+> installed size is 5.2Mb
+> sub-directories of 1Mb or more:
+> doc 1.5Mb
+> libs 2.6Mb
 
 This is not unexpected in packages with compiled code as pointed out here: https://stackoverflow.com/questions/53819970/r-package-libs-directory-too-large-after-compilation-to-submit-on-cran
