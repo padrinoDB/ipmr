@@ -12,6 +12,8 @@ Contains a some tweaks and bug fixes, and a few new features:
   
   - Adds print methods for density dependent models.
   
+  - Adds `log` argument for `lambda`.
+  
 ## Bug fixes
 
   - Corrects bug where `tol` argument was ignored in `is_conv_to_asymptotic()`.

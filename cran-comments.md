@@ -6,6 +6,8 @@ This is a re-submission of ipmr following a request to fix typos from yesterday.
      
 The latter is now corrected and the former has been single quoted per Uwe Ligges's request. I have also updated the package title to omit the redundant "...in R".
 
+Additional information on this submission:
+
 ## Test environments
 * local R installation, Windows 10, R 4.1.0
 * ubuntu 20.04.1 (GitHub Actions), devel, release, and oldrelease

@@ -7,7 +7,7 @@
 \usage{
 is_conv_to_asymptotic(ipm, tol = 1e-10)
 
-conv_plot(ipm, iterations = NULL, log_lam = FALSE, show_stable = TRUE, ...)
+conv_plot(ipm, iterations = NULL, log = FALSE, show_stable = TRUE, ...)
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
@@ -17,7 +17,7 @@ conv_plot(ipm, iterations = NULL, log_lam = FALSE, show_stable = TRUE, ...)
 \item{iterations}{The range of iterations to plot \code{lambda} for. The default
 is every iteration.}
 
-\item{log_lam}{A logical indicating whether log transform \code{lambda}.}
+\item{log}{A logical indicating whether log transform \code{lambda}.}
 
 \item{show_stable}{A logical indicating whether or not to draw a line indicating
 population stability at \code{lambda = 1}.}

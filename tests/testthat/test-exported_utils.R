@@ -626,6 +626,9 @@ test_that("conv_plot works correctly", {
 
   x <- conv_plot(gen_di_stoch_param, log = TRUE)
 
+  expect_s3_class(x, "general_di_stoch_param_ipm")
+
+
 })
 
 

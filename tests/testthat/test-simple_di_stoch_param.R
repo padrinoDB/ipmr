@@ -148,7 +148,7 @@ pop_state_ipmr <- test_stoch_param$pop_state$n_surf_area
 lambda_ipmr <- lambda(test_stoch_param,
                       comp_method = 'pop_size',
                       type_lambda = 'all') %>%
-  as.vector()
+  as.vector
 
 # Now, use the env_seq to plug into this loop for each iteration and see if
 # lambdas are identical. If not, then find a bridge and jump
@@ -394,64 +394,6 @@ test_that('normalize pop_vectors works as it should', {
 
 test_that("t helper variable works as advertised", {
 
-  # test_stoch_param <- init_ipm(sim_gen    = "simple",
-  #                              di_dd      = "di",
-  #                              det_stoch  = "stoch",
-  #                              kern_param = "param") %>%
-  #   define_kernel(
-  #     'P',
-  #     formula = s * g,
-  #     family = 'CC',
-  #     g_mu = g_int_yr + g_slope * surf_area_1,
-  #     s = inv_logit(s_int_yr, s_slope, surf_area_1),
-  #     g = dnorm(surf_area_2, g_mu, g_sd),
-  #     data_list = data_list,
-  #     states = list(c('surf_area')),
-  #     uses_par_sets = FALSE,
-  #     evict_cor = TRUE,
-  #     evict_fun = truncated_distributions('norm', 'g')
-  #   ) %>%
-  #   define_kernel(
-  #     'F',
-  #     formula = f_r * f_s * f_d,
-  #     family = 'CC',
-  #     f_r = inv_logit(f_r_int_yr, f_r_slope, surf_area_1),
-  #     f_s = exp(f_s_int_yr + f_s_slope * surf_area_1),
-  #     f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
-  #     data_list = data_list,
-  #     states = list(c('surf_area')),
-  #     uses_par_sets = FALSE,
-  #     evict_cor = TRUE,
-  #     evict_fun = truncated_distributions('norm', 'f_d')
-  #   ) %>%
-  #   define_impl(
-  #     make_impl_args_list(
-  #       kernel_names = c('P', "F"),
-  #       int_rule = rep('midpoint', 2),
-  #       state_start = rep('surf_area', 2),
-  #       state_end = rep('surf_area', 2)
-  #     )
-  #   ) %>%
-  #   define_domains(surf_area = c(0, 10, 100)) %>%
-  #   define_env_state(
-  #     env_params = mvt_wrapper(r_means, r_sigma, nms = c('s_int_yr',
-  #                                                        'g_int_yr',
-  #                                                        'f_r_int_yr',
-  #                                                        'f_s_int_yr')),
-  #     data_list = list(
-  #       r_means = r_means,
-  #       r_sigma = r_sigma
-  #     )
-  #   ) %>%
-  #   define_pop_state(
-  #     pop_vectors = list(n_surf_area = init_pop_vec),
-  #   ) %>%
-  #   make_ipm(usr_funs = list(inv_logit = inv_logit,
-  #                            mvt_wrapper = mvt_wrapper),
-  #            iterate = TRUE,
-  #            iterations = 10,
-  #            normalize_pop_size = TRUE)
-
   env_state <- test_stoch_param$env_seq
 
   env_sampler <- function(environ_seq, iteration) {
@@ -536,7 +478,7 @@ test_that("t helper variable works as advertised", {
 
 
 
-test_that("stoch_param can handle Hier_effs", {
+test_that("stoch_param can handle pararameter sets", {
 
   par_set_vals <- rnorm(5, 0, 2) %>% as.list
   names(par_set_vals) <- paste("s_int", 2000:2004, sep = "_")
@@ -714,7 +656,8 @@ test_that("stoch_param can handle Hier_effs", {
   }
 
   ipmr_lambda <- lambda(test_stoch_param, type_lambda = "all") %>%
-    as.vector
+    as.vector()
+
   expect_equal(hand_lambda, ipmr_lambda)
 
   ipmr_ps <- test_stoch_param$pop_state$n_surf_area

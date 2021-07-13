@@ -185,7 +185,9 @@ for(i in 2:51) {
 }
 
 
-ipmr_lam <- lambda(x, type_lambda = "all")
+ipmr_lam <- lambda(x, type_lambda = "all") %>%
+  as.vector()
+
 ipmr_pop_sizes <- colSums(x$pop_state$n_size)
 
 hand_lam <- colSums(pop_holder[ , 2:51]) / colSums(pop_holder[ , 1:50])
@@ -193,7 +195,7 @@ hand_pop_sizes <- colSums(pop_holder)
 
 test_that("asymptotic behavior is preserved at every time step", {
 
-  expect_equal(as.vector(ipmr_lam), hand_lam, tolerance = 2e-2)
+  expect_equal(ipmr_lam, hand_lam, tolerance = 2e-2)
   expect_equal(ipmr_pop_sizes, hand_pop_sizes, tolerance = 1)
 
 })

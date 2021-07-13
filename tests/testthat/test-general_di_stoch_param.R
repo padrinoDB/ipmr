@@ -1417,7 +1417,7 @@ test_that("t variable works as advertised", {
 })
 
 
-test_that("Hierarchical effects work in parameter re-sampled model", {
+test_that("Parameter sets work in parameter re-sampled model", {
 
   par_set_vals           <- rnorm(5) %>% as.list()
   names(par_set_vals)    <- paste("nr_s_z_int_", 1:5, sep = "")

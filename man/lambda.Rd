@@ -18,29 +18,29 @@
 \usage{
 lambda(ipm, ...)
 
-\method{lambda}{simple_di_det_ipm}(ipm, type_lambda = "last", ...)
+\method{lambda}{simple_di_det_ipm}(ipm, type_lambda = "last", log = FALSE, ...)
 
-\method{lambda}{simple_di_stoch_kern_ipm}(ipm, type_lambda = "stochastic", burn_in = 0.1, ...)
+\method{lambda}{simple_di_stoch_kern_ipm}(ipm, type_lambda = "stochastic", burn_in = 0.1, log = TRUE, ...)
 
-\method{lambda}{simple_di_stoch_param_ipm}(ipm, type_lambda = "stochastic", burn_in = 0.1, ...)
+\method{lambda}{simple_di_stoch_param_ipm}(ipm, type_lambda = "stochastic", burn_in = 0.1, log = TRUE, ...)
 
-\method{lambda}{general_di_det_ipm}(ipm, type_lambda = "last", ...)
+\method{lambda}{general_di_det_ipm}(ipm, type_lambda = "last", log = FALSE, ...)
 
-\method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
+\method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = TRUE)
 
-\method{lambda}{general_di_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
+\method{lambda}{general_di_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = TRUE)
 
-\method{lambda}{simple_dd_det_ipm}(ipm, type_lambda = "all", ...)
+\method{lambda}{simple_dd_det_ipm}(ipm, type_lambda = "all", ..., log = FALSE)
 
-\method{lambda}{simple_dd_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
+\method{lambda}{simple_dd_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = TRUE)
 
-\method{lambda}{simple_dd_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
+\method{lambda}{simple_dd_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = TRUE)
 
-\method{lambda}{general_dd_det_ipm}(ipm, type_lambda = "last", ...)
+\method{lambda}{general_dd_det_ipm}(ipm, type_lambda = "last", ..., log = FALSE)
 
-\method{lambda}{general_dd_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
+\method{lambda}{general_dd_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = TRUE)
 
-\method{lambda}{general_dd_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1)
+\method{lambda}{general_dd_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = TRUE)
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
@@ -52,8 +52,13 @@ lambda(ipm, ...)
 returns a vector of lambda values for each time step of the simulation (equal
 in length to the \code{iterations} argument of \code{make_ipm()}).
 \code{'last'} returns the lambda value for the final timestep.
-\code{'stochastic'} returns a single value which is the mean
-of the log'd per-capita growth rate from each time step.}
+\code{'stochastic'} returns a single value, which by default is
+\code{mean(log(lambda(ipm, type_lambda = "all")))}, with the proportion of
+\code{burn_in} iterations removed from the beginning of the simulation. Set
+\code{log} to \code{FASLE} to get the arithmetic mean for stochastic models.}
+
+\item{log}{Return lambda on the log scale? This is \code{TRUE} by default for
+stochastic models, and \code{FALSE} for deterministic models.}
 
 \item{burn_in}{The proportion of iterations to discard. Default is 0.1
 (i.e. first 10\% of iterations in the simulation).}

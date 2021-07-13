@@ -1569,7 +1569,7 @@ make_iter_kernel <- function(ipm,
 #' @rdname check_convergence
 #' @param iterations The range of iterations to plot \code{lambda} for. The default
 #' is every iteration.
-#' @param log_lam A logical indicating whether log transform \code{lambda}.
+#' @param log A logical indicating whether log transform \code{lambda}.
 #' @param show_stable A logical indicating whether or not to draw a line indicating
 #' population stability at \code{lambda = 1}.
 #' @param ... Further arguments to \code{plot}.
@@ -1592,9 +1592,9 @@ make_iter_kernel <- function(ipm,
 #' @export
 
 conv_plot <- function(ipm, iterations = NULL,
-                      log_lam = FALSE, show_stable = TRUE, ...) {
+                      log = FALSE, show_stable = TRUE, ...) {
 
-  all_lams <- lambda(ipm, type_lambda = "all")
+  all_lams <- lambda(ipm, type_lambda = "all", log = log)
   nms      <- colnames(all_lams)
 
   dots     <- list(...)
@@ -1610,10 +1610,10 @@ conv_plot <- function(ipm, iterations = NULL,
     dots$type <- "l"
   }
 
-  if(log_lam) {
+  if(log) {
     y_nm <- expression(paste("Single Time Step Log(  ", lambda, ")"))
     nms  <- paste("Log(", nms, ")", sep = "")
-    all_lams <- apply(all_lams, MARGIN = 2, FUN = log)
+    # all_lams <- apply(all_lams, MARGIN = 2, FUN = log)
   } else {
     y_nm <- expression(paste("Single Time Step   ", lambda))
   }

@@ -213,6 +213,7 @@ hand_pop_sizes <- lapply(pop_holder,
 
 ipmr_lams <- lambda(gen_dd_stoch_co, type_lambda = "all") %>%
   as.vector()
+
 hand_lams <- hand_pop_sizes[2:51] / hand_pop_sizes[1:50]
 
 test_that("models compute population sizes correctly", {
