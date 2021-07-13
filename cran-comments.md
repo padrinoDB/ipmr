@@ -1,4 +1,10 @@
-This is an update to ipmr. The last update was submitted in mid May.
+This is a re-submission of ipmr following a request to fix typos from yesterday. The last update was submitted in mid May, and yesterday's submission yielded the following feedback:
+
+   Possibly mis-spelled words in DESCRIPTION:
+     ipmr (33:8)
+     mathemathical (31:3)
+     
+The latter is now corrected and the former has been single quoted per Uwe Ligges's request. I have also updated the package title to omit the redundant "...in R".
 
 ## Test environments
 * local R installation, Windows 10, R 4.1.0
