@@ -665,3 +665,68 @@ test_that("stoch_param can handle pararameter sets", {
   expect_equal(pop_vec, ipmr_ps)
 
 })
+
+test_that("stoch_param can handle expressions in define_env_state()", {
+
+  set.seed(7421)
+  test_stoch_param <- init_ipm(sim_gen    = "simple",
+                               di_dd      = "di",
+                               det_stoch  = "stoch",
+                               kern_param = "param") %>%
+    define_kernel(
+      'P',
+      formula = s * g,
+      family = 'CC',
+      g_mu = g_int_yr + g_slope * surf_area_1,
+      s = inv_logit(s_int_yr, s_slope, surf_area_1),
+      g = dnorm(surf_area_2, g_mu, g_sd),
+      data_list = data_list,
+      states = list(c('surf_area')),
+      uses_par_sets = FALSE,
+      evict_cor = TRUE,
+      evict_fun = truncated_distributions('norm', 'g')
+    ) %>%
+    define_kernel(
+      'F',
+      formula = f_r * f_s * f_d,
+      family = 'CC',
+      f_r = inv_logit(f_r_int_yr, f_r_slope, surf_area_1),
+      f_s = exp(f_s_int_yr + f_s_slope * surf_area_1),
+      f_d = dnorm(surf_area_2, f_d_mu, f_d_sd),
+      data_list = data_list,
+      states = list(c('surf_area')),
+      uses_par_sets = FALSE,
+      evict_cor = TRUE,
+      evict_fun = truncated_distributions('norm', 'f_d')
+    )  %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c('P', "F"),
+        int_rule = rep('midpoint', 2),
+        state_start = rep('surf_area', 2),
+        state_end = rep('surf_area', 2)
+      )
+    ) %>%
+    define_domains(surf_area = c(0, 10, 100)) %>%
+    define_env_state(
+      s_int_yr = rnorm(1, 2.8, 0.2),
+      g_int_yr = rnorm(1, 0.1, 1.45),
+      f_r_int_yr = rnorm(1, 0.3, 0.2),
+      f_s_int_yr = rnorm(1, 0.1, 1.2),
+      data_list = list()
+    ) %>%
+    define_pop_state(
+      pop_vectors = list(n_surf_area = init_pop_vec),
+    ) %>%
+    make_ipm(usr_funs = list(inv_logit = inv_logit,
+                             mvt_wrapper = mvt_wrapper),
+             iterate = TRUE,
+             iterations = 10,
+             normalize_pop_size = TRUE)
+
+
+  expect_s3_class(test_stoch_param, "simple_di_stoch_param_ipm")
+  expect_equal(lambda(test_stoch_param), 0.522, tolerance = 1e-3)
+
+
+})
