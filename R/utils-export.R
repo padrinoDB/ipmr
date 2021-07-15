@@ -201,6 +201,12 @@ define_env_state <- function(proto_ipm, ..., data_list = list()) {
 
   env_quos            <- rlang::enquos(...)
 
+  data_list           <- lapply(data_list,
+                                function(x) {
+                                  attr(x, "flat_protect") <- TRUE
+                                  return(x)
+                                })
+
   out                 <- list(env_quos = unlist(env_quos),
                               constants = data_list)
 
