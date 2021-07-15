@@ -74,7 +74,7 @@ stochastic models." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3.9000</span>
       </span>
     </div>
 
@@ -154,40 +154,40 @@ stochastic models.</p>
     <pre class="usage"><span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for simple_di_det_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"last"</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"last"</span>, log <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for simple_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span>, log <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for simple_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span>, log <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for general_di_det_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"last"</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"last"</span>, log <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for general_di_stoch_kern_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
+<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span>, log <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='co'># S3 method for general_di_stoch_param_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
+<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span>, log <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='co'># S3 method for simple_dd_det_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"all"</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"all"</span>, <span class='va'>...</span>, log <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
 <span class='co'># S3 method for simple_dd_stoch_kern_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
+<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span>, log <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='co'># S3 method for simple_dd_stoch_param_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
+<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span>, log <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='co'># S3 method for general_dd_det_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"last"</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, type_lambda <span class='op'>=</span> <span class='st'>"last"</span>, <span class='va'>...</span>, log <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
 <span class='co'># S3 method for general_dd_stoch_kern_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
+<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span>, log <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='co'># S3 method for general_dd_stoch_param_ipm</span>
-<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span></pre>
+<span class='fu'>lambda</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>...</span>, type_lambda <span class='op'>=</span> <span class='st'>"stochastic"</span>, burn_in <span class='op'>=</span> <span class='fl'>0.1</span>, log <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -207,8 +207,15 @@ stochastic models.</p>
 returns a vector of lambda values for each time step of the simulation (equal
 in length to the <code>iterations</code> argument of <code><a href='make_ipm.html'>make_ipm()</a></code>).
 <code>'last'</code> returns the lambda value for the final timestep.
-<code>'stochastic'</code> returns a single value which is the mean
-of the log'd per-capita growth rate from each time step.</p></td>
+<code>'stochastic'</code> returns a single value, which by default is
+<code><a href='https://rdrr.io/r/base/mean.html'>mean(log(lambda(ipm, type_lambda = "all")))</a></code>, with the proportion of
+<code>burn_in</code> iterations removed from the beginning of the simulation. Set
+<code>log</code> to <code>FASLE</code> to get the arithmetic mean for stochastic models.</p></td>
+    </tr>
+    <tr>
+      <th>log</th>
+      <td><p>Return lambda on the log scale? This is <code>TRUE</code> by default for
+stochastic models, and <code>FALSE</code> for deterministic models.</p></td>
     </tr>
     <tr>
       <th>burn_in</th>
