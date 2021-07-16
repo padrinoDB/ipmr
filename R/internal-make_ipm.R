@@ -79,9 +79,10 @@
 
       return(out)
     },
-    main_env = main_env)
+    main_env = main_env) %>%
+    .flatten_to_depth(1L)
 
-  nms <- lapply(env_state_funs, names) %>% unlist()
+  nms <- names(env_state_funs)
 
   ind <- duplicated(nms)
 
@@ -249,9 +250,10 @@
 
       return(out)
     },
-    main_env = main_env)
+    main_env = main_env) %>%
+    .flatten_to_depth(1L)
 
-  nms <- lapply(env_state_funs, names) %>% unlist()
+  nms <- names(env_state_funs)
 
   ind <- duplicated(nms)
 
@@ -288,8 +290,7 @@
 
 .bind_env_exprs <- function(main_env, env_funs) {
 
-  nms <- lapply(env_funs, names) %>% unlist()
-  env_funs <- .flatten_to_depth(env_funs, 1L)
+  nms <- names(env_funs)
 
   for(i in seq_along(nms)) {
 
@@ -297,6 +298,12 @@
     # the user gives them.
 
     temp <- rlang::eval_tidy(env_funs[[i]])
+
+    if(!rlang::is_list(temp)) {
+
+      temp <- rlang::list2(!!nms[i] := temp)
+
+    }
 
     rlang::env_bind(main_env, !!! temp)
 
