@@ -91,10 +91,10 @@ dc_data_list <- list(
 # Compile full list, then split out fixed parameters into list form (passed to
 # define_kernel) and random parameters into vector form (passed to mvtnorm)
 
-all_params <- purrr::splice(nr_data_list,
-                            fec_data_list,
-                            ra_data_list,
-                            dc_data_list)
+all_params <- c(nr_data_list,
+                fec_data_list,
+                ra_data_list,
+                dc_data_list)
 
 ind_rand <- map_lgl(all_params,
                     .f = function(.x) {
@@ -1053,6 +1053,190 @@ test_that('normalize_pop_vec works', {
 
 })
 
+test_that("define_env_state handles directly named exprs", {
+
+  set.seed(21421)
+  rando_mus <- unname(rando_means) - 0.5
+  rando_ss <- unname(rando_sigs)
+
+  env_exprs <- lapply(seq_along(rando_names),
+                  function(x, nm, mus, sigs) {
+                   list2(!!nm[x] := expr(rnorm(1, !!mus[x], !!sigs[x])))
+                  },
+                  nm = rando_names,
+                  mus = rando_mus,
+                  sigs = rando_ss) %>%
+    .flatten_to_depth(1L)
+
+  gen_di_stoch_param <- init_ipm(sim_gen    = "general",
+                                 di_dd      = "di",
+                                 det_stoch  = "stoch",
+                                 "param") %>%
+    define_kernel(
+      name             = 'k_xx',
+      family           = "CC",
+      formula          = sig_n        *
+        (1 - mu_n)   *
+        (1 - beta_n) *
+        gamma_nn     *
+        d_ln_leaf_l,
+
+      sig_n        = inv_logit(nr_s_z_int, nr_s_z_b, ln_leaf_l_1),
+      gamma_nn     = dnorm(ln_leaf_l_2, nr_nr_mu, nr_nr_sd),
+      nr_nr_mu     = nr_nr_int + nr_nr_b * ln_leaf_l_1,
+      mu_n         = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
+      beta_n       = inv_logit(nr_f_z_int, nr_f_z_b, ln_leaf_l_1),
+
+      data_list        = fixed_params,
+      states           = list(c('ln_leaf_l')),
+      uses_par_sets    = FALSE,
+      evict_cor        = TRUE,
+      evict_fun        = truncated_distributions('norm',
+                                                 'gamma_nn')
+    ) %>%
+    define_kernel(
+      name             = 'k_zx',
+      family           = 'CC',
+
+      formula          = (
+        phi        *
+          nu         *
+          gamma_sr   +
+          sig_r      *
+          (1 - mu_r) *
+          gamma_nr
+      )            *
+        d_sqrt_area,
+
+      phi           = pois(f_s_int, f_s_slope, sqrt_area_1),
+      nu            = sdl_es_r,
+      gamma_sr      = dnorm(ln_leaf_l_2, sdl_z_int, sdl_z_sd),
+      sig_r         = inv_logit(ra_s_z_int, ra_s_z_b, sqrt_area_1),
+      mu_r          = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
+      gamma_nr      = dnorm(ln_leaf_l_2, mu_ra_nr, ra_n_z_sd),
+      mu_ra_nr      = ra_n_z_int + ra_n_z_b * sqrt_area_1,
+
+      data_list     = fixed_params,
+      states        = list(c('sqrt_area', 'ln_leaf_l')),
+      uses_par_sets = FALSE,
+      evict_cor     = TRUE,
+      evict_fun     = truncated_distributions(c('norm', 'norm'),
+                                              c('gamma_nr',
+                                                'gamma_sr'))
+    ) %>%
+    define_kernel(
+      name      = 'k_dx',
+      family    = 'DC',
+
+      formula   = gamma_nd * d_ln_leaf_l,
+
+      gamma_nd  = dnorm(ln_leaf_l_2, dc_nr_int, dc_nr_sd),
+
+      data_list = fixed_params,
+      states    = list(c('ln_leaf_l', "d")),
+
+      uses_par_sets = FALSE,
+      evict_cor     = TRUE,
+      evict_fun     = truncated_distributions('norm',
+                                              'gamma_nd')
+    ) %>%
+    define_kernel(
+      name             = 'k_xz',
+      family           = 'CC',
+      formula          = sig_n         *
+        (1 - mu_n)    *
+        beta_n        *
+        gamma_rn      *
+        tau           *
+        d_ln_leaf_l,
+
+      sig_n            = inv_logit(nr_s_z_int, nr_s_z_b, ln_leaf_l_1),
+      mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
+      beta_n           = inv_logit(nr_f_z_int, nr_f_z_b, ln_leaf_l_1),
+      gamma_rn         = dnorm(sqrt_area_2, mu_nr_ra, nr_ra_sd),
+      mu_nr_ra         = nr_ra_int + nr_ra_b * ln_leaf_l_1,
+      tau              = inv_logit(tau_int, tau_b, ln_leaf_l_1),
+
+      data_list        = fixed_params,
+      states           = list(c('sqrt_area', 'ln_leaf_l')),
+      uses_par_sets    = FALSE,
+      evict_cor        = TRUE,
+      evict_fun        = truncated_distributions('norm',
+                                                 'gamma_rn')
+
+    ) %>%
+    define_kernel(
+      name             = 'k_xd',
+      family           = 'CD',
+      formula          = sig_n * mu_n * d_ln_leaf_l,
+      sig_n            = inv_logit(nr_s_z_int, nr_s_z_b, ln_leaf_l_1),
+      mu_n             = inv_logit(nr_d_z_int, nr_d_z_b, ln_leaf_l_1),
+      data_list        = fixed_params,
+      states           = list(c('ln_leaf_l', "d")),
+      uses_par_sets    = FALSE,
+      evict_cor        = FALSE
+    ) %>%
+    define_kernel(
+      name             = 'k_zd',
+      family           = 'CD',
+      formula          = sig_r * mu_r * d_sqrt_area,
+      sig_r            = inv_logit(ra_s_z_int, ra_s_z_b, sqrt_area_1),
+      mu_r             = inv_logit(ra_d_z_int, ra_d_z_b, sqrt_area_1),
+      data_list        = fixed_params,
+      states           = list(c('sqrt_area', "d")),
+      uses_par_sets    = FALSE,
+      evict_cor        = FALSE
+    ) %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c(paste('k_',
+                               c('xx',
+                                 'zx', 'dx', 'xz', 'xd', 'zd'),
+                               sep = "")),
+        int_rule     = rep('midpoint', 6),
+        state_start    = c('ln_leaf_l',
+                           'sqrt_area',
+                           "d",
+                           'ln_leaf_l',
+                           'ln_leaf_l',
+                           'sqrt_area'),
+        state_end      = c('ln_leaf_l',
+                           'ln_leaf_l',
+                           'ln_leaf_l',
+                           'sqrt_area',
+                           "d",
+                           "d")
+      )
+    ) %>%
+    define_domains(
+      sqrt_area = c(0.63 * 0.9, 3.87 * 1.1, 50),
+      ln_leaf_l = c(0.26 * 0.9, 2.70 * 1.1, 50)
+    ) %>%
+    define_pop_state(
+      pop_vectors = list(
+        n_ln_leaf_l = init_pop_vec$ln_leaf_l,
+        n_sqrt_area = init_pop_vec$sqrt_area,
+        n_d         = 10
+      )
+    ) %>%
+    define_env_state(
+      !!! env_exprs,
+      data_list  = list()
+    ) %>%
+    make_ipm(
+      return_all_envs = TRUE,
+      usr_funs   = list(
+        inv_logit   = inv_logit,
+        pois        = pois
+      ),
+      iterations = 100,
+      normalize_pop_size = TRUE
+    )
+
+  expect_equal(names(gen_di_stoch_param$env_seq), rando_names)
+  expect_equal(dim(gen_di_stoch_param$env_seq), c(100, 13))
+
+})
 
 test_that("t variable works as advertised", {
 
