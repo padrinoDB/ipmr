@@ -55,9 +55,20 @@
     return(start)
 
   } else {
-    max(
-      unlist(
-        lapply(l, .depth, start = start + 1)
+
+    # Wrapped with suppressWarnings() because the only one that ever comes out
+    # is:
+    # Warning message:
+    # In max(unlist(lapply(l, .depth, start = start + 1))) :
+    #   no non-missing arguments to max; returning -Inf
+    # This is innocuous and doesn't seem to affect performance in any way, only
+    # disconcerts those unaccustomed to its usage.
+
+    suppressWarnings(
+      max(
+        unlist(
+          lapply(l, .depth, start = start + 1)
+        )
       )
     )
   }
