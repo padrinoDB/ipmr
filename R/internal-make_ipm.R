@@ -292,12 +292,15 @@
 
   nms <- names(env_funs)
 
+  rlang::env_bind_lazy(main_env, !!! env_funs, .eval_env = main_env)
+
   for(i in seq_along(nms)) {
 
     # This does the binding so that values are accessible by the names
     # the user gives them.
 
-    temp <- rlang::eval_tidy(env_funs[[i]])
+    # temp <- rlang::eval_tidy(env_funs[[i]])
+    temp <- rlang::env_get(main_env, nms[i])
 
     if(!rlang::is_list(temp)) {
 
