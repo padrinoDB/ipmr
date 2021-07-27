@@ -141,14 +141,44 @@
       <small>Source: <a href='https://github.com/levisc8/ipmr/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="ipmr-004" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.4">
+<a href="#ipmr-004" class="anchor"></a>ipmr 0.0.4<small> Unreleased </small>
+</h1>
+<p>Contains small tweaks, bug fixes, and new feature additions. There shouldn’t be any breaking changes to the API.</p>
+<div id="features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#features" class="anchor"></a>Features</h2>
+<ul>
+<li><p>Adds <code>log</code> argument to <code>lambda</code> so users can choose which scale to return. The default is <code>TRUE</code> for stochastic models and <code>FALSE</code> for deterministic models.</p></li>
+<li><p>Allows named expressions in <code><a href="../reference/define_impl.html">define_env_state()</a></code> such that the names of the expressions may be used in <code><a href="../reference/define_kernel.html">define_kernel()</a></code>. Before, the name of the expression didn’t matter, only the names of the outputted list. Now, this will also work as well.</p></li>
+</ul>
+<pre><code><a href="../reference/define_impl.html">define_env_state(proto_ipm, 
+                 temp = rnorm(1, 20, 3), 
+                 precip = rgamma(1, 400, 2),
+                 data_list = list())
+</a></code></pre>
+<ul>
+<li><p>More unit tests for parameter resampled models.</p></li>
+<li><p>Removed innocuous warning messages.</p></li>
+</ul>
+</div>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<ul>
+<li>corrects a bug where functions in the <code>define_env_state</code> <code>data_list</code> argument weren’t recognized.</li>
+</ul>
+</div>
+</div>
     <div id="ipmr-003" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.3">
 <a href="#ipmr-003" class="anchor"></a>ipmr 0.0.3<small> 2021-07-13 </small>
 </h1>
 <p>Contains a some tweaks and bug fixes, and a few new features:</p>
-<div id="features" class="section level2">
+<div id="features-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#features" class="anchor"></a>Features</h2>
+<a href="#features-1" class="anchor"></a>Features</h2>
 <ul>
 <li><p>Implements <code><a href="../reference/right_ev.html">right_ev()</a></code> and <code><a href="../reference/right_ev.html">left_ev()</a></code> methods for stochastic models.</p></li>
 <li><p>Adds a new function, <code><a href="../reference/is_conv_to_asymptotic.html">conv_plot()</a></code>, to graphically check for convergence to asymptotic dynamics in deterministic models.</p></li>
@@ -157,9 +187,9 @@
 <li><p>Adds <code>log</code> argument for <code>lambda</code>.</p></li>
 </ul>
 </div>
-<div id="bug-fixes" class="section level2">
+<div id="bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p>Corrects bug where <code>tol</code> argument was ignored in <code><a href="../reference/is_conv_to_asymptotic.html">is_conv_to_asymptotic()</a></code>.</p></li>
 <li><p>Gives output from <code><a href="../reference/lambda.html">lambda()</a></code> names. Before, outputs from deterministic models with many parameter sets became hard to follow.</p></li>
