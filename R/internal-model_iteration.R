@@ -43,7 +43,7 @@
 
     for(i in seq_along(levs)) {
 
-      use_lev   <- levs[i]
+      use_lev   <- paste("(_", levs[i], ")$", sep = "")
 
       use_kerns <- sub_kern_list[grepl(use_lev, names(sub_kern_list))]
 
@@ -483,7 +483,7 @@
 
     for(i in seq_along(levs)) {
 
-      use_lev <- levs[i]
+      use_lev <- paste("(_", levs[i], ")$", sep = "")
 
       use_kerns <- sub_kern_list[grepl(use_lev, names(sub_kern_list))]
 
@@ -936,7 +936,7 @@
 
     for(j in seq_along(levs)) {
 
-      use_lev   <- levs[j]
+      use_lev   <- paste("(_", levs[j], ")$", sep = "")
 
       use_kerns <- sub_kern_list[grepl(use_lev, names(sub_kern_list))]
 
@@ -1369,7 +1369,7 @@
 
     for(j in seq_along(levs)) {
 
-      use_lev   <- levs[j]
+      use_lev   <- paste("(_", levs[j], ")$", sep = "")
 
       use_kerns <- sub_kern_list[grepl(use_lev, names(sub_kern_list))]
 
