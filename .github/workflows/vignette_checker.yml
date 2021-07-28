@@ -64,7 +64,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          remotes::install_deps(dependencies = TRUE, force = TRUE)
+          remotes::install_github("levisc8/ipmr", force = TRUE)
+          install.packages("rlang")
         shell: Rscript {0}
 
       - name: Install stringi
