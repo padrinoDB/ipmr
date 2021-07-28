@@ -54,6 +54,7 @@ if(inherits(age, c("simpleError", "simpleWarning"))) {
   probs$age <- age
 }
 
+
 if(!rlang::is_empty(probs)) {
 
   msg <- c()
@@ -71,6 +72,8 @@ if(!rlang::is_empty(probs)) {
 
   cat("errors/warnings:\n",
       msg)
+
+  stop("Failure")
 
 }
 

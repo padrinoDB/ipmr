@@ -1,5 +1,7 @@
 [![R build
 status](https://github.com/levisc8/ipmr/workflows/R-CMD-check/badge.svg)](https://github.com/levisc8/ipmr/actions)
+[![Vignette
+Code](https://github.com/levisc8/ipmr/workflows/check-vignettes/badge.svg)](https://github.com/levisc8/ipmr/actions)
 [![Lifecycle:
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![CRAN
