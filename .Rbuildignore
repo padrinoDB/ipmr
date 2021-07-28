@@ -25,3 +25,5 @@
 ^\.github$
 ^build_artefacts/*$
 ^src-i386/*
+^tests/vignettes$
+^tests/vignettes/*$
