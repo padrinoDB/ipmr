@@ -33,6 +33,19 @@ age <- tryCatch({
 error   = function(x) x,
 warning = function(x) x)
 
+mee_cs_1 <- tryCatch({
+  source("tests/vignettes/MEE_case_study_1.R", local = TRUE, keep.source = TRUE)
+},
+error   = function(x) x,
+warning = function(x) x)
+
+mee_cs_2 <- tryCatch({
+  source("tests/vignettes/MEE_case_study_2.R", local = TRUE, keep.source = TRUE)
+},
+error   = function(x) x,
+warning = function(x) x)
+
+
 probs <- list()
 if(inherits(intro, c("simpleError", "simpleWarning"))) {
   probs$intro <- intro
@@ -52,6 +65,14 @@ if(inherits(dens, c("simpleError", "simpleWarning"))) {
 
 if(inherits(age, c("simpleError", "simpleWarning"))) {
   probs$age <- age
+}
+
+if(inherits(mee_cs_1, c("simpleError", "simpleWarning"))) {
+  probs$mee_cs_1 <- mee_cs_1
+}
+
+if(inherits(mee_cs_2, c("simpleError", "simpleWarning"))) {
+  probs$mee_cs_2 <- mee_cs_2
 }
 
 
