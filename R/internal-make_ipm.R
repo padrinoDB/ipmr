@@ -1303,8 +1303,8 @@
     min_0 <- min(mat[mat < 0])
     max_0 <- max(mat[mat < 0])
 
-    if(isTRUE(all.equal(min_0, 0, tolerance = 1e-15)) &&
-       isTRUE(all.equal(max_0, 0, tolerance = 1e-15))) {
+    if(isTRUE(all.equal(min_0, 0, tolerance = 1e-10)) &&
+       isTRUE(all.equal(max_0, 0, tolerance = 1e-10))) {
 
       mat[mat < 0] <- 0
 
