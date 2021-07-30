@@ -1295,6 +1295,10 @@
 
 .valid_it_mat <- function(mat, kern_name) {
 
+  if(any(is.na(mat))) {
+    stop(kern_name, " contains one or more NAs. Double check model parameterization.")
+  }
+
   # Finally, we need to check for floating point errors that generate
   # entries slightly less than 0, and correct those.
 

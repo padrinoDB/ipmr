@@ -201,11 +201,20 @@ define_env_state <- function(proto_ipm, ..., data_list = list()) {
 
   env_quos            <- rlang::enquos(...)
 
-  data_list           <- lapply(data_list,
-                                function(x) {
-                                  attr(x, "flat_protect") <- TRUE
-                                  return(x)
-                                })
+  data_list           <- lapply(
+    data_list,
+    function(x) {
+      attr(x, "flat_protect") <- TRUE
+
+      na_test <- suppressWarnings(any(is.na(x)))
+
+      if(na_test) {
+        warning("'data_list' in 'define_env_state()' contains NAs. Is this correct?",
+                call. = FALSE)
+      }
+
+      return(x)
+    })
 
   out                 <- list(env_quos = unlist(env_quos),
                               constants = data_list)
@@ -213,6 +222,7 @@ define_env_state <- function(proto_ipm, ..., data_list = list()) {
   proto_ipm$env_state <- list(out)
 
   return(proto_ipm)
+
 }
 
 #' @title Predict methods in ipmr
@@ -1061,7 +1071,15 @@ parameters.default <- function(object) {
 
 `parameters<-.proto_ipm` <- function(object, value) {
 
-  value <- lapply(value, .protect_model)
+  value <- lapply(value, function(x) {
+    x <- .protect_model(x)
+    if(any(is.na(x))) {
+      warning("New parameter values set with 'parameters()' contain NA.",
+              " Is this correct?",
+              call. = FALSE)
+    }
+    return(x)
+  })
 
   for(i in seq_len(nrow(object))) {
 

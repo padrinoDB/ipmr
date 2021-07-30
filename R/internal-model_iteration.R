@@ -135,7 +135,7 @@
 
     for(i in seq_len(iterations)) {
 
-      # Simple model, no par_setarchical stuff going on. We can just
+      # Simple model, no par_set stuff going on. We can just
       # stick the kernels and their expressions right into eval_general_det
 
       .bind_iter_var(main_env, i)
@@ -196,9 +196,9 @@
       rlang::env_bind(.env = main_env,
                       !!! pop_list_t_1)
 
-    } # End no par_setarchical stuff
+    } # End no par_set stuff
 
-  } # End if(par_setarchical){} else {}
+  } # End if(par_set){} else {}
 
   # Remove the NA at 1 - it is a dummy so that purrr::map2 can work
   # properly

@@ -1253,15 +1253,19 @@ lambda.general_di_stoch_param_ipm <- function(ipm,
 #' @rdname lambda
 #' @export
 
-lambda.simple_dd_det_ipm <- function(ipm, type_lambda = "all", ..., log = FALSE) {
+lambda.simple_dd_det_ipm <- function(ipm,
+                                     type_lambda = "all",
+                                     ...,
+                                     log = FALSE) {
 
   .check_lambda_args(ipm, type_lambda)
 
-  all_lams <- switch(type_lambda,
-                     'all'  = TRUE,
-                     'last' = FALSE,
-                     'stochastic' = stop("Cannot compute stochastic lambda for deterministic IPM",
-                                         call. = FALSE))
+  all_lams <- switch(
+    type_lambda,
+    'all'  = TRUE,
+    'last' = FALSE,
+    'stochastic' = stop("Cannot compute stochastic lambda for deterministic IPM",
+                        call. = FALSE))
 
   out <- .lambda_pop_size(ipm, all_lambdas = all_lams)
 
@@ -1298,6 +1302,7 @@ lambda.simple_dd_stoch_kern_ipm <- function(ipm,
                 'stochastic' = .thin_stoch_lambda(temp, burn_ind, log))
 
   if(type_lambda == "stochastic") {
+
     if(log) {
       message("log(lambda) is returned by default for stochastic models. Set ",
               "'log = FALSE' for lambda on linear scale.")

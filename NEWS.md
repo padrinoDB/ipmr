@@ -1,3 +1,29 @@
+# ipmr 0.0.4
+
+Contains small tweaks, bug fixes, and new feature additions. There shouldn't be any breaking changes to the API. 
+
+## Features
+
+- Adds `log` argument to `lambda` so users can choose which scale to return. The default is `TRUE` for stochastic models and `FALSE` for deterministic models.
+
+- Allows named expressions in `define_env_state()` such that the names of the expressions may be used in `define_kernel()`. Before, the name of the expression didn't matter, only the names of the outputted list. Now, this will also work as well.  
+
+```
+define_env_state(proto_ipm, 
+                 temp = rnorm(1, 20, 3), 
+                 precip = rgamma(1, 400, 2),
+                 data_list = list())
+
+```
+
+- More unit tests for parameter resampled models.
+
+- Removed innocuous warning messages. Added warnings for `NA` values in a few `define_*` functions and errors when they're produced in sub-kernels.
+
+## Bug fixes
+
+- corrects a bug where functions in the `define_env_state` `data_list` argument weren't recognized. 
+
 # ipmr 0.0.3
 
 Contains a some tweaks and bug fixes, and a few new features:

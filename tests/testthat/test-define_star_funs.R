@@ -16,7 +16,7 @@ single_state <- init_ipm(sim_gen    = "simple",
   define_kernel("P",
                 formula = s * g,
                 family = "CC",
-                s = inv_logit(s_int, s_slope, dbh_1),
+                s = plogis(s_int, s_slope, dbh_1),
                 g = dnorm(dbh_2, mu_g, sd_g),
                 mu_g = g_int + g_slope * dbh_1,
                 data_list = list(s_int = 2.2,
@@ -31,7 +31,7 @@ single_state <- init_ipm(sim_gen    = "simple",
   define_kernel('F',
                 formula = f_r * f_s * f_d,
                 family = 'CC',
-                f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
+                f_r = plogis(f_r_int, f_r_slope, dbh_1),
                 f_s = exp(f_s_int + f_s_slope * dbh_1),
                 f_d = dnorm(dbh_2, mu_fd, sd_fd),
                 data_list = list(f_r_int = 0.03,
@@ -61,7 +61,7 @@ two_state <- init_ipm(sim_gen    = "simple",
   define_kernel("P_1",
                 formula = s * g, # make helper for double transposes
                 family = "CC",
-                s = inv_logit(s_int, s_slope, ht_1),
+                s = plogis(s_int, s_slope, ht_1),
                 g = dnorm(dbh_2, mu_g, sd_g),
                 mu_g = g_int + g_slope * ht_1,
                 data_list = list(s_int = 0.3,
@@ -71,12 +71,11 @@ two_state <- init_ipm(sim_gen    = "simple",
                                  sd_g = 0.6),
                 states = states_2,
                 evict_cor = TRUE,
-                evict_fun = truncated_distributions(g,
-                                                    n_mesh_p = 100)) %>%
+                evict_fun = truncated_distributions("norm", "g")) %>%
   define_kernel("P_2",
-                formula = s * g, # make helper for double transposes
+                formula = s * g,
                 family = "CC",
-                s = inv_logit(s_int, s_slope, dbh_1),
+                s = plogis(s_int, s_slope, dbh_1),
                 g = dnorm(dbh_2, mu_g, sd_g),
                 mu_g = g_int + g_slope * dbh_1,
                 data_list = list(s_int = 2.2,
@@ -86,12 +85,11 @@ two_state <- init_ipm(sim_gen    = "simple",
                                  sd_g = 0.7),
                 states = states_2,
                 evict_cor = TRUE,
-                evict_fun = truncated_distributions(g,
-                                                    n_mesh_p = 100)) %>%
+                evict_fun = truncated_distributions("norm", "g")) %>%
   define_kernel('F',
                 formula = f_r * f_s * f_d,
                 family = 'CC',
-                f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
+                f_r = plogis(f_r_int, f_r_slope, dbh_1),
                 f_s = exp(f_s_int + f_s_slope * dbh_1),
                 f_d = dnorm(ht_2, mu_fd, sd_fd),
                 data_list = list(f_r_int = 0.03,
@@ -104,10 +102,9 @@ two_state <- init_ipm(sim_gen    = "simple",
                 evict_cor = FALSE)  %>%
   define_impl(impl_args_2) %>%
   define_domains(dbh = c(0, 50, 100),
-                 ht = c(0, 10, 100)) %>%
+                 ht = c(0, 10, 150)) %>%
   define_pop_state(n_dbh = rep(1:50, 2),
-                   n_ht = runif(50, 0, 10))
-
+                   n_ht = runif(150, 0, 10))
 
 test_that('define_pop_state produces expected outputs', {
 
@@ -147,4 +144,44 @@ test_that('define_domains can use global variables', {
   new_dom <- two_state$domain[[1]]$dbh
 
   expect_equal(new_dom, c(L, U, n_mesh_p))
+})
+
+
+test_that("NA warnings are generated correctly", {
+
+  expect_warning(parameters(single_state) <- list (s_int = NA))
+  expect_error(make_ipm(single_state))
+  expect_warning(
+    init_ipm("simple", "di", "det") %>%
+      define_kernel("P_1",
+                    formula = s * g, # make helper for double transposes
+                    family = "CC",
+                    s = inv_logit(s_int, s_slope, ht_1),
+                    g = dnorm(dbh_2, mu_g, sd_g),
+                    mu_g = g_int + g_slope * ht_1,
+                    data_list = list(s_int = 0.3,
+                                     s_slope = 0.2,
+                                     g_int = 1.3,
+                                     g_slope = 0.99,
+                                     sd_g = NA),
+                    states = states_2))
+
+  expect_warning(
+    init_ipm("simple", "di", "stoch", "param") %>%
+      define_kernel("P_1",
+                    formula = s * g,
+                    family = "CC",
+                    s = inv_logit(s_int, s_slope, ht_1),
+                    g = dnorm(dbh_2, mu_g, sd_g),
+                    mu_g = g_int + g_slope * ht_1,
+                    data_list = list(s_int = 0.3,
+                                     s_slope = 0.2,
+                                     g_int = 1.3,
+                                     g_slope = 0.99,
+                                     sd_g = 0.2),
+                    states = states_2) %>%
+      define_env_state(env_params = inv_logit(2 * 2),
+                       data_list = list(inv_logit = NA))
+  )
+
 })

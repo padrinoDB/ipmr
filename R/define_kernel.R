@@ -106,7 +106,20 @@ define_kernel <- function(proto_ipm,
   # pop_states and env_states get defined separately. .protect_model detects
   # model objects and keeps them from getting flattened beyond
 
-  data_list <- lapply(data_list, .protect_model)
+  data_list <- lapply(
+    data_list,
+    function(x) {
+      x <- .protect_model(x)
+
+      na_test <- suppressWarnings(any(is.na(x)))
+
+      if(na_test) {
+        warning("'data_list' in 'define_kernel()' contains NAs. Is this correct?",
+                call. = FALSE)
+      }
+
+      return(x)
+    })
 
   param_tree <- list(formula = form_text,
                      family = family,
