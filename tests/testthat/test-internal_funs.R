@@ -31,7 +31,8 @@ test_that("ipm_to_df works properly", {
                                  c(stay_discrete, go_discrete,
                                    leave_discrete, P))[[1]]
 
-  target_df <- expand.grid(t = 1:201, t_1 = 1:201, value = NA_real_) %>% as.list()
+  target_df <- expand.grid(t = 1:201, t_1 = 1:201, value = NA_real_) %>%
+    as.list()
   it <- 1
 
   for(i in seq_len(nrow(temp_big))) {

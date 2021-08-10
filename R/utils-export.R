@@ -1528,6 +1528,9 @@ make_iter_kernel.ipmr_ipm <- function(ipm,
   base_nms  <- proto$kernel_id
 
   all_kerns <- ipm$sub_kernels
+  init_mat <- matrix(0,
+                     nrow = nrow(all_kerns[[1]]),
+                     ncol = ncol(all_kerns[[1]]))
 
   # Check for grouping effects
   if(any(proto$uses_par_sets)) {
@@ -1563,7 +1566,7 @@ make_iter_kernel.ipmr_ipm <- function(ipm,
 
       kern_nms <- all_args[[i]]
 
-      out[[i]] <- do.call(`+`, all_kerns[kern_nms])
+      out[[i]] <- Reduce("+", all_kerns[kern_nms], init = init_mat)
 
       names(out)[i] <- paste("mega_matrix_", levs[i], sep = "")
     }
@@ -1572,7 +1575,7 @@ make_iter_kernel.ipmr_ipm <- function(ipm,
 
     use_kerns <- ipm$sub_kernels
 
-    out <- list(mega_matrix = do.call(`+`, all_kerns))
+    out <- list(mega_matrix = Reduce("+", all_kerns, init = init_mat))
   }
   return(out)
 
