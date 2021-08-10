@@ -1662,9 +1662,10 @@ conv_plot.ipmr_ipm <- function(ipm, iterations = NULL,
 
   for(i in seq_len(ncol(all_lams))) {
 
+    if(!"main" %in% names(dots)) dots$main <- nms[i]
+
     all_args <- c(list(y    = all_lams[ , i],
                        x    = iterations,
-                       main = nms[i],
                        xlab = "Transition",
                        ylab = y_nm),
                   dots)
