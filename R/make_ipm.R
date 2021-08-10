@@ -230,6 +230,7 @@ make_ipm.simple_di_det <- function(proto_ipm,
   attr(out, "iterated")              <- (iterate && iterations >= 1)
 
   class(out)                         <- c('simple_di_det_ipm',
+                                          'ipmr_ipm',
                                           'list')
 
   return(out)
@@ -375,6 +376,7 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
   attr(out, "iterated")              <- (iterate && iterations >= 1)
 
   class(out) <- c('simple_di_stoch_kern_ipm',
+                  'ipmr_ipm',
                   'list')
 
   return(out)
@@ -536,6 +538,7 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
   attr(out, "iterated")              <- (iterate && iterations >= 1)
 
   class(out) <- c('simple_di_stoch_param_ipm',
+                  'ipmr_ipm',
                   'list')
 
   return(out)
@@ -681,8 +684,8 @@ make_ipm.general_di_det <- function(proto_ipm,
   }
   class(out) <- c('general_di_det_ipm',
                   a_s_class,
+                  'ipmr_ipm',
                   'list')
-
   return(out)
 
 }
@@ -836,8 +839,8 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
   }
   class(out) <- c('general_di_stoch_kern_ipm',
                   a_s_class,
+                  'ipmr_ipm',
                   'list')
-
   return(out)
 
 }
@@ -1032,8 +1035,8 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
 
   class(out) <- c('general_di_stoch_param_ipm',
                   a_s_class,
+                  'ipmr_ipm',
                   'list')
-
   return(out)
 
 }
@@ -1217,8 +1220,8 @@ make_ipm.simple_dd_det <- function(proto_ipm,
   attr(out, "iterated")              <- (iterate && iterations >= 1)
 
   class(out)                         <- c('simple_dd_det_ipm',
+                                          'ipmr_ipm',
                                           'list')
-
   return(out)
 
 
@@ -1417,8 +1420,8 @@ make_ipm.simple_dd_stoch_kern <- function(proto_ipm,
   attr(out, "iterated")              <- (iterate && iterations >= 1)
 
   class(out)                         <- c('simple_dd_stoch_kern_ipm',
-                                        'list')
-
+                                          'ipmr_ipm',
+                                          'list')
   return(out)
 
 }
@@ -1631,8 +1634,8 @@ make_ipm.simple_dd_stoch_param <-function(proto_ipm,
   attr(out, "iterated")              <- (iterate && iterations >= 1)
 
   class(out)                         <- c('simple_dd_stoch_param_ipm',
+                                          'ipmr_ipm',
                                           'list')
-
   return(out)
 
 }
@@ -1836,6 +1839,7 @@ make_ipm.general_dd_det <- function(proto_ipm,
 
   class(out)                         <- c('general_dd_det_ipm',
                                           a_s_class,
+                                          'ipmr_ipm',
                                           'list')
 
   return(out)
@@ -2042,6 +2046,7 @@ make_ipm.general_dd_stoch_kern <- function(proto_ipm,
 
   class(out)                         <- c('general_dd_stoch_kern_ipm',
                                           a_s_class,
+                                          'ipmr_ipm',
                                           'list')
 
   return(out)
@@ -2244,7 +2249,7 @@ make_ipm.general_dd_stoch_param <-function(proto_ipm,
 
   out_seq <- temp$env_seq
 
-  sub_kern_out <- set_ipmr_classes(sub_kern_out)
+  temp$sub_kernels <- set_ipmr_classes(temp$sub_kernels)
 
   out <- list(sub_kernels = temp$sub_kernels,
               env_list    = env_ret,
@@ -2264,6 +2269,7 @@ make_ipm.general_dd_stoch_param <-function(proto_ipm,
 
   class(out)                         <- c('general_dd_stoch_param_ipm',
                                           a_s_class,
+                                          'ipmr_ipm',
                                           'list')
 
   return(out)

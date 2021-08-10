@@ -254,6 +254,7 @@ test_that('classes are correctly set', {
 
   expect_true(all(sub_cls == 'ipmr_matrix'))
   expect_s3_class(test_stoch_param, 'simple_di_stoch_param_ipm')
+  expect_s3_class(test_stoch_param, "ipmr_ipm")
 
 
 })

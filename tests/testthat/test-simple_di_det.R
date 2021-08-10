@@ -138,6 +138,7 @@ test_that('classes are correctly set', {
   expect_s3_class(x$sub_kernels$P, 'ipmr_matrix')
   expect_s3_class(x$sub_kernels$F, 'ipmr_matrix')
   expect_s3_class(x, 'simple_di_det_ipm')
+  expect_s3_class(x, "ipmr_ipm")
 
 })
 

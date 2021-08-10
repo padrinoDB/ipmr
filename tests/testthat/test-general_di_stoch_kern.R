@@ -721,6 +721,9 @@ test_that('ipmr version matches simulation', {
 
   expect_equal(ipmr_lambdas, actual_lambdas, tolerance = 1e-10)
 
+  expect_s3_class(gen_di_stoch_kern, "general_di_stoch_kern_ipm")
+  expect_s3_class(gen_di_stoch_kern, "ipmr_ipm")
+
   # Standardized right eigenvectors
 
   ipmr_w <- right_ev(gen_di_stoch_kern)
@@ -1292,7 +1295,7 @@ mean_kernel_r <- function(kernel_holder, n_unique) {
 
 }
 
-test_that("mean_kernel works for fully par_setarchical models", {
+test_that("mean_kernel works for fully par_set models", {
 
   mean_ipmr_kernels <- mean_kernel(gen_di_stoch_kern)
   names(mean_ipmr_kernels) <- gsub("_site", "", names(mean_ipmr_kernels))

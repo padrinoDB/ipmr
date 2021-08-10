@@ -1868,7 +1868,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
     final_it <- dim(ipm$pop_state[[1]])[2]
 
     if(is_conv_to_asymptotic(ipm,
-                             tol = tolerance)) {
+                             tolerance = tolerance)) {
 
       out    <- ipm$pop_state[[1]][ , final_it]
       out_nm <- paste(pop_nm, 'w', sep = "_")
@@ -1910,7 +1910,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
                  iterations = iterations)
 
       if(is_conv_to_asymptotic(test_conv,
-                               tol = tolerance)) {
+                               tolerance = tolerance)) {
 
         final_it <- dim(test_conv$pop_state[[1]])[2]
 
@@ -1977,7 +1977,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
                normalize_pop_size = TRUE)
 
     if(is_conv_to_asymptotic(test_conv,
-                             tol = tolerance)) {
+                             tolerance = tolerance)) {
 
       out    <- test_conv$pop_state[[1]][ , (iterations + 1)]
       out_nm <- paste(pop_nm, 'w', sep = "_")
@@ -2069,7 +2069,7 @@ right_ev.general_di_det_ipm <- function(ipm,
   final_it  <- dim(ipm$pop_state[[1]])[2]
 
   if(is_conv_to_asymptotic(ipm,
-                           tol = tolerance)) {
+                           tolerance = tolerance)) {
 
     out <- .extract_conv_ev_general(ipm$pop_state)
 
@@ -2108,7 +2108,7 @@ right_ev.general_di_det_ipm <- function(ipm,
                iterations = iterations)
 
     if(is_conv_to_asymptotic(test_conv,
-                             tol = tolerance)) {
+                             tolerance = tolerance)) {
 
       out <- .extract_conv_ev_general(test_conv$pop_state)
 
@@ -2237,7 +2237,7 @@ left_ev.simple_di_det_ipm <- function(ipm,
              normalize_pop_size = TRUE)
 
   if(is_conv_to_asymptotic(test_conv,
-                           tol = tolerance)) {
+                           tolerance = tolerance)) {
 
     out    <- test_conv$pop_state[[1]][ , (iterations + 1)]
     out_nm <- paste(pop_nm, 'v', sep = "_")
@@ -2390,7 +2390,7 @@ left_ev.general_di_det_ipm <- function(ipm,
              iteration_direction = "left",
              normalize_pop_size = TRUE)
 
-  if(is_conv_to_asymptotic(test_conv, tol = tolerance)) {
+  if(is_conv_to_asymptotic(test_conv, tolerance = tolerance)) {
 
     out <- .extract_conv_ev_general(test_conv$pop_state)
 

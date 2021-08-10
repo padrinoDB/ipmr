@@ -3,16 +3,19 @@
 \name{is_conv_to_asymptotic}
 \alias{is_conv_to_asymptotic}
 \alias{conv_plot}
+\alias{conv_plot.ipmr_ipm}
 \title{Check for model convergence to asymptotic dynamics}
 \usage{
-is_conv_to_asymptotic(ipm, tol = 1e-10)
+is_conv_to_asymptotic(ipm, tolerance)
 
-conv_plot(ipm, iterations = NULL, log = FALSE, show_stable = TRUE, ...)
+conv_plot(ipm, iterations, log, show_stable, ...)
+
+\method{conv_plot}{ipmr_ipm}(ipm, iterations = NULL, log = FALSE, show_stable = TRUE, ...)
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
 
-\item{tol}{The tolerance for convergence.}
+\item{tolerance}{The tolerance for convergence.}
 
 \item{iterations}{The range of iterations to plot \code{lambda} for. The default
 is every iteration.}
@@ -32,7 +35,7 @@ population stability at \code{lambda = 1}.}
 Checks for convergence to asymptotic dynamics numerically and
 visually. \code{is_conv_to_asymptotic} checks whether
 \code{lambda[iterations - 1]} equals \code{lambda[iterations]} within the
-specified tolerance, \code{tol}. \code{conv_plot} plots the time series of
+specified tolerance, \code{tolerance}. \code{conv_plot} plots the time series of
 \code{lambda} (or \code{log(lambda)}.
 }
 \details{

@@ -399,6 +399,7 @@ test_that('classes are correctly set', {
 
   expect_true(all(sub_cls == 'ipmr_matrix'))
   expect_s3_class(monocarp_sys, 'simple_di_stoch_kern_ipm')
+  expect_s3_class(monocarp_sys, 'ipmr_ipm')
 
 })
 

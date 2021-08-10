@@ -13,7 +13,7 @@ format_mega_kernel(ipm, ...)
 
 \method{format_mega_kernel}{age_x_size_ipm}(ipm, name_ps, f_forms, ...)
 
-make_iter_kernel(ipm, mega_mat = NULL, name_ps = NULL, f_forms = NULL)
+make_iter_kernel(ipm, ..., name_ps, f_forms)
 }
 \arguments{
 \item{ipm}{Output from \code{make_ipm}.}

@@ -686,6 +686,19 @@ test_that("other outputs are of the expected form", {
   expect_equal(names(gen_di_stoch_param$env_seq),
                rando_names)
 
+
+    test_ind <- vapply(gen_di_stoch_param$sub_kernels,
+                       function(x) inherits(x, "ipmr_matrix"),
+                       logical(1L))
+
+    expect_true(all(test_ind))
+    expect_s3_class(gen_di_stoch_param, "general_di_stoch_param_ipm")
+    expect_s3_class(gen_di_stoch_param, "ipmr_ipm")
+
+
+
+
+
   ipmr_w <- right_ev(gen_di_stoch_param)
   hand_w <- lapply(pop_list[1:3], function(x) x[ , 26:101, drop = FALSE])
 

@@ -441,18 +441,24 @@ is_square <- function(x) {
 #' @description Checks for convergence to asymptotic dynamics numerically and
 #' visually. \code{is_conv_to_asymptotic} checks whether
 #' \code{lambda[iterations - 1]} equals \code{lambda[iterations]} within the
-#' specified tolerance, \code{tol}. \code{conv_plot} plots the time series of
+#' specified tolerance, \code{tolerance}. \code{conv_plot} plots the time series of
 #' \code{lambda} (or \code{log(lambda)}.
 #'
 #' @param ipm An object returned by \code{make_ipm()}.
-#' @param tol The tolerance for convergence.
+#' @param tolerance The tolerance for convergence.
 #'
 #' @return \code{is_conv_to_asymptotic}: Either \code{TRUE} or \code{FALSE}.
 #' \code{conv_plot}: code{ipm} invisibly.
 #' @export
 #'
 
-is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
+is_conv_to_asymptotic <- function(ipm, tolerance) {
+  UseMethod("is_conv_to_asymptotic")
+}
+
+#' @export
+
+is_conv_to_asymptotic.ipmr_ipm <- function(ipm, tolerance = 1e-10) {
 
   pop_state_test <- vapply(ipm$pop_state,
                            function(x) ! any(is.na(x)),
@@ -479,7 +485,7 @@ is_conv_to_asymptotic <- function(ipm, tol = 1e-10) {
 
     },
     logical(1L),
-    tol = tol)
+    tol = tolerance)
 
     return(convs)
 

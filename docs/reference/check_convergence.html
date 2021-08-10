@@ -43,7 +43,7 @@
 <meta property="og:description" content="Checks for convergence to asymptotic dynamics numerically and
 visually. is_conv_to_asymptotic checks whether
 lambda[iterations - 1] equals lambda[iterations] within the
-specified tolerance, tol. conv_plot plots the time series of
+specified tolerance, tolerance. conv_plot plots the time series of
 lambda (or log(lambda)." />
 
 
@@ -151,12 +151,15 @@ lambda (or log(lambda)." />
     <p>Checks for convergence to asymptotic dynamics numerically and
 visually. <code>is_conv_to_asymptotic</code> checks whether
 <code>lambda[iterations - 1]</code> equals <code>lambda[iterations]</code> within the
-specified tolerance, <code>tol</code>. <code>conv_plot</code> plots the time series of
+specified tolerance, <code>tolerance</code>. <code>conv_plot</code> plots the time series of
 <code>lambda</code> (or <code><a href='https://rdrr.io/r/base/Log.html'>log(lambda)</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>is_conv_to_asymptotic</span><span class='op'>(</span><span class='va'>ipm</span>, tol <span class='op'>=</span> <span class='fl'>1e-10</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>is_conv_to_asymptotic</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>tolerance</span><span class='op'>)</span>
 
+<span class='fu'>conv_plot</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>iterations</span>, <span class='va'>log</span>, <span class='va'>show_stable</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for ipmr_ipm</span>
 <span class='fu'>conv_plot</span><span class='op'>(</span><span class='va'>ipm</span>, iterations <span class='op'>=</span> <span class='cn'>NULL</span>, log <span class='op'>=</span> <span class='cn'>FALSE</span>, show_stable <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -167,7 +170,7 @@ specified tolerance, <code>tol</code>. <code>conv_plot</code> plots the time ser
       <td><p>An object returned by <code><a href='make_ipm.html'>make_ipm()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>tol</th>
+      <th>tolerance</th>
       <td><p>The tolerance for convergence.</p></td>
     </tr>
     <tr>

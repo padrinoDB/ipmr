@@ -222,3 +222,15 @@ test_that("models compute population sizes correctly", {
   expect_equal(ipmr_lams, hand_lams)
 
 })
+
+test_that("classes are correctly set", {
+
+  test_ind <- vapply(gen_dd_stoch_co$sub_kernels,
+                     function(x) inherits(x, "ipmr_matrix"),
+                     logical(1L))
+
+  expect_true(all(test_ind))
+  expect_s3_class(gen_dd_stoch_co, "general_dd_stoch_kern_ipm")
+  expect_s3_class(gen_dd_stoch_co, "ipmr_ipm")
+
+})

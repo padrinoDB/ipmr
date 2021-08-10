@@ -419,6 +419,17 @@ gen_dd_det_co <- init_ipm(sim_gen    = "general",
     iterations = 50
   )
 
+test_that("classes are correctly set", {
+
+  test_ind <- vapply(gen_dd_det_co$sub_kernels,
+                     function(x) inherits(x, "ipmr_matrix"),
+                     logical(1L))
+
+  expect_true(all(test_ind))
+  expect_s3_class(gen_dd_det_co, "general_dd_det_ipm")
+  expect_s3_class(gen_dd_det_co, "ipmr_ipm")
+
+})
 
 
 pop_holder_control <- lapply(gen_dd_det_co$pop_state[3:8],

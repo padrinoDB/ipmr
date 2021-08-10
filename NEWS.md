@@ -20,6 +20,10 @@ define_env_state(proto_ipm,
 
 - Removed innocuous warning messages. Added warnings for `NA` values in a few `define_*` functions and errors when they're produced in sub-kernels.
 
+- Added the `ipmr_ipm` class so that most functions can tell the difference between a `PADRINO` object and an `ipmr` object.
+
+- Changes argument `tol` to `tolerance` in `is_conv_to_asymptotic()` for consistency with other function/argument names.
+
 ## Bug fixes
 
 - corrects a bug where functions in the `define_env_state` `data_list` argument weren't recognized. 

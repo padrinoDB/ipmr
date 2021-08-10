@@ -228,5 +228,17 @@ test_that("models compute population sizes correctly", {
 
 })
 
+test_that("classes are correctly set", {
+
+  test_ind <- vapply(gen_dd_stoch_co$sub_kernels,
+                     function(x) inherits(x, "ipmr_matrix"),
+                     logical(1L))
+
+  expect_true(all(test_ind))
+  expect_s3_class(gen_dd_stoch_co, "general_dd_stoch_param_ipm")
+  expect_s3_class(gen_dd_stoch_co, "ipmr_ipm")
+
+})
+
 # Needs test for par_set models
 

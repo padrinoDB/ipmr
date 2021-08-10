@@ -19,6 +19,12 @@
 #' @export
 
 mean_kernel <- function(ipm) {
+  UseMethod("mean_kernel")
+}
+
+#' @export
+
+mean_kernel.ipmr_ipm <- function(ipm) {
 
   cls <- class(ipm)[1]
 

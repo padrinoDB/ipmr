@@ -1480,10 +1480,16 @@ ipm_to_df.default <- function(ipm,
 #'
 #' @export
 
-make_iter_kernel <- function(ipm,
-                             mega_mat = NULL,
-                             name_ps = NULL,
-                             f_forms = NULL) {
+make_iter_kernel <- function(ipm, ..., name_ps, f_forms) {
+  UseMethod("make_iter_kernel")
+}
+
+#' @export
+make_iter_kernel.ipmr_ipm <- function(ipm,
+                                      ...,
+                                      mega_mat = NULL,
+                                      name_ps = NULL,
+                                      f_forms = NULL) {
 
   cls_switch <- as.character(grepl("simple", class(ipm)[1]))
 
@@ -1504,6 +1510,8 @@ make_iter_kernel <- function(ipm,
   return(out)
 
 }
+
+#' @noRd
 
 .make_iter_kernel <- function(ipm, ...) {
 
@@ -1615,8 +1623,15 @@ make_iter_kernel <- function(ipm,
 #'
 #' @export
 
-conv_plot <- function(ipm, iterations = NULL,
-                      log = FALSE, show_stable = TRUE, ...) {
+conv_plot <- function(ipm, iterations, log, show_stable, ...) {
+  UseMethod("conv_plot")
+}
+
+#' @rdname check_convergence
+#' @export
+
+conv_plot.ipmr_ipm <- function(ipm, iterations = NULL,
+                               log = FALSE, show_stable = TRUE, ...) {
 
   all_lams <- lambda(ipm, type_lambda = "all", log = log)
   nms      <- colnames(all_lams)

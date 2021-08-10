@@ -375,11 +375,14 @@ hand_lams <- hand_pop_sizes[2:11] / hand_pop_sizes[1:10]
 ipmr_lams <- lambda(test_stoch_param, type_lambda = 'all') %>%
   as.vector()
 
-test_that("parameter resampled par_setarchical models work", {
+test_that("parameter resampled par_set models work", {
 
 
   expect_equal(hand_pop_sizes, ipmr_pop_sizes)
   expect_equal(hand_lams, ipmr_lams)
+
+  expect_s3_class(test_stoch_param, "simple_dd_stoch_param_ipm")
+  expect_s3_class(test_stoch_param, "ipmr_ipm")
 
 })
 

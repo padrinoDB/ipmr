@@ -220,3 +220,15 @@ test_that("sub-kernel names and values are generated correctly", {
 
 })
 
+test_that("classes are correctly set", {
+
+  test_ind <- vapply(x$sub_kernels,
+                     function(x) inherits(x, "ipmr_matrix"),
+                     logical(1L))
+
+  expect_true(all(test_ind))
+  expect_s3_class(x, "simple_dd_stoch_kern_ipm")
+  expect_s3_class(x, "ipmr_ipm")
+
+})
+

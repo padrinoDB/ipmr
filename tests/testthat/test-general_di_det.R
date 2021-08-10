@@ -333,6 +333,7 @@ test_that('classes are correctly set', {
 
   expect_true(all(sub_cls == 'ipmr_matrix'))
   expect_s3_class(ipmr_cr, 'general_di_det_ipm')
+  expect_s3_class(ipmr_cr, "ipmr_ipm")
 })
 
 test_that("kernel definition order doesn't matter", {
