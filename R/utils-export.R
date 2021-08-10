@@ -1673,7 +1673,8 @@ conv_plot.ipmr_ipm <- function(ipm, iterations = NULL,
     do.call("plot", all_args)
 
     if(show_stable) {
-      abline(h = 1, col = "grey40", lty = 2)
+      h_line <- ifelse(log, 0, 1)
+      abline(h = h_line, col = "grey40", lty = 2)
     }
 
   }
