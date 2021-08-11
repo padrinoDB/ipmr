@@ -353,7 +353,7 @@ print.simple_di_det_ipm <- function(x,
     msg    <- c(msg, l_msg)
 
     if(check_conv &&
-       !is_conv_to_asymptotic(x)) {
+       !all(is_conv_to_asymptotic(x))) {
 
       # Captures the name of the model that the user gave rather than
       # just print "x isn't converged"
@@ -555,7 +555,7 @@ print.general_di_det_ipm <- function(x,
 
   }
 
-  if(check_conv && ! is_conv_to_asymptotic(x)) {
+  if(check_conv && !all(is_conv_to_asymptotic(x))) {
 
     message(
       paste(mod_nm,
@@ -1867,8 +1867,8 @@ right_ev.simple_di_det_ipm <- function(ipm,
     # get index for population vector of final iteration
     final_it <- dim(ipm$pop_state[[1]])[2]
 
-    if(is_conv_to_asymptotic(ipm,
-                             tolerance = tolerance)) {
+    if(all(is_conv_to_asymptotic(ipm,
+                                 tolerance = tolerance))) {
 
       out    <- ipm$pop_state[[1]][ , final_it]
       out_nm <- paste(pop_nm, 'w', sep = "_")
@@ -1909,8 +1909,8 @@ right_ev.simple_di_det_ipm <- function(ipm,
         make_ipm(iterate    = TRUE,
                  iterations = iterations)
 
-      if(is_conv_to_asymptotic(test_conv,
-                               tolerance = tolerance)) {
+      if(all(is_conv_to_asymptotic(test_conv,
+                                   tolerance = tolerance))) {
 
         final_it <- dim(test_conv$pop_state[[1]])[2]
 
@@ -1976,8 +1976,8 @@ right_ev.simple_di_det_ipm <- function(ipm,
                iterations = iterations,
                normalize_pop_size = TRUE)
 
-    if(is_conv_to_asymptotic(test_conv,
-                             tolerance = tolerance)) {
+    if(all(is_conv_to_asymptotic(test_conv,
+                                 tolerance = tolerance))) {
 
       out    <- test_conv$pop_state[[1]][ , (iterations + 1)]
       out_nm <- paste(pop_nm, 'w', sep = "_")
@@ -2068,8 +2068,8 @@ right_ev.general_di_det_ipm <- function(ipm,
 
   final_it  <- dim(ipm$pop_state[[1]])[2]
 
-  if(is_conv_to_asymptotic(ipm,
-                           tolerance = tolerance)) {
+  if(all(is_conv_to_asymptotic(ipm,
+                           tolerance = tolerance))) {
 
     out <- .extract_conv_ev_general(ipm$pop_state)
 
@@ -2107,8 +2107,8 @@ right_ev.general_di_det_ipm <- function(ipm,
       make_ipm(iterate    = TRUE,
                iterations = iterations)
 
-    if(is_conv_to_asymptotic(test_conv,
-                             tolerance = tolerance)) {
+    if(all(is_conv_to_asymptotic(test_conv,
+                                 tolerance = tolerance))) {
 
       out <- .extract_conv_ev_general(test_conv$pop_state)
 
@@ -2236,8 +2236,8 @@ left_ev.simple_di_det_ipm <- function(ipm,
              iteration_direction = "left",
              normalize_pop_size = TRUE)
 
-  if(is_conv_to_asymptotic(test_conv,
-                           tolerance = tolerance)) {
+  if(all(is_conv_to_asymptotic(test_conv,
+                               tolerance = tolerance))) {
 
     out    <- test_conv$pop_state[[1]][ , (iterations + 1)]
     out_nm <- paste(pop_nm, 'v', sep = "_")
@@ -2390,7 +2390,7 @@ left_ev.general_di_det_ipm <- function(ipm,
              iteration_direction = "left",
              normalize_pop_size = TRUE)
 
-  if(is_conv_to_asymptotic(test_conv, tolerance = tolerance)) {
+  if(all(is_conv_to_asymptotic(test_conv, tolerance = tolerance))) {
 
     out <- .extract_conv_ev_general(test_conv$pop_state)
 

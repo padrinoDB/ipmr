@@ -11,7 +11,7 @@
 
 .extract_conv_ev_general <- function(pop_state) {
 
-  pop_state <- pop_state[names(pop_state) != 'lambda']
+  pop_state <- pop_state[!grepl("lambda", names(pop_state))]
   final_it <- dim(pop_state[[1]])[2]
 
   temp     <- lapply(pop_state,
