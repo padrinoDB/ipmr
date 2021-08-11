@@ -2092,7 +2092,7 @@ right_ev.general_di_det_ipm <- function(ipm,
       )
     )
 
-    use_pop_state       <- ipm$pop_state[names(ipm$pop_state) != 'lambda']
+    use_pop_state       <- ipm$pop_state[!grepl("lambda", names(ipm$pop_state))]
 
     init_pop_vec        <- lapply(use_pop_state,
                                   function(x, final_it) x[ , final_it],
@@ -2375,7 +2375,7 @@ left_ev.general_di_det_ipm <- function(ipm,
 
   mod_nm    <- deparse(substitute(ipm))
 
-  use_pop_state       <- ipm$pop_state[names(ipm$pop_state) != 'lambda']
+  use_pop_state       <- ipm$pop_state[grepl("lambda", names(ipm$pop_state))]
 
   init_pop_vec       <- lapply(use_pop_state, function(x) x[ , 1])
 
