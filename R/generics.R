@@ -2005,6 +2005,9 @@ right_ev.simple_di_det_ipm <- function(ipm,
 
   out <- rlang::list2(!! out_nm := (out / sum(out)))
 
+  # Replaces the leading n_ with a trailing _v
+  names(out) <- substr(names(out), 3, nchar(names(out)))
+  names(out) <- paste(names(out), 'w', sep = '_')
   class(out) <- "ipmr_w"
 
   return(out)
@@ -2042,8 +2045,9 @@ right_ev.simple_di_stoch_kern_ipm <- function(ipm,
 
   out[[1]] <- out[[1]] / colSums(out[[1]])
 
-  names(out) <- paste(pop_nm, 'w', sep = "_")
-
+  # Replaces the leading n_ with a trailing _v
+  names(out) <- substr(names(out), 3, nchar(names(out)))
+  names(out) <- paste(names(out), 'w', sep = '_')
   class(out) <- "ipmr_w"
 
   return(out)
@@ -2494,6 +2498,14 @@ left_ev.general_di_stoch_param_ipm <- function(ipm,
   sub_kernels <- ipm$sub_kernels
   proto_ipm   <- ipm$proto_ipm
 
+  usr_its <- ncol(ipm$pop_state[[1]]) - 1
+
+  if(usr_its < iterations) {
+
+    stop("'iterations' should be less than or equal to the number of iterations in 'make_ipm()'!")
+
+  }
+
   # Set up the model iteration expressions and initial population state.
   # This is a leaner version of make_ipm.general_di_stoch_param, because
   # we don't need all the user functions or other stuff - just the basic
@@ -2566,8 +2578,7 @@ left_ev.general_di_stoch_param_ipm <- function(ipm,
                 function(x, burn_seq) x[ , burn_seq, drop = FALSE],
                 burn_seq = burn_in_seq)
 
-
-  names(out) <- substr(names(out), 3, nchar(names(out)))
+  names(out) <- gsub("pop_state_", "", names(out))
   names(out) <- paste(names(out), 'v', sep = '_')
 
   class(out) <- "ipmr_v"

@@ -788,8 +788,10 @@
   # Add in user specified functions. These need to be in the main_env
   # so all kernels can access them during evaluation
 
-  rlang::env_bind(main_env,
-                  !!! usr_funs)
+  if(rlang::is_named(usr_funs)){
+    rlang::env_bind(main_env,
+                    !!! usr_funs)
+  }
 
   invisible(main_env)
 }
