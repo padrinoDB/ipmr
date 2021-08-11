@@ -1056,20 +1056,21 @@ parameters.default <- function(object) {
 #' @rdname accessors
 #' @export
 
-`parameters<-` <- function(object, value) {
+`parameters<-` <- function(object, ..., value) {
 
   UseMethod("parameters<-")
 
 }
 
 #' @rdname accessors
+#' @param ... Additional arguments used in \code{RPadrino} methods.
 #' @param value For \code{parameters<-}, a named list of new parameters. The new list does not need
 #' to contain all of the parameters, just the ones to update/append. For
 #' \code{vital_rate_exprs<-} and \code{kernel_formulae<-}, a new functional form.
 #' The new functional form must be wrapped in a call to \code{new_fun_form}.
 #' @export
 
-`parameters<-.proto_ipm` <- function(object, value) {
+`parameters<-.proto_ipm` <- function(object, ..., value) {
 
   value <- lapply(value, function(x) {
     x <- .protect_model(x)

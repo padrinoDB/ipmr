@@ -63,9 +63,9 @@ parameters(object)
 
 \method{parameters}{default}(object)
 
-parameters(object) <- value
+parameters(object, ...) <- value
 
-\method{parameters}{proto_ipm}(object) <- value
+\method{parameters}{proto_ipm}(object, ...) <- value
 
 int_mesh(ipm, full_mesh = TRUE)
 
@@ -96,6 +96,8 @@ The new functional form must be wrapped in a call to \code{new_fun_form}.}
 
 \item{form}{An expression representing the new vital rate or kernel formula
 to insert.}
+
+\item{...}{Additional arguments used in \code{RPadrino} methods.}
 
 \item{full_mesh}{Return the full integration mesh? Default is \code{TRUE}.
 \code{FALSE} returns only unique values for each state variable.}

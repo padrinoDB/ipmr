@@ -195,10 +195,10 @@
 <span class='co'># S3 method for default</span>
 <span class='fu'>parameters</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
-<span class='fu'>parameters</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+<span class='fu'>parameters</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S3 method for proto_ipm</span>
-<span class='fu'>parameters</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+<span class='fu'>parameters</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='fu'>int_mesh</span><span class='op'>(</span><span class='va'>ipm</span>, full_mesh <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
@@ -245,6 +245,10 @@ The new functional form must be wrapped in a call to <code>new_fun_form</code>.<
       <th>form</th>
       <td><p>An expression representing the new vital rate or kernel formula
 to insert.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Additional arguments used in <code>RPadrino</code> methods.</p></td>
     </tr>
     <tr>
       <th>full_mesh</th>
