@@ -167,6 +167,9 @@
 
 <span class='fu'>vital_rate_funs</span><span class='op'>(</span><span class='va'>ipm</span><span class='op'>)</span>
 
+<span class='co'># S3 method for ipmr_ipm</span>
+<span class='fu'>vital_rate_funs</span><span class='op'>(</span><span class='va'>ipm</span><span class='op'>)</span>
+
 <span class='fu'>vital_rate_exprs</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>kernel</span>, <span class='va'>vital_rate</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S3 method for proto_ipm</span>
@@ -202,6 +205,9 @@
 
 <span class='fu'>int_mesh</span><span class='op'>(</span><span class='va'>ipm</span>, full_mesh <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
+<span class='co'># S3 method for ipmr_ipm</span>
+<span class='fu'>int_mesh</span><span class='op'>(</span><span class='va'>ipm</span>, full_mesh <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+
 <span class='fu'>pop_state</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
 <span class='co'># S3 method for proto_ipm</span>
@@ -220,8 +226,8 @@
     <tr>
       <th>ipm</th>
       <td><p>An object created by <code><a href='make_ipm.html'>make_ipm()</a></code>. This argument only applies to
-<code>int_mesh()</code> and <code>vital_rate_funs()</code> (because these are not built
-until <code><a href='make_ipm.html'>make_ipm()</a></code> is called).</p></td>
+<code>int_mesh()</code> and <code>vital_rate_funs()</code> (because these quantities don't
+exist until <code><a href='make_ipm.html'>make_ipm()</a></code> is called).</p></td>
     </tr>
     <tr>
       <th>kernel</th>

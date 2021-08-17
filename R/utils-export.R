@@ -775,6 +775,15 @@ vital_rate_exprs.default <- function(object) {
 
 vital_rate_funs <- function(ipm) {
 
+  UseMethod("vital_rate_funs")
+
+}
+
+#' @rdname accessors
+#' @export
+
+vital_rate_funs.ipmr_ipm <- function(ipm) {
+
   proto    <- .initialize_kernels(ipm$proto_ipm, TRUE, "right")$others
 
   env_list <- ipm$env_list
@@ -1109,13 +1118,20 @@ parameters.default <- function(object) {
 
 #' @rdname accessors
 #' @param ipm An object created by \code{make_ipm()}. This argument only applies to
-#' \code{int_mesh()} and \code{vital_rate_funs()} (because these are not built
-#' until \code{make_ipm()} is called).
+#' \code{int_mesh()} and \code{vital_rate_funs()} (because these quantities don't
+#' exist until \code{make_ipm()} is called).
 #' @param full_mesh Return the full integration mesh? Default is \code{TRUE}.
 #' \code{FALSE} returns only unique values for each state variable.
 #' @export
 
 int_mesh <- function(ipm, full_mesh = TRUE) {
+  UseMethod("int_mesh")
+}
+
+#' @rdname accessors
+#' @export
+
+int_mesh.ipmr_ipm <- function(ipm, full_mesh = TRUE) {
 
   if(!"main_env" %in% names(ipm$env_list)) {
     stop("Cannot find the 'main_env' object in the IPM. Do you need to re-run\n",
