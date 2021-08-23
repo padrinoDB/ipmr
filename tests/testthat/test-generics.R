@@ -1478,6 +1478,8 @@ test_that('right_ev.simple_di_det iterates un-iterated model correctly', {
 
 })
 
+init_pop <- runif(100)
+
 sim_di_det_2 <- init_ipm(sim_gen    = "simple",
                          di_dd      = "di",
                          det_stoch  = "det") %>%
@@ -1507,7 +1509,7 @@ sim_di_det_2 <- init_ipm(sim_gen    = "simple",
   )  %>%
   define_impl(impl_args) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
-  define_pop_state(n_dbh = runif(100)) %>%
+  define_pop_state(n_dbh = init_pop) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit),
            iterate = TRUE,
            iterations = 200,
@@ -1541,7 +1543,7 @@ sim_di_det_3 <- init_ipm(sim_gen    = "simple",
                                                     'f_d')
   ) %>%
   define_impl(impl_args) %>%
-  define_pop_state(n_dbh = runif(100)) %>%
+  define_pop_state(n_dbh = init_pop) %>%
   define_domains(dbh = c(0, 50, 100)) %>%
   make_ipm(usr_funs = list(inv_logit = inv_logit),
            iterate = TRUE,
@@ -1554,7 +1556,7 @@ test_that('right_ev can handle iterated models', {
 
   expect_equal(target, ipmr_w, tolerance = 1e-10)
 
-  ipmr_w <- right_ev(sim_di_det_3)[[1]]
+  ipmr_w <- right_ev(sim_di_det_3, iterations = 200)[[1]]
 
   expect_equal(target, ipmr_w, tolerance = 1e-10)
 
@@ -1932,6 +1934,224 @@ test_that('left_ev.general_di_det returns warnings properly', {
       test_message$message
     )
   )
+
+})
+
+test_that("left/right_ev work with par set deterministic models", {
+
+  fixed_list <- list(s_int = 2.2,
+                     s_slope = 0.25,
+                     g_int = 0.2,
+                     g_slope = 1.02,
+                     sd_g = 0.7,
+                     f_r_int = 0.003,
+                     f_r_slope = 0.015,
+                     f_s_int = 1.3,
+                     f_s_slope = 0.075,
+                     mu_fd = 2,
+                     sd_fd = 0.3)
+
+  s_r_ints <- rnorm(5, -2.2, sd = 1) %>%
+    as.list()
+
+  g_r_ints <- rnorm(5, - 0.2, 1) %>%
+    as.list
+
+  names(s_r_ints) <- paste('s_r_', 1:5, sep = "")
+  names(g_r_ints) <- paste('g_r_', 1:5, sep = "")
+
+  data_list <- c(fixed_list, s_r_ints, g_r_ints)
+
+  states <- list(c("dbh"))
+
+  impl_args <-  make_impl_args_list(c('P_yr', 'F'),
+                                    int_rule = rep('midpoint', 2),
+                                    state_start = rep('dbh', 2),
+                                    state_end = rep('dbh', 2))
+
+  inv_logit <- function(int, slope, sv) {
+
+    1 / (1 + exp(-(int + slope * sv)))
+  }
+
+  par_set_mod <- init_ipm(sim_gen    = "simple",
+                          di_dd      = "di",
+                          det_stoch  = "det") %>%
+    define_kernel("P_yr",
+                  formula = s_yr * g_yr,
+                  family = "CC",
+                  s_yr = inv_logit(s_int + s_r_yr, s_slope, dbh_1),
+                  g_yr = dnorm(dbh_2, mu_g_yr, sd_g),
+                  mu_g_yr = g_int + g_r_yr + g_slope * dbh_1,
+                  data_list = data_list,
+                  states = states,
+                  uses_par_sets = TRUE,
+                  par_set_indices = list(yr = 1:5),
+                  evict_cor = TRUE,
+                  evict_fun = truncated_distributions('norm',
+                                                      'g_yr')
+    ) %>%
+    define_kernel('F',
+                  formula = f_r * f_s * f_d,
+                  family = 'CC',
+                  f_r = inv_logit(f_r_int, f_r_slope, dbh_1),
+                  f_s = exp(f_s_int + f_s_slope * dbh_1),
+                  f_d = dnorm(dbh_2, mu_fd, sd_fd),
+                  data_list = data_list,
+                  states = states,
+                  evict_cor = TRUE,
+                  evict_fun = truncated_distributions('norm',
+                                                      'f_d')
+    ) %>%
+    define_impl(impl_args) %>%
+    define_pop_state(
+      n_dbh_yr = runif(100)
+    ) %>%
+    define_domains(dbh = c(0, 50, 100)) %>%
+    make_ipm(usr_funs = list(inv_logit = inv_logit),
+             iterate = TRUE,
+             iterations = 100,
+             normalize_pop_size = FALSE)
+
+  w <- right_ev(par_set_mod)
+  v <- left_ev(par_set_mod)
+
+  nms_w <- paste0("dbh_", 1:5, "_w")
+  nms_v <- paste0("dbh_", 1:5, "_v")
+
+  expect_equal(names(w), nms_w)
+  expect_equal(names(v), nms_v)
+  expect_s3_class(w, "ipmr_w")
+  expect_s3_class(v, "ipmr_v")
+  expect_type(w[[1]], "double")
+  expect_type(v[[1]], "double")
+
+
+  # General models
+  set.seed(2312)
+  init_pop_vec <- runif(500)
+  init_b <- 20
+  g_ints <- rnorm(3) %>% as.list()
+  s_ints <- rnorm(3) %>% as.list()
+
+  names(g_ints) <- paste("g_int_", 1:3, sep = "")
+  names(s_ints) <- paste("s_int_", 1:3, sep = "")
+  data_list_control <- list(
+    g_int     = 5.781,
+    g_slope   = 0.988,
+    g_sd      = 20.55699,
+    s_int     = -0.352,
+    s_slope   = 0.122,
+    s_slope_2 = -0.000213,
+    f_r_int   = -11.46,
+    f_r_slope = 0.0835,
+    f_s_int   = 2.6204,
+    f_s_slope = 0.01256,
+    f_d_mu    = 5.6655,
+    f_d_sd    = 2.0734,
+    e_p       = 0.15,
+    g_i       = 0.5067
+  )
+  data_list_control <- c(data_list_control, g_ints, s_ints)
+
+  L <- 1.02
+  U <- 624
+  n <- 500
+
+  inv_logit <- function(int, slope, z) {
+    lin_p <- int + slope * z
+    return(1/(1+exp(-lin_p)))
+  }
+
+  inv_logit_2 <- function(int, slope_1, slope_2, z) {
+    lin_p <- int + slope_1 * z + slope_2 * z^2
+    return(1/(1+exp(-lin_p)))
+  }
+
+  states <- list(c("ht", "b"))
+
+  ipmr_control <- init_ipm(sim_gen    = "general",
+                           di_dd      = "di",
+                           det_stoch  = "det") %>%
+    define_kernel(
+      name             = "P_site",
+      formula          = s_site * g_site * d_ht,
+      family           = "CC",
+      g_site           = dnorm(ht_2, g_mu_site, g_sd),
+      g_mu_site        = g_int + g_int_site + g_slope * ht_1,
+      s_site           = inv_logit_2(s_int + s_int_site, s_slope, s_slope_2, ht_1),
+      data_list        = data_list_control,
+      states           = states,
+      uses_par_sets    = TRUE,
+      par_set_indices = list(site = 1:3),
+      evict_cor        = TRUE,
+      evict_fun        = truncated_distributions('norm',
+                                                 'g_site')
+    ) %>%
+    define_kernel(
+      name          = "go_discrete",
+      formula       = f_r * f_s * g_i,
+      family        = 'CD',
+      f_r           = inv_logit(f_r_int, f_r_slope, ht_1),
+      f_s           = exp(f_s_int + f_s_slope * ht_1),
+      data_list     = data_list_control,
+      states        = states,
+      uses_par_sets = FALSE
+    ) %>%
+    define_kernel(
+      name    = 'stay_discrete',
+      formula = 0,
+      family  = "DD",
+      states  = states,
+      evict_cor = FALSE
+    ) %>%
+    define_kernel(
+      name          = 'leave_discrete',
+      formula       = e_p * f_d * d_ht,
+      f_d           = dnorm(ht_2, f_d_mu, f_d_sd),
+      family        = 'DC',
+      data_list     = data_list_control,
+      states        = states,
+      uses_par_sets = FALSE,
+      evict_cor     = TRUE,
+      evict_fun     = truncated_distributions('norm',
+                                              'f_d')
+    ) %>%
+    define_impl(
+      make_impl_args_list(
+        kernel_names = c("P_site", "go_discrete", "stay_discrete", "leave_discrete"),
+        int_rule     = c(rep("midpoint", 4)),
+        state_start    = c('ht', "ht", "b", "b"),
+        state_end      = c('ht', "b", "b", 'ht')
+      )
+    ) %>%
+    define_domains(
+      ht = c(1.02, 624, 500)
+    ) %>%
+    define_pop_state(
+      pop_vectors = list(
+        n_ht_site = init_pop_vec,
+        n_b_site  = init_b
+      )
+    ) %>%
+    make_ipm(iterations = 200,
+             usr_funs = list(inv_logit   = inv_logit,
+                             inv_logit_2 = inv_logit_2),
+             return_all_envs = FALSE,
+             normalize_pop_size = TRUE)
+
+  w <- right_ev(ipmr_control)
+  v <- left_ev(ipmr_control, iterations = 200)
+
+  nms_w <- paste0(c("ht_", "b_"), c(1:3, 1:3), "_w")
+  nms_v <- paste0(c("ht_", "b_"), c(1:3, 1:3), "_v")
+
+  expect_true(all(names(w) %in% nms_w))
+  expect_true(all(names(v) %in% nms_v))
+  expect_s3_class(w, "ipmr_w")
+  expect_s3_class(v, "ipmr_v")
+  expect_type(w[[1]], "double")
+  expect_type(v[[1]], "double")
 
 })
 

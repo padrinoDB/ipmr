@@ -8,9 +8,11 @@
 # thus, we keep them in a list with entries corresponding to states, and
 # use Reduce to compute the total size. The final output will be the list
 # of states standardized by this total population size.
+# TODO General so that par set models can use this as well.
 
-.extract_conv_ev_general <- function(pop_state) {
+.extract_conv_ev_general <- function(pop_state, proto) {
 
+  has_ps <- ifelse(any(proto$uses_par_sets), "yes", "no")
   pop_state <- pop_state[!grepl("lambda", names(pop_state))]
   final_it <- dim(pop_state[[1]])[2]
 
@@ -22,14 +24,68 @@
                      },
                      final_it = final_it)
 
-  pop_std <- Reduce('sum', unlist(temp), init = 0)
+  out <- switch(has_ps,
+                "yes" = .standard_pop_ps(temp, proto),
+                "no"  = .standard_pop(temp))
 
-  out     <- lapply(temp,
+
+  return(out)
+}
+
+.standard_pop_ps <- function(pop_state, proto) {
+
+  ps_inds <- .make_par_set_indices(proto$par_set_indices) %>%
+    paste0("(_", ., ")$")
+
+  out <- list()
+
+  for(i in seq_along(ps_inds)) {
+    use_regex <- ps_inds[i]
+
+    use_pops <- pop_state[grepl(use_regex, names(pop_state))]
+
+    temp <- .standard_pop(use_pops)
+
+    out <- c(out, temp)
+  }
+
+  return(out)
+
+}
+
+#' @noRd
+
+.standard_pop <- function(pop_state) {
+
+  pop_std <- Reduce('sum', unlist(pop_state), init = 0)
+
+  out     <- lapply(pop_state,
                     function(x, pop_std) x / pop_std,
                     pop_std = pop_std)
 
   return(out)
 }
+
+#' @noRd
+#
+.extract_conv_ev_simple <- function(pop_state) {
+
+  pop_state <- pop_state[!grepl("lambda", names(pop_state))]
+  final_it <- dim(pop_state[[1]])[2]
+
+  out      <- lapply(pop_state,
+                     function(x, final_it) {
+
+                       temp <- x[ , final_it]
+
+                       return(temp / sum(temp))
+
+                     },
+                     final_it = final_it)
+
+  return(out)
+}
+
 
 #' @noRd
 

@@ -1856,10 +1856,6 @@ right_ev.simple_di_det_ipm <- function(ipm,
 
   mod_nm <- deparse(substitute(ipm))
 
-  # Identify state variable name
-
-  pop_nm <- .get_pop_nm_simple(ipm)
-
   # if it's already been iterated to convergence, we don't have much work to do.
 
   if(.already_iterated(ipm)) {
@@ -1870,8 +1866,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
     if(all(is_conv_to_asymptotic(ipm,
                                  tolerance = tolerance))) {
 
-      out    <- ipm$pop_state[[1]][ , final_it]
-      out_nm <- paste(pop_nm, 'w', sep = "_")
+      out    <- .extract_conv_ev_simple(ipm$pop_state)
 
     } else {
 
@@ -1894,29 +1889,29 @@ right_ev.simple_di_det_ipm <- function(ipm,
         )
       )
 
-      init_pop_vec <- ipm$pop_state[[1]][ , final_it]
-
-      pop_nm       <- ipm$proto_ipm$state_var %>%
-        unlist() %>%
-        unique() %>%
-        .[1] %>%
-        paste('n_', ., sep = "")
-
-      pop_nm <- rlang::ensym(pop_nm)
+      init_pop_vec <- lapply(ipm$pop_state[!grepl("lambda", names(ipm$pop_state))],
+                             function(x, final_it) {
+                               x[ , final_it]
+                             },
+                             final_it = ncol(ipm$pop_state[[1]]))
+#
+#       pop_nm       <- ipm$proto_ipm$state_var %>%
+#         unlist() %>%
+#         unique() %>%
+#         .[1] %>%
+#         paste('n_', ., sep = "")
+#
+#       pop_nm <- rlang::ensym(pop_nm)
 
       test_conv <- ipm$proto_ipm %>%
-        define_pop_state(!! pop_nm := init_pop_vec) %>%
+        define_pop_state(!!! init_pop_vec) %>%
         make_ipm(iterate    = TRUE,
                  iterations = iterations)
 
       if(all(is_conv_to_asymptotic(test_conv,
                                    tolerance = tolerance))) {
 
-        final_it <- dim(test_conv$pop_state[[1]])[2]
-
-        out      <- test_conv$pop_state[[1]][ , final_it]
-
-        out_nm   <- paste(pop_nm, 'w', sep = "_")
+        out    <- .extract_conv_ev_simple(test_conv$pop_state)
 
         message('model is now converged :)')
 
@@ -1956,10 +1951,11 @@ right_ev.simple_di_det_ipm <- function(ipm,
     # A model that hasn't been iterated yet
 
     # Create variables for internal usage
+    pop_nm <- .get_pop_nm_simple(ipm)
 
-    pop_states  <- paste('n', pop_nm, c('t', 't_1'), sep = '_')
+    pop_states  <- paste('n', pop_nm, sep = '_')
 
-       # Final step is to generate an initial pop_state. This is always just
+    # Final step is to generate an initial pop_state. This is always just
     # vector drawn from a random uniform distribution
 
     len_pop_state <- dim(ipm$sub_kernels[[1]])[1]
@@ -1967,8 +1963,6 @@ right_ev.simple_di_det_ipm <- function(ipm,
 
     # Drop _t for defining the initial population vector so define_pop_state
     # doesn't complain
-
-    pop_states[1] <- gsub("_t$", "", pop_states[1])
 
     test_conv     <- ipm$proto_ipm %>%
       define_pop_state(!! pop_states[1] := init_pop) %>%
@@ -1979,8 +1973,7 @@ right_ev.simple_di_det_ipm <- function(ipm,
     if(all(is_conv_to_asymptotic(test_conv,
                                  tolerance = tolerance))) {
 
-      out    <- test_conv$pop_state[[1]][ , (iterations + 1)]
-      out_nm <- paste(pop_nm, 'w', sep = "_")
+      out    <- .extract_conv_ev_simple(test_conv$pop_state)
 
     } else {
 
@@ -2003,7 +1996,9 @@ right_ev.simple_di_det_ipm <- function(ipm,
 
   # Stuff into a list and standardize
 
-  out <- rlang::list2(!! out_nm := (out / sum(out)))
+  # out <- rlang::list2(!! out_nm := (out / sum(out)))
+
+  out <- Filter(function(x) !any(is.na(x)), out)
 
   # Replaces the leading n_ with a trailing _v
   names(out) <- substr(names(out), 3, nchar(names(out)))
@@ -2075,7 +2070,7 @@ right_ev.general_di_det_ipm <- function(ipm,
   if(all(is_conv_to_asymptotic(ipm,
                            tolerance = tolerance))) {
 
-    out <- .extract_conv_ev_general(ipm$pop_state)
+    out <- .extract_conv_ev_general(ipm$pop_state, ipm$proto_ipm)
 
   } else {
 
@@ -2117,7 +2112,7 @@ right_ev.general_di_det_ipm <- function(ipm,
     if(all(is_conv_to_asymptotic(test_conv,
                                  tolerance = tolerance))) {
 
-      out <- .extract_conv_ev_general(test_conv$pop_state)
+      out <- .extract_conv_ev_general(test_conv$pop_state, test_conv$proto_ipm)
 
     } else {
 
@@ -2137,6 +2132,8 @@ right_ev.general_di_det_ipm <- function(ipm,
 
     }
   }
+
+  out <- Filter(function(x) !any(is.na(x)), out)
 
   # Replaces the leading n_ with a trailing _v
   names(out) <- substr(names(out), 3, nchar(names(out)))
@@ -2181,6 +2178,8 @@ right_ev.general_di_stoch_kern_ipm <- function(ipm,
     }
   }
 
+  out <- Filter(function(x) !any(is.na(x)), out)
+
   # Replaces the leading n_ with a trailing _v
   names(out) <- substr(names(out), 3, nchar(names(out)))
   names(out) <- paste(names(out), 'w', sep = '_')
@@ -2221,20 +2220,27 @@ left_ev.simple_di_det_ipm <- function(ipm,
 
   pop_nm <- .get_pop_nm_simple(ipm)
 
+  if(any(ipm$proto_ipm$uses_par_sets)) {
+
+    ps_nms <- .flatten_to_depth(ipm$proto_ipm$par_set_indices, 1L) %>%
+      names() %>%
+      unique()
+    ps_nms <- ps_nms[ps_nms != "levels"]
+
+    ps_suff <- paste(ps_nms, collapse = "_")
+
+    pop_nm <- paste(pop_nm, ps_suff, sep = "_")
+  }
+
   # Create variables for internal usage
 
-  pop_states  <- paste('n', pop_nm, c('t', 't_1'), sep = '_')
+  pop_states  <- paste('n', pop_nm, sep = '_')
 
   # Final step is to generate an initial pop_state. This is always just
   # vector drawn from a random uniform distribution
 
   len_pop_state <- dim(ipm$sub_kernels[[1]])[1]
   init_pop      <- stats::runif(len_pop_state)
-
-  # Drop _t for defining the initial population vector so define_pop_state
-  # doesn't complain
-
-  pop_states[1] <- gsub("_t$", "", pop_states[1])
 
   test_conv     <- ipm$proto_ipm %>%
     define_pop_state(!! pop_states[1] := init_pop) %>%
@@ -2246,8 +2252,8 @@ left_ev.simple_di_det_ipm <- function(ipm,
   if(all(is_conv_to_asymptotic(test_conv,
                                tolerance = tolerance))) {
 
-    out    <- test_conv$pop_state[[1]][ , (iterations + 1)]
-    out_nm <- paste(pop_nm, 'v', sep = "_")
+    out    <- .extract_conv_ev_simple(test_conv$pop_state)
+    # out_nm <- paste(pop_nm, 'v', sep = "_")
 
   } else {
 
@@ -2266,9 +2272,11 @@ left_ev.simple_di_det_ipm <- function(ipm,
     return(NA_real_)
   }
 
-# Stuff into a list and standardize
+  # Stuff into a list and standardize
 
-  out <- rlang::list2(!! out_nm := (out / sum(out)))
+  out        <- Filter(function(x) !any(is.na(x)), out)
+  names(out) <- substr(names(out), 3, nchar(names(out)))
+  names(out) <- paste(names(out), 'v', sep = '_')
   class(out) <- "ipmr_v"
 
   return(out)
@@ -2402,7 +2410,7 @@ left_ev.general_di_det_ipm <- function(ipm,
 
   if(all(is_conv_to_asymptotic(test_conv, tolerance = tolerance))) {
 
-    out <- .extract_conv_ev_general(test_conv$pop_state)
+    out <- .extract_conv_ev_general(test_conv$pop_state, test_conv$proto_ipm)
 
   } else {
 
@@ -2422,6 +2430,7 @@ left_ev.general_di_det_ipm <- function(ipm,
 
   }
 
+  out <- Filter(function(x) !any(is.na(x)), out)
   # Replaces the leading n_ with a trailing _v
   names(out) <- substr(names(out), 3, nchar(names(out)))
   names(out) <- paste(names(out), 'v', sep = '_')

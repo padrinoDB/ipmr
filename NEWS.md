@@ -26,7 +26,9 @@ define_env_state(proto_ipm,
 
 ## Bug fixes
 
-- corrects a bug where functions in the `define_env_state` `data_list` argument weren't recognized. 
+- corrects a bug where functions in the `define_env_state` `data_list` argument weren't recognized.
+
+- corrects bug in `left_ev()` and `right_ev()` where parameter set indices were ignored for deterministic models .
 
 # ipmr 0.0.3
 
