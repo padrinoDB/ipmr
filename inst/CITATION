@@ -1,0 +1,18 @@
+citHeader("To cite ipmr in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "ipmr: Flexible Implementation of Integral Projection Models in R",
+  author   = "Levin SC, Childs DZ, Compagnoni A, Evers S, Knight TM, Salguero-Gomez R",
+  journal  = "Methods in Ecology and Evolution",
+  year     = "2021",
+  volume   = "",
+  number   = "",
+  pages    = "",
+  url      = "https://doi.org/10.1111/2041-210X.13683",
+  textVersion = paste("Levin, S.C., Childs, D.Z., Compagnoni, A., Evers, S., ",
+  "Knight, T.M., & Salguero-Gomez, R. (2021) ipmr: Flexible Implementation of",
+  " Integral Projection Models in R. Methods in Ecology and Evolution. DOI: ",
+  "https://doi.org/10.1111/2041-210X.13683"
+  )
+)

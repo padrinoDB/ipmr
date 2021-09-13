@@ -1,10 +1,6 @@
-This is a re-submission of ipmr following a request to fix typos from yesterday. The last update was submitted in mid May, and yesterday's submission yielded the following feedback:
-
-   Possibly mis-spelled words in DESCRIPTION:
-     ipmr (33:8)
-     mathemathical (31:3)
-     
-The latter is now corrected and the former has been single quoted per Uwe Ligges's request. I have also updated the package title to omit the redundant "...in R".
+This is an update of ipmr which is already on CRAN. This update includes bug fixes
+and a new citation entry to reflect a publication describing the package. The last
+update was in mid July. 
 
 Additional information on this submission:
 
