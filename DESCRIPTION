@@ -1,6 +1,6 @@
 Package: ipmr
 Title:  Integral Projection Models
-Version: 0.0.4
+Version: 0.0.4.9000
 Authors@R: c( 
     person(given = "Sam",
            family = "Levin",
