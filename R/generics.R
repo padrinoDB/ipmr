@@ -2038,7 +2038,7 @@ right_ev.simple_di_stoch_kern_ipm <- function(ipm,
   # Normalize just in case. easy for simple IPMs where we know there's only
   # one trait contributing to total population size. Tricker in general IPMs.
 
-  out[[1]] <- out[[1]] / colSums(out[[1]])
+  out[[1]] <- apply(out[[1]], 2, function(x) x / sum(x))
 
   # Replaces the leading n_ with a trailing _v
   names(out) <- substr(names(out), 3, nchar(names(out)))

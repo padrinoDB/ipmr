@@ -417,6 +417,9 @@ test_that("left and right_ev work correctly", {
   expect_s3_class(ipmr_w, "ipmr_w")
   expect_equal(hand_w, ipmr_w, ignore_attr = TRUE)
 
+  expect_equal(colSums(ipmr_w[[1]]), rep(1L, dim(ipmr_w[[1]])[2]))
+  expect_equal(colSums(ipmr_v[[1]]), rep(1L, dim(ipmr_v[[1]])[2]))
+
 })
 
 

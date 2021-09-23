@@ -237,6 +237,9 @@ test_that('eigenvectors/values are all good', {
   # Reproductive values
   expect_equal(vs_ipmr, vs, ignore_attr = TRUE)
 
+  expect_equal(colSums(ws_ipmr[[1]]), rep(1L, dim(ws_ipmr[[1]])[2]))
+  expect_equal(colSums(vs_ipmr[[1]]), rep(1L, dim(vs_ipmr[[1]])[2]))
+
 })
 
 
