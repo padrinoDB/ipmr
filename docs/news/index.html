@@ -145,6 +145,20 @@
 <h1 class="page-header" data-toc-text="0.0.5">
 <a href="#ipmr-005" class="anchor"></a>ipmr 0.0.5<small> Unreleased </small>
 </h1>
+<div id="features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#features" class="anchor"></a>Features</h2>
+<ul>
+<li>Adds <code>return_sub_kernels</code> argument to <code><a href="../reference/make_ipm.html">make_ipm()</a></code> for <code>*_stoch_param</code> and all density dependent methods. This is due to the large RAM footprint that these objects can occupy, particularly for long running models. The default is <code>FALSE</code>, which will save considerable memory space. Can be set to <code>TRUE</code> for downstream analyses that require sub-kernels/iteration kernels.</li>
+</ul>
+</div>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<ul>
+<li>Fixes bug in normalization of left/right eigenvectors in simple density independent stochastic models. (thanks to <a href='https://github.com/aariq'>@aariq</a>)</li>
+</ul>
+</div>
 </div>
     <div id="ipmr-004" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.4">

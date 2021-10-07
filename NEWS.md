@@ -1,10 +1,10 @@
 # ipmr 0.0.5
 
-# Features 
+## Features 
 
 - Adds `return_sub_kernels` argument to `make_ipm()` for `*_stoch_param` and all density dependent methods. This is due to the large RAM footprint that these objects can occupy, particularly for long running models. The default is `FALSE`, which will save considerable memory space. Can be set to `TRUE` for downstream analyses that require sub-kernels/iteration kernels. 
 
-# Bug fixes 
+## Bug fixes 
 
  - Fixes bug in normalization of left/right eigenvectors in simple density independent stochastic models. (thanks to @aariq)
 
