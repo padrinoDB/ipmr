@@ -142,7 +142,8 @@ test_stoch_param <- init_ipm(sim_gen    = "simple",
                            mvt_wrapper = mvt_wrapper),
            iterate = TRUE,
            iterations = 100,
-           normalize_pop_size = TRUE)
+           normalize_pop_size = TRUE,
+           return_sub_kernels = TRUE)
 
 pop_state_ipmr <- test_stoch_param$pop_state$n_surf_area
 lambda_ipmr <- lambda(test_stoch_param,
@@ -321,7 +322,8 @@ test_that('normalize pop_vectors works as it should', {
                              mvt_wrapper = mvt_wrapper),
              iterate = TRUE,
              iterations = 10,
-             normalize_pop_size = TRUE)
+             normalize_pop_size = TRUE,
+             return_sub_kernels = TRUE)
 
 
   lambdas_norm <- lambda(test_stoch_param,
@@ -585,7 +587,8 @@ test_that("stoch_param can handle pararameter sets", {
              iterate = TRUE,
              iterations = 10,
              normalize_pop_size = FALSE,
-             kernel_seq = sample(2000:2004, iterations, TRUE))
+             kernel_seq = sample(2000:2004, iterations, TRUE),
+             return_sub_kernels = TRUE)
 
   hand_lambda <- vector('numeric', iterations)
 
@@ -668,6 +671,13 @@ test_that("stoch_param can handle pararameter sets", {
 
   expect_equal(pop_vec, ipmr_ps)
 
+  expect_equal(
+    test_stoch_param$sub_kernels[grep("F_",
+                                      names(test_stoch_param$sub_kernels))],
+    fs,
+    ignore_attr = TRUE)
+
+
 })
 
 test_that("stoch_param can handle expressions in define_env_state()", {
@@ -738,128 +748,136 @@ test_that("stoch_param can handle expressions in define_env_state()", {
 
 })
 
+data("iceplant_ex")
+iceplant_ex$precip <- rgamma(nrow(iceplant_ex), shape = 30, rate = 2)
+iceplant_ex        <- subset(iceplant_ex, size < 10)
+surv_mod           <- glm(survival ~ size + precip,
+                          data = iceplant_ex, family = binomial())
+
+constant_params <- list(
+  surv_mod = surv_mod,
+  g_int     = 0.2,
+  g_slope   = 1.01,
+  g_sd      = 1.2,
+  g_temp    = -0.002,
+  g_precip  = 0.004,
+  r_r_int   = -3.2,
+  r_r_slope = 0.55,
+  r_s_int   = -0.4,
+  r_s_slope = 0.5,
+  r_d_mu    = 1.1,
+  r_d_sd    = 0.1
+)
+
+env_params <- list(
+  temp_mu = 8.9,
+  temp_sd = 1.2,
+  precip_shape = 1000,
+  precip_rate  = 2
+)
+
+
+sample_env <- function(env_params) {
+
+  temp_now   <- rnorm(1,
+                      env_params$temp_mu,
+                      env_params$temp_sd)
+
+  precip_now <- rgamma(1,
+                       shape = env_params$precip_shape,
+                       rate  = env_params$precip_rate)
+
+  out        <- list(temp = temp_now, precip = precip_now)
+
+  return(out)
+
+}
+
+inv_logit <- function(lin_term) {
+  1/(1 + exp(-lin_term))
+}
+
+
+init_pop_vec <- runif(100)
+
+param_resamp_model <- init_ipm(sim_gen    = "simple",
+                               di_dd      = "di",
+                               det_stoch  = "stoch",
+                               kern_param = "param") %>%
+  define_kernel(
+    name    = 'P',
+    formula = s * g,
+    family  = 'CC',
+
+    # Parameters created by define_env_state() can be referenced by name just like
+    # any other parameter in the model.
+
+    g_mu    = g_int + g_slope * surf_area_1 + g_temp * temp + g_precip * precip,
+    s_lin_p = predict(surv_mod, newdata = data.frame(size = surf_area_1, precip = precip)),
+    s       = inv_logit(s_lin_p),
+    g       = dnorm(surf_area_2, g_mu, g_sd),
+
+
+    data_list = constant_params,
+    states    = list(c('surf_area')),
+    uses_par_sets = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "g")
+  ) %>%
+  define_kernel(
+    name          = 'F',
+    formula       = r_r * r_s * r_d,
+    family        = 'CC',
+    r_r_lin_p     = r_r_int + r_r_slope * surf_area_1,
+    r_r           = inv_logit(r_r_lin_p),
+    r_s           = exp(r_s_int + r_s_slope * surf_area_1),
+    r_d           = dnorm(surf_area_2, r_d_mu, r_d_sd),
+    data_list     = constant_params,
+    states        = list(c('surf_area')),
+    uses_par_sets = FALSE,
+    evict_cor     = TRUE,
+    evict_fun     = truncated_distributions("norm", "r_d")
+  ) %>%
+  define_impl(
+    make_impl_args_list(
+      kernel_names = c("P", "F"),
+      int_rule     = rep('midpoint', 2),
+      state_start    = rep('surf_area', 2),
+      state_end      = rep('surf_area', 2)
+    )
+  ) %>%
+  define_domains(surf_area = c(0, 10, 100))
+
+
+param_resamp_model <- param_resamp_model %>%
+
+  define_env_state(
+    env_covs   = sample_env(env_params),
+    data_list  = list(env_params = env_params,
+                      sample_env = sample_env)
+  ) %>%
+  define_pop_state(
+    pop_vectors = list(
+      n_surf_area = init_pop_vec
+    )
+  ) %>%
+  make_ipm(usr_funs   = list(inv_logit  = inv_logit),
+           iterate    = TRUE,
+           iterations = 10)
+
 test_that("predict() works with variables from define_env_state", {
 
-  data("iceplant_ex")
-  iceplant_ex$precip <- rgamma(nrow(iceplant_ex), shape = 30, rate = 2)
-  iceplant_ex        <- subset(iceplant_ex, size < 10)
-  surv_mod           <- glm(survival ~ size + precip,
-                            data = iceplant_ex, family = binomial())
-
-  constant_params <- list(
-    surv_mod = surv_mod,
-    g_int     = 0.2,
-    g_slope   = 1.01,
-    g_sd      = 1.2,
-    g_temp    = -0.002,
-    g_precip  = 0.004,
-    r_r_int   = -3.2,
-    r_r_slope = 0.55,
-    r_s_int   = -0.4,
-    r_s_slope = 0.5,
-    r_d_mu    = 1.1,
-    r_d_sd    = 0.1
-  )
-
-  env_params <- list(
-    temp_mu = 8.9,
-    temp_sd = 1.2,
-    precip_shape = 1000,
-    precip_rate  = 2
-  )
-
-
-  sample_env <- function(env_params) {
-
-    temp_now   <- rnorm(1,
-                        env_params$temp_mu,
-                        env_params$temp_sd)
-
-    precip_now <- rgamma(1,
-                         shape = env_params$precip_shape,
-                         rate  = env_params$precip_rate)
-
-    out        <- list(temp = temp_now, precip = precip_now)
-
-    return(out)
-
-  }
-
-  inv_logit <- function(lin_term) {
-    1/(1 + exp(-lin_term))
-  }
-
-
-  init_pop_vec <- runif(100)
-
-  param_resamp_model <- init_ipm(sim_gen    = "simple",
-                                 di_dd      = "di",
-                                 det_stoch  = "stoch",
-                                 kern_param = "param") %>%
-    define_kernel(
-      name    = 'P',
-      formula = s * g,
-      family  = 'CC',
-
-      # Parameters created by define_env_state() can be referenced by name just like
-      # any other parameter in the model.
-
-      g_mu    = g_int + g_slope * surf_area_1 + g_temp * temp + g_precip * precip,
-      s_lin_p = predict(surv_mod, newdata = data.frame(size = surf_area_1, precip = precip)),
-      s       = inv_logit(s_lin_p),
-      g       = dnorm(surf_area_2, g_mu, g_sd),
-
-
-      data_list = constant_params,
-      states    = list(c('surf_area')),
-      uses_par_sets = FALSE,
-      evict_cor     = TRUE,
-      evict_fun     = truncated_distributions("norm", "g")
-    ) %>%
-    define_kernel(
-      name          = 'F',
-      formula       = r_r * r_s * r_d,
-      family        = 'CC',
-      r_r_lin_p     = r_r_int + r_r_slope * surf_area_1,
-      r_r           = inv_logit(r_r_lin_p),
-      r_s           = exp(r_s_int + r_s_slope * surf_area_1),
-      r_d           = dnorm(surf_area_2, r_d_mu, r_d_sd),
-      data_list     = constant_params,
-      states        = list(c('surf_area')),
-      uses_par_sets = FALSE,
-      evict_cor     = TRUE,
-      evict_fun     = truncated_distributions("norm", "r_d")
-    ) %>%
-    define_impl(
-      make_impl_args_list(
-        kernel_names = c("P", "F"),
-        int_rule     = rep('midpoint', 2),
-        state_start    = rep('surf_area', 2),
-        state_end      = rep('surf_area', 2)
-      )
-    ) %>%
-    define_domains(surf_area = c(0, 10, 100))
-
-
-  param_resamp_model <- param_resamp_model %>%
-
-    define_env_state(
-      env_covs   = sample_env(env_params),
-      data_list  = list(env_params = env_params,
-                        sample_env = sample_env)
-    ) %>%
-    define_pop_state(
-      pop_vectors = list(
-        n_surf_area = init_pop_vec
-      )
-    ) %>%
-    make_ipm(usr_funs   = list(inv_logit  = inv_logit),
-             iterate    = TRUE,
-             iterations = 10)
 
   expect_equal(names(param_resamp_model$env_seq), c("temp", "precip"))
   expect_equal(dim(param_resamp_model$env_seq), c(10, 2))
   expect_type(param_resamp_model$env_seq[ , 1], "double")
   expect_type(param_resamp_model$env_seq[ , 2], "double")
+
+})
+
+test_that("return_sub_kernels works as expected", {
+
+  expect_equal(param_resamp_model$sub_kernels[[1]], NA_real_,
+               ignore_attr = "class")
 
 })

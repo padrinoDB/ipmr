@@ -83,7 +83,7 @@ vignette('ipmr-introduction', 'ipmr')  a more complete introduction." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -204,7 +204,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code>  a more complete introduction.<
   kernel_seq <span class='op'>=</span> <span class='cn'>NULL</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>TRUE</span>,
   report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>,
+  return_sub_kernels <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for general_di_det</span>
@@ -250,7 +251,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code>  a more complete introduction.<
   kernel_seq <span class='op'>=</span> <span class='cn'>NULL</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>TRUE</span>,
   report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>,
+  return_sub_kernels <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for simple_dd_det</span>
@@ -265,7 +267,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code>  a more complete introduction.<
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
   report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>,
+  return_sub_kernels <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for simple_dd_stoch_kern</span>
@@ -281,7 +284,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code>  a more complete introduction.<
   kernel_seq <span class='op'>=</span> <span class='cn'>NA_character_</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
   report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>,
+  return_sub_kernels <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for simple_dd_stoch_param</span>
@@ -297,7 +301,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code>  a more complete introduction.<
   kernel_seq <span class='op'>=</span> <span class='cn'>NA_character_</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
   report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>,
+  return_sub_kernels <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for general_dd_det</span>
@@ -312,7 +317,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code>  a more complete introduction.<
   iterations <span class='op'>=</span> <span class='fl'>50</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
   report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>,
+  return_sub_kernels <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for general_dd_stoch_kern</span>
@@ -328,7 +334,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code>  a more complete introduction.<
   kernel_seq <span class='op'>=</span> <span class='cn'>NA_character_</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
   report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>,
+  return_sub_kernels <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for general_dd_stoch_param</span>
@@ -344,7 +351,8 @@ vignette('ipmr-introduction', 'ipmr')</a></code>  a more complete introduction.<
   kernel_seq <span class='op'>=</span> <span class='cn'>NA_character_</span>,
   normalize_pop_size <span class='op'>=</span> <span class='cn'>FALSE</span>,
   report_progress <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>
+  iteration_direction <span class='op'>=</span> <span class='st'>"right"</span>,
+  return_sub_kernels <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -429,6 +437,13 @@ defined in <code>define_kernel</code>.</p></td>
       <td><p>A logical indicating whether or not to periodically
 report progress for a stochastic simulation. Does not apply to deterministic
 methods. Default is <code>FALSE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>return_sub_kernels</th>
+      <td><p>Only applies to density dependent and parameter
+resampled models. If <code>TRUE</code>, then all sub-kernels will be returned. These
+are required for some analyses, but a large number of iterations will
+start to take up lots of RAM. Default is <code>FALSE</code>.</p></td>
     </tr>
     </table>
 

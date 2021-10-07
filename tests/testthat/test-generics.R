@@ -405,7 +405,8 @@ sim_di_stoch_param <- init_ipm(sim_gen    = "simple",
                            mvt_wrapper = mvt_wrapper),
            iterate = TRUE,
            iterations = 3,
-           normalize_pop_size = FALSE)
+           normalize_pop_size = FALSE,
+           return_sub_kernels = TRUE)
 
 
 test_that('print.simple_di_stoch_param returns correctly', {

@@ -55,7 +55,8 @@ x <- init_ipm(sim_gen    = "simple",
   define_pop_state(n_dbh = runif(100)) %>%
   make_ipm(iterate = TRUE,
            iterations = 100,
-           normalize_pop_size = FALSE)
+           normalize_pop_size = FALSE,
+           return_sub_kernels = TRUE)
 
 
 # Hand implementation

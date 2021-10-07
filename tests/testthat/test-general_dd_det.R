@@ -240,7 +240,8 @@ gen_dd_det_co <- init_ipm(sim_gen    = "general",
   ) %>%
   make_ipm(
     iterate = TRUE,
-    iterations = 50
+    iterations = 50,
+    return_sub_kernels = TRUE
   )
 
 ipmr_pop_sizes <- lapply(gen_dd_det_co$pop_state[1:2],
@@ -520,7 +521,7 @@ hand_b_pop_size <- lapply(pop_holder_control[3:4], colSums) %>%
 hand_c_pop_size <- lapply(pop_holder_control[5:6], colSums) %>%
   do.call(what = `+`, args = .)
 
-test_that("par_setarchical model matches hand implementation", {
+test_that("par_set model matches hand implementation", {
 
   expect_equal(ipmr_a_pop_size, hand_a_pop_size)
   expect_equal(ipmr_b_pop_size, hand_b_pop_size)
@@ -534,7 +535,8 @@ test_that("par_setarchical model matches hand implementation", {
 
 tst_env_ret <- gen_dd_det_co$proto_ipm %>%
   make_ipm(iterations = 10,
-           return_all_envs = TRUE)
+           return_all_envs = TRUE,
+           return_sub_kernels = TRUE)
 
 test_that("return_all_envs works as expected", {
 

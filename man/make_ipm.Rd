@@ -64,7 +64,8 @@ make_ipm(
   kernel_seq = NULL,
   normalize_pop_size = TRUE,
   report_progress = FALSE,
-  iteration_direction = "right"
+  iteration_direction = "right",
+  return_sub_kernels = FALSE
 )
 
 \method{make_ipm}{general_di_det}(
@@ -107,7 +108,8 @@ make_ipm(
   kernel_seq = NULL,
   normalize_pop_size = TRUE,
   report_progress = FALSE,
-  iteration_direction = "right"
+  iteration_direction = "right",
+  return_sub_kernels = FALSE
 )
 
 \method{make_ipm}{simple_dd_det}(
@@ -121,7 +123,8 @@ make_ipm(
   iterations = 50,
   normalize_pop_size = FALSE,
   report_progress = FALSE,
-  iteration_direction = "right"
+  iteration_direction = "right",
+  return_sub_kernels = FALSE
 )
 
 \method{make_ipm}{simple_dd_stoch_kern}(
@@ -136,7 +139,8 @@ make_ipm(
   kernel_seq = NA_character_,
   normalize_pop_size = FALSE,
   report_progress = FALSE,
-  iteration_direction = "right"
+  iteration_direction = "right",
+  return_sub_kernels = FALSE
 )
 
 \method{make_ipm}{simple_dd_stoch_param}(
@@ -151,7 +155,8 @@ make_ipm(
   kernel_seq = NA_character_,
   normalize_pop_size = FALSE,
   report_progress = FALSE,
-  iteration_direction = "right"
+  iteration_direction = "right",
+  return_sub_kernels = FALSE
 )
 
 \method{make_ipm}{general_dd_det}(
@@ -165,7 +170,8 @@ make_ipm(
   iterations = 50,
   normalize_pop_size = FALSE,
   report_progress = FALSE,
-  iteration_direction = "right"
+  iteration_direction = "right",
+  return_sub_kernels = FALSE
 )
 
 \method{make_ipm}{general_dd_stoch_kern}(
@@ -180,7 +186,8 @@ make_ipm(
   kernel_seq = NA_character_,
   normalize_pop_size = FALSE,
   report_progress = FALSE,
-  iteration_direction = "right"
+  iteration_direction = "right",
+  return_sub_kernels = FALSE
 )
 
 \method{make_ipm}{general_dd_stoch_param}(
@@ -195,7 +202,8 @@ make_ipm(
   kernel_seq = NA_character_,
   normalize_pop_size = FALSE,
   report_progress = FALSE,
-  iteration_direction = "right"
+  iteration_direction = "right",
+  return_sub_kernels = FALSE
 )
 }
 \arguments{
@@ -254,6 +262,11 @@ defined in \code{define_kernel}.}
 \item{report_progress}{A logical indicating whether or not to periodically
 report progress for a stochastic simulation. Does not apply to deterministic
 methods. Default is \code{FALSE}.}
+
+\item{return_sub_kernels}{Only applies to density dependent and parameter
+resampled models. If \code{TRUE}, then all sub-kernels will be returned. These
+are required for some analyses, but a large number of iterations will
+start to take up lots of RAM. Default is \code{FALSE}.}
 }
 \value{
 The \code{make_ipm.*} methods will always return a list of length 5

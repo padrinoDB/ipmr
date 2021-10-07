@@ -167,7 +167,7 @@ general_ipm <- init_ipm(sim_gen = "general", di_dd = "di", det_stoch = "det") %>
   ) %>%
   define_kernel(
     name          = "go_discrete",
-    formula       = r_r * r_s * g_i * d_ht,
+    formula       = r_r * r_s * d_ht,
     
     # Note that now, family = "CD" because it denotes a continuous -> discrete transition
     
@@ -210,7 +210,7 @@ general_ipm <- init_ipm(sim_gen = "general", di_dd = "di", det_stoch = "det") %>
     # We append d_ht here as well, because we need to integrate over the 
     # the recruit size distribution.
     
-    formula       = e_p * r_d * d_ht,
+    formula       = e_p * g_i * r_d * d_ht,
     r_d           = dnorm(ht_2, r_d_mu, r_d_sd),
     family        = 'DC',
     data_list     = data_list,
@@ -966,7 +966,8 @@ general_stoch_param_ipm <-  define_env_state(
   make_ipm(usr_funs = list(inv_logit  = inv_logit,
                            sample_env = sample_env),
            iterate = TRUE,
-           iterations = 100)
+           iterations = 100,
+           return_sub_kernels = TRUE)
 
 
 ```
@@ -986,6 +987,12 @@ all.equal(mean_kerns$mean_F,
           check.attributes = FALSE)
 
 ```
+
+### A note on memory management
+
+Longer running stochastic parameter-resampled models can take up a lot of space in memory when all of the sub-kernels are saved from each iteration. For example, running the model above for 10,000 iterations would result in 20,000 $100 \times 100$ matrices, 20,000 $1 \times 100$/$100 \times 1$ matrices, and 10,000 $1 \times 1$ matrices in the `sub_kernels` slot of the IPM object (~16.4 GB of RAM). This will likely result in crashes as smaller machines run out of available RAM. Therefore, `make_ipm()` contains an argument `return_sub_kernels` for these types of models that allows you to switch off that behavior and conserve available RAM. By default, this is set to `FALSE`. If you need sub-kernels for downstream analyses, set this option to `TRUE` and make sure you have a computer with sufficient RAM (64-128 GB range is likely required to store all information for longer running models).
+
+These warnings also apply to *all* density dependent model classes and the same `return_sub_kernels` argument can be used for those as well.
 
 ## Code to construct mega-kernels
 

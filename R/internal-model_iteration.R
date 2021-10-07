@@ -67,7 +67,6 @@
         pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                           proto_ipm     = proto_ipm,
                                           sub_kern_list = use_kerns,
-                                          pop_state     = use_pop,
                                           main_env    = main_env)
 
         names(pop_list_t_1) <- gsub('_t_1', '', names(pop_list_t_1))
@@ -143,7 +142,6 @@
       pop_list_t_1 <- .eval_general_det(k_row         = k_row,
                                         proto_ipm     = proto_ipm,
                                         sub_kern_list = sub_kern_list,
-                                        pop_state     = pop_state,
                                         main_env      = main_env)
 
       # make names match pop_state and then reorder the list for easy
@@ -275,7 +273,6 @@
     pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                       proto_ipm     = proto_ipm,
                                       sub_kern_list = use_kerns,
-                                      pop_state     = pop_state,
                                       main_env    = main_env)
 
     # make names match pop_state and then reorder the list for easy
@@ -387,7 +384,6 @@
   pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                     proto_ipm     = proto_ipm,
                                     sub_kern_list = use_kerns,
-                                    pop_state     = pop_state,
                                     main_env      = main_env)
 
   # make names match pop_state and then reorder the list for easy
@@ -441,8 +437,6 @@
 
   rlang::env_bind(.env = main_env,
                   !!! pop_list_t_1)
-
-
 
   return(pop_state)
 }
@@ -504,7 +498,6 @@
         pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                           proto_ipm     = proto_ipm,
                                           sub_kern_list = use_kerns,
-                                          pop_state     = use_pop,
                                           main_env    = main_env)
 
         names(pop_list_t_1) <- gsub('_t_1', '', names(pop_list_t_1))
@@ -583,7 +576,6 @@
       pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                         proto_ipm     = proto_ipm,
                                         sub_kern_list = use_kerns,
-                                        pop_state     = pop_state,
                                         main_env    = main_env)
 
 
@@ -711,7 +703,6 @@
     pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                       proto_ipm     = proto_ipm,
                                       sub_kern_list = use_kerns,
-                                      pop_state     = pop_state,
                                       main_env    = main_env)
 
 
@@ -826,7 +817,6 @@
   pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                     proto_ipm     = proto_ipm,
                                     sub_kern_list = use_kerns,
-                                    pop_state     = pop_state,
                                     main_env    = main_env)
 
 
@@ -959,7 +949,6 @@
       pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                         proto_ipm     = proto_ipm,
                                         sub_kern_list = use_kerns,
-                                        pop_state     = use_pop,
                                         main_env      = main_env)
 
       names(pop_list_t_1) <- gsub('_t_1', '', names(pop_list_t_1))
@@ -1026,7 +1015,6 @@
     pop_list_t_1 <- .eval_general_det(k_row         = k_row,
                                       proto_ipm     = proto_ipm,
                                       sub_kern_list = sub_kern_list,
-                                      pop_state     = pop_state,
                                       main_env      = main_env)
 
     # make names match pop_state and then reorder the list for easy
@@ -1147,7 +1135,6 @@
   pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                     proto_ipm     = proto_ipm,
                                     sub_kern_list = use_kerns,
-                                    pop_state     = pop_state,
                                     main_env    = main_env)
 
   # make names match pop_state and then reorder the list for easy
@@ -1261,7 +1248,6 @@
   pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                     proto_ipm     = proto_ipm,
                                     sub_kern_list = use_kerns,
-                                    pop_state     = pop_state,
                                     main_env    = main_env)
 
   # make names match pop_state and then reorder the list for easy
@@ -1392,7 +1378,6 @@
       pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                         proto_ipm     = proto_ipm,
                                         sub_kern_list = use_kerns,
-                                        pop_state     = use_pop,
                                         main_env      = main_env)
 
       names(pop_list_t_1) <- gsub('_t_1', '', names(pop_list_t_1))
@@ -1459,7 +1444,6 @@
     pop_list_t_1 <- .eval_general_det(k_row         = k_row,
                                       proto_ipm     = proto_ipm,
                                       sub_kern_list = sub_kern_list,
-                                      pop_state     = pop_state,
                                       main_env      = main_env)
 
     # make names match pop_state and then reorder the list for easy
@@ -1578,7 +1562,6 @@
   pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                     proto_ipm     = proto_ipm,
                                     sub_kern_list = use_kerns,
-                                    pop_state     = pop_state,
                                     main_env    = main_env)
 
   # make names match pop_state and then reorder the list for easy
@@ -1693,7 +1676,6 @@
   pop_list_t_1 <- .eval_general_det(k_row         = use_k,
                                     proto_ipm     = proto_ipm,
                                     sub_kern_list = use_kerns,
-                                    pop_state     = pop_state,
                                     main_env    = main_env)
 
   # make names match pop_state and then reorder the list for easy

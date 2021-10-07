@@ -1508,6 +1508,10 @@ make_iter_kernel.ipmr_ipm <- function(ipm,
                                       name_ps = NULL,
                                       f_forms = NULL) {
 
+  if(all(is.na(ipm$sub_kernels[[1]]))) {
+    stop("Cannot create iteration kernels unless model is run with",
+         " 'return_sub_kernels = TRUE'!")
+  }
   cls_switch <- as.character(grepl("simple", class(ipm)[1]))
 
   k_cls <- switch(cls_switch,

@@ -62,6 +62,10 @@
 #' reproductive values, respectively. This parameter is mostly used internally
 #' by other functions. Use with care.
 #'
+#' @param return_sub_kernels Only applies to density dependent and parameter
+#' resampled models. If \code{TRUE}, then all sub-kernels will be returned. These
+#' are required for some analyses, but a large number of iterations will
+#' take up lots of RAM. Default is \code{FALSE}.
 #'
 #' @return
 #'  The \code{make_ipm.*} methods will always return a list of length 5
@@ -397,7 +401,8 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
                                            kernel_seq          = NULL,
                                            normalize_pop_size  = TRUE,
                                            report_progress     = FALSE,
-                                           iteration_direction = "right") {
+                                           iteration_direction = "right",
+                                           return_sub_kernels  = FALSE) {
 
   # Work out whether to append usr_funs to proto or to restore them from prior
   # implemenation. Logic is documented in make_ipm.simple_di_det()
@@ -498,8 +503,6 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
     }
 
-    names(sub_kernels) <- paste(names(sub_kernels), "it", i, sep = "_")
-
     temp <- .update_param_output(
       sub_kernels,
       pop_state,
@@ -507,7 +510,8 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
       main_env,
       temp,
       iterations,
-      i
+      i,
+      return_sub_kernels
     )
 
   }
@@ -523,6 +527,7 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
 
   temp$pop_state$lambda <- temp$pop_state$lambda[-1]
   names(temp$pop_state) <- gsub("^pop_state_", "n_", names(temp$pop_state))
+
 
   out <- list(
     sub_kernels = temp$sub_kernels,
@@ -861,7 +866,8 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
                                             kernel_seq          = NULL,
                                             normalize_pop_size  = TRUE,
                                             report_progress     = FALSE,
-                                            iteration_direction = "right") {
+                                            iteration_direction = "right",
+                                            return_sub_kernels  = FALSE) {
 
   if(iterate &&
      all(is.null(kernel_seq) | is.na(kernel_seq))  &&
@@ -990,15 +996,14 @@ make_ipm.general_di_stoch_param <- function(proto_ipm,
 
     }
 
-    names(sub_kernels) <- paste(names(sub_kernels), "it", i, sep = "_")
-
     temp         <- .update_param_output(sub_kernels,
                                          pop_state,
                                          env_ret,
                                          main_env,
                                          temp,
                                          iterations,
-                                         i)
+                                         i,
+                                         return_sub_kernels)
 
   }
 
@@ -1056,7 +1061,8 @@ make_ipm.simple_dd_det <- function(proto_ipm,
                                    iterations         = 50,
                                    normalize_pop_size = FALSE,
                                    report_progress    = FALSE,
-                                   iteration_direction = "right") {
+                                   iteration_direction = "right",
+                                   return_sub_kernels  = FALSE) {
 
 
   # Figure out if we're dealing with a new model or an old one that is
@@ -1113,7 +1119,6 @@ make_ipm.simple_dd_det <- function(proto_ipm,
 
   if(iterate) {
 
-    sub_kern_out <- list()
     env_ret      <- list(main_env = main_env)
 
     for(i in seq_len(iterations)) {
@@ -1169,16 +1174,13 @@ make_ipm.simple_dd_det <- function(proto_ipm,
       }
 
       temp         <- .update_param_output(sub_kernels,
-                                              pop_state,
-                                              env_ret,
-                                              main_env,
-                                              temp,
-                                              iterations,
-                                              i)
-
-      names(sub_kernels)           <- paste(names(sub_kernels), "it", i, sep = "_")
-      sub_kern_out                 <- c(sub_kern_out, sub_kernels)
-
+                                           pop_state,
+                                           env_ret,
+                                           main_env,
+                                           temp,
+                                           iterations,
+                                           i,
+                                           return_sub_kernels)
 
     }
 
@@ -1204,12 +1206,9 @@ make_ipm.simple_dd_det <- function(proto_ipm,
 
   out_seq      <- NA_integer_
 
-  sub_kern_out <- set_ipmr_classes(sub_kern_out)
+  temp$sub_kernels <- set_ipmr_classes(temp$sub_kernels)
 
-  # Not storing iteration kernels for now, though that *should* be
-  # fairly easy to change...
-
-  out <- list(sub_kernels = sub_kern_out,
+  out <- list(sub_kernels = temp$sub_kernels,
               env_list    = env_ret,
               env_seq     = out_seq,
               pop_state   = pop_state,
@@ -1242,7 +1241,8 @@ make_ipm.simple_dd_stoch_kern <- function(proto_ipm,
                                           kernel_seq         = NA_character_,
                                           normalize_pop_size = FALSE,
                                           report_progress    = FALSE,
-                                          iteration_direction = "right") {
+                                          iteration_direction = "right",
+                                          return_sub_kernels  = FALSE) {
 
 
   if(iterate &&
@@ -1308,7 +1308,7 @@ make_ipm.simple_dd_stoch_kern <- function(proto_ipm,
 
   if(iterate) {
 
-    sub_kern_out <- list()
+    temp$sub_kernels <- list()
     env_ret      <- list(main_env = main_env)
     kern_seq     <- .make_kern_seq(others,
                                    iterations,
@@ -1369,16 +1369,13 @@ make_ipm.simple_dd_stoch_kern <- function(proto_ipm,
       }
 
       temp         <- .update_param_output(sub_kernels,
-                                              pop_state,
-                                              env_ret,
-                                              main_env,
-                                              temp,
-                                              iterations,
-                                              i)
-
-      names(sub_kernels)           <- paste(names(sub_kernels), "it", i, sep = "_")
-      sub_kern_out                 <- c(sub_kern_out, sub_kernels)
-
+                                           pop_state,
+                                           env_ret,
+                                           main_env,
+                                           temp,
+                                           iterations,
+                                           i,
+                                           return_sub_kernels)
 
     }
 
@@ -1404,12 +1401,10 @@ make_ipm.simple_dd_stoch_kern <- function(proto_ipm,
 
   out_seq      <- kern_seq
 
-  sub_kern_out <- set_ipmr_classes(sub_kern_out)
 
-  # Not storing iteration kernels for now, though that *should* be
-  # fairly easy to change...
+  temp$sub_kernels <- set_ipmr_classes(temp$sub_kernels)
 
-  out <- list(sub_kernels = sub_kern_out,
+  out <- list(sub_kernels = temp$sub_kernels,
               env_list    = env_ret,
               env_seq     = out_seq,
               pop_state   = pop_state,
@@ -1441,7 +1436,8 @@ make_ipm.simple_dd_stoch_param <-function(proto_ipm,
                                           kernel_seq         = NA_character_,
                                           normalize_pop_size = FALSE,
                                           report_progress    = FALSE,
-                                          iteration_direction = "right") {
+                                          iteration_direction = "right",
+                                          return_sub_kernels = FALSE) {
 
 
   if(iterate &&
@@ -1515,7 +1511,6 @@ make_ipm.simple_dd_stoch_param <-function(proto_ipm,
 
   if(iterate) {
 
-    sub_kern_out <- list()
     env_ret      <- list(main_env = main_env)
     kern_seq     <- .make_kern_seq(others,
                                    iterations,
@@ -1581,12 +1576,13 @@ make_ipm.simple_dd_stoch_param <-function(proto_ipm,
                                             sep = "_")
 
       temp         <- .update_param_output(sub_kernels,
-                                                   pop_state,
-                                                   env_ret,
-                                                   main_env,
-                                                   temp,
-                                                   iterations,
-                                                   i)
+                                           pop_state,
+                                           env_ret,
+                                           main_env,
+                                           temp,
+                                           iterations,
+                                           i,
+                                           return_sub_kernels)
 
     }
 
@@ -1621,7 +1617,7 @@ make_ipm.simple_dd_stoch_param <-function(proto_ipm,
 
   out_seq <- temp$env_seq
 
-  sub_kern_out <- set_ipmr_classes(sub_kern_out)
+  temp$sub_kernels <- set_ipmr_classes(temp$sub_kernels)
 
   out <- list(sub_kernels = temp$sub_kernels,
               env_list    = env_ret,
@@ -1654,7 +1650,8 @@ make_ipm.general_dd_det <- function(proto_ipm,
                                     iterations = 50,
                                     normalize_pop_size = FALSE,
                                     report_progress = FALSE,
-                                    iteration_direction = "right"
+                                    iteration_direction = "right",
+                                    return_sub_kernels = FALSE
 ) {
 
   # Figure out if we're dealing with a new model or an old one that is
@@ -1717,7 +1714,6 @@ make_ipm.general_dd_det <- function(proto_ipm,
 
   if(iterate) {
 
-    sub_kern_out <- list()
     env_ret      <- list(main_env = main_env)
 
     for(i in seq_len(iterations)) {
@@ -1772,11 +1768,8 @@ make_ipm.general_dd_det <- function(proto_ipm,
                                            main_env,
                                            temp,
                                            iterations,
-                                           i)
-
-      names(sub_kernels)           <- paste(names(sub_kernels), "it", i, sep = "_")
-      sub_kern_out                 <- c(sub_kern_out, sub_kernels)
-
+                                           i,
+                                           return_sub_kernels)
     }
 
     # Remove the NA at 1 - it is a dummy so that purrr::map2 can work
@@ -1816,12 +1809,10 @@ make_ipm.general_dd_det <- function(proto_ipm,
 
   out_seq      <- NA_integer_
 
-  sub_kern_out <- set_ipmr_classes(sub_kern_out)
 
-  # Not storing iteration kernels for now, though that *should* be
-  # fairly easy to change...
+  temp$sub_kernels <- set_ipmr_classes(temp$sub_kernels)
 
-  out <- list(sub_kernels = sub_kern_out,
+  out <- list(sub_kernels = temp$sub_kernels,
               env_list    = env_ret,
               env_seq     = out_seq,
               pop_state   = pop_state,
@@ -1861,7 +1852,8 @@ make_ipm.general_dd_stoch_kern <- function(proto_ipm,
                                            kernel_seq         = NA_character_,
                                            normalize_pop_size = FALSE,
                                            report_progress    = FALSE,
-                                           iteration_direction = "right") {
+                                           iteration_direction = "right",
+                                           return_sub_kernels = FALSE) {
 
 
   if(iterate &&
@@ -1927,7 +1919,6 @@ make_ipm.general_dd_stoch_kern <- function(proto_ipm,
 
   if(iterate) {
 
-    sub_kern_out <- list()
     env_ret      <- list(main_env = main_env)
     kern_seq     <- .make_kern_seq(others,
                                    iterations,
@@ -1993,11 +1984,8 @@ make_ipm.general_dd_stoch_kern <- function(proto_ipm,
                                               main_env,
                                               temp,
                                               iterations,
-                                              i)
-
-      names(sub_kernels)           <- paste(names(sub_kernels), "it", i, sep = "_")
-      sub_kern_out                 <- c(sub_kern_out, sub_kernels)
-
+                                              i,
+                                           return_sub_kernels)
 
     }
 
@@ -2023,12 +2011,10 @@ make_ipm.general_dd_stoch_kern <- function(proto_ipm,
 
   out_seq      <- kern_seq
 
-  sub_kern_out <- set_ipmr_classes(sub_kern_out)
 
-  # Not storing iteration kernels for now, though that *should* be
-  # fairly easy to change...
+  temp$sub_kernels <- set_ipmr_classes(temp$sub_kernels)
 
-  out <- list(sub_kernels = sub_kern_out,
+  out <- list(sub_kernels = temp$sub_kernels,
               env_list    = env_ret,
               env_seq     = out_seq,
               pop_state   = pop_state,
@@ -2068,7 +2054,8 @@ make_ipm.general_dd_stoch_param <-function(proto_ipm,
                                           kernel_seq         = NA_character_,
                                           normalize_pop_size = FALSE,
                                           report_progress    = FALSE,
-                                          iteration_direction = "right") {
+                                          iteration_direction = "right",
+                                          return_sub_kernels  = FALSE) {
 
 
   if(iterate &&
@@ -2142,7 +2129,6 @@ make_ipm.general_dd_stoch_param <-function(proto_ipm,
 
   if(iterate) {
 
-    sub_kern_out <- list()
     env_ret      <- list(main_env = main_env)
     kern_seq     <- .make_kern_seq(others,
                                    iterations,
@@ -2202,18 +2188,14 @@ make_ipm.general_dd_stoch_param <-function(proto_ipm,
 
       }
 
-      names(sub_kernels) <- paste(names(sub_kernels),
-                                  "it",
-                                  i,
-                                  sep = "_")
-
       temp               <- .update_param_output(sub_kernels,
                                                  pop_state,
                                                  env_ret,
                                                  main_env,
                                                  temp,
                                                  iterations,
-                                                 i)
+                                                 i,
+                                                 return_sub_kernels)
 
     }
 

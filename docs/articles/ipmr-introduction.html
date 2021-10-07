@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -94,7 +94,7 @@
 
       
 
-      </header><script src="ipmr-introduction_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
+      </header><script src="ipmr-introduction_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to ipmr</h1>
@@ -1361,7 +1361,8 @@
   <span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>usr_funs   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>inv_logit  <span class="op">=</span> <span class="va">inv_logit</span><span class="op">)</span>,
            iterate    <span class="op">=</span> <span class="cn">TRUE</span>,
-           iterations <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
+           iterations <span class="op">=</span> <span class="fl">10</span>,
+           return_sub_kernels <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># By default, lambda computes stochastic lambda with stochastic models </span>
 
@@ -1375,6 +1376,12 @@
 <span class="co"># model iteration, we can access these using the output's $env_seq slot.</span>
 
 <span class="va">param_resamp_model</span><span class="op">$</span><span class="va">env_seq</span></code></pre></div>
+</div>
+<div id="a-note-on-memory-management" class="section level3">
+<h3 class="hasAnchor">
+<a href="#a-note-on-memory-management" class="anchor"></a>A note on memory management</h3>
+<p>Longer running stochastic parameter-resampled models can take up a lot of space in memory when all of the sub-kernels are saved from each iteration. For example, running the model above for 10,000 iterations would result in 20,000 <span class="math inline">\(100 \times 100\)</span> matrices in the <code>sub_kernels</code> slot of the IPM object (~16 GB of RAM). This will likely result in crashes as smaller machines run out of available RAM. Therefore, <code><a href="../reference/make_ipm.html">make_ipm()</a></code> contains an argument <code>return_sub_kernels</code> for these types of models that allows you to switch off that behavior and conserve available RAM. By default, this is set to <code>FALSE</code>. If you need sub-kernels for downstream analyses, set this option to <code>TRUE</code> and make sure you have a computer with sufficient RAM (64-128 GB range is likely required to store all information for longer running models).</p>
+<p>These warnings also apply to <em>all</em> density dependent model classes and the same <code>return_sub_kernels</code> argument can be used for those as well.</p>
 </div>
 <div id="pre-determined-sequences-of-environmental-covariates" class="section level3">
 <h3 class="hasAnchor">

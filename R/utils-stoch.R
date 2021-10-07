@@ -28,6 +28,11 @@ mean_kernel.ipmr_ipm <- function(ipm) {
 
   cls <- class(ipm)[1]
 
+  if(all(is.na(ipm$sub_kernels[[1]]))) {
+    stop("Cannot compute mean kernels unless model is run with",
+         " 'return_sub_kernels = TRUE'!")
+  }
+
   if(grepl("stoch_kern", cls)) {
 
     class(ipm) <- c(class(ipm), "stoch_kern")

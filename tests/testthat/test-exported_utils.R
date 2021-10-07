@@ -599,7 +599,8 @@ gen_di_stoch_param <- init_ipm(sim_gen    = "general",
       mvt_wrapper = mvt_wrapper
     ),
     iterations = 100,
-    normalize_pop_size = FALSE
+    normalize_pop_size = FALSE,
+    return_sub_kernels = TRUE
   )
 
 test_that("vital_rate_funs returns correctly for stoch_param/dd models", {

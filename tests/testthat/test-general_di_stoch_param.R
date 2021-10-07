@@ -333,7 +333,8 @@ gen_di_stoch_param <- init_ipm(sim_gen    = "general",
       mvt_wrapper = mvt_wrapper
     ),
     iterations = 100,
-    normalize_pop_size = TRUE
+    normalize_pop_size = TRUE,
+    return_sub_kernels = TRUE
   )
 
 
@@ -1002,7 +1003,8 @@ test_that('normalize_pop_vec works', {
         mvt_wrapper = mvt_wrapper
       ),
       iterations = 100,
-      normalize_pop_size = TRUE
+      normalize_pop_size = TRUE,
+      return_sub_kernels = TRUE
     )
 
   lambdas_ipmr_norm <- lambda(gen_di_stoch_param,
@@ -1243,7 +1245,8 @@ test_that("define_env_state handles directly named exprs", {
         pois        = pois
       ),
       iterations = 100,
-      normalize_pop_size = TRUE
+      normalize_pop_size = TRUE,
+      return_sub_kernels = TRUE
     )
 
   expect_equal(names(gen_di_stoch_param$env_seq), rando_names)
@@ -1422,7 +1425,8 @@ test_that("t variable works as advertised", {
         mvt_wrapper = mvt_wrapper
       ),
       iterations = 100,
-      normalize_pop_size = TRUE
+      normalize_pop_size = TRUE,
+      return_sub_kernels = TRUE
     )
 
 
@@ -1603,7 +1607,8 @@ test_that("t variable works as advertised", {
         pois        = pois
       ),
       iterations = 100,
-      normalize_pop_size = TRUE
+      normalize_pop_size = TRUE,
+      return_sub_kernels = TRUE
     )
 
   det_l <- lambda(test_det_seq)
@@ -1800,7 +1805,8 @@ test_that("Parameter sets work in parameter re-sampled model", {
       ),
       iterations = 100,
       normalize_pop_size = TRUE,
-      kernel_seq = sample(1:5, 100, TRUE)
+      kernel_seq = sample(1:5, 100, TRUE),
+      return_sub_kernels = TRUE
     )
 
   use_param_seq <- gen_di_stoch_param$env_seq

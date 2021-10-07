@@ -1347,7 +1347,8 @@ param_resamp_model <- param_resamp_model %>%
   ) %>%
   make_ipm(usr_funs   = list(inv_logit  = inv_logit),
            iterate    = TRUE,
-           iterations = 10)
+           iterations = 10,
+           return_sub_kernels = TRUE)
 
 # By default, lambda computes stochastic lambda with stochastic models 
 
@@ -1363,6 +1364,12 @@ lambda(param_resamp_model, type_lambda = 'all')
 param_resamp_model$env_seq
 
 ```
+
+### A note on memory management
+
+Longer running stochastic parameter-resampled models can take up a lot of space in memory when all of the sub-kernels are saved from each iteration. For example, running the model above for 10,000 iterations would result in 20,000 $100 \times 100$ matrices in the `sub_kernels` slot of the IPM object (~16 GB of RAM). This will likely result in crashes as smaller machines run out of available RAM. Therefore, `make_ipm()` contains an argument `return_sub_kernels` for these types of models that allows you to switch off that behavior and conserve available RAM. By default, this is set to `FALSE`. If you need sub-kernels for downstream analyses, set this option to `TRUE` and make sure you have a computer with sufficient RAM (64-128 GB range is likely required to store all information for longer running models).
+
+These warnings also apply to *all* density dependent model classes and the same `return_sub_kernels` argument can be used for those as well.
 
 ### Pre-determined sequences of environmental covariates
 

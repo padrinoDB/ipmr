@@ -79,7 +79,8 @@ x <- init_ipm(sim_gen    = "simple",
   make_ipm(
     iterate = TRUE,
     iterations = 50,
-    kernel_seq = sample(1:5, 50, replace = TRUE)
+    kernel_seq = sample(1:5, 50, replace = TRUE),
+    return_sub_kernels = TRUE
   )
 
 

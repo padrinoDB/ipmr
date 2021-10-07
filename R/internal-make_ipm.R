@@ -472,12 +472,13 @@
 #' @noRd
 
 .update_param_output <- function(sub_kernels,
-                                        pop_state,
-                                        data_envs = NA_character_,
-                                        main_env,
-                                        output,
-                                        tot_iterations,
-                                        current_iteration) {
+                                 pop_state,
+                                 data_envs = NA_character_,
+                                 main_env,
+                                 output,
+                                 tot_iterations,
+                                 current_iteration,
+                                 return_sub_kernels) {
 
   # Updates env_seq and data_environments part of output. env, perhaps confusingly,
   # refers to environment in both the programming and the biological sense
@@ -489,7 +490,15 @@
                                current_iteration = current_iteration)
 
 
-  output$sub_kernels <- c(output$sub_kernels, sub_kernels)
+  if(return_sub_kernels){
+    names(sub_kernels) <- paste(names(sub_kernels),
+                                "it",
+                                current_iteration,
+                                sep = "_")
+    output$sub_kernels <- c(output$sub_kernels, sub_kernels)
+  } else {
+    output$sub_kernels <- NA_real_
+  }
 
   output$pop_state   <- pop_state
 
@@ -1574,7 +1583,7 @@ set_ipmr_classes <- function(to_set, cls = NULL) {
 .eval_general_det <- function(k_row,
                               proto_ipm,
                               sub_kern_list,
-                              pop_state,
+                              # pop_state,
                               main_env) {
 
   pop_list <- list()

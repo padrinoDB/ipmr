@@ -1630,6 +1630,9 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
 
 
   plot_list <- ipm$sub_kernels
+  if(all(is.na(plot_list[[1]]))) {
+    stop("Cannot plot sub-kernels unless 'make_ipm(return_sub_kernels = TRUE)'!")
+  }
 
   plt_seq   <- seq_along(plot_list)
 
