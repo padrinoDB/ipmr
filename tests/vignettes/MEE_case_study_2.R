@@ -24,12 +24,12 @@ param_list <- list(
   rcsz_int  =  3.62e-1,
   rcsz_z    =  7.09e-1,
   rcsz_sd   =  1.59e-1
-)  
+)
 
 # define a custom function to handle the F kernels. We could write a rather
-# verbose if(age == 0) {0} else {other_math} in the define_kernel(), but that 
+# verbose if(age == 0) {0} else {other_math} in the define_kernel(), but that
 # might look ugly. Note that we CANNOT use ifelse(), as its output is the same
-# same length as its input (in this case, it would return 1 number, not 10000 
+# same length as its input (in this case, it would return 1 number, not 10000
 # numbers).
 
 r_fun <- function(age, s_age, pb_age, pr_age, recr) {
@@ -43,8 +43,8 @@ r_fun <- function(age, s_age, pb_age, pr_age, recr) {
 
 
 age_size_ipm <- init_ipm(sim_gen = "general",
-                         di_dd = "di", 
-                         det_stoch = "det", 
+                         di_dd = "di",
+                         det_stoch = "det",
                          uses_age = TRUE) %>%
   define_kernel(
     name          = "P_age",
@@ -58,7 +58,7 @@ age_size_ipm <- init_ipm(sim_gen = "general",
     uses_par_sets = FALSE,
     age_indices   = list(age = c(0:20), max_age = 21),
     evict_cor     = FALSE
-  ) 
+  )
 
 
 age_size_ipm <-   define_kernel(
@@ -76,7 +76,7 @@ age_size_ipm <-   define_kernel(
   uses_par_sets = FALSE,
   age_indices   = list(age = c(0:20), max_age = 21),
   evict_cor     = FALSE
-) 
+)
 
 
 
@@ -89,7 +89,7 @@ age_size_ipm <-  define_impl(
     state_start    = c("z_age", "z_age"),
     state_end      = c("z_age", "z_0")
   )
-) 
+)
 
 
 
@@ -109,7 +109,8 @@ age_size_ipm <-  define_pop_state(
     usr_funs = list(r_fun = r_fun),
     iterate  = TRUE,
     iterations = 100,
-    return_all_envs = TRUE
+    return_all_envs = TRUE,
+    return_sub_kernels = TRUE
   )
 
 
@@ -138,15 +139,16 @@ vr_funs$F_12
 
 new_proto <- age_size_ipm$proto_ipm
 
-vital_rate_exprs(new_proto, 
-                 kernel = "F_age", 
+vital_rate_exprs(new_proto,
+                 kernel = "F_age",
                  vital_rate = "pr_age") <-
-  new_fun_form(plogis(recr_int + recr_z * z_1 + recr_a * age)) 
+  new_fun_form(plogis(recr_int + recr_z * z_1 + recr_a * age))
 
 parameters(new_proto) <- list(recr_z = 0.05)
 
 new_ipm <- make_ipm(new_proto,
-                    return_all_envs = TRUE)
+                    return_all_envs = TRUE,
+                    return_sub_kernels = TRUE)
 
 lambda(new_ipm)
 
@@ -163,9 +165,9 @@ stable_dists <- right_ev(age_size_ipm)
 w_plot <- lapply(stable_dists, function(x, d_z) x / d_z,
          d_z = d_z)
 
-repro_values <- left_ev(age_size_ipm) 
+repro_values <- left_ev(age_size_ipm)
 
-v_plot <- lapply(repro_values, function(x, d_z) x / d_z, 
+v_plot <- lapply(repro_values, function(x, d_z) x / d_z,
                  d_z = d_z)
 
 
@@ -202,25 +204,25 @@ max_age <- 22
 P_a <- diag(length(init_pop))
 
 for(yr in seq_len(n_yrs)) {
-  
+
   # When we start, we want to use age-specific kernels until we reach max_age.
   # after that, all survivors have entered the "greybeard" class.
-  
+
   if(yr < max_age) {
-    
+
     P_now <- P_kerns[[yr]]
     F_now <- F_kerns[[yr]]
-    
+
   } else {
-    
+
     P_now <- P_kerns[[max_age]]
     F_now <- F_kerns[[max_age]]
-    
+
   }
-  
+
   l_a[yr] <- sum(colSums(P_a) * init_pop)
   f_a[yr] <- sum(colSums(F_now %*% P_a) * init_pop)
-  
+
   P_a <- P_now %*% P_a
 }
 

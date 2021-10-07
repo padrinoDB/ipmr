@@ -1,6 +1,7 @@
 library(rlang)
 library(ipmr)
 
+
 intro <- tryCatch({
   source("tests/vignettes/ipmr-intro.R", local = TRUE, keep.source = TRUE)
 },

@@ -3,7 +3,7 @@ library(ipmr)
 
 data(iceplant_ex)
 
-# growth model. 
+# growth model.
 
 grow_mod <- lm(log_size_next ~ log_size, data = iceplant_ex)
 grow_sd  <- sd(resid(grow_mod))
@@ -76,16 +76,16 @@ n_mesh_p <- 100
 carpobrotus_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det")
 
 
-## 
+##
 ## carpobrotus_ipm <-  define_kernel(
 ##   proto_ipm = carpobrotus_ipm,
 ##   name      = "P",
 ##   formula   = s * G,
 ##   ...
 ## )
-## 
+##
 
-## 
+##
 ## carpobrotus_ipm <-  define_kernel(
 ##   proto_ipm = carpobrotus_ipm,
 ##   name      = "P",
@@ -93,9 +93,9 @@ carpobrotus_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det")
 ##   family    = "CC",
 ##   ...
 ## )
-## 
+##
 
-## 
+##
 ## carpobrotus_ipm <-  define_kernel(
 ##   proto_ipm = carpobrotus_ipm,
 ##   name      = "P",
@@ -106,7 +106,7 @@ carpobrotus_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det")
 ##   s         = plogis(surv_int + surv_slo * z_1),
 ##   ...
 ## )
-## 
+##
 
 
 carpobrotus_ipm <-  define_kernel(
@@ -120,7 +120,7 @@ carpobrotus_ipm <-  define_kernel(
   data_list = all_params,
   states    = list(c("z")),
   evict_cor = TRUE,
-  evict_fun = truncated_distributions(fun    = "norm", 
+  evict_fun = truncated_distributions(fun    = "norm",
                                       target = "G")
 )
 
@@ -137,9 +137,9 @@ carpobrotus_ipm <-  define_kernel(
   data_list = all_params,
   states    = list(c("z")),
   evict_cor = TRUE,
-  evict_fun = truncated_distributions(fun    = "norm", 
+  evict_fun = truncated_distributions(fun    = "norm",
                                       target =  "r_d")
-) 
+)
 
 
 
@@ -149,22 +149,22 @@ carpobrotus_ipm <-  define_impl(
     kernel_names = c("P", "F"),
     int_rule     = rep('midpoint', 2),
     state_start    = rep('z', 2),
-    state_end      = rep('z', 2) 
-  ) 
-) 
+    state_end      = rep('z', 2)
+  )
+)
 
 
 carpobrotus_ipm <-  define_domains(
   proto_ipm = carpobrotus_ipm,
   z         = c(L, U, n_mesh_p)
-)  
+)
 
 
 
 carpobrotus_ipm <-  define_pop_state(
   proto_ipm = carpobrotus_ipm,
     n_z     = rep(1/100, n_mesh_p)
-) 
+)
 
 
 
@@ -172,7 +172,8 @@ carpobrotus_ipm <-  make_ipm(
   proto_ipm       = carpobrotus_ipm,
   iterate         = TRUE,
   iterations      = 100,
-  return_main_env = TRUE
+  return_main_env = TRUE,
+  return_sub_kernels = TRUE
 )
 
 
@@ -191,19 +192,19 @@ K <- make_iter_kernel(carpobrotus_ipm)
 
 lam_eigen <- Re(eigen(K$mega_matrix)$values[1])
 
-# If we've iterated our model enough, this should be approximately 0 (though 
+# If we've iterated our model enough, this should be approximately 0 (though
 # maybe a little off due to floating point errors).
 
 asymp_grow_rate - lam_eigen
 
 
 
-# Sub-kernels have their own print method to display the range of values 
+# Sub-kernels have their own print method to display the range of values
 # and some diagnotic information.
 
 carpobrotus_ipm$sub_kernels
 
-# Extract the time series of the population state (n_z), 
+# Extract the time series of the population state (n_z),
 # and the n_t+1/n_t values (lambda)
 
 pop_time_series    <- carpobrotus_ipm$pop_state$n_z
@@ -215,12 +216,13 @@ new_proto_ipm      <- carpobrotus_ipm$proto_ipm
 
 # The parameters setter function takes a list. It can replace single values,
 # create new values, or replace the entire parameter list, depending on how you
-# set up the right hand side of the expression. 
+# set up the right hand side of the expression.
 
 parameters(new_proto_ipm) <- list(repr_int = -0.3)
 
-new_carp_ipm <- make_ipm(new_proto_ipm, 
-                         iterations = 100)
+new_carp_ipm <- make_ipm(new_proto_ipm,
+                         iterations = 100,
+                         return_sub_kernels = TRUE)
 
 lambda(new_carp_ipm)
 
@@ -239,7 +241,7 @@ pred_par_list <- list(
   recr_pr  = recr_pr
 )
 
-predict_method_carpobrotus <- init_ipm(sim_gen = "simple", 
+predict_method_carpobrotus <- init_ipm(sim_gen = "simple",
                                        di_dd = "di",
                                        det_stoch = "det") %>%
   define_kernel(
@@ -247,10 +249,10 @@ predict_method_carpobrotus <- init_ipm(sim_gen = "simple",
     formula   = s * G,
     family    = "CC",
     G         = dnorm(z_2, mu_g, grow_sdv),
-    mu_g      = predict(grow_mod, 
+    mu_g      = predict(grow_mod,
                         newdata = data.frame(log_size = z_1),
                         type = 'response'),
-    s         = predict(surv_mod, 
+    s         = predict(surv_mod,
                         newdata = data.frame(log_size = z_1),
                         type = "response"),
     data_list = pred_par_list,
@@ -262,7 +264,7 @@ predict_method_carpobrotus <- init_ipm(sim_gen = "simple",
     name      = "F",
     formula   = recr_pr * r_s * r_d * p_f,
     family    = "CC",
-    r_s       = predict(flow_mod, 
+    r_s       = predict(flow_mod,
                         newdata = data.frame(log_size = z_1),
                         type = "response"),
     r_d       = dnorm(z_2, recr_mu, recr_sd),
@@ -279,8 +281,8 @@ predict_method_carpobrotus <- init_ipm(sim_gen = "simple",
       kernel_names = c("P", "F"),
       int_rule     = rep('midpoint', 2),
       state_start    = rep('z', 2),
-      state_end      = rep('z', 2) 
-    ) 
+      state_end      = rep('z', 2)
+    )
   ) %>%
   define_domains(
     z = c(L, U, n_mesh_p)
@@ -289,62 +291,63 @@ predict_method_carpobrotus <- init_ipm(sim_gen = "simple",
     n_z = rep(1/100, n_mesh_p)
   ) %>%
   make_ipm(iterate    = TRUE,
-           iterations = 100)
+           iterations = 100,
+           return_sub_kernels = TRUE)
 
 
 
 sens <- function(ipm_obj, d_z) {
-  
+
   w <- right_ev(ipm_obj)[[1]]
   v <- left_ev(ipm_obj)[[1]]
-  
+
   return(
     outer(v, w) / sum(v * w * d_z)
   )
-  
+
 }
 
 
 
 elas <- function(ipm_obj, d_z) {
-  
+
   K           <- make_iter_kernel(ipm_obj)$mega_matrix
-  
+
   sensitivity <- sens(ipm_obj, d_z)
-  
+
   lamb        <- lambda(ipm_obj)
-  
+
   out         <- sensitivity * (K / d_z) / lamb
-  
+
   return(out)
-  
+
 }
 
 
 
 R_nought <- function(ipm_obj) {
-  
+
   Pm <- ipm_obj$sub_kernels$P
   Fm <- ipm_obj$sub_kernels$F
-  
+
   I  <- diag(dim(Pm)[1])
-  
+
   N  <- solve(I - Pm)
-  
+
   R  <- Fm %*% N
-  
+
   return(
     Re(eigen(R)$values)[1]
   )
-  
+
 }
 
 gen_time <- function(ipm_obj) {
-  
-  lamb     <- unname(lambda(ipm_obj))  
-  
+
+  lamb     <- unname(lambda(ipm_obj))
+
   r_nought <- R_nought(ipm_obj)
-  
+
   return(log(r_nought) / log(lamb))
 }
 
@@ -369,14 +372,14 @@ tick_seq <- c(1, 20, 40, 60, 80, 100)
 
 par(mfrow = c(2, 2))
 
-# Sub-kernels - ipmr contains plot methods for sub-kernels 
+# Sub-kernels - ipmr contains plot methods for sub-kernels
 
-plot(carpobrotus_ipm$sub_kernels$P, 
+plot(carpobrotus_ipm$sub_kernels$P,
      do_contour = TRUE,
      main       = "P",
      xlab       = "size (t)",
      ylab       = "size (t + 1)",
-     yaxt       = "none", 
+     yaxt       = "none",
      xaxt       = "none")
 axis(1, at = tick_seq, labels = as.character(lab_seq))
 axis(2, at = tick_seq, labels = as.character(lab_seq))
@@ -386,7 +389,7 @@ plot(carpobrotus_ipm$sub_kernels$F,
      main       = "F",
      xlab       = "size (t)",
      ylab       = "size (t + 1)",
-     yaxt       = "none", 
+     yaxt       = "none",
      xaxt       = "none")
 axis(1, at = tick_seq, labels = as.character(lab_seq))
 axis(2, at = tick_seq, labels = as.character(lab_seq))
@@ -398,23 +401,23 @@ axis(2, at = tick_seq, labels = as.character(lab_seq))
 class(sens_mat) <- c("ipmr_matrix", class(sens_mat))
 class(elas_mat) <- c("ipmr_matrix", class(elas_mat))
 
-plot(sens_mat, 
+plot(sens_mat,
      do_contour = TRUE,
      main       = "K Sensitivity",
-     xlab       = "size (t)", 
+     xlab       = "size (t)",
      ylab       = "size (t + 1)",
-     yaxt       = "none", 
+     yaxt       = "none",
      xaxt       = "none")
 axis(1, at = tick_seq, labels = as.character(lab_seq))
 axis(2, at = tick_seq, labels = as.character(lab_seq))
 
 
-plot(elas_mat, 
+plot(elas_mat,
      do_contour = TRUE,
      main       = "K Elasticity",
-     xlab       = "size (t)", 
+     xlab       = "size (t)",
      ylab       = "size (t + 1)",
-     yaxt       = "none", 
+     yaxt       = "none",
      xaxt       = "none")
 axis(1, at = tick_seq, labels = as.character(lab_seq))
 axis(2, at = tick_seq, labels = as.character(lab_seq))
@@ -431,7 +434,7 @@ plot(K$mega_matrix,
      main       = "K",
      xlab       = "size (t)",
      ylab       = "size (t + 1)",
-     yaxt       = "none", 
+     yaxt       = "none",
      xaxt       = "none")
 axis(1, at = tick_seq, labels = as.character(lab_seq))
 axis(2, at = tick_seq, labels = as.character(lab_seq))
@@ -462,8 +465,8 @@ def_theme <- theme(
     size   = 20,
     margin = margin(
       t = 10,
-      r = 0, 
-      l = 0, 
+      r = 0,
+      l = 0,
       b = 2
     )
   ),
@@ -599,9 +602,9 @@ grid.arrange(
   p_plt,    f_plt, k_plt,
   sens_plt, elas_plt,
              layout_matrix = matrix(c(1, 1, 2, 2,
-                                      NA, 3, 3, NA, 
+                                      NA, 3, 3, NA,
                                       4, 4, 5, 5),
-                                    nrow = 3, 
+                                    nrow = 3,
                                     byrow = TRUE))
 
 

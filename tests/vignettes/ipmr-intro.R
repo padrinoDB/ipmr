@@ -178,7 +178,8 @@ my_ipm <- my_ipm %>%
 
 
 my_ipm <- make_ipm(my_ipm,
-                   iterations = 100)
+                   iterations = 100,
+                   return_sub_kernels = TRUE)
 
 lambda_ipmr <- lambda(my_ipm)
 repro_value <- left_ev(my_ipm, iterations = 200)
@@ -312,7 +313,8 @@ pred_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
   ) %>%
   define_pop_state(n_sa = runif(100)) %>%
   make_ipm(iterate = TRUE,
-           iterations = 200)
+           iterations = 200,
+           return_sub_kernels = TRUE)
 
 
 
@@ -378,7 +380,8 @@ pred_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
   ) %>%
   define_pop_state(n_sa = runif(100)) %>%
   make_ipm(iterate = TRUE,
-           iterations = 200)
+           iterations = 200,
+           return_sub_kernels = TRUE)
 
 
 
@@ -555,7 +558,8 @@ my_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
 
   define_pop_state(n_ht_site = runif(100)) %>%
   make_ipm(iterate  = TRUE,
-           iterations = 100)
+           iterations = 100,
+           return_sub_kernels = TRUE)
 
 lambda(my_ipm)
 
@@ -694,7 +698,8 @@ my_ipm <- init_ipm(sim_gen    = "simple",
   make_ipm(usr_funs   = my_funs,
            kernel_seq = sample(1:5, 100, replace = TRUE),
            iterate    = TRUE,
-           iterations = 100)
+           iterations = 100,
+           return_sub_kernels = TRUE)
 
 
 # The default for stochastic lambda is to compute mean(log(ipm$pop_state$lambda)).
@@ -843,7 +848,8 @@ param_resamp_model <- param_resamp_model %>%
   ) %>%
   make_ipm(usr_funs   = list(inv_logit  = inv_logit),
            iterate    = TRUE,
-           iterations = 10)
+           iterations = 10,
+           return_sub_kernels = TRUE)
 
 # By default, lambda computes stochastic lambda with stochastic models
 
@@ -942,7 +948,8 @@ param_resamp_model <- param_resamp_model %>%
   ) %>%
   make_ipm(usr_funs   = list(inv_logit  = inv_logit),
            iterate    = TRUE,
-           iterations = 10)
+           iterations = 10,
+           return_sub_kernels = TRUE)
 
 
 
@@ -1027,7 +1034,8 @@ param_resamp_ipm <- param_resamp_model %>%
   make_ipm(
     iterations = 100,
     usr_funs = list(env_sampler = env_sampler,
-                    inv_logit = inv_logit)
+                    inv_logit = inv_logit),
+    return_sub_kernels = TRUE
   )
 
 lambda(param_resamp_ipm)
@@ -1134,7 +1142,8 @@ obs_ipm <- init_ipm(sim_gen    = "simple",
   ) %>%
   define_pop_state(n_sa = runif(100)) %>%
   make_ipm(iterate = TRUE,
-           iterations = 100)
+           iterations = 100,
+           return_sub_kernels = TRUE)
 
 lambda_obs <- lambda(obs_ipm)
 
@@ -1188,7 +1197,8 @@ for(i in 1:50) {
 
   boot_ipm <- use_proto %>%
     make_ipm(iterate = TRUE,
-             iterations = 100)
+             iterations = 100,
+             return_sub_kernels = TRUE)
 
   all_lambdas[i] <- lambda(boot_ipm)
 

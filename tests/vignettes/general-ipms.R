@@ -191,7 +191,8 @@
    ) %>%
    make_ipm(iterations = 100,
             usr_funs = list(inv_logit   = inv_logit,
-                            inv_logit_2 = inv_logit_2))
+                            inv_logit_2 = inv_logit_2),
+            return_sub_kernels = TRUE)
 
 
  # lambda is a generic function to compute per-capita growth rates. It has a number
@@ -438,7 +439,8 @@
 
      kernel_seq = sample(1:5, size = 100, replace = TRUE),
      usr_funs = list(inv_logit   = inv_logit,
-                     inv_logit_2 = inv_logit_2)
+                     inv_logit_2 = inv_logit_2),
+     return_sub_kernels = TRUE
    )
 
 
@@ -647,7 +649,8 @@
    ) %>%
    make_ipm(usr_funs = list(inv_logit  = inv_logit),
             iterate = TRUE,
-            iterations = 100)
+            iterations = 100,
+            return_sub_kernels = TRUE)
 
 
  # in the second version, sample_env is provided in the usr_funs list of
@@ -665,7 +668,8 @@
    make_ipm(usr_funs = list(inv_logit  = inv_logit,
                             sample_env = sample_env),
             iterate = TRUE,
-            iterations = 100)
+            iterations = 100,
+            return_sub_kernels = TRUE)
 
 
 
@@ -785,7 +789,8 @@
    ) %>%
    make_ipm(iterations = 100,
             usr_funs = list(inv_logit   = inv_logit,
-                            inv_logit_2 = inv_logit_2))
+                            inv_logit_2 = inv_logit_2),
+            return_sub_kernels = TRUE)
 
 
  mega_mat <- make_iter_kernel(ipm = general_ipm,
@@ -932,7 +937,8 @@
      iterations = 10,
      kernel_seq = sample(1:5, size = 10, replace = TRUE),
      usr_funs = list(inv_logit   = inv_logit,
-                     inv_logit_2 = inv_logit_2)
+                     inv_logit_2 = inv_logit_2),
+     return_sub_kernels = TRUE
    )
 
 

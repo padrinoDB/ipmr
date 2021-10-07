@@ -141,7 +141,8 @@ all_params <- c(all_fixed_params, g_alpha_list, s_alpha_list)
      iterate    = TRUE,
      iterations = 100,
      kernel_seq = sample(2001:2006, size = 100, replace = TRUE),
-     normalize_pop_size = TRUE
+     normalize_pop_size = TRUE,
+     return_sub_kernels = TRUE
    )
 
 
@@ -367,7 +368,8 @@ all_params <- c(all_fixed_params, g_alpha_list, s_alpha_list)
    make_ipm(
      iterations         = 20,
      kernel_seq         = sample(LETTERS[1:6], 20, replace = TRUE),
-     normalize_pop_size = TRUE
+     normalize_pop_size = TRUE,
+     return_sub_kernels = TRUE
    )
 
  lambda(ex_ipm)
