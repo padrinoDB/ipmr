@@ -266,7 +266,7 @@ methods. Default is \code{FALSE}.}
 \item{return_sub_kernels}{Only applies to density dependent and parameter
 resampled models. If \code{TRUE}, then all sub-kernels will be returned. These
 are required for some analyses, but a large number of iterations will
-start to take up lots of RAM. Default is \code{FALSE}.}
+take up lots of RAM. Default is \code{FALSE}.}
 }
 \value{
 The \code{make_ipm.*} methods will always return a list of length 5

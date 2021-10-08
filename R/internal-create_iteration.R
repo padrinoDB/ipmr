@@ -86,11 +86,12 @@
       .[!duplicated(names(.))] %>%
       .[!is.na(.)]
 
+    if("drop_levels" %in% names(all_levels)) {
+      all_levels <- all_levels[names(all_levels) != "drop_levels"]
+    }
+
     all_names <- paste(names(all_levels), collapse = "_")
 
-    if("to_drop" %in% names(all_names)) {
-      all_names <- all_names[all_names != "to_drop"]
-    }
 
 
     if(grepl("_det$", class(others)[1])) {
@@ -445,11 +446,11 @@
       .[!duplicated(names(.))] %>%
       .[!is.na(.)]
 
-    all_names <- paste(names(all_levels), collapse = "_")
-
-    if("to_drop" %in% names(all_names)) {
-      all_names <- all_names[all_names != "to_drop"]
+    if("drop_levels" %in% names(all_levels)) {
+      all_levels <- all_levels[names(all_levels) != "drop_levels"]
     }
+
+    all_names <- paste(names(all_levels), collapse = "_")
 
     if(grepl("_det$", class(others)[1])) {
 

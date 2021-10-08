@@ -238,7 +238,7 @@
     if("drop_levels" %in% names(par_sets)) {
 
       to_drop <- par_sets$drop_levels
-      par_sets <- par_sets[-c("drop_levels")]
+      par_sets <- par_sets[!names(par_sets) %in% "drop_levels"]
       drop <- TRUE
 
     } else {
