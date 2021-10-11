@@ -109,8 +109,10 @@ print.proto_ipm <- function(x, ...) {
 
   }
 
+
   # Add more later -----------
 
+  cat("\n\n")
   invisible(x)
 }
 
