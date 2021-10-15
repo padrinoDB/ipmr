@@ -1930,7 +1930,8 @@ right_ev.simple_di_det_ipm <- function(ipm,
             final_it + iterations,
             ' iterations. Returning NA, please try again with more iterations.',
             sep = ""
-          )
+          ),
+          call. = FALSE
         )
 
         return(NA_real_)
@@ -1991,7 +1992,8 @@ right_ev.simple_di_det_ipm <- function(ipm,
           iterations,
           ' iterations. Returning NA, please try again with more iterations.',
           sep = ""
-        )
+        ),
+        call. = FALSE
       )
 
       return(NA_real_)
@@ -2130,7 +2132,8 @@ right_ev.general_di_det_ipm <- function(ipm,
           iterations,
           ' iterations. Returning NA, please try again with more iterations.',
           sep = ""
-        )
+        ),
+        call. = FALSE
       )
 
       return(NA_real_)
@@ -2271,7 +2274,8 @@ left_ev.simple_di_det_ipm <- function(ipm,
         iterations,
         ' iterations. Returning NA, please try again with more iterations.',
         sep = ""
-      )
+      ),
+      call. = FALSE
     )
 
     return(NA_real_)
@@ -2428,7 +2432,8 @@ left_ev.general_di_det_ipm <- function(ipm,
         iterations,
         ' iterations. Returning NA, please try again with more iterations.',
         sep = ""
-      )
+      ),
+      call. = FALSE
     )
 
     return(NA_real_)
