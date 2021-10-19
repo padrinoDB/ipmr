@@ -55,7 +55,8 @@ in length to the \code{iterations} argument of \code{make_ipm()}).
 \code{'stochastic'} returns a single value, which by default is
 \code{mean(log(lambda(ipm, type_lambda = "all")))}, with the proportion of
 \code{burn_in} iterations removed from the beginning of the simulation. Set
-\code{log} to \code{FASLE} to get the arithmetic mean for stochastic models.}
+\code{log} to \code{FALSE} to get \code{lambda} on the linear scale  for
+stochastic models (i.e. \code{exp(mean(log(lambdas)))}).}
 
 \item{log}{Return lambda on the log scale? This is \code{TRUE} by default for
 stochastic models, and \code{FALSE} for deterministic models.}

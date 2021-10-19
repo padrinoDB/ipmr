@@ -839,13 +839,15 @@ is_conv_to_asymptotic.ipmr_ipm <- function(ipm, tolerance = 1e-10) {
 
 .thin_stoch_lambda <- function(lambdas, burn_ind, log) {
 
-  if(log) lambdas <- log(lambdas)
+  lambdas <- log(lambdas)
 
   if(length(burn_ind > 0)) {
     out <- mean(lambdas[-c(burn_ind)])
   } else {
     out <- mean(lambdas)
   }
+
+  if(!log) out <- exp(out)
 
   return(out)
 }

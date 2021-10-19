@@ -1035,7 +1035,8 @@ print.ipmr_vital_rate_funs <- function(x, ...) {
 #' \code{'stochastic'} returns a single value, which by default is
 #' \code{mean(log(lambda(ipm, type_lambda = "all")))}, with the proportion of
 #' \code{burn_in} iterations removed from the beginning of the simulation. Set
-#' \code{log} to \code{FASLE} to get the arithmetic mean for stochastic models.
+#' \code{log} to \code{FALSE} to get \code{lambda} on the linear scale  for
+#' stochastic models (i.e. \code{exp(mean(log(lambdas)))}).
 #' @param ... other arguments passed to methods.
 #' @param burn_in The proportion of iterations to discard. Default is 0.1
 #' (i.e. first 10\% of iterations in the simulation).

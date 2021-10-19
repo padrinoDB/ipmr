@@ -366,7 +366,8 @@ corresponds to an observed trait distribution.</p>
 #&gt; Internally generated model iteration procedure:
 #&gt; 
 #&gt; n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, 
-#&gt;     vectr = n_dbh_t)</div><div class='input'>
+#&gt;     vectr = n_dbh_t)
+#&gt; </div><div class='input'>
 <span class='co'># define_pop_state with a state variable named "z". Note that "n_" is prefixed</span>
 <span class='co'># to denote that it is a population state function!</span>
 
@@ -406,7 +407,8 @@ corresponds to an observed trait distribution.</p>
 #&gt; Internally generated model iteration procedure:
 #&gt; 
 #&gt; n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, 
-#&gt;     vectr = n_dbh_t)</div><div class='input'>
+#&gt;     vectr = n_dbh_t)
+#&gt; </div><div class='input'>
 <span class='co'># alternative, we can make a list before starting to make the IPM</span>
 
 <span class='va'>pop_vecs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>n_z <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
@@ -447,7 +449,8 @@ corresponds to an observed trait distribution.</p>
 #&gt; Internally generated model iteration procedure:
 #&gt; 
 #&gt; n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, 
-#&gt;     vectr = n_dbh_t)</div><div class='input'>
+#&gt;     vectr = n_dbh_t)
+#&gt; </div><div class='input'>
 <span class='co'># define_env_state. Generates a random draw from a known distribution</span>
 <span class='co'># of temperatures.</span>
 
@@ -503,7 +506,8 @@ corresponds to an observed trait distribution.</p>
 #&gt; Internally generated model iteration procedure:
 #&gt; 
 #&gt; n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, 
-#&gt;     vectr = n_dbh_t)</div><div class='input'>
+#&gt;     vectr = n_dbh_t)
+#&gt; </div><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>iceplant_ex</span><span class='op'>)</span>
 
 <span class='va'>z</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>iceplant_ex</span><span class='op'>$</span><span class='va'>log_size</span>, <span class='va'>iceplant_ex</span><span class='op'>$</span><span class='va'>log_size_next</span><span class='op'>)</span>
