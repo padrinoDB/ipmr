@@ -1,12 +1,24 @@
 # ipmr 0.0.5
 
+Contains some tweaks and a number of bug fixes. The latter are mostly related to PADRINO models, and shouldn't have *too much* of an effect on existing user-specified IPMs.
+
 ## Features 
 
 - Adds `return_sub_kernels` argument to `make_ipm()` for `*_stoch_param` and all density dependent methods. This is due to the large RAM footprint that these objects can occupy, particularly for long running models. The default is `FALSE`, which will save considerable memory space. Can be set to `TRUE` for downstream analyses that require sub-kernels/iteration kernels. 
 
+- Prettier printing method for PADRINO objects/lists of user-specified models.
+
+- Prettier warnings for `left/right_ev()` 
+
+- Depending on your view, this may be a bug fix: updates the `log` argument in `lambda()` so that it only changes the scale, NOT the calculation method. The prior behavior was documented, but unlikely to be intuitive, and so caused some confusion. Thanks to @aariq for pointing this out. 
+
 ## Bug fixes 
 
  - Fixes bug in normalization of left/right eigenvectors in simple density independent stochastic models. (thanks to @aariq)
+ 
+ - Fixes bug where `"drop_levels"` was not recognized in some parameter set indexed models.
+ 
+ - Fixes bug where parameter set levels were recycled in some cases. 
 
 # ipmr 0.0.4
 
