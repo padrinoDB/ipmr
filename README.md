@@ -7,7 +7,7 @@ maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www
 [![CRAN
 status](https://www.r-pkg.org/badges/version/ipmr)](https://cran.r-project.org/package=ipmr)
 [![Codecov test
-coverage](https://codecov.io/gh/levisc8/ipmr/branch/master/graph/badge.svg)](https://codecov.io/gh/levisc8/ipmr?branch=master)
+coverage](https://codecov.io/gh/levisc8/ipmr/branch/main/graph/badge.svg)](https://codecov.io/gh/levisc8/ipmr?branch=main)
 [![CRAN
 Downloads](https://cranlogs.r-pkg.org/badges/ipmr)](https://cran.r-project.org/package=ipmr)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5076190.svg)](https://doi.org/10.5281/zenodo.5076190)
