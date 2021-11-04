@@ -1,5 +1,23 @@
+#' @importFrom utils packageDescription
+
 .onAttach <- function(libname = find.package("ipmr"), pkgname = "ipmr") {
 
-  # packageStartupMessage("Welcome to ipmr! browseVignettes('ipmr') to get started.")
+  # Warn development users that package will soon be migrating to padrinoDB
+
+  desc <- utils::packageDescription("ipmr")
+
+  if(!is.null(desc$RemoteType)) {
+
+    if(desc$remoteType == "github" && desc$GithubUsername == "levisc8")
+
+    packageStartupMessage(
+      "It looks like you've installed the development vesrion of ipmr from the",
+      " repository 'levisc8/ipmr'.\n",
+      "ipmr will soon be moving to the padrinoDB Github organization.\n",
+      "In the future, you will need to install the development",
+      " version from there.\nremotes::install_github('padrinoDB/ipmr')"
+    )
+
+  }
 
 }
