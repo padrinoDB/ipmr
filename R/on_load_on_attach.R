@@ -8,7 +8,7 @@
 
   if(!is.null(desc$RemoteType)) {
 
-    if(desc$remoteType == "github" && desc$GithubUsername == "levisc8")
+    if(isTRUE(desc$RemoteType == "github" && desc$GithubUsername == "levisc8"))
 
     packageStartupMessage(
       "It looks like you've installed the development vesrion of ipmr from the",
