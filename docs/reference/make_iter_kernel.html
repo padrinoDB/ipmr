@@ -213,9 +213,9 @@ to code with a complete iteration kernel. This handles constructing those for
 simple and general models of all forms. <code>format_mega_kernel</code> is used
 internally by <code>make_iter_kernel</code> for general IPMs. The difference
 between these two functions is that <code>make_iter_kernel</code> always returns
-a list of objects with <code><a href='https://rdrr.io/r/base/c.html'>c(ipmr_matrix, array, matrix)</a></code> classes,
+a list of objects with <code>c(ipmr_matrix, array, matrix)</code> classes,
 whereas <code>format_mega_kernel</code> always returns a list of objects with
-<code><a href='https://rdrr.io/r/base/c.html'>c(array, matrix)</a></code> classes. The former has <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot()</a></code> methods while
+<code>c(array, matrix)</code> classes. The former has <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot()</a></code> methods while
 the latter does not.</p>
 <p><code>I</code> and <code>0</code> represent identity matrices and 0 matrices,
 respectively. They can be used to fill in blocks that represent either, without
@@ -229,30 +229,30 @@ model, the indices should be attached to the <code>name_ps, f_forms</code> in th
 function arguments, and the correct block matrices will be generated internally.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gen_di_det_ex</span><span class='op'>)</span>
-
-<span class='va'>big_k</span> <span class='op'>&lt;-</span> <span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>,
-                            mega_mat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='va'>go_discrete</span>,
-                                         <span class='va'>leave_discrete</span>, <span class='va'>P</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='va'>char_call</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='st'>"go_discrete"</span>, <span class='st'>"leave_discrete"</span>, <span class='st'>"P"</span><span class='op'>)</span>
-
-<span class='va'>big_k_c</span> <span class='op'>&lt;-</span> <span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>, mega_mat <span class='op'>=</span> <span class='va'>char_call</span><span class='op'>)</span>
-
-<span class='co'># Now, with an Identity matrix instead of a 0</span>
-
-<span class='va'>big_k</span> <span class='op'>&lt;-</span> <span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>,
-                            mega_mat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>I</span>, <span class='va'>go_discrete</span>,
-                                         <span class='va'>leave_discrete</span>, <span class='va'>P</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='co'># For simple IPMs with no grouping effects, this computes the sum of</span>
-<span class='co'># the sub-kernels (i.e. K = P + F)</span>
-
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sim_di_det_ex</span><span class='op'>)</span>
-
-<span class='va'>simple_k</span> <span class='op'>&lt;-</span> <span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>sim_di_det_ex</span><span class='op'>)</span>
-
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gen_di_det_ex</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>big_k</span> <span class='op'>&lt;-</span> <span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>,</span>
+<span class='r-in'>                            mega_mat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='va'>go_discrete</span>,</span>
+<span class='r-in'>                                         <span class='va'>leave_discrete</span>, <span class='va'>P</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>char_call</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='st'>"go_discrete"</span>, <span class='st'>"leave_discrete"</span>, <span class='st'>"P"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>big_k_c</span> <span class='op'>&lt;-</span> <span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>, mega_mat <span class='op'>=</span> <span class='va'>char_call</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Now, with an Identity matrix instead of a 0</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>big_k</span> <span class='op'>&lt;-</span> <span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>,</span>
+<span class='r-in'>                            mega_mat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>I</span>, <span class='va'>go_discrete</span>,</span>
+<span class='r-in'>                                         <span class='va'>leave_discrete</span>, <span class='va'>P</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># For simple IPMs with no grouping effects, this computes the sum of</span></span>
+<span class='r-in'><span class='co'># the sub-kernels (i.e. K = P + F)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sim_di_det_ex</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>simple_k</span> <span class='op'>&lt;-</span> <span class='fu'>make_iter_kernel</span><span class='op'>(</span><span class='va'>sim_di_det_ex</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

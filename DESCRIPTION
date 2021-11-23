@@ -45,6 +45,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: 
+    covr,
     knitr,
     lme4,
     mvtnorm,
@@ -52,7 +53,7 @@ Suggests:
     roxygen2,
     spelling,
     testthat,
-    covr
+    tools
 VignetteBuilder: knitr
 Language: en-US
 Imports:

@@ -156,7 +156,7 @@
 <li>
 <p>Survival (<code>s_age</code>/<span class="math inline">\(s(z,a)\)</span>): A logistic regression with size and age as fixed effects.</p>
 <ul>
-<li><p>Example code: <code><a href="https://rdrr.io/r/stats/glm.html">glm(surv ~ size + age, data = survival_data, family = binomial())</a></code></p></li>
+<li><p>Example code: <code>glm(surv ~ size + age, data = survival_data, family = binomial())</code></p></li>
 <li><p>Mathematical form: <span class="math inline">\(Logit(s(z,a)) = \alpha_s + \beta_s^z * z + \beta_s^a *age\)</span></p></li>
 </ul>
 </li>
@@ -176,21 +176,21 @@
 <li>
 <p>Probability of reproduction (<code>pb_age</code>/<span class="math inline">\(p_b(z,a)\)</span>): A logistic regression with size and age as fixed effects.</p>
 <ul>
-<li><p>Example code: <code><a href="https://rdrr.io/r/stats/glm.html">glm(repr ~ size + age, data = repr_data, family = binomial())</a></code></p></li>
+<li><p>Example code: <code>glm(repr ~ size + age, data = repr_data, family = binomial())</code></p></li>
 <li><p>Mathematical form: <span class="math inline">\(Logit(p_b(z,a)) = \alpha_{p_b} + \beta_{p_b}^z * z + \beta_{p_b}^a * age)\)</span></p></li>
 </ul>
 </li>
 <li>
 <p>Probability of recruitment (<code>pr_age</code>/<span class="math inline">\(p_r(a)\)</span>): A logistic regression with age as a fixed effect.</p>
 <ul>
-<li><p>Example code: <code><a href="https://rdrr.io/r/stats/glm.html">glm(recr ~ age, data = recr_data, family = binomial())</a></code></p></li>
+<li><p>Example code: <code>glm(recr ~ age, data = recr_data, family = binomial())</code></p></li>
 <li><p>Mathematical form: <span class="math inline">\(Logit(p_r(a)) = \alpha_{p_r} + \beta_{p_r}^a * age\)</span></p></li>
 </ul>
 </li>
 <li>
 <p>Recruit size distribution (<code>rcsz</code>/<span class="math inline">\(C_d(z',z)\)</span>): A linear model with parent size as a fixed effect. <span class="math inline">\(f_{C_d}\)</span> denotes a normal probability density function.</p>
 <ul>
-<li><p>Example code: <code><a href="https://rdrr.io/r/stats/lm.html">lm(rcsz ~ size, data = rcsz_data)</a></code></p></li>
+<li><p>Example code: <code>lm(rcsz ~ size, data = rcsz_data)</code></p></li>
 <li>
 <p>Mathematical form:</p>
 <ul>
@@ -246,7 +246,7 @@
 <code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"general"</span>,
                          di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
                          det_stoch  <span class="op">=</span> <span class="st">"det"</span>,
-                         uses_age    <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span>
+                         uses_age    <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"P_age"</span>,
     family        <span class="op">=</span> <span class="st">"CC"</span>,
@@ -287,7 +287,7 @@
 <p>The <code>"F_age"</code> kernel has a custom function in the <code>formula</code> slot that allows us to always set fecundity for age-0 individuals to 0. We also add <code>_age</code> suffixes and <code>age</code> terms to the appropriate equations.</p>
 <p>Our call to <code><a href="../reference/define_impl.html">define_impl()</a></code> will look a little different. In examples in the other vignettes using the index syntax, we never added indices to <code>state_start</code>/<code>state_end</code>. However, we need to append them here. This is because we have to make sure that our <code>P_age</code> kernels produce <code>wt_age</code> individuals, whereas our <code>F_age</code> kernels must produce <code>wt_0</code> individuals (i.e. only age-0 lambs). We do this using the <code>state_start</code> and <code>state_end</code> arguments.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="va">age_size_ipm</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="va">age_size_ipm</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
       kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P_age"</span>, <span class="st">"F_age"</span><span class="op">)</span>,
@@ -304,13 +304,13 @@
 <li><p><code><a href="../reference/make_ipm.html">make_ipm()</a></code> is exactly the same.</p></li>
 </ol>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="va">age_size_ipm</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="va">age_size_ipm</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_impl.html">define_domains</a></span><span class="op">(</span>
     wt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1.6</span>, <span class="fl">3.7</span>, <span class="fl">100</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_impl.html">define_pop_state</a></span><span class="op">(</span>
     n_wt_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>
     usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>inv_logit <span class="op">=</span> <span class="va">inv_logit</span>,
                     f_fun     <span class="op">=</span> <span class="va">f_fun</span><span class="op">)</span>,

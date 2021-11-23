@@ -341,7 +341,7 @@ r = exp(r_int + r_int_<strong>yr</strong> + (r_slope + r_slope_<strong>yr</stron
 <code class="sourceCode R"><span class="va">ex_ipm</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"simple"</span>,
                   di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
                   det_stoch  <span class="op">=</span> <span class="st">"stoch"</span>,
-                  kern_param <span class="op">=</span> <span class="st">"kern"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+                  kern_param <span class="op">=</span> <span class="st">"kern"</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     
     <span class="co"># The _yr index is appended as a suffix with an underscore. Notice how the formula</span>
@@ -376,7 +376,7 @@ r = exp(r_int + r_int_<strong>yr</strong> + (r_slope + r_slope_<strong>yr</stron
     par_set_indices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>yr <span class="op">=</span> <span class="fl">2001</span><span class="op">:</span><span class="fl">2006</span><span class="op">)</span>,
     evict_cor        <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"g_yr"</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   
   <span class="co"># This kernel doesn't get anything special because there are no</span>
   <span class="co"># time-varying parameter values.</span>
@@ -394,7 +394,7 @@ r = exp(r_int + r_int_<strong>yr</strong> + (r_slope + r_slope_<strong>yr</stron
     uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"r_d"</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
       kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P_yr"</span>, <span class="st">"F"</span><span class="op">)</span>,
@@ -402,13 +402,13 @@ r = exp(r_int + r_int_<strong>yr</strong> + (r_slope + r_slope_<strong>yr</stron
       state_start    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="fl">2</span><span class="op">)</span>,
       state_end      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="fl">2</span><span class="op">)</span>
     <span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_impl.html">define_domains</a></span><span class="op">(</span>
     z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_impl.html">define_pop_state</a></span><span class="op">(</span>
     n_z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>
     iterate    <span class="op">=</span> <span class="cn">TRUE</span>,
     iterations <span class="op">=</span> <span class="fl">100</span>,
@@ -442,7 +442,7 @@ n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n
 <li>
 <p><span class="math inline">\(Logit(s^{site}(z, \theta)) = (\alpha_s + \alpha_{s}^{site}) + \beta_s^{z} * z + \beta_s^{t} * \theta^{t} + \beta_s^{p} * \theta^{p}\)</span></p>
 <ul>
-<li>example R code: <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html">glmer(survival ~ size + temp + precip + (1 | site), data = my_surv_data, family = binomial())</a></code>
+<li>example R code: <code>glmer(survival ~ size + temp + precip + (1 | site), data = my_surv_data, family = binomial())</code>
 </li>
 </ul>
 </li>
@@ -450,28 +450,28 @@ n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n
 <li>
 <p><span class="math inline">\(\mu_G^{site}(z, \theta) = (\alpha_G + \alpha_G^{site}) + \beta_G^{z} * z + \beta_G^{t} * \theta^{t} + \beta_G^{p} * \theta^{p}\)</span></p>
 <ul>
-<li>example R code: <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html">lmer(size_next ~ size + temp + precip + (1 | site), data = my_grow_data)</a></code>
+<li>example R code: <code>lmer(size_next ~ size + temp + precip + (1 | site), data = my_grow_data)</code>
 </li>
 </ul>
 </li>
 <li><p><span class="math inline">\(Logit(c_{p}^{site}(z, \theta)) = (\alpha_{c_p} + \alpha_{c_p}^{site}) + \beta_{c_p}^{z} * z + \beta_{c_p}^{t} * \theta^{t} + \beta_{c_p}^{p} * \theta^{p}\)</span></p></li>
 </ol>
 <ul>
-<li>example R code: <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html">glmer(repro ~ size + temp + precip + (1 | site), data = my_repro_data, family = binomial())</a></code>
+<li>example R code: <code>glmer(repro ~ size + temp + precip + (1 | site), data = my_repro_data, family = binomial())</code>
 </li>
 </ul>
 <ol start="12" style="list-style-type: decimal">
 <li>
 <p><span class="math inline">\(log(c_{r}^{site}(z, \theta)) = (\alpha_{c_r} + \alpha_{c_r}^{site}) + \beta_{c_r}^{z} * z + \beta_{c_r}^{t} * \theta_{t} + \beta_{c_r}^{p} * \theta_{p}\)</span></p>
 <ul>
-<li>example R code: <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html">glmer(flower_n ~ size + temp + precip + (1 | site), data = my_flower_data, family = poisson())</a></code>
+<li>example R code: <code>glmer(flower_n ~ size + temp + precip + (1 | site), data = my_flower_data, family = poisson())</code>
 </li>
 </ul>
 </li>
 <li>
 <p><span class="math inline">\(c_d(z') = f_{c_d}(z', \mu_{c_d}, \sigma_{c_d})\)</span></p>
 <ul>
-<li>example R code: <code><a href="https://rdrr.io/r/base/mean.html">mean(my_recr_data$size_next); sd(my_recr_data$size_next)</a></code>
+<li>example R code: <code>mean(my_recr_data$size_next); sd(my_recr_data$size_next)</code>
 </li>
 </ul>
 </li>
@@ -512,26 +512,26 @@ n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n
   beta_c_r_temp <span class="op">=</span> <span class="fl">0.9</span>
 <span class="op">)</span>
 
-<span class="va">g_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">6</span>, mean <span class="op">=</span> <span class="fl">4.5</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">g_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">6</span>, mean <span class="op">=</span> <span class="fl">4.5</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span>
     <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'alpha_g_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
   <span class="op">)</span>
 
-<span class="va">s_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">6</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">7</span>, sd <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">s_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">6</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">7</span>, sd <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span>
     <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'alpha_s_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
   <span class="op">)</span>
 
-<span class="va">c_p_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">6</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>  <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">c_p_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">6</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>  <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span>
     <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'alpha_c_p_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
   <span class="op">)</span>
 
-<span class="va">c_r_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">0.01</span>, <span class="fl">0.1</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">c_r_alphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">0.01</span>, <span class="fl">0.1</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span>
     <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">'alpha_c_r_'</span>, <span class="va">sites</span>, sep <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
   <span class="op">)</span>
@@ -578,7 +578,7 @@ n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n
 <code class="sourceCode R"><span class="va">ex_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"general"</span>,
                    di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
                    det_stoch  <span class="op">=</span> <span class="st">"stoch"</span>,
-                   kern_param <span class="op">=</span> <span class="st">"param"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+                   kern_param <span class="op">=</span> <span class="st">"param"</span><span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     
     name <span class="op">=</span> <span class="st">"P_site"</span>,
@@ -604,7 +604,7 @@ n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n
     par_set_indices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>site <span class="op">=</span> <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span>,
     evict_cor        <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"g_site"</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name             <span class="op">=</span> <span class="st">"F_site"</span>,
     family           <span class="op">=</span> <span class="st">"CC"</span>,
@@ -625,7 +625,7 @@ n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n
     par_set_indices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>site <span class="op">=</span> <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span>,
     evict_cor        <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun        <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"c_d"</span><span class="op">)</span>
-    <span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name             <span class="op">=</span> <span class="st">"go_sb_1_site"</span>,
     family           <span class="op">=</span> <span class="st">"CD"</span>,
@@ -644,7 +644,7 @@ n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n
     uses_par_sets    <span class="op">=</span> <span class="cn">TRUE</span>,
     par_set_indices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>site <span class="op">=</span> <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span>,
     evict_cor        <span class="op">=</span> <span class="cn">FALSE</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"go_sb_2"</span>,
     family        <span class="op">=</span> <span class="st">"DD"</span>,
@@ -653,7 +653,7 @@ n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"sb1"</span>, <span class="st">"sb2"</span><span class="op">)</span><span class="op">)</span>,
     uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">FALSE</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"leave_sb_1"</span>,
     family        <span class="op">=</span> <span class="st">"DC"</span>,
@@ -664,7 +664,7 @@ n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n
     uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"c_d"</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"leave_sb_2"</span>,
     family        <span class="op">=</span> <span class="st">"DC"</span>,
@@ -675,7 +675,7 @@ n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n
     uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
     evict_cor     <span class="op">=</span> <span class="cn">TRUE</span>,
     evict_fun     <span class="op">=</span> <span class="fu"><a href="../reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="st">"c_d"</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_impl.html">define_impl</a></span><span class="op">(</span>
     <span class="fu"><a href="../reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
       kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P_site"</span>,
@@ -688,20 +688,20 @@ n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n
       state_start    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="st">"z"</span>, <span class="st">"z"</span>, <span class="st">"sb1"</span>, <span class="st">"sb1"</span>, <span class="st">"sb2"</span><span class="op">)</span>,
       state_end      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="st">"z"</span>, <span class="st">"sb1"</span>, <span class="st">"sb2"</span>, <span class="st">"z"</span>, <span class="st">"z"</span><span class="op">)</span>
     <span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_impl.html">define_domains</a></span><span class="op">(</span>
     z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">100</span>, <span class="fl">200</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_impl.html">define_pop_state</a></span><span class="op">(</span>
     n_z   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>,
     n_sb1 <span class="op">=</span> <span class="fl">20</span>,
     n_sb2 <span class="op">=</span> <span class="fl">20</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/define_impl.html">define_env_state</a></span><span class="op">(</span>
     env_state <span class="op">=</span> <span class="fu">sample_fun</span><span class="op">(</span><span class="va">env_params</span><span class="op">)</span>,
     data_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>env_params <span class="op">=</span> <span class="va">env_params</span>,
                      sample_fun <span class="op">=</span> <span class="va">sample_fun</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op">%&gt;%</span>  
+  <span class="op">)</span> <span class="op"><a href="../reference/%&gt;%.html">%&gt;%</a></span>  
   <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>
     iterations         <span class="op">=</span> <span class="fl">20</span>,
     kernel_seq         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span>, <span class="fl">20</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,

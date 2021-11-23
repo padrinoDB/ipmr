@@ -182,20 +182,20 @@ on the left side, and a threshold value on the right side.</p></td>
 sizes at each requested time step. Names are taken from <code>...</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gen_di_det_ex</span><span class='op'>)</span>
-
-<span class='co'># Rebuild the model and return_main_env this time</span>
-
-<span class='va'>gen_di_det_ex</span> <span class='op'>&lt;-</span> <span class='va'>gen_di_det_ex</span><span class='op'>$</span><span class='va'>proto_ipm</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='make_ipm.html'>make_ipm</a></span><span class='op'>(</span>iterate <span class='op'>=</span> <span class='cn'>TRUE</span>, iterations <span class='op'>=</span> <span class='fl'>50</span>, return_main_env <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-
-<span class='va'>disc_sizes</span> <span class='op'>&lt;-</span> <span class='fu'>collapse_pop_state</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>,
-                                 time_step <span class='op'>=</span> <span class='fl'>20</span><span class='op'>:</span><span class='fl'>25</span>,
-                                 seedlings <span class='op'>=</span> <span class='va'>ht</span> <span class='op'>&lt;=</span> <span class='fl'>10</span>,
-                                 NRA <span class='op'>=</span> <span class='va'>ht</span> <span class='op'>&gt;</span> <span class='fl'>10</span> <span class='op'>&amp;</span> <span class='va'>ht</span> <span class='op'>&lt;=</span> <span class='fl'>200</span>,
-                                 RA <span class='op'>=</span> <span class='va'>ht</span> <span class='op'>&gt;</span> <span class='fl'>200</span><span class='op'>)</span>
-
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gen_di_det_ex</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Rebuild the model and return_main_env this time</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>gen_di_det_ex</span> <span class='op'>&lt;-</span> <span class='va'>gen_di_det_ex</span><span class='op'>$</span><span class='va'>proto_ipm</span> <span class='op'><a href='%>%.html'>%&gt;%</a></span></span>
+<span class='r-in'>  <span class='fu'><a href='make_ipm.html'>make_ipm</a></span><span class='op'>(</span>iterate <span class='op'>=</span> <span class='cn'>TRUE</span>, iterations <span class='op'>=</span> <span class='fl'>50</span>, return_main_env <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>disc_sizes</span> <span class='op'>&lt;-</span> <span class='fu'>collapse_pop_state</span><span class='op'>(</span><span class='va'>gen_di_det_ex</span>,</span>
+<span class='r-in'>                                 time_step <span class='op'>=</span> <span class='fl'>20</span><span class='op'>:</span><span class='fl'>25</span>,</span>
+<span class='r-in'>                                 seedlings <span class='op'>=</span> <span class='va'>ht</span> <span class='op'>&lt;=</span> <span class='fl'>10</span>,</span>
+<span class='r-in'>                                 NRA <span class='op'>=</span> <span class='va'>ht</span> <span class='op'>&gt;</span> <span class='fl'>10</span> <span class='op'>&amp;</span> <span class='va'>ht</span> <span class='op'>&lt;=</span> <span class='fl'>200</span>,</span>
+<span class='r-in'>                                 RA <span class='op'>=</span> <span class='va'>ht</span> <span class='op'>&gt;</span> <span class='fl'>200</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

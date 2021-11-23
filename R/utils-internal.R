@@ -531,8 +531,10 @@ f_env <- rlang::child_env(
 
   # Other math functions
   sqrt = .unary_op("sqrt(", ")"),
-  sin =  .unary_op("sin(", ")"),
-  log =  .unary_op("log(", ")"),
-  abs =  .unary_op("abs(", ")")
+  sin  = .unary_op("sin(", ")"),
+  cos  = .unary_op("cos(", ")"),
+  tan  = .unary_op("tan(", ")"),
+  log  = .unary_op("log(", ")"),
+  abs  = .unary_op("abs(", ")")
 )
 

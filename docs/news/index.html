@@ -178,11 +178,11 @@
 <li><p>Adds <code>log</code> argument to <code>lambda</code> so users can choose which scale to return. The default is <code>TRUE</code> for stochastic models and <code>FALSE</code> for deterministic models.</p></li>
 <li><p>Allows named expressions in <code><a href="../reference/define_impl.html">define_env_state()</a></code> such that the names of the expressions may be used in <code><a href="../reference/define_kernel.html">define_kernel()</a></code>. Before, the name of the expression didn’t matter, only the names of the outputted list. Now, this will also work as well.</p></li>
 </ul>
-<pre><code><a href="../reference/define_impl.html">define_env_state(proto_ipm, 
+<pre><code>define_env_state(proto_ipm, 
                  temp = rnorm(1, 20, 3), 
                  precip = rgamma(1, 400, 2),
                  data_list = list())
-</a></code></pre>
+</code></pre>
 <ul>
 <li><p>More unit tests for parameter resampled models.</p></li>
 <li><p>Removed innocuous warning messages. Added warnings for <code>NA</code> values in a few <code>define_*</code> functions and errors when they’re produced in sub-kernels.</p></li>

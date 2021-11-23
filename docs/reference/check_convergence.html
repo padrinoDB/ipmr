@@ -152,7 +152,7 @@ lambda (or log(lambda)." />
 visually. <code>is_conv_to_asymptotic</code> checks whether
 <code>lambda[iterations - 1]</code> equals <code>lambda[iterations]</code> within the
 specified tolerance, <code>tolerance</code>. <code>conv_plot</code> plots the time series of
-<code>lambda</code> (or <code><a href='https://rdrr.io/r/base/Log.html'>log(lambda)</a></code>.</p>
+<code>lambda</code> (or <code>log(lambda)</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>is_conv_to_asymptotic</span><span class='op'>(</span><span class='va'>ipm</span>, <span class='va'>tolerance</span><span class='op'>)</span>
@@ -203,19 +203,21 @@ population stability at <code>lambda = 1</code>.</p></td>
 to <code>...</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gen_di_det_ex</span><span class='op'>)</span>
-
-<span class='va'>proto</span> <span class='op'>&lt;-</span> <span class='va'>gen_di_det_ex</span><span class='op'>$</span><span class='va'>proto_ipm</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='define_impl.html'>define_pop_state</a></span><span class='op'>(</span>n_ht <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>200</span><span class='op'>)</span>,
-                   n_b  <span class='op'>=</span> <span class='fl'>200000</span><span class='op'>)</span>
-
-<span class='va'>ipm</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_ipm.html'>make_ipm</a></span><span class='op'>(</span><span class='va'>proto</span><span class='op'>)</span>
-
-<span class='fu'>is_conv_to_asymptotic</span><span class='op'>(</span><span class='va'>ipm</span>, tol <span class='op'>=</span> <span class='fl'>1e-5</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; lambda 
-#&gt;   TRUE </div><div class='input'><span class='fu'>conv_plot</span><span class='op'>(</span><span class='va'>ipm</span><span class='op'>)</span>
-</div><div class='img'><img src='check_convergence-1.png' alt='' width='700' height='433' /></div><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>gen_di_det_ex</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>proto</span> <span class='op'>&lt;-</span> <span class='va'>gen_di_det_ex</span><span class='op'>$</span><span class='va'>proto_ipm</span> <span class='op'><a href='%>%.html'>%&gt;%</a></span></span>
+<span class='r-in'>  <span class='fu'><a href='define_impl.html'>define_pop_state</a></span><span class='op'>(</span>n_ht <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>200</span><span class='op'>)</span>,</span>
+<span class='r-in'>                   n_b  <span class='op'>=</span> <span class='fl'>200000</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>ipm</span> <span class='op'>&lt;-</span> <span class='fu'><a href='make_ipm.html'>make_ipm</a></span><span class='op'>(</span><span class='va'>proto</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>is_conv_to_asymptotic</span><span class='op'>(</span><span class='va'>ipm</span>, tol <span class='op'>=</span> <span class='fl'>1e-5</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> lambda </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   TRUE </span>
+<span class='r-in'><span class='fu'>conv_plot</span><span class='op'>(</span><span class='va'>ipm</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='check_convergence-1.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

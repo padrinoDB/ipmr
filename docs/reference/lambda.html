@@ -208,10 +208,10 @@ returns a vector of lambda values for each time step of the simulation (equal
 in length to the <code>iterations</code> argument of <code><a href='make_ipm.html'>make_ipm()</a></code>).
 <code>'last'</code> returns the lambda value for the final timestep.
 <code>'stochastic'</code> returns a single value, which by default is
-<code><a href='https://rdrr.io/r/base/mean.html'>mean(log(lambda(ipm, type_lambda = "all")))</a></code>, with the proportion of
+<code>mean(log(lambda(ipm, type_lambda = "all")))</code>, with the proportion of
 <code>burn_in</code> iterations removed from the beginning of the simulation. Set
 <code>log</code> to <code>FALSE</code> to get <code>lambda</code> on the linear scale  for
-stochastic models (i.e. <code><a href='https://rdrr.io/r/base/Log.html'>exp(mean(log(lambdas)))</a></code>).</p></td>
+stochastic models (i.e. <code>exp(mean(log(lambdas)))</code>).</p></td>
     </tr>
     <tr>
       <th>log</th>

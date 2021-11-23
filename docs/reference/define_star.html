@@ -300,224 +300,228 @@ This is helpful for creating an initial population state vector that
 corresponds to an observed trait distribution.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'># Example with kernels named "P" and "F", and a domain "z"</span>
-
-<span class='va'>kernel_impl_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>P <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>,
-                                  state_start <span class='op'>=</span> <span class='st'>"z"</span>,
-                                  state_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span>,
-                         F <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>,
-                                  state_start <span class='op'>=</span> <span class='st'>"z"</span>,
-                                  state_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='co'># an equivalent version using make_impl_args_list</span>
-
-<span class='va'>kernel_impl_list</span> <span class='op'>&lt;-</span> <span class='fu'>make_impl_args_list</span><span class='op'>(</span>
-     kernel_names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"P"</span>, <span class='st'>"F"</span><span class='op'>)</span>,
-     int_rule     <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"midpoint"</span>, <span class='st'>"midpoint"</span><span class='op'>)</span>,
-     state_start  <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"z"</span>, <span class='st'>"z"</span><span class='op'>)</span>,
-     state_end    <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"z"</span>, <span class='st'>"z"</span><span class='op'>)</span>
-<span class='op'>)</span>
-
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sim_di_det_ex</span><span class='op'>)</span>
-
-<span class='va'>proto_ipm</span> <span class='op'>&lt;-</span> <span class='va'>sim_di_det_ex</span><span class='op'>$</span><span class='va'>proto_ipm</span>
-
-<span class='co'># define_domains</span>
-
-<span class='va'>lower_bound</span> <span class='op'>&lt;-</span> <span class='fl'>1</span>
-<span class='va'>upper_bound</span> <span class='op'>&lt;-</span> <span class='fl'>100</span>
-<span class='va'>n_meshpoints</span> <span class='op'>&lt;-</span> <span class='fl'>50</span>
-
-
-<span class='fu'>define_domains</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>lower_bound</span>, <span class='va'>upper_bound</span>, <span class='va'>n_meshpoints</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; A simple, density independent, deterministic proto_ipm with 2 kernels defined:
-#&gt;  P, F 
-#&gt; 
-#&gt; Kernel formulae:
-#&gt; 
-#&gt; P: s * g
-#&gt; F: f_r * f_s * f_d
-#&gt; 
-#&gt; Vital rates:
-#&gt; 
-#&gt; s: inv_logit(s_int, s_slope, dbh_1)
-#&gt; g: dnorm(dbh_2, mu_g, sd_g)
-#&gt; mu_g: g_int + g_slope * dbh_1
-#&gt; f_r: inv_logit(f_r_int, f_r_slope, dbh_1)
-#&gt; f_s: exp(f_s_int + f_s_slope * dbh_1)
-#&gt; f_d: dnorm(dbh_2, mu_fd, sd_fd)
-#&gt; 
-#&gt; Parameter names:
-#&gt; 
-#&gt;  [1] "s_int"     "s_slope"   "g_int"     "g_slope"   "sd_g"      "f_r_int"  
-#&gt;  [7] "f_r_slope" "f_s_int"   "f_s_slope" "mu_fd"     "sd_fd"    
-#&gt; 
-#&gt; All parameters in vital rate expressions found in 'data_list':  TRUE
-#&gt; 
-#&gt; Domains for state variables:
-#&gt; 
-#&gt; dbh: lower_bound = 1, upper_bound = 100, n_meshpoints = 50
-#&gt; 
-#&gt; Population states defined:
-#&gt; 
-#&gt; n_dbh: runif(100)
-#&gt; 
-#&gt; Internally generated model iteration procedure:
-#&gt; 
-#&gt; n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, 
-#&gt;     vectr = n_dbh_t)
-#&gt; </div><div class='input'>
-<span class='co'># define_pop_state with a state variable named "z". Note that "n_" is prefixed</span>
-<span class='co'># to denote that it is a population state function!</span>
-
-<span class='fu'>define_pop_state</span><span class='op'>(</span><span class='va'>proto_ipm</span>, n_z <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; A simple, density independent, deterministic proto_ipm with 2 kernels defined:
-#&gt;  P, F 
-#&gt; 
-#&gt; Kernel formulae:
-#&gt; 
-#&gt; P: s * g
-#&gt; F: f_r * f_s * f_d
-#&gt; 
-#&gt; Vital rates:
-#&gt; 
-#&gt; s: inv_logit(s_int, s_slope, dbh_1)
-#&gt; g: dnorm(dbh_2, mu_g, sd_g)
-#&gt; mu_g: g_int + g_slope * dbh_1
-#&gt; f_r: inv_logit(f_r_int, f_r_slope, dbh_1)
-#&gt; f_s: exp(f_s_int + f_s_slope * dbh_1)
-#&gt; f_d: dnorm(dbh_2, mu_fd, sd_fd)
-#&gt; 
-#&gt; Parameter names:
-#&gt; 
-#&gt;  [1] "s_int"     "s_slope"   "g_int"     "g_slope"   "sd_g"      "f_r_int"  
-#&gt;  [7] "f_r_slope" "f_s_int"   "f_s_slope" "mu_fd"     "sd_fd"    
-#&gt; 
-#&gt; All parameters in vital rate expressions found in 'data_list':  TRUE
-#&gt; 
-#&gt; Domains for state variables:
-#&gt; 
-#&gt; dbh: lower_bound = 0, upper_bound = 50, n_meshpoints = 100
-#&gt; 
-#&gt; Population states defined:
-#&gt; 
-#&gt; n_z: runif(100)
-#&gt; 
-#&gt; Internally generated model iteration procedure:
-#&gt; 
-#&gt; n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, 
-#&gt;     vectr = n_dbh_t)
-#&gt; </div><div class='input'>
-<span class='co'># alternative, we can make a list before starting to make the IPM</span>
-
-<span class='va'>pop_vecs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>n_z <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='fu'>define_pop_state</span><span class='op'>(</span><span class='va'>proto_ipm</span>, pop_vectors <span class='op'>=</span> <span class='va'>pop_vecs</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; A simple, density independent, deterministic proto_ipm with 2 kernels defined:
-#&gt;  P, F 
-#&gt; 
-#&gt; Kernel formulae:
-#&gt; 
-#&gt; P: s * g
-#&gt; F: f_r * f_s * f_d
-#&gt; 
-#&gt; Vital rates:
-#&gt; 
-#&gt; s: inv_logit(s_int, s_slope, dbh_1)
-#&gt; g: dnorm(dbh_2, mu_g, sd_g)
-#&gt; mu_g: g_int + g_slope * dbh_1
-#&gt; f_r: inv_logit(f_r_int, f_r_slope, dbh_1)
-#&gt; f_s: exp(f_s_int + f_s_slope * dbh_1)
-#&gt; f_d: dnorm(dbh_2, mu_fd, sd_fd)
-#&gt; 
-#&gt; Parameter names:
-#&gt; 
-#&gt;  [1] "s_int"     "s_slope"   "g_int"     "g_slope"   "sd_g"      "f_r_int"  
-#&gt;  [7] "f_r_slope" "f_s_int"   "f_s_slope" "mu_fd"     "sd_fd"    
-#&gt; 
-#&gt; All parameters in vital rate expressions found in 'data_list':  TRUE
-#&gt; 
-#&gt; Domains for state variables:
-#&gt; 
-#&gt; dbh: lower_bound = 0, upper_bound = 50, n_meshpoints = 100
-#&gt; 
-#&gt; Population states defined:
-#&gt; 
-#&gt; n_z: Pre-defined population state.
-#&gt; 
-#&gt; Internally generated model iteration procedure:
-#&gt; 
-#&gt; n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, 
-#&gt;     vectr = n_dbh_t)
-#&gt; </div><div class='input'>
-<span class='co'># define_env_state. Generates a random draw from a known distribution</span>
-<span class='co'># of temperatures.</span>
-
-<span class='va'>env_sampler</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>env_pars</span><span class='op'>)</span> <span class='op'>{</span>
-
-  <span class='va'>temp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='va'>env_pars</span><span class='op'>$</span><span class='va'>temp_mean</span>, <span class='va'>env_pars</span><span class='op'>$</span><span class='va'>temp_sd</span><span class='op'>)</span>
-
-  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>temp <span class='op'>=</span> <span class='va'>temp</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='op'>}</span>
-
-<span class='va'>env_pars</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>temp_mean <span class='op'>=</span> <span class='fl'>12</span>, temp_sd <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
-
-<span class='fu'>define_env_state</span><span class='op'>(</span>
- <span class='va'>proto_ipm</span>,
- env_values <span class='op'>=</span> <span class='fu'>env_sampler</span><span class='op'>(</span><span class='va'>env_pars</span><span class='op'>)</span>,
- data_list  <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>env_sampler <span class='op'>=</span> <span class='va'>env_sampler</span>,
-                   env_pars    <span class='op'>=</span> <span class='va'>env_pars</span><span class='op'>)</span>
-
-<span class='op'>)</span>
-</div><div class='output co'>#&gt; A simple, density independent, deterministic proto_ipm with 2 kernels defined:
-#&gt;  P, F 
-#&gt; 
-#&gt; Kernel formulae:
-#&gt; 
-#&gt; P: s * g
-#&gt; F: f_r * f_s * f_d
-#&gt; 
-#&gt; Vital rates:
-#&gt; 
-#&gt; s: inv_logit(s_int, s_slope, dbh_1)
-#&gt; g: dnorm(dbh_2, mu_g, sd_g)
-#&gt; mu_g: g_int + g_slope * dbh_1
-#&gt; f_r: inv_logit(f_r_int, f_r_slope, dbh_1)
-#&gt; f_s: exp(f_s_int + f_s_slope * dbh_1)
-#&gt; f_d: dnorm(dbh_2, mu_fd, sd_fd)
-#&gt; 
-#&gt; Parameter names:
-#&gt; 
-#&gt;  [1] "s_int"     "s_slope"   "g_int"     "g_slope"   "sd_g"      "f_r_int"  
-#&gt;  [7] "f_r_slope" "f_s_int"   "f_s_slope" "mu_fd"     "sd_fd"    
-#&gt; 
-#&gt; All parameters in vital rate expressions found in 'data_list':  TRUE
-#&gt; 
-#&gt; Domains for state variables:
-#&gt; 
-#&gt; dbh: lower_bound = 0, upper_bound = 50, n_meshpoints = 100
-#&gt; 
-#&gt; Population states defined:
-#&gt; 
-#&gt; n_dbh: runif(100)
-#&gt; 
-#&gt; Internally generated model iteration procedure:
-#&gt; 
-#&gt; n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, 
-#&gt;     vectr = n_dbh_t)
-#&gt; </div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>iceplant_ex</span><span class='op'>)</span>
-
-<span class='va'>z</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>iceplant_ex</span><span class='op'>$</span><span class='va'>log_size</span>, <span class='va'>iceplant_ex</span><span class='op'>$</span><span class='va'>log_size_next</span><span class='op'>)</span>
-
-<span class='va'>pop_vecs</span> <span class='op'>&lt;-</span> <span class='fu'>discretize_pop_vector</span><span class='op'>(</span><span class='va'>z</span>,
-                                  n_mesh <span class='op'>=</span> <span class='fl'>100</span>,
-                                  pad_low <span class='op'>=</span> <span class='fl'>1.2</span>,
-                                  pad_high <span class='op'>=</span> <span class='fl'>1.2</span><span class='op'>)</span>
-
-</div></pre>
+    <pre class="examples"><span class='r-in'></span>
+<span class='r-in'><span class='co'># Example with kernels named "P" and "F", and a domain "z"</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>kernel_impl_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>P <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>,</span>
+<span class='r-in'>                                  state_start <span class='op'>=</span> <span class='st'>"z"</span>,</span>
+<span class='r-in'>                                  state_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span>,</span>
+<span class='r-in'>                         F <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>int_rule <span class='op'>=</span> <span class='st'>"midpoint"</span>,</span>
+<span class='r-in'>                                  state_start <span class='op'>=</span> <span class='st'>"z"</span>,</span>
+<span class='r-in'>                                  state_end <span class='op'>=</span> <span class='st'>"z"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># an equivalent version using make_impl_args_list</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>kernel_impl_list</span> <span class='op'>&lt;-</span> <span class='fu'>make_impl_args_list</span><span class='op'>(</span></span>
+<span class='r-in'>     kernel_names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"P"</span>, <span class='st'>"F"</span><span class='op'>)</span>,</span>
+<span class='r-in'>     int_rule     <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"midpoint"</span>, <span class='st'>"midpoint"</span><span class='op'>)</span>,</span>
+<span class='r-in'>     state_start  <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"z"</span>, <span class='st'>"z"</span><span class='op'>)</span>,</span>
+<span class='r-in'>     state_end    <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"z"</span>, <span class='st'>"z"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sim_di_det_ex</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>proto_ipm</span> <span class='op'>&lt;-</span> <span class='va'>sim_di_det_ex</span><span class='op'>$</span><span class='va'>proto_ipm</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># define_domains</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>lower_bound</span> <span class='op'>&lt;-</span> <span class='fl'>1</span></span>
+<span class='r-in'><span class='va'>upper_bound</span> <span class='op'>&lt;-</span> <span class='fl'>100</span></span>
+<span class='r-in'><span class='va'>n_meshpoints</span> <span class='op'>&lt;-</span> <span class='fl'>50</span></span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>define_domains</span><span class='op'>(</span><span class='va'>proto_ipm</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>lower_bound</span>, <span class='va'>upper_bound</span>, <span class='va'>n_meshpoints</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> A simple, density independent, deterministic proto_ipm with 2 kernels defined:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  P, F </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Kernel formulae:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> P: s * g</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> F: f_r * f_s * f_d</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Vital rates:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> s: inv_logit(s_int, s_slope, dbh_1)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> g: dnorm(dbh_2, mu_g, sd_g)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> mu_g: g_int + g_slope * dbh_1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> f_r: inv_logit(f_r_int, f_r_slope, dbh_1)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> f_s: exp(f_s_int + f_s_slope * dbh_1)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> f_d: dnorm(dbh_2, mu_fd, sd_fd)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Parameter names:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "s_int"     "s_slope"   "g_int"     "g_slope"   "sd_g"      "f_r_int"  </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "f_r_slope" "f_s_int"   "f_s_slope" "mu_fd"     "sd_fd"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> All parameters in vital rate expressions found in 'data_list':  TRUE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Domains for state variables:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> dbh: lower_bound = 1, upper_bound = 100, n_meshpoints = 50</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Population states defined:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> n_dbh: runif(100)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Internally generated model iteration procedure:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     vectr = n_dbh_t)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># define_pop_state with a state variable named "z". Note that "n_" is prefixed</span></span>
+<span class='r-in'><span class='co'># to denote that it is a population state function!</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>define_pop_state</span><span class='op'>(</span><span class='va'>proto_ipm</span>, n_z <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> A simple, density independent, deterministic proto_ipm with 2 kernels defined:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  P, F </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Kernel formulae:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> P: s * g</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> F: f_r * f_s * f_d</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Vital rates:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> s: inv_logit(s_int, s_slope, dbh_1)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> g: dnorm(dbh_2, mu_g, sd_g)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> mu_g: g_int + g_slope * dbh_1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> f_r: inv_logit(f_r_int, f_r_slope, dbh_1)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> f_s: exp(f_s_int + f_s_slope * dbh_1)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> f_d: dnorm(dbh_2, mu_fd, sd_fd)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Parameter names:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "s_int"     "s_slope"   "g_int"     "g_slope"   "sd_g"      "f_r_int"  </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "f_r_slope" "f_s_int"   "f_s_slope" "mu_fd"     "sd_fd"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> All parameters in vital rate expressions found in 'data_list':  TRUE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Domains for state variables:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> dbh: lower_bound = 0, upper_bound = 50, n_meshpoints = 100</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Population states defined:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> n_z: runif(100)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Internally generated model iteration procedure:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     vectr = n_dbh_t)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># alternative, we can make a list before starting to make the IPM</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>pop_vecs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>n_z <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>define_pop_state</span><span class='op'>(</span><span class='va'>proto_ipm</span>, pop_vectors <span class='op'>=</span> <span class='va'>pop_vecs</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> A simple, density independent, deterministic proto_ipm with 2 kernels defined:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  P, F </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Kernel formulae:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> P: s * g</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> F: f_r * f_s * f_d</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Vital rates:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> s: inv_logit(s_int, s_slope, dbh_1)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> g: dnorm(dbh_2, mu_g, sd_g)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> mu_g: g_int + g_slope * dbh_1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> f_r: inv_logit(f_r_int, f_r_slope, dbh_1)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> f_s: exp(f_s_int + f_s_slope * dbh_1)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> f_d: dnorm(dbh_2, mu_fd, sd_fd)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Parameter names:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "s_int"     "s_slope"   "g_int"     "g_slope"   "sd_g"      "f_r_int"  </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "f_r_slope" "f_s_int"   "f_s_slope" "mu_fd"     "sd_fd"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> All parameters in vital rate expressions found in 'data_list':  TRUE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Domains for state variables:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> dbh: lower_bound = 0, upper_bound = 50, n_meshpoints = 100</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Population states defined:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> n_z: Pre-defined population state.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Internally generated model iteration procedure:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     vectr = n_dbh_t)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># define_env_state. Generates a random draw from a known distribution</span></span>
+<span class='r-in'><span class='co'># of temperatures.</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>env_sampler</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>env_pars</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='va'>temp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='va'>env_pars</span><span class='op'>$</span><span class='va'>temp_mean</span>, <span class='va'>env_pars</span><span class='op'>$</span><span class='va'>temp_sd</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>temp <span class='op'>=</span> <span class='va'>temp</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>env_pars</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>temp_mean <span class='op'>=</span> <span class='fl'>12</span>, temp_sd <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>define_env_state</span><span class='op'>(</span></span>
+<span class='r-in'> <span class='va'>proto_ipm</span>,</span>
+<span class='r-in'> env_values <span class='op'>=</span> <span class='fu'>env_sampler</span><span class='op'>(</span><span class='va'>env_pars</span><span class='op'>)</span>,</span>
+<span class='r-in'> data_list  <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>env_sampler <span class='op'>=</span> <span class='va'>env_sampler</span>,</span>
+<span class='r-in'>                   env_pars    <span class='op'>=</span> <span class='va'>env_pars</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> A simple, density independent, deterministic proto_ipm with 2 kernels defined:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  P, F </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Kernel formulae:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> P: s * g</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> F: f_r * f_s * f_d</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Vital rates:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> s: inv_logit(s_int, s_slope, dbh_1)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> g: dnorm(dbh_2, mu_g, sd_g)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> mu_g: g_int + g_slope * dbh_1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> f_r: inv_logit(f_r_int, f_r_slope, dbh_1)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> f_s: exp(f_s_int + f_s_slope * dbh_1)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> f_d: dnorm(dbh_2, mu_fd, sd_fd)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Parameter names:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "s_int"     "s_slope"   "g_int"     "g_slope"   "sd_g"      "f_r_int"  </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "f_r_slope" "f_s_int"   "f_s_slope" "mu_fd"     "sd_fd"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> All parameters in vital rate expressions found in 'data_list':  TRUE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Domains for state variables:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> dbh: lower_bound = 0, upper_bound = 50, n_meshpoints = 100</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Population states defined:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> n_dbh: runif(100)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Internally generated model iteration procedure:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     vectr = n_dbh_t)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>iceplant_ex</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>z</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>iceplant_ex</span><span class='op'>$</span><span class='va'>log_size</span>, <span class='va'>iceplant_ex</span><span class='op'>$</span><span class='va'>log_size_next</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>pop_vecs</span> <span class='op'>&lt;-</span> <span class='fu'>discretize_pop_vector</span><span class='op'>(</span><span class='va'>z</span>,</span>
+<span class='r-in'>                                  n_mesh <span class='op'>=</span> <span class='fl'>100</span>,</span>
+<span class='r-in'>                                  pad_low <span class='op'>=</span> <span class='fl'>1.2</span>,</span>
+<span class='r-in'>                                  pad_high <span class='op'>=</span> <span class='fl'>1.2</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
