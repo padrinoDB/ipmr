@@ -28,6 +28,17 @@ define_impl <- function(proto_ipm,
   cls     <- class(proto_ipm)
   kernels <- names(kernel_impl_list)
 
+  if(! all(proto_ipm$kernel_id %in% kernels)) {
+
+    missing_kerns <- paste(setdiff(proto_ipm$kernel_id, kernels),
+                           collapse = ", ")
+
+
+    stop(missing_kerns, " have not been defined in `define_impl()`!",
+         call. = FALSE)
+  }
+
+
   for(i in seq_along(kernel_impl_list)) {
 
     proto_ind                     <- which(kernels[i] == proto_ipm$kernel_id)

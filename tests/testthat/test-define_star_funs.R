@@ -26,8 +26,7 @@ single_state <- init_ipm(sim_gen    = "simple",
                                  sd_g = 0.7),
                 states = states_single,
                 evict_cor = TRUE,
-                evict_fun = truncated_distributions(g,
-                                                    n_mesh_p = 100)) %>%
+                evict_fun = truncated_distributions("norm", "g")) %>%
   define_kernel('F',
                 formula = f_r * f_s * f_d,
                 family = 'CC',
@@ -183,5 +182,70 @@ test_that("NA warnings are generated correctly", {
       define_env_state(env_params = inv_logit(2 * 2),
                        data_list = list(inv_logit = NA))
   )
+
+})
+
+bad_impl_args <- list(
+  P = list(
+    int_rule = 'midpoint',
+    state_start = 'z',
+    state_end ='z'),
+  F = list(
+    int_rule = 'midpoint',
+    state_start = "z",
+    state_end = "z"),
+  go_b2 = list(
+    int_rule = "midpoint",
+    state_start = 'b1',
+    state_end = "b2"
+  )
+)
+
+test_that("define_*s fail usefully", {
+
+
+  expect_error(
+    init_ipm(sim_gen    = "general",
+             di_dd      = "di",
+             det_stoch  = "det") %>%
+      define_kernel("P",
+                    formula = s * g,
+                    family = "CC",
+                    s = plogis(s_int, s_slope, dbh_1),
+                    g = dnorm(dbh_2, mu_g, sd_g),
+                    mu_g = g_int + g_slope * dbh_1,
+                    data_list = list(s_int = 2.2,
+                                     s_slope = 0.25,
+                                     g_int = 0.2,
+                                     g_slope = 1.02,
+                                     sd_g = 0.7),
+                    states =  list("z"),
+                    evict_cor = TRUE,
+                    evict_fun = truncated_distributions("norm", "g")) %>%
+      define_kernel('F',
+                    formula = f_r * f_s * f_d,
+                    family = 'CC',
+                    f_r = plogis(f_r_int, f_r_slope, dbh_1),
+                    f_s = exp(f_s_int + f_s_slope * dbh_1),
+                    f_d = dnorm(dbh_2, mu_fd, sd_fd),
+                    data_list = list(f_r_int = 0.03,
+                                     f_r_slope = 0.015,
+                                     f_s_int = 1.3,
+                                     f_s_slope = 0.075,
+                                     mu_fd = 0.5,
+                                     sd_fd = 0.2),
+                    states = list("z"),
+                    evict_cor = FALSE) %>%#,
+      # evict_fun = truncated_distributions(f_d,
+      #                                     n_mesh_p = 100)) %>%
+      define_kernel("go_b1",
+                    formula = 1,
+                    family = "DD",
+                    go = 1,
+                    data_list = list(),
+                    states = list(c("b1", "b2"))) %>%
+      define_impl(bad_impl_args)
+  )
+
 
 })
