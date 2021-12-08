@@ -32,6 +32,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -92,7 +94,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/levisc8/ipmr/">
+  <a href="https://github.com/levisc8/ipmr/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -111,33 +113,33 @@
   <div class="contents col-md-9">
 
 
-<div id="ipmr" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#ipmr" class="anchor"></a>ipmr</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="ipmr">ipmr<a class="anchor" aria-label="anchor" href="#ipmr"></a>
+</h1></div>
 <p><code>ipmr</code> is a package for implementing Integral Projection Models (IPMs) in <em>R</em>. It relies heavily on the mathematical syntax of the models, and does not try to abstract over the process of fitting vital rates. It is now relatively stable, though tweaks may be made. The News tab at the top of this page will contain more details on breaking changes as they are introduced to successive versions.</p>
 <p>Below is a brief overview of how <code>ipmr</code> classifies different model types followed by examples of how to implement those types in this framework.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>Install from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"ipmr"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ipmr"</span><span class="op">)</span></code></pre></div>
 <p>You can install the development version with the snippet below:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="st"><a href="https://remotes.r-lib.org">'remotes'</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://remotes.r-lib.org" class="external-link">'remotes'</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>
 <span class="op">}</span>
 
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"levisc8/ipmr"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"levisc8/ipmr"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="package-scope" class="section level2">
-<h2 class="hasAnchor">
-<a href="#package-scope" class="anchor"></a>Package scope</h2>
-<p><code>ipmr</code> is intended to assist with IPM implementation and analysis. It is important to note that this package <strong>will not</strong> help with the process of fitting regression models for vital rates at all! That is a sufficiently different (and vast) topic that we decided it was not within the scope of this project. This will only help you turn those regression models into an IPM without shooting yourself in the foot. Furthermore, most of the documentation assumes a basic knowledge of IPM theory and construction. For those that are totally new to IPMs, it is strongly recommended to read a theoretical overview of the models first. Some favorites are <a href="https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658%282000%29081%5B0694%3ASSSAAN%5D2.0.CO%3B2">Easterling et al. 2000</a>, <a href="https://doi.org/10.1111/2041-210X.12146">Merow et al. 2013</a>, and <a href="https://doi.org/10.1111/1365-2656.12178">Rees et al. 2014</a>. The <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">Introduction to ipmr vignette</a> also contains a brief overview of IPM theory as well as a far more detailed introduction to this package. Thus, everything that follows here assumes you have some basic understanding of IPM theory, parameterized vital rate models, and are now ready to begin implementing your IPM.</p>
+<div class="section level2">
+<h2 id="package-scope">Package scope<a class="anchor" aria-label="anchor" href="#package-scope"></a>
+</h2>
+<p><code>ipmr</code> is intended to assist with IPM implementation and analysis. It is important to note that this package <strong>will not</strong> help with the process of fitting regression models for vital rates at all! That is a sufficiently different (and vast) topic that we decided it was not within the scope of this project. This will only help you turn those regression models into an IPM without shooting yourself in the foot. Furthermore, most of the documentation assumes a basic knowledge of IPM theory and construction. For those that are totally new to IPMs, it is strongly recommended to read a theoretical overview of the models first. Some favorites are <a href="https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658%282000%29081%5B0694%3ASSSAAN%5D2.0.CO%3B2" class="external-link">Easterling et al. 2000</a>, <a href="https://doi.org/10.1111/2041-210X.12146" class="external-link">Merow et al. 2013</a>, and <a href="https://doi.org/10.1111/1365-2656.12178" class="external-link">Rees et al. 2014</a>. The <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">Introduction to ipmr vignette</a> also contains a brief overview of IPM theory as well as a far more detailed introduction to this package. Thus, everything that follows here assumes you have some basic understanding of IPM theory, parameterized vital rate models, and are now ready to begin implementing your IPM.</p>
 </div>
-<div id="model-classes" class="section level2">
-<h2 class="hasAnchor">
-<a href="#model-classes" class="anchor"></a>Model classes</h2>
+<div class="section level2">
+<h2 id="model-classes">Model classes<a class="anchor" aria-label="anchor" href="#model-classes"></a>
+</h2>
 <p>Once all parameters are estimated, the first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function has five arguments: <code>sim_gen</code>, <code>di_dd</code>, <code>det_stoch</code>, <code>kern_param</code>, and <code>uses_age</code>. We will ignore <code>uses_age</code> for now, because age-size models are less common and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own vignette</a>.</p>
 <p>The combination of these arguments defines the type of IPM, and makes sure that the machinery for subsequent analyses works correctly. The possible entries for each argument are as follows:</p>
 <ul>
@@ -163,7 +165,7 @@
 </ul>
 </li>
 <li>
-<p><code>kern_param</code>: <code>"kern"</code>/<code>"param"</code> (Complete definitions found in <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405">Metcalf et al. 2015</a>)</p>
+<p><code>kern_param</code>: <code>"kern"</code>/<code>"param"</code> (Complete definitions found in <a href="https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12405" class="external-link">Metcalf et al. 2015</a>)</p>
 <ul>
 <li><p>A. <strong>kern</strong>: This describes an IPM with discretely varying parameters such that their values are known before the model is specified. This is usually the case with models that estimate fixed and/or random year/site effects and for which defining a multivariate joint distribution to sample parameters from is not desirable/needed. These models can be a bit more computationally efficient than the <code>param</code> alternative because all kernels can be constructed before the iteration procedure begins, as opposed to requiring reconstruction for every single iteration.</p></li>
 <li><p>B. <strong>param</strong>: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. For example, these could be a multivariate normal defined by covarying slopes and intercepts, or distributions of environmental variables that change from time to time. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Examples of this are available in the Introduction and General IPM vignettes.</p></li>
@@ -175,7 +177,7 @@
 <li>Simple, density independent models: <strong>Completed and ready</strong>
 </li>
 </ul>
-<ol>
+<ol style="list-style-type: decimal">
 <li><p><code>"simple_di_det"</code></p></li>
 <li><p><code>"simple_di_stoch_kern"</code></p></li>
 <li><p><code>"simple_di_stoch_param"</code></p></li>
@@ -184,7 +186,7 @@
 <li>Simple, density dependent models: <strong>Completed, likely stable</strong>
 </li>
 </ul>
-<ol>
+<ol start="4" style="list-style-type: decimal">
 <li><p><code>"simple_dd_det"</code></p></li>
 <li><p><code>"simple_dd_stoch_kern"</code></p></li>
 <li><p><code>"simple_dd_stoch_param"</code></p></li>
@@ -193,7 +195,7 @@
 <li>General, density independent models: <strong>Completed and ready</strong>
 </li>
 </ul>
-<ol>
+<ol start="7" style="list-style-type: decimal">
 <li><p><code>"general_di_det"</code></p></li>
 <li><p><code>"general_di_stoch_kern"</code></p></li>
 <li><p><code>"general_di_stoch_param"</code></p></li>
@@ -202,7 +204,7 @@
 <li>General, density dependent models: <strong>Completed, likely stable</strong>
 </li>
 </ul>
-<ol>
+<ol start="10" style="list-style-type: decimal">
 <li><p><code>"general_dd_det"</code></p></li>
 <li><p><code>"general_dd_stoch_kern"</code></p></li>
 <li><p><code>"general_dd_stoch_param"</code></p></li>
@@ -210,11 +212,11 @@
 <p>Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (<code>simple_di_det</code>, <code>simple_di_stoch_kern</code>, <code>simple_di_stoch_param</code>) are described below as well as <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">here</a>. The <code>general_*</code> versions of these are described <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">here</a>. Density dependent versions are completed for simple and general models, and are probably stable, but have not been tested enough to be certain. A very brief (and incomplete) introduction is available <a href="https://levisc8.github.io/ipmr/articles/density-dependence.html">here</a>.</p>
 <p>Below is an example of how to implement a simple IPM with <code>ipmr</code>.</p>
 </div>
-<div id="examples-for-simple-ipm-classes" class="section level2">
-<h2 class="hasAnchor">
-<a href="#examples-for-simple-ipm-classes" class="anchor"></a>Examples for simple IPM classes</h2>
+<div class="section level2">
+<h2 id="examples-for-simple-ipm-classes">Examples for simple IPM classes<a class="anchor" aria-label="anchor" href="#examples-for-simple-ipm-classes"></a>
+</h2>
 <p>Here is a simple model implemented with <code>ipmr</code>. This is a hypothetical plant species where plants can survive and grow (<em>P</em>(<em>z</em>′, <em>z</em>)), and reproduce sexually (<em>F</em>(<em>z</em>′, <em>z</em>)). There is no seed bank, and so there are no discrete traits in the model. We’ll use 4 regressions: survival (<em>s</em>(<em>z</em>)), growth (<em>G</em>(<em>z</em>′, <em>z</em>), <em>f</em><sub><em>G</em></sub>), probability of reproducing (<em>r</em><sub><em>r</em></sub>(<em>z</em>)), and number of seeds produced conditional on flowering (<em>r</em><sub><em>s</em></sub>(<em>z</em>)). New recruits will be generated with a Gaussian distribution (denoted <em>f</em><sub><em>r</em><sub><em>d</em></sub></sub>), which requires calculating the mean and standard deviation of new recruits from the data. For simplicity, we’ll assume there’s no maternal effect on recruit size. First, we’ll write out the functional forms for each component of the model:</p>
-<ol>
+<ol style="list-style-type: decimal">
 <li><p><em>n</em>(<em>z</em>′, <em>t</em> + 1) = ∫<sub><em>L</em></sub><sup><em>U</em></sup><em>K</em>(<em>z</em>′, <em>z</em>)<em>n</em>(<em>z</em>, <em>t</em>)*d**z*</p></li>
 <li><p><em>K</em>(<em>z</em>′, <em>z</em>) = <em>P</em>(<em>z</em>′, <em>z</em>) + <em>F</em>(<em>z</em>′, <em>z</em>)</p></li>
 <li><p><em>P</em>(<em>z</em>′, <em>z</em>) = <em>s</em>(<em>z</em>) * <em>G</em>(<em>z</em>′, <em>z</em>)</p></li>
@@ -227,32 +229,32 @@
 <li><p><em>r</em><sub><em>d</em></sub>(<em>z</em>′) = <em>f</em><sub><em>r</em><sub><em>d</em></sub></sub>(<em>μ</em><sub><em>r</em><sub><em>d</em></sub></sub>, <em>σ</em><sub><em>r</em><sub><em>d</em></sub></sub>)</p></li>
 </ol>
 <p>Equation 1 describes how all the vital rates act on the initial trait distribution to produce a new one at <em>t</em> + 1. Equations 3-6 describe how existing individuals can survive, and if they survive, grow or shrink. Equations 7-10 describe how existing individuals create new individuals. In order to convert these functions to code, we usually fit regression models to our data. The following set of generalized linear models correspond to the functional forms described above:</p>
-<ol>
+<ol style="list-style-type: decimal">
 <li>
 <p>Survival (<em>s</em>(<em>z</em>) / <code>s</code>): a generalized linear model w/ a logit link.</p>
 <ul>
-<li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(surv ~ size_1, data = my_surv_data, family = binomial())</a></code>
+<li>Example model formula: <code>glm(surv ~ size_1, data = my_surv_data, family = binomial())</code>
 </li>
 </ul>
 </li>
 <li>
 <p>Growth (<em>G</em>(<em>z</em>′, <em>z</em>) / <code>G</code>): a linear model with a normal error distribution.</p>
 <ul>
-<li>Example model formula: <code><a href="https://rdrr.io/r/stats/lm.html">lm(size_2 ~ size_1, data = my_grow_data)</a></code>
+<li>Example model formula: <code>lm(size_2 ~ size_1, data = my_grow_data)</code>
 </li>
 </ul>
 </li>
 <li>
 <p>Pr(flowering) (<em>r</em><sub><em>r</em></sub>(<em>z</em>) / <code>r_r</code>): a generalized linear model w/ a logit link.</p>
 <ul>
-<li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(flower ~ size_1, data = my_repro_data, family = binomial())</a></code>
+<li>Example model formula: <code>glm(flower ~ size_1, data = my_repro_data, family = binomial())</code>
 </li>
 </ul>
 </li>
 <li>
 <p>Seed production (<em>r</em><sub><em>s</em></sub>(<em>z</em>) / <code>r_s</code>): a generalized linear model w/ log link.</p>
 <ul>
-<li>Example model formula: <code><a href="https://rdrr.io/r/stats/glm.html">glm(seeds ~ size_1, data = my_flower_data, family = poisson())</a></code>
+<li>Example model formula: <code>glm(seeds ~ size_1, data = my_flower_data, family = poisson())</code>
 </li>
 </ul>
 </li>
@@ -274,9 +276,9 @@
 <code class="sourceCode R"><span class="co"># Load ipmr and get the parameter values. The data_list argument for define_kernel</span>
 <span class="co"># should hold every regression parameter and every constant used in the model.</span>
 
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
 
-<span class="va">my_data_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>s_int     <span class="op">=</span> <span class="op">-</span><span class="fl">2.2</span>,  <span class="co"># coefficients(my_surv_mod)[1]</span>
+<span class="va">my_data_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>s_int     <span class="op">=</span> <span class="op">-</span><span class="fl">2.2</span>,  <span class="co"># coefficients(my_surv_mod)[1]</span>
                     s_slope   <span class="op">=</span> <span class="fl">0.25</span>,  <span class="co"># coefficients(my_surv_mod)[2]</span>
                     g_int     <span class="op">=</span> <span class="fl">0.2</span>,   <span class="co"># coefficients(my_grow_mod)[1]</span>
                     g_slope   <span class="op">=</span> <span class="fl">0.99</span>,  <span class="co"># coefficients(my_grow_mod)[2]</span>
@@ -292,7 +294,7 @@
                           di_dd   <span class="op">=</span> <span class="st">"di"</span>,
                           det_stoch <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span>
 
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
+<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span>
   
   proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
     
@@ -318,20 +320,20 @@
   <span class="co"># Perform the inverse logit transformation to get survival probabilities</span>
   <span class="co"># from your model. plogis from the "stats" package does this for us. </span>
 
-  s         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html">plogis</a></span><span class="op">(</span><span class="va">s_int</span> <span class="op">+</span> <span class="va">s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>, 
+  s         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="va">s_int</span> <span class="op">+</span> <span class="va">s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>, 
   
   <span class="co"># The growth model requires a function to compute the mean as a function of dbh.</span>
   <span class="co"># The SD is a constant, so we don't need to define that in ... expression, </span>
   <span class="co"># just the data_list.</span>
   
-  G         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">mu_g</span>, <span class="va">sd_g</span><span class="op">)</span>,
+  G         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">mu_g</span>, <span class="va">sd_g</span><span class="op">)</span>,
   mu_g      <span class="op">=</span> <span class="va">g_int</span> <span class="op">+</span> <span class="va">g_slope</span> <span class="op">*</span> <span class="va">dbh_1</span>,
   
   
   <span class="co"># Specify the constant parameters in the model in the data_list. </span>
   
   data_list <span class="op">=</span> <span class="va">my_data_list</span>,
-  states    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,
+  states    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,
   
   <span class="co"># If you want to correct for eviction, set evict_cor = TRUE and specify an</span>
   <span class="co"># evict_fun. ipmr provides truncated_distributions() to help. This function</span>
@@ -339,11 +341,11 @@
   <span class="co"># vital rate that it acts on.</span>
   
   evict_cor <span class="op">=</span> <span class="cn">TRUE</span>,
-  evict_fun <span class="op">=</span> <span class="fu"><a href="reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span>fun    <span class="op">=</span> <span class="st">'norm'</span>,
+  evict_fun <span class="op">=</span> <span class="fu"><a href="reference/eviction.html">truncated_distributions</a></span><span class="op">(</span>fun    <span class="op">=</span> <span class="st">'norm'</span>,
                                       target <span class="op">=</span> <span class="st">'G'</span><span class="op">)</span>
   <span class="op">)</span> 
 
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_kernel.html">define_kernel</a></span><span class="op">(</span>
+<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span>
   proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
   name      <span class="op">=</span> <span class="st">'F_simple'</span>,
   formula   <span class="op">=</span> <span class="va">r_r</span> <span class="op">*</span> <span class="va">r_s</span> <span class="op">*</span> <span class="va">r_d</span>,
@@ -352,26 +354,26 @@
   <span class="co"># Inverse logit transformation for flowering probability</span>
   <span class="co"># (because we used a logistic regression)</span>
   
-  r_r       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html">plogis</a></span><span class="op">(</span><span class="va">r_r_int</span> <span class="op">+</span> <span class="va">r_r_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>,
+  r_r       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="va">r_r_int</span> <span class="op">+</span> <span class="va">r_r_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>,
   
   <span class="co"># Exponential function for seed progression </span>
   <span class="co"># (because we used a Poisson)</span>
   
-  r_s       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">r_s_int</span> <span class="op">+</span> <span class="va">r_s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>,
+  r_s       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">r_s_int</span> <span class="op">+</span> <span class="va">r_s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>,
   
   <span class="co"># The recruit size distribution has no maternal effect for size,</span>
   <span class="co"># so mu_rd and sd_rd are constants. These get passed in the </span>
   <span class="co"># data_list</span>
   
-  r_d       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">mu_rd</span>, <span class="va">sd_rd</span><span class="op">)</span>,
+  r_d       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">mu_rd</span>, <span class="va">sd_rd</span><span class="op">)</span>,
   data_list <span class="op">=</span> <span class="va">my_data_list</span>,
-  states    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,
+  states    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,
   
   <span class="co"># Again, we'll correct for eviction in new recruits by</span>
   <span class="co"># truncating the normal distribution.</span>
   
   evict_cor <span class="op">=</span> <span class="cn">TRUE</span>,
-  evict_fun <span class="op">=</span> <span class="fu"><a href="reference/truncated_distributions.html">truncated_distributions</a></span><span class="op">(</span>fun    <span class="op">=</span> <span class="st">'norm'</span>,
+  evict_fun <span class="op">=</span> <span class="fu"><a href="reference/eviction.html">truncated_distributions</a></span><span class="op">(</span>fun    <span class="op">=</span> <span class="st">'norm'</span>,
                                       target <span class="op">=</span> <span class="st">'r_d'</span><span class="op">)</span>
 <span class="op">)</span> 
 
@@ -382,19 +384,19 @@
 <span class="co"># always be the same, because we only have a single continuous state variable. </span>
 <span class="co"># General_* models will be more complicated.</span>
 
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_impl.html">define_impl</a></span><span class="op">(</span>
+<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_star.html">define_impl</a></span><span class="op">(</span>
   proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
-  <span class="fu"><a href="reference/define_impl.html">make_impl_args_list</a></span><span class="op">(</span>
-    kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"P_simple"</span>, <span class="st">"F_simple"</span><span class="op">)</span>,
-    int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">2</span><span class="op">)</span>,
-    state_start  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span>,
-    state_end    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span>
+  <span class="fu"><a href="reference/define_star.html">make_impl_args_list</a></span><span class="op">(</span>
+    kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"P_simple"</span>, <span class="st">"F_simple"</span><span class="op">)</span>,
+    int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">2</span><span class="op">)</span>,
+    state_start  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span>,
+    state_end    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span>
   <span class="op">)</span>
 <span class="op">)</span> 
 
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_impl.html">define_domains</a></span><span class="op">(</span>
+<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_star.html">define_domains</a></span><span class="op">(</span>
   proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
-  dbh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="co"># the first entry is the lower bound of the domain.</span>
+  dbh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="co"># the first entry is the lower bound of the domain.</span>
           <span class="fl">50</span>, <span class="co"># the second entry is the upper bound of the domain.</span>
           <span class="fl">100</span> <span class="co"># third entry is the number of meshpoints for the domain.</span>
   <span class="op">)</span> 
@@ -404,17 +406,17 @@
 <span class="co"># ipmr computes everything through simulation, and simulations require a </span>
 <span class="co"># population state.</span>
 
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_impl.html">define_pop_state</a></span><span class="op">(</span>
+<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_star.html">define_pop_state</a></span><span class="op">(</span>
   proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
-  n_dbh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
+  n_dbh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
 <span class="op">)</span>
 
 <span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span><span class="op">)</span>
 
 
 <span class="va">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
-<span class="va">w_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/right_ev.html">right_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
-<span class="va">v_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/right_ev.html">left_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span></code></pre></div>
+<span class="va">w_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/eigenvectors.html">right_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
+<span class="va">v_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/eigenvectors.html">left_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span></code></pre></div>
 <p>A more detailed introduction to <code>ipmr</code> is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. Help with age × size models, density dependent models, and the parameter set index syntax are also available there. That’s all for now, happy modeling!</p>
 </div>
 </div>
@@ -423,40 +425,41 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=ipmr">https://​cloud.r-project.org/​package=ipmr</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/levisc8/ipmr/">https://​github.com/​levisc8/​ipmr/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/levisc8/ipmr/issues">https://​github.com/​levisc8/​ipmr/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=ipmr" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/levisc8/ipmr/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/levisc8/ipmr/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
+
 <div class="community">
-<h2>Community</h2>
+<h2 data-toc-skip>Community</h2>
 <ul class="list-unstyled">
 <li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
 </ul>
 </div>
+
 <div class="citation">
-<h2>Citation</h2>
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html">Citing ipmr</a></li>
+<li><a href="authors.html#citation">Citing ipmr</a></li>
 </ul>
 </div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>
-<a href="https://github.com/levisc8">Sam Levin</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-3289-9925" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<a href="https://github.com/levisc8" class="external-link">Sam Levin</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-3289-9925" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Aldo Compagnoni <br><small class="roles"> Author </small>  </li>
 <li>Dylan Childs <br><small class="roles"> Author </small>  </li>
 <li>Sanne Evers <br><small class="roles"> Author </small>  </li>
@@ -465,29 +468,32 @@
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/levisc8/ipmr/actions"><img src="https://github.com/levisc8/ipmr/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
-<li><a href="https://github.com/levisc8/ipmr/actions"><img src="https://github.com/levisc8/ipmr/workflows/check-vignettes/badge.svg" alt="Vignette Code"></a></li>
-<li><a href="https://www.tidyverse.org/lifecycle/#maturing"><img src="https://img.shields.io/badge/lifecycle-maturing-blue.svg" alt="Lifecycle: maturing"></a></li>
-<li><a href="https://cran.r-project.org/package=ipmr"><img src="https://www.r-pkg.org/badges/version/ipmr" alt="CRAN status"></a></li>
-<li><a href="https://codecov.io/gh/levisc8/ipmr?branch=main"><img src="https://codecov.io/gh/levisc8/ipmr/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
-<li><a href="https://cran.r-project.org/package=ipmr"><img src="https://cranlogs.r-pkg.org/badges/ipmr" alt="CRAN Downloads"></a></li>
-<li><a href="https://doi.org/10.5281/zenodo.5076190"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.5076190.svg" alt="DOI"></a></li>
-<li><a href="https://doi.org/10.1111/2041-210X.13683"><img src="https://zenodo.org/badge/DOI/10.1111/2041-210X.13683.svg" alt="DOI"></a></li>
+<li><a href="https://github.com/levisc8/ipmr/actions" class="external-link"><img src="https://github.com/levisc8/ipmr/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://github.com/levisc8/ipmr/actions" class="external-link"><img src="https://github.com/levisc8/ipmr/workflows/check-vignettes/badge.svg" alt="Vignette Code"></a></li>
+<li><a href="https://www.tidyverse.org/lifecycle/#maturing" class="external-link"><img src="https://img.shields.io/badge/lifecycle-maturing-blue.svg" alt="Lifecycle: maturing"></a></li>
+<li><a href="https://cran.r-project.org/package=ipmr" class="external-link"><img src="https://www.r-pkg.org/badges/version/ipmr" alt="CRAN status"></a></li>
+<li><a href="https://codecov.io/gh/levisc8/ipmr?branch=main" class="external-link"><img src="https://codecov.io/gh/levisc8/ipmr/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://cran.r-project.org/package=ipmr" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/ipmr" alt="CRAN Downloads"></a></li>
+<li><a href="https://doi.org/10.5281/zenodo.5076190" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.5076190.svg" alt="DOI"></a></li>
+<li><a href="https://doi.org/10.1111/2041-210X.13683" class="external-link"><img src="https://zenodo.org/badge/DOI/10.1111/2041-210X.13683.svg" alt="DOI"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://github.com/levisc8">Sam Levin</a>, Aldo Compagnoni, Dylan Childs, Sanne Evers, Roberto Salguero-Gomez, Tiffany Knight.</p>
+  <p></p>
+<p>Developed by <a href="https://github.com/levisc8" class="external-link">Sam Levin</a>, Aldo Compagnoni, Dylan Childs, Sanne Evers, Roberto Salguero-Gomez, Tiffany Knight.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -495,6 +501,8 @@
 
   
 
+
+  
 
   </body>
 </html>
