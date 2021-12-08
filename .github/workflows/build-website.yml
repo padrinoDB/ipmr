@@ -1,7 +1,7 @@
 on:
   push:
     branches: main
-name: pkgdown
+name: deploy website
 
 jobs:
   pkgdown:
