@@ -228,6 +228,13 @@ test_that("models compute population sizes correctly", {
 
 })
 
+test_that("log = TRUE works for all type_lambda= 'last' and 'all'", {
+  expect_equal(log(lambda(gen_dd_stoch_co, type_lambda = "last")),
+               lambda(gen_dd_stoch_co, type_lambda = "last", log = TRUE))
+  expect_equal(log(lambda(gen_dd_stoch_co, type_lambda = "all")),
+               lambda(gen_dd_stoch_co, type_lambda = "all", log = TRUE))
+})
+
 test_that("classes are correctly set", {
 
   test_ind <- vapply(gen_dd_stoch_co$sub_kernels,

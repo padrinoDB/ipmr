@@ -1569,3 +1569,10 @@ test_that('partially stochastic models also work', {
 
 
 })
+
+test_that("log = TRUE works for all type_lambda= 'last' and 'all'", {
+  expect_equal(log(lambda(gen_di_stoch_kern, type_lambda = "last")),
+               lambda(gen_di_stoch_kern, type_lambda = "last", log = TRUE))
+  expect_equal(log(lambda(gen_di_stoch_kern, type_lambda = "all")),
+               lambda(gen_di_stoch_kern, type_lambda = "all", log = TRUE))
+})

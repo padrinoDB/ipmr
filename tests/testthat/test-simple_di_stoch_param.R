@@ -243,6 +243,12 @@ test_that('eigenvectors/values are all good', {
 
 })
 
+test_that("log = TRUE works for all type_lambda= 'last' and 'all'", {
+  expect_equal(log(lambda(test_stoch_param, type_lambda = "last")),
+               lambda(test_stoch_param, type_lambda = "last", log = TRUE))
+  expect_equal(log(lambda(test_stoch_param, type_lambda = "all")),
+               lambda(test_stoch_param, type_lambda = "all", log = TRUE))
+})
 
 test_that('classes are correctly set', {
 
