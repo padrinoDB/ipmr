@@ -498,10 +498,13 @@ is_square <- function(x) {
 #' visually. \code{is_conv_to_asymptotic} checks whether
 #' \code{lambda[iterations - 1]} equals \code{lambda[iterations]} within the
 #' specified tolerance, \code{tolerance}. \code{conv_plot} plots the time series of
-#' \code{lambda} (or \code{log(lambda)}.
+#' \code{lambda} (or \code{log(lambda)}. For stochastic models, a running mean of
+#' log(lambda) is used to check for convergence.
 #'
 #' @param ipm An object returned by \code{make_ipm()}.
 #' @param tolerance The tolerance for convergence.
+#' @param burn_in The proportion of iterations to discard. Default is 0.1
+#' (i.e. first 10\% of iterations in the simulation). Ignored for deterministic models.
 #'
 #' @return \code{is_conv_to_asymptotic}: Either \code{TRUE} or \code{FALSE}.
 #' \code{conv_plot}: code{ipm} invisibly.
@@ -514,7 +517,7 @@ is_conv_to_asymptotic <- function(ipm, tolerance) {
 
 #' @export
 
-is_conv_to_asymptotic.ipmr_ipm <- function(ipm, tolerance = 1e-10) {
+is_conv_to_asymptotic.ipmr_ipm <- function(ipm, tolerance = 1e-10, burn_in = 0.1) {
 
   pop_state_test <- vapply(ipm$pop_state,
                            function(x) ! any(is.na(x)),
@@ -531,6 +534,19 @@ is_conv_to_asymptotic.ipmr_ipm <- function(ipm, tolerance = 1e-10) {
   lambdas <- ipm$pop_state[grepl("lambda", names(ipm$pop_state))]
 
   if(!all(is.na(unlist(lambdas)))) {
+
+    #for stochastic models, convert to cummean(log(lambda)) after removing burn_in
+    if(grepl("_stoch_", class(ipm)[1])) {
+      lambdas <- lapply(lambdas, function(x, burn_in) {
+
+        burn_ind <- seq_len(round(length(x) * burn_in))
+        temp <- x[-burn_ind]
+        #cummulative mean
+        cumsum(log(temp))/1:length(temp)
+
+      },
+      burn_in = burn_in)
+    }
 
     convs <- vapply(lambdas, function(x, tol) {
 
