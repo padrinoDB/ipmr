@@ -20,27 +20,27 @@ lambda(ipm, ...)
 
 \method{lambda}{simple_di_det_ipm}(ipm, type_lambda = "last", log = FALSE, ...)
 
-\method{lambda}{simple_di_stoch_kern_ipm}(ipm, type_lambda = "stochastic", burn_in = 0.1, log = TRUE, ...)
+\method{lambda}{simple_di_stoch_kern_ipm}(ipm, type_lambda = "stochastic", burn_in = 0.1, log = NULL, ...)
 
-\method{lambda}{simple_di_stoch_param_ipm}(ipm, type_lambda = "stochastic", burn_in = 0.1, log = TRUE, ...)
+\method{lambda}{simple_di_stoch_param_ipm}(ipm, type_lambda = "stochastic", burn_in = 0.1, log = NULL, ...)
 
 \method{lambda}{general_di_det_ipm}(ipm, type_lambda = "last", log = FALSE, ...)
 
-\method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = TRUE)
+\method{lambda}{general_di_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = NULL)
 
-\method{lambda}{general_di_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = TRUE)
+\method{lambda}{general_di_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = NULL)
 
 \method{lambda}{simple_dd_det_ipm}(ipm, type_lambda = "all", ..., log = FALSE)
 
-\method{lambda}{simple_dd_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = TRUE)
+\method{lambda}{simple_dd_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = NULL)
 
-\method{lambda}{simple_dd_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = TRUE)
+\method{lambda}{simple_dd_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = NULL)
 
 \method{lambda}{general_dd_det_ipm}(ipm, type_lambda = "last", ..., log = FALSE)
 
-\method{lambda}{general_dd_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = TRUE)
+\method{lambda}{general_dd_stoch_kern_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = NULL)
 
-\method{lambda}{general_dd_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = TRUE)
+\method{lambda}{general_dd_stoch_param_ipm}(ipm, ..., type_lambda = "stochastic", burn_in = 0.1, log = NULL)
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}

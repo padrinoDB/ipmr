@@ -391,6 +391,13 @@ test_that("burn_in works", {
 
 })
 
+test_that("log = TRUE works for all type_lambda= 'last' and 'all'", {
+  expect_equal(log(lambda(monocarp_sys, type_lambda = "last")),
+               lambda(monocarp_sys, type_lambda = "last", log = TRUE))
+  expect_equal(log(lambda(monocarp_sys, type_lambda = "all")),
+               lambda(monocarp_sys, type_lambda = "all", log = TRUE))
+})
+
 test_that('classes are correctly set', {
 
   sub_cls <- vapply(monocarp_sys$sub_kernels,

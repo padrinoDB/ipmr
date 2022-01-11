@@ -6,7 +6,7 @@
 \alias{conv_plot.ipmr_ipm}
 \title{Check for model convergence to asymptotic dynamics}
 \usage{
-is_conv_to_asymptotic(ipm, tolerance)
+is_conv_to_asymptotic(ipm, tolerance, burn_in)
 
 conv_plot(ipm, iterations, log, show_stable, ...)
 
@@ -16,6 +16,9 @@ conv_plot(ipm, iterations, log, show_stable, ...)
 \item{ipm}{An object returned by \code{make_ipm()}.}
 
 \item{tolerance}{The tolerance for convergence.}
+
+\item{burn_in}{The proportion of iterations to discard. Default is 0.1
+(i.e. first 10\% of iterations in the simulation). Ignored for deterministic models.}
 
 \item{iterations}{The range of iterations to plot \code{lambda} for. The default
 is every iteration.}
@@ -36,7 +39,8 @@ Checks for convergence to asymptotic dynamics numerically and
 visually. \code{is_conv_to_asymptotic} checks whether
 \code{lambda[iterations - 1]} equals \code{lambda[iterations]} within the
 specified tolerance, \code{tolerance}. \code{conv_plot} plots the time series of
-\code{lambda} (or \code{log(lambda)}.
+\code{lambda} (or \code{log(lambda)}. For stochastic models, a running mean of
+log(lambda) is used to check for convergence.
 }
 \details{
 Plotting can be controlled by passing additional graphing parameters

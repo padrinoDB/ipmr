@@ -201,6 +201,13 @@ test_that("asymptotic behavior is preserved at every time step", {
 
 })
 
+test_that("log = TRUE works for all type_lambda= 'last' and 'all'", {
+  expect_equal(log(lambda(x, type_lambda = "last")),
+               lambda(x, type_lambda = "last", log = TRUE))
+  expect_equal(log(lambda(x, type_lambda = "all")),
+               lambda(x, type_lambda = "all", log = TRUE))
+})
+
 
 test_that("sub-kernel names and values are generated correctly", {
 

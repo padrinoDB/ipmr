@@ -204,6 +204,14 @@ test_that("math works", {
 
 })
 
+test_that("log = TRUE works for all type_lambda= 'last' and 'all'", {
+  expect_equal(log(lambda(test_stoch_param, type_lambda = "last")),
+               lambda(test_stoch_param, type_lambda = "last", log = TRUE))
+  expect_equal(log(lambda(test_stoch_param, type_lambda = "all")),
+               lambda(test_stoch_param, type_lambda = "all", log = TRUE))
+})
+
+
 # Hierarchical models -------------
 
 g_int_effs <- rnorm(3) %>%

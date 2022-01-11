@@ -681,6 +681,12 @@ test_that('ipmr lambdas match user generated ones', {
 
 })
 
+test_that("log = TRUE works for all type_lambda= 'last' and 'all'", {
+  expect_equal(log(lambda(gen_di_stoch_param, type_lambda = "last")),
+               lambda(gen_di_stoch_param, type_lambda = "last", log = TRUE))
+  expect_equal(log(lambda(gen_di_stoch_param, type_lambda = "all")),
+               lambda(gen_di_stoch_param, type_lambda = "all", log = TRUE))
+})
 
 test_that("other outputs are of the expected form", {
 
