@@ -3,7 +3,8 @@
 visually. is_conv_to_asymptotic checks whether
 lambda[iterations - 1] equals lambda[iterations] within the
 specified tolerance, tolerance. conv_plot plots the time series of
-lambda (or log(lambda)."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
+lambda (or log(lambda). For stochastic models, a running mean of
+log(lambda) is used to check for convergence."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
@@ -88,11 +89,12 @@ lambda (or log(lambda)."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
 visually. <code>is_conv_to_asymptotic</code> checks whether
 <code>lambda[iterations - 1]</code> equals <code>lambda[iterations]</code> within the
 specified tolerance, <code>tolerance</code>. <code>conv_plot</code> plots the time series of
-<code>lambda</code> (or <code>log(lambda)</code>.</p>
+<code>lambda</code> (or <code>log(lambda)</code>. For stochastic models, a running mean of
+log(lambda) is used to check for convergence.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">is_conv_to_asymptotic</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">tolerance</span><span class="op">)</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">is_conv_to_asymptotic</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">tolerance</span>, <span class="va">burn_in</span><span class="op">)</span>
 
 <span class="fu">conv_plot</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">iterations</span>, <span class="va">log</span>, <span class="va">show_stable</span>, <span class="va">...</span><span class="op">)</span>
 
@@ -106,6 +108,9 @@ specified tolerance, <code>tolerance</code>. <code>conv_plot</code> plots the ti
 <dd><p>An object returned by <code><a href="make_ipm.html">make_ipm()</a></code>.</p></dd>
 <dt>tolerance</dt>
 <dd><p>The tolerance for convergence.</p></dd>
+<dt>burn_in</dt>
+<dd><p>The proportion of iterations to discard. Default is 0.1
+(i.e. first 10% of iterations in the simulation). Ignored for deterministic models.</p></dd>
 <dt>iterations</dt>
 <dd><p>The range of iterations to plot <code>lambda</code> for. The default
 is every iteration.</p></dd>
