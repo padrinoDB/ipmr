@@ -1666,8 +1666,11 @@ conv_plot.ipmr_ipm <- function(ipm, iterations = NULL,
               "'log = FALSE' to plot on a linear scale.")
     }
     all_lams <- lambda(ipm, type_lambda = "all", log = TRUE)
+    #store iteration# as rownames so correct after burn_in removed
+    row.names(all_lams) <- seq_len(nrow(all_lams))
     burn_ind <- seq_len(round(length(all_lams) * burn_in))
     temp <- all_lams[-burn_ind, , drop = FALSE]
+
     for(i in 1:ncol(temp)) {
       temp[ , i] <- cumsum(temp[,i])/1:nrow(temp)
     }
@@ -1685,6 +1688,7 @@ conv_plot.ipmr_ipm <- function(ipm, iterations = NULL,
     }
 
     all_lams <- lambda(ipm, type_lambda = "all", log = log)
+    row.names(all_lams) <- seq_len(nrow(all_lams))
 
   }
   nms      <- colnames(all_lams)
@@ -1692,16 +1696,15 @@ conv_plot.ipmr_ipm <- function(ipm, iterations = NULL,
   dots     <- list(...)
 
   if(is.null(iterations)) {
-
-    iterations <- seq(1, nrow(all_lams), by = 1)
+    iterations <- as.numeric(row.names(all_lams))
   }
 
-  all_lams <- all_lams[iterations, , drop = FALSE]
+  all_lams <- all_lams[row.names(all_lams) %in% iterations, , drop = FALSE]
 
   if(!"type" %in% names(dots)) {
     dots$type <- "l"
   }
-#TODO: for stochastic models y axis should be "Cumulattive Mean Log(lambda)"
+
   if(grepl("_stoch_", class(ipm)[1])) {
     if(log) {
       y_nm <- expression(paste("Cumulative Mean Log(  ", lambda, ")"))
