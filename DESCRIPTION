@@ -26,11 +26,11 @@ Authors@R: c(
     person(given = "Tiffany",
            family = "Knight",
            email = "tiffany.knight@idiv.de",
-           role = "aut")),
+           role = "aut"),
     person(given = "Eric",
            family = "Scott",
            email  = "scottericr@gmail.com",
-           role   = "ctb")
+           role   = "ctb"))
 Description: Flexibly implements Integral Projection Models using a
   mathematical(ish) syntax. This package will not help with the vital rate
   modeling process, but will help convert those regression models into an
