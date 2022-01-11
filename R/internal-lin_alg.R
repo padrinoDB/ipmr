@@ -498,7 +498,7 @@ is_square <- function(x) {
 #' visually. \code{is_conv_to_asymptotic} checks whether
 #' \code{lambda[iterations - 1]} equals \code{lambda[iterations]} within the
 #' specified tolerance, \code{tolerance}. \code{conv_plot} plots the time series of
-#' \code{lambda} (or \code{log(lambda)}. For stochastic models, a running mean of
+#' \code{lambda} (or \code{log(lambda)}). For stochastic models, a cumulative mean of
 #' log(lambda) is used to check for convergence.
 #'
 #' @param ipm An object returned by \code{make_ipm()}.

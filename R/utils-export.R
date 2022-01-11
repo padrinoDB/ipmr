@@ -1621,13 +1621,16 @@ make_iter_kernel.ipmr_ipm <- function(ipm,
   return(out)
 
 }
-#TODO: add burn_in param and description, add explanation of what is plotted for stochastic models.
 #' @rdname check_convergence
 #' @param iterations The range of iterations to plot \code{lambda} for. The default
 #' is every iteration.
-#' @param log A logical indicating whether log transform \code{lambda}.
+#' @param log A logical indicating whether to log transform \code{lambda}. This
+#'   defaults to TRUE for stochastic models and FALSE for deterministic models.
 #' @param show_stable A logical indicating whether or not to draw a line indicating
 #' population stability at \code{lambda = 1}.
+#' @param burn_in The proportion of iterations to discard. Default is 0.1 (i.e.
+#'   first 10\% of iterations in the simulation). Ignored for deterministic
+#'   models.
 #' @param ... Further arguments to \code{plot}.
 #'
 #' @details Plotting can be controlled by passing additional graphing parameters
@@ -1647,7 +1650,7 @@ make_iter_kernel.ipmr_ipm <- function(ipm,
 #'
 #' @export
 
-conv_plot <- function(ipm, iterations, log, show_stable, ...) {
+conv_plot <- function(ipm, iterations, log, show_stable, burn_in, ...) {
   UseMethod("conv_plot")
 }
 
