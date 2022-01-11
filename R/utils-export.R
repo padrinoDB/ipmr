@@ -1655,9 +1655,38 @@ conv_plot <- function(ipm, iterations, log, show_stable, ...) {
 #' @export
 
 conv_plot.ipmr_ipm <- function(ipm, iterations = NULL,
-                               log = FALSE, show_stable = TRUE, ...) {
+                               log = NULL, show_stable = TRUE, burn_in  = 0.1, ...) {
 
-  all_lams <- lambda(ipm, type_lambda = "all", log = log)
+  #for stochastic models, convert to cummean(log(lambda)) after removing burn_in
+  if(grepl("_stoch_", class(ipm)[1])) {
+
+    if(is.null(log)) {
+      log <- TRUE
+      message("Values of log(lambda) are plotted by default for stochastic models. Set ",
+              "'log = FALSE' to plot on a linear scale.")
+    }
+    all_lams <- lambda(ipm, type_lambda = "all", log = TRUE)
+    burn_ind <- seq_len(round(length(all_lams) * burn_in))
+    temp <- all_lams[-burn_ind, , drop = FALSE]
+    for(i in 1:ncol(temp)) {
+      temp[ , i] <- cumsum(temp[,i])/1:nrow(temp)
+    }
+
+    if(log) {
+      all_lams <- temp
+    } else {
+      all_lams <- exp(temp)
+    }
+
+  } else {
+
+    if(is.null(log)) {
+      log <- FALSE
+    }
+
+    all_lams <- lambda(ipm, type_lambda = "all", log = log)
+
+  }
   nms      <- colnames(all_lams)
 
   dots     <- list(...)
