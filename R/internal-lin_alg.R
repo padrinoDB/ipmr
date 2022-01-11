@@ -511,7 +511,7 @@ is_square <- function(x) {
 #' @export
 #'
 
-is_conv_to_asymptotic <- function(ipm, tolerance) {
+is_conv_to_asymptotic <- function(ipm, tolerance, burn_in) {
   UseMethod("is_conv_to_asymptotic")
 }
 
