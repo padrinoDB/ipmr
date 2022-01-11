@@ -1621,7 +1621,7 @@ make_iter_kernel.ipmr_ipm <- function(ipm,
   return(out)
 
 }
-
+#TODO: add burn_in param and description, add explanation of what is plotted for stochastic models.
 #' @rdname check_convergence
 #' @param iterations The range of iterations to plot \code{lambda} for. The default
 #' is every iteration.
@@ -1701,15 +1701,24 @@ conv_plot.ipmr_ipm <- function(ipm, iterations = NULL,
   if(!"type" %in% names(dots)) {
     dots$type <- "l"
   }
+#TODO: for stochastic models y axis should be "Cumulattive Mean Log(lambda)"
+  if(grepl("_stoch_", class(ipm)[1])) {
+    if(log) {
+      y_nm <- expression(paste("Cumulative Mean Log(  ", lambda, ")"))
+      nms  <- paste("Log(", nms, ")", sep = "")
+    } else {
+      y_nm <- expression(paste("Cumulative Mean   ", lambda))
+    }
 
-  if(log) {
-    y_nm <- expression(paste("Single Time Step Log(  ", lambda, ")"))
-    nms  <- paste("Log(", nms, ")", sep = "")
-    # all_lams <- apply(all_lams, MARGIN = 2, FUN = log)
   } else {
-    y_nm <- expression(paste("Single Time Step   ", lambda))
-  }
-
+    if(log) {
+      y_nm <- expression(paste("Single Time Step Log(  ", lambda, ")"))
+      nms  <- paste("Log(", nms, ")", sep = "")
+      # all_lams <- apply(all_lams, MARGIN = 2, FUN = log)
+    } else {
+      y_nm <- expression(paste("Single Time Step   ", lambda))
+    }
+}
   for(i in seq_len(ncol(all_lams))) {
 
     if(!"main" %in% names(dots)) dots$main <- nms[i]
