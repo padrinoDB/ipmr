@@ -3,7 +3,7 @@
 visually. is_conv_to_asymptotic checks whether
 lambda[iterations - 1] equals lambda[iterations] within the
 specified tolerance, tolerance. conv_plot plots the time series of
-lambda (or log(lambda). For stochastic models, a running mean of
+lambda (or log(lambda)). For stochastic models, a cumulative mean of
 log(lambda) is used to check for convergence."><meta name="robots" content="noindex"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -22,7 +22,7 @@ log(lambda) is used to check for convergence."><meta name="robots" content="noin
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.0.4.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.0.4.9001</span>
       </span>
     </div>
 
@@ -89,17 +89,24 @@ log(lambda) is used to check for convergence."><meta name="robots" content="noin
 visually. <code>is_conv_to_asymptotic</code> checks whether
 <code>lambda[iterations - 1]</code> equals <code>lambda[iterations]</code> within the
 specified tolerance, <code>tolerance</code>. <code>conv_plot</code> plots the time series of
-<code>lambda</code> (or <code>log(lambda)</code>. For stochastic models, a running mean of
+<code>lambda</code> (or <code>log(lambda)</code>). For stochastic models, a cumulative mean of
 log(lambda) is used to check for convergence.</p>
     </div>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">is_conv_to_asymptotic</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">tolerance</span>, <span class="va">burn_in</span><span class="op">)</span>
 
-<span class="fu">conv_plot</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">iterations</span>, <span class="va">log</span>, <span class="va">show_stable</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu">conv_plot</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">iterations</span>, <span class="va">log</span>, <span class="va">show_stable</span>, <span class="va">burn_in</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S3 method for ipmr_ipm</span>
-<span class="fu">conv_plot</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="cn">NULL</span>, log <span class="op">=</span> <span class="cn">FALSE</span>, show_stable <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+<span class="fu">conv_plot</span><span class="op">(</span>
+  <span class="va">ipm</span>,
+  iterations <span class="op">=</span> <span class="cn">NULL</span>,
+  log <span class="op">=</span> <span class="cn">NULL</span>,
+  show_stable <span class="op">=</span> <span class="cn">TRUE</span>,
+  burn_in <span class="op">=</span> <span class="fl">0.1</span>,
+  <span class="va">...</span>
+<span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -109,13 +116,15 @@ log(lambda) is used to check for convergence.</p>
 <dt>tolerance</dt>
 <dd><p>The tolerance for convergence.</p></dd>
 <dt>burn_in</dt>
-<dd><p>The proportion of iterations to discard. Default is 0.1
-(i.e. first 10% of iterations in the simulation). Ignored for deterministic models.</p></dd>
+<dd><p>The proportion of iterations to discard. Default is 0.1 (i.e.
+first 10% of iterations in the simulation). Ignored for deterministic
+models.</p></dd>
 <dt>iterations</dt>
 <dd><p>The range of iterations to plot <code>lambda</code> for. The default
 is every iteration.</p></dd>
 <dt>log</dt>
-<dd><p>A logical indicating whether log transform <code>lambda</code>.</p></dd>
+<dd><p>A logical indicating whether to log transform <code>lambda</code>. This
+defaults to TRUE for stochastic models and FALSE for deterministic models.</p></dd>
 <dt>show_stable</dt>
 <dd><p>A logical indicating whether or not to draw a line indicating
 population stability at <code>lambda = 1</code>.</p></dd>

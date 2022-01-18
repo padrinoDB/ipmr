@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.0.4.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.0.4.9001</span>
       </span>
     </div>
 
@@ -79,20 +79,22 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.0.5" id="ipmr-005">ipmr 0.0.5<a class="anchor" aria-label="anchor" href="#ipmr-005"></a></h2>
+<h2 class="page-header" data-toc-text="development version" id="ipmr-development-version">ipmr (development version)<a class="anchor" aria-label="anchor" href="#ipmr-development-version"></a></h2>
 <p>Contains some tweaks and a number of bug fixes. The latter are mostly related to PADRINO models, and shouldn’t have <em>too much</em> of an effect on existing user-specified IPMs.</p>
 <div class="section level3">
-<h3 id="features-0-0-5">Features<a class="anchor" aria-label="anchor" href="#features-0-0-5"></a></h3>
+<h3 id="features-development-version">Features<a class="anchor" aria-label="anchor" href="#features-development-version"></a></h3>
 <ul><li><p>Adds <code>return_sub_kernels</code> argument to <code><a href="../reference/make_ipm.html">make_ipm()</a></code> for <code>*_stoch_param</code> and all density dependent methods. This is due to the large RAM footprint that these objects can occupy, particularly for long running models. The default is <code>FALSE</code>, which will save considerable memory space. Can be set to <code>TRUE</code> for downstream analyses that require sub-kernels/iteration kernels.</p></li>
 <li><p>Prettier printing method for PADRINO objects/lists of user-specified models.</p></li>
 <li><p>Prettier warnings for <code>left/right_ev()</code></p></li>
 <li><p>Depending on your view, this may be a bug fix: updates the <code>log</code> argument in <code><a href="../reference/lambda.html">lambda()</a></code> so that it only changes the scale, NOT the calculation method. The prior behavior was documented, but unlikely to be intuitive, and so caused some confusion. Thanks to <a href="https://github.com/aariq" class="external-link">@aariq</a> for pointing this out.</p></li>
+<li><p>For stochastic IPMs, <code><a href="../reference/check_convergence.html">is_conv_to_asymptotic()</a></code> and <code><a href="../reference/check_convergence.html">conv_plot()</a></code> now check for convergence in stochastic lambda. That is, they use a cumulative mean <code>log(lambda)</code> over iterations after discarding a burn-in.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-0-5">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-5"></a></h3>
+<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p>Fixes bug in normalization of left/right eigenvectors in simple density independent stochastic models. (thanks to <a href="https://github.com/aariq" class="external-link">@aariq</a>)</p></li>
 <li><p>Fixes bug where <code>"drop_levels"</code> was not recognized in some parameter set indexed models.</p></li>
 <li><p>Fixes bug where parameter set levels were recycled in some cases.</p></li>
+<li><p>Fixes bug in <code><a href="../reference/lambda.html">lambda()</a></code> where <code>log = TRUE</code> had no effect when the IPM was stochastic and <code>type_lambda</code> was <code>'last'</code> or <code>'all'</code>.</p></li>
 </ul></div>
 </div>
     <div class="section level2">
