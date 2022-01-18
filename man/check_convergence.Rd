@@ -8,22 +8,31 @@
 \usage{
 is_conv_to_asymptotic(ipm, tolerance, burn_in)
 
-conv_plot(ipm, iterations, log, show_stable, ...)
+conv_plot(ipm, iterations, log, show_stable, burn_in, ...)
 
-\method{conv_plot}{ipmr_ipm}(ipm, iterations = NULL, log = FALSE, show_stable = TRUE, ...)
+\method{conv_plot}{ipmr_ipm}(
+  ipm,
+  iterations = NULL,
+  log = NULL,
+  show_stable = TRUE,
+  burn_in = 0.1,
+  ...
+)
 }
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
 
 \item{tolerance}{The tolerance for convergence.}
 
-\item{burn_in}{The proportion of iterations to discard. Default is 0.1
-(i.e. first 10\% of iterations in the simulation). Ignored for deterministic models.}
+\item{burn_in}{The proportion of iterations to discard. Default is 0.1 (i.e.
+first 10\% of iterations in the simulation). Ignored for deterministic
+models.}
 
 \item{iterations}{The range of iterations to plot \code{lambda} for. The default
 is every iteration.}
 
-\item{log}{A logical indicating whether log transform \code{lambda}.}
+\item{log}{A logical indicating whether to log transform \code{lambda}. This
+defaults to TRUE for stochastic models and FALSE for deterministic models.}
 
 \item{show_stable}{A logical indicating whether or not to draw a line indicating
 population stability at \code{lambda = 1}.}
@@ -39,7 +48,7 @@ Checks for convergence to asymptotic dynamics numerically and
 visually. \code{is_conv_to_asymptotic} checks whether
 \code{lambda[iterations - 1]} equals \code{lambda[iterations]} within the
 specified tolerance, \code{tolerance}. \code{conv_plot} plots the time series of
-\code{lambda} (or \code{log(lambda)}. For stochastic models, a running mean of
+\code{lambda} (or \code{log(lambda)}). For stochastic models, a cumulative mean of
 log(lambda) is used to check for convergence.
 }
 \details{

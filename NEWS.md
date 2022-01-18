@@ -1,4 +1,4 @@
-# ipmr 0.0.5
+# ipmr (development version)
 
 Contains some tweaks and a number of bug fixes. The latter are mostly related to PADRINO models, and shouldn't have *too much* of an effect on existing user-specified IPMs.
 
@@ -12,6 +12,8 @@ Contains some tweaks and a number of bug fixes. The latter are mostly related to
 
 - Depending on your view, this may be a bug fix: updates the `log` argument in `lambda()` so that it only changes the scale, NOT the calculation method. The prior behavior was documented, but unlikely to be intuitive, and so caused some confusion. Thanks to @aariq for pointing this out. 
 
+- For stochastic IPMs, `is_conv_to_asymptotic()` and `conv_plot()` now check for convergence in stochastic lambda.  That is, they use a cumulative mean `log(lambda)` over iterations after discarding a burn-in.
+
 ## Bug fixes 
 
  - Fixes bug in normalization of left/right eigenvectors in simple density independent stochastic models. (thanks to @aariq)
@@ -19,6 +21,8 @@ Contains some tweaks and a number of bug fixes. The latter are mostly related to
  - Fixes bug where `"drop_levels"` was not recognized in some parameter set indexed models.
  
  - Fixes bug where parameter set levels were recycled in some cases. 
+ 
+ - Fixes bug in `lambda()` where `log = TRUE` had no effect when the IPM was stochastic and `type_lambda` was `'last'` or `'all'`.
 
 # ipmr 0.0.4
 

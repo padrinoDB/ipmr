@@ -1621,13 +1621,16 @@ make_iter_kernel.ipmr_ipm <- function(ipm,
   return(out)
 
 }
-
 #' @rdname check_convergence
 #' @param iterations The range of iterations to plot \code{lambda} for. The default
 #' is every iteration.
-#' @param log A logical indicating whether log transform \code{lambda}.
+#' @param log A logical indicating whether to log transform \code{lambda}. This
+#'   defaults to TRUE for stochastic models and FALSE for deterministic models.
 #' @param show_stable A logical indicating whether or not to draw a line indicating
 #' population stability at \code{lambda = 1}.
+#' @param burn_in The proportion of iterations to discard. Default is 0.1 (i.e.
+#'   first 10\% of iterations in the simulation). Ignored for deterministic
+#'   models.
 #' @param ... Further arguments to \code{plot}.
 #'
 #' @details Plotting can be controlled by passing additional graphing parameters
@@ -1647,7 +1650,7 @@ make_iter_kernel.ipmr_ipm <- function(ipm,
 #'
 #' @export
 
-conv_plot <- function(ipm, iterations, log, show_stable, ...) {
+conv_plot <- function(ipm, iterations, log, show_stable, burn_in, ...) {
   UseMethod("conv_plot")
 }
 
@@ -1655,32 +1658,73 @@ conv_plot <- function(ipm, iterations, log, show_stable, ...) {
 #' @export
 
 conv_plot.ipmr_ipm <- function(ipm, iterations = NULL,
-                               log = FALSE, show_stable = TRUE, ...) {
+                               log = NULL, show_stable = TRUE, burn_in  = 0.1, ...) {
 
-  all_lams <- lambda(ipm, type_lambda = "all", log = log)
+  #for stochastic models, convert to cummean(log(lambda)) after removing burn_in
+  if(grepl("_stoch_", class(ipm)[1])) {
+
+    if(is.null(log)) {
+      log <- TRUE
+      message("Values of log(lambda) are plotted by default for stochastic models. Set ",
+              "'log = FALSE' to plot on a linear scale.")
+    }
+    all_lams <- lambda(ipm, type_lambda = "all", log = TRUE)
+    #store iteration# as rownames so correct after burn_in removed
+    row.names(all_lams) <- seq_len(nrow(all_lams))
+    burn_ind <- seq_len(round(length(all_lams) * burn_in))
+    temp <- all_lams[-burn_ind, , drop = FALSE]
+
+    for(i in 1:ncol(temp)) {
+      temp[ , i] <- cumsum(temp[,i])/1:nrow(temp)
+    }
+
+    if(log) {
+      all_lams <- temp
+    } else {
+      all_lams <- exp(temp)
+    }
+
+  } else {
+
+    if(is.null(log)) {
+      log <- FALSE
+    }
+
+    all_lams <- lambda(ipm, type_lambda = "all", log = log)
+    row.names(all_lams) <- seq_len(nrow(all_lams))
+
+  }
   nms      <- colnames(all_lams)
 
   dots     <- list(...)
 
   if(is.null(iterations)) {
-
-    iterations <- seq(1, nrow(all_lams), by = 1)
+    iterations <- as.numeric(row.names(all_lams))
   }
 
-  all_lams <- all_lams[iterations, , drop = FALSE]
+  all_lams <- all_lams[row.names(all_lams) %in% iterations, , drop = FALSE]
 
   if(!"type" %in% names(dots)) {
     dots$type <- "l"
   }
 
-  if(log) {
-    y_nm <- expression(paste("Single Time Step Log(  ", lambda, ")"))
-    nms  <- paste("Log(", nms, ")", sep = "")
-    # all_lams <- apply(all_lams, MARGIN = 2, FUN = log)
-  } else {
-    y_nm <- expression(paste("Single Time Step   ", lambda))
-  }
+  if(grepl("_stoch_", class(ipm)[1])) {
+    if(log) {
+      y_nm <- expression(paste("Cumulative Mean Log(  ", lambda, ")"))
+      nms  <- paste("Log(", nms, ")", sep = "")
+    } else {
+      y_nm <- expression(paste("Cumulative Mean   ", lambda))
+    }
 
+  } else {
+    if(log) {
+      y_nm <- expression(paste("Single Time Step Log(  ", lambda, ")"))
+      nms  <- paste("Log(", nms, ")", sep = "")
+      # all_lams <- apply(all_lams, MARGIN = 2, FUN = log)
+    } else {
+      y_nm <- expression(paste("Single Time Step   ", lambda))
+    }
+}
   for(i in seq_len(ncol(all_lams))) {
 
     if(!"main" %in% names(dots)) dots$main <- nms[i]
