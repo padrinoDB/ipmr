@@ -1,5 +1,5 @@
 development:
-  mode: devel
+  mode: release
 url: https://levisc8.github.io/ipmr
 authors:
   Sam Levin:
