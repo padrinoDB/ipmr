@@ -32,7 +32,7 @@ Relative to how we define simple models in `ipmr`, there are now two new bits:
 
 This example will use an IPM for _Ligustrum obtusifolium_, a tree species that is now invasive in North America. Data were collected outside of St. Louis, Missouri, and the full model is described in [Levin et al. 2019](https://esajournals.onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1002%2Fecy.2681&file=ecy2681-sup-0002-MetadataS1.pdf). The IPM consists of a single discrete stage (seed bank, abbreviated `b`) and a single continuous state (height, abbreviated `ht`/$z,z'$). The census timing was such that all seeds must enter the seed bank. They can either germinate in the next year, or they can die (so `stay_discrete` = 0). Thus, the full model takes the following form:
 
-1. $n(z', t + 1) = \int_L^U P(z', z) n(z,t)d\mathrm{z} + b(t) * \int_L^U leave\_discrete(z') \mathrm{dz'}$  
+1. $n(z', t + 1) = \int_L^U P(z', z) n(z,t)d\mathrm{z} + b(t) * leave\_discrete(z')$  
 
 2. $b(t + 1) = \int_L^Ugo\_discrete(z) n(z,t)d\mathrm{z}+ stay\_discrete$
 
@@ -190,7 +190,7 @@ general_ipm <- init_ipm(sim_gen = "general", di_dd = "di", det_stoch = "det") %>
     
     formula = 0,
     
-    # Note that now, family = "DD" becuase it denotes a discrete -> discrete transition
+    # Note that now, family = "DD" because it denotes a discrete -> discrete transition
     
     family  = "DD",
     
@@ -206,11 +206,7 @@ general_ipm <- init_ipm(sim_gen = "general", di_dd = "di", det_stoch = "det") %>
     # transition
     
     name          = 'leave_discrete',
-    
-    # We append d_ht here as well, because we need to integrate over the 
-    # the recruit size distribution.
-    
-    formula       = e_p * g_i * r_d * d_ht,
+    formula       = e_p * g_i * r_d,
     r_d           = dnorm(ht_2, r_d_mu, r_d_sd),
     family        = 'DC',
     data_list     = data_list,
@@ -391,7 +387,7 @@ If you've already read the Intro to `ipmr` article and the example above, then t
 
 We'll use a variation of the model above, simulating some random year-specific intercepts for growth and seed production. Parameters, functions, and kernels that are now time varying have a subscript $x_{yr}$ appended to them.
 
-1. $n(z', t + 1) = \int_L^U P_{yr}(z', z) n(z,t)d\mathrm{z} + b(t) * \int_L^U leave\_discrete(z') \mathrm{dz'}$  
+1. $n(z', t + 1) = \int_L^U P_{yr}(z', z) n(z,t)d\mathrm{z} + b(t) * leave\_discrete(z')$  
 
 2. $b(t + 1) = \int_L^Ugo\_discrete_{yr}(z) n(z,t)d\mathrm{z}+ stay\_discrete$
 
@@ -605,7 +601,7 @@ general_stoch_kern_ipm <- init_ipm(sim_gen    = "general",
     # This kernel also doesn't get a index, because there are no varying parameters.
     
     name          = 'leave_discrete',
-    formula       = e_p * r_d * d_ht,
+    formula       = e_p * r_d,
     r_d           = dnorm(ht_2, r_d_mu, r_d_sd),
     family        = 'DC',
     data_list     = all_params,
@@ -651,7 +647,7 @@ general_stoch_kern_ipm <- init_ipm(sim_gen    = "general",
 
 100 isn't too many iterations, but hopefully this demonstrates how to set up and implement such a model. There are a number of slots in the output that may be useful for further analyses.
 
-1. `env_seq`: This contains a character vector which shows the sequence in which levels of the time-varying components were chosen during model iteration. We could use this reproduce the model outputs later. 
+1. `env_seq`: This contains a character vector which shows the sequence in which levels of the time-varying components were chosen during model iteration. We could use this to reproduce the model outputs later. 
 
 2. `pop_state$lambda`: This shows the single timestep per-capita growth rates for the simulation. 
 
@@ -672,7 +668,7 @@ We can also use continuously varying parameters to construct general IPMs. These
 
 This example includes survival and growth models that make use of environmental covariates. The model can be written as:
 
-1. $n(z', t+1) = \int_L^U K(z',z, \theta)n(z,t)dz + B(t) * r_s * r_d * \int_L^Uf_{c_d}(z')dz'$
+1. $n(z', t+1) = \int_L^U K(z',z, \theta)n(z,t)dz + B(t) * r_s * r_d * f_{c_d}(z')$
 
 2. $B(t + 1) = r_e * r_s * \int_L^U c_r(z) * c_s(z)n(z,t)dz + B(t) * r_s * r_r$
 
@@ -893,7 +889,7 @@ general_stoch_param_model <- init_ipm(sim_gen    = "general",
   define_kernel(
     name          = "leave_discrete",
     family        = "DC",
-    formula       = r_d * r_s * c_d * d_surf_area,
+    formula       = r_d * r_s * c_d,
     c_d           = dnorm(surf_area_2, c_d_mu, c_d_sd),
     data_list     = constant_params,
     states        = list(c("surf_area", "sb")),
@@ -1078,7 +1074,7 @@ general_ipm <- init_ipm(sim_gen    = "general",
   ) %>%
   define_kernel(
     name          = 'leave_discrete',
-    formula       = e_p * r_d * d_ht,
+    formula       = e_p * r_d,
     r_d           = dnorm(ht_2, r_d_mu, r_d_sd),
     family        = 'DC',
     data_list     = data_list,
