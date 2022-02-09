@@ -97,7 +97,7 @@
 
       
 
-      </header><script src="general-ipms_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>General IPMs</h1>
@@ -134,7 +134,7 @@
 </h3>
 <p>This example will use an IPM for <em>Ligustrum obtusifolium</em>, a tree species that is now invasive in North America. Data were collected outside of St. Louis, Missouri, and the full model is described in <a href="https://esajournals.onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1002%2Fecy.2681&amp;file=ecy2681-sup-0002-MetadataS1.pdf" class="external-link">Levin et al. 2019</a>. The IPM consists of a single discrete stage (seed bank, abbreviated <code>b</code>) and a single continuous state (height, abbreviated <code>ht</code>/<span class="math inline">\(z,z'\)</span>). The census timing was such that all seeds must enter the seed bank. They can either germinate in the next year, or they can die (so <code>stay_discrete</code> = 0). Thus, the full model takes the following form:</p>
 <ol style="list-style-type: decimal">
-<li><p><span class="math inline">\(n(z', t + 1) = \int_L^U P(z', z) n(z,t)d\mathrm{z} + b(t) * \int_L^U leave\_discrete(z') \mathrm{dz'}\)</span></p></li>
+<li><p><span class="math inline">\(n(z', t + 1) = \int_L^U P(z', z) n(z,t)d\mathrm{z} + b(t) * leave\_discrete(z')\)</span></p></li>
 <li><p><span class="math inline">\(b(t + 1) = \int_L^Ugo\_discrete(z) n(z,t)d\mathrm{z}+ stay\_discrete\)</span></p></li>
 <li><p><span class="math inline">\(P(z',z) = s(z) * G(z',z)\)</span></p></li>
 <li><p><span class="math inline">\(go\_discrete(z) = f_s(z) * f_r(z) * g_i\)</span></p></li>
@@ -286,7 +286,7 @@
     
     formula <span class="op">=</span> <span class="fl">0</span>,
     
-    <span class="co"># Note that now, family = "DD" becuase it denotes a discrete -&gt; discrete transition</span>
+    <span class="co"># Note that now, family = "DD" because it denotes a discrete -&gt; discrete transition</span>
     
     family  <span class="op">=</span> <span class="st">"DD"</span>,
     
@@ -302,11 +302,7 @@
     <span class="co"># transition</span>
     
     name          <span class="op">=</span> <span class="st">'leave_discrete'</span>,
-    
-    <span class="co"># We append d_ht here as well, because we need to integrate over the </span>
-    <span class="co"># the recruit size distribution.</span>
-    
-    formula       <span class="op">=</span> <span class="va">e_p</span> <span class="op">*</span> <span class="va">g_i</span> <span class="op">*</span> <span class="va">r_d</span> <span class="op">*</span> <span class="va">d_ht</span>,
+    formula       <span class="op">=</span> <span class="va">e_p</span> <span class="op">*</span> <span class="va">g_i</span> <span class="op">*</span> <span class="va">r_d</span>,
     r_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">ht_2</span>, <span class="va">r_d_mu</span>, <span class="va">r_d_sd</span><span class="op">)</span>,
     family        <span class="op">=</span> <span class="st">'DC'</span>,
     data_list     <span class="op">=</span> <span class="va">data_list</span>,
@@ -460,7 +456,7 @@
 </h3>
 <p>We’ll use a variation of the model above, simulating some random year-specific intercepts for growth and seed production. Parameters, functions, and kernels that are now time varying have a subscript <span class="math inline">\(x_{yr}\)</span> appended to them.</p>
 <ol style="list-style-type: decimal">
-<li><p><span class="math inline">\(n(z', t + 1) = \int_L^U P_{yr}(z', z) n(z,t)d\mathrm{z} + b(t) * \int_L^U leave\_discrete(z') \mathrm{dz'}\)</span></p></li>
+<li><p><span class="math inline">\(n(z', t + 1) = \int_L^U P_{yr}(z', z) n(z,t)d\mathrm{z} + b(t) * leave\_discrete(z')\)</span></p></li>
 <li><p><span class="math inline">\(b(t + 1) = \int_L^Ugo\_discrete_{yr}(z) n(z,t)d\mathrm{z}+ stay\_discrete\)</span></p></li>
 <li><p><span class="math inline">\(P_{yr}(z',z) = s(z) * G_{yr}(z',z)\)</span></p></li>
 <li><p><span class="math inline">\(go\_discrete_{yr}(z) = r_{s,yr}(z) * r_r(z) * g_i\)</span></p></li>
@@ -669,7 +665,7 @@
     <span class="co"># This kernel also doesn't get a index, because there are no varying parameters.</span>
     
     name          <span class="op">=</span> <span class="st">'leave_discrete'</span>,
-    formula       <span class="op">=</span> <span class="va">e_p</span> <span class="op">*</span> <span class="va">r_d</span> <span class="op">*</span> <span class="va">d_ht</span>,
+    formula       <span class="op">=</span> <span class="va">e_p</span> <span class="op">*</span> <span class="va">r_d</span>,
     r_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">ht_2</span>, <span class="va">r_d_mu</span>, <span class="va">r_d_sd</span><span class="op">)</span>,
     family        <span class="op">=</span> <span class="st">'DC'</span>,
     data_list     <span class="op">=</span> <span class="va">all_params</span>,
@@ -712,7 +708,7 @@
   <span class="op">)</span></code></pre></div>
 <p>100 isn’t too many iterations, but hopefully this demonstrates how to set up and implement such a model. There are a number of slots in the output that may be useful for further analyses.</p>
 <ol style="list-style-type: decimal">
-<li><p><code>env_seq</code>: This contains a character vector which shows the sequence in which levels of the time-varying components were chosen during model iteration. We could use this reproduce the model outputs later.</p></li>
+<li><p><code>env_seq</code>: This contains a character vector which shows the sequence in which levels of the time-varying components were chosen during model iteration. We could use this to reproduce the model outputs later.</p></li>
 <li><p><code>pop_state$lambda</code>: This shows the single timestep per-capita growth rates for the simulation.</p></li>
 </ol>
 <p>Additionally, there are functions to compute the stochastic population growth rate (<span class="math inline">\(\lambda_s\)</span>, computed as <code>mean(log(pop_state$lambda))</code>, burn in can be controlled with the <code>burn_in</code> parameter), and the mean sub-kernels.</p>
@@ -730,7 +726,7 @@
 </h3>
 <p>This example includes survival and growth models that make use of environmental covariates. The model can be written as:</p>
 <ol style="list-style-type: decimal">
-<li><p><span class="math inline">\(n(z', t+1) = \int_L^U K(z',z, \theta)n(z,t)dz + B(t) * r_s * r_d * \int_L^Uf_{c_d}(z')dz'\)</span></p></li>
+<li><p><span class="math inline">\(n(z', t+1) = \int_L^U K(z',z, \theta)n(z,t)dz + B(t) * r_s * r_d * f_{c_d}(z')\)</span></p></li>
 <li><p><span class="math inline">\(B(t + 1) = r_e * r_s * \int_L^U c_r(z) * c_s(z)n(z,t)dz + B(t) * r_s * r_r\)</span></p></li>
 <li><p><span class="math inline">\(K(z',z,\theta) = P(z',z,\theta) + F(z',z)\)</span></p></li>
 <li><p><span class="math inline">\(P(z',z,\theta) = s(z, \theta) * G(z',z,\theta)\)</span></p></li>
@@ -942,7 +938,7 @@
   <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"leave_discrete"</span>,
     family        <span class="op">=</span> <span class="st">"DC"</span>,
-    formula       <span class="op">=</span> <span class="va">r_d</span> <span class="op">*</span> <span class="va">r_s</span> <span class="op">*</span> <span class="va">c_d</span> <span class="op">*</span> <span class="va">d_surf_area</span>,
+    formula       <span class="op">=</span> <span class="va">r_d</span> <span class="op">*</span> <span class="va">r_s</span> <span class="op">*</span> <span class="va">c_d</span>,
     c_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">surf_area_2</span>, <span class="va">c_d_mu</span>, <span class="va">c_d_sd</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">constant_params</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"surf_area"</span>, <span class="st">"sb"</span><span class="op">)</span><span class="op">)</span>,
@@ -1111,7 +1107,7 @@
   <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">'leave_discrete'</span>,
-    formula       <span class="op">=</span> <span class="va">e_p</span> <span class="op">*</span> <span class="va">r_d</span> <span class="op">*</span> <span class="va">d_ht</span>,
+    formula       <span class="op">=</span> <span class="va">e_p</span> <span class="op">*</span> <span class="va">r_d</span>,
     r_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">ht_2</span>, <span class="va">r_d_mu</span>, <span class="va">r_d_sd</span><span class="op">)</span>,
     family        <span class="op">=</span> <span class="st">'DC'</span>,
     data_list     <span class="op">=</span> <span class="va">data_list</span>,

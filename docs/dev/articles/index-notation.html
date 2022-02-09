@@ -97,7 +97,7 @@
 
       
 
-      </header><script src="index-notation_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Index Notation in ipmr</h1>
@@ -428,7 +428,7 @@ r = exp(r_int + r_int_<strong>yr</strong> + (r_slope + r_slope_<strong>yr</stron
 <p>The full IPM looks like this:</p>
 <ol style="list-style-type: decimal">
 <li><p><span class="math display">\[
-n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n(z, t)dz +\\ s_{{sb}_1} * r_{{sb}_1} * sb_1(t) * \int_L^U c_d(z')dz' + \\s_{{sb}_2} * r_{{sb}_2} * sb_2(t) *\int_L^U c_d(z')dz'
+n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n(z, t)dz +\\ s_{{sb}_1} * r_{{sb}_1} * sb_1(t) *  c_d(z') + \\s_{{sb}_2} * r_{{sb}_2} * sb_2(t) * c_d(z')
 \]</span></p></li>
 <li><p><span class="math inline">\(sb_1(t + 1) = (1-r_i) * \int_L^U [c_p^{site}(z, \theta) * c_r^{site}(z,\theta)] n(z, t)dz\)</span></p></li>
 <li><p><span class="math inline">\(sb_2(t + 1) = s_{{sb}_1} * (1-r_{{sb}_1}) * sb_1(t)\)</span></p></li>
@@ -660,7 +660,7 @@ n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n
   <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"leave_sb_1"</span>,
     family        <span class="op">=</span> <span class="st">"DC"</span>,
-    formula       <span class="op">=</span> <span class="va">s_sb1</span> <span class="op">*</span> <span class="va">r_sb1</span> <span class="op">*</span> <span class="va">c_d</span> <span class="op">*</span> <span class="va">d_z</span>,
+    formula       <span class="op">=</span> <span class="va">s_sb1</span> <span class="op">*</span> <span class="va">r_sb1</span> <span class="op">*</span> <span class="va">c_d</span>,
     c_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">z_2</span>, <span class="va">mu_c_d</span>, <span class="va">sigma_c_d</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">all_pars</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="st">"sb1"</span><span class="op">)</span><span class="op">)</span>,
@@ -671,7 +671,7 @@ n(z, t + 1) = \int_L^U [P^{site}(z', z,\theta) + r_i * F^{site}(z', z, \theta)]n
   <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span>
     name          <span class="op">=</span> <span class="st">"leave_sb_2"</span>,
     family        <span class="op">=</span> <span class="st">"DC"</span>,
-    formula       <span class="op">=</span> <span class="va">s_sb2</span> <span class="op">*</span> <span class="va">r_sb2</span> <span class="op">*</span> <span class="va">c_d</span> <span class="op">*</span> <span class="va">d_z</span>,
+    formula       <span class="op">=</span> <span class="va">s_sb2</span> <span class="op">*</span> <span class="va">r_sb2</span> <span class="op">*</span> <span class="va">c_d</span>,
     c_d           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">z_2</span>, <span class="va">mu_c_d</span>, <span class="va">sigma_c_d</span><span class="op">)</span>,
     data_list     <span class="op">=</span> <span class="va">all_pars</span>,
     states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="st">"sb2"</span><span class="op">)</span><span class="op">)</span>,

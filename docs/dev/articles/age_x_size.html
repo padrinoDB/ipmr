@@ -97,7 +97,7 @@
 
       
 
-      </header><script src="age_x_size_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Age-Size IPMs</h1>
@@ -244,7 +244,7 @@
   <span class="va">s_age</span> <span class="op">*</span> <span class="va">pb_age</span> <span class="op">*</span> <span class="va">pr_age</span> <span class="op">*</span> <span class="va">recr</span> <span class="op">*</span> <span class="fl">0.5</span>
 
 <span class="op">}</span></code></pre></div>
-<p>Next, we begin to initialize our kernels. <code>init_ipm</code> now has a fifth argument - <code>uses_age</code>. This is a logical and denotes that we are specifying a model with individuals cross-classified by both age and size. The <code>sim_gen</code> argument is <code>"general</code>", because age-size models are always general IPMs, and <code>det_stoch = "det"</code> because we are only working on a deterministic version of this model for now. We’ll append the <code>_age</code> index to every variable that is age dependent. Additionally, we can use <code>age</code> as a standalone term - these will be substituted during the model building as well.</p>
+<p>Next, we begin to initialize our kernels. <code>init_ipm</code> now has a fifth argument - <code>uses_age</code>. This is a logical and denotes that we are specifying a model with individuals cross-classified by both age and size. The <code>sim_gen</code> argument is <code>"general</code>“, because age-size models are always general IPMs, and <code>det_stoch = "det"</code> because we are only working on a deterministic version of this model for now. We’ll append the <code>_age</code> index to every variable that is age dependent. Additionally, we can use <code>age</code> as a standalone term - these will be substituted during the model building as well.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"general"</span>,
                          di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
