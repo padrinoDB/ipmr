@@ -110,15 +110,15 @@
 
     
     
-<div class="section level1">
-<h1 id="scope-and-motivation">Scope and motivation<a class="anchor" aria-label="anchor" href="#scope-and-motivation"></a>
-</h1>
+<div class="section level2">
+<h2 id="scope-and-motivation">Scope and motivation<a class="anchor" aria-label="anchor" href="#scope-and-motivation"></a>
+</h2>
 <p>This vignette provides the technical details underlying the <code>proto_ipm</code> data structure. Most users will probably not care about much, if any, of the information in this vignette, and can skip it. It is primarily aimed at those interested in extending the data structure for their own purposes, or those who are just curious how this all works.</p>
 <p>The primary motivation in defining this data structure was to provide a sort of middle ground between user-defined models, and ones that are stored in the <em>PADRINO</em> database. Defining this means we can use the exact same machinery to actually generate the kernels once we’ve defined the <code>proto_ipm</code> itself. This considerably reduces code duplication across tasks. Additionally, the hope is that <code>ipmr</code> becomes widely used, and authors can just email us a <code>proto_ipm</code> and a few other bits of metadata (or even just put in the supplementary data of their manuscripts), and we can stick it into the database. This last point may well be a pipe dream, but we all need something to hope for, right?</p>
 </div>
-<div class="section level1">
-<h1 id="the-actual-details">The actual details<a class="anchor" aria-label="anchor" href="#the-actual-details"></a>
-</h1>
+<div class="section level2">
+<h2 id="the-actual-details">The actual details<a class="anchor" aria-label="anchor" href="#the-actual-details"></a>
+</h2>
 <p>The <code>proto_ipm</code> data structure powers most of <code>ipmr</code>. It represents the minimum amount of information one needs to specify to implement an IPM, and provides a (hopefully) standardized data structure going forward. It has the following classes: <code>model_class</code> (defined in <code><a href="../reference/init_ipm.html">init_ipm()</a></code>), <code>proto_ipm</code>, and <code>data.frame</code>. It will always have as many rows as calls to <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code> that are used in the model definition pipeline. Each row corresponds to 1 or more kernels.</p>
 <p>NB: A row may correspond to more than 1 kernel when discrete effects like age, year, or site are included in the model. When this happens, <code><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid()</a></code> is called on the list in <code>par_set_indices</code>, and all rows are <code>paste</code>’d together with <code>collapse = "_"</code>. This creates fully crossed levels. Each row that contains the grouping effects is then replicated, but with a single level substituted in for the suffix(es). These steps are implemented within <code><a href="../reference/make_ipm.html">make_ipm()</a></code> (and, more specifically <code>.initialize_kernels()</code>), and so you will never actually see the results of the suffix expansion when you print <code>proto_ipm</code>, only the output from <code><a href="../reference/make_ipm.html">make_ipm()</a></code>.</p>
 <p>The <code>proto_ipm</code> will also always contain the following columns:</p>
@@ -147,13 +147,13 @@
 </li>
 <li><p><code>usr_funs</code>: A list. If the user has specified their own functions in the call to <code>make_ipm</code>, they will get stored here.</p></li>
 </ol>
-<div class="section level2">
-<h2 id="additional-information">Additional information<a class="anchor" aria-label="anchor" href="#additional-information"></a>
-</h2>
 <div class="section level3">
-<h3 id="flat_protect-attribute">
-<code>flat_protect</code> attribute<a class="anchor" aria-label="anchor" href="#flat_protect-attribute"></a>
+<h3 id="additional-information">Additional information<a class="anchor" aria-label="anchor" href="#additional-information"></a>
 </h3>
+<div class="section level4">
+<h4 id="flat_protect-attribute">
+<code>flat_protect</code> attribute<a class="anchor" aria-label="anchor" href="#flat_protect-attribute"></a>
+</h4>
 <p><code>.flatten_to_depth</code> is an internal function that takes a nested list and “flattens” it to the depth specified in the 2nd argument. Names are preserved at the most nested level of the list. This function is used extensively by functions in <code>ipmr</code> to ensure that binding things to evaluation environments goes smoothly.</p>
 <p>The <code>flat_protect</code> attribute controls whether <code>.flatten_to_depth</code> “flattens” a particular list element or leaves it untouched. This is necessary to prevent it from recursively flattening regression model objects, which themselves are usually lists. <code>predict</code> methods require an intact list though, so squashing them down and stripping their classes/other attributes prevents those from working. In general, values in the <code>data_list</code> should not have this attribute set to <code>TRUE</code> unless they are regression models passed to <code>predict</code> methods in the vital rate expressions. <code>ipmr</code> sets this attribute internally using <code>.protect_model</code> in <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code>. Adding new model classes requires updating the output from <code>.supported_models</code>.</p>
 </div>
@@ -178,7 +178,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
