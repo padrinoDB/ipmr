@@ -1,5 +1,5 @@
-pandoc: 2.14.2
-pkgdown: 2.0.2
+pandoc: '2.12'
+pkgdown: 2.0.1
 pkgdown_sha: ~
 articles:
   age_x_size: age_x_size.html
@@ -9,7 +9,7 @@ articles:
   index-notation: index-notation.html
   ipmr-introduction: ipmr-introduction.html
   proto-ipms: proto-ipms.html
-last_built: 2022-02-09T17:50Z
+last_built: 2022-02-09T17:59Z
 urls:
   reference: https://levisc8.github.io/ipmr/reference
   article: https://levisc8.github.io/ipmr/articles
