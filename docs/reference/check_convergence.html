@@ -96,6 +96,9 @@ log(lambda) is used to check for convergence.</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">is_conv_to_asymptotic</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">tolerance</span>, <span class="va">burn_in</span><span class="op">)</span>
 
+<span class="co"># S3 method for ipmr_ipm</span>
+<span class="fu">is_conv_to_asymptotic</span><span class="op">(</span><span class="va">ipm</span>, tolerance <span class="op">=</span> <span class="fl">1e-06</span>, burn_in <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>
+
 <span class="fu">conv_plot</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">iterations</span>, <span class="va">log</span>, <span class="va">show_stable</span>, <span class="va">burn_in</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S3 method for ipmr_ipm</span>
@@ -152,7 +155,7 @@ to <code>...</code>.</p>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_ipm.html">make_ipm</a></span><span class="op">(</span><span class="va">proto</span><span class="op">)</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="fu">is_conv_to_asymptotic</span><span class="op">(</span><span class="va">ipm</span>, tol <span class="op">=</span> <span class="fl">1e-5</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">is_conv_to_asymptotic</span><span class="op">(</span><span class="va">ipm</span>, tolerance <span class="op">=</span> <span class="fl">1e-5</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> lambda </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   TRUE </span>
 <span class="r-in"><span class="fu">conv_plot</span><span class="op">(</span><span class="va">ipm</span><span class="op">)</span></span>
