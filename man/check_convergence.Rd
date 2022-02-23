@@ -9,7 +9,7 @@
 \usage{
 is_conv_to_asymptotic(ipm, tolerance, burn_in)
 
-\method{is_conv_to_asymptotic}{ipmr_ipm}(ipm, tolerance = 1e-10, burn_in = 0.1)
+\method{is_conv_to_asymptotic}{ipmr_ipm}(ipm, tolerance = 1e-06, burn_in = 0.1)
 
 conv_plot(ipm, iterations, log, show_stable, burn_in, ...)
 

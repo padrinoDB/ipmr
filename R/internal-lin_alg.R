@@ -518,7 +518,7 @@ is_conv_to_asymptotic <- function(ipm, tolerance, burn_in) {
 #' @rdname check_convergence
 #' @export
 
-is_conv_to_asymptotic.ipmr_ipm <- function(ipm, tolerance = 1e-10, burn_in = 0.1) {
+is_conv_to_asymptotic.ipmr_ipm <- function(ipm, tolerance = 1e-6, burn_in = 0.1) {
 
   pop_state_test <- vapply(ipm$pop_state,
                            function(x) ! any(is.na(x)),
