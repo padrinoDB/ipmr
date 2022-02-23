@@ -1645,7 +1645,7 @@ make_iter_kernel.ipmr_ipm <- function(ipm,
 #'
 #' ipm <- make_ipm(proto)
 #'
-#' is_conv_to_asymptotic(ipm, tol = 1e-5)
+#' is_conv_to_asymptotic(ipm, tolerance = 1e-5)
 #' conv_plot(ipm)
 #'
 #' @export

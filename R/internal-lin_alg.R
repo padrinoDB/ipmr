@@ -515,6 +515,7 @@ is_conv_to_asymptotic <- function(ipm, tolerance, burn_in) {
   UseMethod("is_conv_to_asymptotic")
 }
 
+#' @rdname check_convergence
 #' @export
 
 is_conv_to_asymptotic.ipmr_ipm <- function(ipm, tolerance = 1e-10, burn_in = 0.1) {
