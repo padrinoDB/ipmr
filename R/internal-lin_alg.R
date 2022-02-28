@@ -465,7 +465,7 @@ is_square <- function(x) {
 # Checks for convergence to asymptotic dynamics. Supports either
 # lambdas computed by iteration, which
 
-.is_conv_to_asymptotic <- function(x, tol = 1e-10) {
+.is_conv_to_asymptotic <- function(x, tol = 1e-6) {
 
   # Standardize columns in case of dealing w/ population state
   # within right/left_ev. lambdas won't be affected
