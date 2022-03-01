@@ -25,7 +25,7 @@ conv_plot(ipm, iterations, log, show_stable, burn_in, ...)
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
 
-\item{tolerance}{The tolerance for convergence.}
+\item{tolerance}{The tolerance for convergence in lambda or, in the case of stochastic models, the cumulative mean of log(lambda).}
 
 \item{burn_in}{The proportion of iterations to discard. Default is 0.1 (i.e.
 first 10\% of iterations in the simulation). Ignored for deterministic
