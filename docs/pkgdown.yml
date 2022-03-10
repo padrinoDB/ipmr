@@ -1,28 +1,15 @@
-<<<<<<< HEAD
-pandoc: '2.12'
-pkgdown: 1.6.1
-=======
 pandoc: 2.14.2
 pkgdown: 2.0.2
->>>>>>> 053fb52210e325209f64056c9a3a82b98312d7a2
 pkgdown_sha: ~
 articles:
   age_x_size: age_x_size.html
   density-dependence: density-dependence.html
   general-ipms: general-ipms.html
   generic-funs: generic-funs.html
-<<<<<<< HEAD
-  generic-progress: generic-progress.html
   index-notation: index-notation.html
   ipmr-introduction: ipmr-introduction.html
   proto-ipms: proto-ipms.html
-last_built: 2021-11-23T15:39Z
-=======
-  index-notation: index-notation.html
-  ipmr-introduction: ipmr-introduction.html
-  proto-ipms: proto-ipms.html
-last_built: 2022-03-01T19:50Z
->>>>>>> 053fb52210e325209f64056c9a3a82b98312d7a2
+last_built: 2022-03-10T15:40Z
 urls:
   reference: https://levisc8.github.io/ipmr/reference
   article: https://levisc8.github.io/ipmr/articles
