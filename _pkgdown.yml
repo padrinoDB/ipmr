@@ -32,17 +32,18 @@ navbar:
       href: news/index.html
 
 reference:
-  - title: "IPM Construction"
+  - title: "IPM Construction and Reporting"
     desc: >
       Functions for initializing an IPM, constructing sub-kernels, defining
       numerical integration, defining initial conditions, defining the
-      environmental state, and handling eviction.
+      environmental state, handling eviction, and generating automated reports
+      describing the IPM.
   - contents:
       - init_ipm
       - starts_with("define")
       - truncated_distributions
       - use_vr_model
-      - make_ipm
+      - starts_with("make_ipm")
   - title: "Projection Diagnostics"
     desc: >
       Evaluate the behavior of the population projection.
