@@ -2,11 +2,14 @@
 % Please edit documentation in R/internal-lin_alg.R, R/utils-export.R
 \name{is_conv_to_asymptotic}
 \alias{is_conv_to_asymptotic}
+\alias{is_conv_to_asymptotic.ipmr_ipm}
 \alias{conv_plot}
 \alias{conv_plot.ipmr_ipm}
 \title{Check for model convergence to asymptotic dynamics}
 \usage{
 is_conv_to_asymptotic(ipm, tolerance, burn_in)
+
+\method{is_conv_to_asymptotic}{ipmr_ipm}(ipm, tolerance = 1e-06, burn_in = 0.1)
 
 conv_plot(ipm, iterations, log, show_stable, burn_in, ...)
 
@@ -22,7 +25,7 @@ conv_plot(ipm, iterations, log, show_stable, burn_in, ...)
 \arguments{
 \item{ipm}{An object returned by \code{make_ipm()}.}
 
-\item{tolerance}{The tolerance for convergence.}
+\item{tolerance}{The tolerance for convergence in lambda or, in the case of stochastic models, the cumulative mean of log(lambda).}
 
 \item{burn_in}{The proportion of iterations to discard. Default is 0.1 (i.e.
 first 10\% of iterations in the simulation). Ignored for deterministic
@@ -64,7 +67,7 @@ proto <- gen_di_det_ex$proto_ipm \%>\%
 
 ipm <- make_ipm(proto)
 
-is_conv_to_asymptotic(ipm, tol = 1e-5)
+is_conv_to_asymptotic(ipm, tolerance = 1e-5)
 conv_plot(ipm)
 
 }

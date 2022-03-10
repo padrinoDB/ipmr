@@ -465,7 +465,7 @@ is_square <- function(x) {
 # Checks for convergence to asymptotic dynamics. Supports either
 # lambdas computed by iteration, which
 
-.is_conv_to_asymptotic <- function(x, tol = 1e-10) {
+.is_conv_to_asymptotic <- function(x, tol = 1e-6) {
 
   # Standardize columns in case of dealing w/ population state
   # within right/left_ev. lambdas won't be affected
@@ -502,7 +502,7 @@ is_square <- function(x) {
 #' log(lambda) is used to check for convergence.
 #'
 #' @param ipm An object returned by \code{make_ipm()}.
-#' @param tolerance The tolerance for convergence.
+#' @param tolerance The tolerance for convergence in lambda or, in the case of stochastic models, the cumulative mean of log(lambda).
 #' @param burn_in The proportion of iterations to discard. Default is 0.1
 #' (i.e. first 10\% of iterations in the simulation). Ignored for deterministic models.
 #'
@@ -515,9 +515,10 @@ is_conv_to_asymptotic <- function(ipm, tolerance, burn_in) {
   UseMethod("is_conv_to_asymptotic")
 }
 
+#' @rdname check_convergence
 #' @export
 
-is_conv_to_asymptotic.ipmr_ipm <- function(ipm, tolerance = 1e-10, burn_in = 0.1) {
+is_conv_to_asymptotic.ipmr_ipm <- function(ipm, tolerance = 1e-6, burn_in = 0.1) {
 
   pop_state_test <- vapply(ipm$pop_state,
                            function(x) ! any(is.na(x)),
@@ -553,7 +554,7 @@ is_conv_to_asymptotic.ipmr_ipm <- function(ipm, tolerance = 1e-10, burn_in = 0.1
       end <- length(x)
       start <- end - 1
 
-      isTRUE(all.equal(x[start], x[end], tolerance = tol))
+      abs(x[start] - x[end]) <= tol
 
     },
     logical(1L),

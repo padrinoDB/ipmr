@@ -1,9 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+<<<<<<< HEAD
     <loc>https://levisc8.github.io/ipmr/index.html</loc>
   </url>
   <url>
+=======
+    <loc>https://levisc8.github.io/ipmr/404.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/CODE_OF_CONDUCT.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/articles/age_x_size.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/articles/density-dependence.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/articles/general-ipms.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/articles/generic-funs.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/articles/index-notation.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/articles/ipmr-introduction.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/articles/proto-ipms.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/authors.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/index.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/news/index.html</loc>
+  </url>
+  <url>
+>>>>>>> 053fb52210e325209f64056c9a3a82b98312d7a2
     <loc>https://levisc8.github.io/ipmr/reference/accessors.html</loc>
   </url>
   <url>
@@ -25,10 +73,17 @@
     <loc>https://levisc8.github.io/ipmr/reference/gen_di_det.html</loc>
   </url>
   <url>
+<<<<<<< HEAD
     <loc>https://levisc8.github.io/ipmr/reference/init_ipm.html</loc>
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/ipm_report.html</loc>
+=======
+    <loc>https://levisc8.github.io/ipmr/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://levisc8.github.io/ipmr/reference/init_ipm.html</loc>
+>>>>>>> 053fb52210e325209f64056c9a3a82b98312d7a2
   </url>
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/ipm_to_df.html</loc>
@@ -78,6 +133,7 @@
   <url>
     <loc>https://levisc8.github.io/ipmr/reference/tidyeval.html</loc>
   </url>
+<<<<<<< HEAD
   <url>
     <loc>https://levisc8.github.io/ipmr/articles/age_x_size.html</loc>
   </url>
@@ -102,4 +158,6 @@
   <url>
     <loc>https://levisc8.github.io/ipmr/articles/proto-ipms.html</loc>
   </url>
+=======
+>>>>>>> 053fb52210e325209f64056c9a3a82b98312d7a2
 </urlset>
