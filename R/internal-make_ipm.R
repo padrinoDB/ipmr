@@ -1095,8 +1095,8 @@
   # checks pop_state, env_state, domain definitions
   .check_ipm_definition(proto_ipm, iterate)
 
-  # Experimental function - automatically generates the k_row object.
-  # is meant to take the place of define_k.
+  # automatically generates the k_row object, which contains the iteration
+  # expressions (e.g. n_z_t_1 = P %*% n_z_t + F %*% n_z_t)
 
   k_row <- .init_iteration(proto_ipm, iterate, direction = iter_dir)
 
