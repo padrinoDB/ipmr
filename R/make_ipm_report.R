@@ -1,4 +1,5 @@
 #' @title Generate an RMarkdown file with IPM metadata
+#'
 #' @rdname ipm_report
 #'
 #' @description Generates a \code{.rmd} file containing a mathematical
@@ -19,7 +20,10 @@
 #'   the \code{.rmd} file will need further editing before it's useful, so the
 #'   default is \code{FALSE}.
 #' @param block_eqs A logical. If \code{TRUE}, all equations will be inserted
-#'   with blocks, and
+#'   with blocks and numbered using \code{tag{}}. If \code{FALSE}, equations
+#'   will be rendered as inline equations on a single line, and numbered as
+#'   1.1, 1.2, 1.3 (iteration expressions), 2.1, 2.2 (vital rate expressions),
+#'   etc.
 #'
 #' @details \code{make_ipm_report_body} only translates the iteration
 #'   expressions and vital rate expressions into Markdown with LaTeX, and does
@@ -27,7 +31,7 @@
 #'   mostly for re-usage in \code{\link[Rpadrino]{pdb_report}}, and isn't really
 #'   intended for use by \code{ipmr} users.
 #'
-#' @section \strong{Translations}
+#' @section \strong{Translations}:
 #'
 #'   For iteration expressions, vital rate expressions, and parameter names,
 #'   \code{make_ipm_report} first translates all values in the \code{data_list}
@@ -50,7 +54,8 @@ make_ipm_report <- function(proto_ipm,
                             rmd_dest        = getwd(),
                             title           = "",
                             output_format   = "html",
-                            render_output   = FALSE) {
+                            render_output   = FALSE,
+                            block_eqs       = TRUE) {
 
   if(!requireNamespace("rmarkdown", quietly = TRUE) && render_output) {
     stop("The 'rmarkdown' package is required for 'render_output = TRUE'.\n",
@@ -91,22 +96,21 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
   # 1. unk_env is first because it contains everything in the IPM. This guarantees
   # that every variable will at least get defined as "itself". Unknown functions
   # that aren't added to .math_env() will fall back to here.
-  # 2. greek_env comes next, as this isn't so much unknown variables as it
 
   unk_env   <- .unk_env(proto_ipm)
   greek_env <- .greek_env(unk_env)
-  math_env  <- .math_env(greek_env)
+  pop_env   <- .pop_env(proto_ipm, greek_env)
+  math_env  <- .math_env(pop_env)
   par_env   <- .par_env(proto_ipm, math_env)
-  pop_env   <- .pop_env(proto_ipm, par_env)
 
 
-  iter_exprs <- .make_ipm_report_iter_exprs(proto_ipm, pop_env, block_eqs)
-  vr_exprs   <- .make_ipm_report_vr_exprs(proto_ipm,   pop_env, block_eqs)
-  all_params <- .make_ipm_report_params(proto_ipm,     pop_env, block_eqs)
-  impl_args  <- .make_ipm_report_impl_args(proto_ipm,  pop_env, block_eqs)
-  glossary   <- .make_ipm_report_glossary(proto_ipm,   pop_env, block_eqs)
+  iter_exprs <- .make_ipm_report_iter_exprs(proto_ipm, par_env, block_eqs)
+  vr_exprs   <- .make_ipm_report_vr_exprs(proto_ipm,   par_env, block_eqs)
+  all_params <- .make_ipm_report_params(proto_ipm,     par_env)
+  # impl_args  <- .make_ipm_report_impl_args(proto_ipm,  par_env, block_eqs)
+  # glossary   <- .make_ipm_report_glossary(proto_ipm,   par_env, block_eqs)
 
-  out <- c(iter_exprs, vr_exprs, all_params, impl_args, glossary)
+  out <- c(iter_exprs, vr_exprs, all_params)#, impl_args, glossary)
 
   return(out)
 
@@ -114,13 +118,13 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 
 .wrap_inline_eq <- function(eq, section, ind) {
 
-  paste0("\n$",section, ".", ind, ": ", eq, "$\n")
+  paste0("\n", section, ".", ind, "$", ": ", eq, "$\n")
 
 }
 
 .wrap_block_eq <- function(eq, section, ind) {
 
-  paste0("$$\n\n", eq, "\\tag{", section, ".", ind, "}\n\n", "$$")
+  paste0("\n$$", eq, "\\tag{", section, ".", ind, "}", "$$\n")
 
 
 }
@@ -139,6 +143,12 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 
   families   <- .sub_kernel_families(proto_ipm)
   start_end  <- .find_start_end(proto_ipm)
+  kern_forms <- kernel_formulae(proto_ipm)
+
+  # This adds family and start_end to right_mult calls. These
+  # are used by the function definition in 'math_env()' to decide
+  # where a given sub-kernel/pop_state combo needs integration in the
+  # latex expression.
 
   iter_exprs <- k_row$params[[1]]$formula %>%
     .add_right_mult_args(families, start_end, pop_env) %>%
@@ -146,13 +156,25 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 
   t_1_nms    <- names(iter_exprs)
 
-  latex_exprs <- .translate_iter_exprs(iter_exprs,
+  latex_exprs <- .translate_kern_exprs(iter_exprs,
+                                       proto_ipm,
                                        families,
                                        start_end,
                                        pop_env,
                                        block_eqs)
 
-  c(.make_ipm_report_iter_exprs_header(), latex_exprs)
+  unlist(c(.make_ipm_report_iter_exprs_header(),
+           latex_exprs),
+         use.names = FALSE)
+
+}
+
+.make_ipm_report_iter_exprs_header <- function() {
+
+  paste0("\n# IPM Iteration Expressions\n\n",
+         "These expressions iterate the IPM. Check translations from ",
+         "R code to Latex for accuracy before distributing!\n")
+
 
 }
 
@@ -163,6 +185,9 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 
   se_env  <- rlang::child_env(.parent = pop_env,
                               !!! start_end)
+
+  # Adds the kernel family (CC,CD,DC,DD) to the call to right_mult().
+  # This determines whether or not a sub-kernel should get an integral.
 
   fam_env$right_mult <- function(kernel, vectr) {
     k2 <- rlang::enexpr(kernel)
@@ -180,12 +205,15 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 
   }
 
+  # Adds state_start to the call to right_mult. If the sub-kernel gets an
+  # integral, this determines the domain that integration is performed over.
+
   se_env$right_mult <- function(kernel, vectr, family) {
     k2 <- rlang::enexpr(kernel)
     v2 <- rlang::enexpr(vectr)
     f2 <- rlang::enexpr(family)
 
-    se <- rlang::eval_bare(kernel, se_env)[1]
+    se <- rlang::eval_bare(kernel, se_env)
 
     rlang::expr_text(
       rlang::expr(
@@ -198,6 +226,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 
   }
 
+  # This actually performs that evaluation.
   temps <- lapply(iter_exprs, function(x, ev) {
     exs <- rlang::parse_expr(x)
     eval_bare(exs, ev)
@@ -211,25 +240,35 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 }
 
 #' @noRd
-# TODO need to work out how multi-state models fit into all this.
 
-.translate_iter_exprs <- function(full_exprs,
+.translate_kern_exprs <- function(full_exprs,
+                                  proto_ipm,
                                   families,
                                   start_end,
                                   pop_env,
                                   block_eqs) {
 
-  out <- vector("list", length(full_exprs))
+  kern_forms <- kernel_formulae(proto_ipm)
+
+  nms <- out <- vector("list", length(full_exprs) + length(kern_forms))
+
+  # Handles the iteration expressions first. Next, we'll loop over kern_forms
+  # to create the correct format for them.
 
   for(i in seq_along(full_exprs)) {
 
+    # Translates right hand side of expression to latex
+
     out[[i]] <- rlang::eval_bare(full_exprs[[i]], env = pop_env)
+
+    # Translate the left hand side to latex (i.e. n(z', t + 1))
 
     nms[i] <- rlang::eval_bare(
       rlang::parse_expr(names(full_exprs)[i]),
       env = pop_env
     )
 
+    # And now put it all together and wrap w/ $$/$!
     out[[i]] <- paste0(nms[i], " = ", out[[i]])
 
     if(block_eqs) {
@@ -238,18 +277,32 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
       out[[i]] <- .wrap_inline_eq(out[[i]], 1, i)
     }
 
-
   }
 
-  names(out) <- names(full_exprs)
+  # Create iterator for (i + 1) from above. indexs
+  for(i in (seq_along(kern_forms) + length(full_exprs))) {
+
+    it <- i - length(full_exprs)
+
+    out[[i]] <- eval_bare(kern_forms[[it]], pop_env)
+    out[[i]] <- paste0(names(kern_forms)[it], " = ", out[[i]])
+
+    if(block_eqs) {
+      out[[i]] <- .wrap_block_eq(out[[i]], 1, i)
+    } else {
+      out[[i]] <- .wrap_inline_eq(out[[i]], 1, i)
+    }
+  }
 
   return(out)
 
 }
 
+#' @noRd
+
 .add_integral <- function(eq, start_end) {
 
-  dz <- paste0("d_", start_end)
+  dz <- paste0("d", start_end)
 
   Lz <- paste0("L_{", start_end, "}")
   Uz <- paste0("U_{", start_end, "}")
@@ -259,10 +312,18 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 
 }
 
+#' @noRd
+
 .unk_env <- function(proto_ipm) {
+
+  # Hold symbols that we can't convert for some reason. Most of these
+  # will get overridden by the .par_env object, but this houses all symbols
+  # in the IPM so that at least they get a proper underscore
 
   all_forms <- c(vital_rate_exprs(proto_ipm),
                  kernel_formulae(proto_ipm))
+  all_nms   <- gsub("_", "\\_", names(all_forms), fixed = TRUE)
+  all_nms   <- setNames(as.list(all_nms), names(all_forms))
 
   all_syms  <- lapply(all_forms,
                       function(x) {
@@ -270,14 +331,29 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
       .args_from_txt()
   }) %>%
     unlist() %>%
-    unique() %>%
-  c(proto_ipm$kernel_id)
+    unique()
 
   vals <- gsub(pattern = "_", replacement = "\\_", x = all_syms, fixed = TRUE)
+  out <- c(setNames(vals, all_syms), all_nms)
 
-  rlang::as_environment(setNames(vals, all_syms))
+  all_calls <- lapply(all_forms, function(x) {
+    rlang::expr_text(x) %>%
+    .calls_from_txt()
+  }) %>%
+    unlist() %>%
+    unique()
+
+  call_vals <- lapply(all_calls, .unknown_op) %>%
+    setNames(all_calls)
+  call_vals <- c(call_vals, list(c = base::c))
+
+  out <- c(out, call_vals)
+
+  rlang::as_environment(out[!duplicated(names(out))])
 
 }
+
+#' @noRd
 
 .binary_group_op <- function(sep) {
   rlang::new_function(
@@ -289,10 +365,51 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
   )
 }
 
-.math_env <- function(greek_env) {
+.unknown_op <- function(op) {
+
+  op <- gsub("_", "\\_", op, fixed = TRUE)
+
+  rlang::new_function(
+    exprs(... = ),
+    expr({
+      args <- paste(unlist(list(...)), collapse = ", ")
+      paste0(!!paste0("\\mathrm{", op, "}("), args, ")")
+    })
+  )
+
+}
+
+.new_pdf <- function(fun) {
+  rlang::new_function(
+    rlang::exprs(... = , .pop_env = pop_env),
+    rlang::expr(
+      {
+        args <- rlang::enexprs(...)
+
+        for(i in seq_along(args)) args[[i]] <- eval_bare(args[[i]], .pop_env)
+
+
+        paste0(!! fun,
+               "(",
+               args[[1]],
+               " | ",
+               paste(unlist(args[-1]), collapse = ", "),
+               ")")
+
+      }
+    ),
+    rlang::caller_env()
+  )
+}
+
+#' @noRd
+
+.math_env <- function(pop_env) {
 
   rlang::child_env(
-    .parent = greek_env,
+    .parent = pop_env,
+
+    # Usual operations
     `+` = .binary_op(" + "),
     `-` = .binary_op(" - "),
     `*` = .binary_op(" * "),
@@ -306,19 +423,48 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
     exp = function(a) paste0("e^{", a, "}"),
     `[` = .unary_op("[", "]"),
     `(` = .unary_op("\\left(", "\\right)"),
-    as.vector = .unary_op("as.vector(", ")"),
-    predict   = function(a) paste0("\\mathrm{predict(", a, ")}"),
+    predict   = .unknown_op("predict"),
     right_mult = function(kernel, vectr, family, start_end) {
 
-      out <- paste0(kernel, vectr)
+      if(!is.na(start_end[1])) {
+        start_end[1] <- paste0(start_end[1])
+      }
+
+      if(!is.na(start_end[2])) {
+        start_end[2] <- paste0(start_end[2], "'")
+      }
+
+      z_p_z <- paste(rev(start_end), collapse = ", ")
+
+      out <- paste0("[", kernel, "(", z_p_z, ")", "]", vectr)
 
       if(substr(family[1], 1, 1) == "C") {
-        out <- .add_integral(out, start_end)
+        out <- .add_integral(out, start_end[1])
       }
 
       out
     },
-    left_mult = function(kernel, vectr) paste0(vectr, kernel),
+
+    # Probability Density Functions
+    dbeta     = .new_pdf("Beta"),
+    dbinom    = .new_pdf("Binomial"),
+    dcauchy   = .new_pdf("Cauchy"),
+    dchisq    = .new_pdf("\\chi^2"),
+    dexp      = .new_pdf("Exponential"),
+    df        = .new_pdf("F"),
+    dgeom     = .new_pdf("Geometric"),
+    dhyper    = .new_pdf("Hypergeometric"),
+    dlnorm    = .new_pdf("LogNormal"),
+    dmultinom = .new_pdf("Multinomial"),
+    dpois     = .new_pdf("Poisson"),
+    dt        = .new_pdf("T"),
+    dunif     = .new_pdf("Uniform"),
+    dweibull  = .new_pdf("Weibull"),
+    dmvnorm   = .new_pdf("MVNormal"),
+    dnorm     = .new_pdf("Norm"),
+    dgamma    = .new_pdf("Gamma"),
+    dnbinom   = .new_pdf("NegBinomial"),
+
 
     # Other math functions
     sqrt = .unary_op("\\sqrt{", "}"),
@@ -330,6 +476,8 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
   )
 
 }
+
+#' @noRd
 
 .greek_env <- function(unk_env) {
   greek <- c(
@@ -346,9 +494,18 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
   return(greek_env)
 }
 
+#' @noRd
+# TODO: Determine best way forward for parameter set indices.
+
 .par_env <- function(proto_ipm, math_env) {
 
   params <- parameters(proto_ipm)
+  vrs    <- vital_rate_exprs(proto_ipm)
+
+  # These will get added afterwards to make sure they don't get beta'd
+  doms   <- .domain_list_to_latex(proto_ipm)
+
+  params <- c(params, vrs)
 
   # if(.has_par_sets(proto_ipm)) params <- .ipmr_report_par_set_nms(params,
   #                                                                 proto_ipm)
@@ -361,18 +518,20 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
     # things like model objects. These will get replaced by their data_list
     # name.
 
-    if(rlang::is_syntactic_literal(beta_list[[i]])) {
+    if(rlang::is_syntactic_literal(params)) {
 
       beta_list[[i]] <- paste0("\\beta_{", i, "}")
 
     } else {
 
-      beta_list[[i]] <- names(params)[i]
+      beta_list[[i]] <- gsub("_", "\\_",  names(params)[i], fixed = TRUE)
 
     }
   }
 
-  beta_list <- setNames(beta_list, names(params))
+  beta_list <- setNames(beta_list, names(params)) %>%
+    c(doms)
+
 
   rlang::as_environment(beta_list, parent = math_env)
 
@@ -381,7 +540,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 # Evaluates n_z_t_1 -> "n(z', t+1) = iter_expr * n_z_t"
 # Evaluates n_z_t   -> "n_z_t      = n(z, t)"
 
-.pop_env <- function(proto_ipm, par_env)  {
+.pop_env <- function(proto_ipm, greek_env)  {
 
   dom_nms <- unique(unlist(proto_ipm$state_var))
 
@@ -397,18 +556,44 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
     as.list() %>%
     set_names(t_1_nms)
 
-  rlang::child_env(par_env,
+  doms   <- .domain_list_to_latex(proto_ipm)
+
+
+  rlang::child_env(greek_env,
                    !!! t_vals,
-                   !!! t_1_vals)
+                   !!! t_1_vals,
+                   !!! doms)
 
 }
 
+.domain_list_to_latex <- function(proto_ipm) {
+
+  doms <- domains(proto_ipm)
+
+  out <- list()
+
+  for(i in seq_along(doms)) {
+
+    z_1 <- names(doms)[i]
+    z_2 <- paste0(z_1, "'")
+
+    z_1_nm <- paste0(z_1, "_1")
+    z_2_nm <- paste0(z_1, "_2")
+
+    out[[i]] <- rlang::list2(
+      !! z_1_nm := z_1,
+      !! z_2_nm := z_2
+    )
+
+  }
+
+  .flatten_to_depth(out, 1L)
+}
 
 # TODO: Devise way of grouping all parameters from an indexed symbol into
 # one '\\beta_{x}^{ind_1, ind_2}'
 
 .ipmr_report_par_set_nms <- function(params, proto_ipm) {
-
 
 
 }
@@ -436,80 +621,122 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 # 1. if(translate_greek): linear functional forms into a common rep
 #    - s_int + s_slope * z_1 -> beta_0_s + beta_1_s * z_1
 # 2. translated forms into LaTex
-#    - beta_0_s + beta_1_s * z_1 -> \beta_{0,s} + \beta_{1,s} * z
-# Notes:
-#     - if(translate_greek): attach dictionary mapping old names -> new names as
-#       as an attribute to proto_ipm so subsequent functions have less work to
-#       do.
+#    - beta_0 + beta_1 * z_1 -> \beta_{0} + \beta_{1} * z
 
-.pdb_make_ipm_report_vr_exprs <- function(proto_ipm, translate_greek) {
 
-  if(translate_greek) {
-    .update_make_ipm_report_proto_ipm(proto_ipm,
-                                      translate_greek,
-                                      translated_values)
+.make_ipm_report_vr_exprs <- function(proto_ipm, pop_env, block_eqs) {
+
+  vr_exprs <- vital_rate_exprs(proto_ipm)
+
+  out <- nms <- vector("list", length(vr_exprs))
+
+  for(i in seq_along(vr_exprs)) {
+
+    out[[i]] <- rlang::eval_bare(vr_exprs[[i]], env = pop_env)
+
+    # Translate the left hand side to latex (i.e. grow_mod = grow\\_mod)
+
+    nms[i] <- rlang::eval_bare(
+      rlang::parse_expr(names(vr_exprs)[i]),
+      env = pop_env
+    )
+
+    # And now put it all together and wrap w/ $$/$!
+    out[[i]] <- paste0(nms[i], " = ", out[[i]])
+
+    if(block_eqs) {
+      out[[i]] <- .wrap_block_eq(out[[i]], 2, i)
+    } else {
+      out[[i]] <- .wrap_inline_eq(out[[i]], 2, i)
+    }
   }
 
-  return(translated_values)
+  unlist(c(.make_ipm_report_vr_exprs_header(), out), use.names = FALSE)
+
+}
+
+.make_ipm_report_vr_exprs_header <- function() {
+
+  paste0("\n\n# IPM Vital Rate Expressions\n\n",
+         "These expressions generate the vital rates the IPM. Check  ",
+         "translations from R code to Latex for accuracy before distributing!\n")
 
 }
 
 #' @noRd
+#'
+.make_ipm_report_params <- function(proto_ipm, par_env) {
 
-.pdb_make_ipm_report_params <- function(proto_ipm, translate_greek) {
+  pars <- parameters(proto_ipm)
+  doms <- domains(proto_ipm)
+  ints <- unique(proto_ipm$int_rule)
 
+  par_trans <- rlang::env_get_list(par_env, names(pars))
 
-}
+  par_out <- character(length(pars))
 
-#' @noRd
+  for(i in seq_along(pars)) {
 
-.pdb_make_ipm_report_impl_args <- function(proto_ipm, translate_greek) {
+    if(isTRUE(is.numeric(pars[[i]]))){
+      par_out[i] <- paste(par_trans[[i]],
+                          round(pars[[i]], 3),
+                          sep = " = ")
+    } else {
 
+      par_out[i] <- paste(par_trans[[i]],
+                          "is a user-defined object and has not been",
+                          "translated. Please provide the details manually.")
 
-}
-
-#' @noRd
-
-.pdb_make_ipm_report_glossary <- function(proto_ipm, translate_greek) {
-
-
-
-}
-
-.update_make_ipm_report_proto_ipm <- function(proto_ipm,
-                                              translate_greek,
-                                              translated_values) {
-
-    proto_ipm <- .append_greek_dictionary(proto_ipm, translated_values)
-
-    # This will overwrite proto_ipm in make_report_body, as that is always
-    # 2 frames up from the current call
-
-    assign("proto_ipm", proto_ipm, envir = rlang::caller_env(n = 2))
-
-}
-
-#' @noRd
-# to_append should be character vector or list w/ names of parameter values
-# as values and translated values as names.
-
-.append_greek_dictionary <- function(proto_ipm, to_append) {
-
-  dict <- attr(proto_ipm, "translation_dictionary")
-
-  if(is.null(dict)) {
-
-    attr(proto_ipm, "translation_dictionary") <- to_append
-
-  } else {
-
-    to_append <- c(dict, to_append)
-
-    attr(proto_ipm, "translation_dictionary") <- to_append
+    }
 
   }
 
-  return(proto_ipm)
+  dom_out <- character(length(doms))
+
+  for(i in seq_along(doms)) {
+
+    d_nm <- names(doms)[i]
+    l_nm <- paste0("L_{", d_nm, "}")
+    u_nm <- paste0("U_{", d_nm, "}")
+
+    dom_out[i] <- paste0("$", d_nm, " = ",
+                         "[",
+                         l_nm, " = ", round(doms[[i]][1], 3),
+                         ", ",
+                         u_nm, " = ", round(doms[[i]][2], 3), "]$")
+
+  }
+
+  par_out <- .pars_to_latex_list(par_out)
+  dom_out <- .pars_to_latex_list(dom_out)
+
+  par_hdr <- paste0(
+    "\n\n# Implementation Details\n\n## Parameter values\n\n",
+    "The following parameter values were used to implement this IPM: \n\n"
+  )
+  dom_hdr <- paste0(
+    "\n\n## Domains and Integration Rules\n\n",
+    "The following domains and integration rules were used to implement this IPM: \n\n")
+
+  c(par_hdr, par_out, dom_hdr, dom_out)
+
+}
+
+.pars_to_latex_list <- function(pars) {
+
+  pars <- paste("  -", pars)
+  pars <- paste(pars, collapse = "\n\n")
+
+  pars
+
+}
+
+#' @noRd
+
+.make_ipm_report_glossary <- function(proto_ipm, pop_env) {
+
+
+
 }
 
 #' @noRd
