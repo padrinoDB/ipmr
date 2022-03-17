@@ -5,13 +5,15 @@
 \alias{left_mult}
 \title{Right/left multiplication}
 \usage{
-right_mult(kernel, vectr)
+right_mult(kernel, vectr, family = NULL, start_end = NULL)
 
 left_mult(kernel, vectr)
 }
 \arguments{
 \item{kernel, vectr}{\code{kernel} should be a bivariate kernel, \code{vectr}
 should be a univariate trait distribution.}
+
+\item{family, start_end}{Used internally, do not touch.}
 }
 \value{
 \code{left_mult} returns \code{t(kernel) \%*\% vectr}. \code{right_mult}

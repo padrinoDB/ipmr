@@ -320,6 +320,8 @@ lambda_ipmr <- lambda(my_simple_ipm)
 w_ipmr      <- right_ev(my_simple_ipm)
 v_ipmr      <- left_ev(my_simple_ipm)
 
+make_ipm_report(my_simple_ipm, title = "my_ipm_report", render_output = TRUE)
+
 ```
 
 A more detailed introduction to `ipmr` is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. Help with age $\times$ size models, density dependent models, and the parameter set index syntax are also available there. That's all for now, happy modeling!

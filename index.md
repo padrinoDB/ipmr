@@ -409,6 +409,8 @@ my_simple_ipm <- make_ipm(proto_ipm = my_simple_ipm)
 lambda_ipmr <- lambda(my_simple_ipm)
 w_ipmr      <- right_ev(my_simple_ipm)
 v_ipmr      <- left_ev(my_simple_ipm)
+
+make_ipm_report(my_simple_ipm, title = "my_ipm_report", render_output = TRUE)
 ```
 
 A more detailed introduction to `ipmr` is available in the Intro to ipmr

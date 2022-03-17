@@ -11,10 +11,10 @@ make_ipm_report(
   title = "",
   output_format = "html",
   render_output = FALSE,
-  translate_greek = TRUE
+  block_eqs = TRUE
 )
 
-make_ipm_report_body(proto_ipm, translate_greek)
+make_ipm_report_body(proto_ipm, block_eqs, rmd_dest)
 }
 \arguments{
 \item{proto_ipm}{A proto_ipm object}
@@ -32,24 +32,25 @@ report, and is not included in the file path!}
 \code{.rmd} document.}
 
 \item{render_output}{A logical indicating whether to call
-\code{rmarkdown::render} on the generated \code{.rmd} file. Often times, the
-\code{.rmd} file will need further editing before it's useful, so the default
-is \code{FALSE}.}
+\code{rmarkdown::render} on the generated \code{.rmd} file. Often times,
+the \code{.rmd} file will need further editing before it's useful, so the
+default is \code{FALSE}.}
 
-\item{translate_greek}{A logical. \code{TRUE} means the function will attempt
-to translate symbols in vital rate expressions to Greek equivalents, which
-can make reports prettier. \code{FALSE} will leave the expressions largely
-as is before translating them to LaTeX equivalents.}
+\item{block_eqs}{A logical. If \code{TRUE}, all equations will be inserted
+with blocks and numbered using \code{tag{}}. If \code{FALSE}, equations
+will be rendered as inline equations on a single line, and numbered as
+1.1, 1.2, 1.3 (iteration expressions), 2.1, 2.2 (vital rate expressions),
+etc.}
 }
 \value{
 For \code{make_ipm_report}, the filepath to the \code{.rmd} file. The
-default name is \code{ "ipmr_report_<current_date>.rmd"}. For
-\code{make_ipm_report_body}, a character vector with Markdown and LaTeX
-suitable for rendering, but without a header.
+  default name is \code{ "ipmr_report_<current_date>.rmd"}. For
+  \code{make_ipm_report_body}, a character vector with Markdown and LaTeX
+  suitable for rendering, but without a header.
 }
 \description{
-Generates a \code{.rmd} file containing a mathematical description
-of the \code{proto_ipm} object.
+Generates a \code{.rmd} file containing a mathematical
+  description of the \code{proto_ipm} object.
 }
 \details{
 \code{make_ipm_report_body} only translates the iteration
@@ -57,14 +58,16 @@ of the \code{proto_ipm} object.
   not produce any headers needed to knit the file. This function is exported
   mostly for re-usage in \code{\link[Rpadrino]{pdb_report}}, and isn't really
   intended for use by \code{ipmr} users.
+}
+\section{\strong{Translations}}{
 
-  @section \strong{Translations}
 
   For iteration expressions, vital rate expressions, and parameter names,
-  \code{make_ipm_report} first attempts to translate functional forms into a
-  common set of names. For example, \code{s = surv_int + surv_slope * z_1} is
-  translated into \code{beta_0_s + beta_1_s * z_1}, and then is
-  translated into LaTeX equations. This helps create useful Greek symbols
-  more consistently. This may cause strange/incorrect results when parsing
-  non-linear models.
+  \code{make_ipm_report} first translates all values in the \code{data_list}
+  to \code{beta_X}. For example, \code{s = surv_int + surv_slope * z_1} is
+  translated into \code{beta_0 + beta_1 * z_1}, and then is translated into
+  LaTeX equations. Since everything is call \code{beta_X}, a glossary is
+  provided at the end of each report that matches \code{beta}s to their names
+  in the \code{data_list}.
 }
+

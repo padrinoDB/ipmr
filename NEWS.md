@@ -12,7 +12,9 @@ Contains some tweaks and a number of bug fixes. The latter are mostly related to
 
 - Depending on your view, this may be a bug fix: updates the `log` argument in `lambda()` so that it only changes the scale, NOT the calculation method. The prior behavior was documented, but unlikely to be intuitive, and so caused some confusion. Thanks to @aariq for pointing this out. 
 
-- For stochastic IPMs, `is_conv_to_asymptotic()` and `conv_plot()` now check for convergence in stochastic lambda.  That is, they use a cumulative mean `log(lambda)` over iterations after discarding a burn-in.
+- For stochastic IPMs, `is_conv_to_asymptotic()` and `conv_plot()` now check for convergence in stochastic lambda.  That is, they use a cumulative mean `log(lambda)` over iterations after discarding a burn-in. Thanks to @aariq for implementing this in #45.
+
+- Adds experimental function `make_ipm_report()`. This function converts `proto_ipm` objects into Rmarkdown documents that, when rendered, contain the equations and parameters used to implement the model in Latex. See the function documentation for more details, and report bugs/notation quirks/preferences in the issue tracker.
 
 ## Bug fixes 
 
@@ -23,6 +25,8 @@ Contains some tweaks and a number of bug fixes. The latter are mostly related to
  - Fixes bug where parameter set levels were recycled in some cases. 
  
  - Fixes bug in `lambda()` where `log = TRUE` had no effect when the IPM was stochastic and `type_lambda` was `'last'` or `'all'`.
+ 
+ - Switched from `all.equal` to absolute tolerance. @aariq in #52.
 
 # ipmr 0.0.4
 
