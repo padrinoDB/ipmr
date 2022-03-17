@@ -50,6 +50,7 @@ define_domains <- function(proto_ipm, ...) {
   res <- proto_ipm$domain
 
   for(i in seq_along(dom_names)) {
+
     nm <- dom_names[i]
 
     temp <- purrr::map(res,
@@ -73,4 +74,4 @@ define_domains <- function(proto_ipm, ...) {
 
 #' @importFrom utils globalVariables
 
-utils::globalVariables(c('.', "e1", "e2"), add = FALSE)
+utils::globalVariables(c('.', "e1", "e2", ".pop_ev", "pop_env"), add = FALSE)

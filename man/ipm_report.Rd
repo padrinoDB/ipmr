@@ -14,7 +14,7 @@ make_ipm_report(
   block_eqs = TRUE
 )
 
-make_ipm_report_body(proto_ipm, block_eqs)
+make_ipm_report_body(proto_ipm, block_eqs, rmd_dest)
 }
 \arguments{
 \item{proto_ipm}{A proto_ipm object}
@@ -37,7 +37,10 @@ the \code{.rmd} file will need further editing before it's useful, so the
 default is \code{FALSE}.}
 
 \item{block_eqs}{A logical. If \code{TRUE}, all equations will be inserted
-with blocks and numbered using \code{tag{}}}
+with blocks and numbered using \code{tag{}}. If \code{FALSE}, equations
+will be rendered as inline equations on a single line, and numbered as
+1.1, 1.2, 1.3 (iteration expressions), 2.1, 2.2 (vital rate expressions),
+etc.}
 }
 \value{
 For \code{make_ipm_report}, the filepath to the \code{.rmd} file. The
@@ -56,3 +59,15 @@ Generates a \code{.rmd} file containing a mathematical
   mostly for re-usage in \code{\link[Rpadrino]{pdb_report}}, and isn't really
   intended for use by \code{ipmr} users.
 }
+\section{\strong{Translations}}{
+
+
+  For iteration expressions, vital rate expressions, and parameter names,
+  \code{make_ipm_report} first translates all values in the \code{data_list}
+  to \code{beta_X}. For example, \code{s = surv_int + surv_slope * z_1} is
+  translated into \code{beta_0 + beta_1 * z_1}, and then is translated into
+  LaTeX equations. Since everything is call \code{beta_X}, a glossary is
+  provided at the end of each report that matches \code{beta}s to their names
+  in the \code{data_list}.
+}
+

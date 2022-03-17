@@ -285,6 +285,7 @@ use_vr_model <- function(model) {
 #'
 #' @param kernel,vectr \code{kernel} should be a bivariate kernel, \code{vectr}
 #' should be a univariate trait distribution.
+#' @param family,start_end Used internally, do not touch.
 #'
 #' @return \code{left_mult} returns \code{t(kernel) \%*\% vectr}. \code{right_mult}
 #' returns \code{kernel \%*\% vectr}.
@@ -292,7 +293,7 @@ use_vr_model <- function(model) {
 #'
 #' @export
 
-right_mult <- function(kernel, vectr) {
+right_mult <- function(kernel, vectr, family = NULL, start_end = NULL) {
 
   kernel %*% vectr
 

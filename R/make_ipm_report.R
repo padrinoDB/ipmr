@@ -71,7 +71,7 @@ make_ipm_report <- function(proto_ipm,
 
   rmd_dest     <- .make_ipm_report_fp(rmd_dest, keep_rmd = TRUE)
   header       <- .make_ipm_report_header(output_format, title, block_eqs)
-  body         <- make_ipm_report_body(proto_ipm, block_eqs)
+  body         <- make_ipm_report_body(proto_ipm, block_eqs, rmd_dest)
 
   rmd_contents <- c(header, body)
 
@@ -88,7 +88,7 @@ make_ipm_report <- function(proto_ipm,
 #' @rdname ipm_report
 #' @export
 
-make_ipm_report_body <- function(proto_ipm, block_eqs) {
+make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
   # first, generate stack of translation environments. Each environment on the
   # stack uses the previous environment as the parent for symbol lookup and
@@ -104,17 +104,19 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
   par_env   <- .par_env(proto_ipm, math_env)
 
 
-  iter_exprs <- .make_ipm_report_iter_exprs(proto_ipm, par_env, block_eqs)
+  iter_exprs <- .make_ipm_report_iter_exprs(proto_ipm, par_env,
+                                            block_eqs, rmd_dest)
+
   vr_exprs   <- .make_ipm_report_vr_exprs(proto_ipm,   par_env, block_eqs)
   all_params <- .make_ipm_report_params(proto_ipm,     par_env)
-  # impl_args  <- .make_ipm_report_impl_args(proto_ipm,  par_env, block_eqs)
-  # glossary   <- .make_ipm_report_glossary(proto_ipm,   par_env, block_eqs)
 
-  out <- c(iter_exprs, vr_exprs, all_params)#, impl_args, glossary)
+  out <- c(iter_exprs, vr_exprs, all_params)
 
   return(out)
 
 }
+
+#' @noRd
 
 .wrap_inline_eq <- function(eq, section, ind) {
 
@@ -122,19 +124,19 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 
 }
 
+#' @noRd
+
 .wrap_block_eq <- function(eq, section, ind) {
 
   paste0("\n$$", eq, "\\tag{", section, ".", ind, "}", "$$\n")
-
 
 }
 
 #' @noRd
 # Translates:
 # n_z_t_1 = P %*% n_z_t + F %*% n_z_t -> n(z', t + 1) = \int([P+F]n(z , t)dz)
-# Use CC/DC to decide if \int applies!
 
-.make_ipm_report_iter_exprs <- function(proto_ipm, pop_env, block_eqs) {
+.make_ipm_report_iter_exprs <- function(proto_ipm, pop_env, block_eqs, rmd_dest) {
 
   # Set up iteration expressions, and get sub-kernel families and start/end
   # state so we can append z/z' correctly.
@@ -163,20 +165,26 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
                                        pop_env,
                                        block_eqs)
 
-  unlist(c(.make_ipm_report_iter_exprs_header(),
+  unlist(c(.make_ipm_report_iter_exprs_header(rmd_dest),
            latex_exprs),
          use.names = FALSE)
 
 }
 
-.make_ipm_report_iter_exprs_header <- function() {
+.make_ipm_report_iter_exprs_header <- function(rmd_dest) {
 
   paste0("\n# IPM Iteration Expressions\n\n",
          "These expressions iterate the IPM. Check translations from ",
-         "R code to Latex for accuracy before distributing!\n")
+         "R code to Latex for accuracy before distributing!",
+         " If needed, edit the _Rmd_ file directly. It can be found here: ",
+         paste0("`", rmd_dest, "`"),
+         "\n")
 
 
 }
+
+#' @importFrom rlang eval_bare
+#' @noRd
 
 .add_right_mult_args <- function(iter_exprs, families, start_end, pop_env) {
 
@@ -249,6 +257,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
                                   block_eqs) {
 
   kern_forms <- kernel_formulae(proto_ipm)
+  names(kern_forms) <- .z_p_z_kernel_names(kern_forms, families, start_end)
 
   nms <- out <- vector("list", length(full_exprs) + length(kern_forms))
 
@@ -284,7 +293,8 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 
     it <- i - length(full_exprs)
 
-    out[[i]] <- eval_bare(kern_forms[[it]], pop_env)
+    out[[i]] <- eval_bare(kern_forms[[it]], pop_env) %>%
+      .rm_dz(families[[it]], start_end[[it]])
     out[[i]] <- paste0(names(kern_forms)[it], " = ", out[[i]])
 
     if(block_eqs) {
@@ -293,6 +303,66 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
       out[[i]] <- .wrap_inline_eq(out[[i]], 1, i)
     }
   }
+
+  return(out)
+
+}
+
+#' @noRd
+# Removes d_z's that are already present in the iteration expressions.
+
+.rm_dz <- function(txt, family, start_end) {
+
+  if(family %in% c("DC", "DD")) return(txt)
+
+  d_z <- paste0(c("\\* d\\\\_", "\\*d\\\\_"), start_end[1], "$")
+
+  for(i in seq_along(d_z)) {
+    txt <- gsub(d_z[i], "", txt)
+  }
+
+  return(txt)
+
+}
+
+#' @noRd
+.z_p_z_kernel_names <- function(kern_forms, families, start_end) {
+
+  stopifnot(
+    all(names(families) %in% names(kern_forms)) &&
+    length(families) == length(kern_forms)
+  )
+
+  stopifnot(
+    all(names(start_end) %in% names(kern_forms)) &&
+    length(start_end) == length(kern_forms)
+  )
+
+  # Make sure positional matching works
+  families  <- families[names(kern_forms)]
+  start_end <- start_end[names(kern_forms)]
+
+  out <- character(length(kern_forms))
+  for(i in seq_along(kern_forms)) {
+
+    nm <- switch(
+      families[[i]],
+      "DD" = "",                       # Discrete to discrete get no modification
+      "CC" = paste0("(",               # Create <(z',z)>
+                    start_end[[i]][2],
+                    "', ",
+                    start_end[[i]][1],
+                    ")"),
+      "DC" = paste0("(", start_end[[i]][2], "')"), # Create <(z')>
+      "CD" = paste0("(", start_end[[i]][1], ")")   # Create <(z)>
+    )
+
+    out[i] <- paste0(names(kern_forms)[i], nm)
+
+  }
+
+  # Escape underscored names
+  out <- gsub("_", "\\_", out, fixed = TRUE)
 
   return(out)
 
@@ -365,6 +435,8 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
   )
 }
 
+#' @noRd
+
 .unknown_op <- function(op) {
 
   op <- gsub("_", "\\_", op, fixed = TRUE)
@@ -379,14 +451,17 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 
 }
 
+#' @noRd
+
 .new_pdf <- function(fun) {
   rlang::new_function(
-    rlang::exprs(... = , .pop_env = pop_env),
+    rlang::exprs(... = , .pop_ev = pop_env),
     rlang::expr(
       {
         args <- rlang::enexprs(...)
 
-        for(i in seq_along(args)) args[[i]] <- eval_bare(args[[i]], .pop_env)
+        for(i in seq_along(args)) args[[i]] <- rlang::eval_bare(args[[i]],
+                                                                .pop_ev)
 
 
         paste0(!! fun,
@@ -419,24 +494,23 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
     `^` = .binary_group_op("^"),
     `%*%` = .binary_op(""),
 
-    paste = paste,
-    exp = function(a) paste0("e^{", a, "}"),
-    `[` = .unary_op("[", "]"),
-    `(` = .unary_op("\\left(", "\\right)"),
-    predict   = .unknown_op("predict"),
+    # Commonly used functions
+    paste      = paste,
+    exp        = function(a) paste0("e^{", a, "}"),
+    `[`        = .unary_op("[", "]"),
+    `(`        = .unary_op("\\left(", "\\right)"),
+    predict    = .unknown_op("predict"),
     right_mult = function(kernel, vectr, family, start_end) {
 
-      if(!is.na(start_end[1])) {
-        start_end[1] <- paste0(start_end[1])
-      }
+      z_p_z <- switch(family,
+                      "cc" = paste(rev(start_end), collapse = ", "),
+                      "CD" = start_end[1],
+                      "DC" = paste0(start_end[2], "'"),
+                      "DD" = NA)
 
-      if(!is.na(start_end[2])) {
-        start_end[2] <- paste0(start_end[2], "'")
-      }
-
-      z_p_z <- paste(rev(start_end), collapse = ", ")
-
-      out <- paste0("[", kernel, "(", z_p_z, ")", "]", vectr)
+      out <- paste0("[", kernel,
+                    ifelse(!is.na(z_p_z), paste0("(", z_p_z, ")"), ""),
+                     "]", vectr)
 
       if(substr(family[1], 1, 1) == "C") {
         out <- .add_integral(out, start_end[1])
@@ -488,7 +562,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
     "xi", "Gamma", "Lambda", "Sigma", "Psi", "Delta", "Xi",
     "Upsilon", "Omega", "Theta", "Pi", "Phi"
   )
-  greek_list <- set_names(paste0("\\", greek), greek)
+  greek_list <- stats::setNames(paste0("\\", greek), greek)
   greek_env <- rlang::as_environment(greek_list, parent = unk_env)
 
   return(greek_env)
@@ -542,28 +616,41 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 
 .pop_env <- function(proto_ipm, greek_env)  {
 
-  dom_nms <- unique(unlist(proto_ipm$state_var))
-
-  # ipmr names to be evaluated.
-  t_nms   <- paste0("n_", dom_nms, "_t")
-  t_1_nms <- paste0("n_", dom_nms, "_t_1")
-
-  # Latex values output
-  t_vals   <- paste0('n(', dom_nms, ", t)") %>%
-    as.list() %>%
-    set_names(t_nms)
-  t_1_vals <- paste0('n(', dom_nms, "', t + 1)") %>%
-    as.list() %>%
-    set_names(t_1_nms)
+  sv_nms    <- unique(unlist(proto_ipm$state_var))
+  cont_doms <- names(domains(proto_ipm))
 
   doms   <- .domain_list_to_latex(proto_ipm)
 
+  out <- rlang::child_env(greek_env,
+                          !!! doms)
+  for(i in seq_along(sv_nms)) {
 
-  rlang::child_env(greek_env,
-                   !!! t_vals,
-                   !!! t_1_vals,
-                   !!! doms)
+    t_nms   <- paste0("n_", sv_nms[i], "_t")
+    t_1_nms <- paste0("n_", sv_nms[i], "_t_1")
 
+    if(sv_nms[i] %in% cont_doms) {
+
+      # Latex values output
+      t_vals   <- paste0('n(', sv_nms[i], ", t)") %>%
+        as.list() %>%
+        setNames(t_nms)
+      t_1_vals <- paste0('n(', sv_nms[i], "', t + 1)") %>%
+        as.list() %>%
+        setNames(t_1_nms)
+    } else {
+      t_vals <- paste0(paste0(sv_nms[i], "(t)")) %>%
+        as.list() %>%
+        setNames(t_nms)
+      t_1_vals <- paste0(paste0(sv_nms[i], "(t + 1)")) %>%
+        as.list() %>%
+        setNames(t_1_nms)
+    }
+
+    rlang::env_bind(out, !!! t_vals, !!! t_1_vals)
+
+  }
+
+  out
 }
 
 .domain_list_to_latex <- function(proto_ipm) {
@@ -617,12 +704,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 }
 
 #' @noRd
-# Translates:
-# 1. if(translate_greek): linear functional forms into a common rep
-#    - s_int + s_slope * z_1 -> beta_0_s + beta_1_s * z_1
-# 2. translated forms into LaTex
-#    - beta_0 + beta_1 * z_1 -> \beta_{0} + \beta_{1} * z
-
+# TODO: add z',z if possible, to  vr_exprs
 
 .make_ipm_report_vr_exprs <- function(proto_ipm, pop_env, block_eqs) {
 
@@ -664,7 +746,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 }
 
 #' @noRd
-#'
+# TODO: add mesh points and int rule
 .make_ipm_report_params <- function(proto_ipm, par_env) {
 
   pars <- parameters(proto_ipm)
@@ -733,15 +815,14 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
 
 #' @noRd
 
-.make_ipm_report_glossary <- function(proto_ipm, pop_env) {
-
-
-
-}
-
-#' @noRd
-
 .make_ipm_report_header <- function(output_format, title, block_eqs) {
+
+  if(block_eqs && output_format != "pdf") {
+
+    message("Block equation numbering may not work well in formats other than",
+            " 'pdf'!\nMake sure to inspect output.")
+  }
+
 
   paste("---",
         paste0("title: '", title, "'"),
@@ -774,11 +855,11 @@ make_ipm_report_body <- function(proto_ipm, block_eqs) {
   # Non-specified output directory gets a tempdir()
   if((is.null(rmd_dest) || is.na(rmd_dest) || rmd_dest == "") && keep_rmd) {
 
-    rmd_dest <- tempfile(pattern = paste0("Rpadrino_report_", date),
+    rmd_dest <- tempfile(pattern = paste0("ipmr_report_", date),
                          fileext = ".Rmd")
 
     message("'keep_rmd = TRUE' and 'rmd_dest' is not specified! ",
-            "Saving to a temporary file: \n", rmd_dest)
+            "Saving to file: \n", rmd_dest)
 
   } else if(tools::file_ext(rmd_dest) == "") {
 
