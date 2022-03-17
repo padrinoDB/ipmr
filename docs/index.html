@@ -416,7 +416,9 @@
 
 <span class="va">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
 <span class="va">w_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/eigenvectors.html">right_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
-<span class="va">v_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/eigenvectors.html">left_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span></code></pre></div>
+<span class="va">v_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/eigenvectors.html">left_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
+
+<span class="fu"><a href="reference/ipm_report.html">make_ipm_report</a></span><span class="op">(</span><span class="va">my_simple_ipm</span>, title <span class="op">=</span> <span class="st">"my_ipm_report"</span>, render_output <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>A more detailed introduction to <code>ipmr</code> is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. Help with age × size models, density dependent models, and the parameter set index syntax are also available there. That’s all for now, happy modeling!</p>
 </div>
 </div>

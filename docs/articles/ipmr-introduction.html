@@ -454,7 +454,10 @@
 
 <span class="va">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">my_ipm</span><span class="op">)</span>
 <span class="va">repro_value</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/eigenvectors.html">left_ev</a></span><span class="op">(</span><span class="va">my_ipm</span><span class="op">)</span>
-<span class="va">stable_dist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/eigenvectors.html">right_ev</a></span><span class="op">(</span><span class="va">my_ipm</span><span class="op">)</span></code></pre></div>
+<span class="va">stable_dist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/eigenvectors.html">right_ev</a></span><span class="op">(</span><span class="va">my_ipm</span><span class="op">)</span>
+
+<span class="co"># Requires the rmarkdown package to run:</span>
+<span class="fu"><a href="../reference/ipm_report.html">make_ipm_report</a></span><span class="op">(</span><span class="va">my_ipm</span>, title <span class="op">=</span> <span class="st">"my_ipm_report"</span>, render_output <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>In this example, there are no additional arguments that need to be passed to <code><a href="../reference/make_ipm.html">make_ipm()</a></code> - the <code>proto_ipm</code> has all of the information needed to generate a deterministic iteration kernel. All of the <code><a href="../reference/make_ipm.html">make_ipm()</a></code> methods return a list with a length of 5 with entries:</p>
 <ul>
 <li><p><code>sub_kernels</code> contains, in this example, <code>P</code> and <code>F</code>.</p></li>
@@ -463,7 +466,7 @@
 <li><p><code>pop_state</code> contains a list of matrices for each item defined in <code><a href="../reference/define_star.html">define_pop_state()</a></code>. The rows of each matrix correspond to the population state and columns are time steps. Additionally, contains a slot <code>lambda</code> with a 1 x <code>iterations</code> matrix containing per-capita growth rates for every time step of the model.</p></li>
 <li><p><code>proto_ipm</code> contains the <code>proto_ipm</code> object used to generate the model. This is used extensively by other methods in the package.</p></li>
 </ul>
-<p><code>lambda</code>, <code>left_ev</code>, and <code>right_ev</code> are generic functions corresponding to the dominant eigenvalue, dominant left eigenvector, and dominant right eigenvector of the iteration kernel, respectively. <code>lambda</code> is available for all classes of IPMs, while <code>left/right_ev</code> is available for all deterministic IPMs. Stochastic equivalents of the latter will get implemented eventually.</p>
+<p><code>lambda</code>, <code>left_ev</code>, and <code>right_ev</code> are generic functions corresponding to the dominant eigenvalue, dominant left eigenvector, and dominant right eigenvector of the iteration kernel, respectively. <code>lambda</code> is available for all classes of IPMs, while <code>left/right_ev</code> is available for all deterministic IPMs. Stochastic equivalents of the latter will get implemented eventually. <code><a href="../reference/ipm_report.html">make_ipm_report()</a></code> generates an Rmarkdown file containing Latex equations and parameter values used to implement the IPM. This may be useful for publications/appendices.</p>
 <div class="section level4">
 <h4 id="using-predict-methods-in-vital-rate-expressions">Using <code>predict()</code> methods in vital rate expressions<a class="anchor" aria-label="anchor" href="#using-predict-methods-in-vital-rate-expressions"></a>
 </h4>
