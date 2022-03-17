@@ -58,43 +58,6 @@ test_that("make_rmd_header produces correct headers", {
 })
 
 
-test_that("make_ipm_report produces files correctly", {
-
-  skip_on_cran()
-
-  drr <- tempdir()
-  dt  <- gsub("-", "", Sys.Date())
-  fps <- paste0(drr, "/ipmr_report_", dt, c(".Rmd", ".pdf"))
-
-
-  fp <- make_ipm_report(gen_di_det_ex$proto_ipm,
-                        rmd_dest = drr,
-                        title = "test_rmd_report",
-                        output_format = "pdf",
-                        render_output = TRUE,
-                        block_eqs = TRUE)
-
-  fp  <- c(fp, gsub("\\.Rmd$", ".pdf", fp))
-  fps <- paste0(drr, "/", dir(drr))
-
-  expect_true(all(fp %in% fps))
-
-  fp <- make_ipm_report(sim_di_det_ex$proto_ipm,
-                         rmd_dest = drr,
-                         title = "test_rmd_report_simple",
-                         output_format = "html",
-                         render_output = TRUE,
-                         block_eqs = FALSE)
-
-  fp <- c(fp, gsub("\\.Rmd$", ".html", fp))
-  fps <- paste0(drr, "/", dir(drr))
-
-  expect_true(all(fp %in% fps))
-
-  unlink(drr, TRUE, TRUE)
-
-})
-
 test_that("internal helpers translate correctly", {
 
   proto_ipm <- sim_di_det_ex$proto_ipm
