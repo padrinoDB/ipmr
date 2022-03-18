@@ -173,7 +173,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
 .make_ipm_report_iter_exprs_header <- function(rmd_dest) {
 
-  paste0("\n# IPM Iteration Expressions\n\n",
+  paste0("\n## IPM Iteration Expressions\n\n",
          "These expressions iterate the IPM. Check translations from ",
          "R code to Latex for accuracy before distributing!",
          " If needed, edit the _Rmd_ file directly. It can be found here: ",
@@ -435,6 +435,21 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
   )
 }
 
+.binary_or_unary_op <- function(sep) {
+  rlang::new_function(
+    rlang::exprs(e1 = , e2 = ),
+    rlang::expr(
+      if(!missing(e2)){
+        paste0(e1, !!sep, e2)
+      } else {
+        paste0(!!sep, e1)
+      }
+
+      ),
+    rlang::caller_env()
+  )
+}
+
 #' @noRd
 
 .unknown_op <- function(op) {
@@ -486,7 +501,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
     # Usual operations
     `+` = .binary_op(" + "),
-    `-` = .binary_op(" - "),
+    `-` = .binary_or_unary_op(" - "),
     `*` = .binary_op(" * "),
     `/` = function(a, b) {
       paste0("\\frac{", a, "}{", b, "}")
@@ -739,7 +754,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
 .make_ipm_report_vr_exprs_header <- function() {
 
-  paste0("\n\n# IPM Vital Rate Expressions\n\n",
+  paste0("\n\n## IPM Vital Rate Expressions\n\n",
          "These expressions generate the vital rates the IPM. Check  ",
          "translations from R code to Latex for accuracy before distributing!\n")
 
@@ -793,11 +808,11 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
   dom_out <- .pars_to_latex_list(dom_out)
 
   par_hdr <- paste0(
-    "\n\n# Implementation Details\n\n## Parameter values\n\n",
+    "\n\n## Implementation Details\n\n### Parameter values\n\n",
     "The following parameter values were used to implement this IPM: \n\n"
   )
   dom_hdr <- paste0(
-    "\n\n## Domains and Integration Rules\n\n",
+    "\n\n### Domains and Integration Rules\n\n",
     "The following domains and integration rules were used to implement this IPM: \n\n")
 
   c(par_hdr, par_out, dom_hdr, dom_out)
