@@ -506,8 +506,18 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
     `/` = function(a, b) {
       paste0("\\frac{", a, "}{", b, "}")
     },
+    `>` = function(a, b) paste0(a, "\\gt", b),
+    `>=` = function(a, b) paste0(a, "\\gte", b),
+    `<` = function(a, b) paste0(a, "\\lt", b),
+    `<=` = function(a, b) paste0(a, "\\lte", b),
+
     `^` = .binary_group_op("^"),
     `%*%` = .binary_op(""),
+    ifelse = function(a, tr, fa) {
+      paste0("\\begin{cases} ", tr, " & \\text{if }", a, "\\\\",
+             fa, "\\end{cases}")
+    },
+    t = function(a) paste0(a, "^T"),
 
     # Commonly used functions
     paste      = paste,
