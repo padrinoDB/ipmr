@@ -273,6 +273,7 @@ use_vr_model <- function(model) {
 
 
   attr(model, "flat_protect") <- TRUE
+  attr(model, "na_ok")        <- TRUE
 
   return(model)
 

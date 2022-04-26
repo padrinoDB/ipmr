@@ -111,7 +111,7 @@ define_kernel <- function(proto_ipm,
     function(x) {
       x <- .protect_model(x)
 
-      na_test <- suppressWarnings(any(is.na(x)))
+      na_test <- attr(x, "na_ok")
 
       if(na_test) {
         warning("'data_list' in 'define_kernel()' contains NAs. Is this correct?",
