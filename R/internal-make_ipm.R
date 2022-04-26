@@ -929,7 +929,7 @@
 
   nms_test  <- logical(length(pos_ids))
 
-  pos_kerns <- proto[proto$uses_par_sets, "kernel_ids"]
+  pos_kerns <- proto[proto$uses_par_sets, "kernel_id"]
 
   for(i in seq_along(pos_ids)) {
 
