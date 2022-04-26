@@ -925,14 +925,15 @@
   }
 
   # Make sure everything in kernel_seq appears is actually an option
+  pos_ids   <- unique(kernel_seq)
 
-  nms_test <- logical(length(unique(kernel_seq)))
+  nms_test  <- logical(length(pos_ids))
 
-  pos_ids  <- proto[proto$uses_par_sets, ]
+  pos_kerns <- proto[proto$uses_par_sets, "kernel_ids"]
 
-  for(i in seq_along(unique(kernel_seq))) {
+  for(i in seq_along(pos_ids)) {
 
-    nms_test[i] <- any(grepl(kernel_seq[i], pos_ids))
+    nms_test[i] <- any(grepl(pos_ids[i], pos_kerns))
 
   }
 
