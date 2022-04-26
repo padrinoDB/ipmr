@@ -120,7 +120,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
 .wrap_inline_eq <- function(eq, section, ind) {
 
-  paste0("\n", section, ".", ind, "$", ": ", eq, "$\n")
+  paste0("\n", section, ".", ind, ": ", "$", eq, "$\n")
 
 }
 
@@ -128,7 +128,25 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
 .wrap_block_eq <- function(eq, section, ind) {
 
+  if(nchar(eq) > 80) {
+
+    eq <- .split_eq_lines(eq)
+  }
+
   paste0("\n$$", eq, "\\tag{", section, ".", ind, "}", "$$\n")
+
+}
+
+#' @noRd
+
+# This is unlikely to be respected by output: pdf_document based on my
+# experience, buy may as well try
+
+.split_eq_lines <- function(eq) {
+
+  all_lines <- strwrap(eq, width = 65)
+
+  paste(all_lines, collapse = " \\ ")
 
 }
 
@@ -170,6 +188,8 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
          use.names = FALSE)
 
 }
+
+#' @noRd
 
 .make_ipm_report_iter_exprs_header <- function(rmd_dest) {
 
