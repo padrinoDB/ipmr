@@ -5,7 +5,7 @@
 #' @description Generates a \code{.rmd} file containing a mathematical
 #'   description of the \code{proto_ipm} object.
 #'
-#' @param proto_ipm A proto_ipm object
+#' @param object A \code{proto_ipm} or output from \code{make_ipm()}.
 #' @param rmd_dest  The folder to save the Rmd file at. The default is
 #'   \code{getwd()}. Alternatively, can be a complete file path that specifies
 #'   the location and title of the document with the extension \code{".rmd"}. in
@@ -49,13 +49,52 @@
 #'
 #' @export
 
+make_ipm_report <- function(object,
+                            rmd_dest      = getwd(),
+                            title         = "",
+                            output_format = "html",
+                            render_output = FALSE,
+                            block_eqs     = TRUE) {
 
-make_ipm_report <- function(proto_ipm,
-                            rmd_dest        = getwd(),
-                            title           = "",
-                            output_format   = "html",
-                            render_output   = FALSE,
-                            block_eqs       = TRUE) {
+  UseMethod("make_ipm_report")
+}
+
+#' @export
+#' @rdname ipm_report
+
+make_ipm_report.default <- function(object,
+                                    rmd_dest      = getwd(),
+                                    title         = "",
+                                    output_format = "html",
+                                    render_output = FALSE,
+                                    block_eqs     = TRUE) {
+
+  .make_ipm_report_impl(object, rmd_dest, title, output_format,
+                        render_output, block_eqs)
+}
+
+#' @export
+#' @rdname ipm_report
+
+make_ipm_report.ipmr_ipm <- function(object,
+                                     rmd_dest      = getwd(),
+                                     title         = "",
+                                     output_format = "html",
+                                     render_output = FALSE,
+                                     block_eqs     = TRUE) {
+
+  .make_ipm_report_impl(object$proto_ipm, rmd_dest, title, output_format,
+                        render_output, block_eqs)
+}
+
+#' @noRd
+
+.make_ipm_report_impl <- function(proto_ipm,
+                             rmd_dest,
+                             title  ,
+                             output_format,
+                             render_output,
+                             block_eqs) {
 
   if(!requireNamespace("rmarkdown", quietly = TRUE) && render_output) {
     stop("The 'rmarkdown' package is required for 'render_output = TRUE'.\n",
@@ -86,6 +125,8 @@ make_ipm_report <- function(proto_ipm,
 }
 
 #' @rdname ipm_report
+#' @param proto_ipm A \code{proto_ipm} object. Only used for
+#' \code{make_ipm_report_body}.
 #' @export
 
 make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
@@ -796,7 +837,10 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
   pars <- parameters(proto_ipm)
   doms <- domains(proto_ipm)
-  ints <- unique(proto_ipm$int_rule)
+  # Only one integration rule currently, might want to add it as an attribute
+  # to domains() or something, so that it's easier to get text version directly
+  # from the domain that is being integrated.
+  # ints <- unique(proto_ipm$int_rule)
 
   par_trans <- rlang::env_get_list(par_env, names(pars))
 
@@ -830,7 +874,12 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
                          "[",
                          l_nm, " = ", round(doms[[i]][1], 3),
                          ", ",
-                         u_nm, " = ", round(doms[[i]][2], 3), "]$")
+                         u_nm, " = ", round(doms[[i]][2], 3),
+                         "], ",
+                         "n_{", d_nm, "} = ", doms[[i]][2],
+                         "$\n\n",
+                         " where $n_{x}$ denotes the number of meshpoints",
+                         " for the midpoint rule for integration.")
 
   }
 

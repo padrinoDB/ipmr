@@ -405,8 +405,9 @@ lambda_ipmr <- lambda(my_ipm)
 repro_value <- left_ev(my_ipm)
 stable_dist <- right_ev(my_ipm)
 
-# Requires the rmarkdown package to run:
-make_ipm_report(my_ipm, title = "my_ipm_report", render_output = TRUE)
+# make_ipm_report works on either proto_ipms or made ipm objects. This 
+# requires the 'rmarkdown' package to run.
+make_ipm_report(my_ipm$proto_ipm, title = "my_ipm_report", render_output = TRUE)
 
 ```
 
