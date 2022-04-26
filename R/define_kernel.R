@@ -113,7 +113,7 @@ define_kernel <- function(proto_ipm,
 
       na_test <- attr(x, "na_ok")
 
-      if(na_test) {
+      if(! na_test) {
         warning("'data_list' in 'define_kernel()' contains NAs. Is this correct?",
                 call. = FALSE)
       }
