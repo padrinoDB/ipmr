@@ -379,12 +379,12 @@ test_that('.iterate_kerns is acting correctly', {
 
 test_that("burn_in works", {
 
-  burn_lams <- mean(log(iterated_sys$pop_state$lambda[6:50]))
+  burn_lams <- c(lambda = mean(log(iterated_sys$pop_state$lambda[6:50])))
   stoch_lam <- lambda(iterated_sys)
 
   expect_equal(burn_lams, stoch_lam)
 
-  unburn_lams      <- mean(log(iterated_sys$pop_state$lambda))
+  unburn_lams      <- c(lambda = mean(log(iterated_sys$pop_state$lambda)))
   unburn_stoch_lam <- lambda(iterated_sys, burn_in = 0)
 
   expect_equal(unburn_lams, unburn_stoch_lam)

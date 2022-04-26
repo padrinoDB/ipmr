@@ -859,14 +859,16 @@ is_conv_to_asymptotic.ipmr_ipm <- function(ipm, tolerance = 1e-6, burn_in = 0.1)
   lambdas <- log(lambdas)
 
   if(length(burn_ind > 0)) {
-    out <- mean(lambdas[-c(burn_ind)])
+    out <- apply(lambdas, 2,
+                 function(x, burn_ind) mean(x[-c(burn_ind)]),
+                 burn_ind = burn_ind)
   } else {
-    out <- mean(lambdas)
+    out <- apply(lambdas, 2, mean)
   }
 
   if(!log) out <- exp(out)
 
-  names(out) <- names(lambdas)
+  names(out) <- dimnames(lambdas)[[2]]
 
   return(out)
 }

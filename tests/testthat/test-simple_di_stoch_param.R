@@ -746,7 +746,7 @@ test_that("stoch_param can handle expressions in define_env_state()", {
 
 
   expect_s3_class(test_stoch_param, "simple_di_stoch_param_ipm")
-  expect_equal(lambda(test_stoch_param), 0.522, tolerance = 1e-3)
+  expect_equal(lambda(test_stoch_param), c(lambda = 0.522), tolerance = 1e-3)
   expect_equal(names(test_stoch_param$env_seq), c("s_int_yr",
                                                   "g_int_yr",
                                                   "f_r_int_yr",
