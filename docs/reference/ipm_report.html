@@ -87,7 +87,27 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">make_ipm_report</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
+  <span class="va">object</span>,
+  rmd_dest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>,
+  title <span class="op">=</span> <span class="st">""</span>,
+  output_format <span class="op">=</span> <span class="st">"html"</span>,
+  render_output <span class="op">=</span> <span class="cn">FALSE</span>,
+  block_eqs <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span>
+
+<span class="co"># S3 method for default</span>
+<span class="fu">make_ipm_report</span><span class="op">(</span>
+  <span class="va">object</span>,
+  rmd_dest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>,
+  title <span class="op">=</span> <span class="st">""</span>,
+  output_format <span class="op">=</span> <span class="st">"html"</span>,
+  render_output <span class="op">=</span> <span class="cn">FALSE</span>,
+  block_eqs <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span>
+
+<span class="co"># S3 method for ipmr_ipm</span>
+<span class="fu">make_ipm_report</span><span class="op">(</span>
+  <span class="va">object</span>,
   rmd_dest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>,
   title <span class="op">=</span> <span class="st">""</span>,
   output_format <span class="op">=</span> <span class="st">"html"</span>,
@@ -100,8 +120,8 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>proto_ipm</dt>
-<dd><p>A proto_ipm object</p></dd>
+    <dl><dt>object</dt>
+<dd><p>A <code>proto_ipm</code> or output from <code><a href="make_ipm.html">make_ipm()</a></code>.</p></dd>
 <dt>rmd_dest</dt>
 <dd><p>The folder to save the Rmd file at. The default is
 <code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd()</a></code>. Alternatively, can be a complete file path that specifies
@@ -125,6 +145,9 @@ with blocks and numbered using <code>tag{}</code>. If <code>FALSE</code>, equati
 will be rendered as inline equations on a single line, and numbered as
 1.1, 1.2, 1.3 (iteration expressions), 2.1, 2.2 (vital rate expressions),
 etc.</p></dd>
+<dt>proto_ipm</dt>
+<dd><p>A <code>proto_ipm</code> object. Only used for
+<code>make_ipm_report_body</code>.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
