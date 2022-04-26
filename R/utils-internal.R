@@ -100,7 +100,12 @@
   } else {
 
     attr(obj, "flat_protect") <- FALSE
-    attr(obj, "na_ok")        <- FALSE
+
+    if(is.na(obj)) {
+      attr(obj, "na_ok") <- FALSE
+    } else {
+      attr(obj, "na_ok") <- TRUE
+    }
 
   }
 

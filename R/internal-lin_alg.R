@@ -433,7 +433,7 @@
       out <- out[n_its, ]
     }
 
-    if(inherits(out, c('matrix', 'array'))){
+    if(inherits(out, c('matrix', 'array'))) {
 
       dimnames(out) <- list(NULL, names(lams))
 
@@ -865,6 +865,8 @@ is_conv_to_asymptotic.ipmr_ipm <- function(ipm, tolerance = 1e-6, burn_in = 0.1)
   }
 
   if(!log) out <- exp(out)
+
+  names(out) <- names(lambdas)
 
   return(out)
 }
