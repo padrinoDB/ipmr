@@ -422,7 +422,7 @@ In this example, there are no additional arguments that need to be passed to `ma
 
 - `proto_ipm` contains the `proto_ipm` object used to generate the model. This is used extensively by other methods in the package. 
 
-`lambda`, `left_ev`, and `right_ev` are generic functions corresponding to the dominant eigenvalue, dominant left eigenvector, and dominant right eigenvector of the iteration kernel, respectively. `lambda` is available for all classes of IPMs, while `left/right_ev` is available for all deterministic IPMs. Stochastic equivalents of the latter will get implemented eventually. `make_ipm_report()` generates an Rmarkdown file containing Latex equations and parameter values used to implement the IPM. This may be useful for publications/appendices.
+`lambda`, `left_ev`, and `right_ev` are generic functions corresponding to the dominant eigenvalue, dominant left eigenvector, and dominant right eigenvector of the iteration kernel, respectively. `lambda` is available for all classes of IPMs, while `left/right_ev` is available for all deterministic IPMs. Stochastic equivalents of the latter will get implemented eventually. `make_ipm_report()` generates an Rmarkdown file containing Latex equations and parameter values used to implement the IPM. This may be useful for publications/appendices, or for sending an IPM to the [PADRINO](https://padrinodb.github.io/Padrino/) project for archiving.
 
 ### Using `predict()` methods in vital rate expressions
 

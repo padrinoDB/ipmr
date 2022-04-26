@@ -319,7 +319,7 @@ make_ipm_report(my_simple_ipm,
 
 ```
 
-`make_ipm_report()` generates an Rmarkdown file containing Latex equations and parameter values used to implement the IPM. This may be useful for publications/appendices.
+`make_ipm_report()` generates an Rmarkdown file containing Latex equations and parameter values used to implement the IPM. This may be useful for publications/appendices, or for sending an IPM to the [PADRINO](https://padrinodb.github.io/Padrino/) project for archiving.
 
 ## More complicated models
 
