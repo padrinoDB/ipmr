@@ -13,7 +13,8 @@ make_ipm_report(
   title = "",
   output_format = "html",
   render_output = FALSE,
-  block_eqs = TRUE
+  block_eqs = TRUE,
+  long_eq_length = 65
 )
 
 \method{make_ipm_report}{default}(
@@ -22,7 +23,8 @@ make_ipm_report(
   title = "",
   output_format = "html",
   render_output = FALSE,
-  block_eqs = TRUE
+  block_eqs = TRUE,
+  long_eq_length = 65
 )
 
 \method{make_ipm_report}{ipmr_ipm}(
@@ -31,10 +33,11 @@ make_ipm_report(
   title = "",
   output_format = "html",
   render_output = FALSE,
-  block_eqs = TRUE
+  block_eqs = TRUE,
+  long_eq_length = 65
 )
 
-make_ipm_report_body(proto_ipm, block_eqs, rmd_dest)
+make_ipm_report_body(proto_ipm, block_eqs, rmd_dest, long_eq_length)
 }
 \arguments{
 \item{object}{A \code{proto_ipm} or output from \code{make_ipm()}.}
@@ -61,6 +64,11 @@ with blocks and numbered using \code{tag{}}. If \code{FALSE}, equations
 will be rendered as inline equations on a single line, and numbered as
 1.1, 1.2, 1.3 (iteration expressions), 2.1, 2.2 (vital rate expressions),
 etc.}
+
+\item{long_eq_length}{For longer equations, \code{make_ipm_report} tries
+to wrap these into multiple lines using \code{\\}. This parameter controls
+the number of characters per line. Default is 65. Ignored when
+\code{block_eqs = FALSE}.}
 
 \item{proto_ipm}{A \code{proto_ipm} object. Only used for
 \code{make_ipm_report_body}.}

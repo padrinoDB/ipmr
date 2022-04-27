@@ -1,6 +1,5 @@
 This is an update of ipmr which is already on CRAN. This update includes bug fixes
-and a new citation entry to reflect a publication describing the package. The last
-update was in mid July. 
+and a new features. The last update was in mid September, 2021.
 
 Additional information on this submission:
 
@@ -9,7 +8,6 @@ Additional information on this submission:
 * ubuntu 20.04.4 (GitHub Actions), devel, release, and oldrelease
 * macOS Big Sur/Monterey 10.16 (GitHub Actions), release and oldrelease
 * Windows server x64 (Github Actions), devel, release, and 3.6.3
-* Ubuntu Linux 20.04.1 LTS, GCC (R-Hub) Release
 
 
 ## R CMD check results
