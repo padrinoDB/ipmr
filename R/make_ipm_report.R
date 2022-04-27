@@ -25,7 +25,7 @@
 #'   1.1, 1.2, 1.3 (iteration expressions), 2.1, 2.2 (vital rate expressions),
 #'   etc.
 #' @param long_eq_length For longer equations, \code{make_ipm_report} tries
-#'   to wrap these into multiple lines using \code{\\}. This parameter controls
+#'   to wrap these into multiple lines using \code{\\\\}. This parameter controls
 #'   the number of characters per line. Default is 65. Ignored when
 #'   \code{block_eqs = FALSE}.
 #'
@@ -204,7 +204,7 @@ make_ipm_report_body <- function(proto_ipm,
 
   all_lines <- strwrap(eq, width = long_eq_length)
 
-  paste(all_lines, collapse = " \\ ")
+  paste(all_lines, collapse = " \\\\ ")
 
 }
 

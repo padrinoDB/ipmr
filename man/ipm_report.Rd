@@ -66,7 +66,7 @@ will be rendered as inline equations on a single line, and numbered as
 etc.}
 
 \item{long_eq_length}{For longer equations, \code{make_ipm_report} tries
-to wrap these into multiple lines using \code{\\}. This parameter controls
+to wrap these into multiple lines using \code{\\\\}. This parameter controls
 the number of characters per line. Default is 65. Ignored when
 \code{block_eqs = FALSE}.}
 
