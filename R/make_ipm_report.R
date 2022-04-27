@@ -533,8 +533,13 @@ make_ipm_report_body <- function(proto_ipm,
 }
 
 #' @noRd
+# ... is not an essential argument of this function, but is required to silence
+# cran NOTEs about 'possibly incorrect usage of ...' because it does not
+# rlang::new_function() as something that creates new functions. Unfortunately,
+# we need the quasi-quoting/unquoting version of function creation to correctly
+# get 'op'/'fun' into the output function.
 
-.unknown_op <- function(op) {
+.unknown_op <- function(op, ...) {
 
   op <- gsub("_", "\\_", op, fixed = TRUE)
 
@@ -549,8 +554,13 @@ make_ipm_report_body <- function(proto_ipm,
 }
 
 #' @noRd
+# ... is not an essential argument of this function, but is required to silence
+# cran NOTEs about 'possibly incorrect usage of ...' because it does not
+# rlang::new_function() as something that creates new functions. Unfortunately,
+# we need the quasi-quoting/unquoting version of function creation to correctly
+# get 'op'/'fun' into the output function.
 
-.new_pdf <- function(fun) {
+.new_pdf <- function(fun, ...) {
   rlang::new_function(
     rlang::exprs(... = , .pop_ev = pop_env),
     rlang::expr(
