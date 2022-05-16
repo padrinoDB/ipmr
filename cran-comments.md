@@ -1,4 +1,4 @@
-This is a resubmission of ipmr 0.0.6. This update includes bug fixes and a new features. The last update was in late April, 2022
+This is a submission of ipmr 0.0.6. This update includes bug fixes and a new features. The last update was in late April, 2022
 
 ## Test environments
 * local R installation, Windows 10, R 4.2.0

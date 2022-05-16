@@ -1326,8 +1326,7 @@
 
     } else {
 
-      msg <- paste("Negative numbers greater than expected due",
-                   " to  floating point error generated building: ",
+      msg <- paste("Negative numbers found in the following sub-kernel: ",
                    kern_name,". Double check model parameteriztion.",
                    sep = "")
 
