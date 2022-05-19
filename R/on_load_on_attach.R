@@ -21,3 +21,7 @@
   }
 
 }
+
+.onUnload <- function(libpath = find.package("ipmr")) {
+  library.dynam.unload("ipmr", libpath)
+}
