@@ -753,7 +753,7 @@ print.ipmr_vital_rate_exprs <- function(x, ...) {
 
   if(any(proto$uses_par_sets) | .uses_age(proto)) {
 
-    out <- .pretty_print_par_sets(x, proto)
+    out <- .pretty_print_par_sets(x, proto, "<", ">")
 
   } else {
 
@@ -773,44 +773,48 @@ print.ipmr_vital_rate_exprs <- function(x, ...) {
 
 }
 
-.pretty_print_par_sets <- function(x, proto) {
+.pretty_print_par_sets <- function(x, proto, l, r) {
 
-  nm_par_sets <- proto$par_set_indices %>%
+  nm_par_sets <- c(proto$par_set_indices, proto$age_indices) %>%
     .flatten_to_depth(1L) %>%
+    .[!rlang::is_empty(.)] %>%
     names() %>%
     unique()
 
-  if(.uses_age(proto)) {
+  if(all(nm_par_sets == "levels")) return(x)
 
-    ages <- proto$age_indices %>%
-      .flatten_to_depth(1L) %>%
-      names() %>%
-      unique()
-
-    nm_par_sets <- c(nm_par_sets, ages)
-
-  }
 
   nm_par_sets <- nm_par_sets[!is.na(nm_par_sets)]
+  # nm_par_sets <- paste0("(", nm_par_sets, ")")
 
-  x <- lapply(x, rlang::expr_text)
+  # In print.proto_ipm, incoming 'x' are language objects.
+  # in make_ipm_report, they're already text
+
+  if(!is.character(x[[1]])) x <- lapply(x, rlang::expr_text)
 
   for(i in seq_along(nm_par_sets)) {
 
-    to_print <- paste("<", nm_par_sets[i], ">", sep = "")
+    to_print <- .wrap_par_set(nm_par_sets[i], l, r)
+    to_sub   <- .wrap_par_set(nm_par_sets[i], "(", ")")
 
     x <- lapply(x,
                 function(y, nm, to_print) {
                   gsub(nm, to_print, y)
                 },
-                nm       = nm_par_sets[i],
+                nm       = to_sub,
                 to_print = to_print)
 
-    names(x) <- gsub(nm_par_sets[i], to_print, names(x))
+    names(x) <- gsub(to_sub, to_print, names(x))
 
   }
 
   return(x)
+}
+
+#' @noRd
+
+.wrap_par_set <- function(nm, l, r) {
+  paste0(l, nm, r)
 }
 
 #' @export
@@ -821,7 +825,7 @@ print.ipmr_kernel_exprs <- function(x, ...) {
 
   if(any(proto$uses_par_sets) | .uses_age(proto)) {
 
-    out <- .pretty_print_par_sets(x, proto)
+    out <- .pretty_print_par_sets(x, proto, "<", ">")
 
   } else {
 
@@ -880,6 +884,7 @@ print.ipmr_domains <- function(x, ...) {
 print.ipmr_pop_state <- function(x, ...) {
 
   out <- lapply(x, function(y) y)
+  proto <- attr(x, "proto")
 
   if(out[[1]] == "No population state defined.") {
 
@@ -893,7 +898,10 @@ print.ipmr_pop_state <- function(x, ...) {
 
     names(out) <- gsub("pop_state_", "n_", names(out))
 
-    out <- paste(names(out), out, sep = ": ") %>%
+    nms <- names(out) %>%
+      .pretty_print_par_sets(proto, "<", ">")
+
+    out <- paste(nms, out, sep = ": ") %>%
       paste(., collapse = "\n")
 
     cat(out)

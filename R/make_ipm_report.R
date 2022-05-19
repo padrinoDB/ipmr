@@ -165,10 +165,17 @@ make_ipm_report_body <- function(proto_ipm,
                                           par_env,
                                           block_eqs,
                                           long_eq_length)
+
   all_params <- .make_ipm_report_params(proto_ipm,
                                         par_env)
 
-  out <- c(iter_exprs, vr_exprs, all_params)
+  if(.has_usr_funs(proto_ipm)) {
+    usr_funs   <- .make_ipm_report_usr_funs(proto_ipm)
+  } else {
+    usr_funs <- NULL
+  }
+
+  out <- c(iter_exprs, vr_exprs, all_params, usr_funs)
 
   return(out)
 
@@ -242,7 +249,8 @@ make_ipm_report_body <- function(proto_ipm,
                                        start_end,
                                        pop_env,
                                        block_eqs,
-                                       long_eq_length)
+                                       long_eq_length) %>%
+    .pretty_print_par_sets(proto_ipm, "\\lt", "\\gt")
 
   unlist(c(.make_ipm_report_iter_exprs_header(rmd_dest),
            latex_exprs),
@@ -259,7 +267,9 @@ make_ipm_report_body <- function(proto_ipm,
          "R code to Latex for accuracy before distributing!",
          " If needed, edit the _Rmd_ file directly. It can be found here: ",
          paste0("`", rmd_dest, "`"),
-         "\n")
+         "\n",
+         "Models with parameter set index notation will have indices wrapped",
+         " in '<...>'.")
 
 
 }
@@ -698,9 +708,6 @@ make_ipm_report_body <- function(proto_ipm,
 
   params <- c(params, vrs)
 
-  # if(.has_par_sets(proto_ipm)) params <- .ipmr_report_par_set_nms(params,
-  #                                                                 proto_ipm)
-
   beta_list <- vector("list", length(params))
 
   for(i in seq_along(beta_list)) {
@@ -794,13 +801,6 @@ make_ipm_report_body <- function(proto_ipm,
   .flatten_to_depth(out, 1L)
 }
 
-# TODO: Devise way of grouping all parameters from an indexed symbol into
-# one '\\beta_{x}^{ind_1, ind_2}'
-
-.ipmr_report_par_set_nms <- function(params, proto_ipm) {
-
-
-}
 
 #' @noRd
 
@@ -842,7 +842,8 @@ make_ipm_report_body <- function(proto_ipm,
     )
 
     # And now put it all together and wrap w/ $$/$!
-    out[[i]] <- paste0(nms[i], " = ", out[[i]])
+    out[[i]] <- paste0(nms[i], " = ", out[[i]]) %>%
+      .pretty_print_par_sets(proto_ipm, "\\lt", "\\gt")
 
     if(block_eqs) {
       out[[i]] <- .wrap_block_eq(out[[i]], 2, i, long_eq_length)
@@ -858,8 +859,10 @@ make_ipm_report_body <- function(proto_ipm,
 .make_ipm_report_vr_exprs_header <- function() {
 
   paste0("\n\n## IPM Vital Rate Expressions\n\n",
-         "These expressions generate the vital rates the IPM. Check  ",
-         "translations from R code to Latex for accuracy before distributing!\n")
+         "These expressions generate the vital rates in the IPM. Check  ",
+         "translations from R code to Latex for accuracy before distributing!\n",
+         "Models with parameter set index notation will have indices wrapped",
+         " in '<...>'.")
 
 }
 
@@ -915,6 +918,33 @@ make_ipm_report_body <- function(proto_ipm,
 
   }
 
+  if(.has_par_sets(proto_ipm)) {
+
+    par_inds <- .flatten_to_depth(proto_ipm$par_set_indices, 1L) %>%
+      .[!duplicated(names(.))] %>%
+      lapply(eval)
+
+    if("to_drop" %in% names(par_inds)) par_inds$to_drop <- NULL
+
+    par_set_out <- character(length(par_inds))
+
+    for(i in seq_along(par_inds)) {
+      par_out[i] <- paste0("  -", names(par_inds)[i], ": ",
+                          paste(par_inds[[i]], collapse = ", "))
+    }
+
+    par_set_out <- paste(par_set_out, collapse = "\n\n")
+    par_set_hdr <- paste0("\n\n### Parameter set indices\n\n",
+                          "The following parameter set indices are used in the",
+                          " vital rate expressions, iteration expressions, ",
+                          " possibly in the population state names: \n\n")
+
+
+  } else {
+    par_set_out <- NULL
+    par_set_hdr <- NULL
+  }
+
   par_out <- .pars_to_latex_list(par_out)
   dom_out <- .pars_to_latex_list(dom_out)
 
@@ -926,7 +956,7 @@ make_ipm_report_body <- function(proto_ipm,
     "\n\n### Domains and Integration Rules\n\n",
     "The following domains and integration rules were used to implement this IPM: \n\n")
 
-  c(par_hdr, par_out, dom_hdr, dom_out)
+  c(par_hdr, par_out, par_set_hdr, par_set_out, dom_hdr, dom_out)
 
 }
 
@@ -1008,4 +1038,34 @@ make_ipm_report_body <- function(proto_ipm,
   }
 
   rmd_dest
+}
+
+#' @noRd
+
+.make_ipm_report_usr_funs <- function(proto) {
+
+  hdr <- paste0("## User-defined functions\n\nThese user",
+                " defined functions appear in the IPM definition:\n\n")
+
+  funs <- proto$usr_funs %>%
+    .flatten_to_depth(1L) %>%
+    .[!duplicated(names(.))] %>%
+    lapply(rlang::expr_text)
+
+  full_defs <- paste0(names(funs), " <- ", funs, "\n\n")
+
+  full_block <- paste0("```{r eval = FALSE}\n\n",
+                       full_defs,
+                       "```")
+
+  c(hdr, full_block)
+
+}
+
+#' @noRd
+
+.has_usr_funs <- function(proto) {
+
+  isTRUE(all(is.na(proto$usr_funs)))
+
 }
