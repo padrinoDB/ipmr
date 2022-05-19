@@ -5,7 +5,7 @@
 #' @description Generates a \code{.rmd} file containing a mathematical
 #'   description of the \code{proto_ipm} object.
 #'
-#' @param proto_ipm A proto_ipm object
+#' @param object A \code{proto_ipm} or output from \code{make_ipm()}.
 #' @param rmd_dest  The folder to save the Rmd file at. The default is
 #'   \code{getwd()}. Alternatively, can be a complete file path that specifies
 #'   the location and title of the document with the extension \code{".rmd"}. in
@@ -24,6 +24,10 @@
 #'   will be rendered as inline equations on a single line, and numbered as
 #'   1.1, 1.2, 1.3 (iteration expressions), 2.1, 2.2 (vital rate expressions),
 #'   etc.
+#' @param long_eq_length For longer equations, \code{make_ipm_report} tries
+#'   to wrap these into multiple lines using \code{\\\\}. This parameter controls
+#'   the number of characters per line. Default is 65. Ignored when
+#'   \code{block_eqs = FALSE}.
 #'
 #' @details \code{make_ipm_report_body} only translates the iteration
 #'   expressions and vital rate expressions into Markdown with LaTeX, and does
@@ -49,13 +53,56 @@
 #'
 #' @export
 
+make_ipm_report <- function(object,
+                            rmd_dest       = getwd(),
+                            title          = "",
+                            output_format  = "html",
+                            render_output  = FALSE,
+                            block_eqs      = TRUE,
+                            long_eq_length = 65) {
 
-make_ipm_report <- function(proto_ipm,
-                            rmd_dest        = getwd(),
-                            title           = "",
-                            output_format   = "html",
-                            render_output   = FALSE,
-                            block_eqs       = TRUE) {
+  UseMethod("make_ipm_report")
+}
+
+#' @export
+#' @rdname ipm_report
+
+make_ipm_report.default <- function(object,
+                                    rmd_dest      = getwd(),
+                                    title         = "",
+                                    output_format = "html",
+                                    render_output = FALSE,
+                                    block_eqs     = TRUE,
+                                    long_eq_length = 65) {
+
+  .make_ipm_report_impl(object, rmd_dest, title, output_format,
+                        render_output, block_eqs, long_eq_length)
+}
+
+#' @export
+#' @rdname ipm_report
+
+make_ipm_report.ipmr_ipm <- function(object,
+                                     rmd_dest      = getwd(),
+                                     title         = "",
+                                     output_format = "html",
+                                     render_output = FALSE,
+                                     block_eqs     = TRUE,
+                                     long_eq_length = 65) {
+
+  .make_ipm_report_impl(object$proto_ipm, rmd_dest, title, output_format,
+                        render_output, block_eqs, long_eq_length)
+}
+
+#' @noRd
+
+.make_ipm_report_impl <- function(proto_ipm,
+                                  rmd_dest,
+                                  title  ,
+                                  output_format,
+                                  render_output,
+                                  block_eqs,
+                                  long_eq_length) {
 
   if(!requireNamespace("rmarkdown", quietly = TRUE) && render_output) {
     stop("The 'rmarkdown' package is required for 'render_output = TRUE'.\n",
@@ -71,7 +118,8 @@ make_ipm_report <- function(proto_ipm,
 
   rmd_dest     <- .make_ipm_report_fp(rmd_dest, keep_rmd = TRUE)
   header       <- .make_ipm_report_header(output_format, title, block_eqs)
-  body         <- make_ipm_report_body(proto_ipm, block_eqs, rmd_dest)
+  body         <- make_ipm_report_body(proto_ipm, block_eqs,
+                                       rmd_dest, long_eq_length)
 
   rmd_contents <- c(header, body)
 
@@ -86,9 +134,14 @@ make_ipm_report <- function(proto_ipm,
 }
 
 #' @rdname ipm_report
+#' @param proto_ipm A \code{proto_ipm} object. Only used for
+#' \code{make_ipm_report_body}.
 #' @export
 
-make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
+make_ipm_report_body <- function(proto_ipm,
+                                 block_eqs,
+                                 rmd_dest,
+                                 long_eq_length) {
 
   # first, generate stack of translation environments. Each environment on the
   # stack uses the previous environment as the parent for symbol lookup and
@@ -105,10 +158,15 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
 
   iter_exprs <- .make_ipm_report_iter_exprs(proto_ipm, par_env,
-                                            block_eqs, rmd_dest)
+                                            block_eqs, rmd_dest,
+                                            long_eq_length)
 
-  vr_exprs   <- .make_ipm_report_vr_exprs(proto_ipm,   par_env, block_eqs)
-  all_params <- .make_ipm_report_params(proto_ipm,     par_env)
+  vr_exprs   <- .make_ipm_report_vr_exprs(proto_ipm,
+                                          par_env,
+                                          block_eqs,
+                                          long_eq_length)
+  all_params <- .make_ipm_report_params(proto_ipm,
+                                        par_env)
 
   out <- c(iter_exprs, vr_exprs, all_params)
 
@@ -120,15 +178,33 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
 .wrap_inline_eq <- function(eq, section, ind) {
 
-  paste0("\n", section, ".", ind, "$", ": ", eq, "$\n")
+  paste0("\n", section, ".", ind, ": ", "$", eq, "$\n")
 
 }
 
 #' @noRd
 
-.wrap_block_eq <- function(eq, section, ind) {
+.wrap_block_eq <- function(eq, section, ind, long_eq_length) {
+
+  if(nchar(eq) > long_eq_length) {
+
+    eq <- .split_eq_lines(eq, long_eq_length)
+  }
 
   paste0("\n$$", eq, "\\tag{", section, ".", ind, "}", "$$\n")
+
+}
+
+#' @noRd
+
+# This is unlikely to be respected by output: pdf_document based on my
+# experience, buy may as well try
+
+.split_eq_lines <- function(eq, long_eq_length) {
+
+  all_lines <- strwrap(eq, width = long_eq_length)
+
+  paste(all_lines, collapse = " \\\\ ")
 
 }
 
@@ -136,7 +212,9 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 # Translates:
 # n_z_t_1 = P %*% n_z_t + F %*% n_z_t -> n(z', t + 1) = \int([P+F]n(z , t)dz)
 
-.make_ipm_report_iter_exprs <- function(proto_ipm, pop_env, block_eqs, rmd_dest) {
+.make_ipm_report_iter_exprs <- function(proto_ipm, pop_env,
+                                        block_eqs, rmd_dest,
+                                        long_eq_length) {
 
   # Set up iteration expressions, and get sub-kernel families and start/end
   # state so we can append z/z' correctly.
@@ -163,7 +241,8 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
                                        families,
                                        start_end,
                                        pop_env,
-                                       block_eqs)
+                                       block_eqs,
+                                       long_eq_length)
 
   unlist(c(.make_ipm_report_iter_exprs_header(rmd_dest),
            latex_exprs),
@@ -171,9 +250,11 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
 }
 
+#' @noRd
+
 .make_ipm_report_iter_exprs_header <- function(rmd_dest) {
 
-  paste0("\n# IPM Iteration Expressions\n\n",
+  paste0("\n## IPM Iteration Expressions\n\n",
          "These expressions iterate the IPM. Check translations from ",
          "R code to Latex for accuracy before distributing!",
          " If needed, edit the _Rmd_ file directly. It can be found here: ",
@@ -254,7 +335,8 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
                                   families,
                                   start_end,
                                   pop_env,
-                                  block_eqs) {
+                                  block_eqs,
+                                  long_eq_length) {
 
   kern_forms <- kernel_formulae(proto_ipm)
   names(kern_forms) <- .z_p_z_kernel_names(kern_forms, families, start_end)
@@ -281,7 +363,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
     out[[i]] <- paste0(nms[i], " = ", out[[i]])
 
     if(block_eqs) {
-      out[[i]] <- .wrap_block_eq(out[[i]], 1, i)
+      out[[i]] <- .wrap_block_eq(out[[i]], 1, i, long_eq_length)
     } else {
       out[[i]] <- .wrap_inline_eq(out[[i]], 1, i)
     }
@@ -298,7 +380,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
     out[[i]] <- paste0(names(kern_forms)[it], " = ", out[[i]])
 
     if(block_eqs) {
-      out[[i]] <- .wrap_block_eq(out[[i]], 1, i)
+      out[[i]] <- .wrap_block_eq(out[[i]], 1, i, long_eq_length)
     } else {
       out[[i]] <- .wrap_inline_eq(out[[i]], 1, i)
     }
@@ -435,9 +517,29 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
   )
 }
 
-#' @noRd
+.binary_or_unary_op <- function(sep) {
+  rlang::new_function(
+    rlang::exprs(e1 = , e2 = ),
+    rlang::expr(
+      if(!missing(e2)){
+        paste0(e1, !!sep, e2)
+      } else {
+        paste0(!!sep, e1)
+      }
 
-.unknown_op <- function(op) {
+      ),
+    rlang::caller_env()
+  )
+}
+
+#' @noRd
+# ... is not an essential argument of this function, but is required to silence
+# cran NOTEs about 'possibly incorrect usage of ...' because it does not
+# rlang::new_function() as something that creates new functions. Unfortunately,
+# we need the quasi-quoting/unquoting version of function creation to correctly
+# get 'op'/'fun' into the output function.
+
+.unknown_op <- function(op, ...) {
 
   op <- gsub("_", "\\_", op, fixed = TRUE)
 
@@ -452,8 +554,13 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 }
 
 #' @noRd
+# ... is not an essential argument of this function, but is required to silence
+# cran NOTEs about 'possibly incorrect usage of ...' because it does not
+# rlang::new_function() as something that creates new functions. Unfortunately,
+# we need the quasi-quoting/unquoting version of function creation to correctly
+# get 'op'/'fun' into the output function.
 
-.new_pdf <- function(fun) {
+.new_pdf <- function(fun, ...) {
   rlang::new_function(
     rlang::exprs(... = , .pop_ev = pop_env),
     rlang::expr(
@@ -486,13 +593,23 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
     # Usual operations
     `+` = .binary_op(" + "),
-    `-` = .binary_op(" - "),
+    `-` = .binary_or_unary_op(" - "),
     `*` = .binary_op(" * "),
     `/` = function(a, b) {
       paste0("\\frac{", a, "}{", b, "}")
     },
+    `>` = function(a, b) paste0(a, "\\gt", b),
+    `>=` = function(a, b) paste0(a, "\\gte", b),
+    `<` = function(a, b) paste0(a, "\\lt", b),
+    `<=` = function(a, b) paste0(a, "\\lte", b),
+
     `^` = .binary_group_op("^"),
     `%*%` = .binary_op(""),
+    ifelse = function(a, tr, fa) {
+      paste0("\\begin{cases} ", tr, " & \\text{if }", a, "\\\\",
+             fa, "\\end{cases}")
+    },
+    t = function(a) paste0(a, "^T"),
 
     # Commonly used functions
     paste      = paste,
@@ -706,7 +823,8 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 #' @noRd
 # TODO: add z',z if possible, to  vr_exprs
 
-.make_ipm_report_vr_exprs <- function(proto_ipm, pop_env, block_eqs) {
+.make_ipm_report_vr_exprs <- function(proto_ipm, pop_env,
+                                      block_eqs, long_eq_length) {
 
   vr_exprs <- vital_rate_exprs(proto_ipm)
 
@@ -727,7 +845,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
     out[[i]] <- paste0(nms[i], " = ", out[[i]])
 
     if(block_eqs) {
-      out[[i]] <- .wrap_block_eq(out[[i]], 2, i)
+      out[[i]] <- .wrap_block_eq(out[[i]], 2, i, long_eq_length)
     } else {
       out[[i]] <- .wrap_inline_eq(out[[i]], 2, i)
     }
@@ -739,7 +857,7 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
 .make_ipm_report_vr_exprs_header <- function() {
 
-  paste0("\n\n# IPM Vital Rate Expressions\n\n",
+  paste0("\n\n## IPM Vital Rate Expressions\n\n",
          "These expressions generate the vital rates the IPM. Check  ",
          "translations from R code to Latex for accuracy before distributing!\n")
 
@@ -751,7 +869,10 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
   pars <- parameters(proto_ipm)
   doms <- domains(proto_ipm)
-  ints <- unique(proto_ipm$int_rule)
+  # Only one integration rule currently, might want to add it as an attribute
+  # to domains() or something, so that it's easier to get text version directly
+  # from the domain that is being integrated.
+  # ints <- unique(proto_ipm$int_rule)
 
   par_trans <- rlang::env_get_list(par_env, names(pars))
 
@@ -785,7 +906,12 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
                          "[",
                          l_nm, " = ", round(doms[[i]][1], 3),
                          ", ",
-                         u_nm, " = ", round(doms[[i]][2], 3), "]$")
+                         u_nm, " = ", round(doms[[i]][2], 3),
+                         "], ",
+                         "n_{", d_nm, "} = ", doms[[i]][2],
+                         "$\n\n",
+                         " where $n_{x}$ denotes the number of meshpoints",
+                         " for the midpoint rule for integration.")
 
   }
 
@@ -793,11 +919,11 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
   dom_out <- .pars_to_latex_list(dom_out)
 
   par_hdr <- paste0(
-    "\n\n# Implementation Details\n\n## Parameter values\n\n",
+    "\n\n## Implementation Details\n\n### Parameter values\n\n",
     "The following parameter values were used to implement this IPM: \n\n"
   )
   dom_hdr <- paste0(
-    "\n\n## Domains and Integration Rules\n\n",
+    "\n\n### Domains and Integration Rules\n\n",
     "The following domains and integration rules were used to implement this IPM: \n\n")
 
   c(par_hdr, par_out, dom_hdr, dom_out)
@@ -817,10 +943,10 @@ make_ipm_report_body <- function(proto_ipm, block_eqs, rmd_dest) {
 
 .make_ipm_report_header <- function(output_format, title, block_eqs) {
 
-  if(block_eqs && output_format != "pdf") {
+  if(block_eqs && ! output_format %in% c("pdf", "html")) {
 
     message("Block equation numbering may not work well in formats other than",
-            " 'pdf'!\nMake sure to inspect output.")
+            " 'pdf' or 'html'!\nMake sure to inspect output.")
   }
 
 

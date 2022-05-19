@@ -313,13 +313,15 @@ lambda_ipmr <- lambda(my_simple_ipm)
 w_ipmr      <- right_ev(my_simple_ipm, iterations = 200)
 v_ipmr      <- left_ev(my_simple_ipm, iterations = 200)
 
+# make_ipm_report works on either proto_ipms or made ipm objects
+
 make_ipm_report(my_simple_ipm, 
                 render_output = TRUE, 
                 title         = "my_simple_ipm_report")
 
 ```
 
-`make_ipm_report()` generates an Rmarkdown file containing Latex equations and parameter values used to implement the IPM. This may be useful for publications/appendices.
+`make_ipm_report()` generates an Rmarkdown file containing Latex equations and parameter values used to implement the IPM. This may be useful for publications/appendices, or for sending an IPM to the [PADRINO](https://padrinodb.github.io/Padrino/) project for archiving.
 
 ## More complicated models
 

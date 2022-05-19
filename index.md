@@ -185,10 +185,10 @@ Below is an example of how to implement a simple IPM with `ipmr`.
 ## Examples for simple IPM classes
 
 Here is a simple model implemented with `ipmr`. This is a hypothetical
-plant species where plants can survive and grow (*P*(*z*′, *z*)), and
-reproduce sexually (*F*(*z*′, *z*)). There is no seed bank, and so there
+plant species where plants can survive and grow (*P*(*z*′,*z*)), and
+reproduce sexually (*F*(*z*′,*z*)). There is no seed bank, and so there
 are no discrete traits in the model. We’ll use 4 regressions: survival
-(*s*(*z*)), growth (*G*(*z*′, *z*), *f*<sub>*G*</sub>), probability of
+(*s*(*z*)), growth (*G*(*z*′,*z*), *f*<sub>*G*</sub>), probability of
 reproducing (*r*<sub>*r*</sub>(*z*)), and number of seeds produced
 conditional on flowering (*r*<sub>*s*</sub>(*z*)). New recruits will be
 generated with a Gaussian distribution (denoted
@@ -197,25 +197,25 @@ and standard deviation of new recruits from the data. For simplicity,
 we’ll assume there’s no maternal effect on recruit size. First, we’ll
 write out the functional forms for each component of the model:
 
-1.  *n*(*z*′, *t* + 1) = ∫<sub>*L*</sub><sup>*U*</sup>*K*(*z*′, *z*)*n*(*z*, *t*)*d**z*
+1.  *n*(*z*′,*t*+1) = ∫<sub>*L*</sub><sup>*U*</sup>*K*(*z*′,*z*)*n*(*z*,*t*)*d**z*
 
-2.  *K*(*z*′, *z*) = *P*(*z*′, *z*) + *F*(*z*′, *z*)
+2.  *K*(*z*′,*z*) = *P*(*z*′,*z*) + *F*(*z*′,*z*)
 
-3.  *P*(*z*′, *z*) = *s*(*z*) \* *G*(*z*′, *z*)
+3.  *P*(*z*′,*z*) = *s*(*z*) \* *G*(*z*′,*z*)
 
 4.  *L**o**g**i**t*(*s*(*z*)) = *α*<sub>*s*</sub> + *β*<sub>*s*</sub> \* *z*
 
-5.  *G*(*z*′, *z*) = *f*<sub>*G*</sub>(*μ*<sub>*G*</sub>, *σ*<sub>*G*</sub>)
+5.  *G*(*z*′,*z*) = *f*<sub>*G*</sub>(*μ*<sub>*G*</sub>,*σ*<sub>*G*</sub>)
 
 6.  *μ*<sub>*G*</sub> = *α*<sub>*G*</sub> + *β*<sub>*G*</sub> \* *z*
 
-7.  *F*(*z*′, *z*) = *r*<sub>*r*</sub>(*z*) \* *r*<sub>*s*</sub>(*z*) \* *r*<sub>*d*</sub>(*z*′)
+7.  *F*(*z*′,*z*) = *r*<sub>*r*</sub>(*z*) \* *r*<sub>*s*</sub>(*z*) \* *r*<sub>*d*</sub>(*z*′)
 
 8.  *L**o**g**i**t*(*r*<sub>*r*</sub>(*z*)) = *α*<sub>*r*<sub>*r*</sub></sub> + *β*<sub>*r*<sub>*r*</sub></sub> \* *z*
 
 9.  *L**o**g*(*r*<sub>*s*</sub>(*z*)) = *α*<sub>*r*<sub>*s*</sub></sub> + *β*<sub>*r*<sub>*s*</sub></sub> \* *z*
 
-10. *r*<sub>*d*</sub>(*z*′) = *f*<sub>*r*<sub>*d*</sub></sub>(*μ*<sub>*r*<sub>*d*</sub></sub>, *σ*<sub>*r*<sub>*d*</sub></sub>)
+10. *r*<sub>*d*</sub>(*z*′) = *f*<sub>*r*<sub>*d*</sub></sub>(*μ*<sub>*r*<sub>*d*</sub></sub>,*σ*<sub>*r*<sub>*d*</sub></sub>)
 
 Equation 1 describes how all the vital rates act on the initial trait
 distribution to produce a new one at *t* + 1. Equations 3-6 describe how
@@ -231,7 +231,7 @@ correspond to the functional forms described above:
     -   Example model formula:
         `glm(surv ~ size_1, data = my_surv_data, family = binomial())`
 
-2.  Growth (*G*(*z*′, *z*) / `G`): a linear model with a normal error
+2.  Growth (*G*(*z*′,*z*) / `G`): a linear model with a normal error
     distribution.
 
     -   Example model formula:
@@ -410,7 +410,11 @@ lambda_ipmr <- lambda(my_simple_ipm)
 w_ipmr      <- right_ev(my_simple_ipm)
 v_ipmr      <- left_ev(my_simple_ipm)
 
-make_ipm_report(my_simple_ipm, title = "my_ipm_report", render_output = TRUE)
+# make_ipm_report works on either proto_ipms or made ipm objects
+
+make_ipm_report(my_simple_ipm,
+                title = "my_ipm_report",
+                render_output = TRUE)
 ```
 
 A more detailed introduction to `ipmr` is available in the Intro to ipmr

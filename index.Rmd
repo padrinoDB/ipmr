@@ -320,7 +320,11 @@ lambda_ipmr <- lambda(my_simple_ipm)
 w_ipmr      <- right_ev(my_simple_ipm)
 v_ipmr      <- left_ev(my_simple_ipm)
 
-make_ipm_report(my_simple_ipm, title = "my_ipm_report", render_output = TRUE)
+# make_ipm_report works on either proto_ipms or made ipm objects
+
+make_ipm_report(my_simple_ipm,
+                title = "my_ipm_report",
+                render_output = TRUE)
 
 ```
 

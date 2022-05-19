@@ -1980,7 +1980,7 @@ test_that("Parameter sets work in parameter re-sampled model", {
   }
 
   kernel_holder <- list()
-  lambdas <- numeric
+  lambdas <- numeric()
   pop_list <- list(
     n_ln_leaf_l = matrix(NA_real_, nrow = 50, ncol = 101),
     n_sqrt_area = matrix(NA_real_, nrow = 50, ncol = 101),
@@ -2023,7 +2023,7 @@ test_that("Parameter sets work in parameter re-sampled model", {
 
   }
 
-  hand_lam <- mean(log(lambdas[11:100]))
+  hand_lam <- c(lambda = mean(log(lambdas[11:100])))
 
   ipmr_lam <- lambda(gen_di_stoch_param)
 

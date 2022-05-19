@@ -41,7 +41,7 @@ test_that("make_rmd_header produces correct headers", {
 
   expect_true(all(tst))
 
-  expect_message(.make_ipm_report_header("html", "test_header", TRUE),
+  expect_message(.make_ipm_report_header("word", "test_header", TRUE),
                  regex = "Block equation numbering")
 
   hdr <- .make_ipm_report_header("pdf", "test_header", TRUE)

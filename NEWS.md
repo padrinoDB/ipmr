@@ -1,6 +1,10 @@
-# ipmr (development version)
+# ipmr 0.0.5.9000 
 
-Contains some tweaks and a number of bug fixes. The latter are mostly related to PADRINO models, and shouldn't have *too much* of an effect on existing user-specified IPMs.
+
+
+# ipmr 0.0.5
+
+Contains a number of bug fixes and some new functionality. The latter are mostly related to PADRINO models, and shouldn't have *too much* of an effect on existing user-specified IPMs.
 
 ## Features 
 
@@ -27,6 +31,12 @@ Contains some tweaks and a number of bug fixes. The latter are mostly related to
  - Fixes bug in `lambda()` where `log = TRUE` had no effect when the IPM was stochastic and `type_lambda` was `'last'` or `'all'`.
  
  - Switched from `all.equal` to absolute tolerance. @aariq in #52.
+ 
+ - Fixes bug where the value of `lambda()` was named for determinstic models and unnamed for stochastic models.  @aariq in #57.
+ 
+ - Fixes bug in `make_ipm()` where a user-specified sequence wasn't getting used correctly for certain model classes. @aariq in #58. 
+ 
+ - Warnings about `NA`s in `data_list` are no longer raised for model objects. 
 
 # ipmr 0.0.4
 

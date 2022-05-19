@@ -317,7 +317,7 @@ make_ipm.simple_di_stoch_kern <- function(proto_ipm,
   sub_kern_list <- all_sub_kerns$sub_kernels
   env_list      <- all_sub_kerns$env_list
 
-  kern_seq      <-  .make_kern_seq(proto_ipm,
+  kern_seq      <-  .make_kern_seq(others,
                                    iterations,
                                    kernel_seq)
 
@@ -791,7 +791,7 @@ make_ipm.general_di_stoch_kern <- function(proto_ipm,
 
   if(iterate) {
 
-    kern_seq  <- .make_kern_seq(proto_ipm,
+    kern_seq  <- .make_kern_seq(others,
                                 iterations,
                                 kernel_seq)
 

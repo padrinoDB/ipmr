@@ -95,10 +95,17 @@
   if(inherits(obj, supported_models)) {
 
     attr(obj, "flat_protect") <- TRUE
+    attr(obj, "na_ok")        <- TRUE
 
   } else {
 
     attr(obj, "flat_protect") <- FALSE
+
+    if(is.na(obj)) {
+      attr(obj, "na_ok") <- FALSE
+    } else {
+      attr(obj, "na_ok") <- TRUE
+    }
 
   }
 

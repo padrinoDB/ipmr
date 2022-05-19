@@ -1,31 +1,13 @@
-This is an update of ipmr which is already on CRAN. This update includes bug fixes
-and a new citation entry to reflect a publication describing the package. The last
-update was in mid July. 
-
-Additional information on this submission:
+This is a submission of ipmr 0.0.6. This update includes bug fixes and a new features. The last update was in late April, 2022
 
 ## Test environments
-* local R installation, Windows 10, R 4.1.0
-* ubuntu 20.04.1 (GitHub Actions), devel, release, and oldrelease
-* macOS Catalina 10.15.7 (GitHub Actions), release and oldrelease
-* Windows server 2019 x64 (Github Actions), release, and oldrelease
-* Windows server 2008 x86_64 (Win Builder) devel, release, and oldrelease
-* Ubuntu Linux 20.04.1 LTS, GCC (R-Hub) Release
+* local R installation, Windows 10, R 4.2.0
+* ubuntu 20.04.4 (GitHub Actions), devel, release, and oldrelease
+* macOS Big Sur/Monterey 10.16 (GitHub Actions), release and oldrelease
+* Windows server x64 (Github Actions), devel, release, and 3.6.3
 
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 note on all platforms except Linux Ubuntu GCC
+0 errors | 0 warnings | 0 note on all platforms
 
-## Linux Ubuntu GCC R CMD check results
-
-0 errors | 0 warnings | 1 note
-
-checking installed package size ... NOTE
-
-> installed size is 5.2Mb
-> sub-directories of 1Mb or more:
-> doc 1.5Mb
-> libs 2.6Mb
-
-This is not unexpected in packages with compiled code as pointed out here: https://stackoverflow.com/questions/53819970/r-package-libs-directory-too-large-after-compilation-to-submit-on-cran

@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">ipmr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.4.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
       </span>
     </div>
 
@@ -173,37 +173,29 @@
 </li>
 </ul>
 <p>The following possibilities are currently or will become available in <code>ipmr</code> (bold text denotes development progress):</p>
-<ul>
-<li>Simple, density independent models: <strong>Completed and ready</strong>
-</li>
-</ul>
+<ul><li>Simple, density independent models: <strong>Completed and ready</strong>
+</li></ul>
 <ol style="list-style-type: decimal">
 <li><p><code>"simple_di_det"</code></p></li>
 <li><p><code>"simple_di_stoch_kern"</code></p></li>
 <li><p><code>"simple_di_stoch_param"</code></p></li>
 </ol>
-<ul>
-<li>Simple, density dependent models: <strong>Completed, likely stable</strong>
-</li>
-</ul>
+<ul><li>Simple, density dependent models: <strong>Completed, likely stable</strong>
+</li></ul>
 <ol start="4" style="list-style-type: decimal">
 <li><p><code>"simple_dd_det"</code></p></li>
 <li><p><code>"simple_dd_stoch_kern"</code></p></li>
 <li><p><code>"simple_dd_stoch_param"</code></p></li>
 </ol>
-<ul>
-<li>General, density independent models: <strong>Completed and ready</strong>
-</li>
-</ul>
+<ul><li>General, density independent models: <strong>Completed and ready</strong>
+</li></ul>
 <ol start="7" style="list-style-type: decimal">
 <li><p><code>"general_di_det"</code></p></li>
 <li><p><code>"general_di_stoch_kern"</code></p></li>
 <li><p><code>"general_di_stoch_param"</code></p></li>
 </ol>
-<ul>
-<li>General, density dependent models: <strong>Completed, likely stable</strong>
-</li>
-</ul>
+<ul><li>General, density dependent models: <strong>Completed, likely stable</strong>
+</li></ul>
 <ol start="10" style="list-style-type: decimal">
 <li><p><code>"general_dd_det"</code></p></li>
 <li><p><code>"general_dd_stoch_kern"</code></p></li>
@@ -215,60 +207,50 @@
 <div class="section level2">
 <h2 id="examples-for-simple-ipm-classes">Examples for simple IPM classes<a class="anchor" aria-label="anchor" href="#examples-for-simple-ipm-classes"></a>
 </h2>
-<p>Here is a simple model implemented with <code>ipmr</code>. This is a hypothetical plant species where plants can survive and grow (<em>P</em>(<em>z</em>′, <em>z</em>)), and reproduce sexually (<em>F</em>(<em>z</em>′, <em>z</em>)). There is no seed bank, and so there are no discrete traits in the model. We’ll use 4 regressions: survival (<em>s</em>(<em>z</em>)), growth (<em>G</em>(<em>z</em>′, <em>z</em>), <em>f</em><sub><em>G</em></sub>), probability of reproducing (<em>r</em><sub><em>r</em></sub>(<em>z</em>)), and number of seeds produced conditional on flowering (<em>r</em><sub><em>s</em></sub>(<em>z</em>)). New recruits will be generated with a Gaussian distribution (denoted <em>f</em><sub><em>r</em><sub><em>d</em></sub></sub>), which requires calculating the mean and standard deviation of new recruits from the data. For simplicity, we’ll assume there’s no maternal effect on recruit size. First, we’ll write out the functional forms for each component of the model:</p>
+<p>Here is a simple model implemented with <code>ipmr</code>. This is a hypothetical plant species where plants can survive and grow (<em>P</em>(<em>z</em>′,<em>z</em>)), and reproduce sexually (<em>F</em>(<em>z</em>′,<em>z</em>)). There is no seed bank, and so there are no discrete traits in the model. We’ll use 4 regressions: survival (<em>s</em>(<em>z</em>)), growth (<em>G</em>(<em>z</em>′,<em>z</em>), <em>f</em><sub><em>G</em></sub>), probability of reproducing (<em>r</em><sub><em>r</em></sub>(<em>z</em>)), and number of seeds produced conditional on flowering (<em>r</em><sub><em>s</em></sub>(<em>z</em>)). New recruits will be generated with a Gaussian distribution (denoted <em>f</em><sub><em>r</em><sub><em>d</em></sub></sub>), which requires calculating the mean and standard deviation of new recruits from the data. For simplicity, we’ll assume there’s no maternal effect on recruit size. First, we’ll write out the functional forms for each component of the model:</p>
 <ol style="list-style-type: decimal">
-<li><p><em>n</em>(<em>z</em>′, <em>t</em> + 1) = ∫<sub><em>L</em></sub><sup><em>U</em></sup><em>K</em>(<em>z</em>′, <em>z</em>)<em>n</em>(<em>z</em>, <em>t</em>)*d**z*</p></li>
-<li><p><em>K</em>(<em>z</em>′, <em>z</em>) = <em>P</em>(<em>z</em>′, <em>z</em>) + <em>F</em>(<em>z</em>′, <em>z</em>)</p></li>
-<li><p><em>P</em>(<em>z</em>′, <em>z</em>) = <em>s</em>(<em>z</em>) * <em>G</em>(<em>z</em>′, <em>z</em>)</p></li>
+<li><p><em>n</em>(<em>z</em>′,<em>t</em>+1) = ∫<sub><em>L</em></sub><sup><em>U</em></sup><em>K</em>(<em>z</em>′,<em>z</em>)<em>n</em>(<em>z</em>,<em>t</em>)*d**z*</p></li>
+<li><p><em>K</em>(<em>z</em>′,<em>z</em>) = <em>P</em>(<em>z</em>′,<em>z</em>) + <em>F</em>(<em>z</em>′,<em>z</em>)</p></li>
+<li><p><em>P</em>(<em>z</em>′,<em>z</em>) = <em>s</em>(<em>z</em>) * <em>G</em>(<em>z</em>′,<em>z</em>)</p></li>
 <li><p><em>L<strong>o</strong>g<strong>i</strong>t</em>(<em>s</em>(<em>z</em>)) = <em>α</em><sub><em>s</em></sub> + <em>β</em><sub><em>s</em></sub> * <em>z</em></p></li>
-<li><p><em>G</em>(<em>z</em>′, <em>z</em>) = <em>f</em><sub><em>G</em></sub>(<em>μ</em><sub><em>G</em></sub>, <em>σ</em><sub><em>G</em></sub>)</p></li>
+<li><p><em>G</em>(<em>z</em>′,<em>z</em>) = <em>f</em><sub><em>G</em></sub>(<em>μ</em><sub><em>G</em></sub>,<em>σ</em><sub><em>G</em></sub>)</p></li>
 <li><p><em>μ</em><sub><em>G</em></sub> = <em>α</em><sub><em>G</em></sub> + <em>β</em><sub><em>G</em></sub> * <em>z</em></p></li>
-<li><p><em>F</em>(<em>z</em>′, <em>z</em>) = <em>r</em><sub><em>r</em></sub>(<em>z</em>) * <em>r</em><sub><em>s</em></sub>(<em>z</em>) * <em>r</em><sub><em>d</em></sub>(<em>z</em>′)</p></li>
+<li><p><em>F</em>(<em>z</em>′,<em>z</em>) = <em>r</em><sub><em>r</em></sub>(<em>z</em>) * <em>r</em><sub><em>s</em></sub>(<em>z</em>) * <em>r</em><sub><em>d</em></sub>(<em>z</em>′)</p></li>
 <li><p><em>L<strong>o</strong>g<strong>i</strong>t</em>(<em>r</em><sub><em>r</em></sub>(<em>z</em>)) = <em>α</em><sub><em>r</em><sub><em>r</em></sub></sub> + <em>β</em><sub><em>r</em><sub><em>r</em></sub></sub> * <em>z</em></p></li>
 <li><p><em>L<strong>o</strong>g</em>(<em>r</em><sub><em>s</em></sub>(<em>z</em>)) = <em>α</em><sub><em>r</em><sub><em>s</em></sub></sub> + <em>β</em><sub><em>r</em><sub><em>s</em></sub></sub> * <em>z</em></p></li>
-<li><p><em>r</em><sub><em>d</em></sub>(<em>z</em>′) = <em>f</em><sub><em>r</em><sub><em>d</em></sub></sub>(<em>μ</em><sub><em>r</em><sub><em>d</em></sub></sub>, <em>σ</em><sub><em>r</em><sub><em>d</em></sub></sub>)</p></li>
+<li><p><em>r</em><sub><em>d</em></sub>(<em>z</em>′) = <em>f</em><sub><em>r</em><sub><em>d</em></sub></sub>(<em>μ</em><sub><em>r</em><sub><em>d</em></sub></sub>,<em>σ</em><sub><em>r</em><sub><em>d</em></sub></sub>)</p></li>
 </ol>
 <p>Equation 1 describes how all the vital rates act on the initial trait distribution to produce a new one at <em>t</em> + 1. Equations 3-6 describe how existing individuals can survive, and if they survive, grow or shrink. Equations 7-10 describe how existing individuals create new individuals. In order to convert these functions to code, we usually fit regression models to our data. The following set of generalized linear models correspond to the functional forms described above:</p>
 <ol style="list-style-type: decimal">
 <li>
 <p>Survival (<em>s</em>(<em>z</em>) / <code>s</code>): a generalized linear model w/ a logit link.</p>
-<ul>
-<li>Example model formula: <code>glm(surv ~ size_1, data = my_surv_data, family = binomial())</code>
-</li>
-</ul>
+<ul><li>Example model formula: <code>glm(surv ~ size_1, data = my_surv_data, family = binomial())</code>
+</li></ul>
 </li>
 <li>
-<p>Growth (<em>G</em>(<em>z</em>′, <em>z</em>) / <code>G</code>): a linear model with a normal error distribution.</p>
-<ul>
-<li>Example model formula: <code>lm(size_2 ~ size_1, data = my_grow_data)</code>
-</li>
-</ul>
+<p>Growth (<em>G</em>(<em>z</em>′,<em>z</em>) / <code>G</code>): a linear model with a normal error distribution.</p>
+<ul><li>Example model formula: <code>lm(size_2 ~ size_1, data = my_grow_data)</code>
+</li></ul>
 </li>
 <li>
 <p>Pr(flowering) (<em>r</em><sub><em>r</em></sub>(<em>z</em>) / <code>r_r</code>): a generalized linear model w/ a logit link.</p>
-<ul>
-<li>Example model formula: <code>glm(flower ~ size_1, data = my_repro_data, family = binomial())</code>
-</li>
-</ul>
+<ul><li>Example model formula: <code>glm(flower ~ size_1, data = my_repro_data, family = binomial())</code>
+</li></ul>
 </li>
 <li>
 <p>Seed production (<em>r</em><sub><em>s</em></sub>(<em>z</em>) / <code>r_s</code>): a generalized linear model w/ log link.</p>
-<ul>
-<li>Example model formula: <code>glm(seeds ~ size_1, data = my_flower_data, family = poisson())</code>
-</li>
-</ul>
+<ul><li>Example model formula: <code>glm(seeds ~ size_1, data = my_flower_data, family = poisson())</code>
+</li></ul>
 </li>
 <li>
 <p>Recruit size distribution (<em>r</em><sub><em>d</em></sub>(<em>z</em>′) / <code>r_d</code>): a normal distribution w parameters <code>mu_rd</code> (mean) and <code>sd_rd</code> (standard deviation).</p>
-<ul>
-<li>
+<ul><li>
 <p>Example computations:</p>
 <ul>
 <li><p><code>mu_rd = mean(seedling_data$size_2)</code></p></li>
 <li><p><code>sd_rd = sd(seedling_data$size_2)</code></p></li>
 </ul>
-</li>
-</ul>
+</li></ul>
 </li>
 </ol>
 <p>The example below assumes we’ve already fit our vital rate models from the raw data. In this example, the numbers are made up, but code that extracts the values you need from a real regression model is provided in comments.</p>
@@ -416,7 +398,13 @@
 
 <span class="va">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
 <span class="va">w_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/eigenvectors.html">right_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
-<span class="va">v_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/eigenvectors.html">left_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span></code></pre></div>
+<span class="va">v_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/eigenvectors.html">left_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
+
+<span class="co"># make_ipm_report works on either proto_ipms or made ipm objects</span>
+
+<span class="fu"><a href="reference/ipm_report.html">make_ipm_report</a></span><span class="op">(</span><span class="va">my_simple_ipm</span>,
+                title <span class="op">=</span> <span class="st">"my_ipm_report"</span>,
+                render_output <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>A more detailed introduction to <code>ipmr</code> is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. Help with age × size models, density dependent models, and the parameter set index syntax are also available there. That’s all for now, happy modeling!</p>
 </div>
 </div>
@@ -494,7 +482,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer>

@@ -2,22 +2,45 @@
 % Please edit documentation in R/make_ipm_report.R
 \name{make_ipm_report}
 \alias{make_ipm_report}
+\alias{make_ipm_report.default}
+\alias{make_ipm_report.ipmr_ipm}
 \alias{make_ipm_report_body}
 \title{Generate an RMarkdown file with IPM metadata}
 \usage{
 make_ipm_report(
-  proto_ipm,
+  object,
   rmd_dest = getwd(),
   title = "",
   output_format = "html",
   render_output = FALSE,
-  block_eqs = TRUE
+  block_eqs = TRUE,
+  long_eq_length = 65
 )
 
-make_ipm_report_body(proto_ipm, block_eqs, rmd_dest)
+\method{make_ipm_report}{default}(
+  object,
+  rmd_dest = getwd(),
+  title = "",
+  output_format = "html",
+  render_output = FALSE,
+  block_eqs = TRUE,
+  long_eq_length = 65
+)
+
+\method{make_ipm_report}{ipmr_ipm}(
+  object,
+  rmd_dest = getwd(),
+  title = "",
+  output_format = "html",
+  render_output = FALSE,
+  block_eqs = TRUE,
+  long_eq_length = 65
+)
+
+make_ipm_report_body(proto_ipm, block_eqs, rmd_dest, long_eq_length)
 }
 \arguments{
-\item{proto_ipm}{A proto_ipm object}
+\item{object}{A \code{proto_ipm} or output from \code{make_ipm()}.}
 
 \item{rmd_dest}{The folder to save the Rmd file at. The default is
 \code{getwd()}. Alternatively, can be a complete file path that specifies
@@ -41,6 +64,14 @@ with blocks and numbered using \code{tag{}}. If \code{FALSE}, equations
 will be rendered as inline equations on a single line, and numbered as
 1.1, 1.2, 1.3 (iteration expressions), 2.1, 2.2 (vital rate expressions),
 etc.}
+
+\item{long_eq_length}{For longer equations, \code{make_ipm_report} tries
+to wrap these into multiple lines using \code{\\\\}. This parameter controls
+the number of characters per line. Default is 65. Ignored when
+\code{block_eqs = FALSE}.}
+
+\item{proto_ipm}{A \code{proto_ipm} object. Only used for
+\code{make_ipm_report_body}.}
 }
 \value{
 For \code{make_ipm_report}, the filepath to the \code{.rmd} file. The
