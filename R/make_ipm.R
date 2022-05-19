@@ -128,10 +128,10 @@ make_ipm.simple_di_det <- function(proto_ipm,
                                    iteration_direction = "right"
 ) {
 
-  # Figure out if we're dealing with a new model or an old one that is
-  # being reimplemented. If the proto is not new and usr_funs isn't passed to the new
-  # make_ipm call, then restore the old version. If usr_funs are passed,
-  # we append them regardless of whether or not the model has been implemented.
+  # Figure out if we're dealing with a new model or an old one that is being
+  # reimplemented. If the proto is not new and usr_funs isn't passed to the new
+  # make_ipm call, then restore the old version. If usr_funs are passed, we
+  # append them regardless of whether or not the model has been implemented.
 
   if(isTRUE(attr(proto_ipm, 'implemented')) && rlang::is_empty(usr_funs)) {
 
@@ -443,8 +443,8 @@ make_ipm.simple_di_stoch_param <- function(proto_ipm,
   main_env <- .bind_all_constants(env_state   = others$env_state[[1]]$constants,
                                     env_to_bind = main_env)
 
-  temp        <- .prep_di_output(others, k_row, proto_ipm, iterations,
-                                 normalize_pop_size)
+  temp     <- .prep_di_output(others, k_row, proto_ipm, iterations,
+                              normalize_pop_size)
 
   # initialize the pop_state vectors in main_env so they can be found
   # at evaluation time

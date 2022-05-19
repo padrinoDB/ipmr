@@ -69,7 +69,7 @@ define_kernel <- function(proto_ipm,
                           states,
                           uses_par_sets = FALSE,
                           par_set_indices = list(),
-                          age_indices      = list(),
+                          age_indices     = list(),
                           evict_cor= FALSE,
                           evict_fun = NULL,
                           integrate = TRUE) {
