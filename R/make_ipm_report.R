@@ -249,8 +249,8 @@ make_ipm_report_body <- function(proto_ipm,
                                        start_end,
                                        pop_env,
                                        block_eqs,
-                                       long_eq_length) %>%
-    .pretty_print_par_sets(proto_ipm, "\\lt", "\\gt")
+                                       long_eq_length)  %>%
+    .pretty_print_par_sets(proto_ipm, "\\\\mathrm{ \\\\textbf{", "}}")
 
   unlist(c(.make_ipm_report_iter_exprs_header(rmd_dest),
            latex_exprs),
@@ -268,8 +268,7 @@ make_ipm_report_body <- function(proto_ipm,
          " If needed, edit the _Rmd_ file directly. It can be found here: ",
          paste0("`", rmd_dest, "`"),
          "\n",
-         "Models with parameter set index notation will have indices wrapped",
-         " in '<...>'.")
+         "Models with parameter set index notation will have indices in bold.")
 
 
 }
@@ -464,6 +463,8 @@ make_ipm_report_body <- function(proto_ipm,
 
 .add_integral <- function(eq, start_end) {
 
+  start_end <- gsub("_", "\\_", start_end, fixed = TRUE)
+
   dz <- paste0("d", start_end)
 
   Lz <- paste0("L_{", start_end, "}")
@@ -583,7 +584,7 @@ make_ipm_report_body <- function(proto_ipm,
 
         paste0(!! fun,
                "(",
-               args[[1]],
+               gsub("_", "\\_", args[[1]], fixed = TRUE),
                " | ",
                paste(unlist(args[-1]), collapse = ", "),
                ")")
@@ -755,17 +756,29 @@ make_ipm_report_body <- function(proto_ipm,
     if(sv_nms[i] %in% cont_doms) {
 
       # Latex values output
-      t_vals   <- paste0('n(', sv_nms[i], ", t)") %>%
+      t_vals   <- paste0('n(', gsub("_", "\\_",
+                                    sv_nms[i],
+                                    fixed = TRUE),
+                         ", t)") %>%
         as.list() %>%
         setNames(t_nms)
-      t_1_vals <- paste0('n(', sv_nms[i], "', t + 1)") %>%
+      t_1_vals <- paste0('n(',  gsub("_", "\\_",
+                                     sv_nms[i],
+                                     fixed = TRUE),
+                         "', t + 1)") %>%
         as.list() %>%
         setNames(t_1_nms)
     } else {
-      t_vals <- paste0(paste0(sv_nms[i], "(t)")) %>%
+      t_vals <- paste0(paste0(gsub("_", "\\_",
+                                   sv_nms[i],
+                                   fixed = TRUE),
+                              "(t)")) %>%
         as.list() %>%
         setNames(t_nms)
-      t_1_vals <- paste0(paste0(sv_nms[i], "(t + 1)")) %>%
+      t_1_vals <- paste0(paste0(gsub("_", "\\_",
+                                     sv_nms[i],
+                                     fixed = TRUE),
+                                "(t + 1)")) %>%
         as.list() %>%
         setNames(t_1_nms)
     }
@@ -843,7 +856,7 @@ make_ipm_report_body <- function(proto_ipm,
 
     # And now put it all together and wrap w/ $$/$!
     out[[i]] <- paste0(nms[i], " = ", out[[i]]) %>%
-      .pretty_print_par_sets(proto_ipm, "\\lt", "\\gt")
+      .pretty_print_par_sets(proto_ipm, "\\\\mathrm{ \\\\textbf{ ", " }}")
 
     if(block_eqs) {
       out[[i]] <- .wrap_block_eq(out[[i]], 2, i, long_eq_length)
@@ -861,8 +874,7 @@ make_ipm_report_body <- function(proto_ipm,
   paste0("\n\n## IPM Vital Rate Expressions\n\n",
          "These expressions generate the vital rates in the IPM. Check  ",
          "translations from R code to Latex for accuracy before distributing!\n",
-         "Models with parameter set index notation will have indices wrapped",
-         " in '<...>'.")
+         "Models with parameter set index notation will have indices in bold.")
 
 }
 
@@ -929,7 +941,7 @@ make_ipm_report_body <- function(proto_ipm,
     par_set_out <- character(length(par_inds))
 
     for(i in seq_along(par_inds)) {
-      par_out[i] <- paste0("  -", names(par_inds)[i], ": ",
+      par_set_out[i] <- paste0("  -", names(par_inds)[i], ": ",
                           paste(par_inds[[i]], collapse = ", "))
     }
 
@@ -1044,7 +1056,7 @@ make_ipm_report_body <- function(proto_ipm,
 
 .make_ipm_report_usr_funs <- function(proto) {
 
-  hdr <- paste0("## User-defined functions\n\nThese user",
+  hdr <- paste0("\n\n## User-defined functions\n\nThese user",
                 " defined functions appear in the IPM definition:\n\n")
 
   funs <- proto$usr_funs %>%
@@ -1066,6 +1078,6 @@ make_ipm_report_body <- function(proto_ipm,
 
 .has_usr_funs <- function(proto) {
 
-  isTRUE(all(is.na(proto$usr_funs)))
+  isTRUE(!all(is.na(proto$usr_funs)))
 
 }
