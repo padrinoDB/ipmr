@@ -2698,5 +2698,29 @@ left_ev.simple_di_stoch_param_ipm <- left_ev.general_di_stoch_param_ipm
   Reduce("+", x = dots, init = 0)
 }
 
+#' @rdname matrix-coercion
+#' @title  Convert to bare matrices
+#' @description Converts objects to \code{c("matrix", "array")}.
+#' @param x An object of class \code{ipmr_matrix}, or the output from
+#' \code{make_ipm}.
+#' @param ... ignored.
+#'
+#' @return A matrix.
+#' @export
 
+as.matrix.ipmr_matrix <- function(x, ...) {
 
+  class(x) <- c("matrix", "array")
+
+  return(x)
+
+}
+
+#' @rdname matrix-coercion
+#' @export
+
+as.matrix.ipmr_ipm <- function(x, ...) {
+
+  lapply(x$sub_kernels, as.matrix)
+
+}

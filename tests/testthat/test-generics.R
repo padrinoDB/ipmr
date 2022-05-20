@@ -172,6 +172,16 @@ test_that('plot.simple_di_det returns correctly', {
 
 })
 
+test_that("as.matrix.ipmr_matrix works", {
+
+  p <- sim_di_det_1$sub_kernels$P
+
+  expect_s3_class(p, "ipmr_matrix")
+
+  pm <- as.matrix(p)
+  expect_s3_class(pm, c("matrix", "array"))
+
+})
 
 # simple_di_stoch_kern methods --------------
 

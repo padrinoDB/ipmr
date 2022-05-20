@@ -69,12 +69,14 @@ Imports:
     rlang (>= 0.3.0),
     stats,
     utils,
-    Rcpp
+    Rcpp,
+    RcppEigen
 Depends: R (>= 3.4)
 RoxygenNote: 7.1.2
 Config/testthat/parallel: true
 Config/testthat/edition: 3
 LinkingTo: 
-    Rcpp
+    Rcpp,
+    RcppEigen
 URL: https://levisc8.github.io/ipmr/, https://github.com/levisc8/ipmr
 BugReports: https://github.com/levisc8/ipmr/issues

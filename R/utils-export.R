@@ -296,7 +296,7 @@ use_vr_model <- function(model) {
 
 right_mult <- function(kernel, vectr, family = NULL, start_end = NULL) {
 
-  kernel %*% vectr
+  right_mult_impl(kernel, vectr)
 
 }
 
@@ -305,7 +305,7 @@ right_mult <- function(kernel, vectr, family = NULL, start_end = NULL) {
 
 left_mult <- function(kernel, vectr) {
 
-  t(kernel) %*% vectr
+  left_mult_impl(kernel, vectr)
 
 }
 
