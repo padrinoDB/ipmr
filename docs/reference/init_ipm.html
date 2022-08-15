@@ -90,29 +90,40 @@ helper functions. See Details for complete overview of each option.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">init_ipm</span><span class="op">(</span><span class="va">sim_gen</span>, <span class="va">di_dd</span>, <span class="va">det_stoch</span>, kern_param <span class="op">=</span> <span class="cn">NULL</span>, uses_age <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">init_ipm</span><span class="op">(</span><span class="va">sim_gen</span>, <span class="va">di_dd</span>, <span class="va">det_stoch</span>, kern_param <span class="op">=</span> <span class="cn">NULL</span>, uses_age <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>sim_gen</dt>
 <dd><p>Either <code>"simple"</code> or <code>"general"</code>.</p></dd>
+
+
 <dt>di_dd</dt>
 <dd><p>Either <code>"di"</code> or <code>"dd"</code>.</p></dd>
+
+
 <dt>det_stoch</dt>
 <dd><p>Either <code>"det"</code> or <code>"stoch"</code>. If this is <code>"det"</code>,
 then <code>kern_param</code> is ignored. If <code>"stoch"</code>, then <code>kern_param</code>
 must be specified.</p></dd>
+
+
 <dt>kern_param</dt>
 <dd><p>If <code>det_stoch = "stoch"</code>, then this should be either
 <code>"kern"</code> or <code>"param"</code>.</p></dd>
+
+
 <dt>uses_age</dt>
 <dd><p>A logical indicating whether the model has age structure. Default
 is <code>FALSE</code></p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An object with classes <code>"proto_ipm"</code> and a combination of
+    
+
+<p>An object with classes <code>"proto_ipm"</code> and a combination of
 <code>sim_gen</code>, <code>di_dd</code>, <code>det_stoch</code>, and possibly
 <code>kern_param</code>. If
 <code>uses_age = TRUE</code>, then an <code>"age_x_size"</code> class is also added.</p>
@@ -170,7 +181,7 @@ Models. Methods in Ecology and Evolution, 6: 1007-1017</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

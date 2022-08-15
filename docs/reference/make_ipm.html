@@ -90,207 +90,207 @@ vignette('ipmr-introduction', 'ipmr')</a></code>  a more complete introduction.<
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">make_ipm</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
-  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,
-  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for simple_di_det</span>
-<span class="fu">make_ipm</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
-  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,
-  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  domain_list <span class="op">=</span> <span class="cn">NULL</span>,
-  iterate <span class="op">=</span> <span class="cn">TRUE</span>,
-  iterations <span class="op">=</span> <span class="fl">50</span>,
-  normalize_pop_size <span class="op">=</span> <span class="cn">TRUE</span>,
-  iteration_direction <span class="op">=</span> <span class="st">"right"</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for simple_di_stoch_kern</span>
-<span class="fu">make_ipm</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
-  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,
-  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  domain_list <span class="op">=</span> <span class="cn">NULL</span>,
-  iterate <span class="op">=</span> <span class="cn">TRUE</span>,
-  iterations <span class="op">=</span> <span class="fl">50</span>,
-  kernel_seq <span class="op">=</span> <span class="cn">NULL</span>,
-  normalize_pop_size <span class="op">=</span> <span class="cn">TRUE</span>,
-  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,
-  iteration_direction <span class="op">=</span> <span class="st">"right"</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for simple_di_stoch_param</span>
-<span class="fu">make_ipm</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
-  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,
-  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  domain_list <span class="op">=</span> <span class="cn">NULL</span>,
-  iterate <span class="op">=</span> <span class="cn">TRUE</span>,
-  iterations <span class="op">=</span> <span class="fl">50</span>,
-  kernel_seq <span class="op">=</span> <span class="cn">NULL</span>,
-  normalize_pop_size <span class="op">=</span> <span class="cn">TRUE</span>,
-  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,
-  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,
-  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for general_di_det</span>
-<span class="fu">make_ipm</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
-  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,
-  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  domain_list <span class="op">=</span> <span class="cn">NULL</span>,
-  iterate <span class="op">=</span> <span class="cn">TRUE</span>,
-  iterations <span class="op">=</span> <span class="fl">50</span>,
-  normalize_pop_size <span class="op">=</span> <span class="cn">TRUE</span>,
-  iteration_direction <span class="op">=</span> <span class="st">"right"</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for general_di_stoch_kern</span>
-<span class="fu">make_ipm</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
-  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,
-  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  domain_list <span class="op">=</span> <span class="cn">NULL</span>,
-  iterate <span class="op">=</span> <span class="cn">TRUE</span>,
-  iterations <span class="op">=</span> <span class="fl">50</span>,
-  kernel_seq <span class="op">=</span> <span class="cn">NULL</span>,
-  normalize_pop_size <span class="op">=</span> <span class="cn">TRUE</span>,
-  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,
-  iteration_direction <span class="op">=</span> <span class="st">"right"</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for general_di_stoch_param</span>
-<span class="fu">make_ipm</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
-  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,
-  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  domain_list <span class="op">=</span> <span class="cn">NULL</span>,
-  iterate <span class="op">=</span> <span class="cn">TRUE</span>,
-  iterations <span class="op">=</span> <span class="fl">50</span>,
-  kernel_seq <span class="op">=</span> <span class="cn">NULL</span>,
-  normalize_pop_size <span class="op">=</span> <span class="cn">TRUE</span>,
-  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,
-  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,
-  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for simple_dd_det</span>
-<span class="fu">make_ipm</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
-  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,
-  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  domain_list <span class="op">=</span> <span class="cn">NULL</span>,
-  iterate <span class="op">=</span> <span class="cn">TRUE</span>,
-  iterations <span class="op">=</span> <span class="fl">50</span>,
-  normalize_pop_size <span class="op">=</span> <span class="cn">FALSE</span>,
-  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,
-  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,
-  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for simple_dd_stoch_kern</span>
-<span class="fu">make_ipm</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
-  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,
-  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  domain_list <span class="op">=</span> <span class="cn">NULL</span>,
-  iterate <span class="op">=</span> <span class="cn">TRUE</span>,
-  iterations <span class="op">=</span> <span class="fl">50</span>,
-  kernel_seq <span class="op">=</span> <span class="cn">NA_character_</span>,
-  normalize_pop_size <span class="op">=</span> <span class="cn">FALSE</span>,
-  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,
-  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,
-  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for simple_dd_stoch_param</span>
-<span class="fu">make_ipm</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
-  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,
-  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  domain_list <span class="op">=</span> <span class="cn">NULL</span>,
-  iterate <span class="op">=</span> <span class="cn">TRUE</span>,
-  iterations <span class="op">=</span> <span class="fl">50</span>,
-  kernel_seq <span class="op">=</span> <span class="cn">NA_character_</span>,
-  normalize_pop_size <span class="op">=</span> <span class="cn">FALSE</span>,
-  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,
-  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,
-  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for general_dd_det</span>
-<span class="fu">make_ipm</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
-  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,
-  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  domain_list <span class="op">=</span> <span class="cn">NULL</span>,
-  iterate <span class="op">=</span> <span class="cn">TRUE</span>,
-  iterations <span class="op">=</span> <span class="fl">50</span>,
-  normalize_pop_size <span class="op">=</span> <span class="cn">FALSE</span>,
-  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,
-  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,
-  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for general_dd_stoch_kern</span>
-<span class="fu">make_ipm</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
-  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,
-  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  domain_list <span class="op">=</span> <span class="cn">NULL</span>,
-  iterate <span class="op">=</span> <span class="cn">TRUE</span>,
-  iterations <span class="op">=</span> <span class="fl">50</span>,
-  kernel_seq <span class="op">=</span> <span class="cn">NA_character_</span>,
-  normalize_pop_size <span class="op">=</span> <span class="cn">FALSE</span>,
-  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,
-  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,
-  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for general_dd_stoch_param</span>
-<span class="fu">make_ipm</span><span class="op">(</span>
-  <span class="va">proto_ipm</span>,
-  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,
-  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  <span class="va">...</span>,
-  domain_list <span class="op">=</span> <span class="cn">NULL</span>,
-  iterate <span class="op">=</span> <span class="cn">TRUE</span>,
-  iterations <span class="op">=</span> <span class="fl">50</span>,
-  kernel_seq <span class="op">=</span> <span class="cn">NA_character_</span>,
-  normalize_pop_size <span class="op">=</span> <span class="cn">FALSE</span>,
-  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,
-  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,
-  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">make_ipm</span><span class="op">(</span></span>
+<span>  <span class="va">proto_ipm</span>,</span>
+<span>  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_di_det</span></span>
+<span><span class="fu">make_ipm</span><span class="op">(</span></span>
+<span>  <span class="va">proto_ipm</span>,</span>
+<span>  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  domain_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  normalize_pop_size <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iteration_direction <span class="op">=</span> <span class="st">"right"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_di_stoch_kern</span></span>
+<span><span class="fu">make_ipm</span><span class="op">(</span></span>
+<span>  <span class="va">proto_ipm</span>,</span>
+<span>  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  domain_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  kernel_seq <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  normalize_pop_size <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  iteration_direction <span class="op">=</span> <span class="st">"right"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_di_stoch_param</span></span>
+<span><span class="fu">make_ipm</span><span class="op">(</span></span>
+<span>  <span class="va">proto_ipm</span>,</span>
+<span>  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  domain_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  kernel_seq <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  normalize_pop_size <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,</span>
+<span>  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_di_det</span></span>
+<span><span class="fu">make_ipm</span><span class="op">(</span></span>
+<span>  <span class="va">proto_ipm</span>,</span>
+<span>  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  domain_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  normalize_pop_size <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iteration_direction <span class="op">=</span> <span class="st">"right"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_di_stoch_kern</span></span>
+<span><span class="fu">make_ipm</span><span class="op">(</span></span>
+<span>  <span class="va">proto_ipm</span>,</span>
+<span>  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  domain_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  kernel_seq <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  normalize_pop_size <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  iteration_direction <span class="op">=</span> <span class="st">"right"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_di_stoch_param</span></span>
+<span><span class="fu">make_ipm</span><span class="op">(</span></span>
+<span>  <span class="va">proto_ipm</span>,</span>
+<span>  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  domain_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  kernel_seq <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  normalize_pop_size <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,</span>
+<span>  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_dd_det</span></span>
+<span><span class="fu">make_ipm</span><span class="op">(</span></span>
+<span>  <span class="va">proto_ipm</span>,</span>
+<span>  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  domain_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  normalize_pop_size <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,</span>
+<span>  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_dd_stoch_kern</span></span>
+<span><span class="fu">make_ipm</span><span class="op">(</span></span>
+<span>  <span class="va">proto_ipm</span>,</span>
+<span>  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  domain_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  kernel_seq <span class="op">=</span> <span class="cn">NA_character_</span>,</span>
+<span>  normalize_pop_size <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,</span>
+<span>  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_dd_stoch_param</span></span>
+<span><span class="fu">make_ipm</span><span class="op">(</span></span>
+<span>  <span class="va">proto_ipm</span>,</span>
+<span>  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  domain_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  kernel_seq <span class="op">=</span> <span class="cn">NA_character_</span>,</span>
+<span>  normalize_pop_size <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,</span>
+<span>  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_dd_det</span></span>
+<span><span class="fu">make_ipm</span><span class="op">(</span></span>
+<span>  <span class="va">proto_ipm</span>,</span>
+<span>  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  domain_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  normalize_pop_size <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,</span>
+<span>  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_dd_stoch_kern</span></span>
+<span><span class="fu">make_ipm</span><span class="op">(</span></span>
+<span>  <span class="va">proto_ipm</span>,</span>
+<span>  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  domain_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  kernel_seq <span class="op">=</span> <span class="cn">NA_character_</span>,</span>
+<span>  normalize_pop_size <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,</span>
+<span>  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_dd_stoch_param</span></span>
+<span><span class="fu">make_ipm</span><span class="op">(</span></span>
+<span>  <span class="va">proto_ipm</span>,</span>
+<span>  return_main_env <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_all_envs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  domain_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  kernel_seq <span class="op">=</span> <span class="cn">NA_character_</span>,</span>
+<span>  normalize_pop_size <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  report_progress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  iteration_direction <span class="op">=</span> <span class="st">"right"</span>,</span>
+<span>  return_sub_kernels <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -298,11 +298,15 @@ vignette('ipmr-introduction', 'ipmr')</a></code>  a more complete introduction.<
     <dl><dt>proto_ipm</dt>
 <dd><p>A proto_ipm. This should be the
 output of <code>define_kernel</code>, or the <code>define_*</code> functions.</p></dd>
+
+
 <dt>return_main_env</dt>
 <dd><p>A logical indicating whether to return the main environment
 for the model. This environment contains the integration mesh, weights, and
 other potentially useful variables for subsequent analyses. Default is
 <code>TRUE</code>.</p></dd>
+
+
 <dt>return_all_envs</dt>
 <dd><p>A logical indicating whether to return the environments that
 the kernel expressions are evaluated in. These may be useful for some analyses,
@@ -310,27 +314,41 @@ such as regression-level sensitivity/elasticity analyses, but can also rapidly
 increase memory consumption for models with many kernels (e.g. ones with
 parameter set indices that have many levels, or any <code>*_stoch_param</code> model).
 Default is <code>FALSE</code>.</p></dd>
+
+
 <dt>usr_funs</dt>
 <dd><p>An optional list of user-specified functions that are passed
 on to the  model building process. This can help make vital rate expressions
 more concise and expressive. Names in this list should exactly match the names
 of the function calls in the <code>...</code> or <code>formula</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments passed to methods.</p></dd>
+
+
 <dt>domain_list</dt>
 <dd><p>An optional list of new domain information to implement
 the IPM with.</p></dd>
+
+
 <dt>iterate</dt>
 <dd><p>A logical indicating whether or not iterate the model before exiting
 or just return the sub-kernels. Only applies to density-independent, deterministic
 models and density-independent, stochastic kernel re-sampled models.</p></dd>
+
+
 <dt>iterations</dt>
 <dd><p>If <code>iterate</code> is <code>TRUE</code>, then the number of iterations
 to run the model for.</p></dd>
+
+
 <dt>normalize_pop_size</dt>
 <dd><p>A logical indicating whether to re-scale the population
 vector to sum to 1 before each iteration. Default is <code>TRUE</code> for
 <code>*_di_*</code> methods and <code>FALSE</code> for <code>*_dd_*</code> methods.</p></dd>
+
+
 <dt>iteration_direction</dt>
 <dd><p>Either <code>"right"</code> (default) or <code>"left"</code>.
 This controls the direction of projection. Right iteration will generate
@@ -338,6 +356,8 @@ the right eigenvector (if it exists), while left iteration generates
 the left eigenvector. These correspond to the stable trait distributions, and
 reproductive values, respectively. This parameter is mostly used internally
 by other functions. Use with care.</p></dd>
+
+
 <dt>kernel_seq</dt>
 <dd><p>For <code>*_stoch_kern</code> methods, the sequence of kernels
 to use during the simulation process. It should have the same number of entries
@@ -347,20 +367,30 @@ in <code>par_set_indices</code>, or empty. Support for Markov chains will eventu
 get implemented. If it is empty, <code>make_ipm</code> will try to generate a
 sequence internally using a random selection of the <code>par_set_indices</code>
 defined in <code>define_kernel</code>.</p></dd>
+
+
 <dt>report_progress</dt>
 <dd><p>A logical indicating whether or not to periodically
 report progress for a stochastic simulation. Does not apply to deterministic
 methods. Default is <code>FALSE</code>.</p></dd>
+
+
 <dt>return_sub_kernels</dt>
 <dd><p>Only applies to density dependent and parameter
 resampled models. If <code>TRUE</code>, then all sub-kernels will be returned. These
 are required for some analyses, but a large number of iterations will
 take up lots of RAM. Default is <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The <code>make_ipm.*</code> methods will always return a list of length 5
-containing the following components:</p><ul><li><p><strong>sub_kernels</strong>: a list of arrays specified in <code>define_kernel</code>.</p></li>
+    
+
+<p>The <code>make_ipm.*</code> methods will always return a list of length 5
+containing the following components:</p>
+
+
+<ul><li><p><strong>sub_kernels</strong>: a list of arrays specified in <code>define_kernel</code>.</p></li>
 <li><p><strong>env_list</strong>: a list containing the evaluation environments of
                            kernel. This will contain the <code>main_env</code> object
                            if <code>return_main_env = TRUE</code>. It will also contain
@@ -381,7 +411,10 @@ containing the following components:</p><ul><li><p><strong>sub_kernels</strong>:
 </ul><p>In addition to the list class, each object will have a class comprised of the
 arguments from  <code>init_ipm</code> plus <code>'ipm'</code> pasted together with
 underscores. This is to facilitate <code>print</code>, <code>plot</code>, and
-<code>lambda</code> methods. For example, a <code>init_ipm("general", "di", "det")</code>model will have the class <code>'general_di_det_ipm'</code> once it has been
+<code>lambda</code> methods. For example, a <code>init_ipm("general", "di", "det")</code></p>
+
+
+<p>model will have the class <code>'general_di_det_ipm'</code> once it has been
 implemented using <code>make_ipm</code>.</p>
     </div>
 
@@ -397,7 +430,7 @@ implemented using <code>make_ipm</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

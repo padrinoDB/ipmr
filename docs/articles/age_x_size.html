@@ -210,58 +210,58 @@
 <p>This example directly reproduces the model found in Ellner, Rees &amp; Childs (2016), chapter 6.2. The code that implements that version can be found <a href="https://github.com/ipmbook/first-edition/tree/master/Rcode/c6" class="external-link">here</a>. This example will skip the IBM simulation and model fitting and just focus on the new syntax (<code>ipmr</code> doesn’t .</p>
 <p>First, we set up our parameter list and define a couple functions to help out. The <code>f_fun</code> is used to wrap <code>formula</code> argument in <code>"F_age"</code> kernel so that we can concisely express that age-0 individuals do not reproduce. Note that it is not possible to use an <code><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse()</a></code> statement instead, because <code>age</code> will be a single number, and <code><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse()</a></code> always returns a value that is the same length as its input (and we want the return value to be a <span class="math inline">\(100\times100\)</span> matrix).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
-
-<span class="va">param_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
-  surv_int <span class="op">=</span> <span class="op">-</span><span class="fl">17</span>, 
-  surv_z <span class="op">=</span> <span class="fl">6.68</span>,
-  surv_a <span class="op">=</span> <span class="op">-</span><span class="fl">0.334</span>, 
-  grow_int <span class="op">=</span> <span class="fl">1.27</span>, 
-  grow_z <span class="op">=</span> <span class="fl">0.612</span>, 
-  grow_a <span class="op">=</span> <span class="op">-</span><span class="fl">0.00724</span>,
-  grow_sd <span class="op">=</span> <span class="fl">0.0787</span>,
-  repr_int <span class="op">=</span> <span class="op">-</span><span class="fl">7.88</span>, 
-  repr_z <span class="op">=</span> <span class="fl">3.11</span>,
-  repr_a <span class="op">=</span> <span class="op">-</span><span class="fl">0.078</span>, 
-  recr_int <span class="op">=</span> <span class="fl">1.11</span>, 
-  recr_a <span class="op">=</span> <span class="fl">0.184</span>, 
-  rcsz_int <span class="op">=</span> <span class="fl">0.362</span>,
-  rcsz_z <span class="op">=</span> <span class="fl">0.709</span>, 
-  rcsz_sd <span class="op">=</span> <span class="fl">0.159</span>
-<span class="op">)</span>
-
-
-<span class="va">inv_logit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
-
-  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span>
-<span class="op">}</span>
-
-<span class="va">f_fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">age</span>, <span class="va">s_age</span>, <span class="va">pb_age</span>, <span class="va">pr_age</span>, <span class="va">recr</span><span class="op">)</span> <span class="op">{</span>
-
-  <span class="kw">if</span><span class="op">(</span><span class="va">age</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>
-
-  <span class="va">s_age</span> <span class="op">*</span> <span class="va">pb_age</span> <span class="op">*</span> <span class="va">pr_age</span> <span class="op">*</span> <span class="va">recr</span> <span class="op">*</span> <span class="fl">0.5</span>
-
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">param_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  surv_int <span class="op">=</span> <span class="op">-</span><span class="fl">17</span>, </span>
+<span>  surv_z <span class="op">=</span> <span class="fl">6.68</span>,</span>
+<span>  surv_a <span class="op">=</span> <span class="op">-</span><span class="fl">0.334</span>, </span>
+<span>  grow_int <span class="op">=</span> <span class="fl">1.27</span>, </span>
+<span>  grow_z <span class="op">=</span> <span class="fl">0.612</span>, </span>
+<span>  grow_a <span class="op">=</span> <span class="op">-</span><span class="fl">0.00724</span>,</span>
+<span>  grow_sd <span class="op">=</span> <span class="fl">0.0787</span>,</span>
+<span>  repr_int <span class="op">=</span> <span class="op">-</span><span class="fl">7.88</span>, </span>
+<span>  repr_z <span class="op">=</span> <span class="fl">3.11</span>,</span>
+<span>  repr_a <span class="op">=</span> <span class="op">-</span><span class="fl">0.078</span>, </span>
+<span>  recr_int <span class="op">=</span> <span class="fl">1.11</span>, </span>
+<span>  recr_a <span class="op">=</span> <span class="fl">0.184</span>, </span>
+<span>  rcsz_int <span class="op">=</span> <span class="fl">0.362</span>,</span>
+<span>  rcsz_z <span class="op">=</span> <span class="fl">0.709</span>, </span>
+<span>  rcsz_sd <span class="op">=</span> <span class="fl">0.159</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">inv_logit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">f_fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">age</span>, <span class="va">s_age</span>, <span class="va">pb_age</span>, <span class="va">pr_age</span>, <span class="va">recr</span><span class="op">)</span> <span class="op">{</span></span>
+<span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="va">age</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">s_age</span> <span class="op">*</span> <span class="va">pb_age</span> <span class="op">*</span> <span class="va">pr_age</span> <span class="op">*</span> <span class="va">recr</span> <span class="op">*</span> <span class="fl">0.5</span></span>
+<span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <p>Next, we begin to initialize our kernels. <code>init_ipm</code> now has a fifth argument - <code>uses_age</code>. This is a logical and denotes that we are specifying a model with individuals cross-classified by both age and size. The <code>sim_gen</code> argument is <code>"general</code>“, because age-size models are always general IPMs, and <code>det_stoch = "det"</code> because we are only working on a deterministic version of this model for now. We’ll append the <code>_age</code> index to every variable that is age dependent. Additionally, we can use <code>age</code> as a standalone term - these will be substituted during the model building as well.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"general"</span>,
-                         di_dd      <span class="op">=</span> <span class="st">"di"</span>, 
-                         det_stoch  <span class="op">=</span> <span class="st">"det"</span>,
-                         uses_age    <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span>
-    name          <span class="op">=</span> <span class="st">"P_age"</span>,
-    family        <span class="op">=</span> <span class="st">"CC"</span>,
-    formula       <span class="op">=</span> <span class="va">s_age</span> <span class="op">*</span> <span class="va">g_age</span> <span class="op">*</span> <span class="va">d_wt</span>,
-    s_age         <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">surv_int</span> <span class="op">+</span> <span class="va">surv_z</span> <span class="op">*</span> <span class="va">wt_1</span> <span class="op">+</span> <span class="va">surv_a</span> <span class="op">*</span> <span class="va">age</span><span class="op">)</span>,
-    g_age         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">wt_2</span>, <span class="va">mu_g_age</span>, <span class="va">grow_sd</span><span class="op">)</span>,
-    mu_g_age      <span class="op">=</span> <span class="va">grow_int</span> <span class="op">+</span> <span class="va">grow_z</span> <span class="op">*</span> <span class="va">wt_1</span> <span class="op">+</span> <span class="va">grow_a</span> <span class="op">*</span> <span class="va">age</span>,
-    data_list     <span class="op">=</span> <span class="va">param_list</span>,
-    states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wt"</span><span class="op">)</span><span class="op">)</span>,
-    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
-    age_indices   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>, max_age <span class="op">=</span> <span class="fl">21</span><span class="op">)</span>,
-    evict_cor     <span class="op">=</span> <span class="cn">FALSE</span>
-  <span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen    <span class="op">=</span> <span class="st">"general"</span>,</span>
+<span>                         di_dd      <span class="op">=</span> <span class="st">"di"</span>, </span>
+<span>                         det_stoch  <span class="op">=</span> <span class="st">"det"</span>,</span>
+<span>                         uses_age    <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span></span>
+<span>    name          <span class="op">=</span> <span class="st">"P_age"</span>,</span>
+<span>    family        <span class="op">=</span> <span class="st">"CC"</span>,</span>
+<span>    formula       <span class="op">=</span> <span class="va">s_age</span> <span class="op">*</span> <span class="va">g_age</span> <span class="op">*</span> <span class="va">d_wt</span>,</span>
+<span>    s_age         <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">surv_int</span> <span class="op">+</span> <span class="va">surv_z</span> <span class="op">*</span> <span class="va">wt_1</span> <span class="op">+</span> <span class="va">surv_a</span> <span class="op">*</span> <span class="va">age</span><span class="op">)</span>,</span>
+<span>    g_age         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">wt_2</span>, <span class="va">mu_g_age</span>, <span class="va">grow_sd</span><span class="op">)</span>,</span>
+<span>    mu_g_age      <span class="op">=</span> <span class="va">grow_int</span> <span class="op">+</span> <span class="va">grow_z</span> <span class="op">*</span> <span class="va">wt_1</span> <span class="op">+</span> <span class="va">grow_a</span> <span class="op">*</span> <span class="va">age</span>,</span>
+<span>    data_list     <span class="op">=</span> <span class="va">param_list</span>,</span>
+<span>    states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wt"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    age_indices   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>, max_age <span class="op">=</span> <span class="fl">21</span><span class="op">)</span>,</span>
+<span>    evict_cor     <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <p>The primary difference in defining this kernel vs any other indexed model is that we now specify <code>uses_par_sets = FALSE</code>, and pass a list to <code>age_indices</code> instead of <code>par_set_indices</code>. <code>age_indices</code> takes a list with at least one, but possibly two components:</p>
 <ol style="list-style-type: decimal">
 <li><p><code>age</code>: This is the age range for the model. It should always start from 0 and be a sequence of integers.</p></li>
@@ -269,35 +269,35 @@
 </ol>
 <p>Next, we continue defining the models as we did before.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> 
-  <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span>
-    proto_ipm     <span class="op">=</span> <span class="va">age_size_ipm</span>,
-    name          <span class="op">=</span> <span class="st">"F_age"</span>,
-    family        <span class="op">=</span> <span class="st">"CC"</span>,
-    formula       <span class="op">=</span> <span class="fu">f_fun</span><span class="op">(</span><span class="va">age</span>, <span class="va">s_age</span>, <span class="va">pb_age</span>, <span class="va">pr_age</span>, <span class="va">rcsz</span><span class="op">)</span> <span class="op">*</span> <span class="va">d_wt</span>,
-    s_age         <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">surv_int</span> <span class="op">+</span> <span class="va">surv_z</span> <span class="op">*</span> <span class="va">wt_1</span> <span class="op">+</span> <span class="va">surv_a</span> <span class="op">*</span> <span class="va">age</span><span class="op">)</span>,
-    pb_age        <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">repr_int</span> <span class="op">+</span> <span class="va">repr_z</span> <span class="op">*</span> <span class="va">wt_1</span> <span class="op">+</span> <span class="va">repr_a</span> <span class="op">*</span> <span class="va">age</span><span class="op">)</span>,
-    pr_age        <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">recr_int</span> <span class="op">+</span> <span class="va">recr_a</span> <span class="op">*</span> <span class="va">age</span><span class="op">)</span>,
-    rcsz          <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">wt_2</span>, <span class="va">rcsz_mu</span>, <span class="va">rcsz_sd</span><span class="op">)</span>,
-    rcsz_mu       <span class="op">=</span> <span class="va">rcsz_int</span> <span class="op">+</span> <span class="va">rcsz_z</span> <span class="op">*</span> <span class="va">wt_1</span>,
-    data_list     <span class="op">=</span> <span class="va">param_list</span>,
-    states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wt"</span><span class="op">)</span><span class="op">)</span>,
-    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,
-    age_indices   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>, max_age <span class="op">=</span> <span class="fl">21</span><span class="op">)</span>,
-    evict_cor     <span class="op">=</span> <span class="cn">FALSE</span>
-  <span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span></span>
+<span>    proto_ipm     <span class="op">=</span> <span class="va">age_size_ipm</span>,</span>
+<span>    name          <span class="op">=</span> <span class="st">"F_age"</span>,</span>
+<span>    family        <span class="op">=</span> <span class="st">"CC"</span>,</span>
+<span>    formula       <span class="op">=</span> <span class="fu">f_fun</span><span class="op">(</span><span class="va">age</span>, <span class="va">s_age</span>, <span class="va">pb_age</span>, <span class="va">pr_age</span>, <span class="va">rcsz</span><span class="op">)</span> <span class="op">*</span> <span class="va">d_wt</span>,</span>
+<span>    s_age         <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">surv_int</span> <span class="op">+</span> <span class="va">surv_z</span> <span class="op">*</span> <span class="va">wt_1</span> <span class="op">+</span> <span class="va">surv_a</span> <span class="op">*</span> <span class="va">age</span><span class="op">)</span>,</span>
+<span>    pb_age        <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">repr_int</span> <span class="op">+</span> <span class="va">repr_z</span> <span class="op">*</span> <span class="va">wt_1</span> <span class="op">+</span> <span class="va">repr_a</span> <span class="op">*</span> <span class="va">age</span><span class="op">)</span>,</span>
+<span>    pr_age        <span class="op">=</span> <span class="fu">inv_logit</span><span class="op">(</span><span class="va">recr_int</span> <span class="op">+</span> <span class="va">recr_a</span> <span class="op">*</span> <span class="va">age</span><span class="op">)</span>,</span>
+<span>    rcsz          <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">wt_2</span>, <span class="va">rcsz_mu</span>, <span class="va">rcsz_sd</span><span class="op">)</span>,</span>
+<span>    rcsz_mu       <span class="op">=</span> <span class="va">rcsz_int</span> <span class="op">+</span> <span class="va">rcsz_z</span> <span class="op">*</span> <span class="va">wt_1</span>,</span>
+<span>    data_list     <span class="op">=</span> <span class="va">param_list</span>,</span>
+<span>    states        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wt"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    uses_par_sets <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    age_indices   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>, max_age <span class="op">=</span> <span class="fl">21</span><span class="op">)</span>,</span>
+<span>    evict_cor     <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <p>The <code>"F_age"</code> kernel has a custom function in the <code>formula</code> slot that allows us to always set fecundity for age-0 individuals to 0. We also add <code>_age</code> suffixes and <code>age</code> terms to the appropriate equations.</p>
 <p>Our call to <code><a href="../reference/define_star.html">define_impl()</a></code> will look a little different. In examples in the other vignettes using the index syntax, we never added indices to <code>state_start</code>/<code>state_end</code>. However, we need to append them here. This is because we have to make sure that our <code>P_age</code> kernels produce <code>wt_age</code> individuals, whereas our <code>F_age</code> kernels must produce <code>wt_0</code> individuals (i.e. only age-0 lambs). We do this using the <code>state_start</code> and <code>state_end</code> arguments.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="va">age_size_ipm</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="../reference/define_star.html">define_impl</a></span><span class="op">(</span>
-    <span class="fu"><a href="../reference/define_star.html">make_impl_args_list</a></span><span class="op">(</span>
-      kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"P_age"</span>, <span class="st">"F_age"</span><span class="op">)</span>,
-      int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">2</span><span class="op">)</span>,
-      state_start    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wt_age"</span>, <span class="st">"wt_age"</span><span class="op">)</span>,
-      state_end      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wt_age"</span>, <span class="st">"wt_0"</span><span class="op">)</span>
-    <span class="op">)</span>
-  <span class="op">)</span> </code></pre></div>
+<code class="sourceCode R"><span><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="va">age_size_ipm</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/define_star.html">define_impl</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/define_star.html">make_impl_args_list</a></span><span class="op">(</span></span>
+<span>      kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"P_age"</span>, <span class="st">"F_age"</span><span class="op">)</span>,</span>
+<span>      int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>      state_start    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wt_age"</span>, <span class="st">"wt_age"</span><span class="op">)</span>,</span>
+<span>      state_end      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wt_age"</span>, <span class="st">"wt_0"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span> </span></code></pre></div>
 <p>The rest of the steps are largely similar to previous examples:</p>
 <ol style="list-style-type: decimal">
 <li><p><code><a href="../reference/define_star.html">define_domains()</a></code> is exactly the same.</p></li>
@@ -306,54 +306,54 @@
 <li><p><code><a href="../reference/make_ipm.html">make_ipm()</a></code> is exactly the same.</p></li>
 </ol>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="va">age_size_ipm</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="../reference/define_star.html">define_domains</a></span><span class="op">(</span>
-    wt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.6</span>, <span class="fl">3.7</span>, <span class="fl">100</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="../reference/define_star.html">define_pop_state</a></span><span class="op">(</span>
-    n_wt_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
-  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>
-    usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>inv_logit <span class="op">=</span> <span class="va">inv_logit</span>,
-                    f_fun     <span class="op">=</span> <span class="va">f_fun</span><span class="op">)</span>,
-    iterate  <span class="op">=</span> <span class="cn">TRUE</span>,
-    iterations <span class="op">=</span> <span class="fl">100</span>
-  <span class="op">)</span>
-
-<span class="va">lam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">age_size_ipm</span><span class="op">)</span>
-<span class="va">lam</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">age_size_ipm</span> <span class="op">&lt;-</span> <span class="va">age_size_ipm</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/define_star.html">define_domains</a></span><span class="op">(</span></span>
+<span>    wt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.6</span>, <span class="fl">3.7</span>, <span class="fl">100</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/define_star.html">define_pop_state</a></span><span class="op">(</span></span>
+<span>    n_wt_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/make_ipm.html">make_ipm</a></span><span class="op">(</span></span>
+<span>    usr_funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>inv_logit <span class="op">=</span> <span class="va">inv_logit</span>,</span>
+<span>                    f_fun     <span class="op">=</span> <span class="va">f_fun</span><span class="op">)</span>,</span>
+<span>    iterate  <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>    iterations <span class="op">=</span> <span class="fl">100</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">lam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">age_size_ipm</span><span class="op">)</span></span>
+<span><span class="va">lam</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="further-analyses">Further analyses<a class="anchor" aria-label="anchor" href="#further-analyses"></a>
 </h2>
 <p>There are a number of other calculations that we can perform using functions provided by <code>ipmr</code>. <code><a href="../reference/eigenvectors.html">left_ev()</a></code> and <code>right_ev</code> also work for age <span class="math inline">\(\times\)</span> size models. We’ll extract them and plot their values.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">v_a</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/eigenvectors.html">left_ev</a></span><span class="op">(</span><span class="va">age_size_ipm</span>, iterations <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
-<span class="va">w_a</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/eigenvectors.html">right_ev</a></span><span class="op">(</span><span class="va">age_size_ipm</span>, iterations <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">w_a</span><span class="op">)</span><span class="op">)</span>, length.out <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"n"</span>,
-     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"w"</span><span class="op">[</span><span class="va">a</span><span class="op">]</span>,<span class="st">"(z)"</span><span class="op">)</span><span class="op">)</span>,
-     xlab <span class="op">=</span> <span class="st">"Size bin"</span><span class="op">)</span>
-
-<span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">w_a</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  
-  <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">w_a</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
-  
-<span class="op">}</span>
-
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, 
-     <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">v_a</span><span class="op">)</span><span class="op">)</span>, length.out <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
-     type <span class="op">=</span> <span class="st">"n"</span>,
-     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"v"</span><span class="op">[</span><span class="va">a</span><span class="op">]</span>, <span class="st">"(z)"</span><span class="op">)</span><span class="op">)</span>,
-     xlab <span class="op">=</span> <span class="st">"Size bin"</span><span class="op">)</span>
-
-<span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">v_a</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  
- <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">v_a</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> 
-  
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">v_a</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/eigenvectors.html">left_ev</a></span><span class="op">(</span><span class="va">age_size_ipm</span>, iterations <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
+<span><span class="va">w_a</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/eigenvectors.html">right_ev</a></span><span class="op">(</span><span class="va">age_size_ipm</span>, iterations <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">w_a</span><span class="op">)</span><span class="op">)</span>, length.out <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"n"</span>,</span>
+<span>     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"w"</span><span class="op">[</span><span class="va">a</span><span class="op">]</span>,<span class="st">"(z)"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>     xlab <span class="op">=</span> <span class="st">"Size bin"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">w_a</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">w_a</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span>  </span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, </span>
+<span>     <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">v_a</span><span class="op">)</span><span class="op">)</span>, length.out <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>     type <span class="op">=</span> <span class="st">"n"</span>,</span>
+<span>     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"v"</span><span class="op">[</span><span class="va">a</span><span class="op">]</span>, <span class="st">"(z)"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>     xlab <span class="op">=</span> <span class="st">"Size bin"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">v_a</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  </span>
+<span> <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">v_a</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> </span>
+<span>  </span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
   </div>
 
@@ -374,7 +374,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

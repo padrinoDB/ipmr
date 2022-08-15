@@ -86,82 +86,100 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">make_ipm_report</span><span class="op">(</span>
-  <span class="va">object</span>,
-  rmd_dest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>,
-  title <span class="op">=</span> <span class="st">""</span>,
-  output_format <span class="op">=</span> <span class="st">"html"</span>,
-  render_output <span class="op">=</span> <span class="cn">FALSE</span>,
-  block_eqs <span class="op">=</span> <span class="cn">TRUE</span>,
-  long_eq_length <span class="op">=</span> <span class="fl">65</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for default</span>
-<span class="fu">make_ipm_report</span><span class="op">(</span>
-  <span class="va">object</span>,
-  rmd_dest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>,
-  title <span class="op">=</span> <span class="st">""</span>,
-  output_format <span class="op">=</span> <span class="st">"html"</span>,
-  render_output <span class="op">=</span> <span class="cn">FALSE</span>,
-  block_eqs <span class="op">=</span> <span class="cn">TRUE</span>,
-  long_eq_length <span class="op">=</span> <span class="fl">65</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for ipmr_ipm</span>
-<span class="fu">make_ipm_report</span><span class="op">(</span>
-  <span class="va">object</span>,
-  rmd_dest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>,
-  title <span class="op">=</span> <span class="st">""</span>,
-  output_format <span class="op">=</span> <span class="st">"html"</span>,
-  render_output <span class="op">=</span> <span class="cn">FALSE</span>,
-  block_eqs <span class="op">=</span> <span class="cn">TRUE</span>,
-  long_eq_length <span class="op">=</span> <span class="fl">65</span>
-<span class="op">)</span>
-
-<span class="fu">make_ipm_report_body</span><span class="op">(</span><span class="va">proto_ipm</span>, <span class="va">block_eqs</span>, <span class="va">rmd_dest</span>, <span class="va">long_eq_length</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">make_ipm_report</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  rmd_dest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  output_format <span class="op">=</span> <span class="st">"html"</span>,</span>
+<span>  render_output <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  block_eqs <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  long_eq_length <span class="op">=</span> <span class="fl">65</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">make_ipm_report</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  rmd_dest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  output_format <span class="op">=</span> <span class="st">"html"</span>,</span>
+<span>  render_output <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  block_eqs <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  long_eq_length <span class="op">=</span> <span class="fl">65</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for ipmr_ipm</span></span>
+<span><span class="fu">make_ipm_report</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  rmd_dest <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  output_format <span class="op">=</span> <span class="st">"html"</span>,</span>
+<span>  render_output <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  block_eqs <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  long_eq_length <span class="op">=</span> <span class="fl">65</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">make_ipm_report_body</span><span class="op">(</span><span class="va">proto_ipm</span>, <span class="va">block_eqs</span>, <span class="va">rmd_dest</span>, <span class="va">long_eq_length</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>object</dt>
 <dd><p>A <code>proto_ipm</code> or output from <code><a href="make_ipm.html">make_ipm()</a></code>.</p></dd>
+
+
 <dt>rmd_dest</dt>
 <dd><p>The folder to save the Rmd file at. The default is
 <code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd()</a></code>. Alternatively, can be a complete file path that specifies
 the location and title of the document with the extension <code>".rmd"</code>. in
 this case, the current date will be appended to the title.</p></dd>
+
+
 <dt>title</dt>
 <dd><p>The title to include in the document. This is not necessarily
 the same as <code>rmd_dest</code>, as this appears at the top of the generated
 report, and is not included in the file path!</p></dd>
+
+
 <dt>output_format</dt>
 <dd><p>The format to include in the YAML header for the created
 <code>.rmd</code> document.</p></dd>
+
+
 <dt>render_output</dt>
 <dd><p>A logical indicating whether to call
 <code><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">rmarkdown::render</a></code> on the generated <code>.rmd</code> file. Often times,
 the <code>.rmd</code> file will need further editing before it's useful, so the
 default is <code>FALSE</code>.</p></dd>
+
+
 <dt>block_eqs</dt>
 <dd><p>A logical. If <code>TRUE</code>, all equations will be inserted
 with blocks and numbered using <code>tag{}</code>. If <code>FALSE</code>, equations
 will be rendered as inline equations on a single line, and numbered as
 1.1, 1.2, 1.3 (iteration expressions), 2.1, 2.2 (vital rate expressions),
 etc.</p></dd>
+
+
 <dt>long_eq_length</dt>
 <dd><p>For longer equations, <code>make_ipm_report</code> tries
 to wrap these into multiple lines using <code>\\</code>. This parameter controls
 the number of characters per line. Default is 65. Ignored when
 <code>block_eqs = FALSE</code>.</p></dd>
+
+
 <dt>proto_ipm</dt>
 <dd><p>A <code>proto_ipm</code> object. Only used for
 <code>make_ipm_report_body</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>For <code>make_ipm_report</code>, the filepath to the <code>.rmd</code> file. The
-  default name is <code> "ipmr_report_&lt;current_date&gt;.rmd"</code>. For
-<code>make_ipm_report_body</code>, a character vector with Markdown and LaTeX
+    
+
+<p>For <code>make_ipm_report</code>, the filepath to the <code>.rmd</code> file. The
+  default name is <code> "ipmr_report_&lt;current_date&gt;.rmd"</code>. For</p>
+<p></p>
+<p><code>make_ipm_report_body</code>, a character vector with Markdown and LaTeX
   suitable for rendering, but without a header.</p>
     </div>
     <div id="details">
@@ -198,7 +216,7 @@ the number of characters per line. Default is 65. Ignored when
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -84,81 +84,115 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">define_impl</span><span class="op">(</span><span class="va">proto_ipm</span>, <span class="va">kernel_impl_list</span><span class="op">)</span>
-
-<span class="fu">make_impl_args_list</span><span class="op">(</span><span class="va">kernel_names</span>, <span class="va">int_rule</span>, <span class="va">state_start</span>, <span class="va">state_end</span><span class="op">)</span>
-
-<span class="fu">define_domains</span><span class="op">(</span><span class="va">proto_ipm</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">define_pop_state</span><span class="op">(</span><span class="va">proto_ipm</span>, <span class="va">...</span>, pop_vectors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu">define_env_state</span><span class="op">(</span><span class="va">proto_ipm</span>, <span class="va">...</span>, data_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu">discretize_pop_vector</span><span class="op">(</span>
-  <span class="va">trait_values</span>,
-  <span class="va">n_mesh</span>,
-  pad_low <span class="op">=</span> <span class="cn">NULL</span>,
-  pad_high <span class="op">=</span> <span class="cn">NULL</span>,
-  normalize <span class="op">=</span> <span class="cn">TRUE</span>,
-  na.rm <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">define_impl</span><span class="op">(</span><span class="va">proto_ipm</span>, <span class="va">kernel_impl_list</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">make_impl_args_list</span><span class="op">(</span><span class="va">kernel_names</span>, <span class="va">int_rule</span>, <span class="va">state_start</span>, <span class="va">state_end</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">define_domains</span><span class="op">(</span><span class="va">proto_ipm</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">define_pop_state</span><span class="op">(</span><span class="va">proto_ipm</span>, <span class="va">...</span>, pop_vectors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">define_env_state</span><span class="op">(</span><span class="va">proto_ipm</span>, <span class="va">...</span>, data_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">discretize_pop_vector</span><span class="op">(</span></span>
+<span>  <span class="va">trait_values</span>,</span>
+<span>  <span class="va">n_mesh</span>,</span>
+<span>  pad_low <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pad_high <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  na.rm <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>proto_ipm</dt>
 <dd><p>The name of the model.</p></dd>
+
+
 <dt>kernel_impl_list</dt>
 <dd><p>A named list. Names correspond to kernel names. Each
 kernel should have 3 slots defined - the <code>int_rule</code> (integration rule),
 the <code>state_start</code> (the domain the kernel begins on), and the <code>state_end</code>
 (the domain the kernel ends on). For more complicated models, it is usually
 safest to use <code>make_impl_args_list</code> to generate this.</p></dd>
+
+
 <dt>kernel_names</dt>
 <dd><p>A character vector with the names of the kernels
 that parameters are being defined for.</p></dd>
+
+
 <dt>int_rule</dt>
 <dd><p>The integration rule to be used for the kernel. The default is
 "midpoint". "b2b" (bin to bin) and "cdf" (cumulative density functions) will
 be implemented as well.</p></dd>
+
+
 <dt>state_start</dt>
 <dd><p>The name of the state variable for the kernel that the
 kernel acts on at time <em>t</em>.</p></dd>
+
+
 <dt>state_end</dt>
 <dd><p>The name of the state variable that the kernel produces
 at time <em>t+1</em>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Named expressions. See Details for more information on their usage in
 each <code>define_*</code> function.</p></dd>
+
+
 <dt>pop_vectors</dt>
 <dd><p>If the population vectors are already pre-defined (i.e. are
 not defined by a function passed to <code>...</code>), then they can
 be passed as a named list here.</p></dd>
+
+
 <dt>data_list</dt>
 <dd><p>A list of named values that contain data used in the expressions
 in <code>...</code> in <code>define_env_state()</code>.</p></dd>
+
+
 <dt>trait_values</dt>
 <dd><p>A numeric vector of trait values.</p></dd>
+
+
 <dt>n_mesh</dt>
 <dd><p>The number of meshpoints to use when integrating the trait
 distribution.</p></dd>
+
+
 <dt>pad_low</dt>
 <dd><p>The amount to pad the smallest value by, expressed as a
 proportion. For example, 0.8 would shrink the smallest value by 20%.</p></dd>
+
+
 <dt>pad_high</dt>
 <dd><p>The amount to pad the largest value by, expressed as a
 proportion. For example, 1.2 would increase the largest value by 20%.</p></dd>
+
+
 <dt>normalize</dt>
 <dd><p>A logical indicating whether to normalize the result to sum
 to 1.</p></dd>
+
+
 <dt>na.rm</dt>
 <dd><p>A logical indicating whether to remove <code>NA</code>s from
 <code>trait_distrib</code>. If <code>FALSE</code> and <code>trait_values</code> contains
 <code>NA</code>s, returns a <code>NA</code> with a warning</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>All <code>define_*</code> functions return a proto_ipm. <code>make_impl_args_list</code>returns a list, and so must be used within a call to <code>define_impl</code> or
+    
+
+<p>All <code>define_*</code> functions return a proto_ipm. <code>make_impl_args_list</code></p>
+
+
+<p>returns a list, and so must be used within a call to <code>define_impl</code> or
 before initiating the model creation procedure.</p>
     </div>
     <div id="details">
@@ -205,37 +239,37 @@ corresponds to an observed trait distribution.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co"># Example with kernels named "P" and "F", and a domain "z"</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">kernel_impl_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>P <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int_rule <span class="op">=</span> <span class="st">"midpoint"</span>,</span>
-<span class="r-in">                                  state_start <span class="op">=</span> <span class="st">"z"</span>,</span>
-<span class="r-in">                                  state_end <span class="op">=</span> <span class="st">"z"</span><span class="op">)</span>,</span>
-<span class="r-in">                         F <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int_rule <span class="op">=</span> <span class="st">"midpoint"</span>,</span>
-<span class="r-in">                                  state_start <span class="op">=</span> <span class="st">"z"</span>,</span>
-<span class="r-in">                                  state_end <span class="op">=</span> <span class="st">"z"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># an equivalent version using make_impl_args_list</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">kernel_impl_list</span> <span class="op">&lt;-</span> <span class="fu">make_impl_args_list</span><span class="op">(</span></span>
-<span class="r-in">     kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"P"</span>, <span class="st">"F"</span><span class="op">)</span>,</span>
-<span class="r-in">     int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="st">"midpoint"</span><span class="op">)</span>,</span>
-<span class="r-in">     state_start  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="st">"z"</span><span class="op">)</span>,</span>
-<span class="r-in">     state_end    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="st">"z"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sim_di_det_ex</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">proto_ipm</span> <span class="op">&lt;-</span> <span class="va">sim_di_det_ex</span><span class="op">$</span><span class="va">proto_ipm</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># define_domains</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">lower_bound</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span class="r-in"><span class="va">upper_bound</span> <span class="op">&lt;-</span> <span class="fl">100</span></span>
-<span class="r-in"><span class="va">n_meshpoints</span> <span class="op">&lt;-</span> <span class="fl">50</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">define_domains</span><span class="op">(</span><span class="va">proto_ipm</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">lower_bound</span>, <span class="va">upper_bound</span>, <span class="va">n_meshpoints</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Example with kernels named "P" and "F", and a domain "z"</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">kernel_impl_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>P <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int_rule <span class="op">=</span> <span class="st">"midpoint"</span>,</span></span>
+<span class="r-in"><span>                                  state_start <span class="op">=</span> <span class="st">"z"</span>,</span></span>
+<span class="r-in"><span>                                  state_end <span class="op">=</span> <span class="st">"z"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                         F <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>int_rule <span class="op">=</span> <span class="st">"midpoint"</span>,</span></span>
+<span class="r-in"><span>                                  state_start <span class="op">=</span> <span class="st">"z"</span>,</span></span>
+<span class="r-in"><span>                                  state_end <span class="op">=</span> <span class="st">"z"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># an equivalent version using make_impl_args_list</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">kernel_impl_list</span> <span class="op">&lt;-</span> <span class="fu">make_impl_args_list</span><span class="op">(</span></span></span>
+<span class="r-in"><span>     kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"P"</span>, <span class="st">"F"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>     int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="st">"midpoint"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>     state_start  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="st">"z"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>     state_end    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="st">"z"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sim_di_det_ex</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">proto_ipm</span> <span class="op">&lt;-</span> <span class="va">sim_di_det_ex</span><span class="op">$</span><span class="va">proto_ipm</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># define_domains</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">lower_bound</span> <span class="op">&lt;-</span> <span class="fl">1</span></span></span>
+<span class="r-in"><span><span class="va">upper_bound</span> <span class="op">&lt;-</span> <span class="fl">100</span></span></span>
+<span class="r-in"><span><span class="va">n_meshpoints</span> <span class="op">&lt;-</span> <span class="fl">50</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">define_domains</span><span class="op">(</span><span class="va">proto_ipm</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">lower_bound</span>, <span class="va">upper_bound</span>, <span class="va">n_meshpoints</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> A simple, density independent, deterministic proto_ipm with 2 kernels defined:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  P, F </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -273,11 +307,11 @@ corresponds to an observed trait distribution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     vectr = n_dbh_t)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># define_pop_state with a state variable named "z". Note that "n_" is prefixed</span></span>
-<span class="r-in"><span class="co"># to denote that it is a population state function!</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">define_pop_state</span><span class="op">(</span><span class="va">proto_ipm</span>, n_z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># define_pop_state with a state variable named "z". Note that "n_" is prefixed</span></span></span>
+<span class="r-in"><span><span class="co"># to denote that it is a population state function!</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">define_pop_state</span><span class="op">(</span><span class="va">proto_ipm</span>, n_z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> A simple, density independent, deterministic proto_ipm with 2 kernels defined:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  P, F </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -315,12 +349,12 @@ corresponds to an observed trait distribution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     vectr = n_dbh_t)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># alternative, we can make a list before starting to make the IPM</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">pop_vecs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n_z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">define_pop_state</span><span class="op">(</span><span class="va">proto_ipm</span>, pop_vectors <span class="op">=</span> <span class="va">pop_vecs</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># alternative, we can make a list before starting to make the IPM</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">pop_vecs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n_z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">define_pop_state</span><span class="op">(</span><span class="va">proto_ipm</span>, pop_vectors <span class="op">=</span> <span class="va">pop_vecs</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> A simple, density independent, deterministic proto_ipm with 2 kernels defined:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  P, F </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -358,27 +392,27 @@ corresponds to an observed trait distribution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     vectr = n_dbh_t)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># define_env_state. Generates a random draw from a known distribution</span></span>
-<span class="r-in"><span class="co"># of temperatures.</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">env_sampler</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">env_pars</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="va">temp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">env_pars</span><span class="op">$</span><span class="va">temp_mean</span>, <span class="va">env_pars</span><span class="op">$</span><span class="va">temp_sd</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>temp <span class="op">=</span> <span class="va">temp</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">env_pars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>temp_mean <span class="op">=</span> <span class="fl">12</span>, temp_sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">define_env_state</span><span class="op">(</span></span>
-<span class="r-in"> <span class="va">proto_ipm</span>,</span>
-<span class="r-in"> env_values <span class="op">=</span> <span class="fu">env_sampler</span><span class="op">(</span><span class="va">env_pars</span><span class="op">)</span>,</span>
-<span class="r-in"> data_list  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>env_sampler <span class="op">=</span> <span class="va">env_sampler</span>,</span>
-<span class="r-in">                   env_pars    <span class="op">=</span> <span class="va">env_pars</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># define_env_state. Generates a random draw from a known distribution</span></span></span>
+<span class="r-in"><span><span class="co"># of temperatures.</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">env_sampler</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">env_pars</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">temp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">env_pars</span><span class="op">$</span><span class="va">temp_mean</span>, <span class="va">env_pars</span><span class="op">$</span><span class="va">temp_sd</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>temp <span class="op">=</span> <span class="va">temp</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">env_pars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>temp_mean <span class="op">=</span> <span class="fl">12</span>, temp_sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">define_env_state</span><span class="op">(</span></span></span>
+<span class="r-in"><span> <span class="va">proto_ipm</span>,</span></span>
+<span class="r-in"><span> env_values <span class="op">=</span> <span class="fu">env_sampler</span><span class="op">(</span><span class="va">env_pars</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span> data_list  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>env_sampler <span class="op">=</span> <span class="va">env_sampler</span>,</span></span>
+<span class="r-in"><span>                   env_pars    <span class="op">=</span> <span class="va">env_pars</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> A simple, density independent, deterministic proto_ipm with 2 kernels defined:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  P, F </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -416,16 +450,16 @@ corresponds to an observed trait distribution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> n_dbh_t_1: right_mult(kernel = P, vectr = n_dbh_t) + right_mult(kernel = F, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     vectr = n_dbh_t)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">iceplant_ex</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">iceplant_ex</span><span class="op">$</span><span class="va">log_size</span>, <span class="va">iceplant_ex</span><span class="op">$</span><span class="va">log_size_next</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">pop_vecs</span> <span class="op">&lt;-</span> <span class="fu">discretize_pop_vector</span><span class="op">(</span><span class="va">z</span>,</span>
-<span class="r-in">                                  n_mesh <span class="op">=</span> <span class="fl">100</span>,</span>
-<span class="r-in">                                  pad_low <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span class="r-in">                                  pad_high <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">iceplant_ex</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">iceplant_ex</span><span class="op">$</span><span class="va">log_size</span>, <span class="va">iceplant_ex</span><span class="op">$</span><span class="va">log_size_next</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">pop_vecs</span> <span class="op">&lt;-</span> <span class="fu">discretize_pop_vector</span><span class="op">(</span><span class="va">z</span>,</span></span>
+<span class="r-in"><span>                                  n_mesh <span class="op">=</span> <span class="fl">100</span>,</span></span>
+<span class="r-in"><span>                                  pad_low <span class="op">=</span> <span class="fl">1.2</span>,</span></span>
+<span class="r-in"><span>                                  pad_high <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -440,7 +474,7 @@ corresponds to an observed trait distribution.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -86,106 +86,123 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">domains</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="co"># S3 method for proto_ipm</span>
-<span class="fu">domains</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="co"># S3 method for default</span>
-<span class="fu">domains</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="co"># S3 method for proto_ipm</span>
-<span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="co"># S3 method for default</span>
-<span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="fu">vital_rate_funs</span><span class="op">(</span><span class="va">ipm</span><span class="op">)</span>
-
-<span class="co"># S3 method for ipmr_ipm</span>
-<span class="fu">vital_rate_funs</span><span class="op">(</span><span class="va">ipm</span><span class="op">)</span>
-
-<span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">object</span>, <span class="va">kernel</span>, <span class="va">vital_rate</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span>
-
-<span class="co"># S3 method for proto_ipm</span>
-<span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">object</span>, <span class="va">kernel</span>, <span class="va">vital_rate</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span>
-
-<span class="fu">new_fun_form</span><span class="op">(</span><span class="va">form</span><span class="op">)</span>
-
-<span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="co"># S3 method for proto_ipm</span>
-<span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="co"># S3 method for default</span>
-<span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">object</span>, <span class="va">kernel</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span>
-
-<span class="co"># S3 method for proto_ipm</span>
-<span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">object</span>, <span class="va">kernel</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span>
-
-<span class="fu">parameters</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="co"># S3 method for proto_ipm</span>
-<span class="fu">parameters</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="co"># S3 method for default</span>
-<span class="fu">parameters</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="fu">parameters</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span>
-
-<span class="co"># S3 method for proto_ipm</span>
-<span class="fu">parameters</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span>
-
-<span class="fu">int_mesh</span><span class="op">(</span><span class="va">ipm</span>, full_mesh <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># S3 method for ipmr_ipm</span>
-<span class="fu">int_mesh</span><span class="op">(</span><span class="va">ipm</span>, full_mesh <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="fu">pop_state</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="co"># S3 method for proto_ipm</span>
-<span class="fu">pop_state</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
-
-<span class="co"># S3 method for default</span>
-<span class="fu">pop_state</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">domains</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for proto_ipm</span></span>
+<span><span class="fu">domains</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">domains</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for proto_ipm</span></span>
+<span><span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">vital_rate_funs</span><span class="op">(</span><span class="va">ipm</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for ipmr_ipm</span></span>
+<span><span class="fu">vital_rate_funs</span><span class="op">(</span><span class="va">ipm</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">object</span>, <span class="va">kernel</span>, <span class="va">vital_rate</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
+<span></span>
+<span><span class="co"># S3 method for proto_ipm</span></span>
+<span><span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">object</span>, <span class="va">kernel</span>, <span class="va">vital_rate</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
+<span></span>
+<span><span class="fu">new_fun_form</span><span class="op">(</span><span class="va">form</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for proto_ipm</span></span>
+<span><span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">object</span>, <span class="va">kernel</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
+<span></span>
+<span><span class="co"># S3 method for proto_ipm</span></span>
+<span><span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">object</span>, <span class="va">kernel</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
+<span></span>
+<span><span class="fu">parameters</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for proto_ipm</span></span>
+<span><span class="fu">parameters</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">parameters</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">parameters</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
+<span></span>
+<span><span class="co"># S3 method for proto_ipm</span></span>
+<span><span class="fu">parameters</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
+<span></span>
+<span><span class="fu">int_mesh</span><span class="op">(</span><span class="va">ipm</span>, full_mesh <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for ipmr_ipm</span></span>
+<span><span class="fu">int_mesh</span><span class="op">(</span><span class="va">ipm</span>, full_mesh <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">pop_state</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for proto_ipm</span></span>
+<span><span class="fu">pop_state</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">pop_state</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>object</dt>
 <dd><p>A <code>proto_ipm</code> or object created by <code><a href="make_ipm.html">make_ipm()</a></code>.</p></dd>
+
+
 <dt>ipm</dt>
 <dd><p>An object created by <code><a href="make_ipm.html">make_ipm()</a></code>. This argument only applies to
 <code>int_mesh()</code> and <code>vital_rate_funs()</code> (because these quantities don't
 exist until <code><a href="make_ipm.html">make_ipm()</a></code> is called).</p></dd>
+
+
 <dt>kernel</dt>
 <dd><p>The name of the kernel to insert the new vital rate expression
 into.</p></dd>
+
+
 <dt>vital_rate</dt>
 <dd><p>The name of the vital rate to replace. If the vital rate
 doesn't already exist in the <code>object</code>, a new one with this name will be
 created.</p></dd>
+
+
 <dt>value</dt>
 <dd><p>For <code>parameters&lt;-</code>, a named list of new parameters. The new list does not need
 to contain all of the parameters, just the ones to update/append. For
 <code>vital_rate_exprs&lt;-</code> and <code>kernel_formulae&lt;-</code>, a new functional form.
 The new functional form must be wrapped in a call to <code>new_fun_form</code>.</p></dd>
+
+
 <dt>form</dt>
 <dd><p>An expression representing the new vital rate or kernel formula
 to insert.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional arguments used in <code>RPadrino</code> methods.</p></dd>
+
+
 <dt>full_mesh</dt>
 <dd><p>Return the full integration mesh? Default is <code>TRUE</code>.
 <code>FALSE</code> returns only unique values for each state variable.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Depending on the class of <code>object</code>, a list
+    
+
+<p>Depending on the class of <code>object</code>, a list
 with types numeric or character.</p>
     </div>
     <div id="details">
@@ -204,28 +221,28 @@ incorrectly.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gen_di_det_ex</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">proto</span> <span class="op">&lt;-</span> <span class="va">gen_di_det_ex</span><span class="op">$</span><span class="va">proto_ipm</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Create a new, iterated IPM</span></span>
-<span class="r-in"><span class="va">new_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_ipm.html">make_ipm</a></span><span class="op">(</span><span class="va">proto</span>, iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">                    iterations <span class="op">=</span> <span class="fl">100</span>, return_all_envs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">new_ipm</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gen_di_det_ex</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">proto</span> <span class="op">&lt;-</span> <span class="va">gen_di_det_ex</span><span class="op">$</span><span class="va">proto_ipm</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Create a new, iterated IPM</span></span></span>
+<span class="r-in"><span><span class="va">new_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_ipm.html">make_ipm</a></span><span class="op">(</span><span class="va">proto</span>, iterate <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                    iterations <span class="op">=</span> <span class="fl">100</span>, return_all_envs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">new_ipm</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> g: dnorm(ht_2, g_mu, g_sd)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> g_mu: g_int + g_slope * ht_1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> s: inv_logit_2(s_int, s_slope, s_slope_2, ht_1)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> f_r: inv_logit(f_r_int, f_r_slope, ht_1)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> f_s: exp(f_s_int + f_s_slope * ht_1)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> f_d: dnorm(ht_2, f_d_mu, f_d_sd)</span>
-<span class="r-in"><span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">new_ipm</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">new_ipm</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> P: s * g * d_ht</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> go_discrete: f_r * f_s * g_i * d_ht</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> stay_discrete: 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> leave_discrete: e_p * f_d * d_ht</span>
-<span class="r-in"><span class="fu">vital_rate_funs</span><span class="op">(</span><span class="va">new_ipm</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">vital_rate_funs</span><span class="op">(</span><span class="va">new_ipm</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $P</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> g (not yet discretized): A 200 x 200 kernel with minimum value: 0 and maximum value: 0.0344</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> g_mu (not yet discretized): A 200 x 200 kernel with minimum value: 8.3275 and maximum value: 620.7542</span>
@@ -241,63 +258,63 @@ incorrectly.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $leave_discrete</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> f_d (not yet discretized): A 200 x 1 column vector with minimum value: 0 and maximum value: 0.1948</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">domains</span><span class="op">(</span><span class="va">new_ipm</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">domains</span><span class="op">(</span><span class="va">new_ipm</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ht: lower_bound = 1.02, upper_bound = 624, n_meshpoints = 200</span>
-<span class="r-in"><span class="fu">parameters</span><span class="op">(</span><span class="va">new_ipm</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">new_ipm</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      g_int    g_slope       g_sd      s_int    s_slope  s_slope_2    f_r_int </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   5.781000   0.988000  20.556990  -0.352000   0.122000  -0.000213 -11.460000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  f_r_slope    f_s_int  f_s_slope     f_d_mu     f_d_sd        e_p        g_i </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   0.083500   2.620400   0.012560   5.665500   2.073400   0.150000   0.506700 </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Usage is the same for proto_ipm's as *_ipm's</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">proto</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Usage is the same for proto_ipm's as *_ipm's</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">proto</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> g: dnorm(ht_2, g_mu, g_sd)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> g_mu: g_int + g_slope * ht_1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> s: inv_logit_2(s_int, s_slope, s_slope_2, ht_1)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> f_r: inv_logit(f_r_int, f_r_slope, ht_1)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> f_s: exp(f_s_int + f_s_slope * ht_1)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> f_d: dnorm(ht_2, f_d_mu, f_d_sd)</span>
-<span class="r-in"><span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">proto</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">proto</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> P: s * g * d_ht</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> go_discrete: f_r * f_s * g_i * d_ht</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> stay_discrete: 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> leave_discrete: e_p * f_d * d_ht</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">domains</span><span class="op">(</span><span class="va">proto</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">domains</span><span class="op">(</span><span class="va">proto</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ht: lower_bound = 1.02, upper_bound = 624, n_meshpoints = 200</span>
-<span class="r-in"><span class="fu">parameters</span><span class="op">(</span><span class="va">proto</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">proto</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      g_int    g_slope       g_sd      s_int    s_slope  s_slope_2    f_r_int </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   5.781000   0.988000  20.556990  -0.352000   0.122000  -0.000213 -11.460000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  f_r_slope    f_s_int  f_s_slope     f_d_mu     f_d_sd        e_p        g_i </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   0.083500   2.620400   0.012560   5.665500   2.073400   0.150000   0.506700 </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">int_mesh</span><span class="op">(</span><span class="va">new_ipm</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">int_mesh</span><span class="op">(</span><span class="va">new_ipm</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> d_ht - 3.1149</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ht_1 - Lower bound: 2.57745, Upper bound: 622.44255, # of Meshpoints: 200</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ht_2 - Lower bound: 2.57745, Upper bound: 622.44255, # of Meshpoints: 200</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Setting new parameters, vital rate expressions, and kernel formulae</span></span>
-<span class="r-in"><span class="co"># only works on proto_ipm's.</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># This replaces the "g_int" parameter and leaves the rest untouched</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">parameters</span><span class="op">(</span><span class="va">proto</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>g_int <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># This creates a new g_z parameter and leaves the rest of parameters untouched</span></span>
-<span class="r-in"><span class="fu">parameters</span><span class="op">(</span><span class="va">proto</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>g_z <span class="op">=</span> <span class="fl">2.2</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># setting a new vital rate or kernel expression requires wrapping the</span></span>
-<span class="r-in"><span class="co"># right-hand side in a call to new_fun_form(). new_fun_form uses expressions</span></span>
-<span class="r-in"><span class="co"># with the same format as ... in define_kernel()</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">proto</span>,</span>
-<span class="r-in">                 kernel <span class="op">=</span> <span class="st">"P"</span>,</span>
-<span class="r-in">                 vital_rate <span class="op">=</span> <span class="st">"g_mu"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">new_fun_form</span><span class="op">(</span><span class="va">g_int</span> <span class="op">+</span> <span class="va">g_z</span> <span class="op">+</span> <span class="va">g_slope</span> <span class="op">*</span> <span class="va">ht_1</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">proto</span>, kernel <span class="op">=</span> <span class="st">"stay_discrete"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">new_fun_form</span><span class="op">(</span><span class="va">g_z</span> <span class="op">*</span> <span class="va">d_ht</span><span class="op">)</span></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Setting new parameters, vital rate expressions, and kernel formulae</span></span></span>
+<span class="r-in"><span><span class="co"># only works on proto_ipm's.</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># This replaces the "g_int" parameter and leaves the rest untouched</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">proto</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>g_int <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># This creates a new g_z parameter and leaves the rest of parameters untouched</span></span></span>
+<span class="r-in"><span><span class="fu">parameters</span><span class="op">(</span><span class="va">proto</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>g_z <span class="op">=</span> <span class="fl">2.2</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># setting a new vital rate or kernel expression requires wrapping the</span></span></span>
+<span class="r-in"><span><span class="co"># right-hand side in a call to new_fun_form(). new_fun_form uses expressions</span></span></span>
+<span class="r-in"><span><span class="co"># with the same format as ... in define_kernel()</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">vital_rate_exprs</span><span class="op">(</span><span class="va">proto</span>,</span></span>
+<span class="r-in"><span>                 kernel <span class="op">=</span> <span class="st">"P"</span>,</span></span>
+<span class="r-in"><span>                 vital_rate <span class="op">=</span> <span class="st">"g_mu"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">new_fun_form</span><span class="op">(</span><span class="va">g_int</span> <span class="op">+</span> <span class="va">g_z</span> <span class="op">+</span> <span class="va">g_slope</span> <span class="op">*</span> <span class="va">ht_1</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">kernel_formulae</span><span class="op">(</span><span class="va">proto</span>, kernel <span class="op">=</span> <span class="st">"stay_discrete"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">new_fun_form</span><span class="op">(</span><span class="va">g_z</span> <span class="op">*</span> <span class="va">d_ht</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -312,7 +329,7 @@ incorrectly.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -94,49 +94,64 @@ log(lambda) is used to check for convergence.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">is_conv_to_asymptotic</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">tolerance</span>, <span class="va">burn_in</span><span class="op">)</span>
-
-<span class="co"># S3 method for ipmr_ipm</span>
-<span class="fu">is_conv_to_asymptotic</span><span class="op">(</span><span class="va">ipm</span>, tolerance <span class="op">=</span> <span class="fl">1e-06</span>, burn_in <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>
-
-<span class="fu">conv_plot</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">iterations</span>, <span class="va">log</span>, <span class="va">show_stable</span>, <span class="va">burn_in</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for ipmr_ipm</span>
-<span class="fu">conv_plot</span><span class="op">(</span>
-  <span class="va">ipm</span>,
-  iterations <span class="op">=</span> <span class="cn">NULL</span>,
-  log <span class="op">=</span> <span class="cn">NULL</span>,
-  show_stable <span class="op">=</span> <span class="cn">TRUE</span>,
-  burn_in <span class="op">=</span> <span class="fl">0.1</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">is_conv_to_asymptotic</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">tolerance</span>, <span class="va">burn_in</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for ipmr_ipm</span></span>
+<span><span class="fu">is_conv_to_asymptotic</span><span class="op">(</span><span class="va">ipm</span>, tolerance <span class="op">=</span> <span class="fl">1e-06</span>, burn_in <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">conv_plot</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">iterations</span>, <span class="va">log</span>, <span class="va">show_stable</span>, <span class="va">burn_in</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for ipmr_ipm</span></span>
+<span><span class="fu">conv_plot</span><span class="op">(</span></span>
+<span>  <span class="va">ipm</span>,</span>
+<span>  iterations <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  log <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  show_stable <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  burn_in <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>ipm</dt>
 <dd><p>An object returned by <code><a href="make_ipm.html">make_ipm()</a></code>.</p></dd>
+
+
 <dt>tolerance</dt>
 <dd><p>The tolerance for convergence in lambda or, in the case of stochastic models, the cumulative mean of log(lambda).</p></dd>
+
+
 <dt>burn_in</dt>
 <dd><p>The proportion of iterations to discard. Default is 0.1 (i.e.
 first 10% of iterations in the simulation). Ignored for deterministic
 models.</p></dd>
+
+
 <dt>iterations</dt>
 <dd><p>The range of iterations to plot <code>lambda</code> for. The default
 is every iteration.</p></dd>
+
+
 <dt>log</dt>
 <dd><p>A logical indicating whether to log transform <code>lambda</code>. This
 defaults to TRUE for stochastic models and FALSE for deterministic models.</p></dd>
+
+
 <dt>show_stable</dt>
 <dd><p>A logical indicating whether or not to draw a line indicating
 population stability at <code>lambda = 1</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Further arguments to <code>plot</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>is_conv_to_asymptotic</code>: Either <code>TRUE</code> or <code>FALSE</code>.
+    
+
+<p><code>is_conv_to_asymptotic</code>: Either <code>TRUE</code> or <code>FALSE</code>.
 <code>conv_plot</code>: codeipm invisibly.</p>
     </div>
     <div id="details">
@@ -147,20 +162,20 @@ to <code>...</code>.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gen_di_det_ex</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">proto</span> <span class="op">&lt;-</span> <span class="va">gen_di_det_ex</span><span class="op">$</span><span class="va">proto_ipm</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span>
-<span class="r-in">  <span class="fu"><a href="define_star.html">define_pop_state</a></span><span class="op">(</span>n_ht <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>,</span>
-<span class="r-in">                   n_b  <span class="op">=</span> <span class="fl">200000</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_ipm.html">make_ipm</a></span><span class="op">(</span><span class="va">proto</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">is_conv_to_asymptotic</span><span class="op">(</span><span class="va">ipm</span>, tolerance <span class="op">=</span> <span class="fl">1e-5</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">gen_di_det_ex</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">proto</span> <span class="op">&lt;-</span> <span class="va">gen_di_det_ex</span><span class="op">$</span><span class="va">proto_ipm</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="define_star.html">define_pop_state</a></span><span class="op">(</span>n_ht <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                   n_b  <span class="op">=</span> <span class="fl">200000</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_ipm.html">make_ipm</a></span><span class="op">(</span><span class="va">proto</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">is_conv_to_asymptotic</span><span class="op">(</span><span class="va">ipm</span>, tolerance <span class="op">=</span> <span class="fl">1e-5</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> lambda </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   TRUE </span>
-<span class="r-in"><span class="fu">conv_plot</span><span class="op">(</span><span class="va">ipm</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">conv_plot</span><span class="op">(</span><span class="va">ipm</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="check_convergence-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -175,7 +190,7 @@ to <code>...</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
