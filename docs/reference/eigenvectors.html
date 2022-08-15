@@ -84,69 +84,82 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for simple_di_det_ipm</span>
-<span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">100</span>, tolerance <span class="op">=</span> <span class="fl">1e-10</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for simple_di_stoch_kern_ipm</span>
-<span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for simple_di_stoch_param_ipm</span>
-<span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for general_di_det_ipm</span>
-<span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">100</span>, tolerance <span class="op">=</span> <span class="fl">1e-10</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for general_di_stoch_kern_ipm</span>
-<span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for general_di_stoch_param_ipm</span>
-<span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for simple_di_det_ipm</span>
-<span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">100</span>, tolerance <span class="op">=</span> <span class="fl">1e-10</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for simple_di_stoch_kern_ipm</span>
-<span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">10000</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, kernel_seq <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for general_di_det_ipm</span>
-<span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">100</span>, tolerance <span class="op">=</span> <span class="fl">1e-10</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for general_di_stoch_kern_ipm</span>
-<span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">10000</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, kernel_seq <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for general_di_stoch_param_ipm</span>
-<span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">10000</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, kernel_seq <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for simple_di_stoch_param_ipm</span>
-<span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">10000</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, kernel_seq <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_di_det_ipm</span></span>
+<span><span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">100</span>, tolerance <span class="op">=</span> <span class="fl">1e-10</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_di_stoch_kern_ipm</span></span>
+<span><span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_di_stoch_param_ipm</span></span>
+<span><span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_di_det_ipm</span></span>
+<span><span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">100</span>, tolerance <span class="op">=</span> <span class="fl">1e-10</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_di_stoch_kern_ipm</span></span>
+<span><span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_di_stoch_param_ipm</span></span>
+<span><span class="fu">right_ev</span><span class="op">(</span><span class="va">ipm</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_di_det_ipm</span></span>
+<span><span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">100</span>, tolerance <span class="op">=</span> <span class="fl">1e-10</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_di_stoch_kern_ipm</span></span>
+<span><span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">10000</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, kernel_seq <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_di_det_ipm</span></span>
+<span><span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">100</span>, tolerance <span class="op">=</span> <span class="fl">1e-10</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_di_stoch_kern_ipm</span></span>
+<span><span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">10000</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, kernel_seq <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_di_stoch_param_ipm</span></span>
+<span><span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">10000</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, kernel_seq <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_di_stoch_param_ipm</span></span>
+<span><span class="fu">left_ev</span><span class="op">(</span><span class="va">ipm</span>, iterations <span class="op">=</span> <span class="fl">10000</span>, burn_in <span class="op">=</span> <span class="fl">0.25</span>, kernel_seq <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>ipm</dt>
 <dd><p>Output from <code><a href="make_ipm.html">make_ipm()</a></code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments passed to methods</p></dd>
+
+
 <dt>iterations</dt>
 <dd><p>The number of times to iterate the model to reach
 convergence. Default is 100.</p></dd>
+
+
 <dt>tolerance</dt>
 <dd><p>Tolerance to evaluate convergence to asymptotic dynamics.</p></dd>
+
+
 <dt>burn_in</dt>
 <dd><p>The proportion of early iterations to discard from the
 stochastic simulation</p></dd>
+
+
 <dt>kernel_seq</dt>
 <dd><p>The sequece of parameter set indices used to select kernels
 during the iteration procedure. If <code>NULL</code>, will use the sequence stored
 in the <code>ipm</code> object. Should usually be left as <code>NULL</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list of named numeric vector(s) corresponding to the stable trait distribution
+    
+
+<p>A list of named numeric vector(s) corresponding to the stable trait distribution
 function (<code>right_ev</code>) or the reproductive values for each trait (<code>left_ev</code>).</p>
     </div>
     <div id="deterministic-eigenvectors">
@@ -200,7 +213,7 @@ details.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

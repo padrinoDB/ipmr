@@ -94,7 +94,7 @@ correctly represented in the <code>data_list</code>.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">use_vr_model</span><span class="op">(</span><span class="va">model</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">use_vr_model</span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -103,10 +103,13 @@ correctly represented in the <code>data_list</code>.</p>
 <dd><p>A fitted model object representing a vital rate. Primarily used to avoid
 writing the mathematical expression for a vital rate, and using a <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
 method instead.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A model object with a <code>"flat_protect"</code> attribute.</p>
+    
+
+<p>A model object with a <code>"flat_protect"</code> attribute.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -123,19 +126,19 @@ to pass to <code>define_kernel</code>.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">iceplant_ex</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">grow_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">log_size_next</span> <span class="op">~</span> <span class="va">log_size</span>, data <span class="op">=</span> <span class="va">iceplant_ex</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">surv_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">survival</span> <span class="op">~</span> <span class="va">log_size</span>, data <span class="op">=</span> <span class="va">iceplant_ex</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">data_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">  grow_mod <span class="op">=</span> <span class="fu">use_vr_model</span><span class="op">(</span><span class="va">grow_mod</span><span class="op">)</span>,</span>
-<span class="r-in">  surv_mod <span class="op">=</span> <span class="fu">use_vr_model</span><span class="op">(</span><span class="va">surv_mod</span><span class="op">)</span>,</span>
-<span class="r-in">  recruit_mean <span class="op">=</span> <span class="fl">20</span>,</span>
-<span class="r-in">  recruit_sd   <span class="op">=</span> <span class="fl">5</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">iceplant_ex</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">grow_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">log_size_next</span> <span class="op">~</span> <span class="va">log_size</span>, data <span class="op">=</span> <span class="va">iceplant_ex</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">surv_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">survival</span> <span class="op">~</span> <span class="va">log_size</span>, data <span class="op">=</span> <span class="va">iceplant_ex</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">data_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  grow_mod <span class="op">=</span> <span class="fu">use_vr_model</span><span class="op">(</span><span class="va">grow_mod</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  surv_mod <span class="op">=</span> <span class="fu">use_vr_model</span><span class="op">(</span><span class="va">surv_mod</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  recruit_mean <span class="op">=</span> <span class="fl">20</span>,</span></span>
+<span class="r-in"><span>  recruit_sd   <span class="op">=</span> <span class="fl">5</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -150,7 +153,7 @@ to pass to <code>define_kernel</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

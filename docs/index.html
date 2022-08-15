@@ -123,14 +123,14 @@
 </h2>
 <p>Install from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ipmr"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ipmr"</span><span class="op">)</span></span></code></pre></div>
 <p>You can install the development version with the snippet below:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://remotes.r-lib.org" class="external-link">'remotes'</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>
-<span class="op">}</span>
-
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"levisc8/ipmr"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://remotes.r-lib.org" class="external-link">'remotes'</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"levisc8/ipmr"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="package-scope">Package scope<a class="anchor" aria-label="anchor" href="#package-scope"></a>
@@ -255,156 +255,156 @@
 </ol>
 <p>The example below assumes we’ve already fit our vital rate models from the raw data. In this example, the numbers are made up, but code that extracts the values you need from a real regression model is provided in comments.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Load ipmr and get the parameter values. The data_list argument for define_kernel</span>
-<span class="co"># should hold every regression parameter and every constant used in the model.</span>
-
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span>
-
-<span class="va">my_data_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>s_int     <span class="op">=</span> <span class="op">-</span><span class="fl">2.2</span>,  <span class="co"># coefficients(my_surv_mod)[1]</span>
-                    s_slope   <span class="op">=</span> <span class="fl">0.25</span>,  <span class="co"># coefficients(my_surv_mod)[2]</span>
-                    g_int     <span class="op">=</span> <span class="fl">0.2</span>,   <span class="co"># coefficients(my_grow_mod)[1]</span>
-                    g_slope   <span class="op">=</span> <span class="fl">0.99</span>,  <span class="co"># coefficients(my_grow_mod)[2]</span>
-                    sd_g      <span class="op">=</span> <span class="fl">0.7</span>,   <span class="co"># sd(resid(my_grow_mod))</span>
-                    r_r_int   <span class="op">=</span> <span class="fl">0.003</span>, <span class="co"># coefficients(my_pr_flower_mod)[1]</span>
-                    r_r_slope <span class="op">=</span> <span class="fl">0.015</span>, <span class="co"># coefficients(my_pr_flower_mod)[2]</span>
-                    r_s_int   <span class="op">=</span> <span class="fl">0.45</span>,  <span class="co"># coefficients(my_seed_mod)[1]</span>
-                    r_s_slope <span class="op">=</span> <span class="fl">0.075</span>, <span class="co"># coefficients(my_seed_mod)[2]</span>
-                    mu_fd     <span class="op">=</span> <span class="fl">2</span>,     <span class="co"># mean(recruit_data$size_next)</span>
-                    sd_fd     <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span>   <span class="co"># sd(recruit_data$size_next)</span>
-
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen <span class="op">=</span> <span class="st">"simple"</span>,
-                          di_dd   <span class="op">=</span> <span class="st">"di"</span>,
-                          det_stoch <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span>
-
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span>
-  
-  proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
-    
-  <span class="co"># Name of the kernel</span>
-  
-  name      <span class="op">=</span> <span class="st">"P_simple"</span>,
-  
-  <span class="co"># The type of transition it describes (e.g. continuous - continuous, discrete - continuous).</span>
-  <span class="co"># These must be specified for all kernels!</span>
-  
-  family    <span class="op">=</span> <span class="st">"CC"</span>,
-  
-  <span class="co"># The formula for the kernel. We dont need to tack on the "z'/z"s here.  </span>
-  
-  formula   <span class="op">=</span> <span class="va">s</span> <span class="op">*</span> <span class="va">G</span>,
-  
-  <span class="co"># A named set of expressions for the vital rates it includes. </span>
-  <span class="co"># note the use of user-specified functions here. Additionally, each </span>
-  <span class="co"># state variable has a stateVariable_1 and stateVariable_2, corresponding to</span>
-  <span class="co"># z and z' in the equations above. We don't need to define these variables ourselves,</span>
-  <span class="co"># just reference them correctly based on the way we've set up our model on paper.</span>
-  
-  <span class="co"># Perform the inverse logit transformation to get survival probabilities</span>
-  <span class="co"># from your model. plogis from the "stats" package does this for us. </span>
-
-  s         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="va">s_int</span> <span class="op">+</span> <span class="va">s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>, 
-  
-  <span class="co"># The growth model requires a function to compute the mean as a function of dbh.</span>
-  <span class="co"># The SD is a constant, so we don't need to define that in ... expression, </span>
-  <span class="co"># just the data_list.</span>
-  
-  G         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">mu_g</span>, <span class="va">sd_g</span><span class="op">)</span>,
-  mu_g      <span class="op">=</span> <span class="va">g_int</span> <span class="op">+</span> <span class="va">g_slope</span> <span class="op">*</span> <span class="va">dbh_1</span>,
-  
-  
-  <span class="co"># Specify the constant parameters in the model in the data_list. </span>
-  
-  data_list <span class="op">=</span> <span class="va">my_data_list</span>,
-  states    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,
-  
-  <span class="co"># If you want to correct for eviction, set evict_cor = TRUE and specify an</span>
-  <span class="co"># evict_fun. ipmr provides truncated_distributions() to help. This function</span>
-  <span class="co"># takes 2 arguments - the type of distribution, and the name of the parameter/</span>
-  <span class="co"># vital rate that it acts on.</span>
-  
-  evict_cor <span class="op">=</span> <span class="cn">TRUE</span>,
-  evict_fun <span class="op">=</span> <span class="fu"><a href="reference/eviction.html">truncated_distributions</a></span><span class="op">(</span>fun    <span class="op">=</span> <span class="st">'norm'</span>,
-                                      target <span class="op">=</span> <span class="st">'G'</span><span class="op">)</span>
-  <span class="op">)</span> 
-
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span>
-  proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
-  name      <span class="op">=</span> <span class="st">'F_simple'</span>,
-  formula   <span class="op">=</span> <span class="va">r_r</span> <span class="op">*</span> <span class="va">r_s</span> <span class="op">*</span> <span class="va">r_d</span>,
-  family    <span class="op">=</span> <span class="st">'CC'</span>,
-  
-  <span class="co"># Inverse logit transformation for flowering probability</span>
-  <span class="co"># (because we used a logistic regression)</span>
-  
-  r_r       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="va">r_r_int</span> <span class="op">+</span> <span class="va">r_r_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>,
-  
-  <span class="co"># Exponential function for seed progression </span>
-  <span class="co"># (because we used a Poisson)</span>
-  
-  r_s       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">r_s_int</span> <span class="op">+</span> <span class="va">r_s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>,
-  
-  <span class="co"># The recruit size distribution has no maternal effect for size,</span>
-  <span class="co"># so mu_rd and sd_rd are constants. These get passed in the </span>
-  <span class="co"># data_list</span>
-  
-  r_d       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">mu_rd</span>, <span class="va">sd_rd</span><span class="op">)</span>,
-  data_list <span class="op">=</span> <span class="va">my_data_list</span>,
-  states    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,
-  
-  <span class="co"># Again, we'll correct for eviction in new recruits by</span>
-  <span class="co"># truncating the normal distribution.</span>
-  
-  evict_cor <span class="op">=</span> <span class="cn">TRUE</span>,
-  evict_fun <span class="op">=</span> <span class="fu"><a href="reference/eviction.html">truncated_distributions</a></span><span class="op">(</span>fun    <span class="op">=</span> <span class="st">'norm'</span>,
-                                      target <span class="op">=</span> <span class="st">'r_d'</span><span class="op">)</span>
-<span class="op">)</span> 
-
-<span class="co"># Next, we have to define the implementation details for the model. </span>
-<span class="co"># We need to tell ipmr how each kernel is integrated, what state</span>
-<span class="co"># it starts on (i.e. z from above), and what state</span>
-<span class="co"># it ends on (i.e. z' above). In simple_* models, state_start and state_end will </span>
-<span class="co"># always be the same, because we only have a single continuous state variable. </span>
-<span class="co"># General_* models will be more complicated.</span>
-
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_star.html">define_impl</a></span><span class="op">(</span>
-  proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
-  <span class="fu"><a href="reference/define_star.html">make_impl_args_list</a></span><span class="op">(</span>
-    kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"P_simple"</span>, <span class="st">"F_simple"</span><span class="op">)</span>,
-    int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">2</span><span class="op">)</span>,
-    state_start  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span>,
-    state_end    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span>
-  <span class="op">)</span>
-<span class="op">)</span> 
-
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_star.html">define_domains</a></span><span class="op">(</span>
-  proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
-  dbh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="co"># the first entry is the lower bound of the domain.</span>
-          <span class="fl">50</span>, <span class="co"># the second entry is the upper bound of the domain.</span>
-          <span class="fl">100</span> <span class="co"># third entry is the number of meshpoints for the domain.</span>
-  <span class="op">)</span> 
-<span class="op">)</span> 
-
-<span class="co"># Next, we define the initial state of the population. We must do this because</span>
-<span class="co"># ipmr computes everything through simulation, and simulations require a </span>
-<span class="co"># population state.</span>
-
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_star.html">define_pop_state</a></span><span class="op">(</span>
-  proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,
-  n_dbh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
-<span class="op">)</span>
-
-<span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span><span class="op">)</span>
-
-
-<span class="va">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
-<span class="va">w_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/eigenvectors.html">right_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
-<span class="va">v_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/eigenvectors.html">left_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span>
-
-<span class="co"># make_ipm_report works on either proto_ipms or made ipm objects</span>
-
-<span class="fu"><a href="reference/ipm_report.html">make_ipm_report</a></span><span class="op">(</span><span class="va">my_simple_ipm</span>,
-                title <span class="op">=</span> <span class="st">"my_ipm_report"</span>,
-                render_output <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Load ipmr and get the parameter values. The data_list argument for define_kernel</span></span>
+<span><span class="co"># should hold every regression parameter and every constant used in the model.</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">my_data_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>s_int     <span class="op">=</span> <span class="op">-</span><span class="fl">2.2</span>,  <span class="co"># coefficients(my_surv_mod)[1]</span></span>
+<span>                    s_slope   <span class="op">=</span> <span class="fl">0.25</span>,  <span class="co"># coefficients(my_surv_mod)[2]</span></span>
+<span>                    g_int     <span class="op">=</span> <span class="fl">0.2</span>,   <span class="co"># coefficients(my_grow_mod)[1]</span></span>
+<span>                    g_slope   <span class="op">=</span> <span class="fl">0.99</span>,  <span class="co"># coefficients(my_grow_mod)[2]</span></span>
+<span>                    sd_g      <span class="op">=</span> <span class="fl">0.7</span>,   <span class="co"># sd(resid(my_grow_mod))</span></span>
+<span>                    r_r_int   <span class="op">=</span> <span class="fl">0.003</span>, <span class="co"># coefficients(my_pr_flower_mod)[1]</span></span>
+<span>                    r_r_slope <span class="op">=</span> <span class="fl">0.015</span>, <span class="co"># coefficients(my_pr_flower_mod)[2]</span></span>
+<span>                    r_s_int   <span class="op">=</span> <span class="fl">0.45</span>,  <span class="co"># coefficients(my_seed_mod)[1]</span></span>
+<span>                    r_s_slope <span class="op">=</span> <span class="fl">0.075</span>, <span class="co"># coefficients(my_seed_mod)[2]</span></span>
+<span>                    mu_fd     <span class="op">=</span> <span class="fl">2</span>,     <span class="co"># mean(recruit_data$size_next)</span></span>
+<span>                    sd_fd     <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span>   <span class="co"># sd(recruit_data$size_next)</span></span>
+<span></span>
+<span><span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/init_ipm.html">init_ipm</a></span><span class="op">(</span>sim_gen <span class="op">=</span> <span class="st">"simple"</span>,</span>
+<span>                          di_dd   <span class="op">=</span> <span class="st">"di"</span>,</span>
+<span>                          det_stoch <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span></span>
+<span>  </span>
+<span>  proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,</span>
+<span>    </span>
+<span>  <span class="co"># Name of the kernel</span></span>
+<span>  </span>
+<span>  name      <span class="op">=</span> <span class="st">"P_simple"</span>,</span>
+<span>  </span>
+<span>  <span class="co"># The type of transition it describes (e.g. continuous - continuous, discrete - continuous).</span></span>
+<span>  <span class="co"># These must be specified for all kernels!</span></span>
+<span>  </span>
+<span>  family    <span class="op">=</span> <span class="st">"CC"</span>,</span>
+<span>  </span>
+<span>  <span class="co"># The formula for the kernel. We dont need to tack on the "z'/z"s here.  </span></span>
+<span>  </span>
+<span>  formula   <span class="op">=</span> <span class="va">s</span> <span class="op">*</span> <span class="va">G</span>,</span>
+<span>  </span>
+<span>  <span class="co"># A named set of expressions for the vital rates it includes. </span></span>
+<span>  <span class="co"># note the use of user-specified functions here. Additionally, each </span></span>
+<span>  <span class="co"># state variable has a stateVariable_1 and stateVariable_2, corresponding to</span></span>
+<span>  <span class="co"># z and z' in the equations above. We don't need to define these variables ourselves,</span></span>
+<span>  <span class="co"># just reference them correctly based on the way we've set up our model on paper.</span></span>
+<span>  </span>
+<span>  <span class="co"># Perform the inverse logit transformation to get survival probabilities</span></span>
+<span>  <span class="co"># from your model. plogis from the "stats" package does this for us. </span></span>
+<span></span>
+<span>  s         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="va">s_int</span> <span class="op">+</span> <span class="va">s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>, </span>
+<span>  </span>
+<span>  <span class="co"># The growth model requires a function to compute the mean as a function of dbh.</span></span>
+<span>  <span class="co"># The SD is a constant, so we don't need to define that in ... expression, </span></span>
+<span>  <span class="co"># just the data_list.</span></span>
+<span>  </span>
+<span>  G         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">mu_g</span>, <span class="va">sd_g</span><span class="op">)</span>,</span>
+<span>  mu_g      <span class="op">=</span> <span class="va">g_int</span> <span class="op">+</span> <span class="va">g_slope</span> <span class="op">*</span> <span class="va">dbh_1</span>,</span>
+<span>  </span>
+<span>  </span>
+<span>  <span class="co"># Specify the constant parameters in the model in the data_list. </span></span>
+<span>  </span>
+<span>  data_list <span class="op">=</span> <span class="va">my_data_list</span>,</span>
+<span>  states    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  </span>
+<span>  <span class="co"># If you want to correct for eviction, set evict_cor = TRUE and specify an</span></span>
+<span>  <span class="co"># evict_fun. ipmr provides truncated_distributions() to help. This function</span></span>
+<span>  <span class="co"># takes 2 arguments - the type of distribution, and the name of the parameter/</span></span>
+<span>  <span class="co"># vital rate that it acts on.</span></span>
+<span>  </span>
+<span>  evict_cor <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  evict_fun <span class="op">=</span> <span class="fu"><a href="reference/eviction.html">truncated_distributions</a></span><span class="op">(</span>fun    <span class="op">=</span> <span class="st">'norm'</span>,</span>
+<span>                                      target <span class="op">=</span> <span class="st">'G'</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> </span>
+<span></span>
+<span><span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span></span>
+<span>  proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,</span>
+<span>  name      <span class="op">=</span> <span class="st">'F_simple'</span>,</span>
+<span>  formula   <span class="op">=</span> <span class="va">r_r</span> <span class="op">*</span> <span class="va">r_s</span> <span class="op">*</span> <span class="va">r_d</span>,</span>
+<span>  family    <span class="op">=</span> <span class="st">'CC'</span>,</span>
+<span>  </span>
+<span>  <span class="co"># Inverse logit transformation for flowering probability</span></span>
+<span>  <span class="co"># (because we used a logistic regression)</span></span>
+<span>  </span>
+<span>  r_r       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="va">r_r_int</span> <span class="op">+</span> <span class="va">r_r_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>,</span>
+<span>  </span>
+<span>  <span class="co"># Exponential function for seed progression </span></span>
+<span>  <span class="co"># (because we used a Poisson)</span></span>
+<span>  </span>
+<span>  r_s       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">r_s_int</span> <span class="op">+</span> <span class="va">r_s_slope</span> <span class="op">*</span> <span class="va">dbh_1</span><span class="op">)</span>,</span>
+<span>  </span>
+<span>  <span class="co"># The recruit size distribution has no maternal effect for size,</span></span>
+<span>  <span class="co"># so mu_rd and sd_rd are constants. These get passed in the </span></span>
+<span>  <span class="co"># data_list</span></span>
+<span>  </span>
+<span>  r_d       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">dbh_2</span>, <span class="va">mu_rd</span>, <span class="va">sd_rd</span><span class="op">)</span>,</span>
+<span>  data_list <span class="op">=</span> <span class="va">my_data_list</span>,</span>
+<span>  states    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'dbh'</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  </span>
+<span>  <span class="co"># Again, we'll correct for eviction in new recruits by</span></span>
+<span>  <span class="co"># truncating the normal distribution.</span></span>
+<span>  </span>
+<span>  evict_cor <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  evict_fun <span class="op">=</span> <span class="fu"><a href="reference/eviction.html">truncated_distributions</a></span><span class="op">(</span>fun    <span class="op">=</span> <span class="st">'norm'</span>,</span>
+<span>                                      target <span class="op">=</span> <span class="st">'r_d'</span><span class="op">)</span></span>
+<span><span class="op">)</span> </span>
+<span></span>
+<span><span class="co"># Next, we have to define the implementation details for the model. </span></span>
+<span><span class="co"># We need to tell ipmr how each kernel is integrated, what state</span></span>
+<span><span class="co"># it starts on (i.e. z from above), and what state</span></span>
+<span><span class="co"># it ends on (i.e. z' above). In simple_* models, state_start and state_end will </span></span>
+<span><span class="co"># always be the same, because we only have a single continuous state variable. </span></span>
+<span><span class="co"># General_* models will be more complicated.</span></span>
+<span></span>
+<span><span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_star.html">define_impl</a></span><span class="op">(</span></span>
+<span>  proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,</span>
+<span>  <span class="fu"><a href="reference/define_star.html">make_impl_args_list</a></span><span class="op">(</span></span>
+<span>    kernel_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"P_simple"</span>, <span class="st">"F_simple"</span><span class="op">)</span>,</span>
+<span>    int_rule     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"midpoint"</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>    state_start  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>    state_end    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"dbh"</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_star.html">define_domains</a></span><span class="op">(</span></span>
+<span>  proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,</span>
+<span>  dbh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="co"># the first entry is the lower bound of the domain.</span></span>
+<span>          <span class="fl">50</span>, <span class="co"># the second entry is the upper bound of the domain.</span></span>
+<span>          <span class="fl">100</span> <span class="co"># third entry is the number of meshpoints for the domain.</span></span>
+<span>  <span class="op">)</span> </span>
+<span><span class="op">)</span> </span>
+<span></span>
+<span><span class="co"># Next, we define the initial state of the population. We must do this because</span></span>
+<span><span class="co"># ipmr computes everything through simulation, and simulations require a </span></span>
+<span><span class="co"># population state.</span></span>
+<span></span>
+<span><span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/define_star.html">define_pop_state</a></span><span class="op">(</span></span>
+<span>  proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span>,</span>
+<span>  n_dbh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">my_simple_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_ipm.html">make_ipm</a></span><span class="op">(</span>proto_ipm <span class="op">=</span> <span class="va">my_simple_ipm</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">lambda_ipmr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lambda.html">lambda</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span></span>
+<span><span class="va">w_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/eigenvectors.html">right_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span></span>
+<span><span class="va">v_ipmr</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/eigenvectors.html">left_ev</a></span><span class="op">(</span><span class="va">my_simple_ipm</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># make_ipm_report works on either proto_ipms or made ipm objects</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/ipm_report.html">make_ipm_report</a></span><span class="op">(</span><span class="va">my_simple_ipm</span>,</span>
+<span>                title <span class="op">=</span> <span class="st">"my_ipm_report"</span>,</span>
+<span>                render_output <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>A more detailed introduction to <code>ipmr</code> is available in the Intro to ipmr article on this page. General IPM (ones with multiple continuous and/or discrete states) tutorials are also available there under the General IPMs article. Help with age × size models, density dependent models, and the parameter set index syntax are also available there. That’s all for now, happy modeling!</p>
 </div>
 </div>
@@ -457,19 +457,7 @@
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://github.com/levisc8/ipmr/actions" class="external-link"><img src="https://github.com/levisc8/ipmr/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
-<li><a href="https://github.com/levisc8/ipmr/actions" class="external-link"><img src="https://github.com/levisc8/ipmr/workflows/check-vignettes/badge.svg" alt="Vignette Code"></a></li>
-<li><a href="https://www.tidyverse.org/lifecycle/#maturing" class="external-link"><img src="https://img.shields.io/badge/lifecycle-maturing-blue.svg" alt="Lifecycle: maturing"></a></li>
-<li><a href="https://cran.r-project.org/package=ipmr" class="external-link"><img src="https://www.r-pkg.org/badges/version/ipmr" alt="CRAN status"></a></li>
-<li><a href="https://codecov.io/gh/levisc8/ipmr?branch=main" class="external-link"><img src="https://codecov.io/gh/levisc8/ipmr/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
-<li><a href="https://cran.r-project.org/package=ipmr" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/ipmr" alt="CRAN Downloads"></a></li>
-<li><a href="https://doi.org/10.5281/zenodo.5076190" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.5076190.svg" alt="DOI"></a></li>
-<li><a href="https://doi.org/10.1111/2041-210X.13683" class="external-link"><img src="https://zenodo.org/badge/DOI/10.1111/2041-210X.13683.svg" alt="DOI"></a></li>
-</ul>
-</div>
+
 
   </div>
 </div>
@@ -482,7 +470,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

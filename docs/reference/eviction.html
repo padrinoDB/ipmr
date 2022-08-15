@@ -86,9 +86,9 @@ et al. 2012).</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">truncated_distributions</span><span class="op">(</span><span class="va">fun</span>, <span class="va">target</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">discrete_extrema</span><span class="op">(</span><span class="va">target</span>, <span class="va">state</span>, ncol <span class="op">=</span> <span class="cn">NULL</span>, nrow <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">truncated_distributions</span><span class="op">(</span><span class="va">fun</span>, <span class="va">target</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">discrete_extrema</span><span class="op">(</span><span class="va">target</span>, <span class="va">state</span>, ncol <span class="op">=</span> <span class="cn">NULL</span>, nrow <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -97,25 +97,38 @@ et al. 2012).</p>
 <dd><p>The density function to use. For example, could be
 <code>"norm"</code> to correct a Gaussian density function, or <code>"lnorm"</code> to
 correct a log-normal density function.</p></dd>
+
+
 <dt>target</dt>
 <dd><p>The parameter/vital rate being modified. If this is a vector, the
 distribution specified in <code>fun</code> will be recycled.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Used internally, do not touch!</p></dd>
+
+
 <dt>state</dt>
 <dd><p>The state variable used in the kernel that is being discretized.</p></dd>
+
+
 <dt>ncol, nrow</dt>
 <dd><p>The number of rows or column that the final form of the iteration
 matrix should have. This is only necessary for rectangular kernels with
 class <code>"CC"</code>. <code>make_ipm</code> works out the correct dimensions for
 <code>"DC"</code> and <code>"CD"</code> kernels internally.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>For <code>truncated_distributions</code>, a
+    
+
+<p>For <code>truncated_distributions</code>, a
 modified function call with that truncates the probability density
-function based on the cumulative density function.
-For <code>discrete_extrema</code>, a numeric vector with modified entries based
+function based on the cumulative density function.</p>
+
+
+<p>For <code>discrete_extrema</code>, a numeric vector with modified entries based
 on the discretization process.</p>
     </div>
     <div id="note">
@@ -142,7 +155,7 @@ from integral projection models.Ecology 93(9): 2008-2014.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

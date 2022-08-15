@@ -84,9 +84,9 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">right_mult</span><span class="op">(</span><span class="va">kernel</span>, <span class="va">vectr</span>, family <span class="op">=</span> <span class="cn">NULL</span>, start_end <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">left_mult</span><span class="op">(</span><span class="va">kernel</span>, <span class="va">vectr</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">right_mult</span><span class="op">(</span><span class="va">kernel</span>, <span class="va">vectr</span>, family <span class="op">=</span> <span class="cn">NULL</span>, start_end <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">left_mult</span><span class="op">(</span><span class="va">kernel</span>, <span class="va">vectr</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -94,12 +94,20 @@
     <dl><dt>kernel, vectr</dt>
 <dd><p><code>kernel</code> should be a bivariate kernel, <code>vectr</code>
 should be a univariate trait distribution.</p></dd>
+
+
 <dt>family, start_end</dt>
 <dd><p>Used internally, do not touch.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>left_mult</code> returns <code>t(kernel) %*% vectr</code>. <code>right_mult</code>returns <code>kernel %*% vectr</code>.</p>
+    
+
+<p><code>left_mult</code> returns <code>t(kernel) %*% vectr</code>. <code>right_mult</code></p>
+
+
+<p>returns <code>kernel %*% vectr</code>.</p>
     </div>
 
   </div>
@@ -114,7 +122,7 @@ should be a univariate trait distribution.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -110,10 +110,10 @@
 <h3 id="features-0-0-4">Features<a class="anchor" aria-label="anchor" href="#features-0-0-4"></a></h3>
 <ul><li><p>Adds <code>log</code> argument to <code>lambda</code> so users can choose which scale to return. The default is <code>TRUE</code> for stochastic models and <code>FALSE</code> for deterministic models.</p></li>
 <li><p>Allows named expressions in <code><a href="../reference/define_star.html">define_env_state()</a></code> such that the names of the expressions may be used in <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code>. Before, the name of the expression didn’t matter, only the names of the outputted list. Now, this will also work as well.</p></li>
-</ul><pre><code><span class="fu"><a href="../reference/define_star.html">define_env_state</a></span><span class="op">(</span><span class="va">proto_ipm</span>, 
-                 temp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">20</span>, <span class="fl">3</span><span class="op">)</span>, 
-                 precip <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">400</span>, <span class="fl">2</span><span class="op">)</span>,
-                 data_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre>
+</ul><pre><code><span><span class="fu"><a href="../reference/define_star.html">define_env_state</a></span><span class="op">(</span><span class="va">proto_ipm</span>, </span>
+<span>                 temp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">20</span>, <span class="fl">3</span><span class="op">)</span>, </span>
+<span>                 precip <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">400</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>                 data_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre>
 <ul><li><p>More unit tests for parameter resampled models.</p></li>
 <li><p>Removed innocuous warning messages. Added warnings for <code>NA</code> values in a few <code>define_*</code> functions and errors when they’re produced in sub-kernels.</p></li>
 <li><p>Added the <code>ipmr_ipm</code> class so that most functions can tell the difference between a <code>PADRINO</code> object and an <code>ipmr</code> object.</p></li>
@@ -170,7 +170,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

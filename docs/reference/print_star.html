@@ -86,83 +86,96 @@ Generics for IPM classes"><!-- mathjax --><script src="https://cdnjs.cloudflare.
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S3 method for proto_ipm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for simple_di_det_ipm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span>
-  <span class="va">x</span>,
-  comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>,
-  type_lambda <span class="op">=</span> <span class="st">"last"</span>,
-  sig_digits <span class="op">=</span> <span class="fl">3</span>,
-  check_conv <span class="op">=</span> <span class="cn">TRUE</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for simple_dd_det_ipm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"last"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for simple_di_stoch_kern_ipm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for simple_dd_stoch_kern_ipm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for simple_di_stoch_param_ipm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for simple_dd_stoch_param_ipm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for general_di_det_ipm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span>
-  <span class="va">x</span>,
-  comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>,
-  type_lambda <span class="op">=</span> <span class="st">"last"</span>,
-  sig_digits <span class="op">=</span> <span class="fl">3</span>,
-  check_conv <span class="op">=</span> <span class="cn">TRUE</span>,
-  <span class="va">...</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for general_dd_det_ipm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"last"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for general_di_stoch_kern_ipm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for general_dd_stoch_kern_ipm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for general_di_stoch_param_ipm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for general_dd_stoch_param_ipm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for proto_ipm</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_di_det_ipm</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  type_lambda <span class="op">=</span> <span class="st">"last"</span>,</span>
+<span>  sig_digits <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  check_conv <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_dd_det_ipm</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"last"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_di_stoch_kern_ipm</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_dd_stoch_kern_ipm</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_di_stoch_param_ipm</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for simple_dd_stoch_param_ipm</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_di_det_ipm</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  type_lambda <span class="op">=</span> <span class="st">"last"</span>,</span>
+<span>  sig_digits <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  check_conv <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_dd_det_ipm</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"last"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_di_stoch_kern_ipm</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_dd_stoch_kern_ipm</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_di_stoch_param_ipm</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for general_dd_stoch_param_ipm</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, comp_lambda <span class="op">=</span> <span class="cn">TRUE</span>, type_lambda <span class="op">=</span> <span class="st">"stochastic"</span>, sig_digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>An object of class <code>proto_ipm</code> or produced by <code><a href="make_ipm.html">make_ipm()</a></code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Ignored</p></dd>
+
+
 <dt>comp_lambda</dt>
 <dd><p>A logical indicating whether or not to calculate lambdas
 for the iteration kernels and display them.</p></dd>
+
+
 <dt>type_lambda</dt>
 <dd><p>Either <code>'all'</code> or <code>'stochastic'</code>. See
 <code><a href="lambda.html">lambda</a></code> for more details.</p></dd>
+
+
 <dt>sig_digits</dt>
 <dd><p>The number of significant digits to round to if <code>
 comp_lambda = TRUE</code>.</p></dd>
+
+
 <dt>check_conv</dt>
 <dd><p>A logical: for deterministic models, check if population state
 has converged to asymptotic dynamics? If <code>TRUE</code> and the model has not
 converged, a message will be printed.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>x</code> invisibly.</p>
+    
+
+<p><code>x</code> invisibly.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -183,7 +196,7 @@ just a visual aid.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
