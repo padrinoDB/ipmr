@@ -1643,9 +1643,6 @@ plot.simple_di_det_ipm <- function(x = NULL, y = NULL,
 
   plot_list <- ipm$sub_kernels
 
-  # plt_seq   <- seq_along(plot_list)
-
-  # canvas_dims <- .ncol_nrow(plt_seq)
   par(mar   = c(6, 2, 3, 1),
       mfrow = c(n_row, n_col))
 
@@ -1709,8 +1706,6 @@ plot.simple_di_stoch_param_ipm <- function(x = NULL, y = NULL,
   }
 
   plt_seq   <- seq_along(plot_list)
-
-  # canvas_dims <- .ncol_nrow(plt_seq)
 
   par(mar   = c(6, 2, 3, 1),
       mfrow = c(n_row, n_col))
