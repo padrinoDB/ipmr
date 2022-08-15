@@ -29,6 +29,8 @@
   do_contour = FALSE,
   do_legend = FALSE,
   exponent = 1,
+  n_row = 1,
+  n_col = 1,
   ...
 )
 
@@ -41,6 +43,8 @@
   do_contour = FALSE,
   do_legend = FALSE,
   exponent = 1,
+  n_row = 1,
+  n_col = 1,
   ...
 )
 
@@ -53,6 +57,8 @@
   do_contour = FALSE,
   do_legend = FALSE,
   exponent = 1,
+  n_row = 1,
+  n_col = 1,
   ...
 )
 
@@ -66,6 +72,8 @@
   do_contour = FALSE,
   do_legend = FALSE,
   exponent = 1,
+  n_row = 1,
+  n_col = 1,
   ...
 )
 }
@@ -91,7 +99,11 @@ contour lines.}
 \item{...}{further arguments passed to legend}
 
 \item{exponent}{The exponent to raise each kernel to. Setting this to a low
-number can help visualize kernels that are overwhelmed by a few very large numbers.}
+number can help visualize kernels that are overwhelmed by a few very large
+numbers.}
+
+\item{n_row, n_col}{If plotting multiple (sub-)kernels, how many rows and
+columns to arrange them in.}
 
 \item{mega_mat}{A vector with symbols, I's, and/or 0s representing the matrix blocks.
 They should be specified in ROW MAJOR order! Can also be a character
