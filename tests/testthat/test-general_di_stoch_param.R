@@ -2019,7 +2019,8 @@ test_that("Parameter sets work in parameter re-sampled model", {
     kerns_temp        <- temp$kernels
     lambdas           <- temp$lambdas
     names(kerns_temp) <- paste(names(kerns_temp), i, sep = '_')
-    kernel_holder     <- splice(kernel_holder, kerns_temp)
+
+    kernel_holder     <- c(kernel_holder, kerns_temp)
 
   }
 
