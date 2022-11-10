@@ -347,7 +347,7 @@ test_that('normalize pop_vectors works as it should', {
       as.list() %>%
       setNames(names(r_means))
 
-    temp <- purrr::splice(data_list,  r_ests)
+    temp <- c(data_list,  r_ests)
 
     g_mat <- g(domains$d2, domains$d1,
                params = c(temp$g_int_yr,

@@ -1637,32 +1637,10 @@ test_that('left_ev.simple_di_det_ipm can re-iterate models', {
 })
 
 test_that('warnings are produced correctly', {
-
-  msg <- catch_cnd(left_ev(sim_di_det_3,
-                           iterations = 3))
-
-  expect_true(
-    grepl(
-      'did not converge after 3 iterations\\. Returning NA',
-      msg$message
-    )
-  )
-
-
-  msg <- capture_warning(
-    left_ev(sim_di_det_1,
-            iterations = 2
-    )
-  )
-
-  expect_true(
-    grepl(
-      'did not converge after 2 iterations\\. Returning NA',
-      msg$message
-    )
-  )
-
-
+  expect_snapshot({
+    . <- left_ev(sim_di_det_3, iterations = 3)
+    . <- left_ev(sim_di_det_1, iterations = 2)
+  })
 })
 
 
