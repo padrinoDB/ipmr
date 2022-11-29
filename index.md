@@ -1,13 +1,13 @@
 [![R build
-status](https://github.com/levisc8/ipmr/workflows/R-CMD-check/badge.svg)](https://github.com/levisc8/ipmr/actions)
+status](https://github.com/padrinoDB/ipmr/workflows/R-CMD-check/badge.svg)](https://github.com/padrinoDB/ipmr/actions)
 [![Vignette
-Code](https://github.com/levisc8/ipmr/workflows/check-vignettes/badge.svg)](https://github.com/levisc8/ipmr/actions)
+Code](https://github.com/padrinoDB/ipmr/workflows/check-vignettes/badge.svg)](https://github.com/padrinoDB/ipmr/actions)
 [![Lifecycle:
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/ipmr)](https://cran.r-project.org/package=ipmr)
 [![Codecov test
-coverage](https://codecov.io/gh/levisc8/ipmr/branch/main/graph/badge.svg)](https://codecov.io/gh/levisc8/ipmr?branch=main)
+coverage](https://codecov.io/gh/padrinoDB/ipmr/branch/main/graph/badge.svg)](https://codecov.io/gh/padrinoDB/ipmr?branch=main)
 [![CRAN
 Downloads](https://cranlogs.r-pkg.org/badges/ipmr)](https://cran.r-project.org/package=ipmr)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5076190.svg)](https://doi.org/10.5281/zenodo.5076190)
@@ -40,7 +40,7 @@ if(!require('remotes', quietly = TRUE)) {
   install.packages("remotes")
 }
 
-remotes::install_github("levisc8/ipmr", build_vignettes = TRUE)
+remotes::install_github("padrinoDB/ipmr", build_vignettes = TRUE)
 ```
 
 ## Package scope
@@ -59,7 +59,7 @@ al. 2000](https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658
 [Merow et al. 2013](https://doi.org/10.1111/2041-210X.12146), and [Rees
 et al. 2014](https://doi.org/10.1111/1365-2656.12178). The [Introduction
 to ipmr
-vignette](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html)
+vignette](https://padrinoDB.github.io/ipmr/articles/ipmr-introduction.html)
 also contains a brief overview of IPM theory as well as a far more
 detailed introduction to this package. Thus, everything that follows
 here assumes you have some basic understanding of IPM theory,
@@ -73,7 +73,7 @@ Once all parameters are estimated, the first step of defining a model in
 five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and
 `uses_age`. We will ignore `uses_age` for now, because age-size models
 are less common and have their [own
-vignette](https://levisc8.github.io/ipmr/articles/age_x_size.html).
+vignette](https://padrinoDB.github.io/ipmr/articles/age_x_size.html).
 
 The combination of these arguments defines the type of IPM, and makes
 sure that the machinery for subsequent analyses works correctly. The
@@ -172,13 +172,13 @@ Simple density-independent deterministic, simple kernel-resampled
 stochastic, and simple parameter resampled stochastic models
 (`simple_di_det`, `simple_di_stoch_kern`, `simple_di_stoch_param`) are
 described below as well as
-[here](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html).
+[here](https://padrinoDB.github.io/ipmr/articles/ipmr-introduction.html).
 The `general_*` versions of these are described
-[here](https://levisc8.github.io/ipmr/articles/general-ipms.html).
+[here](https://padrinoDB.github.io/ipmr/articles/general-ipms.html).
 Density dependent versions are completed for simple and general models,
 and are probably stable, but have not been tested enough to be certain.
 A very brief (and incomplete) introduction is available
-[here](https://levisc8.github.io/ipmr/articles/density-dependence.html).
+[here](https://padrinoDB.github.io/ipmr/articles/density-dependence.html).
 
 Below is an example of how to implement a simple IPM with `ipmr`.
 

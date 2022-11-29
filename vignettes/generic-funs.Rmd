@@ -18,35 +18,35 @@ knitr::opts_chunk$set(
 
 ## Asymptotic/stochastic behavior
 
-- [`lambda()`](https://levisc8.github.io/ipmr/reference/lambda.html)
+- [`lambda()`](https://padrinoDB.github.io/ipmr/reference/lambda.html)
 
-- [`right_ev()`](https://levisc8.github.io/ipmr/reference/eigenvectors.html)
+- [`right_ev()`](https://padrinoDB.github.io/ipmr/reference/eigenvectors.html)
 
-- [`left_ev()`](https://levisc8.github.io/ipmr/reference/eigenvectors.html)
+- [`left_ev()`](https://padrinoDB.github.io/ipmr/reference/eigenvectors.html)
 
 ## More familiar generics
 
-- [`print()`](https://levisc8.github.io/ipmr/reference/print_star.html)
+- [`print()`](https://padrinoDB.github.io/ipmr/reference/print_star.html)
 
-- [`plot()`](https://levisc8.github.io/ipmr/reference/plot_star.html)
+- [`plot()`](https://padrinoDB.github.io/ipmr/reference/plot_star.html)
 
 ## Miscellaneous helpers
 
-- [`format_mega_kernel()`](https://levisc8.github.io/ipmr/reference/format_mega_kernel.html)
+- [`format_mega_kernel()`](https://padrinoDB.github.io/ipmr/reference/format_mega_kernel.html)
 
-- [`use_vr_model()`](https://levisc8.github.io/ipmr/reference/predict_methods.html)
+- [`use_vr_model()`](https://padrinoDB.github.io/ipmr/reference/predict_methods.html)
 
-- [`is_conv_to_asymptotic()`](https://levisc8.github.io/ipmr/reference/check_convergence.html)
+- [`is_conv_to_asymptotic()`](https://padrinoDB.github.io/ipmr/reference/check_convergence.html)
 
 ## (proto_)ipm accessor functions
 
-- [`kernel_formulae()`](https://levisc8.github.io/ipmr/reference/accessors.html)
+- [`kernel_formulae()`](https://padrinoDB.github.io/ipmr/reference/accessors.html)
 
-- [`vital_rate_exprs()`](https://levisc8.github.io/ipmr/reference/accessors.html)
+- [`vital_rate_exprs()`](https://padrinoDB.github.io/ipmr/reference/accessors.html)
 
-- [`domains()`](https://levisc8.github.io/ipmr/reference/accessors.html)
+- [`domains()`](https://padrinoDB.github.io/ipmr/reference/accessors.html)
 
-- [`int_mesh()`](https://levisc8.github.io/ipmr/reference/accessors.html)
+- [`int_mesh()`](https://padrinoDB.github.io/ipmr/reference/accessors.html)
 
-- [`vital_rate_funs()`](https://levisc8.github.io/ipmr/reference/accessors.html)
+- [`vital_rate_funs()`](https://padrinoDB.github.io/ipmr/reference/accessors.html)
 

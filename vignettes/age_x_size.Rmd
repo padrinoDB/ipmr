@@ -16,7 +16,7 @@ Many species exhibit age-dependent demography in addition to some other continuo
   
 While we may be tempted to think of age as a continuous quantity, it must be a discrete state in a discrete time model. This makes the age $\times$ size IPM a special case of the general IPM. This also uses the parameter index syntax, and it is largely the same as for other, non-age structured IPMs, but includes a couple extra bits that must be specified.
 
-The rest of this vignette assumes you are familiar with the suffix notation that `ipmr` uses. If you haven't already covered this, it would be best to read at least the [Intro](https://levisc8.github.io/ipmr/articles/ipmr-introduction.html) and [General IPM](https://levisc8.github.io/ipmr/articles/general-ipms.html) vignettes before continuing. We'll model Soay sheep (*Ovis aries*) from St. Kilda using parameters from Chapter 6 of Ellner, Childs, & Rees (2016). 
+The rest of this vignette assumes you are familiar with the suffix notation that `ipmr` uses. If you haven't already covered this, it would be best to read at least the [Intro](https://padrinoDB.github.io/ipmr/articles/ipmr-introduction.html) and [General IPM](https://padrinoDB.github.io/ipmr/articles/general-ipms.html) vignettes before continuing. We'll model Soay sheep (*Ovis aries*) from St. Kilda using parameters from Chapter 6 of Ellner, Childs, & Rees (2016). 
 
 ## Mathematical overview
 

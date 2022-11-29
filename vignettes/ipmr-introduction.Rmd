@@ -52,7 +52,7 @@ While `ipmr` intends to mimic the notation above as closely as possible, it does
   
 ## Types of models in `ipmr` {#model-types}
   
-The first step of defining a model in `ipmr` is to initialize the model using `init_ipm()`. This function has five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and `uses_age`. We will ignore `uses_age` for now, because age-size models are less common and have their [own vignette](https://levisc8.github.io/ipmr/articles/age_x_size.html). 
+The first step of defining a model in `ipmr` is to initialize the model using `init_ipm()`. This function has five arguments: `sim_gen`, `di_dd`, `det_stoch`, `kern_param`, and `uses_age`. We will ignore `uses_age` for now, because age-size models are less common and have their [own vignette](https://padrinoDB.github.io/ipmr/articles/age_x_size.html). 
 
 The combination of these arguments defines the type of IPM, and makes sure that the machinery for subsequent analyses works correctly. The possible entries for each argument are as follows:
 
@@ -80,7 +80,7 @@ The combination of these arguments defines the type of IPM, and makes sure that 
 
     + B. **param**: This describes an IPM with parameters that are re-sampled from some distribution at each iteration of the model. This could be a multivariate normal defined by covarying slopes and intercepts, or distributions of environmental variables that change from time to time. All that is required is that the parameters for the distribution are specified and that the function that generates the parameters at each iteration returns named lists that correspond to the parameter names in the model. Jump down to the `"simple_di_stoch_param"` example for some inspiration in writing those.
 
-The rest of this vignette will deal with simple, density independent IPMs. If you already know that you need a general IPM (i.e. an IPM with discrete stages and/or multiple continuous state variables), I still strongly  recommend reading at least one complete example here before you start with  [those](https://levisc8.github.io/ipmr/articles/general-ipms.html).
+The rest of this vignette will deal with simple, density independent IPMs. If you already know that you need a general IPM (i.e. an IPM with discrete stages and/or multiple continuous state variables), I still strongly  recommend reading at least one complete example here before you start with  [those](https://padrinoDB.github.io/ipmr/articles/general-ipms.html).
 
 ## Specifying a simple deterministic IPM without density dependence
 
@@ -619,7 +619,7 @@ pred_ipm <- init_ipm(sim_gen = "simple", di_dd = "di", det_stoch = "det") %>%
 
 `make_ipm()` can handle most types of widely used model classes without any additional effort (e.g. `lm`, `glm`, `lme4`, `brms`, `nlme`,`betareg`). The list of method available in `ipmr` is not exhaustive though, and sometimes there will be errors.
 
-If you are sure that a `predict` method exists for your model type, but you get errors along the lines of `Element <some number> of '.x' must be a vector, not a call`, this usually means that I forgot to add the class of model that you're trying to use to `ipmr`. We can get around this by wrapping those model objects in `use_vr_model()`. Please also create an [Issue here](https://github.com/levisc8/ipmr/issues) describing the model class you're trying to work with so it can be added to future versions. 
+If you are sure that a `predict` method exists for your model type, but you get errors along the lines of `Element <some number> of '.x' must be a vector, not a call`, this usually means that I forgot to add the class of model that you're trying to use to `ipmr`. We can get around this by wrapping those model objects in `use_vr_model()`. Please also create an [Issue here](https://github.com/padrinoDB/ipmr/issues) describing the model class you're trying to work with so it can be added to future versions. 
 
 Say our growth model isn't recognized by `ipmr`. We try to `make_ipm()`, and get our obscure error message about `.x`. The snippet below shows how to rectify this. We wrap our model objects in `use_vr_model()` when creating the `data_list`, and then re-run it with the exact same code as above. `use_vr_model()` tells `ipmr` that this object is a model object, not a raw parameter value. As the package (hopefully) gets used more widely, this issue should disappear, and `use_vr_model()` will (hopefully) become obsolete.
 
@@ -735,7 +735,7 @@ In the example above, we created a model with a single, deterministic kernel def
 
 Say we have multiple sites sampled in the same year, but are only interested in each site's asymptotic dynamics (perhaps to compare performance across space). `ipmr` uses a syntax that closely mirrors the mathematical notation of these models to successively build up more complicated expressions without requiring that much extra code as compared to the examples above. `ipmr` refers to these as _parameter sets_, and abbreviates them `par_sets`. For example, a random intercept for site may be denoted $\alpha_{site}$, where $_{site}$ provides an index for the different values that $\alpha$ can take on.  
 
-The general idea is to append an index suffix to each variable in the code that is modified, and supply a list of values that the index can actually take in the `par_set_indices` slot of `define_kernel()`. In the example below, the $site$ index subscripts are incorporated into the `ipmr` code using the `_site` suffix.   There is a longer vignette dedicated to translating math to R code to the `ipmr` syntax [here](https://levisc8.github.io/ipmr/articles/index-notation.html).
+The general idea is to append an index suffix to each variable in the code that is modified, and supply a list of values that the index can actually take in the `par_set_indices` slot of `define_kernel()`. In the example below, the $site$ index subscripts are incorporated into the `ipmr` code using the `_site` suffix.   There is a longer vignette dedicated to translating math to R code to the `ipmr` syntax [here](https://padrinoDB.github.io/ipmr/articles/index-notation.html).
 
 >NB: because of the way these indices are handled internally, they should always appear at the end of the name they modify. For example, use `s_slope_site` instead of `s_site_slope`. Multiple indices are fine as long as they chained together at the end (e.g. `s_slope_site_year`). Models may still work if formatted with indices in the middle of a name, but they also may not (often with obscure error messages).
 
@@ -1780,7 +1780,7 @@ You can adapt this code to store any quantity of interest (e.g. regression coeff
 
 ## General IPMs
 
-An article on these is available on the [website](https://levisc8.github.io/ipmr/articles/general-ipms.html) and from an R session:
+An article on these is available on the [website](https://padrinoDB.github.io/ipmr/articles/general-ipms.html) and from an R session:
 
 ```{r eval = FALSE}
 
