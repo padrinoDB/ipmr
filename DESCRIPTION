@@ -76,5 +76,5 @@ Config/testthat/parallel: true
 Config/testthat/edition: 3
 LinkingTo: 
     Rcpp
-URL: https://levisc8.github.io/ipmr/, https://github.com/levisc8/ipmr
-BugReports: https://github.com/levisc8/ipmr/issues
+URL: https://padrinoDB.github.io/ipmr/, https://github.com/padrinoDB/ipmr
+BugReports: https://github.com/padrinoDB/ipmr/issues
