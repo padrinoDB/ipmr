@@ -67,6 +67,7 @@ reference:
       - mean_kernel
       - mat_power
       - right_mult
+      - as.matrix
   - title: "Printing and Plotting"
     desc: >
       Functions to print and plot `proto_ipm` and IPM objects.
