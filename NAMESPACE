@@ -3,6 +3,8 @@
 S3method("kernel_formulae<-",proto_ipm)
 S3method("parameters<-",proto_ipm)
 S3method("vital_rate_exprs<-",proto_ipm)
+S3method(as.matrix,ipmr_ipm)
+S3method(as.matrix,ipmr_matrix)
 S3method(conv_plot,ipmr_ipm)
 S3method(domains,default)
 S3method(domains,proto_ipm)
