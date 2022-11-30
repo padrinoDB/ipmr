@@ -2673,7 +2673,7 @@ left_ev.simple_di_stoch_param_ipm <- left_ev.general_di_stoch_param_ipm
   Reduce("+", x = dots, init = 0)
 }
 
-#' @rdname matrix-coercion
+#' @rdname as_matrix
 #' @title  Convert to bare matrices
 #' @description Converts objects to \code{c("matrix", "array")}.
 #' @param x An object of class \code{ipmr_matrix}, or the output from

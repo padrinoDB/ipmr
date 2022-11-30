@@ -2,12 +2,9 @@
 % Please edit documentation in R/generics.R
 \name{as.matrix.ipmr_matrix}
 \alias{as.matrix.ipmr_matrix}
-\alias{as.matrix.ipmr_ipm}
 \title{Convert to bare matrices}
 \usage{
 \method{as.matrix}{ipmr_matrix}(x, ...)
-
-\method{as.matrix}{ipmr_ipm}(x, ...)
 }
 \arguments{
 \item{x}{An object of class \code{ipmr_matrix}, or the output from
