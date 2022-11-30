@@ -60,7 +60,7 @@
   <a href="../news/index.html">News</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/levisc8/ipmr/" class="external-link">
+  <a href="https://github.com/padrinoDB/ipmr/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -75,7 +75,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
       <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href="https://github.com/levisc8/ipmr/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/padrinoDB/ipmr/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
@@ -90,7 +90,7 @@
 <li><p>Prettier printing method for PADRINO objects/lists of user-specified models.</p></li>
 <li><p>Prettier warnings for <code>left/right_ev()</code></p></li>
 <li><p>Depending on your view, this may be a bug fix: updates the <code>log</code> argument in <code><a href="../reference/lambda.html">lambda()</a></code> so that it only changes the scale, NOT the calculation method. The prior behavior was documented, but unlikely to be intuitive, and so caused some confusion. Thanks to <a href="https://github.com/aariq" class="external-link">@aariq</a> for pointing this out.</p></li>
-<li><p>For stochastic IPMs, <code><a href="../reference/check_convergence.html">is_conv_to_asymptotic()</a></code> and <code><a href="../reference/check_convergence.html">conv_plot()</a></code> now check for convergence in stochastic lambda. That is, they use a cumulative mean <code>log(lambda)</code> over iterations after discarding a burn-in. Thanks to <a href="https://github.com/aariq" class="external-link">@aariq</a> for implementing this in <a href="https://github.com/levisc8/ipmr/issues/45" class="external-link">#45</a>.</p></li>
+<li><p>For stochastic IPMs, <code><a href="../reference/check_convergence.html">is_conv_to_asymptotic()</a></code> and <code><a href="../reference/check_convergence.html">conv_plot()</a></code> now check for convergence in stochastic lambda. That is, they use a cumulative mean <code>log(lambda)</code> over iterations after discarding a burn-in. Thanks to <a href="https://github.com/aariq" class="external-link">@aariq</a> for implementing this in <a href="https://github.com/padrinoDB/ipmr/issues/45" class="external-link">#45</a>.</p></li>
 <li><p>Adds experimental function <code><a href="../reference/ipm_report.html">make_ipm_report()</a></code>. This function converts <code>proto_ipm</code> objects into Rmarkdown documents that, when rendered, contain the equations and parameters used to implement the model in Latex. See the function documentation for more details, and report bugs/notation quirks/preferences in the issue tracker.</p></li>
 </ul></div>
 <div class="section level3">
@@ -99,9 +99,9 @@
 <li><p>Fixes bug where <code>"drop_levels"</code> was not recognized in some parameter set indexed models.</p></li>
 <li><p>Fixes bug where parameter set levels were recycled in some cases.</p></li>
 <li><p>Fixes bug in <code><a href="../reference/lambda.html">lambda()</a></code> where <code>log = TRUE</code> had no effect when the IPM was stochastic and <code>type_lambda</code> was <code>'last'</code> or <code>'all'</code>.</p></li>
-<li><p>Switched from <code>all.equal</code> to absolute tolerance. <a href="https://github.com/aariq" class="external-link">@aariq</a> in <a href="https://github.com/levisc8/ipmr/issues/52" class="external-link">#52</a>.</p></li>
-<li><p>Fixes bug where the value of <code><a href="../reference/lambda.html">lambda()</a></code> was named for determinstic models and unnamed for stochastic models. <a href="https://github.com/aariq" class="external-link">@aariq</a> in <a href="https://github.com/levisc8/ipmr/issues/57" class="external-link">#57</a>.</p></li>
-<li><p>Fixes bug in <code><a href="../reference/make_ipm.html">make_ipm()</a></code> where a user-specified sequence wasn’t getting used correctly for certain model classes. <a href="https://github.com/aariq" class="external-link">@aariq</a> in <a href="https://github.com/levisc8/ipmr/issues/58" class="external-link">#58</a>.</p></li>
+<li><p>Switched from <code>all.equal</code> to absolute tolerance. <a href="https://github.com/aariq" class="external-link">@aariq</a> in <a href="https://github.com/padrinoDB/ipmr/issues/52" class="external-link">#52</a>.</p></li>
+<li><p>Fixes bug where the value of <code><a href="../reference/lambda.html">lambda()</a></code> was named for determinstic models and unnamed for stochastic models. <a href="https://github.com/aariq" class="external-link">@aariq</a> in <a href="https://github.com/padrinoDB/ipmr/issues/57" class="external-link">#57</a>.</p></li>
+<li><p>Fixes bug in <code><a href="../reference/make_ipm.html">make_ipm()</a></code> where a user-specified sequence wasn’t getting used correctly for certain model classes. <a href="https://github.com/aariq" class="external-link">@aariq</a> in <a href="https://github.com/padrinoDB/ipmr/issues/58" class="external-link">#58</a>.</p></li>
 <li><p>Warnings about <code>NA</code>s in <code>data_list</code> are no longer raised for model objects.</p></li>
 </ul></div>
 </div>

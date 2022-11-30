@@ -81,7 +81,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/levisc8/ipmr/" class="external-link">
+  <a href="https://github.com/padrinoDB/ipmr/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -102,7 +102,7 @@
       <h1 data-toc-skip>Index Notation in ipmr</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/levisc8/ipmr/blob/HEAD/vignettes/index-notation.Rmd" class="external-link"><code>vignettes/index-notation.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/padrinoDB/ipmr/blob/HEAD/vignettes/index-notation.Rmd" class="external-link"><code>vignettes/index-notation.Rmd</code></a></small>
       <div class="hidden name"><code>index-notation.Rmd</code></div>
 
     </div>
@@ -386,7 +386,7 @@ would in a simple IPM when we implement the model in
 <p>and modeled in R as follows:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/lme4/lme4/" class="external-link">lme4</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://padrinoDB.github.io/ipmr/" class="external-link">ipmr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">grow_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">size_2</span> <span class="op">~</span> <span class="va">size_1</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">year</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">grow_data</span><span class="op">)</span></span>
 <span></span>
@@ -660,7 +660,7 @@ some parameters for each site. Additionally, we’ll specify the
 distribution parameters for each <span class="math inline">\(\theta\)</span> and write a function that samples
 them once.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://padrinoDB.github.io/ipmr/" class="external-link">ipmr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">51</span><span class="op">)</span></span>
 <span></span>

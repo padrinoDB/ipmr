@@ -81,7 +81,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/levisc8/ipmr/" class="external-link">
+  <a href="https://github.com/padrinoDB/ipmr/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -102,7 +102,7 @@
       <h1 data-toc-skip>Introduction to ipmr</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/levisc8/ipmr/blob/HEAD/vignettes/ipmr-introduction.Rmd" class="external-link"><code>vignettes/ipmr-introduction.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/padrinoDB/ipmr/blob/HEAD/vignettes/ipmr-introduction.Rmd" class="external-link"><code>vignettes/ipmr-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>ipmr-introduction.Rmd</code></div>
 
     </div>
@@ -222,7 +222,7 @@ initialize the model using <code><a href="../reference/init_ipm.html">init_ipm()
 five arguments: <code>sim_gen</code>, <code>di_dd</code>,
 <code>det_stoch</code>, <code>kern_param</code>, and
 <code>uses_age</code>. We will ignore <code>uses_age</code> for now,
-because age-size models are less common and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own
+because age-size models are less common and have their <a href="https://padrinoDB.github.io/ipmr/articles/age_x_size.html" class="external-link">own
 vignette</a>.</p>
 <p>The combination of these arguments defines the type of IPM, and makes
 sure that the machinery for subsequent analyses works correctly. The
@@ -302,7 +302,7 @@ writing those.</p></li>
 IPMs. If you already know that you need a general IPM (i.e. an IPM with
 discrete stages and/or multiple continuous state variables), I still
 strongly recommend reading at least one complete example here before you
-start with <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">those</a>.</p>
+start with <a href="https://padrinoDB.github.io/ipmr/articles/general-ipms.html" class="external-link">those</a>.</p>
 </div>
 <div class="section level3">
 <h3 id="specifying-a-simple-deterministic-ipm-without-density-dependence">Specifying a simple deterministic IPM without density
@@ -865,7 +865,7 @@ z\)</span></li>
 \sigma_{r_d})\)</span></li>
 </ul>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://padrinoDB.github.io/ipmr/" class="external-link">ipmr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">iceplant_ex</span><span class="op">)</span></span>
 <span></span>
@@ -1013,7 +1013,7 @@ model type, but you get errors along the lines of
 this usually means that I forgot to add the class of model that you’re
 trying to use to <code>ipmr</code>. We can get around this by wrapping
 those model objects in <code><a href="../reference/predict_methods.html">use_vr_model()</a></code>. Please also create
-an <a href="https://github.com/levisc8/ipmr/issues" class="external-link">Issue here</a>
+an <a href="https://github.com/padrinoDB/ipmr/issues" class="external-link">Issue here</a>
 describing the model class you’re trying to work with so it can be added
 to future versions.</p>
 <p>Say our growth model isn’t recognized by <code>ipmr</code>. We try to
@@ -1156,7 +1156,7 @@ actually take in the <code>par_set_indices</code> slot of
 <code><a href="../reference/kernel-definitions.html">define_kernel()</a></code>. In the example below, the <span class="math inline">\(site\)</span> index subscripts are incorporated
 into the <code>ipmr</code> code using the <code>_site</code> suffix.
 There is a longer vignette dedicated to translating math to R code to
-the <code>ipmr</code> syntax <a href="https://levisc8.github.io/ipmr/articles/index-notation.html">here</a>.</p>
+the <code>ipmr</code> syntax <a href="https://padrinoDB.github.io/ipmr/articles/index-notation.html" class="external-link">here</a>.</p>
 <blockquote>
 <p>NB: because of the way these indices are handled internally, they
 should always appear at the end of the name they modify. For example,
@@ -1234,7 +1234,7 @@ different (and probably involve the use of
 <code>fixef(some_vital_rate_model</code> and
 <code>ranef(some_vital_rate_model)</code>)).</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://padrinoDB.github.io/ipmr/" class="external-link">ipmr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define some fixed parameters</span></span>
 <span></span>
@@ -1464,7 +1464,7 @@ different (and probably involve the use of
 <code>fixef(some_vital_rate_model)</code> and/or
 <code>ranef(some_vital_rate_model)</code>).</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://padrinoDB.github.io/ipmr/" class="external-link">ipmr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define some fixed parameters</span></span>
 <span></span>
@@ -1770,7 +1770,7 @@ deviation (<code>r_d_sd</code>)
 </ol>
 <p>And the the parameter values are given here:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://padrinoDB.github.io/ipmr/" class="external-link">ipmr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define the fixed parameters in a list. The temperature and precipitation</span></span>
 <span><span class="co"># coefficients are defined as s_temp, s_precip, g_temp, and g_precip.</span></span>
@@ -2194,7 +2194,7 @@ intervals.</p>
 <p>First, we construct our vital rate models and IPM from the observed
 data.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://padrinoDB.github.io/ipmr/" class="external-link">ipmr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">iceplant_ex</span><span class="op">)</span></span>
 <span></span>
@@ -2370,7 +2370,7 @@ saving time, we will only do 50.</p>
 <div class="section level3">
 <h3 id="general-ipms">General IPMs<a class="anchor" aria-label="anchor" href="#general-ipms"></a>
 </h3>
-<p>An article on these is available on the <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">website</a>
+<p>An article on these is available on the <a href="https://padrinoDB.github.io/ipmr/articles/general-ipms.html" class="external-link">website</a>
 and from an R session:</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/browseVignettes.html" class="external-link">browseVignettes</a></span><span class="op">(</span><span class="st">"ipmr"</span><span class="op">)</span></span></code></pre></div>

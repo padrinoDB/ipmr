@@ -94,7 +94,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/levisc8/ipmr/" class="external-link">
+  <a href="https://github.com/padrinoDB/ipmr/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -130,17 +130,17 @@
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"levisc8/ipmr"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"padrinoDB/ipmr"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="package-scope">Package scope<a class="anchor" aria-label="anchor" href="#package-scope"></a>
 </h2>
-<p><code>ipmr</code> is intended to assist with IPM implementation and analysis. It is important to note that this package <strong>will not</strong> help with the process of fitting regression models for vital rates at all! That is a sufficiently different (and vast) topic that we decided it was not within the scope of this project. This will only help you turn those regression models into an IPM without shooting yourself in the foot. Furthermore, most of the documentation assumes a basic knowledge of IPM theory and construction. For those that are totally new to IPMs, it is strongly recommended to read a theoretical overview of the models first. Some favorites are <a href="https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658%282000%29081%5B0694%3ASSSAAN%5D2.0.CO%3B2" class="external-link">Easterling et al. 2000</a>, <a href="https://doi.org/10.1111/2041-210X.12146" class="external-link">Merow et al. 2013</a>, and <a href="https://doi.org/10.1111/1365-2656.12178" class="external-link">Rees et al. 2014</a>. The <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">Introduction to ipmr vignette</a> also contains a brief overview of IPM theory as well as a far more detailed introduction to this package. Thus, everything that follows here assumes you have some basic understanding of IPM theory, parameterized vital rate models, and are now ready to begin implementing your IPM.</p>
+<p><code>ipmr</code> is intended to assist with IPM implementation and analysis. It is important to note that this package <strong>will not</strong> help with the process of fitting regression models for vital rates at all! That is a sufficiently different (and vast) topic that we decided it was not within the scope of this project. This will only help you turn those regression models into an IPM without shooting yourself in the foot. Furthermore, most of the documentation assumes a basic knowledge of IPM theory and construction. For those that are totally new to IPMs, it is strongly recommended to read a theoretical overview of the models first. Some favorites are <a href="https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658%282000%29081%5B0694%3ASSSAAN%5D2.0.CO%3B2" class="external-link">Easterling et al. 2000</a>, <a href="https://doi.org/10.1111/2041-210X.12146" class="external-link">Merow et al. 2013</a>, and <a href="https://doi.org/10.1111/1365-2656.12178" class="external-link">Rees et al. 2014</a>. The <a href="https://padrinoDB.github.io/ipmr/articles/ipmr-introduction.html" class="external-link">Introduction to ipmr vignette</a> also contains a brief overview of IPM theory as well as a far more detailed introduction to this package. Thus, everything that follows here assumes you have some basic understanding of IPM theory, parameterized vital rate models, and are now ready to begin implementing your IPM.</p>
 </div>
 <div class="section level2">
 <h2 id="model-classes">Model classes<a class="anchor" aria-label="anchor" href="#model-classes"></a>
 </h2>
-<p>Once all parameters are estimated, the first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function has five arguments: <code>sim_gen</code>, <code>di_dd</code>, <code>det_stoch</code>, <code>kern_param</code>, and <code>uses_age</code>. We will ignore <code>uses_age</code> for now, because age-size models are less common and have their <a href="https://levisc8.github.io/ipmr/articles/age_x_size.html">own vignette</a>.</p>
+<p>Once all parameters are estimated, the first step of defining a model in <code>ipmr</code> is to initialize the model using <code><a href="reference/init_ipm.html">init_ipm()</a></code>. This function has five arguments: <code>sim_gen</code>, <code>di_dd</code>, <code>det_stoch</code>, <code>kern_param</code>, and <code>uses_age</code>. We will ignore <code>uses_age</code> for now, because age-size models are less common and have their <a href="https://padrinoDB.github.io/ipmr/articles/age_x_size.html" class="external-link">own vignette</a>.</p>
 <p>The combination of these arguments defines the type of IPM, and makes sure that the machinery for subsequent analyses works correctly. The possible entries for each argument are as follows:</p>
 <ul>
 <li>
@@ -209,7 +209,7 @@
 <li><p><code>"general_dd_stoch_kern"</code></p></li>
 <li><p><code>"general_dd_stoch_param"</code></p></li>
 </ol>
-<p>Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (<code>simple_di_det</code>, <code>simple_di_stoch_kern</code>, <code>simple_di_stoch_param</code>) are described below as well as <a href="https://levisc8.github.io/ipmr/articles/ipmr-introduction.html">here</a>. The <code>general_*</code> versions of these are described <a href="https://levisc8.github.io/ipmr/articles/general-ipms.html">here</a>. Density dependent versions are completed for simple and general models, and are probably stable, but have not been tested enough to be certain. A very brief (and incomplete) introduction is available <a href="https://levisc8.github.io/ipmr/articles/density-dependence.html">here</a>.</p>
+<p>Simple density-independent deterministic, simple kernel-resampled stochastic, and simple parameter resampled stochastic models (<code>simple_di_det</code>, <code>simple_di_stoch_kern</code>, <code>simple_di_stoch_param</code>) are described below as well as <a href="https://padrinoDB.github.io/ipmr/articles/ipmr-introduction.html" class="external-link">here</a>. The <code>general_*</code> versions of these are described <a href="https://padrinoDB.github.io/ipmr/articles/general-ipms.html" class="external-link">here</a>. Density dependent versions are completed for simple and general models, and are probably stable, but have not been tested enough to be certain. A very brief (and incomplete) introduction is available <a href="https://padrinoDB.github.io/ipmr/articles/density-dependence.html" class="external-link">here</a>.</p>
 <p>Below is an example of how to implement a simple IPM with <code>ipmr</code>.</p>
 </div>
 <div class="section level2">
@@ -276,7 +276,7 @@
 <code class="sourceCode R"><span><span class="co"># Load ipmr and get the parameter values. The data_list argument for define_kernel</span></span>
 <span><span class="co"># should hold every regression parameter and every constant used in the model.</span></span>
 <span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://levisc8.github.io/ipmr/">ipmr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://padrinoDB.github.io/ipmr/" class="external-link">ipmr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">my_data_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>s_int     <span class="op">=</span> <span class="op">-</span><span class="fl">2.2</span>,  <span class="co"># coefficients(my_surv_mod)[1]</span></span>
 <span>                    s_slope   <span class="op">=</span> <span class="fl">0.25</span>,  <span class="co"># coefficients(my_surv_mod)[2]</span></span>
@@ -434,8 +434,8 @@
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li><a href="https://cloud.r-project.org/package=ipmr" class="external-link">View on CRAN</a></li>
-<li><a href="https://github.com/levisc8/ipmr/" class="external-link">Browse source code</a></li>
-<li><a href="https://github.com/levisc8/ipmr/issues" class="external-link">Report a bug</a></li>
+<li><a href="https://github.com/padrinoDB/ipmr/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/padrinoDB/ipmr/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
