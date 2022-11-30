@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ipmr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.6</span>
       </span>
     </div>
 
@@ -79,7 +79,18 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.0.5.9000" id="ipmr-0059000">ipmr 0.0.5.9000<a class="anchor" aria-label="anchor" href="#ipmr-0059000"></a></h2>
+<h2 class="page-header" data-toc-text="0.0.6" id="ipmr-006">ipmr 0.0.6<a class="anchor" aria-label="anchor" href="#ipmr-006"></a></h2>
+<p>This is a maintenance to release to ensure compatibility with the upcoming release of <code>purrr</code>. There aren’t any major changes. A couple features have been added, and some bugs have been fixed.</p>
+<div class="section level3">
+<h3 id="features-0-0-6">Features<a class="anchor" aria-label="anchor" href="#features-0-0-6"></a></h3>
+<ul><li>Adds an <code><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix()</a></code> method for <code>ipmr_ipm</code> and <code>ipmr_matrix</code>. This strips the <code>ipmr_matrix</code> class away, and returns a matrix/array object. When called on an <code>ipmr_ipm</code>, it returns a list of sub-kernels that are just standard matrix/array objects. Thanks for <a href="https://github.com/Aariq" class="external-link">@Aariq</a> for requesting this (<a href="https://github.com/padrinoDB/ipmr/issues/63" class="external-link">#63</a>).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-0-6">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-6"></a></h3>
+<ul><li><p>The title in <code>conv_plot</code> is now correctly updated when there are multiple parameter sets used to construct an IPM. Previously, the title was always something like <code>lamdba_1</code>, regardless of which level of parameter set was being plotted. Thanks to <a href="https://github.com/SanneE1" class="external-link">@SanneE1</a> for pointing this out (<a href="https://github.com/padrinoDB/ipmr/issues/64" class="external-link">#64</a>).</p></li>
+<li><p>Clarifies some error messages.</p></li>
+<li><p>Removes automatic faceting in <code>plot.*</code>, as that usually failed when too many kernels were present. Instead, just use the <code>nrow</code> and <code>ncol</code> arguments to the function now.</p></li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.5" id="ipmr-005">ipmr 0.0.5<small>2022-04-28</small><a class="anchor" aria-label="anchor" href="#ipmr-005"></a></h2>
