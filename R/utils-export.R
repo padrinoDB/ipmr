@@ -1726,17 +1726,20 @@ conv_plot.ipmr_ipm <- function(ipm, iterations = NULL,
     } else {
       y_nm <- expression(paste("Single Time Step   ", lambda))
     }
-}
+  }
   for(i in seq_len(ncol(all_lams))) {
 
-    if(!"main" %in% names(dots)) dots$main <- nms[i]
+    if(!"main" %in% names(dots)){
+      use_dots <- c(dots, list(main =  nms[i]))
+    } else {
+      use_dots <- dots
+    }
 
     all_args <- c(list(y    = all_lams[ , i],
                        x    = iterations,
                        xlab = "Transition",
                        ylab = y_nm),
-                  dots)
-    # plot(all_lams[ , i], main = nms[i], type = type, dots)
+                  use_dots)
     do.call("plot", all_args)
 
     if(show_stable) {
