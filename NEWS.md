@@ -1,6 +1,18 @@
-# ipmr 0.0.5.9000 
+# ipmr 0.0.6
 
+This is a maintenance to release to ensure compatibility with the upcoming release of `purrr`. There aren't any major changes. A couple features have been added, and some bugs have been fixed. 
 
+## Features
+
+- Adds an `as.matrix()` method for `ipmr_ipm` and `ipmr_matrix`. This strips the `ipmr_matrix` class away, and returns a matrix/array object. When called on an `ipmr_ipm`, it returns a list of sub-kernels that are just standard matrix/array objects. Thanks for @Aariq for requesting this (#63).
+
+## Bug fixes
+
+- The title in `conv_plot` is now correctly updated when there are multiple parameter sets used to construct an IPM. Previously, the title was always something like `lamdba_1`, regardless of which level of parameter set was being plotted. Thanks to @SanneE1 for pointing this out (#64).
+
+- Clarifies some error messages. 
+
+- Removes automatic faceting in `plot.*`, as that usually failed when too many kernels were present. Instead, just use the `nrow` and `ncol` arguments to the function now.
 
 # ipmr 0.0.5
 
