@@ -2692,7 +2692,7 @@ as.matrix.ipmr_matrix <- function(x, ...) {
 
 }
 
-#' @rdname matrix-coercion
+#' @rdname as_matrix
 #' @export
 
 
