@@ -176,13 +176,13 @@ test_that("as.matrix strips ipmr_ipm class effectively", {
 
   mats <- as.matrix(sim_di_det_1)
 
-  expect_s3_class(mats[[1]], "matrix")
+  expect_true(inherits(mats[[1]], "matrix"))
   expect_false(inherits(mats[[1]], "ipmr_matrix"))
   expect_length(mats, 2L)
   expect_type(mats, "list")
 
   mat_p <- as.matrix(sim_di_det_1$sub_kernels$P)
-  expect_s3_class(mat_p, "matrix")
+  expect_true(inherits(mat_p, "matrix"))
   expect_false(inherits(mat_p, "ipmr_matrix"))
 
 })
