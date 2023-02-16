@@ -1,18 +1,35 @@
-citHeader("To cite ipmr in publications use:")
-
-citEntry(
-  entry    = "Article",
-  title    = "ipmr: Flexible Implementation of Integral Projection Models in R",
-  author   = "Levin SC, Childs DZ, Compagnoni A, Evers S, Knight TM, Salguero-Gomez R",
+bibentry(
+  bibtype = "article",
+  title   = "ipmr: Flexible Implementation of Integral Projection Models in R",
+  author  = c(
+      person(given = "Sam",
+           family = "Levin",
+           role = c("aut", "cre"),
+           email = "levisc8@gmail.com"),
+    person(given = "Dylan",
+           family = "Childs",
+           email = "d.childs@sheffield.ac.uk",
+           role = "aut"),
+    person(given = "Aldo",
+           family = "Compagnoni",
+           email = "aldo.compagnoni@idiv.de",
+           role = "aut"),
+    person(given = "Sanne",
+           family = "Evers",
+           email = "sanne.evers@idiv.de",
+           role = "aut"),
+    person(given = "Tiffany",
+           family = "Knight",
+           email = "tiffany.knight@idiv.de",
+           role = "aut"),
+    person(given = "Roberto",
+           family = "Salguero-Gomez",
+           email = "rob.salguero@zoo.ox.ac.uk",
+           role = "aut")
+  ),
   journal  = "Methods in Ecology and Evolution",
   year     = "2021",
-  volume   = "",
-  number   = "",
-  pages    = "",
   url      = "https://doi.org/10.1111/2041-210X.13683",
-  textVersion = paste("Levin, S.C., Childs, D.Z., Compagnoni, A., Evers, S., ",
-  "Knight, T.M., & Salguero-Gomez, R. (2021) ipmr: Flexible Implementation of",
-  " Integral Projection Models in R. Methods in Ecology and Evolution. DOI: ",
-  "https://doi.org/10.1111/2041-210X.13683"
-  )
+  volume   = "12",
+  issue    = "10"
 )
