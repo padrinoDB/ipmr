@@ -1,6 +1,6 @@
-# ipmr 0.0.6.9000
+# ipmr 0.0.7
 
-
+Fixes a test that was failing for `r-devel` on CRAN. There are no other changes.
 
 # ipmr 0.0.6
 
