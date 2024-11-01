@@ -4,6 +4,8 @@ output: pdf_document
 urlcolor: blue
 ---
 
+\pagenumbering{gobble}
+
 ## A more complicated, age and size structured model
 
 Many life cycles cannot be described by a single, continuous state variable. For example, some plants are best modeled using height or diameter at breast height (DBH) as a state variable, and may also form a seed bank. Seeds in the seed bank can't have a value for height or DBH, but may lose their viability as they age. Thus, we require a discrete state to capture the dynamics of the seed bank. Models that include discrete states and/or multiple continuous state variables are _general IPMs_. 
