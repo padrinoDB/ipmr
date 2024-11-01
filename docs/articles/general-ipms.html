@@ -6,20 +6,19 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>General IPMs • ipmr</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/yeti/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/yeti/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="General IPMs">
-<meta property="og:description" content="ipmr">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -42,7 +41,7 @@
 <li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li>
@@ -51,7 +50,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Vignettes
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -83,7 +82,7 @@
 <li>
   <a href="https://github.com/padrinoDB/ipmr/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -94,7 +93,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -102,7 +101,7 @@
       <h1 data-toc-skip>General IPMs</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/padrinoDB/ipmr/blob/HEAD/vignettes/general-ipms.Rmd" class="external-link"><code>vignettes/general-ipms.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/padrinoDB/ipmr/blob/main/vignettes/general-ipms.Rmd" class="external-link"><code>vignettes/general-ipms.Rmd</code></a></small>
       <div class="hidden name"><code>general-ipms.Rmd</code></div>
 
     </div>
@@ -149,7 +148,8 @@ are now two new bits:</p>
 <ol style="list-style-type: decimal">
 <li><p>Each kernel that has an integration requires that
 <code>d_statevariable</code> get appended to the kernel
-<code>formula</code>. This is equivalent to the “dz” in <span class="math inline">\(\int_L^U K(z',z) n(z,t) \mathrm{dz}\)</span>.
+<code>formula</code>. This is equivalent to the “dz” in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mi>L</mi><mi>U</mi></msubsup><mi>K</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mi mathvariant="normal">d</mi><mi mathvariant="normal">z</mi></mrow></mrow><annotation encoding="application/x-tex">\int_L^U K(z',z) n(z,t) \mathrm{dz}</annotation></semantics></math>.
 <code>ipmr</code> automatically generates this variable internally, so
 there is no need to define it in the <code>data_list</code> or
 <code><a href="../reference/define_star.html">define_domains()</a></code>, we can just add it any of the formula(s)
@@ -170,26 +170,25 @@ tree species that is now invasive in North America. Data were collected
 outside of St. Louis, Missouri, and the full model is described in <a href="https://esajournals.onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1002%2Fecy.2681&amp;file=ecy2681-sup-0002-MetadataS1.pdf" class="external-link">Levin
 et al. 2019</a>. The IPM consists of a single discrete stage (seed bank,
 abbreviated <code>b</code>) and a single continuous state (height,
-abbreviated <code>ht</code>/<span class="math inline">\(z,z'\)</span>). The census timing was such
-that all seeds must enter the seed bank. They can either germinate in
-the next year, or they can die (so <code>stay_discrete</code> = 0).
-Thus, the full model takes the following form:</p>
+abbreviated
+<code>ht</code>/<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><mo>,</mo><mi>z</mi><mi>′</mi></mrow><annotation encoding="application/x-tex">z,z'</annotation></semantics></math>).
+The census timing was such that all seeds must enter the seed bank. They
+can either germinate in the next year, or they can die (so
+<code>stay_discrete</code> = 0). Thus, the full model takes the
+following form:</p>
 <ol style="list-style-type: decimal">
-<li><p><span class="math inline">\(n(z', t + 1) = \int_L^U P(z',
-z) n(z,t)d\mathrm{z} + b(t) * leave\_discrete(z')\)</span></p></li>
-<li><p><span class="math inline">\(b(t + 1) = \int_L^Ugo\_discrete(z)
-n(z,t)d\mathrm{z}+ stay\_discrete\)</span></p></li>
-<li><p><span class="math inline">\(P(z',z) = s(z) *
-G(z',z)\)</span></p></li>
-<li><p><span class="math inline">\(go\_discrete(z) = f_s(z) * f_r(z) *
-g_i\)</span></p></li>
-<li><p><span class="math inline">\(leave\_discrete(z') = e_p *
-f_d(z')\)</span></p></li>
-<li><p><span class="math inline">\(stay\_discrete = 0\)</span></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msubsup><mo>∫</mo><mi>L</mi><mi>U</mi></msubsup><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>d</mi><mi mathvariant="normal">z</mi><mo>+</mo><mi>b</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><mi>l</mi><mi>e</mi><mi>a</mi><mi>v</mi><mi>e</mi><mi>_</mi><mi>d</mi><mi>i</mi><mi>s</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">n(z', t + 1) = \int_L^U P(z', z) n(z,t)d\mathrm{z} + b(t) * leave\_discrete(z')</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msubsup><mo>∫</mo><mi>L</mi><mi>U</mi></msubsup><mi>g</mi><mi>o</mi><mi>_</mi><mi>d</mi><mi>i</mi><mi>s</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>d</mi><mi mathvariant="normal">z</mi><mo>+</mo><mi>s</mi><mi>t</mi><mi>a</mi><mi>y</mi><mi>_</mi><mi>d</mi><mi>i</mi><mi>s</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">b(t + 1) = \int_L^Ugo\_discrete(z) n(z,t)d\mathrm{z}+ stay\_discrete</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><mi>G</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">P(z',z) = s(z) * G(z',z)</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mi>o</mi><mi>_</mi><mi>d</mi><mi>i</mi><mi>s</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>f</mi><mi>s</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><msub><mi>f</mi><mi>r</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><msub><mi>g</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">go\_discrete(z) = f_s(z) * f_r(z) * g_i</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>e</mi><mi>a</mi><mi>v</mi><mi>e</mi><mi>_</mi><mi>d</mi><mi>i</mi><mi>s</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>e</mi><mi>p</mi></msub><mo>*</mo><msub><mi>f</mi><mi>d</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">leave\_discrete(z') = e_p * f_d(z')</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>t</mi><mi>a</mi><mi>y</mi><mi>_</mi><mi>d</mi><mi>i</mi><mi>s</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">stay\_discrete = 0</annotation></semantics></math></p></li>
 </ol>
-<p><span class="math inline">\(f_G\)</span> and <span class="math inline">\(f_{r_d}\)</span> denote Normal probability density
-functions. The vital rates functions and example code to fit them
-are:</p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>G</mi></msub><annotation encoding="application/x-tex">f_G</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><msub><mi>r</mi><mi>d</mi></msub></msub><annotation encoding="application/x-tex">f_{r_d}</annotation></semantics></math>
+denote Normal probability density functions. The vital rates functions
+and example code to fit them are:</p>
 <ol style="list-style-type: decimal">
 <li>
 <p>survival (<code>s</code>): A logistic regression with a squared
@@ -197,8 +196,8 @@ term</p>
 <ul>
 <li><p>Example code:
 <code>glm(surv ~ ht_1 + I(ht_1)^2, data = my_surv_data, family = binomial())</code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(Logit(s(z)) =
-\alpha_s + \beta_{s,1} * z + \beta_{s,2} * z^2\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><mi>s</mi></msub><mo>+</mo><msub><mi>β</mi><mrow><mi>s</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>*</mo><mi>z</mi><mo>+</mo><msub><mi>β</mi><mrow><mi>s</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>*</mo><msup><mi>z</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">Logit(s(z)) = \alpha_s + \beta_{s,1} * z + \beta_{s,2} * z^2</annotation></semantics></math></p></li>
 </ul>
 </li>
 <li>
@@ -209,10 +208,8 @@ term</p>
 <li>
 <p>Mathematical form:</p>
 <ul>
-<li><p><span class="math inline">\(\mu_G = \alpha_G + \beta_G *
-z\)</span></p></li>
-<li><p><span class="math inline">\(G(z',z) = f_G(\mu_G,
-\sigma_G)\)</span></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mi>G</mi></msub><mo>=</mo><msub><mi>α</mi><mi>G</mi></msub><mo>+</mo><msub><mi>β</mi><mi>G</mi></msub><mo>*</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">\mu_G = \alpha_G + \beta_G * z</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>f</mi><mi>G</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mi>G</mi></msub><mo>,</mo><msub><mi>σ</mi><mi>G</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">G(z',z) = f_G(\mu_G, \sigma_G)</annotation></semantics></math></p></li>
 </ul>
 </li>
 </ul>
@@ -223,8 +220,8 @@ regression</p>
 <ul>
 <li><p>example code:
 <code>glm(repro ~ ht_1, data = my_repro_data, family = binomial())</code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(Logit(r_r(z)) =
-\alpha_{r_r} + \beta_{r_r} * z\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mi>r</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><msub><mi>r</mi><mi>r</mi></msub></msub><mo>+</mo><msub><mi>β</mi><msub><mi>r</mi><mi>r</mi></msub></msub><mo>*</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">Logit(r_r(z)) = \alpha_{r_r} + \beta_{r_r} * z</annotation></semantics></math></p></li>
 </ul>
 </li>
 <li>
@@ -232,8 +229,8 @@ regression</p>
 <ul>
 <li><p>example code:
 <code>glm(seeds ~ ht_1, data = my_seed_data, family = poisson())</code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(Log(r_s(z)) =
-\alpha_{r_s} + \beta_{r_s} * z\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mi>s</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><msub><mi>r</mi><mi>s</mi></msub></msub><mo>+</mo><msub><mi>β</mi><msub><mi>r</mi><mi>s</mi></msub></msub><mo>*</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">Log(r_s(z)) = \alpha_{r_s} + \beta_{r_s} * z</annotation></semantics></math></p></li>
 </ul>
 </li>
 <li>
@@ -244,8 +241,8 @@ distribution with mean <code>r_d_mu</code> and standard deviation
 <li><p>example code:
 <code>r_d_mu &lt;- mean(my_recr_data$ht_2, na.rm = TRUE)</code> and
 <code>r_d_sd &lt;- sd(my_rer_data$ht_2, na.rm = TRUE)</code>.</p></li>
-<li><p>Mathematical form: <span class="math inline">\(r_d(z') =
-f_{r_d}(\mu_{r_d}, \sigma_{r_d})\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>d</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>f</mi><msub><mi>r</mi><mi>d</mi></msub></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><msub><mi>r</mi><mi>d</mi></msub></msub><mo>,</mo><msub><mi>σ</mi><msub><mi>r</mi><mi>d</mi></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">r_d(z') = f_{r_d}(\mu_{r_d}, \sigma_{r_d})</annotation></semantics></math></p></li>
 </ul>
 </li>
 <li>
@@ -258,8 +255,8 @@ don’t know the fate of for whatever reason are <code>NA</code>s.</p>
 <li><p>example code:
 <code>g_i &lt;- mean(my_germ_data, na.rm = TRUE)</code> and
 <code>e_p &lt;- mean(my_est_data, na.rm = TRUE)</code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(g_i = 0.5067, e_p
-= 0.15\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mn>0.5067</mn><mo>,</mo><msub><mi>e</mi><mi>p</mi></msub><mo>=</mo><mn>0.15</mn></mrow><annotation encoding="application/x-tex">g_i = 0.5067, e_p = 0.15</annotation></semantics></math></p></li>
 </ul>
 </li>
 </ol>
@@ -292,8 +289,9 @@ parameters in a list.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Next, we set up two functions to pass into the model. These perform
 the inverse logit transformations for the probability of flowering model
-(<code>r_r</code>/<span class="math inline">\(r_r(z)\)</span>) and
-survival model (<code>s</code>/<span class="math inline">\(s(z)\)</span>).</p>
+(<code>r_r</code>/<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>r</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">r_r(z)</annotation></semantics></math>)
+and survival model
+(<code>s</code>/<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">s(z)</annotation></semantics></math>).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># We'll set up some helper functions. The survival function</span></span>
 <span><span class="co"># in this model is a quadratic function, so we use an additional inverse logit function</span></span>
@@ -505,14 +503,26 @@ are not yet implemented.</p>
 <h3 id="further-analysis">Further analysis<a class="anchor" aria-label="anchor" href="#further-analysis"></a>
 </h3>
 <p>Say we wanted to calculate the mean and variance of life span
-conditional on initial state <span class="math inline">\(z_0\)</span>.
-This requires us to generate the IPM’s fundamental operator, <span class="math inline">\(N\)</span>, which is computed as follows: <span class="math inline">\(N = (I - P)^{-1}\)</span>. The following chunk is
-a function to compute average lifespan as a function of initial size.
-Note that we omit the fecundity from these calculations entirely, as our
-model does not assume that reproduction imposes a cost on survival.</p>
-<p>The formula for mean lifespan is given as <span class="math inline">\(\bar{\eta}(z_0) = eN\)</span> (where <span class="math inline">\(e\)</span> is a constant function such that <span class="math inline">\(e(z)\equiv1\)</span>), and the formula for its
-variance is <span class="math inline">\(\sigma^2_\eta(z_0) = e(2N^2-N) -
-(eN)^2\)</span>. Since the <span class="math inline">\(e\)</span>
+conditional on initial state
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>z</mi><mn>0</mn></msub><annotation encoding="application/x-tex">z_0</annotation></semantics></math>.
+This requires us to generate the IPM’s fundamental operator,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>,
+which is computed as follows:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>P</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">N = (I - P)^{-1}</annotation></semantics></math>.
+The following chunk is a function to compute average lifespan as a
+function of initial size. Note that we omit the fecundity from these
+calculations entirely, as our model does not assume that reproduction
+imposes a cost on survival.</p>
+<p>The formula for mean lifespan is given as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>η</mi><mo accent="true">‾</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>z</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>e</mi><mi>N</mi></mrow><annotation encoding="application/x-tex">\bar{\eta}(z_0) = eN</annotation></semantics></math>
+(where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>
+is a constant function such that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>≡</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">e(z)\equiv1</annotation></semantics></math>),
+and the formula for its variance is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>σ</mi><mi>η</mi><mn>2</mn></msubsup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>z</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>e</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><msup><mi>N</mi><mn>2</mn></msup><mo>−</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>e</mi><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\sigma^2_\eta(z_0) = e(2N^2-N) - (eN)^2</annotation></semantics></math>.
+Since the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>
 function has the effect of summing columns, we’ll replace that with the
 <em>R</em> function <code>colSums</code>. Our second function,
 <code>sigma_eta</code>, will make use of <code>%^%</code> from
@@ -582,8 +592,13 @@ example, working with conditional modes for a random intercept
 corresponding to year or site.</p>
 <p><code>ipmr</code> refers to these as <em>parameter sets</em>, and
 abbreviates them <code>par_sets</code>. For example, a random intercept
-for year may be denoted <span class="math inline">\(\alpha_{yr}\)</span>, where <span class="math inline">\(_{yr}\)</span> provides an index for the different
-values that <span class="math inline">\(\alpha\)</span> can take on.</p>
+for year may be denoted
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><annotation encoding="application/x-tex">\alpha_{yr}</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi></mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><annotation encoding="application/x-tex">_{yr}</annotation></semantics></math>
+provides an index for the different values that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+can take on.</p>
 <p>If you’ve already read the Intro to <code>ipmr</code> article and the
 example above, then there aren’t any new concepts to introduce here.
 Below is an example showing how all of these come together.</p>
@@ -592,21 +607,16 @@ Below is an example showing how all of these come together.</p>
 </h3>
 <p>We’ll use a variation of the model above, simulating some random
 year-specific intercepts for growth and seed production. Parameters,
-functions, and kernels that are now time varying have a subscript <span class="math inline">\(x_{yr}\)</span> appended to them.</p>
+functions, and kernels that are now time varying have a subscript
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><annotation encoding="application/x-tex">x_{yr}</annotation></semantics></math>
+appended to them.</p>
 <ol style="list-style-type: decimal">
-<li><p><span class="math inline">\(n(z', t + 1) = \int_L^U
-P_{yr}(z', z) n(z,t)d\mathrm{z} + b(t) *
-leave\_discrete(z')\)</span></p></li>
-<li><p><span class="math inline">\(b(t + 1) =
-\int_L^Ugo\_discrete_{yr}(z) n(z,t)d\mathrm{z}+
-stay\_discrete\)</span></p></li>
-<li><p><span class="math inline">\(P_{yr}(z',z) = s(z) *
-G_{yr}(z',z)\)</span></p></li>
-<li><p><span class="math inline">\(go\_discrete_{yr}(z) = r_{s,yr}(z) *
-r_r(z) * g_i\)</span></p></li>
-<li><p><span class="math inline">\(leave\_discrete(z') = e_p *
-r_d(z')\)</span></p></li>
-<li><p><span class="math inline">\(stay\_discrete = 0\)</span></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msubsup><mo>∫</mo><mi>L</mi><mi>U</mi></msubsup><msub><mi>P</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>d</mi><mi mathvariant="normal">z</mi><mo>+</mo><mi>b</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><mi>l</mi><mi>e</mi><mi>a</mi><mi>v</mi><mi>e</mi><mi>_</mi><mi>d</mi><mi>i</mi><mi>s</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">n(z', t + 1) = \int_L^U P_{yr}(z', z) n(z,t)d\mathrm{z} + b(t) * leave\_discrete(z')</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msubsup><mo>∫</mo><mi>L</mi><mi>U</mi></msubsup><mi>g</mi><mi>o</mi><mi>_</mi><mi>d</mi><mi>i</mi><mi>s</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><msub><mi>e</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>d</mi><mi mathvariant="normal">z</mi><mo>+</mo><mi>s</mi><mi>t</mi><mi>a</mi><mi>y</mi><mi>_</mi><mi>d</mi><mi>i</mi><mi>s</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">b(t + 1) = \int_L^Ugo\_discrete_{yr}(z) n(z,t)d\mathrm{z}+ stay\_discrete</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><msub><mi>G</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">P_{yr}(z',z) = s(z) * G_{yr}(z',z)</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mi>o</mi><mi>_</mi><mi>d</mi><mi>i</mi><mi>s</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><msub><mi>e</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>r</mi><mrow><mi>s</mi><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><msub><mi>r</mi><mi>r</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><msub><mi>g</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">go\_discrete_{yr}(z) = r_{s,yr}(z) * r_r(z) * g_i</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>e</mi><mi>a</mi><mi>v</mi><mi>e</mi><mi>_</mi><mi>d</mi><mi>i</mi><mi>s</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>e</mi><mi>p</mi></msub><mo>*</mo><msub><mi>r</mi><mi>d</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">leave\_discrete(z') = e_p * r_d(z')</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>t</mi><mi>a</mi><mi>y</mi><mi>_</mi><mi>d</mi><mi>i</mi><mi>s</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">stay\_discrete = 0</annotation></semantics></math></p></li>
 </ol>
 <p>The vital rate models are as follows:</p>
 <ol style="list-style-type: decimal">
@@ -615,23 +625,22 @@ r_d(z')\)</span></p></li>
 <ul>
 <li><p>Example code:
 <code>glm(surv ~ ht_1, data = my_surv_data, family = binomial())</code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(Logit(s(z)) =
-\alpha_s + \beta_{s,1} * z + \beta_{s,2} * z^2\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><mi>s</mi></msub><mo>+</mo><msub><mi>β</mi><mrow><mi>s</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>*</mo><mi>z</mi><mo>+</mo><msub><mi>β</mi><mrow><mi>s</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>*</mo><msup><mi>z</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">Logit(s(z)) = \alpha_s + \beta_{s,1} * z + \beta_{s,2} * z^2</annotation></semantics></math></p></li>
 </ul>
 </li>
 <li>
-<p>growth (<code>g</code>): A linear mixed effects regression. <span class="math inline">\(f_G\)</span> denotes a normal probability density
-function.</p>
+<p>growth (<code>g</code>): A linear mixed effects regression.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>G</mi></msub><annotation encoding="application/x-tex">f_G</annotation></semantics></math>
+denotes a normal probability density function.</p>
 <ul>
 <li><p>example code:
 <code>lmer(ht_2 ~ ht_1 + (1 | year), data = grow_data)</code></p></li>
 <li>
 <p>Mathematical form:</p>
 <ul>
-<li><p><span class="math inline">\(\mu_{G,yr} = \alpha_G + \alpha_{G,yr}
-+ \beta_G * z\)</span></p></li>
-<li><p><span class="math inline">\(G_{yr}(z',z) = f_G(z',
-\mu_{G,yr}, \sigma_G)\)</span></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mi>G</mi><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mo>=</mo><msub><mi>α</mi><mi>G</mi></msub><mo>+</mo><msub><mi>α</mi><mrow><mi>G</mi><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mo>+</mo><msub><mi>β</mi><mi>G</mi></msub><mo>*</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">\mu_{G,yr} = \alpha_G + \alpha_{G,yr} + \beta_G * z</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>G</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>f</mi><mi>G</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><msub><mi>μ</mi><mrow><mi>G</mi><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mo>,</mo><msub><mi>σ</mi><mi>G</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">G_{yr}(z',z) = f_G(z', \mu_{G,yr}, \sigma_G)</annotation></semantics></math></p></li>
 </ul>
 </li>
 </ul>
@@ -642,8 +651,8 @@ regression</p>
 <ul>
 <li><p>example code:
 <code>glm(repro ~ ht_1, data = my_repro_data, family = binomial())</code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(Logit(r_r(z)) =
-\alpha_{r_r} + \beta_{r_r} * z\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mi>r</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><msub><mi>r</mi><mi>r</mi></msub></msub><mo>+</mo><msub><mi>β</mi><msub><mi>r</mi><mi>r</mi></msub></msub><mo>*</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">Logit(r_r(z)) = \alpha_{r_r} + \beta_{r_r} * z</annotation></semantics></math></p></li>
 </ul>
 </li>
 <li>
@@ -652,20 +661,22 @@ regression</p>
 <ul>
 <li><p>example code:
 <code>glmer(seeds ~ ht_1 + (1 | year), data = my_seed_data, family = poisson())</code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(Log(r_{s,yr}(z)) =
-\alpha_{r_s} + \alpha_{r_s, yr} + \beta_{r_s} * z\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mrow><mi>s</mi><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><msub><mi>r</mi><mi>s</mi></msub></msub><mo>+</mo><msub><mi>α</mi><mrow><msub><mi>r</mi><mi>s</mi></msub><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mo>+</mo><msub><mi>β</mi><msub><mi>r</mi><mi>s</mi></msub></msub><mo>*</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">Log(r_{s,yr}(z)) = \alpha_{r_s} + \alpha_{r_s, yr} + \beta_{r_s} * z</annotation></semantics></math></p></li>
 </ul>
 </li>
 <li>
 <p>Recruit size distribution (<code>r_d</code>): A normal
-distribution (<span class="math inline">\(f_{r_d}\)</span>) with mean
-<code>r_d_mu</code> and standard deviation <code>r_d_sd</code>.</p>
+distribution
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><msub><mi>r</mi><mi>d</mi></msub></msub><annotation encoding="application/x-tex">f_{r_d}</annotation></semantics></math>)
+with mean <code>r_d_mu</code> and standard deviation
+<code>r_d_sd</code>.</p>
 <ul>
 <li><p>example code:
 <code>r_d_mu &lt;- mean(my_recr_data$ht_2, na.rm = TRUE)</code> and
 <code>r_d_sd &lt;- sd(my_recr_data$ht_2, na.rm = TRUE)</code>.</p></li>
-<li><p>Mathematical form: <span class="math inline">\(r_d(z') =
-f_{r_d}(z', \mu_{r_d}, \sigma_{r_d})\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>d</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>f</mi><msub><mi>r</mi><mi>d</mi></msub></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><msub><mi>μ</mi><msub><mi>r</mi><mi>d</mi></msub></msub><mo>,</mo><msub><mi>σ</mi><msub><mi>r</mi><mi>d</mi></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">r_d(z') = f_{r_d}(z', \mu_{r_d}, \sigma_{r_d})</annotation></semantics></math></p></li>
 </ul>
 </li>
 <li>
@@ -678,8 +689,8 @@ we don’t know the fate of for whatever reason are <code>NA</code>s.</p>
 <li><p>example code:
 <code>g_i &lt;- mean(my_germ_data, na.rm = TRUE)</code> and
 <code>e_p &lt;- mean(my_est_data, na.rm = TRUE)</code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(g_i = 0.5067, e_p
-= 0.15\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mn>0.5067</mn><mo>,</mo><msub><mi>e</mi><mi>p</mi></msub><mo>=</mo><mn>0.15</mn></mrow><annotation encoding="application/x-tex">g_i = 0.5067, e_p = 0.15</annotation></semantics></math></p></li>
 </ul>
 </li>
 </ol>
@@ -910,7 +921,8 @@ outputs later.</p></li>
 per-capita growth rates for the simulation.</p></li>
 </ol>
 <p>Additionally, there are functions to compute the stochastic
-population growth rate (<span class="math inline">\(\lambda_s\)</span>,
+population growth rate
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\lambda_s</annotation></semantics></math>,
 computed as <code>mean(log(pop_state$lambda))</code>, burn in can be
 controlled with the <code>burn_in</code> parameter), and the mean
 sub-kernels.</p>
@@ -934,85 +946,85 @@ iteration of the model.</p>
 <p>This example includes survival and growth models that make use of
 environmental covariates. The model can be written as:</p>
 <ol style="list-style-type: decimal">
-<li><p><span class="math inline">\(n(z', t+1) = \int_L^U K(z',z,
-\theta)n(z,t)dz + B(t) * r_s * r_d * f_{c_d}(z')\)</span></p></li>
-<li><p><span class="math inline">\(B(t + 1) = r_e * r_s * \int_L^U
-c_r(z) * c_s(z)n(z,t)dz + B(t) * r_s * r_r\)</span></p></li>
-<li><p><span class="math inline">\(K(z',z,\theta) =
-P(z',z,\theta) + F(z',z)\)</span></p></li>
-<li><p><span class="math inline">\(P(z',z,\theta) = s(z, \theta) *
-G(z',z,\theta)\)</span></p></li>
-<li><p><span class="math inline">\(F(z',z) = c_r(z) * c_s(z) *
-c_d(z') * (1 - r_e)\)</span></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msubsup><mo>∫</mo><mi>L</mi><mi>U</mi></msubsup><mi>K</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>d</mi><mi>z</mi><mo>+</mo><mi>B</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><msub><mi>r</mi><mi>s</mi></msub><mo>*</mo><msub><mi>r</mi><mi>d</mi></msub><mo>*</mo><msub><mi>f</mi><msub><mi>c</mi><mi>d</mi></msub></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">n(z', t+1) = \int_L^U K(z',z, \theta)n(z,t)dz + B(t) * r_s * r_d * f_{c_d}(z')</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>r</mi><mi>e</mi></msub><mo>*</mo><msub><mi>r</mi><mi>s</mi></msub><mo>*</mo><msubsup><mo>∫</mo><mi>L</mi><mi>U</mi></msubsup><msub><mi>c</mi><mi>r</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><msub><mi>c</mi><mi>s</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>d</mi><mi>z</mi><mo>+</mo><mi>B</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><msub><mi>r</mi><mi>s</mi></msub><mo>*</mo><msub><mi>r</mi><mi>r</mi></msub></mrow><annotation encoding="application/x-tex">B(t + 1) = r_e * r_s * \int_L^U c_r(z) * c_s(z)n(z,t)dz + B(t) * r_s * r_r</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">K(z',z,\theta) = P(z',z,\theta) + F(z',z)</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><mi>G</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">P(z',z,\theta) = s(z, \theta) * G(z',z,\theta)</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>c</mi><mi>r</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><msub><mi>c</mi><mi>s</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><msub><mi>c</mi><mi>d</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><msub><mi>r</mi><mi>e</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">F(z',z) = c_r(z) * c_s(z) * c_d(z') * (1 - r_e)</annotation></semantics></math></p></li>
 </ol>
-<p><span class="math inline">\(\theta\)</span> is a vector of
-time-varying environmental parameters. For this example, we’ll use a
-Gaussian distribution for temperature and a Gamma distribution for
-precipitation:</p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
+is a vector of time-varying environmental parameters. For this example,
+we’ll use a Gaussian distribution for temperature and a Gamma
+distribution for precipitation:</p>
 <ol start="6" style="list-style-type: decimal">
-<li><p><span class="math inline">\(\theta_t \sim Norm(\mu = 8.9, \sigma
-= 1.2)\)</span></p></li>
-<li><p><span class="math inline">\(\theta_p \sim Gamma(k = 1000, \beta =
-2)\)</span></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mi>t</mi></msub><mo>∼</mo><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>μ</mi><mo>=</mo><mn>8.9</mn><mo>,</mo><mi>σ</mi><mo>=</mo><mn>1.2</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\theta_t \sim Norm(\mu = 8.9, \sigma = 1.2)</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mi>p</mi></msub><mo>∼</mo><mi>G</mi><mi>a</mi><mi>m</mi><mi>m</mi><mi>a</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>=</mo><mn>1000</mn><mo>,</mo><mi>β</mi><mo>=</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\theta_p \sim Gamma(k =  1000, \beta = 2)</annotation></semantics></math></p></li>
 </ol>
 <p>Next, we’ll write out the actual vital rate functions in the
 model:</p>
 <ol start="8" style="list-style-type: decimal">
 <li>
-<p>survival (<code>s</code>/<span class="math inline">\(s(z,\theta)\)</span>): a logistic regression.</p>
+<p>survival
+(<code>s</code>/<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">s(z,\theta)</annotation></semantics></math>):
+a logistic regression.</p>
 <ul>
 <li><p>Example model formula:
 <code>glm(survival ~ size_1 + temp + precip, data = my_surv_data, family = binomial())</code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(Logit(s(z,\theta))
-= \alpha_s + \beta_s^z * z + \beta_s^t * temp + \beta_s^p *
-precip\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><mi>s</mi></msub><mo>+</mo><msubsup><mi>β</mi><mi>s</mi><mi>z</mi></msubsup><mo>*</mo><mi>z</mi><mo>+</mo><msubsup><mi>β</mi><mi>s</mi><mi>t</mi></msubsup><mo>*</mo><mi>t</mi><mi>e</mi><mi>m</mi><mi>p</mi><mo>+</mo><msubsup><mi>β</mi><mi>s</mi><mi>p</mi></msubsup><mo>*</mo><mi>p</mi><mi>r</mi><mi>e</mi><mi>c</mi><mi>i</mi><mi>p</mi></mrow><annotation encoding="application/x-tex">Logit(s(z,\theta)) = \alpha_s + \beta_s^z * z + \beta_s^t * temp + \beta_s^p * precip</annotation></semantics></math></p></li>
 </ul>
 </li>
 <li>
-<p>growth (<code>g</code>, <span class="math inline">\(G(z',z,\theta)\)</span>): a linear regression
-with a Normal error distribution (denoted <span class="math inline">\(f_G\)</span>)</p>
+<p>growth (<code>g</code>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">G(z',z,\theta)</annotation></semantics></math>):
+a linear regression with a Normal error distribution (denoted
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>G</mi></msub><annotation encoding="application/x-tex">f_G</annotation></semantics></math>)</p>
 <ul>
 <li><p>Example model formula:
 <code>glm(size_2 ~ size_1 + temp + precip, data = my_grow_data)</code></p></li>
 <li>
 <p>Mathematical form:</p>
 <ul>
-<li><p><span class="math inline">\(G(z',z) = f_G(z',
-\mu_G(z,\theta), \sigma_G)\)</span></p></li>
-<li><p><span class="math inline">\(\mu_G(z, \theta) = \alpha_G +
-\beta_G^z * z + \beta_G^t * temp + \beta_G^p * precip\)</span></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>f</mi><mi>G</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><msub><mi>μ</mi><mi>G</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mi>σ</mi><mi>G</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">G(z',z) = f_G(z', \mu_G(z,\theta), \sigma_G)</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mi>G</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><mi>G</mi></msub><mo>+</mo><msubsup><mi>β</mi><mi>G</mi><mi>z</mi></msubsup><mo>*</mo><mi>z</mi><mo>+</mo><msubsup><mi>β</mi><mi>G</mi><mi>t</mi></msubsup><mo>*</mo><mi>t</mi><mi>e</mi><mi>m</mi><mi>p</mi><mo>+</mo><msubsup><mi>β</mi><mi>G</mi><mi>p</mi></msubsup><mo>*</mo><mi>p</mi><mi>r</mi><mi>e</mi><mi>c</mi><mi>i</mi><mi>p</mi></mrow><annotation encoding="application/x-tex">\mu_G(z, \theta) = \alpha_G + \beta_G^z * z + \beta_G^t * temp + \beta_G^p * precip</annotation></semantics></math></p></li>
 </ul>
 </li>
 </ul>
 </li>
 <li>
-<p>flower probability (<code>c_r</code>/<span class="math inline">\(c_r(z)\)</span>): A logistic regression.</p>
+<p>flower probability
+(<code>c_r</code>/<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mi>r</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">c_r(z)</annotation></semantics></math>):
+A logistic regression.</p>
 <ul>
 <li><p>Example model formula:
 <code>glm(repro ~ size_1, data = my_repro_data, family = binomial())</code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(Logit(c_r(z)) =
-\alpha_{c} + \beta_{c_r} * z\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>c</mi><mi>r</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><mi>c</mi></msub><mo>+</mo><msub><mi>β</mi><msub><mi>c</mi><mi>r</mi></msub></msub><mo>*</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">Logit(c_r(z)) = \alpha_{c} + \beta_{c_r} * z</annotation></semantics></math></p></li>
 </ul>
 </li>
 <li>
-<p>seed production (<code>c_s</code>/<span class="math inline">\(c_s(z)\)</span>: a logistic regression.</p>
+<p>seed production
+(<code>c_s</code>/<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mi>s</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">c_s(z)</annotation></semantics></math>:
+a logistic regression.</p>
 <ul>
 <li><p>Example model formula:
 <code>glm(flower_n ~ size_1, data = my_flower_data, family = poisson())</code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(Log(c_s(z)) =
-\alpha_{c_s} + \beta_{c_s} * z\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>c</mi><mi>s</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><msub><mi>c</mi><mi>s</mi></msub></msub><mo>+</mo><msub><mi>β</mi><msub><mi>c</mi><mi>s</mi></msub></msub><mo>*</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">Log(c_s(z)) = \alpha_{c_s} + \beta_{c_s} * z</annotation></semantics></math></p></li>
 </ul>
 </li>
 <li>
-<p>recruit sizes (<code>c_d</code>/<span class="math inline">\(c_d(z')\)</span>): A Normal distribution
-(denoted <span class="math inline">\(f_{c_d}\)</span>)</p>
+<p>recruit sizes
+(<code>c_d</code>/<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mi>d</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">c_d(z')</annotation></semantics></math>):
+A Normal distribution (denoted
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><msub><mi>c</mi><mi>d</mi></msub></msub><annotation encoding="application/x-tex">f_{c_d}</annotation></semantics></math>)</p>
 <ul>
 <li><p>Example code: mean (<code>c_d_mu</code>)
 <code>mean(my_recruit_data$size_2, na.rm = TRUE)</code> and standard
 deviation (<code>c_d_sd</code>)
 <code>sd(my_recruit_data$size_2, na.rm = TRUE)</code></p></li>
-<li><p>Mathematical form: <span class="math inline">\(c_d(z') =
-f_{c_d}(z', \mu_{f_d}, \sigma_{f_d})\)</span></p></li>
+<li><p>Mathematical form:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mi>d</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>f</mi><msub><mi>c</mi><mi>d</mi></msub></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><msub><mi>μ</mi><msub><mi>f</mi><mi>d</mi></msub></msub><mo>,</mo><msub><mi>σ</mi><msub><mi>f</mi><mi>d</mi></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">c_d(z') = f_{c_d}(z', \mu_{f_d}, \sigma_{f_d})</annotation></semantics></math></p></li>
 </ul>
 </li>
 <li><p>Constants: Discrete stage survival (<code>r_s</code>), discrete
@@ -1276,8 +1288,9 @@ the <code>data_list</code> of <code><a href="../reference/define_star.html">defi
 <p>Stochastic parameter-resampled models also return an
 <code>env_seq</code>, but this time it will be a <code>data.frame</code>
 of parameter draws rather than a character vector. We can also compute
-mean sub-kernels and <span class="math inline">\(\lambda_s\)</span> as
-we did in the kernel-resampled models. This time, each mean kernel is
+mean sub-kernels and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\lambda_s</annotation></semantics></math>
+as we did in the kernel-resampled models. This time, each mean kernel is
 computed as the average of each sub-kernel over the course of the
 simulation (i.e. mean of all <code>P</code> kernels). Some sub-kernels
 in our example are not time-varying - they will be numerically
@@ -1299,16 +1312,18 @@ equivalent to the sub-kernels stored in the IPM object.</p>
 <p>Longer running stochastic parameter-resampled models can take up a
 lot of space in memory when all of the sub-kernels are saved from each
 iteration. For example, running the model above for 10,000 iterations
-would result in 20,000 <span class="math inline">\(100 \times
-100\)</span> matrices, 20,000 <span class="math inline">\(1 \times
-100\)</span>/<span class="math inline">\(100 \times 1\)</span> matrices,
-and 10,000 <span class="math inline">\(1 \times 1\)</span> matrices in
-the <code>sub_kernels</code> slot of the IPM object (~16.4 GB of RAM).
-This will likely result in crashes as smaller machines run out of
-available RAM. Therefore, <code><a href="../reference/make_ipm.html">make_ipm()</a></code> contains an argument
-<code>return_sub_kernels</code> for these types of models that allows
-you to switch off that behavior and conserve available RAM. By default,
-this is set to <code>FALSE</code>. If you need sub-kernels for
+would result in 20,000
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>100</mn><mo>×</mo><mn>100</mn></mrow><annotation encoding="application/x-tex">100 \times 100</annotation></semantics></math>
+matrices, 20,000
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>×</mo><mn>100</mn></mrow><annotation encoding="application/x-tex">1 \times 100</annotation></semantics></math>/<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>100</mn><mo>×</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">100 \times 1</annotation></semantics></math>
+matrices, and 10,000
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>×</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">1 \times 1</annotation></semantics></math>
+matrices in the <code>sub_kernels</code> slot of the IPM object (~16.4
+GB of RAM). This will likely result in crashes as smaller machines run
+out of available RAM. Therefore, <code><a href="../reference/make_ipm.html">make_ipm()</a></code> contains an
+argument <code>return_sub_kernels</code> for these types of models that
+allows you to switch off that behavior and conserve available RAM. By
+default, this is set to <code>FALSE</code>. If you need sub-kernels for
 downstream analyses, set this option to <code>TRUE</code> and make sure
 you have a computer with sufficient RAM (64-128 GB range is likely
 required to store all information for longer running models).</p>
@@ -1604,7 +1619,8 @@ like so:</p>
 <span>                                 mega_mat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">stay_discrete</span>, <span class="va">go_discrete_year</span>,</span>
 <span>                                              <span class="va">leave_discrete</span>, <span class="va">P_year</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/make_iter_kernel.html">make_iter_kernel()</a></code> also works for simple models, but
-assumes that all sub-kernels are combined additively (i.e. <span class="math inline">\(K(z',z) = P(z',z) + F('z,z)\)</span>).
+assumes that all sub-kernels are combined additively
+(i.e. <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>′</mi><mi>z</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">K(z',z) = P(z',z) + F('z,z)</annotation></semantics></math>).
 It can handle parameter set index syntax as well, but does not require
 the <code>mega_mat</code> argument, and can just be called with an IPM
 object.</p>
@@ -1613,9 +1629,7 @@ object.</p>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
@@ -1628,16 +1642,16 @@ object.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>

@@ -6,20 +6,19 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Density Dependent IPMs • ipmr</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/yeti/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/yeti/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Density Dependent IPMs">
-<meta property="og:description" content="ipmr">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -42,7 +41,7 @@
 <li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li>
@@ -51,7 +50,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Vignettes
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -83,7 +82,7 @@
 <li>
   <a href="https://github.com/padrinoDB/ipmr/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -94,7 +93,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -102,7 +101,7 @@
       <h1 data-toc-skip>Density Dependent IPMs</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/padrinoDB/ipmr/blob/HEAD/vignettes/density-dependence.Rmd" class="external-link"><code>vignettes/density-dependence.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/padrinoDB/ipmr/blob/main/vignettes/density-dependence.Rmd" class="external-link"><code>vignettes/density-dependence.Rmd</code></a></small>
       <div class="hidden name"><code>density-dependence.Rmd</code></div>
 
     </div>
@@ -121,59 +120,60 @@ dependence<a class="anchor" aria-label="anchor" href="#example-of-a-simple-stoch
 <p>This example assumes that density dependence is modeled as a fixed
 effect in survival and recruit production models, and assumes there is
 no density dependence in growth or probability of reproducing models.
-The survival (<span class="math inline">\(s(z,
-N)\)</span>/<code>s_yr</code>), growth (<span class="math inline">\(G_{yr}(z',z)\)</span>/ <code>g_yr</code>), and
-number of recruit models (<span class="math inline">\(r_{s,yr}(z,
-N)\)</span>/<code>r_s_yr</code>) have year-specific intercepts as
-well.</p>
+The survival
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">s(z, N)</annotation></semantics></math>/<code>s_yr</code>),
+growth
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>G</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">G_{yr}(z',z)</annotation></semantics></math>/
+<code>g_yr</code>), and number of recruit models
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mrow><mi>s</mi><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">r_{s,yr}(z, N)</annotation></semantics></math>/<code>r_s_yr</code>)
+have year-specific intercepts as well.</p>
 <p>The mathematical form for the IPM is below:</p>
 <ol style="list-style-type: decimal">
-<li><p><span class="math inline">\(n(z', t+1) = K_{yr}(z', z,
-N)n(z, t)dz\)</span></p></li>
-<li><p><span class="math inline">\(N =
-\int_L^Un(z,t)dz\)</span></p></li>
-<li><p><span class="math inline">\(K_{yr}(z', z, N) = P_{yr}(z',
-z, N) + F_{yr}(z', z, N)\)</span></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>K</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>d</mi><mi>z</mi></mrow><annotation encoding="application/x-tex">n(z', t+1) = K_{yr}(z', z, N)n(z, t)dz</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>=</mo><msubsup><mo>∫</mo><mi>L</mi><mi>U</mi></msubsup><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>d</mi><mi>z</mi></mrow><annotation encoding="application/x-tex">N = \int_L^Un(z,t)dz</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>K</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>P</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msub><mi>F</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">K_{yr}(z', z, N) = P_{yr}(z', z, N) + F_{yr}(z', z, N)</annotation></semantics></math></p></li>
 </ol>
-<p>Here, <span class="math inline">\(N\)</span> represents the total
-population size. The kernel values fluctuate as a function of <span class="math inline">\(N\)</span> at each iteration of the model.</p>
-<p>The <span class="math inline">\(P_{yr}(z', z, N)\)</span> kernel
-is comprised of a density independent function for growth (Eq 6-7) and a
-density dependent function for survival (Eq 5). <span class="math inline">\(f_G\)</span> denotes a Gaussian probability
-density function:</p>
+<p>Here,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
+represents the total population size. The kernel values fluctuate as a
+function of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
+at each iteration of the model.</p>
+<p>The
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">P_{yr}(z', z, N)</annotation></semantics></math>
+kernel is comprised of a density independent function for growth (Eq
+6-7) and a density dependent function for survival (Eq 5).
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>G</mi></msub><annotation encoding="application/x-tex">f_G</annotation></semantics></math>
+denotes a Gaussian probability density function:</p>
 <ol start="4" style="list-style-type: decimal">
-<li><p><span class="math inline">\(P(z', z, N) = s(z, N) * G(z',
-z)\)</span></p></li>
-<li><p><span class="math inline">\(Logit(s(z, N)) = \alpha_s +
-\alpha_{s,yr} + \beta_s^z * z + \beta_s^{N} * N\)</span></p></li>
-<li><p><span class="math inline">\(G(z', z, \theta) = f_G(z',
-\mu_{G,yr}(z), \sigma_G)\)</span></p></li>
-<li><p><span class="math inline">\(\mu_{G,yr}(z) = \alpha_G +
-\alpha_{G,yr} + \beta_G^z * z\)</span></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><mi>G</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">P(z', z, N) = s(z, N) * G(z', z)</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><mi>s</mi></msub><mo>+</mo><msub><mi>α</mi><mrow><mi>s</mi><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mo>+</mo><msubsup><mi>β</mi><mi>s</mi><mi>z</mi></msubsup><mo>*</mo><mi>z</mi><mo>+</mo><msubsup><mi>β</mi><mi>s</mi><mi>N</mi></msubsup><mo>*</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">Logit(s(z, N)) = \alpha_s + \alpha_{s,yr} + \beta_s^z * z + \beta_s^{N} * N</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>f</mi><mi>G</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><msub><mi>μ</mi><mrow><mi>G</mi><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mi>σ</mi><mi>G</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">G(z', z, \theta) = f_G(z', \mu_{G,yr}(z), \sigma_G)</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mi>G</mi><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><mi>G</mi></msub><mo>+</mo><msub><mi>α</mi><mrow><mi>G</mi><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mo>+</mo><msubsup><mi>β</mi><mi>G</mi><mi>z</mi></msubsup><mo>*</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">\mu_{G,yr}(z) = \alpha_G + \alpha_{G,yr} + \beta_G^z * z</annotation></semantics></math></p></li>
 </ol>
-<p>The <span class="math inline">\(F_{yr}(z',z, N)\)</span> kernel
-is comprised of a density independent function for recruit size (Eq 10)
-and probability of reproducing (Eq 9), and a density dependent function
-for number of recruits produced by parents (Eq 11). <span class="math inline">\(f_{r_d}\)</span> denotes a Gaussian probability
-density function:</p>
+<p>The
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>F</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">F_{yr}(z',z, N)</annotation></semantics></math>
+kernel is comprised of a density independent function for recruit size
+(Eq 10) and probability of reproducing (Eq 9), and a density dependent
+function for number of recruits produced by parents (Eq 11).
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><msub><mi>r</mi><mi>d</mi></msub></msub><annotation encoding="application/x-tex">f_{r_d}</annotation></semantics></math>
+denotes a Gaussian probability density function:</p>
 <ol start="8" style="list-style-type: decimal">
-<li><p><span class="math inline">\(F_{yr}(z', z, N) = r_r(z) *
-r_{s,yr}(z, N) + r_d(z')\)</span></p></li>
-<li><p><span class="math inline">\(Logit(r_r(z)) = \alpha_{r_r} +
-\beta_{r_r}^z * z\)</span></p></li>
-<li><p><span class="math inline">\(r_d(z') = f_{r_d}(z',
-\mu_{r_d}, \sigma_{r_d})\)</span></p></li>
-<li><p><span class="math inline">\(Log(r_{s,yr}(z, N)) = \alpha_{r_s} +
-\alpha_{{r_s},yr} + \beta_{r_s}^z * z + \beta_{r_s}^N *
-N\)</span></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>F</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>r</mi><mi>r</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><msub><mi>r</mi><mrow><mi>s</mi><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><msub><mi>r</mi><mi>d</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">F_{yr}(z', z, N) = r_r(z) * r_{s,yr}(z, N) + r_d(z')</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mi>r</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><msub><mi>r</mi><mi>r</mi></msub></msub><mo>+</mo><msubsup><mi>β</mi><msub><mi>r</mi><mi>r</mi></msub><mi>z</mi></msubsup><mo>*</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">Logit(r_r(z)) = \alpha_{r_r} + \beta_{r_r}^z * z</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>d</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>f</mi><msub><mi>r</mi><mi>d</mi></msub></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><msub><mi>μ</mi><msub><mi>r</mi><mi>d</mi></msub></msub><mo>,</mo><msub><mi>σ</mi><msub><mi>r</mi><mi>d</mi></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">r_d(z') = f_{r_d}(z', \mu_{r_d}, \sigma_{r_d})</annotation></semantics></math></p></li>
+<li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>r</mi><mrow><mi>s</mi><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>α</mi><msub><mi>r</mi><mi>s</mi></msub></msub><mo>+</mo><msub><mi>α</mi><mrow><msub><mi>r</mi><mi>s</mi></msub><mo>,</mo><mi>y</mi><mi>r</mi></mrow></msub><mo>+</mo><msubsup><mi>β</mi><msub><mi>r</mi><mi>s</mi></msub><mi>z</mi></msubsup><mo>*</mo><mi>z</mi><mo>+</mo><msubsup><mi>β</mi><msub><mi>r</mi><mi>s</mi></msub><mi>N</mi></msubsup><mo>*</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">Log(r_{s,yr}(z, N)) = \alpha_{r_s} + \alpha_{{r_s},yr} + \beta_{r_s}^z * z + \beta_{r_s}^N * N</annotation></semantics></math></p></li>
 </ol>
 <p>We’ll simulate a 50 year time series using hypothetical parameter
 values. The fixed parameter values are created as with a density
 independent model. The difference is that we now have two more
 parameters: <code>s_dd</code>, and <code>r_s_dd</code>. These are the
-coefficients that correspond to <span class="math inline">\(\beta_s^N\)</span> and <span class="math inline">\(\beta_{r_s}^N\)</span>, respectively. The chunk
-below initializes the data list object, which we name
-<code>params</code>.</p>
+coefficients that correspond to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>β</mi><mi>s</mi><mi>N</mi></msubsup><annotation encoding="application/x-tex">\beta_s^N</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>β</mi><msub><mi>r</mi><mi>s</mi></msub><mi>N</mi></msubsup><annotation encoding="application/x-tex">\beta_{r_s}^N</annotation></semantics></math>,
+respectively. The chunk below initializes the data list object, which we
+name <code>params</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://padrinoDB.github.io/ipmr/" class="external-link">ipmr</a></span><span class="op">)</span></span>
 <span></span>
@@ -246,7 +246,9 @@ to use subsets of the trait distribution.</p>
 <p>Other than the inclusion of the density dependent term in the
 survival expression, this should look quite similar to the
 density-independent kernel-resampled models from the Introduction
-vignette. We are now ready to continue defining the <span class="math inline">\(F_{yr}(z',z,N)\)</span> kernel.</p>
+vignette. We are now ready to continue defining the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>F</mi><mrow><mi>y</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>z</mi><mi>′</mi><mo>,</mo><mi>z</mi><mo>,</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">F_{yr}(z',z,N)</annotation></semantics></math>
+kernel.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dd_ipm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kernel-definitions.html">define_kernel</a></span><span class="op">(</span></span>
 <span>  proto_ipm        <span class="op">=</span> <span class="va">dd_ipm</span>,</span>
@@ -305,9 +307,7 @@ for these models by extracting the column sums of the arrays in
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
@@ -320,16 +320,16 @@ for these models by extracting the column sums of the arrays in
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>
